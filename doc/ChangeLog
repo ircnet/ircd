@@ -1,3 +1,11 @@
+2004-02-22  Piotr Kucharski
+
+	* s_misc.c/exit_server(): moved "Received SQUIT", so the sequence on
+	  &SERVERS is not reversed (patch from jv).
+	* s_misc.c/exit_client(): removed unnecessary "Sending SQUIT" notice.
+	* s_serv.c/m_squit(): removed unnecessary "Received SQUIT", it's now
+	  in exit_server().
+
 2004-02-21  Piotr Kucharski
 
 	* channel.c/m_kick(): "KICK # me,other" caused desync on remote servers:
