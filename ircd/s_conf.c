@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.83 2004/03/04 13:11:36 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.84 2004/03/04 13:18:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -337,11 +337,6 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 			} else if (match(aconf->host, uhost))	/* 1.2.3.* */
 				continue;
 		} /* else empty host name, match any ipaddr */
-		if (*aconf->name == '\0' && hp)
-		    {
-			strncpyzt(uhost, hp->h_name, sizeof(uhost));
-			add_local_domain(uhost, sizeof(uhost) - strlen(uhost));
-		    }
 
 		if (!BadPtr(aconf->passwd) &&
 			!StrEq(cptr->passwd, aconf->passwd))
@@ -373,6 +368,11 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		/* Copy uhost (hostname) over sockhost, if conf flag permits. */
 		if (hp && !IsConfNoResolve(aconf))
 		{
+			/* If aconf->name was not NULL, it did break on
+			** matching hp->h_name; if it was NULL, just take
+			** the first name. */
+			strncpyzt(uhost, hp->h_name, sizeof(uhost));
+			add_local_domain(uhost, sizeof(uhost) - strlen(uhost));
 			get_sockhost(cptr, uhost);
 		}
 		if ((i = attach_conf(cptr, aconf)) < -1)
