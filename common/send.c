@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.39 1999/07/21 22:57:40 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.40 1999/08/15 20:57:56 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -383,7 +383,8 @@ aClient *to;
 
 #ifndef CLIENT_COMPILE
 static	anUser	ausr = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL,
-			 NULL, "anonymous", "anonymous.", "anonymous."};
+			 0, NULL, NULL,
+			 "anonymous", "0", "anonymous.", "anonymous."};
 
 static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 			 &anon, -2, 0, STAT_CLIENT, "anonymous", "anonymous",
@@ -400,7 +401,7 @@ static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 #endif
 
 /*
- *
+ * sendprep: takes care of building the string according to format & args
  */
 #if ! USE_STDARG
 static	int	sendprep(pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
@@ -434,6 +435,10 @@ static	int	vsendprep(char *pattern, va_list va)
 
 #ifndef CLIENT_COMPILE
 #if ! USE_STDARG
+/*
+ * sendpreprep: takes care of building the string according to format & args,
+ *		and of adding a complete prefix if necessary
+ */
 static	int	sendpreprep(to, from, pattern,
 			    p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 aClient	*to, *from;
@@ -1387,6 +1392,7 @@ static	SChan	svchans[SCH_MAX] = {
 	{ SCH_SERVICE,	"&SERVICES",	NULL },
 	{ SCH_DEBUG,	"&DEBUG",	NULL },
 	{ SCH_AUTH,	"&AUTH",	NULL },
+	{ SCH_SAVE,	"&SAVE",	NULL },
 };
 
 
