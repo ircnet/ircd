@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.105 1999/07/21 16:24:23 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.106 1999/07/21 22:57:39 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1469,7 +1469,14 @@ char	*parv[], *mbuf, *pbuf;
 				whatt = 1;
 			    }
 			if (ischop)
+			  {
 				mode->mode |= *ip;
+				if (*ip == MODE_ANONYMOUS && MyPerson(sptr))
+				  {
+				      sendto_channel_butone(NULL, &me, chptr, ":%s NOTICE %s :The anonymous flag is being set on channel %s.", ME, chptr->chname, chptr->chname);
+				      sendto_channel_butone(NULL, &me, chptr, ":%s NOTICE %s :Be aware that anonymity on IRC is NOT securely enforced!", ME, chptr->chname);
+				  }
+			  }
 			*mbuf++ = *(ip+1);
 		    }
 
@@ -2238,6 +2245,11 @@ char	*parv[];
 					   name, chptr->topic);
 			parv[1] = name;
 			(void)m_names(cptr, sptr, 2, parv);
+			if (IsAnonymous(chptr) && !IsQuiet(chptr))
+			    {
+				sendto_one(sptr, ":%s NOTICE %s :Channel %s has the anonymous flag set.", ME, chptr->chname, chptr->chname);
+				sendto_one(sptr, ":%s NOTICE %s :Be aware that anonymity on IRC is NOT securely enforced!", ME, chptr->chname);
+			    }
 		    }
 		/*
 	        ** notify other servers

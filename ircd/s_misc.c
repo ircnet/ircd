@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.29 1999/07/02 16:49:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.30 1999/07/21 22:57:39 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -736,6 +736,9 @@ char	*comment;
 #endif
 						 is_chan_op(sptr, lp->value.chptr))
 						lp->value.chptr->history = timeofday + DELAYCHASETIMELIMIT;
+				if (IsAnonymous(lp->value.chptr) &&
+				    !IsQuiet(lp->value.chptr))
+					sendto_channel_butserv(lp->value.chptr, sptr, ":%s PART %s :None", sptr->name, lp->value.chptr->chname);
 				remove_user_from_channel(sptr,lp->value.chptr);
 			    }
 

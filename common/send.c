@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.38 1999/07/09 23:27:53 q Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.39 1999/07/21 22:57:40 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -802,7 +802,8 @@ sendto_serv_notv(aClient *one, int ver, char *pattern, ...)
  * sendto_common_channels()
  *
  * Sends a message to all people (inclusing user) on local server who are
- * in same channel with user.
+ * in same channel with user, except for channels set Quiet or Anonymous
+ * The calling procedure must take the necessary steps for such channels.
  */
 #if ! USE_STDARG
 /*VARARGS*/
@@ -849,8 +850,12 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
 			    user == cptr || !user->user)
 				continue;
 			for (lp = user->user->channel; lp; lp = lp->next)
-				if (IsMember(cptr, lp->value.chptr) &&
-				    !IsQuiet(lp->value.chptr))
+			    {
+				if (!IsMember(cptr, lp->value.chptr))
+					continue;
+				if (IsAnonymous(lp->value.chptr))
+					continue;
+				if (!IsQuiet(lp->value.chptr))
 				    {
 #ifndef DEBUGMODE
 					if (!len) /* This saves little cpu,
@@ -873,6 +878,7 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
 							   len);
 					break;
 				    }
+			    }
 		    }
 	    }
 	else
@@ -899,6 +905,8 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
 		     channels=channels->next)
 		    {
 			if (IsQuiet(channels->value.chptr))
+				continue;
+			if (IsAnonymous(channels->value.chptr))
 				continue;
 			for (lp=channels->value.chptr->members;lp;
 			     lp=lp->next)
