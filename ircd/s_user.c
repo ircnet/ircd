@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.83 1999/07/02 17:12:30 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.84 1999/07/04 19:07:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -822,22 +822,27 @@ char	*parv[];
 		sptr->flags |= FLAGS_KILLED;
 		return exit_client(cptr, sptr, &me, "Nick/Server collision");
 	    }
-	if ((acptr = get_history(nick, (long)(KILLCHASETIMELIMIT))) &&
-	    !MyConnect(acptr))  
-		/*
-		** Lock nick for KCTL so one cannot nick collide (due to kill
-		** chase) people who recently changed their nicks. --Beeth
-		*/
-		delayed = 1;
-	else
-		delayed = find_history(nick, (long)DELAYCHASETIMELIMIT);
-	/*
-	** Nick is free, and it comes from another server or
-	** it has been free for a while here
-	*/
-	if (!(acptr = find_client(nick, NULL)) &&
-	    (IsServer(cptr) || !(bootopt & BOOT_PROT) || !delayed))
-		goto nickkilldone;  /* No collisions, all clear... */
+	if (!(acptr = find_client(nick, NULL))
+	    {
+		aClient	*acptr2;
+		if ((IsServer(cptr) || !(bootopt & BOOT_PROT))
+			goto nickkilldone;
+		if (acptr2 = get_history(nick, (long)(KILLCHASETIMELIMIT)) &&
+		    !MyConnect(acptr2))
+			/*
+			** Lock nick for KCTL so one cannot nick collide
+			** (due to kill chase) people who recently changed
+			** their nicks. --Beeth
+			*/
+			delayed = 1;
+		else
+			/*
+			** Let ND work
+			*/
+			delayed = find_history(nick, (long)(DELAYCHASETIMELIMIT));
+		if (!delayed)
+			goto nickkilldone;  /* No collisions, all clear... */
+	    }
 	/*
 	** If acptr == sptr, then we have a client doing a nick
 	** change between *equivalent* nicknames as far as server
