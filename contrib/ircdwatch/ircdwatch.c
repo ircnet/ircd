@@ -17,9 +17,7 @@
  *
  */
 
-#ifndef lint
-static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.5 2003/10/14 20:35:16 q Exp $";
-#endif
+static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.6 2003/10/14 20:43:57 q Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>     /* atol() */
