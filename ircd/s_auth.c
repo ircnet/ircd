@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.37 1999/06/17 01:00:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.38 1999/06/17 01:22:21 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -94,6 +94,7 @@ aClient *cptr;
 
 u_char		iauth_options = 0;
 u_int		iauth_spawn = 0;
+char		*iauth_version = NULL;
 
 static aExtCf	*iauth_conf = NULL;
 static aExtData	*iauth_stats = NULL;
@@ -221,6 +222,16 @@ read_iauth()
 			    start = end;
 			    continue;
 			}
+		    if (*start == 'V') /* version */
+			{
+			    if (iauth_version)
+				    MyFree(iauth_version);
+			    iauth_version = mystrdup(start+2);
+			    sendto_flag(SCH_AUTH, "iauth version %s running.",
+					iauth_version);
+			    start = end;
+			    continue;
+			}
 		    if (*start == 'a')
 			{
 			    aExtCf *ectmp;
@@ -268,8 +279,9 @@ read_iauth()
 				    MyMalloc(sizeof(aExtData));
 			    iauth_stats->next->line = MyMalloc(40);
 			    sprintf(iauth_stats->next->line,
-				    "spawned: %d, current options: %X",
-				    iauth_spawn, iauth_options);
+				    "spawned: %d, current options: %X (%s)",
+				    iauth_spawn, iauth_options,
+				    (iauth_version) ? iauth_version : "???");
 			    iauth_stats->next->next = NULL;
 			    start = end;
 			    continue;

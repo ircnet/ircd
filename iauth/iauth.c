@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: iauth.c,v 1.10 1999/03/10 00:30:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: iauth.c,v 1.11 1999/06/17 01:22:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -186,6 +186,7 @@ char	*argv[];
 		   );
 	init_io();
 	xopt = conf_read(NULL);
+	sendto_ircd("V %s", make_version());
 	sendto_ircd("O %s", xopt);
 	conf_ircd();
 
