@@ -1,5 +1,5 @@
 /*
- *   IRC - Internet Relay Chat, ircd/irc_sprintf.c
+ *   IRC - Internet Relay Chat, common/irc_sprintf.c
  *   Copyright (C) 2002 Piotr Kucharski
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: irc_sprintf.c,v 1.1 2002/07/30 23:12:21 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: irc_sprintf.c,v 1.2 2002/07/30 23:13:22 chopin Exp $";
 #endif
 
 #define IRC_SPRINTF_C

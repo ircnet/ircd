@@ -1,5 +1,5 @@
 /************************************************************************
- *   IRC - Internet Relay Chat, ircd/irc_sprintf_ext.h
+ *   IRC - Internet Relay Chat, common/irc_sprintf_ext.h
  *   Copyright (C) 2002 Piotr Kucharski
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 
 /*  This file contains external definitions for global variables and functions
     defined in ircd/irc_sprintf.c.
+    $Id: irc_sprintf_ext.h,v 1.2 2002/07/30 23:13:22 chopin Exp $
  */
 
 /*  External definitions for global functions.
