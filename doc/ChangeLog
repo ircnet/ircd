@@ -11,6 +11,14 @@
 	* channel.c: m_mode(), m_join(), m_njoin(), m_part(), m_kick(),
 	  m_topic(), m_invite(), m_names(): added convert_scandinavian() in
 	  proper places (I hope no important function is missing).
+	* channel.c/names_channel(): using strlen for checking if server is
+	  bugus, proper is finding dot.
+	* struct_def.h: increased NICKLEN to 12, added ONICKLEN=9 for keeping
+	  compatibility.
+	* support.c/make_isupport(), s_debug.c/send_defines(): use ONICKLEN,
+	  as this is the nicklen allowed from clients.
+	* s_user.c/do_nick_name(): allow ONICKLEN long nicks from clients
+	  and NICKLEN long from servers.
 
 2003-08-07  Piotr Kucharski
 
