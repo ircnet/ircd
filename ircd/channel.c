@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.49 1998/08/02 17:29:29 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.50 1998/08/02 18:12:18 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1641,7 +1641,7 @@ char	*key;
 	    }
 
 	if (banned)
-		sendto_channel_butserv(chptr, &me,
+		sendto_channel_butone(&me, &me, chptr,
        ":%s NOTICE %s :%s carries an invitation (overriding ban on %s).",
 				       ME, chptr->chname, sptr->name,
 				       banned->value.cp);
@@ -3000,7 +3000,7 @@ aChannel *chptr;
 		    ** unless the reop is really overdue.
 		    */
 		    return 0;
-	    sendto_channel_butserv(chptr, &me,
+	    sendto_channel_butone(&me, &me, chptr,
 			   ":%s NOTICE %s :Enforcing channel mode +r (%d)",
 				   ME, chptr->chname, now - chptr->reop);
 	    op.flags = MODE_ADD|MODE_CHANOP;
@@ -3012,10 +3012,10 @@ aChannel *chptr;
 			{
 			    mbuf[cnt] = '\0';
 			    if (lp != chptr->members)
-				    sendto_channel_butserv(chptr, &me,
-						   ":%s MODE %s +%s %s",
-							   ME, chptr->chname,
-							   mbuf, nbuf);
+				    sendto_channel_butone(&me, &me, chptr,
+							  ":%s MODE %s +%s %s",
+							  ME, chptr->chname,
+							  mbuf, nbuf);
 			    cnt = 0;
 			    mbuf[0] = nbuf[0] = '\0';
 			}
@@ -3029,8 +3029,8 @@ aChannel *chptr;
 	    if (cnt)
 		{
 		    mbuf[cnt] = '\0';
-		    sendto_channel_butserv(chptr, &me, ":%s MODE %s +%s %s",
-					   ME, chptr->chname, mbuf, nbuf);
+		    sendto_channel_butone(&me, &me, chptr,":%s MODE %s +%s %s",
+					  ME, chptr->chname, mbuf, nbuf);
 		}
 	}
     else
@@ -3056,12 +3056,12 @@ aChannel *chptr;
 		}
 	    if (op.value.cptr == NULL)
 		    return 0;
-	    sendto_channel_butserv(chptr, &me,
+	    sendto_channel_butone(&me, &me, chptr,
 			   ":%s NOTICE %s :Enforcing channel mode +r (%d)", ME,
 					   chptr->chname, now - chptr->reop);
 	    op.flags = MODE_ADD|MODE_CHANOP;
 	    change_chan_flag(&op, chptr);
-	    sendto_channel_butserv(chptr, &me, ":%s MODE %s +o %s",
+	    sendto_channel_butone(&me, &me, chptr, ":%s MODE %s +o %s",
 				   ME, chptr->chname, op.value.cptr->name);
 	}
     chptr->reop = 0;
