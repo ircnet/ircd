@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.14 2002/01/07 02:08:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.15 2002/01/08 03:40:20 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -40,6 +40,25 @@ static	struct	liststats {
 aServer	*svrtop = NULL;
 
 int	numclients = 0;
+
+/*
+** There is a max of CHIDNB ^ (SIDLEN - 1) servers
+** with tokens (ie. 2.10).
+*/
+
+#if CHIDNB == 36 && SIDLEN == 3
+# define MAX210SERVERS 1296
+#else
+# error Fix MAX210SERVERS.
+#endif
+
+/* we keep tokens in a bit array, hence /8 */
+/* +7 to make sure it's big enough */
+unsigned char	used_tokens[(MAX210SERVERS + 7 ) / 8];
+
+#define	IsBitSet(x)	(used_tokens[x / 8] & (1 << (x % 8)))
+#define	SetBit(x)	(used_tokens[x / 8] |= (1 << (x % 8)))
+#define	ClearBit(x)	(used_tokens[x / 8] &= ~(1 << (x % 8)))
 
 void	initlists()
 {
@@ -185,11 +204,10 @@ aClient *cptr;
 	return user;
 }
 
-aServer	*make_server(cptr, add)
-aClient	*cptr;
-int add;
+aServer	*make_server(aClient *cptr)
 {
-	Reg	aServer	*serv = cptr->serv, *sp, *spp = NULL;
+	aServer	*serv = cptr->serv;
+	int	tok;
 
 	if (!serv)
 	    {
@@ -198,6 +216,7 @@ int add;
 #ifdef	DEBUGMODE
 		servs.inuse++;
 #endif
+		cptr->serv = serv;
 		serv->user = NULL;
 		serv->snum = -1;
 		*serv->by = '\0';
@@ -206,40 +225,34 @@ int add;
 		serv->up = NULL;
 		serv->refcnt = 1;
 		serv->nexts = NULL;
-		cptr->serv = serv;
+		serv->prevs = NULL;
 
-		for (sp = svrtop; sp; spp = sp, sp = sp->nexts)
-			if (spp && ((spp->ltok) + 1 < sp->ltok))
+		if (svrtop)
+		{
+			svrtop->prevs = serv;
+			serv->nexts = svrtop;
+		}
+		svrtop = serv;
+
+		/* 
+		** me is number 1 and is first added.
+		** There is a max of MAX210SERVERS.
+		*/
+		for (tok = 1; tok < MAX210SERVERS ; tok++)
+		{
+			if (!IsBitSet(tok))
+			{
 				break;
-
-		if (add)
-		{
-			serv->prevs = spp;
-		}
-		if (spp)
-		{
-			serv->ltok = spp->ltok + 1;
-			if (add)
-			{
-				spp->nexts = serv;
 			}
 		}
-		else
+		if (tok == MAX210SERVERS)
 		{
-			/* Me, myself and I alone */
-			serv->ltok = 1;
-			if (add)
-			{
-				svrtop = serv;
-			}
+			sendto_flag(SCH_ERROR, "No more tokens");
+			return NULL;
 		}
 
-		if (add && sp)
-		{
-			serv->nexts = sp;
-			sp->prevs = serv;
-		}
-
+		SetBit(tok);
+		serv->ltok = tok;
 		SPRINTF(serv->tok, "%d", serv->ltok);
 		serv->bcptr = cptr;
 		serv->lastload = 0;
@@ -380,6 +393,7 @@ Reg	aClient	*cptr;
 			cptr->serv->user = NULL;
 		    }
 
+		ClearBit(cptr->serv->ltok);
 		/* decrement reference counter, and eventually free it */
 		cptr->serv->bcptr = NULL;
 		free_server(cptr->serv, cptr);
