@@ -1,3 +1,13 @@
+2004-09-07  Piotr Kucharski
+
+	* parse.c: allow HAZH without params to allow sending minihelp (noted
+	  by fiction).
+	* s_id.c, res_mkquery.c: compilation warnings for strict CC (reported
+	  by Mark Visser).
+	* Makefile.in: few tiny fixes (suggested by Olafur Osvaldsson).
+	* example.conf is installed as ircd.conf.example from now on.
+	* config.h.dist: some cleanup (suggested by Core).
+
 2.11.0b12
 
 2004-08-31  Piotr Kucharski
