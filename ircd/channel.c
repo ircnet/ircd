@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.50 1998/08/02 18:12:18 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.51 1998/08/02 18:29:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2226,7 +2226,7 @@ char	*parv[];
 			sendto_serv_notv(cptr, SV_NJOIN, ":%s JOIN %s%s", name,
 					 parv[1], mbuf);
 		/* send join to local users on channel */
-		sendto_channel_butserv(chptr, &me, ":%s JOIN %s", name,
+		sendto_channel_butserv(chptr, acptr, ":%s JOIN %s", name,
 				       parv[1]);
 		/* build MODE for local users on channel, eventually send it */
 		if (*mbuf)
