@@ -25,6 +25,7 @@
  */
 #ifndef S_CONF_C
 extern aConfItem *conf, *kconf;
+extern char *networkname;
 #endif /* S_CONF_C */
 
 /*  External definitions for global functions.
