@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.244 2005/02/04 18:34:29 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.245 2005/02/04 18:45:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1753,11 +1753,6 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 					{
 						chptr->reop = timeofday +
 							LDELAYCHASETIMELIMIT;
-					}
-					/* XXX: fix this in 2.11.1 */
-					if (MyClient(sptr) && !IsAnOper(sptr))
-					{
-						break;
 					}
 				}
 				if (ischop &&
