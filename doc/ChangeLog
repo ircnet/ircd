@@ -1,3 +1,9 @@
+2004-10-03  Piotr Kucharski
+
+	* get rid of more warnings.
+
+2.11.0b13
+
 2004-10-01  Piotr Kucharski
 
 	* struct_def.h, s_debug.c/send_defines(), s_misc.c/initruntimeconf():
@@ -16,7 +22,7 @@
 	* config.h.dist: SIXBONE_HACK default off.
 	* os.h: include first <syslog.h> and then <sys/syslog.h> (for proper
 	  declaration of syslog(), openlog() etc.)
-	* got rid of all warnings.
+	* got rid of most warnings.
 
 2004-09-28  Piotr Kucharski
 
