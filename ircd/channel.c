@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.66 1998/09/23 23:18:47 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.67 1998/09/23 23:20:28 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2302,8 +2302,9 @@ char	*parv[];
 				       sptr->name, parv[1], modebuf, parabuf);
 
 	/* send NJOIN to capable servers */
-	sendto_serv_v(cptr, SV_NJOIN, ":%s NJOIN %s :%s", parv[0], parv[1],
-		      nbuf);
+	if (nbuf[0])
+		sendto_serv_v(cptr, SV_NJOIN, ":%s NJOIN %s :%s", parv[0],
+			      parv[1], nbuf);
 	return 0;
 }
 
