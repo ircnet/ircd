@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.1 1998/08/16 20:02:24 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1998/08/16 20:02:24 $"
+.\" @(#)$Id: iauth.conf.5,v 1.2 1998/09/21 16:13:21 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1998/09/21 16:13:21 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -17,7 +17,7 @@ eventual options using the following format:
 .nf
 module\ \fImodule-name\fP
 [TAB]option = \fIstring\fP
-[TAB]hostname = \fIhost-name\fP
+[TAB]host = \fIhost-name\fP
 [TAB]address = \fIip-address\fP
 
 .fi
@@ -74,7 +74,7 @@ address.
 .RS
 .nf
 module rfc931
-        hostname = *
+        host = *
 .fi
 .RE
 .SH COPYRIGHT
