@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.10 1997/05/28 13:38:14 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.11 1997/06/02 13:15:27 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -2634,7 +2634,9 @@ int	old;
 		send_umode(cptr, sptr, old, ALL_UMODES, buf);
 #ifdef USE_SERVICES
 	/* buf contains all modes for local users, and iow only for remotes */
-	check_services_butone(SERVICE_WANT_UMODE, NULL, sptr,
-			      ":%s MODE %s :%s", sptr->name, sptr->name, buf);
+	if (*buf)
+		check_services_butone(SERVICE_WANT_UMODE, NULL, sptr,
+				      ":%s MODE %s :%s", sptr->name,
+				      sptr->name, buf);
 #endif
 }
