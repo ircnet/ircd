@@ -1,3 +1,12 @@
+2004-07-12  Piotr Kucharski
+
+	* config_read.c/config_read(): if included file was empty we got core.
+
+2004-07-11  Piotr Kucharski
+
+	* config_read.c/config_read(): do not proceed if error occured, go to
+	  next line instead (could be fatal with too long filename).
+
 2004-07-11  Jakub Vlasek
 
 	* ircd.c, ircd_ext.h: Define ListenerLL.
