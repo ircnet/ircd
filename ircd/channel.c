@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.60 1998/09/07 23:51:47 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.61 1998/09/09 12:25:45 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -845,10 +845,18 @@ char	*parv[];
 			    }
 			if (strlen(modebuf) > (size_t)1)
 			    {	/* got new mode to pass on */
-				sendto_match_servs(chptr, cptr,
-						   ":%s MODE %s %s %s",
-						   parv[0], name, modebuf,
-						   parabuf);
+				if (modebuf[1] == 'e' || modebuf[1] == 'I')
+					/* 2.9.x compatibility */
+					sendto_match_servs_v(chptr, cptr,
+							     SV_NMODE,
+							   ":%s MODE %s %s %s",
+							     parv[0], name,
+							     modebuf, parabuf);
+				else
+					sendto_match_servs(chptr, cptr,
+							   ":%s MODE %s %s %s",
+							   parv[0], name,
+							   modebuf, parabuf);
 				if ((IsServer(cptr) && !IsServer(sptr) &&
 				     !chanop) || mcount < 0)
 				    {
