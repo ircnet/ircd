@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.157 2004/02/22 18:27:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.158 2004/02/23 12:41:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -256,7 +256,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			sendto_one(acptr->from, ":%s SQUIT %s :%s",
 				    ST_UID(sptr) && ST_UID(acptr->from) ?
 				    sptr->serv->sid : sptr->name,
-				    ST_UID(acptr->from) ?
+				    ST_UID(acptr->from) && acptr->serv->sid[0] != '$' ?
 				    acptr->serv->sid : acptr->name, comment);
 			
 			sendto_flag(SCH_SERVER,
@@ -280,7 +280,8 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    {
 			sendto_one(cptr, ":%s SQUIT %s :%s (Bounced for %s)",
 				   ST_UID(cptr) ? me.serv->sid : ME,
-				   ST_UID(cptr) && ST_UID(acptr) ? acptr->serv->sid:
+				   ST_UID(cptr) && ST_UID(acptr) &&
+				   acptr->serv->sid[0]!='$' ? acptr->serv->sid:
 				   acptr->name, comment, parv[0]);
 			sendto_flag(SCH_DEBUG, "Bouncing SQUIT %s back to %s",
 				    acptr->name, acptr->from->name);
