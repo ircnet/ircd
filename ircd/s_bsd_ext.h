@@ -55,7 +55,7 @@ EXTERN void close_connection __P((aClient *cptr));
 EXTERN int get_sockerr __P((aClient *cptr));
 EXTERN void set_non_blocking __P((int fd, aClient *cptr));
 EXTERN aClient *add_connection __P((aClient *cptr, int fd));
-EXTERN int read_message __P((time_t delay, FdAry *fdp));
+EXTERN int read_message __P((time_t delay, FdAry *fdp, int ro));
 EXTERN int connect_server __P((aConfItem *aconf, aClient *by,
 			       struct hostent *hp));
 EXTERN void get_my_name __P((aClient *cptr, char *name, int len));

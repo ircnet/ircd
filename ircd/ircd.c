@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.41 1999/01/23 23:01:23 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.42 1999/02/04 23:50:21 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -53,7 +53,7 @@ time_t	nextconnect = 1;	/* time for next try_connections call */
 time_t	nextgarbage = 1;        /* time for next collect_channel_garbage call*/
 time_t	nextping = 1;		/* same as above for check_pings() */
 time_t	nextdnscheck = 0;	/* next time to poll dns to force timeouts */
-time_t	nextexpire = 1;	/* next expire run on the dns cache */
+time_t	nextexpire = 1;		/* next expire run on the dns cache */
 
 #ifdef	PROFIL
 extern	etext();
@@ -923,12 +923,7 @@ char	*argv[];
 time_t	io_loop(delay)
 time_t	delay;
 {
-#ifdef PREFER_SERVER
-	static	time_t	nextc = 0;
-#endif
-#ifdef HUB
-	static	time_t	lastl = 0;
-#endif
+	int maxs = 4;
 
 	/*
 	** We only want to connect if a connection is due,
@@ -977,19 +972,32 @@ time_t	delay;
 	else
 		delay = MIN(delay, TIMESEC);
 
-#if defined(PREFER_SERVER)
-	(void)read_message(1, &fdas);
+	/*
+	** First, try to drain traffic from servers (this includes listening
+	** ports).  Give up, either if there's no traffic, or too many
+	** iterations.
+	*/
+	while (maxs--)
+		if (read_message(0, &fdas, 0))
+			flush_fdary(&fdas);
+		else
+			break;
+
 	Debug((DEBUG_DEBUG, "delay for %d", delay));
-	if (timeofday > nextc)
+	/*
+	** Second, deal with _all_ clients but only try to empty sendQ's for
+	** servers.  Other clients are dealt with below..
+	*/
+	if (read_message(1, &fdall, 1) == 0 && delay > 1)
 	    {
-		(void)read_message(delay, &fdall);
-		nextc = timeofday;
+		/*
+		** Timed out (e.g. *NO* traffic at all).
+		** Try again but also check to empty sendQ's for all clients.
+		*/
+		sendto_flag(SCH_DEBUG, "read_message(RO) -> 0 [%d]", delay);
+		(void)read_message(delay - 1, &fdall, 0);
 	    }
 	timeofday = time(NULL);
-#else
-	(void)read_message(delay, &fdall);
-	timeofday = time(NULL);
-#endif
 
 	Debug((DEBUG_DEBUG ,"Got message(s)"));
 	/*
@@ -1025,6 +1033,7 @@ time_t	delay;
 	** -avalon
 	*/
 	flush_connections(me.fd);
+
 #ifdef	DEBUGMODE
 	checklists();
 #endif
