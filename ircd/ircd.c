@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.18 1998/04/15 18:29:06 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.19 1998/04/20 22:00:25 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -874,7 +874,7 @@ time_t	delay;
 	if (timeofday > nextc)
 	    {
 		(void)read_message(delay, &fdall);
-		nextc = timeofday + HUB;
+		nextc = timeofday;
 	    }
 /*
 	else
