@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.78 1998/12/12 23:40:57 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.79 1998/12/12 23:48:16 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2915,7 +2915,7 @@ char	*parv[];
 			break;
 		lp = c2ptr->user->channel;
 		/*
-		 * dont show a client if they are on a secret channel or
+		 * don't show a client if they are on a secret channel or
 		 * they are on a channel sptr is on since they have already
 		 * been show earlier. -avalon
 		 */

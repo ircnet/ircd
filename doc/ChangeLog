@@ -1,3 +1,11 @@
+1998-12-12  Christophe Kalt  <kalt@azurite>
+
+	* channel.c: +a/+r fix for !channels.
+
+1998-11-20  Christophe Kalt
+
+	* irc.c: allocate me.info (fix by Helmut Franzke <hf@rp-online.de>).
+
 2.10.1
 
 1998-11-12  Christophe Kalt

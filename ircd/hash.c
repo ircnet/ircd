@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.9 1998/05/25 20:44:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.10 1998/12/12 23:48:16 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -571,9 +571,9 @@ aClient *cptr;
 	t = ((char *)server + strlen(server));
 	/*
 	 * Whats happening in this next loop ? Well, it takes a name like
-	 * foo.bar.edu and proceeds to earch for *.edu and then *.bar.edu.
+	 * foo.bar.edu and proceeds to search for *.edu and then *.bar.edu.
 	 * This is for checking full server names against masks although
-	 * it isnt often done this way in lieu of using match().
+	 * it isn't often done this way in lieu of using match().
 	 */
 	for (;;)
 	    {
@@ -586,7 +586,7 @@ aClient *cptr;
 		ch = *t;
 		*t = '*';
 		/*
-	 	 * Dont need to check IsServer() here since nicknames cant
+	 	 * Don't need to check IsServer() here since nicknames can't
 		 * have *'s in them anyway.
 		 */
 		if (((tmp = hash_find_client(t, cptr))) != cptr)
@@ -603,8 +603,8 @@ aClient *cptr;
 /*
  * hash_find_channel
  *
- * If the name doesn't begin with #, or & or -, then we're looking for
- * -????name instead of a real match.
+ * If the name doesn't begin with #, or & or !, then we're looking for
+ * !?????name instead of a real match.
  */
 aChannel	*hash_find_channel(name, chptr)
 char	*name;

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.59 1998/10/28 21:25:03 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.60 1998/12/12 23:48:17 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1646,7 +1646,7 @@ char	*parv[];
 				break;
 			/*
 			 * 'Rules' established for sending a WHOIS reply:
-			 * - if wildcards are being used dont send a reply if
+			 * - if wildcards are being used don't send a reply if
 			 *   the querier isnt any common channels and the
 			 *   client in question is invisible and wildcards are
 			 *   in use (allow exact matches only);

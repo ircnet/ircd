@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.19 1998/09/18 22:02:51 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.20 1998/12/12 23:48:17 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -141,7 +141,7 @@ static	Numeric	numeric_errors[] = {
 /* 481 */	{ ERR_NOPRIVILEGES,
 		":Permission Denied- You're not an IRC operator" },
 /* 482 */	{ ERR_CHANOPRIVSNEEDED, "%s :You're not channel operator" },
-/* 483 */	{ ERR_CANTKILLSERVER, "%s :You cant kill a server!" },
+/* 483 */	{ ERR_CANTKILLSERVER, "%s :You can't kill a server!" },
 /* 484 */	{ ERR_RESTRICTED, ":Your connection is restricted!" },
 		{ 0, (char *)NULL },
 		{ 0, (char *)NULL },
@@ -160,7 +160,7 @@ static	Numeric	numeric_errors[] = {
 		{ 0, (char *)NULL },
                 { 0, (char *)NULL },
 /* 501 */	{ ERR_UMODEUNKNOWNFLAG, ":Unknown MODE flag" },
-/* 502 */	{ ERR_USERSDONTMATCH, ":Cant change mode for other users" },
+/* 502 */	{ ERR_USERSDONTMATCH, ":Can't change mode for other users" },
 		{ 0, (char *)NULL }
 };
 

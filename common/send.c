@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.28 1998/09/09 12:25:26 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.29 1998/12/12 23:48:15 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -72,7 +72,7 @@ char	*notice;
 		return -1;
 	to->flags |= FLAGS_DEADSOCKET;
 	/*
-	 * If because of BUFFERPOOL problem then clean dbuf's now so that
+	 * If because of BUFFERPOOL problem then clean dbufs now so that
 	 * notices don't hurt operators below.
 	 */
 	DBufClear(&to->recvQ);
@@ -92,7 +92,7 @@ char	*notice;
 **	be called once per scan of connections. There should be a select in
 **	here perhaps but that means either forcing a timeout or doing a poll.
 **	When flushing, all we do is empty the obuffer array for each local
-**	client and try to send it. if we cant send it, it goes into the sendQ
+**	client and try to send it. if we can't send it, it goes into the sendQ
 **	-avalon
 */
 void	flush_connections(fd)

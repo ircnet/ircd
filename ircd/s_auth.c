@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.19 1998/10/10 12:19:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.20 1998/12/12 23:48:16 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -491,7 +491,7 @@ Reg	aClient	*cptr;
 	Debug((DEBUG_NOTICE,"read_authports(%x) fd %d authfd %d stat %d",
 		cptr, cptr->fd, cptr->authfd, cptr->status));
 	/*
-	 * Nasty.  Cant allow any other reads from client fd while we're
+	 * Nasty.  Can't allow any other reads from client fd while we're
 	 * waiting on the authfd to return a full valid string.  Use the
 	 * client's input buffer to buffer the authd reply.
 	 * Oh. this is needed because an authd reply may come back in more

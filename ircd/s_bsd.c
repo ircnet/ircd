@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.44 1998/11/12 11:46:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.45 1998/12/12 23:48:16 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -233,7 +233,7 @@ int	port;
 		server.sin_port = htons(port);
 		/*
 		 * Try 10 times to bind the socket with an interval of 20
-		 * seconds. Do this so we dont have to keep trying manually
+		 * seconds. Do this so we don't have to keep trying manually
 		 * to bind. Why ? Because a port that has closed often lingers
 		 * around for a short time.
 		 * This used to be the case.  Now it no longer is.
@@ -807,7 +807,7 @@ aClient	*cptr;
 			** Do a lookup for the CONF line *only* and not
 			** the server connection else we get stuck in a
 			** nasty state since it takes a SERVER message to
-			** get us here and we cant interrupt that very
+			** get us here and we can't interrupt that very
 			** well.
 			*/
 			ClearAccess(cptr);
@@ -2223,7 +2223,7 @@ struct	hostent	*hp;
 	    }
 
 	/*
-	 * If we dont know the IP# for this host and itis a hostname and
+	 * If we don't know the IP# for this host and it is a hostname and
 	 * not a ip# string, then try and find the appropriate host record.
 	 */
 	if (!aconf->ipnum.s_addr && *aconf->host != '/')
@@ -2395,7 +2395,7 @@ int	*lenp;
 	/*
 	 * By this point we should know the IP# of the host listed in the
 	 * conf line, whether as a result of the hostname lookup or the ip#
-	 * being present instead. If we dont know it, then the connect fails.
+	 * being present instead. If we don't know it, then the connect fails.
 	 */
 	if (isdigit(*aconf->host) && (aconf->ipnum.s_addr == -1))
 		aconf->ipnum.s_addr = inetaddr(aconf->host);
