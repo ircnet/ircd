@@ -1,3 +1,16 @@
+2003-01-01  Kurt Roeckx
+
+	* support.c/make_isupport(): Replace MAXCHANNEL by CHANLIMIT.
+	* channel.c:add_user_to_channel(), remove_user_from_channel()
+		m_join(): Don't count &-channels for MAXCHANNELSPERUSER,
+                instead of not counting +q channels.
+	* channel.c: m_join(): Allow joining &-channels even when
+		MAXCHANNELSPERUSER already reached.
+
+2003-12-24  Kurt Roeckx
+
+	* config.guess, config.sub: Newer versions.
+
 2003-12-09  Piotr Kucharski
 
 	* s_conf.c/find_denied(): try find_client with server name (from C:),
@@ -22,7 +35,7 @@
 	* hash.c/m_hash(): Spelling fixes, hash_channel_name() takes 3 params
 	  - removed the hashfunc from HashTables[].
 
-2003-10-18  Kurt Roeckx
+2003-10-19  Kurt Roeckx
 
 	* support.c/make_isupport(): Limit to sending 12 tokens in
 	  005 numeric.

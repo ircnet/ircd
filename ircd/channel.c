@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.165 2003/12/12 16:36:03 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.166 2004/01/01 14:13:50 q Exp $";
 #endif
 
 #include "os.h"
@@ -444,11 +444,11 @@ static	void	add_user_to_channel(aChannel *chptr, aClient *who, int flags)
 		ptr->value.chptr = chptr;
 		ptr->next = who->user->channel;
 		who->user->channel = ptr;
-		if (!IsQuiet(chptr))
-		    {
+		if (chptr->chname[0] != '&')
+		{
 			who->user->joined++;
 			istat.is_userc++;
-		    }
+		}
 
 		if (!(ptr = find_user_link(chptr->clist, who->from)))
 		    {
@@ -501,11 +501,11 @@ void	remove_user_from_channel(aClient *sptr, aChannel *chptr)
 				free_link(tmp);
 				break;
 			    }
-	if (!IsQuiet(chptr))
-	    {
+	if (chptr->chname[0] != '&')
+	{
 		sptr->user->joined--;
 		istat.is_userc--;
-	    }
+	}
 #ifdef USE_SERVICES
 	if (chptr->users == 1)
 		check_services_butone(SERVICE_WANT_CHANNEL|
@@ -2319,10 +2319,9 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		else
 			clean_channelname(name), s = NULL;
 
-		if (MyConnect(sptr) &&
-		    sptr->user->joined >= MAXCHANNELSPERUSER) {
-			/* Feature: Cannot join &flagchannels either
-			   if already joined MAXCHANNELSPERUSER times. */
+		if (MyConnect(sptr) && name[0] != '&' &&
+		    sptr->user->joined >= MAXCHANNELSPERUSER)
+		{
 			sendto_one(sptr, replies[ERR_TOOMANYCHANNELS],
 				   ME, BadTo(parv[0]), name);
 			/* can't return, need to send the info everywhere */
