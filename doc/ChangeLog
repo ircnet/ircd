@@ -10,6 +10,12 @@
 	  s_service.c: changed cptr->name to pointer, added namebuf[]s of
 	  proper sizes to cptr, cptr->serv and cptr->service; this saves us
 	  in memory (HOSTLEN-NICKLEN) bytes per each client (5MB on IRCnet).
+	* parse.c/remove_unknown(): SID can be source too, treat like server.
+	* parse.c/find_sender(): fix core when unknown sid source.
+	* s_id.c/check_uid(), s_user.c/m_unick(): check uid introduced if
+	  matches source sid.
+	* s_user.c/register_user(): not only remove client received in NICK
+	  with improper servertok, but also the server that introduced it.
 
 2004-03-05  Piotr Kucharski
 
