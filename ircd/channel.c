@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.106 1999/07/21 22:57:39 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.107 1999/07/25 19:52:59 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2195,7 +2195,7 @@ char	*parv[];
 		/*
 		**  Complete user entry to the new channel (if any)
 		*/
-		if (s)
+		if (s && UseModes(name))
 		    {
 			if (*s == 'O')
 				/*
@@ -2219,7 +2219,7 @@ char	*parv[];
 		*/
 		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
 						parv[0], name);
-		if (s)
+		if (s && UseModes(name))
 		    {
 			/* no need if user is creating the channel */
 			if (chptr->users != 1)
@@ -2360,7 +2360,7 @@ char	*parv[];
 				return 0;
 			    }
 			chptr = get_channel(acptr, parv[1], CREATE);
-			if (chptr == NULL)
+			if (!IsChannelName(parv[1]) || chptr == NULL)
 			    {
 				sendto_one(sptr, err_str(ERR_NOSUCHCHANNEL,
 							 parv[0]), parv[1]);
@@ -2376,7 +2376,7 @@ char	*parv[];
 			continue;
 		    }
 		/* add user to channel */
-		add_user_to_channel(chptr, acptr, chop);
+		add_user_to_channel(chptr, acptr, UseModes(parv[1]) ? chop :0);
 		/* build buffer for NJOIN capable servers */
 		if (q != nbuf)
 			*q++ = ',';
@@ -2386,13 +2386,21 @@ char	*parv[];
 		if (*chptr->chname != '!')
 			nj = sendto_match_servs_notv(chptr, cptr, SV_NJOIN,
 						     ":%s JOIN %s%s", name,
-						     parv[1], mbuf);
+						     parv[1], 
+						     UseModes(parv[1]) ? mbuf : 
+						     "");
 		/* send join to local users on channel */
 		sendto_channel_butserv(chptr, acptr, ":%s JOIN %s", name,
 				       parv[1]);
 		/* build MODE for local users on channel, eventually send it */
 		if (*mbuf)
 		    {
+			if (UseModes(parv[1]))
+			    {
+				sendto_one(cptr, err_str(ERR_NOCHANMODES,
+							 parv[0]), parv[1]);
+				continue;
+			    }
 			switch (cnt)
 			    {
 			case 0:
@@ -2569,6 +2577,12 @@ char	*parv[];
 		    }
 		if (check_channelmask(sptr, cptr, name))
 			continue;
+                if (!UseModes(name))
+                    {
+                        sendto_one(sptr, err_str(ERR_NOCHANMODES, parv[0]),
+				   name);
+                        continue;
+                    }
 		if (!IsServer(sptr) && !is_chan_op(sptr, chptr))
 		    {
 			if (!IsMember(sptr, chptr))
