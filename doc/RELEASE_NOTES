@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.50 2004/06/19 00:56:39 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.51 2004/06/19 18:07:40 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -35,6 +35,9 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* irc client is no longer included.
 	* rehash q was changed to rehash d (dns flush).
 	* ircd is capable of including files to config file without need of m4.
+	* new commands: TKLINE and UNTKLINE.
+	* stats K returns list of klines, stats k list of tklines.
+	* rehash t removes all tklines.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================

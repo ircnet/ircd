@@ -1,3 +1,20 @@
+2004-06-19  Piotr Kucharski
+
+	* parse.c/parse(): don't check for min param count for commands which
+	  are (for given caller) either ignored or insufficient privs, or unreg.
+	* struct_def.h: CONF_TKILL, CONF_TOTHERKILL and ACL_TKLINE.
+	* s_conf.c, s_conf_ext.h: new functions: m_tkline(), m_untkline(), 
+	  tkline_expire(), do_tkline() and one variable tkconf added.
+	* s_conf.c/find_kill(): support for tklines.
+	* s_conf.c/rehash(): "rehash t" flushes all tklines.
+	* s_user.c/is_allowed(): add ACL_TKLINE case.
+	* config.h.dist: TKLINE related defines.
+	* s_serv.c/report_configured_links(): aware of tklines (also shows
+	  time to live of a tkline, not port).
+	* s_serv.c/m_stats(): stats k reports tklines, stats K klines.
+	* parse.c: TKLINE and UNTKLINE handlers.
+	* ircd.c/io_loop(): call tkline_expire() from time to time.
+
 2004-06-18  Piotr Kucharski
 
 	* s_conf.c: move config_read() to new file.
