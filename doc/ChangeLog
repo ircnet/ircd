@@ -1,3 +1,13 @@
+2001-12-28  Piotr Kucharski
+
+	* s_conf.c/find_kill(): make K:user@host remove also +r clients
+	  (that is, +user@host).
+	* s_misc.c/get_sockhost(): don't trust input values, so we don't
+	  accidentally copy on null.
+	* s_user.c/m_unick(): cleanup, remove m_user() call, fill whatever
+	  we need to fill in this function directly.
+	* s_id.c/sid_valid(): allow fake sids.
+
 2001-12-25  Kurt Roeckx
 
 	* send.c, struct_def.h, channel.c, channel_ext.h, s_send.c,
