@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.13 1999/01/22 21:04:00 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.14 1999/02/12 03:57:21 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -661,7 +661,7 @@ aChannel *chptr;
 
 	if (chptr == NULL)
 		return NULL;
-	for (tmp = chptr; tmp; tmp, tmp = tmp->hnextch)
+	for (tmp = chptr; tmp; tmp = tmp->hnextch)
 		if (hv == tmp->hashv && *tmp->chname == '!' &&
 		    mycmp(name, tmp->chname + CHIDLEN + 1) == 0)
 		    {
