@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.89 2002/01/08 03:37:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.90 2002/01/24 00:54:32 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2050,7 +2050,7 @@ char	*parv[];
 		       3,parc,parv) != HUNTED_ISME)
 		return 1;
 
-	if (parc < 3 || *parv[1] == '\0')
+	if (parc < 2 || *parv[1] == '\0')
 	    {
 		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
 			   "CONNECT");
@@ -2093,18 +2093,36 @@ char	*parv[];
 	** from there, then use the precompiled default.
 	*/
 	tmpport = port = aconf->port;
-	if ((port = atoi(parv[2])) <= 0)
-	    {
+	if (parc > 2)
+	{
+		port = atoi(parv[2]);
+	}
+	
+	if (parc < 3 || !port)
+	{
+		if (tmpport < 0)
+		{
+			port = 0 - port;
+		}
+		else
+		{
+			port = tmpport;
+		}
+
+		if (!port)
+		{
+			sendto_one(sptr,
+				":%s NOTICE %s :Connect: missing port number",
+				ME, parv[0]);
+			return 0;
+		}
+	}
+	if (port < 0)
+	{
 		sendto_one(sptr, "NOTICE %s :Connect: Illegal port number",
-			   parv[0]);
-		return 0;
-	    }
-	else if (port <= 0)
-	    {
-		sendto_one(sptr, ":%s NOTICE %s :Connect: missing port number",
-			   ME, parv[0]);
-		return 0;
-	    }
+				  parv[0]);
+	}
+
 	/*
 	** Notify all operators about remote connect requests
 	*/
