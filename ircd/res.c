@@ -31,7 +31,7 @@
 #include "res.h"
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.4 1997/04/28 02:19:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.5 1997/05/15 20:31:39 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -449,7 +449,7 @@ ResRQ	*rptr;
 	HEADER	*hptr;
 
 	bzero(buf, sizeof(buf));
-	r = res_mkquery(QUERY, name, class, type, NULL, 0, NULL,
+	r = ircd_res_mkquery(QUERY, name, class, type, NULL, 0, NULL,
 			(u_char *)buf, sizeof(buf));
 	if (r <= 0)
 	    {
@@ -530,7 +530,7 @@ HEADER	*hptr;
 #else
 	while (hptr->qdcount-- > 0)
 #endif
-		if ((n = dn_skipname((u_char *)cp, (u_char *)eob)) == -1)
+		if ((n = __ircd_dn_skipname((u_char *)cp, (u_char *)eob)) == -1)
 			break;
 		else
 			cp += (n + QFIXEDSZ);
@@ -538,19 +538,19 @@ HEADER	*hptr;
 	 * proccess each answer sent to us blech.
 	 */
 	while (hptr->ancount-- > 0 && cp && cp < eob) {
-		n = dn_expand((u_char *)buf, (u_char *)eob, (u_char *)cp,
+		n = ircd_dn_expand((u_char *)buf, (u_char *)eob, (u_char *)cp,
 			      hostbuf, sizeof(hostbuf));
 		if (n <= 0)
 			break;
 
 		cp += n;
-		type = (int)_getshort((u_char *)cp);
+		type = (int)ircd_getshort((u_char *)cp);
 		cp += sizeof(short);
-		class = (int)_getshort((u_char *)cp);
+		class = (int)ircd_getshort((u_char *)cp);
 		cp += sizeof(short);
-		rptr->ttl = _getlong((u_char *)cp);
+		rptr->ttl = ircd_getlong((u_char *)cp);
 		cp += sizeof(rptr->ttl);
-		dlen =  (int)_getshort((u_char *)cp);
+		dlen =  (int)ircd_getshort((u_char *)cp);
 		cp += sizeof(short);
 		rptr->type = type;
 
@@ -587,7 +587,7 @@ HEADER	*hptr;
 			cp += dlen;
  			break;
 		case T_PTR :
-			if((n = dn_expand((u_char *)buf, (u_char *)eob,
+			if((n = ircd_dn_expand((u_char *)buf, (u_char *)eob,
 					  (u_char *)cp, hostbuf,
 					  sizeof(hostbuf) )) < 0)
 			    {

@@ -53,13 +53,15 @@
  * --Copyright--
  */
 
-#ifndef lint
-static  char rcsid[] = "@(#)$Id: res_mkquery.c,v 1.2 1997/04/14 15:04:20 kalt Exp $";
-#endif
+#if defined(LIBC_SCCS) && !defined(lint)
+static char sccsid[] = "@(#)res_mkquery.c	8.1 (Berkeley) 6/4/93";
+static char rcsid[] = "$Id: res_mkquery.c,v 1.3 1997/05/15 20:31:40 kalt Exp $";
+#endif /* LIBC_SCCS and not lint */
 
 #include "config.h"
 #include "sys.h"
 
+#include <sys/types.h>
 #include <sys/param.h>
 #include <netinet/in.h>
 #include "nameser.h"
@@ -69,6 +71,8 @@ static  char rcsid[] = "@(#)$Id: res_mkquery.c,v 1.2 1997/04/14 15:04:20 kalt Ex
 #include "resolv.h"
 #if defined(BSD) && (BSD >= 199103)
 # include <string.h>
+#else
+# include "portability.h"
 #endif
 
 #if defined(USE_OPTIONS_H)
@@ -80,7 +84,7 @@ static  char rcsid[] = "@(#)$Id: res_mkquery.c,v 1.2 1997/04/14 15:04:20 kalt Ex
  * Returns the size of the result or -1.
  */
 int
-res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
+ircd_res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
 	int op;			/* opcode of query */
 	const char *dname;	/* domain name */
 	int class, type;	/* class and type of query */
@@ -93,9 +97,6 @@ res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
 	register HEADER *hp;
 	register u_char *cp;
 	register int n;
-#ifdef ALLOW_UPDATES
-	struct rrec *newrr = (struct rrec *) newrr_in;
-#endif
 	u_char *dnptrs[20], **dpp, **lastdnptr;
 
 	if ((ircd_res.options & RES_INIT) == 0 && ircd_res_init() == -1) {
@@ -132,13 +133,13 @@ res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
 	case NS_NOTIFY_OP:
 		if ((buflen -= QFIXEDSZ) < 0)
 			return (-1);
-		if ((n = dn_comp(dname, cp, buflen, dnptrs, lastdnptr)) < 0)
+		if ((n = ircd_dn_comp(dname, cp, buflen, dnptrs, lastdnptr)) < 0)
 			return (-1);
 		cp += n;
 		buflen -= n;
-		__putshort(type, cp);
+		ircd__putshort(type, cp);
 		cp += INT16SZ;
-		__putshort(class, cp);
+		ircd__putshort(class, cp);
 		cp += INT16SZ;
 		hp->qdcount = htons(1);
 		if (op == QUERY || data == NULL)
@@ -147,18 +148,18 @@ res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
 		 * Make an additional record for completion domain.
 		 */
 		buflen -= RRFIXEDSZ;
-		n = dn_comp((char *)data, cp, buflen, dnptrs, lastdnptr);
+		n = ircd_dn_comp((char *)data, cp, buflen, dnptrs, lastdnptr);
 		if (n < 0)
 			return (-1);
 		cp += n;
 		buflen -= n;
-		__putshort(T_NULL, cp);
+		ircd__putshort(T_NULL, cp);
 		cp += INT16SZ;
-		__putshort(class, cp);
+		ircd__putshort(class, cp);
 		cp += INT16SZ;
-		__putlong(0, cp);
+		ircd__putlong(0, cp);
 		cp += INT32SZ;
-		__putshort(0, cp);
+		ircd__putshort(0, cp);
 		cp += INT16SZ;
 		hp->arcount = htons(1);
 		break;
@@ -170,13 +171,13 @@ res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
 		if (buflen < 1 + RRFIXEDSZ + datalen)
 			return (-1);
 		*cp++ = '\0';	/* no domain name */
-		__putshort(type, cp);
+		ircd__putshort(type, cp);
 		cp += INT16SZ;
-		__putshort(class, cp);
+		ircd__putshort(class, cp);
 		cp += INT16SZ;
-		__putlong(0, cp);
+		ircd__putlong(0, cp);
 		cp += INT32SZ;
-		__putshort(datalen, cp);
+		ircd__putshort(datalen, cp);
 		cp += INT16SZ;
 		if (datalen) {
 			bcopy(data, cp, datalen);
@@ -185,63 +186,6 @@ res_mkquery(op, dname, class, type, data, datalen, newrr_in, buf, buflen)
 		hp->ancount = htons(1);
 		break;
 
-#ifdef ALLOW_UPDATES
-	/*
-	 * For UPDATEM/UPDATEMA, do UPDATED/UPDATEDA followed by UPDATEA
-	 * (Record to be modified is followed by its replacement in msg.)
-	 */
-	case UPDATEM:
-	case UPDATEMA:
-
-	case UPDATED:
-		/*
-		 * The res code for UPDATED and UPDATEDA is the same; user
-		 * calls them differently: specifies data for UPDATED; server
-		 * ignores data if specified for UPDATEDA.
-		 */
-	case UPDATEDA:
-		buflen -= RRFIXEDSZ + datalen;
-		if ((n = dn_comp(dname, cp, buflen, dnptrs, lastdnptr)) < 0)
-			return (-1);
-		cp += n;
-		__putshort(type, cp);
-		cp += INT16SZ;
-		__putshort(class, cp);
-		cp += INT16SZ;
-		__putlong(0, cp);
-		cp += INT32SZ;
-		__putshort(datalen, cp);
-		cp += INT16SZ;
-		if (datalen) {
-			bcopy(data, cp, datalen);
-			cp += datalen;
-		}
-		if ( (op == UPDATED) || (op == UPDATEDA) ) {
-			hp->ancount = htons(0);
-			break;
-		}
-		/* Else UPDATEM/UPDATEMA, so drop into code for UPDATEA */
-
-	case UPDATEA:	/* Add new resource record */
-		buflen -= RRFIXEDSZ + datalen;
-		if ((n = dn_comp(dname, cp, buflen, dnptrs, lastdnptr)) < 0)
-			return (-1);
-		cp += n;
-		__putshort(newrr->r_type, cp);
-		cp += INT16SZ;
-		__putshort(newrr->r_class, cp);
-		cp += INT16SZ;
-		__putlong(0, cp);
-		cp += INT32SZ;
-		__putshort(newrr->r_size, cp);
-		cp += INT16SZ;
-		if (newrr->r_size) {
-			bcopy(newrr->r_data, cp, newrr->r_size);
-			cp += newrr->r_size;
-		}
-		hp->ancount = htons(0);
-		break;
-#endif /* ALLOW_UPDATES */
 	default:
 		return (-1);
 	}

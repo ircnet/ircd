@@ -53,12 +53,12 @@
  * --Copyright--
  */
 
-#ifndef lint
-static  char rcsid[] = "@(#)$Id: res_comp.c,v 1.2 1997/04/14 15:04:19 kalt Exp $";
-#endif
+#if defined(LIBC_SCCS) && !defined(lint)
+static char sccsid[] = "@(#)res_comp.c	8.1 (Berkeley) 6/4/93";
+static char rcsid[] = "$Id: res_comp.c,v 1.3 1997/05/15 20:31:40 kalt Exp $";
+#endif /* LIBC_SCCS and not lint */
 
-#include "config.h"
-
+#include <sys/types.h>
 #include <sys/param.h>
 #include <netinet/in.h>
 #include "nameser.h"
@@ -70,9 +70,11 @@ static  char rcsid[] = "@(#)$Id: res_comp.c,v 1.2 1997/04/14 15:04:19 kalt Exp $
 #if defined(BSD) && (BSD >= 199103)
 # include <unistd.h>
 # include <string.h>
+#else
+# include "portability.h"
 #endif
 
-static int	dn_find __P((u_char *exp_dn, u_char *msg,
+static int	ircd_dn_find __P((u_char *exp_dn, u_char *msg,
 			     u_char **dnptrs, u_char **lastdnptr));
 
 /*
@@ -83,7 +85,7 @@ static int	dn_find __P((u_char *exp_dn, u_char *msg,
  * Return size of compressed name or -1 if there was an error.
  */
 int
-dn_expand(msg, eomorig, comp_dn, exp_dn, length)
+ircd_dn_expand(msg, eomorig, comp_dn, exp_dn, length)
 	const u_char *msg, *eomorig, *comp_dn;
 	char *exp_dn;
 	int length;
@@ -100,7 +102,7 @@ dn_expand(msg, eomorig, comp_dn, exp_dn, length)
 	/*
 	 * fetch next label in domain name
 	 */
-	while ((n = *cp++)) {
+	while (n = *cp++) {
 		/*
 		 * Check for indirection
 		 */
@@ -147,9 +149,6 @@ dn_expand(msg, eomorig, comp_dn, exp_dn, length)
 		}
 	}
 	*dn = '\0';
-	for (dn = exp_dn; (c = *dn) != '\0'; dn++)
-		if (isascii(c) && isspace(c))
-			return (-1);
 	if (len < 0)
 		len = cp - comp_dn;
 	return (len);
@@ -168,7 +167,7 @@ dn_expand(msg, eomorig, comp_dn, exp_dn, length)
  * is NULL, we don't update the list.
  */
 int
-dn_comp(exp_dn, comp_dn, length, dnptrs, lastdnptr)
+ircd_dn_comp(exp_dn, comp_dn, length, dnptrs, lastdnptr)
 	const char *exp_dn;
 	u_char *comp_dn, **dnptrs, **lastdnptr;
 	int length;
@@ -193,7 +192,7 @@ dn_comp(exp_dn, comp_dn, length, dnptrs, lastdnptr)
 	for (c = *dn++; c != '\0'; ) {
 		/* look to see if we can use pointers */
 		if (msg != NULL) {
-			if ((l = dn_find(dn-1, msg, dnptrs, lpp)) >= 0) {
+			if ((l = ircd_dn_find(dn-1, msg, dnptrs, lpp)) >= 0) {
 				if (cp+1 >= eob)
 					return (-1);
 				*cp++ = (l >> 8) | INDIR_MASK;
@@ -248,7 +247,7 @@ dn_comp(exp_dn, comp_dn, length, dnptrs, lastdnptr)
  * Skip over a compressed domain name. Return the size or -1.
  */
 int
-__dn_skipname(comp_dn, eom)
+__ircd_dn_skipname(comp_dn, eom)
 	const u_char *comp_dn, *eom;
 {
 	register const u_char *cp;
@@ -292,7 +291,7 @@ mklower(ch)
  * not the pointer to the start of the message.
  */
 static int
-dn_find(exp_dn, msg, dnptrs, lastdnptr)
+ircd_dn_find(exp_dn, msg, dnptrs, lastdnptr)
 	u_char *exp_dn, *msg;
 	u_char **dnptrs, **lastdnptr;
 {
@@ -303,7 +302,7 @@ dn_find(exp_dn, msg, dnptrs, lastdnptr)
 	for (cpp = dnptrs; cpp < lastdnptr; cpp++) {
 		dn = exp_dn;
 		sp = cp = *cpp;
-		while ((n = *cp++)) {
+		while (n = *cp++) {
 			/*
 			 * check for indirection
 			 */
@@ -339,11 +338,127 @@ dn_find(exp_dn, msg, dnptrs, lastdnptr)
 }
 
 /*
+ * Verify that a domain name uses an acceptable character set.
+ */
+
+/*
+ * Note the conspicuous absence of ctype macros in these definitions.  On
+ * non-ASCII hosts, we can't depend on string literals or ctype macros to
+ * tell us anything about network-format data.  The rest of the BIND system
+ * is not careful about this, but for some reason, we're doing it right here.
+ */
+#define PERIOD 0x2e
+#define	hyphenchar(c) ((c) == 0x2d)
+#define bslashchar(c) ((c) == 0x5c)
+#define periodchar(c) ((c) == PERIOD)
+#define asterchar(c) ((c) == 0x2a)
+#define alphachar(c) (((c) >= 0x41 && (c) <= 0x5a) \
+		   || ((c) >= 0x61 && (c) <= 0x7a))
+#define digitchar(c) ((c) >= 0x30 && (c) <= 0x39)
+
+#define borderchar(c) (alphachar(c) || digitchar(c))
+#define middlechar(c) (borderchar(c) || hyphenchar(c))
+#define	domainchar(c) ((c) > 0x20 && (c) < 0x7f)
+
+#if 0
+/* it seems that we don't need these -krys */
+
+int
+res_hnok(dn)
+	const char *dn;
+{
+	int ppch = '\0', pch = PERIOD, ch = *dn++;
+
+	while (ch != '\0') {
+		int nch = *dn++;
+
+		if (periodchar(ch)) {
+			NULL;
+		} else if (periodchar(pch)) {
+			if (!borderchar(ch))
+				return (0);
+		} else if (periodchar(nch) || nch == '\0') {
+			if (!borderchar(ch))
+				return (0);
+		} else {
+			if (!middlechar(ch))
+				return (0);
+		}
+		ppch = pch, pch = ch, ch = nch;
+	}
+	return (1);
+}
+
+/*
+ * hostname-like (A, MX, WKS) owners can have "*" as their first label
+ * but must otherwise be as a host name.
+ */
+int
+res_ownok(dn)
+	const char *dn;
+{
+	if (asterchar(dn[0])) {
+		if (periodchar(dn[1]))
+			return (res_hnok(dn+2));
+		if (dn[1] == '\0')
+			return (1);
+	}
+	return (res_hnok(dn));
+}
+
+/*
+ * SOA RNAMEs and RP RNAMEs can have any printable character in their first
+ * label, but the rest of the name has to look like a host name.
+ */
+int
+res_mailok(dn)
+	const char *dn;
+{
+	int ch, escaped = 0;
+
+	/* "." is a valid missing representation */
+	if (*dn == '\0')
+		return(1);
+
+	/* otherwise <label>.<hostname> */
+	while ((ch = *dn++) != '\0') {
+		if (!domainchar(ch))
+			return (0);
+		if (!escaped && periodchar(ch))
+			break;
+		if (escaped)
+			escaped = 0;
+		else if (bslashchar(ch))
+			escaped = 1;
+	}
+	if (periodchar(ch))
+		return (res_hnok(dn));
+	return(0);
+}
+
+/*
+ * This function is quite liberal, since RFC 1034's character sets are only
+ * recommendations.
+ */
+int
+res_dnok(dn)
+	const char *dn;
+{
+	int ch;
+
+	while ((ch = *dn++) != '\0')
+		if (!domainchar(ch))
+			return (0);
+	return (1);
+}
+#endif
+
+/*
  * Routines to insert/extract short/long's.
  */
 
 u_int16_t
-_getshort(msgp)
+ircd_getshort(msgp)
 	register const u_char *msgp;
 {
 	register u_int16_t u;
@@ -365,7 +480,7 @@ res_getshort(msgp)
 #endif
 
 u_int32_t
-_getlong(msgp)
+ircd_getlong(msgp)
 	register const u_char *msgp;
 {
 	register u_int32_t u;
@@ -376,9 +491,9 @@ _getlong(msgp)
 
 void
 #if defined(__STDC__) || defined(__cplusplus)
-__putshort(register u_int16_t s, register u_char *msgp)	/* must match proto */
+ircd__putshort(register u_int16_t s, register u_char *msgp)	/* must match proto */
 #else
-__putshort(s, msgp)
+ircd__putshort(s, msgp)
 	register u_int16_t s;
 	register u_char *msgp;
 #endif
@@ -387,42 +502,9 @@ __putshort(s, msgp)
 }
 
 void
-__putlong(l, msgp)
+ircd__putlong(l, msgp)
 	register u_int32_t l;
 	register u_char *msgp;
 {
 	PUTLONG(l, msgp);
 }
-
-#ifdef ultrix
-/* ultrix 4.0 had some icky packaging in its libc.a.  alias for it here.
- * there is more gunk of this kind over in res_debug.c.
- */
-#undef putshort
-void
-#if defined(__STDC__) || defined(__cplusplus)
-putshort(register u_short s, register u_char *msgp)
-#else
-putshort(s, msgp)
-	register u_short s;
-	register u_char *msgp;
-#endif
-{
-	__putshort(s, msgp);
-}
-#undef putlong
-void
-putlong(l, msgp)
-	register u_int32_t l;
-	register u_char *msgp;
-{
-	__putlong(l, msgp);
-}
- 
-#undef dn_skipname
-dn_skipname(comp_dn, eom)
-	const u_char *comp_dn, *eom;
-{
-	return (__dn_skipname(comp_dn, eom));
-}
-#endif /* Ultrix 4.0 hackery */

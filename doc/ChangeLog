@@ -1,3 +1,29 @@
+Thu May 15 16:27:13 1997  Christophe Kalt
+
+	* struct.h, s_conf.h, s_serv.c: created k: lines to be able to
+	deny access based on OTHER ident replies.
+
+	* s_user.c: changed 001 reply to return n!u@h (more zen).
+
+	* s_serv.c:
+		* if A: is bogus, trash it and complain instead of crashing.
+		* get_client_name() is non-reentrant. *sigh*
+	
+Wed May  7 22:11:04 1997  Christophe Kalt
+
+	* s_user.c: nick chasing kill bug fix. (Chris Behrens)
+
+	* h.h, ircd.c, s_conf.c, s_user.c: K-lined users now exit
+	displaying the Kline comment, if any.
+
+	* s_conf.c: fixed notice ERR_YOUWILLBEBANNED, and don't disconnect
+	then.
+
+	* inet.h, nameser.h, resolv.h, inet_addr.c, portability.h, res.c,
+	res_comp.c, res_init.c, res_mkquery.c: updated. (BIND 4.9.5-P1)
+
+	* channel.c: notice for service could use free'ed memory.
+
 Sun Apr 27 16:40:08 1997  Christophe Kalt
 
 	* send.c: fixed couple buglets (added by Chris Behrens :^).

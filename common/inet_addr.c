@@ -52,32 +52,29 @@
  * -
  * --Copyright--
  */
+
+#if defined(LIBC_SCCS) && !defined(lint)
+static char sccsid[] = "@(#)inet_addr.c	8.1 (Berkeley) 6/17/93";
+static char rcsid[] = "$Id: inet_addr.c,v 1.3 1997/05/15 20:31:34 kalt Exp $";
+#endif /* LIBC_SCCS and not lint */
+
 #include "setup.h"
-#include "struct.h"
 #include "common.h"
 #include "sys.h"
+#include <sys/types.h>
+#include <sys/param.h>
 #include <netinet/in.h>
-#ifdef HAVE_ARPA_NAMESER_H
-# include <arpa/nameser.h>
-#else
-# include "nameser.h"
-#endif
-#include "resolv.h"
+/*#include "inet.h"*/
+/*#include <ctype.h>*/
+/*#include "portability.h"*/
 
-#ifndef lint
-static  char rcsid[] = "@(#)$Id: inet_addr.c,v 1.2 1997/04/14 15:04:05 kalt Exp $";
-#endif
+/* these are compatibility routines, not needed on recent BSD releases */
 
-#ifndef	INADDR_NONE
-#define	INADDR_NONE	((u_long)0xffffffff)
-#endif
-
-/* this is a compatibility routine, not needed on recent BSD releases */
-#ifdef	NEED_INET_ADDR
 /*
  * Ascii internet address interpretation routine.
  * The value returned is in network order.
  */
+#ifdef NEED_INET_ADDR
 u_long
 inet_addr(cp)
 	register const char *cp;
@@ -97,62 +94,64 @@ inet_addr(cp)
  * This replaces inet_addr, the return value from which
  * cannot distinguish between failure and a local broadcast address.
  */
-#ifdef	NEED_INET_ATON
+#ifdef NEED_INET_ATON
 int
 inet_aton(cp, addr)
-	register const u_char *cp;
+	register const char *cp;
 	struct in_addr *addr;
 {
 	register u_long val;
 	register int base, n;
-	register u_char c;
+	register char c;
 	u_int parts[4];
 	register u_int *pp = parts;
 
+	c = *cp;
 	for (;;) {
 		/*
 		 * Collect number up to ``.''.
 		 * Values are specified as for C:
-		 * 0x=hex, 0=octal, other=decimal.
+		 * 0x=hex, 0=octal, isdigit=decimal.
 		 */
+		if (!isdigit(c))
+			return (0);
 		val = 0; base = 10;
-		if (*cp == '0') {
-			if (*++cp == 'x' || *cp == 'X')
-				base = 16, cp++;
+		if (c == '0') {
+			c = *++cp;
+			if (c == 'x' || c == 'X')
+				base = 16, c = *++cp;
 			else
 				base = 8;
 		}
-		while ((c = *cp) != '\0') {
+		for (;;) {
 			if (isascii(c) && isdigit(c)) {
 				val = (val * base) + (c - '0');
-				cp++;
-				continue;
-			}
-			if (base == 16 && isascii(c) && isxdigit(c)) {
-				val = (val << 4) + 
+				c = *++cp;
+			} else if (base == 16 && isascii(c) && isxdigit(c)) {
+				val = (val << 4) |
 					(c + 10 - (islower(c) ? 'a' : 'A'));
-				cp++;
-				continue;
-			}
-			break;
+				c = *++cp;
+			} else
+				break;
 		}
-		if (*cp == '.') {
+		if (c == '.') {
 			/*
 			 * Internet format:
 			 *	a.b.c.d
-			 *	a.b.c	(with c treated as 16-bits)
+			 *	a.b.c	(with c treated as 16 bits)
 			 *	a.b	(with b treated as 24 bits)
 			 */
-			if (pp >= parts + 3 || val > 0xff)
+			if (pp >= parts + 3)
 				return (0);
-			*pp++ = val, cp++;
+			*pp++ = val;
+			c = *++cp;
 		} else
 			break;
 	}
 	/*
 	 * Check for trailing characters.
 	 */
-	if (*cp && (!isascii(*cp) || !isspace(*cp)))
+	if (c != '\0' && (!isascii(c) || !isspace(c)))
 		return (0);
 	/*
 	 * Concoct the address according to
@@ -160,6 +159,9 @@ inet_aton(cp, addr)
 	 */
 	n = pp - parts + 1;
 	switch (n) {
+
+	case 0:
+		return (0);		/* initial nondigit */
 
 	case 1:				/* a -- 32 bits */
 		break;
