@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.16 1997/09/24 18:40:54 kalt Exp $
+  $Id: INSTALL.txt,v 1.17 1997/10/01 17:50:48 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.4.
 
@@ -804,6 +804,13 @@
         though, why would you run an ircd if you allow nobody to connect
         to it anyways ?
 
+        If you specify an IP address, or IP mask, it will match clients
+        connecting from the matching addresses, no matter if they
+        resolve or not.
+
+        You can prefix an IP address or IP mask by ``='' in which case
+        only non resolving matching hosts will be banned.
+
      ttiimmee iinntteerrvvaall((ss))||ccoommmmeenntt
         Either leave this field empty or put a comment, then the line
         active continuously for the specified user/host machine.  You
@@ -835,7 +842,7 @@
         If user ``jtrim'' connects to IRC from host
         ``orion.cair.du.edu'' then IMMEDIATELY REMOVE HIM from my IRCD.
 
-        K:*.stealth.net::-43589:0:
+        k:*.stealth.net::-43589:0:
 
         If a user connects from any host that has the suffix
         ``stealth.net'' and if that host ident server returns ``-43589''
@@ -858,6 +865,16 @@
         access to your server between 8 and 12am, 2 and 7pm. Users get
         kicked off if they're already signed on when the line becomes
         active (they'll get a warning 5 minutes ago).
+
+        K:192.11.35.*::*:0:
+
+        This line disallows all hosts whose IP address matches
+        ``192.11.35.*'' to login to the ircd.
+
+        K:=192.11.35.*::*:0:
+
+        This line disallows all hosts whose IP address matches
+        ``192.11.35.*'' and which didn't resolve to login to the ircd.
 
 
   44..99..  SSeerrvveerr ccoonnnneeccttiioonnss
@@ -988,6 +1005,7 @@
   C:garfield.mit.edu::garfield.mit.edu:6667:1
   C:irc.nada.kth.se::irc.nada.kth.se:6667:1
   C:nic.funet.fi::nic.funet.fi:6667:1
+
   Ircd will attempt to connect to nic.funet.fi first, then to irc.nada
   and finally to garfield.
 
@@ -1035,6 +1053,7 @@
         present for the line to be recognized. If CRYPT_LINK_PASSWORD is
         defined in config.h, this password must be crypted.
 
+
      TTAARRGGEETT HHoosstt NNAAMMEE
         The full hostname of the target machine. This is the name that
         the TARGET server will identify itself with when you connect to
@@ -1054,6 +1073,7 @@
         we take an example of such:
 
         *.de  - a domain name matching all machines in Germany.
+
         Wildcard domains are useful in that ALL SERVERS in Germany (or
         any other domain area) can be shown as one to the rest of the
         world. Imagine 100 servers in Germany, it would be incredible
@@ -1118,7 +1138,6 @@
 
         Allows ``eff.org'' to introduce (and act as a hub for) any
         server.
-
 
      NNoottee
         It is possible to have and use multiple H-lines (or L-lines) for
@@ -1298,6 +1317,7 @@
         service. Be very careful in the types you allow.  The types can
         be found in include/service.h
 
+
      CCllaassss
         The class field should refer to an existing class.
 
@@ -1318,6 +1338,7 @@
         This information is provided to clients which are denied
         connection, either because their connection class is full, or
         the server is full, or they are not authorized to connect.
+
      FFoorrmmaatt
 
         B:<Class|Host Mask>::<Server Name>:<Port>:
@@ -1362,6 +1383,7 @@
         secondary server.
 
 
+
   44..1166..  DDeeffaauulltt llooccaall sseerrvveerr ((ffoorr llooccaall cclliieennttss)) **OOBBSSOOLLEETTEEDD**
 
 
@@ -1384,6 +1406,7 @@
         U:128.214.5.6::tolsun.oulu.fi:6667
 
         U:tolsun.oulu.fi::tolsun.oulu.fi
+
         If the port number is omitted, irc will default to using 6667.
 
 
@@ -1406,29 +1429,6 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info22835tmp2.
+input file /tmp/sgml2info19441tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.16 1997/09/24 18:40:52 kalt Exp $
+     $Id: INSTALL.info,v 1.17 1997/10/01 17:50:46 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.4.
 
@@ -873,6 +873,13 @@ Excluded accounts
      why would you run an ircd if you allow nobody to connect to it
      anyways ?
 
+     If you specify an IP address, or IP mask, it will match clients
+     connecting from the matching addresses, no matter if they resolve
+     or not.
+
+     You can prefix an IP address or IP mask by "=" in which case only
+     non resolving matching hosts will be banned.
+
 `time interval(s)|comment'
      Either leave this field empty or put a comment, then the line
      active continuously for the specified user/host machine.  You may
@@ -903,7 +910,7 @@ Excluded accounts
      If user "jtrim" connects to IRC from host "orion.cair.du.edu" then
      IMMEDIATELY REMOVE HIM from my IRCD.
 
-     K:*.stealth.net::-43589:0:
+     k:*.stealth.net::-43589:0:
 
      If a user connects from any host that has the suffix "stealth.net"
      and if that host ident server returns "-43589" - then IMMEDIATELY
@@ -925,6 +932,16 @@ Excluded accounts
      access to your server between 8 and 12am, 2 and 7pm. Users get
      kicked off if they're already signed on when the line becomes
      active (they'll get a warning 5 minutes ago).
+
+     K:192.11.35.*::*:0:
+
+     This line disallows all hosts whose IP address matches
+     "192.11.35.*" to login to the ircd.
+
+     K:=192.11.35.*::*:0:
+
+     This line disallows all hosts whose IP address matches
+     "192.11.35.*" and which didn't resolve to login to the ircd.
 
 
 File: INSTALL.info,  Node: Server connections,  Next: Hub connections,  Prev: Excluded accounts,  Up: The ircd-conf file
@@ -1472,14 +1489,14 @@ Node: Client connections24265
 Node: Operator priviliges27550
 Node: Restrict connections29670
 Node: Excluded accounts30985
-Node: Server connections34285
-Node: Hub connections42718
-Node: Leaf connections43931
-Node: Version limitations46014
-Node: Excluded machines47253
-Node: Service connections48560
-Node: Bounce server50153
-Node: Default local server (for local clients) `*OBSOLETED*'51776
-Node: Related resources52659
+Node: Server connections34843
+Node: Hub connections43276
+Node: Leaf connections44489
+Node: Version limitations46572
+Node: Excluded machines47811
+Node: Service connections49118
+Node: Bounce server50711
+Node: Default local server (for local clients) `*OBSOLETED*'52334
+Node: Related resources53217
 
 End Tag Table
