@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.32 2004/09/21 13:59:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.33 2004/09/21 23:23:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -422,6 +422,7 @@ char	*conf_read(char *cfile)
 		(*last)->popt = NULL;
 		(*last)->address = NULL;
 		(*last)->delayed = 0;
+		(*last)->port = 0;
 	    }
 	ident->timeout = MAX(DEFAULT_TIMEOUT, ident->timeout);
 	if (ident->delayed)
