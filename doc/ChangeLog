@@ -16,6 +16,12 @@
 	  matches source sid.
 	* s_user.c/register_user(): not only remove client received in NICK
 	  with improper servertok, but also the server that introduced it.
+	* s_user.c/register_user(): when iterating over fdas, check for
+	  null acptr and IsServer(apctr).
+	* ircd.c, s_bsd.c, s_bsd_ext.h: moved listeners from local[] to
+	  listeners[] table (preparation for better handling).
+	* s_serv.c/report_listeners(): as stats l/L is not returning
+	  listeners anymore, show them detailed in stats P.
 
 2004-03-05  Piotr Kucharski
 
