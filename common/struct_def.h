@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.57 2002/06/02 00:41:59 jv Exp $
+ *   $Id: struct_def.h,v 1.58 2002/06/06 14:01:13 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -612,6 +612,9 @@ struct Channel	{
 #define	CHFL_BAN	0x0008 /* ban channel flag */
 #define	CHFL_EXCEPTION	0x0010 /* exception channel flag */
 #define	CHFL_INVITE	0x0020 /* invite channel flag */
+#ifdef OPER_KLUDGE
+#define	CHFL_OPERS	0x1000 /* oper mode flag */
+#endif
 
 /* Channel Visibility macros */
 
@@ -817,6 +820,7 @@ typedef	struct	{
 #define EXITC_DEAD	'D'	/* socket died */
 #define EXITC_ERROR	'E'	/* socket error */
 #define EXITC_FLOOD	'F'	/* client flooding */
+#define EXITC_FAILURE	'f'	/* connect failure */
 #define EXITC_GHMAX	'G'	/* global clients per host max limit */
 #define EXITC_GUHMAX	'g'	/* global clients per user@host max limit */
 #define EXITC_NOILINE	'I'	/* No matching I:line */

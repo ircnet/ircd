@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.52 2002/06/06 13:55:10 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.53 2002/06/06 14:01:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1589,6 +1589,7 @@ char	msg, *username, *hostname;
 			case EXITC_NOILINE:	anyptr=" No Auth "; break;
 			case EXITC_AUTHFAIL:	anyptr="No iauth!"; break;
 			case EXITC_AUTHTOUT:	anyptr="iauth t/o"; break;
+			case EXITC_FAILURE:	anyptr=" Failure "; break;
 			default:		anyptr=" Unknown ";
 		}
 		(void)sprintf(buf, "%s", anyptr);
