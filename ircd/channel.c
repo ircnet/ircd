@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.172 2004/02/12 19:53:28 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.173 2004/02/12 20:13:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3644,30 +3644,59 @@ time_t	collect_channel_garbage(time_t now)
 
 	collect_chid();
 
-	while (chptr)
-	    {
+	for (; chptr; chptr = chptr->nextch)
+	{
 		if (chptr->users == 0)
+		{
 			curh_nb++;
+		}
 		else
-		    {
-			cur_nb++;
-			if (*chptr->chname == '!' &&
-			    (chptr->mode.mode & MODE_REOP) &&
-			    chptr->reop && chptr->reop <= now)
-				r_cnt += reop_channel(now, chptr);
-		    }
-		chptr = chptr->nextch;
-	    }
-	if (cur_nb > max_nb)
-		max_nb = cur_nb;
+		{
+			Link	*tmp;
 
-	if (r_cnt)
+			cur_nb++;
+
+			if (IsSplit())
+			{
+				continue;
+			}
+			if (chptr->reop == 0 || chptr->reop > now)
+			{
+				continue;
+			}
+			for (tmp = chptr->mlist; tmp; tmp = tmp->next)
+			{
+				if (tmp->flags == CHFL_REOPLIST)
+				{
+					break;
+				}
+			}
+			if (tmp && tmp->flags == CHFL_REOPLIST)
+			{
+				r_cnt += reop_channel(now, chptr);
+			}
+			else if (chptr->mode.mode & MODE_REOP)
+			{
+				r_cnt += reop_channel(now, chptr);
+			}
+		}
+	}
+	if (cur_nb > max_nb)
+	{
+		max_nb = cur_nb;
+	}
+
+	if (r_cnt > 0)
+	{
 		sendto_flag(SCH_CHAN, "Re-opped %u channel(s).", r_cnt);
+	}
 
 	/*
 	** check for huge netsplits, if so, garbage collection is not really
 	** done but make sure there aren't too many channels kept for
 	** history - krys
+	** This is dubious, but I'll leave it for now, until better split
+	** detection. --B.
 	*/
 	if ((2*curh_nb > cur_nb) && curh_nb < max_nb)
 		split = 1;
