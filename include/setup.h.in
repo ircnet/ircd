@@ -97,7 +97,7 @@
 /* Define if the operating system is Solaris 2.2 (SunOS 5.2).  */
 #undef SOLARIS_2_2
 
-/* Define if sys_errlist is declared in errno.h. */
+/* Define if sys_errlist is declared in stdio.h or errno.h. */
 #undef SYS_ERRLIST_DECLARED
 
 /* Define if the system provides POSIX sigaction. */
