@@ -1,3 +1,13 @@
+2005-01-03  Kurt Roeckx
+
+	* check_pings: Initialise reason.  Could be used unintialised
+	  when TIMEDKLINES is not defined.
+	* configure, setup.h.in, os.h: Make configure detect the arguments of
+	  accept() and use the 3rd argument for SOCK_LEN_TYPE, which should be
+          socklen_t in most cases.
+	* mode_pipe.c: Properly terminate the call to execlp() with a
+	  (char *)NULL.
+
 2005-01-02  Kurt Roeckx
 
 	* configure.in/configure: Use AC_CHECK_LIB to check if pow needs -lm.
