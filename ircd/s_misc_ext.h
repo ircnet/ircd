@@ -48,7 +48,7 @@ EXTERN void get_sockhost (Reg aClient *cptr, Reg char *host);
 EXTERN char *my_name_for_link (char *name, Reg int count);
 EXTERN int mark_blind_servers (aClient *cptr, aClient *server);
 EXTERN int exit_client (aClient *cptr, aClient *sptr, aClient *from,
-			    char *comment);
+			    const char *comment);
 EXTERN void checklist(void);
 EXTERN void initstats(void);
 EXTERN void initruntimeconf(void);

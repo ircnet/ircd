@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.62 2003/10/18 16:48:16 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.63 2003/10/18 18:40:38 q Exp $";
 #endif
 
 #include "os.h"
@@ -36,9 +36,9 @@ extern int dk_tocheck;
 extern int dk_lastfd;
 #endif
 
-static	void	exit_one_client (aClient *, aClient *, aClient *, char *);
-static	void	exit_server(aClient *cptr, aClient *acptr, char *comment,
-			char *comment2);
+static	void	exit_one_client (aClient *, aClient *, aClient *, const char *);
+static	void	exit_server(aClient *cptr, aClient *acptr, const char *comment,
+			const char *comment2);
 
 
 static	char	*months[] = {
@@ -351,8 +351,8 @@ int	mark_blind_servers (aClient *cptr, aClient *server)
 **	comment: The original comment for the SQUIT. (Only for cptr itself.)
 **	comment2: The comment for (S)QUIT reasons for the rest.
 */
-static	void	exit_server(aClient *cptr, aClient *acptr, char *comment,
-			char *comment2)
+static	void	exit_server(aClient *cptr, aClient *acptr, const char *comment,
+			const char *comment2)
 {
 	aClient	*acptr2;
 	int	flags;
@@ -445,7 +445,8 @@ static	void	exit_server(aClient *cptr, aClient *acptr, char *comment,
 **	char	*comment
 **		Reason for the exit
 */
-int	exit_client(aClient *cptr, aClient *sptr, aClient *from, char *comment)
+int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
+		const char *comment)
 {
 	char	comment1[HOSTLEN + HOSTLEN + 2];
 
@@ -595,7 +596,7 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from, char *comment)
 	comment1[0] = '\0';
 	if ((sptr->flags & FLAGS_KILLED) == 0)
 	    {
-	        char *c = comment;
+	        const char *c = comment;
 		int i = 0;
 		while (*c && *c != ' ')
 			if (*c++ == '.')
@@ -636,7 +637,7 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from, char *comment)
 ** been already removed, and socket closed for local client.
 */
 static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
-	char *comment)
+	const char *comment)
 {
 	Reg	aClient *acptr;
 	Reg	int	i;
