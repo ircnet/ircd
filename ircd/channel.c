@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.95 1999/04/15 21:00:57 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.96 1999/04/15 22:07:29 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2673,6 +2673,12 @@ char	*parv[];
 			sendto_channel_butserv(chptr, sptr, ":%s TOPIC %s :%s",
 					       parv[0],
 					       chptr->chname, chptr->topic);
+#ifdef USE_SERVICES
+			check_services_butone(SERVICE_WANT_TOPIC,
+					      NULL, sptr, ":%s TOPIC %s :%s",
+					      parv[0], chptr->chname, 
+					      chptr->topic);
+#endif
 			penalty += 2;
 		    }
 		else

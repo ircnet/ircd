@@ -17,6 +17,7 @@
 #define	SERVICE_WANT_MODE	0x00001000 /* channel modes (not +ov) */
 #define	SERVICE_WANT_CHANNEL	0x00002000 /* channel creations/destructions */
 #define	SERVICE_WANT_VCHANNEL	0x00004000 /* channel joins/parts */
+#define	SERVICE_WANT_TOPIC	0x00008000 /* channel topics */
 
 #define	SERVICE_WANT_ERRORS	0x01000000 /* &ERRORS */
 #define	SERVICE_WANT_NOTICES	0x02000000 /* &NOTICES */
