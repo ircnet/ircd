@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.20 1999/03/07 23:01:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.21 1999/07/02 17:31:17 kalt Exp $";
 #endif
 
 /* #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -617,13 +617,13 @@ HEADER	*hptr;
 
 		cp += n;
 		type = (int)ircd_getshort((u_char *)cp);
-		cp += sizeof(short);
+		cp += 2; /* INT16SZ */
 		class = (int)ircd_getshort((u_char *)cp);
-		cp += sizeof(short);
+		cp += 2; /* INT16SZ */
 		rptr->ttl = ircd_getlong((u_char *)cp);
-		cp += sizeof(rptr->ttl);
+		cp += 4; /* INT32SZ */
 		dlen =  (int)ircd_getshort((u_char *)cp);
-		cp += sizeof(short);
+		cp += 2; /* INT16SZ */
 		rptr->type = type;
 
 		len = strlen(hostbuf);
