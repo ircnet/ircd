@@ -3,6 +3,9 @@
 	* channel.c/m_join(): get rid of ^G hack; simplify, as we don't get
 	  JOIN from other servers.
 	* channel.c/m_join(): tiny bug, JOIN 0,#chan did not join #chan.
+	* s_serv.c/get_version(): anything below 2.11.0b12 is too old.
+	* s_serv.c/m_squit(): SV_OLDSQUIT is gone.
+	* s_serv.c/m_server_estab(): drop too old servers.
 
 2005-02-08  Piotr Kucharski
 
