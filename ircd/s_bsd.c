@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.102 2003/10/17 19:04:56 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.103 2003/10/17 19:29:05 q Exp $";
 #endif
 
 #include "os.h"
@@ -635,6 +635,8 @@ void	daemonize()
 	if (((bootopt & BOOT_CONSOLE) || isatty(0)) &&
 	    !(bootopt & (BOOT_INETD|BOOT_OPER)))
 	    {
+		if (fork())
+			exit(0);
 #ifdef TIOCNOTTY
 		if ((fd = open("/dev/tty", O_RDWR)) >= 0)
 		    {
