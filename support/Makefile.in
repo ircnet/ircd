@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.33 1998/09/14 11:44:53 kalt Exp $
+#*   $Id: Makefile.in,v 1.34 1998/09/23 13:29:51 kalt Exp $
 #*
 #*/
 
@@ -55,7 +55,7 @@ MKDIRHIER = ../support/mkdirhier
 # Directory in which to install irc.
 client_bin_dir = @bindir@
 
-# Directory in which to install ircd and chkconf.
+# Directory in which to install ircd, iauth, ircdwatch, mkpasswd and chkconf.
 server_bin_dir = @sbindir@
 
 # Directory in which to install the client manual page file.
