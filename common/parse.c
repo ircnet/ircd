@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.20 1998/09/13 20:09:05 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.21 1998/11/02 17:47:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -38,15 +38,18 @@ static  char rcsid[] = "@(#)$Id: parse.c,v 1.20 1998/09/13 20:09:05 kalt Exp $";
 
 struct Message msgtab[] = {
   { MSG_PRIVATE, m_private,  MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_NICK,    m_nick,     MAXPARA, MSG_LAG, 0, 0, 0L},
-  { MSG_NOTICE,  m_notice,   MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_NJOIN,   m_njoin,    MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_JOIN,    m_join,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_MODE,    m_mode,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_QUIT,    m_quit,     MAXPARA, MSG_LAG, 0, 0, 0L},
+  { MSG_NICK,    m_nick,     MAXPARA, MSG_LAG, 0, 0, 0L},
   { MSG_PART,    m_part,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_QUIT,    m_quit,     MAXPARA, MSG_LAG, 0, 0, 0L},
+  { MSG_NOTICE,  m_notice,   MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_KICK,    m_kick,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_SERVER,  m_server,   MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+  { MSG_TRACE,   m_trace,    MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_TOPIC,   m_topic,    MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_INVITE,  m_invite,   MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_KICK,    m_kick,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_WALLOPS, m_wallops,  MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
   { MSG_PING,    m_ping,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_PONG,    m_pong,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
@@ -61,16 +64,13 @@ struct Message msgtab[] = {
   { MSG_AWAY,    m_away,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_UMODE,   m_umode,    MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_ISON,    m_ison,     1,	 MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_SERVER,  m_server,   MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_SQUIT,   m_squit,    MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
-  { MSG_NJOIN,   m_njoin,    MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_WHOIS,   m_whois,    MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_WHO,     m_who,      MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_WHOWAS,  m_whowas,   MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_LIST,    m_list,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_NAMES,   m_names,    MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_USERHOST,m_userhost, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_TRACE,   m_trace,    MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_PASS,    m_pass,     MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_LUSERS,  m_lusers,   MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_TIME,    m_time,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
