@@ -1,6 +1,38 @@
+2004-07-15  Piotr Kucharski
+
+	* chkconf.c: use config_error() instead of fprintf(stderr... and adjust
+	  wherever needed for changed filelist (different definition depending
+	  on compile-time options).
+	* chkconf.c: allow -d and -s, show filenames and linenumbers when -d1 -s.
+	* config_read.c/config_read(): added CF_NONE level for printing without
+	  filename:linenum prefix.
+	* config_read.c, chkconf.c: tidy up.
+
 2004-07-15  Jakub Vlasek
 	
 	* s_bsd.c/activate_delayed_listeners(): Use ListenerLL.
+
+2004-07-14  Piotr Kucharski
+
+	* chkconf.c/validate(): make it void.
+	* chkconf.c: new function showconf() for printing config file as ircd
+	  would see it.
+	* chkconf.c/main(): new command line option -s.
+	* config_read.c/config_read(): do not omit bad #include and comments,
+	  put them in config so admin can see problems with `chkconf -s'.
+	* config_read.c: new function config_error().
+	* config_read.c: new struct aFile, changed struct aConfig.
+	* config_read.c: new function new_config_file().
+	* config_read.c/config_read(): keep track of line numbers in config.
+	* config_read.c/config_read(): new parameter (config file name).
+	* s_conf.c/initconf(), chkconf/showconf(), initconf(): config_read()
+	  added parameter.
+	* config_read.c/config_free(): free also config file stack.
+	* config_read.c/config_read(): set file in each new aConfig.
+	* config_read.c/config_error(): print traceback for chkconf.
+	* config_read.c/config_read(): use config_error() for printing errors.
+	* config_read.c/config_read(): don't print IRCDCONF_PATH if no need.
+	* config_read.c/config_read(): detect loops.
 
 2004-07-13  Piotr Kucharski
 
