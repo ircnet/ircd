@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.33 1998/03/26 14:35:05 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.34 1998/03/31 21:50:32 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -263,8 +263,9 @@ aClient	*cptr;
 			/* the NJOIN command appeared on 2.9.5 */
 			cptr->hopcount |= SV_NJOIN;
 	    }
-	else if (!strncmp(cptr->info, "021", 3))
-		cptr->hopcount = SV_29|SV_NJOIN;
+	else if (!strncmp(cptr->info, "021", 3) ||
+		 !strncmp(cptr->info, "020999", 6))
+		cptr->hopcount = SV_29|SV_NJOIN|SV_NMODE;
 	else
 		cptr->hopcount = SV_OLD;
 

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.13 1997/12/16 22:10:50 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.14 1998/03/31 21:54:24 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -40,7 +40,7 @@ static	Numeric	local_replies[] = {
 /* 001 */	{ RPL_WELCOME, ":Welcome to the Internet Relay Network %s" },
 /* 002 */	{ RPL_YOURHOST, ":Your host is %s, running version %s" },
 /* 003 */	{ RPL_CREATED, ":This server was created %s" },
-/* 004 */	{ RPL_MYINFO, "%s %s oirw abiklmnopqstv" },
+/* 004 */	{ RPL_MYINFO, "%s %s oOirw abeiIklmnopqstv" },
 /* 005 */	{ RPL_BOUNCE, ":Try server %s, port %d" },
 		{ 0, (char *)NULL }
 };
@@ -211,10 +211,10 @@ static	Numeric	numeric_replies[] = {
 		{ 0, (char *)NULL },
 		{ 0, (char *)NULL },
 		{ 0, (char *)NULL },
-		{ 0, (char *)NULL },
-		{ 0, (char *)NULL },
-		{ 0, (char *)NULL },
-		{ 0, (char *)NULL },
+/* 346 */	{ RPL_INVITELIST, "%s %s" },
+/* 347 */       { RPL_ENDOFINVITELIST, "%s :End of Channel Invite List" },
+/* 348 */	{ RPL_EXCEPTLIST, "%s %s" },
+/* 349 */       { RPL_ENDOFEXCEPTLIST, "%s :End of Channel Exception List" },
 		{ 0, (char *)NULL },
 /* 351 */	{ RPL_VERSION, "%s.%s %s :%s" },
 /* 352 */	{ RPL_WHOREPLY, "%s %s %s %s %s %s :%d %s" },

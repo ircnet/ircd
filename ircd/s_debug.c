@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.15 1998/03/26 14:35:05 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.16 1998/03/31 21:50:31 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -480,7 +480,7 @@ int	debug;
 				d_chu++;
 			for (link = chptr->invites; link; link = link->next)
 				d_chi++;
-			for (link = chptr->banlist; link; link = link->next)
+			for (link = chptr->mlist; link; link = link->next)
 			    {
 				d_chb++;
 				d_chbm += strlen(link->value.cp) + 1;
@@ -566,12 +566,12 @@ int	debug;
 			   d_cl*sizeof(aClass));
 
 	sendto_one(cptr,
-		   ":%s %d %s :Channels %d(%d) Bans %d(%d) History %d(%d)",
+		   ":%s %d %s :Channels %d(%d) Modes %d(%d) History %d(%d)",
 		   me.name, RPL_STATSDEBUG, nick, ch, chm, chb, chbm,chh,chhm);
 	if (debug && (ch != d_ch || chm != d_chm || chb != d_chb
 		      || chbm != d_chbm || chh != d_chh || chhm != d_chhm))
 		sendto_one(cptr,
-	       ":%s %d %s :Channels %d(%d) Bans %d(%d) History %d(%d) [REAL]",
+	       ":%s %d %s :Channels %d(%d) Modes %d(%d) History %d(%d) [REAL]",
 			   me.name, RPL_STATSDEBUG, nick, d_ch, d_chm, d_chb,
 			   d_chbm, d_chh, d_chhm);
 	sendto_one(cptr, ":%s %d %s :Channel members %d(%d) invite %d(%d)",

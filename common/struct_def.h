@@ -49,7 +49,7 @@ typedef struct        MotdItem aMotd;
 #define	KEYLEN		23
 #define	BUFSIZE		512		/* WARNING: *DONT* CHANGE THIS!!!! */
 #define	MAXRECIPIENTS 	20
-#define	MAXBANS		20
+#define	MAXBANS		30
 #define	MAXBANLENGTH	1024
 #define	BANLEN		(USERLEN + NICKLEN + HOSTLEN + 3)
 #define MAXPENALTY	10
@@ -567,7 +567,7 @@ struct Channel	{
 	int	users;		/* current membership total */
 	Link	*members;	/* channel members */
 	Link	*invites;	/* outstanding invitations */
-	Link	*banlist;
+	Link	*mlist;		/* list of extended modes: +b/+e/+I */
 	Link	*clist;		/* list of connections which are members */
 	time_t	history;
 	char	chname[1];
@@ -582,6 +582,8 @@ struct Channel	{
 #define	CHFL_CHANOP     0x0001 /* Channel operator */
 #define	CHFL_VOICE      0x0002 /* the power to speak */
 #define	CHFL_BAN	0x0004 /* ban channel flag */
+#define	CHFL_EXCEPTION	0x0008 /* exception channel flag */
+#define	CHFL_INVITE	0x0010 /* invite channel flag */
 
 /* Channel Visibility macros */
 
@@ -598,11 +600,14 @@ struct Channel	{
 #define	MODE_LIMIT	0x0400
 #define	MODE_ANONYMOUS	0x0800
 #define	MODE_QUIET	0x1000
+#define	MODE_EXCEPTION	0x2000
+#define	MODE_INVITE	0x4000
 #define MODE_FLAGS	0x1fff
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */
-#define	MODE_WPARAS	(MODE_CHANOP|MODE_VOICE|MODE_BAN|MODE_KEY|MODE_LIMIT)
+#define	MODE_WPARAS	(MODE_CHANOP|MODE_VOICE|MODE_BAN|MODE_KEY|MODE_LIMIT\
+			 |MODE_INVITE|MODE_EXCEPTION)
 /*
  * Undefined here, these are used in conjunction with the above modes in
  * the source.
@@ -717,6 +722,7 @@ typedef	struct	{
 #define	SV_OLD		0x0000
 #define	SV_29		0x0001	/* useless, but preserved for coherence */
 #define	SV_NJOIN	0x0002	/* server understands the NJOIN command */
+#define	SV_NMODE	0x0004	/* server knows new MODEs (+e/+I) */
 
 /* used for sendto_flag */
 

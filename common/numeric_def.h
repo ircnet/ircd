@@ -233,6 +233,12 @@
 #define RPL_INVITING         341
 #define	RPL_SUMMONING        342
 
+#define RPL_INVITELIST       346
+#define RPL_ENDOFINVITELIST  347
+
+#define RPL_EXCEPTLIST       348
+#define RPL_ENDOFEXCEPTLIST  349
+
 #define RPL_VERSION          351
 
 #define RPL_WHOREPLY         352
