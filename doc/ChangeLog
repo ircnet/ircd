@@ -1,3 +1,15 @@
+2002-09-29  Jakub Vlasek
+
+	* iauth-internals.txt: Update for 2.11 protocol (added kill reason).
+	* struct_def.h: Added reason to struct Client - used for storing
+	  of extended information about client quit (like from iauth modules).
+	* a_conf.c: Parse reason from iauth.conf
+	* a_conf_def.h: Added reason to struct Instance.
+	* mod_socks.h: Send kill reason to ircd.
+	* list.c/free_client(): Free aClient->reason.
+	* s_auth.c: Parse kill reason from iauth.
+	* s_user.c/register_user(): Send kill reason from iauth to the client.
+
 2002-09-13  Jakub Vlasek
 
 	* ircd.c, s_ircd.c: Make -t (don't fork) avaible even when not
