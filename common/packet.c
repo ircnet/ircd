@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: packet.c,v 1.6 1999/01/18 17:07:03 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: packet.c,v 1.7 1999/02/19 20:46:38 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -64,7 +64,7 @@ Reg	int	length;
 	aClient	*acpt = cptr->acpt;
 	int	r = 1;
 #ifdef ZIP_LINKS
-	int	zipped = 0;
+	int	unzipped = 0;
 #endif
  
 	me.receiveB += length; /* Update bytes received */
@@ -92,35 +92,49 @@ Reg	int	length;
 	bufptr = cptr->buffer;
 	ch1 = bufptr + cptr->count;
 	ch2 = buffer;
-#ifdef	ZIP_LINKS
-        if (cptr->flags & FLAGS_ZIPSTART)
-            {
-                if (*ch2 == '\n') /* also check \r ? */
-                    {
-                        ch2++;
-                        length--;
-                    }   
-                cptr->flags &= ~FLAGS_ZIPSTART;
-		if (length == 0)
-			return r;
-            }
-	if (cptr->flags & FLAGS_ZIP)
-	    {
-		/* uncompressed buffer first */
-		zipped = length;
-		ch2 = unzip_packet(cptr, ch2, &zipped);
-		length = zipped;
-		zipped = 1;
-		if (length == -1)
-			return exit_client(cptr, cptr, &me,
-					   "fatal error in unzip_packet()");
-	    }
-#endif
 
-	while (--length >= 0 && ch2)
+#ifdef ZIP_LINKS
+	while ((length > 0 && ch2) || ((cptr->flags & FLAGS_ZIP) &&
+				       (cptr->zip->in->avail_in ||
+					!unzipped)))
+#else
+	while (length > 0 && ch2)
+#endif
 	    {
 		Reg	char	c;
 
+#ifdef ZIP_LINKS
+		if (cptr->flags & FLAGS_ZIPSTART)
+		    {
+			/*
+			 ** beginning of server connection, the buffer
+			 ** contained PASS/SERVER and is now zipped!
+			 ** Ignore the '\n' that should be here.
+			 */
+			if (*ch2 == '\n') /* also check \r ? */
+			    {
+				ch2++;
+				length--;
+				cptr->flags &= ~FLAGS_ZIPSTART;
+			    }
+			if (length == 0)
+				return 1;
+		    }
+
+		if ((cptr->flags & FLAGS_ZIP) && !(unzipped && length))
+		    {
+			/* uncompressed buffer first */
+			unzipped = length; /* length is register, store
+						  temp in unzipped */
+			ch2 = unzip_packet(cptr, ch2, &unzipped);
+			length = unzipped;
+			unzipped = 1;
+			if (length == -1)
+				return exit_client(cptr, cptr, &me,
+					"fatal error in unzip_packet()");
+		    }
+#endif
+		length--;
 		c = (*ch1 = *ch2++);
 		/*
 		 * Yuck.  Stuck.  To make sure we stay backward compatible,
@@ -170,30 +184,6 @@ Reg	int	length;
 			*/
 			if (IsServer(cptr) && (cptr->flags & FLAGS_UNKCMD))
 				break;
-#endif
-#ifdef	ZIP_LINKS
-			if ((cptr->flags & FLAGS_ZIP) && (zipped == 0) &&
-			    (length > 0))
-			    {
-				/*
-				** beginning of server connection, the buffer
-				** contained PASS/SERVER and is now zipped!
-				** Ignore the '\n' that should be here.
-				*/
-				zipped = length;
-				if (zipped > 0 && *ch2 == '\n')
-				    {
-					ch2++;
-					zipped--;
-				    }
-				cptr->flags &= ~FLAGS_ZIPSTART;
-				ch2 = unzip_packet(cptr, ch2, &zipped);
-				length = zipped;
-				zipped = 1;
-				if (length == -1)
-					return exit_client(cptr, cptr, &me,
-					   "fatal error in unzip_packet()");
-			    }
 #endif
 			ch1 = bufptr;
 		    }

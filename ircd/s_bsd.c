@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.54 1999/02/12 04:10:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.55 1999/02/19 20:46:38 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1899,21 +1899,6 @@ int	msg_ready;
 			done = dopacket(cptr, readbuf, length);
 			if (done && done != 2)
 				return done;
-#ifdef ZIP_LINKS
-			/*
-			** compressed data received cannot always be
-			** entirely uncompressed in one step (because of
-			** buffer sizes); this makes sure to uncompress
-			** all that was received.
-			*/
-			if (cptr->flags & FLAGS_ZIP)
-				while (cptr->zip->in->avail_in != 0)
-				    {
-					done = dopacket(cptr, readbuf, 0);
-					if (done && done != 2)
-						return done;
-				    }
-#endif
 		    }
 	    }
 	else
