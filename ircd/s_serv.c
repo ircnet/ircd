@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.142 2004/02/13 01:38:16 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.143 2004/02/13 01:55:21 jv Exp $";
 #endif
 
 #include "os.h"
@@ -253,7 +253,9 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    {
 			/* better server: just propagate upstream */
 			sendto_one(acptr->from, ":%s SQUIT %s :%s",
-				    parv[0], ST_UID(acptr->from) ?
+				    ST_UID(acptr->from) ? sptr->serv->sid :
+				    sptr->name,
+				    ST_UID(acptr->from) ?
 				    acptr->serv->sid : acptr->name, comment);
 			
 			sendto_flag(SCH_SERVER,
@@ -276,7 +278,9 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    (cptr->serv->version & SV_OLDSQUIT) == 0)
 		    {
 			sendto_one(cptr, ":%s SQUIT %s :%s (Bounced for %s)",
-				   ME, acptr->name, comment, parv[0]);
+				   ST_UID(cptr) ? me.serv->sid : ME,
+				   ST_UID(cptr) ? acptr->serv->sid:
+				   acptr->name, comment, parv[0]);
 			sendto_flag(SCH_DEBUG, "Bouncing SQUIT %s back to %s",
 				    acptr->name, acptr->from->name);
 		    }
