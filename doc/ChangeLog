@@ -1,3 +1,17 @@
+2003-02-15  Piotr Kucharski
+
+	* s_bsd.c/polludp(): sometimes garbage IP was shown in error message.
+	* send.c/sendto_match_butone(): don't send to old servers.
+	* send.c: new function sendto_match_butone_old() for sending $#/$$
+	  mask message to old servers only.
+	* s_user.c/m_message(): use sendto_match_butone_old().
+	* struct_def.h: added ST_NOTUID() define.
+	* s_misc.c, s_send.c, s_serv.c, s_service.c, s_user.c, send.c:
+	  we miserably forgot about De Morgan laws, changing all
+	  !ST_UID() to ST_NOTUID(); luckily in most, if not every, places it
+	  was guarded by earlier IsServer or similar (talk about redundant
+	  checks, eh?), so it didn't affect us badly (noted by Grega Pogacnik).
+
 2003-02-14  Piotr Kucharski
 
 	* channel.c/match_modeid(): wrong UID ban checks.
