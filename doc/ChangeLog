@@ -1,3 +1,8 @@
+2002-08-25  Jakub Vlasek
+	* parse.c/getfield(): Support quoting of delimiter in ircd.conf.
+	* s_user.c/m_user(): Fixed crash introduced during last change 
+	  (from fiction).
+	  
 2002-08-24  Piotr Kucharski
 
 	* parse.c/remove_unknown(), channel.c/collect_channel_garbage(),
