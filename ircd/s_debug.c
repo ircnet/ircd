@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.38 2003/10/18 15:31:26 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.39 2004/02/12 19:39:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -117,9 +117,6 @@ char	serveropts[] = {
 #endif
 #ifdef	ENABLE_SUMMON
 'S',
-#endif
-#ifdef	OPER_REMOTE
-'t',
 #endif
 #ifdef TOPIC_WHO_TIME
 'T',
