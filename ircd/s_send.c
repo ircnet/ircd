@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_send.c,v 1.3 2003/02/15 19:25:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_send.c,v 1.4 2003/06/22 15:15:02 q Exp $";
 #endif
 
 #include "os.h"
@@ -276,7 +276,7 @@ esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 		{
 		    /* to local users */
 		    if (plen == 0)
-			    plen = sprintf(":anonymous!anonymous@anonymous %s %s", imsg, chptr->chname);
+			    plen = sprintf(":anonymous!anonymous@anonymous. %s %s", imsg, chptr->chname);
 		}
 	    else
 		{
