@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.16 2004/02/13 19:08:46 chopin Exp $
+# $Id: ircd.conf.example,v 1.17 2004/06/17 18:29:08 chopin Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -247,13 +247,13 @@ I:::*@indial*.irc.org::12
 #
 #
 ############################
-# O: [OPTIONAL]. These lines define operator access. You do not need to
+# o: [OPTIONAL]. These lines define operator access. You do not need to
 # have an operator to run a server. A well configured leaf site should not
 # need an operator online, if its connections are well defined, the irc
 # administrator can use 'kill -HUP' on the ircd to reload the configuration
 # file. 
 #
-# O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>
+# o:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>
 #
 # If the person in "Nickname" is not coming from the hostname defined in
 # the first field then the person will get the error message "No O: lines
@@ -262,21 +262,21 @@ I:::*@indial*.irc.org::12
 # Note that you don't need to use 'Nickname' to become operator, if you're
 # using some other nick at that moment '/oper Nickname' will do also.
 #
-O:*.bu.edu:Zaphod:Trillian::10
+o:*.bu.edu:Zaphod:Trillian::10
 #
 # and this line forces ident match:
-O:hrose@csa.bu.edu:Zaphod:Trillian::10
+o:hrose@csa.bu.edu:Zaphod:Trillian::10
 # 
 # and this line allows oper to come from ip block:
-O:192.168.0.0/16:Zaphod:Trillian::10
+o:192.168.0.0/16:Zaphod:Trillian::10
 #
-# This line is a "local operator", it is specified with a lower-case "o"
+# This line is a "local operator", it is specified with a upper-case "O"
 #
 # this line permits the nickname "jhs" with the password of "ITBites" to
 # be a local operator only (restrictions are defined in config.h during
 # ircd compilation time).
 #
-o:*.bu.edu:ITBites:jhs::10
+O:*.bu.edu:ITBites:jhs::10
 #
 # a crypted password line (NOTE that if you have crypted passwords, *all*
 # of you passwords must be crypted! In fact, if you are getting an error
@@ -285,7 +285,7 @@ o:*.bu.edu:ITBites:jhs::10
 # crypted strings in the same IRC server configuration file is an
 # impossibility (but it is just theoretical, which is why I explained both).
 #
-O:rocker@csa.bu.edu:T0eiVgHrqeKTQ:Rocker::10
+o:rocker@csa.bu.edu:T0eiVgHrqeKTQ:Rocker::10
 #
 #
 ############################
