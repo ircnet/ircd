@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.15 1997/10/01 17:42:59 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.16 1997/10/06 15:00:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1486,9 +1486,12 @@ char	*parv[];
 	    }
 
 	*jbuf = '\0';
+	*buf = '\0';
 	/*
 	** Rebuild list of channels joined to be the actual result of the
 	** JOIN.  Note that "JOIN 0" is the destructive problem.
+	** Also note that this can easily trash the correspondance between
+	** parv[1] and parv[2] lists.
 	*/
 	for (i = 0, name = strtoken(&p, parv[1], ","); name;
 	     name = strtoken(&p, NULL, ","))
@@ -1615,7 +1618,15 @@ char	*parv[];
 			*--s = '\007';
 		}
 #endif
-		sendto_match_servs(chptr, cptr, ":%s JOIN :%s", parv[0], name);
+		if (index(name, ':'))
+			sendto_match_servs(chptr, cptr, ":%s JOIN :%s",
+					   parv[0], name);
+		else
+		    {
+			if (*buf)
+				strcat(buf, ",");
+			strcat(buf, name);
+		    }
 
 		if (MyClient(sptr))
 		    {
@@ -1631,6 +1642,8 @@ char	*parv[];
 			(void)m_names(cptr, sptr, 2, parv);
 		    }
 	    }
+	if (*buf)
+		sendto_serv_butone(cptr, ":%s JOIN :%s", parv[0], buf);
 	return 2;
 }
 
