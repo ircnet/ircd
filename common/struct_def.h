@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.53 2002/03/03 21:56:48 jv Exp $
+ *   $Id: struct_def.h,v 1.54 2002/04/05 03:04:08 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -172,6 +172,8 @@ typedef struct        LineItem aExtData;
 #define	FLAGS_SQUIT	0x2000000 /* This is set when we send the last
 				  ** server, so we know we have to send
 				  ** a SQUIT. */
+#define	FLAGS_EOB	0x4000000 /* EOB received */
+
 #define	FLAGS_OPER	0x0001 /* Operator */
 #define	FLAGS_LOCOP	0x0002 /* Local operator -- SRB */
 #define	FLAGS_WALLOP	0x0004 /* send wallops to them */
@@ -199,6 +201,7 @@ typedef struct        LineItem aExtData;
 #define	IsListening(x)		((x)->flags & FLAGS_LISTEN)
 #define	IsLocal(x)		(MyConnect(x) && (x)->flags & FLAGS_LOCAL)
 #define	IsDead(x)		((x)->flags & FLAGS_DEADSOCK)
+#define	IsBursting(x)		(!((x)->flags & FLAGS_EOB))
 #define	SetDead(x)		((x)->flags |= FLAGS_DEADSOCK)
 #define	CBurst(x)		((x)->flags & FLAGS_CBURST)
 #define	SetOper(x)		((x)->user->flags |= FLAGS_OPER)
@@ -209,6 +212,7 @@ typedef struct        LineItem aExtData;
 #define	SetUnixSock(x)		((x)->flags |= FLAGS_UNIX)
 #define	SetDNS(x)		((x)->flags |= FLAGS_DOINGDNS)
 #define	SetDoneXAuth(x)		((x)->flags |= FLAGS_XAUTHDONE)
+#define	SetEOB(x)		((x)->flags |= FLAGS_EOB)
 #define	DoingDNS(x)		((x)->flags & FLAGS_DOINGDNS)
 #define	DoingAuth(x)		((x)->flags & FLAGS_AUTH)
 #define	DoingXAuth(x)		((x)->flags & FLAGS_XAUTH)
@@ -696,6 +700,7 @@ struct Channel	{
 typedef	struct	{
 	u_long	is_user[2];	/* users, non[0] invis and invis[1] */
 	u_long	is_serv;	/* servers */
+	u_long	is_eobservers;  /* number of servers which sent EOB */
 	u_long	is_masked;	/* masked servers. */
 	u_long	is_service;	/* services */
 	u_long	is_chan;	/* channels */
