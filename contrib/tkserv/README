@@ -86,11 +86,13 @@ B) Editing the configuration file (tkconf.h)
 
    TKSERV_DEBUG (for debugging only, displays traffic to standard output)
 
+   TKSERV_CONF_PATH aka CPATH (where to save tklines (defined in ircd Makefile)
+
    TKSERV_IRCD_CONFIG_BAK (the suffix after CPATH for the backup file 
-                          of the ircd.conf file)
+                          of the conf file)
 
    TKSERV_IRCD_CONFIG_TMP (the suffix after CPATH for the temporary copy
-                          of the ircd.conf file) 
+                          of the conf file) 
   
 C) Compiling the source
 

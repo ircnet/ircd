@@ -737,7 +737,7 @@ void service_pong(void)
 */
 void service_notice(char **args)
 {
-    if ((!strcmp(args[4], "reloading") && (!strcmp(args[5], TKSERV_IRCD_CONF))) ||
+    if ((!strcmp(args[4], "reloading") && (!strcmp(args[5], "ircd.conf"))) ||
         (!strcmp(args[3], "rehashing") && (!strcmp(args[4], "Server"))))
     {
         if (tklined)
