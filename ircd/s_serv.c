@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.233 2004/08/31 08:35:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.234 2004/10/01 16:16:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3237,6 +3237,7 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		{ TSET_POOLSIZE, "POOLSIZE" },
 		{ TSET_ACONNECT, "ACONNECT" },
+		{ TSET_CACCEPT, "CACCEPT" },
 		{ 0, NULL }
 	};
 	int i, acmd = 0;
@@ -3286,7 +3287,7 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				else
 				{
 					sendto_one(sptr, ":%s NOTICE %s SET "
-						":Illegal value for ACONNECT"
+						":Illegal value for ACONNECT. "
 						"Possible values: ON OFF",
 						ME, parv[0]);
 					break;
@@ -3318,6 +3319,30 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				}
 				break;
 			} /* TSET_POOLSIZE */
+			case TSET_CACCEPT:
+				if (!mycmp(parv[2], "OFF"))
+				{
+					iconf.caccept = 0;
+				}
+				else if (!mycmp(parv[2], "ON"))
+				{
+					iconf.caccept = 1;
+				}
+				else if (!mycmp(parv[2], "SPLIT"))
+				{
+					iconf.caccept = 2;
+				}
+				else
+				{
+					sendto_one(sptr, ":%s NOTICE %s SET "
+						":Illegal value for CACCEPT. "
+						"Possible values: ON OFF SPLIT",
+						ME, parv[0]);
+					break;
+				}
+				sendto_flag(SCH_NOTICE, "%s changed value of "
+					"CACCEPT to %s", sptr->name, parv[2]);
+				break;
 		} /* switch(acmd) */
 	} /* parc > 2 */
 
@@ -3332,6 +3357,12 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{
 			sendto_one(sptr, ":%s NOTICE %s :ACONNECT = %s", ME,
 				parv[0], iconf.aconnect == 1 ? "ON" : "OFF");
+		}
+		if (acmd & TSET_CACCEPT)
+		{
+			sendto_one(sptr, ":%s NOTICE %s :CACCEPT = %s", ME,
+				parv[0], iconf.caccept == 2 ? "SPLIT" :
+				iconf.caccept == 1 ? "ON" : "OFF");
 		}
 	}
 	return 1;
