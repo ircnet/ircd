@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.252 2005/02/09 16:20:56 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.253 2005/02/10 17:53:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1821,12 +1821,6 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 
 		sendto_match_servs_v(chptr, cptr, SV_UID,
 			":%s MODE %s %s %s", s, chptr->chname, mbuf, upbuf);
-		if (modebuf[1] != 'R') /* don't send +R list to old servers */
-		{
-			sendto_match_servs_notv(chptr, cptr, SV_UID, 
-				":%s MODE %s %s %s", sptr->name, chptr->chname,
-				mbuf, pbuf);
-		}
 
 		if ((IsServer(cptr) && !IsServer(sptr) && !ischop))
 		{
