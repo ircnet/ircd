@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.39 1998/09/13 16:47:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.40 1998/09/18 22:02:27 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -981,11 +981,13 @@ aClient	*cptr;
 	    }
 	if (!BadPtr(aconf->passwd))
 #ifndef	ZIP_LINKS
-		sendto_one(cptr, "PASS %s %s %s", aconf->passwd, pass_version,
-			   serveropts);
-#else
-		sendto_one(cptr, "PASS %s %s %s %s", aconf->passwd,
+		sendto_one(cptr, "PASS %s %s IRC|%s %s", aconf->passwd,
 			   pass_version, serveropts,
+			   (bootopt & BOOT_STRICTPROT) ? "P" : "");
+#else
+		sendto_one(cptr, "PASS %s %s IRC|%s %s%s", aconf->passwd,
+			   pass_version, serveropts,
+			   (bootopt & BOOT_STRICTPROT) ? "P" : "",
 			   (aconf->status == CONF_ZCONNECT_SERVER) ? "Z" : "");
 #endif
 
