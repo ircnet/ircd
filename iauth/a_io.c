@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.21 1999/07/04 22:09:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.22 1999/07/11 22:09:59 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -556,7 +556,7 @@ loop_io()
 		    cldata[i].instance /* shouldn't be needed.. but it is */)
 		    {
 			DebugLog((ALOG_DIO, 0,
-				  "loop_io(): module %s timeout [%d]",
+				  "io_loop(): module %s timeout [%d]",
 				  cldata[i].instance->mod->name, i));
 			if (cldata[i].instance->mod->timeout(i) != 0)
 				next_io(i, cldata[i].instance);
@@ -714,7 +714,7 @@ loop_io()
 
 #if defined(IAUTH_DEBUG)
 	if (nfds > 0)
-		sendto_log(ALOG_DIO, 0, "loop_io(): nfds = %d !!!", nfds);
+		sendto_log(ALOG_DIO, 0, "io_loop(): nfds = %d !!!", nfds);
 # if !defined(USE_POLL)
 	/* the equivalent should be written for poll() */
 	if (nfds == 0)
