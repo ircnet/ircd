@@ -474,7 +474,8 @@ AC_DEFUN(IRC_NON_BLOCKING_SYSTEM,
 AC_CACHE_VAL(irc_cv_non_blocking_system,
 [
 changequote(<<, >>)dnl
-irc_precode='#ifdef HAVE_SYS_TYPES_H
+irc_precode='#include "confdefs.h"
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
 #if HAVE_SYS_SOCKET_H
@@ -862,7 +863,7 @@ dnl main
 dnl ----
 
 AC_INIT([irc], [2.11], [ircd-bugs@irc.org])
-AC_REVISION([$Id: configure.in,v 1.54 2004/05/08 02:07:00 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.55 2004/05/09 18:56:25 chopin Exp $])
 AC_PREREQ([2.57])
 
 AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [PREFIX/var/log/ircd]], [
