@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.4 1997/10/01 19:57:04 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.5 1997/11/13 02:02:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -245,6 +245,10 @@ int	opt;
 			case 'c': /* in case of lp failures             */
 				ccount++;
 				aconf->status = CONF_CONNECT_SERVER;
+				break;
+			case 'D': /* auto connect restrictions */
+			case 'd':
+				aconf->status = CONF_DENY;
 				break;
 			case 'H': /* Hub server line */
 			case 'h':

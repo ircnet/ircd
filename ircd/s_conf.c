@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.22 1997/10/13 19:09:40 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.23 1997/11/13 02:02:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -866,6 +866,10 @@ int	opt;
 				ccount++;
 				aconf->status = CONF_ZCONNECT_SERVER;
 				break;
+			case 'D': /* auto connect restrictions */
+			case 'd':
+				aconf->status = CONF_DENY;
+				break;
 			case 'H': /* Hub server line */
 			case 'h':
 				aconf->status = CONF_HUB;
@@ -1518,3 +1522,34 @@ int	class, fd;
 	
     }
 
+/*
+** find_denied
+**	for a given server name, make sure no D line matches any of the
+**	servers currently present on the net.
+*/
+aConfItem *
+find_denied(name, class)
+    char *name;
+    int class;
+{
+    aServer	*asptr;
+    aConfItem	*aconf;
+
+    for (aconf = conf; aconf; aconf = aconf->next)
+	{
+	    if (aconf->status != CONF_DENY)
+		    continue;
+	    if (!aconf->name)
+		    continue;
+	    if (match(aconf->name, name))
+		    continue;
+	    for (asptr = svrtop; asptr; asptr = asptr->nexts)
+		{
+		    if (aconf->port == class)
+			    return aconf;
+		    if (aconf->host && !match(aconf->host, asptr->bcptr->name))
+				    return aconf;
+		}
+	}
+    return NULL;
+}

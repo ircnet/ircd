@@ -62,4 +62,5 @@ EXTERN int find_two_masks __P((char *name, char *host, int stat));
 EXTERN int find_conf_flags __P((char *name, char *key, int stat));
 EXTERN int find_restrict __P((aClient *cptr));
 EXTERN void find_bounce __P((aClient *cptr, int class, int fd));
+EXTERN aConfItem *find_denied __P((char *name, int class));
 #undef EXTERN
