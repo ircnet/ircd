@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.15 2002/07/29 22:38:50 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.16 2002/11/07 21:52:59 jv Exp $";
 #endif
 
 #include "os.h"
@@ -30,25 +30,41 @@ static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.15 2002/07/29 22:38:50 chopin Exp
 #define MyMalloc(x)     malloc(x)
 /*#define MyFree(x)       free(x)*/
 
-static	void	new_class();
-static	char	*getfield(), confchar ();
-static	int	openconf(), validate __P((aConfItem *));
-static	int	dgets __P((int, char *, int));
-static	aClass	*get_class();
+static	void	new_class(int);
+static	char	*getfield(char *), confchar(u_int);
+static	int	openconf(), validate(aConfItem *);
+static	int	dgets(int, char *, int);
+static	aClass	*get_class(int, int);
 static	aConfItem	*initconf();
+
+struct	wordcount {
+	char *filename;
+	int min;
+	int max;
+	struct wordcount *next;
+};
+static	void	mywc();
+static	int	checkSID(char *, int);
+static  struct	wordcount *	findConfLineNumber(int);
+#ifdef M4_PREPROC
+static	char *	mystrinclude(char *, int);
+static	int	simulateM4Include(struct wordcount *, int, char *, int);
+#endif
 
 static	int	numclasses = 0, *classarr = (int *)NULL, debugflag = 0;
 static	char	*configfile = IRCDCONF_PATH;
 static	char	nullfield[] = "";
 static	char	maxsendq[12];
+static	struct	wordcount *files;
 
 #define	SHOWSTR(x)	((x) ? (x) : "*")
 
-int	main(argc, argv)
-int	argc;
-char	*argv[];
+int	main(int argc, char *argv[])
 {
-	if (argc > 1 && !strncmp(argv[1], "-h", 2)) {
+	struct wordcount *filelist = files;
+	aConfItem *result;
+	if (argc > 1 && !strncmp(argv[1], "-h", 2))
+	{
 		(void)fprintf(stderr, "Usage: %s [-h] [-d[#]] [%s]\n",
 			      argv[0], IRCDCONF_PATH);
 		exit(0);
@@ -56,15 +72,24 @@ char	*argv[];
 	new_class(0);
 
 	if (argc > 1 && !strncmp(argv[1], "-d", 2))
-   	    {
+   	{
 		debugflag = 1;
 		if (argv[1][2])
 			debugflag = atoi(argv[1]+2);
-		argc--, argv++;
-	    }
+		argc--;
+		argv++;
+	}
 	if (argc > 1)
 		configfile = argv[1];
-	return validate(initconf());
+	/* Initialize counters to be able to print line number even with m4 */
+	mywc();
+	for(filelist = files; filelist->next; filelist = filelist->next)
+	  fprintf(stderr, "%s: Min %d - Max %d\n",
+		  filelist->filename, filelist->min, filelist->max);
+	/* If I do not use result as temporary return value
+	 * I get loops when M4_PREPROC is defined - Babar */
+	result = initconf();
+	return validate(result);
 }
 
 /*
@@ -81,20 +106,22 @@ static	int	openconf()
 
 	/* ircd.m4 with full path now! Kratz */
 	if (access(IRCDM4_PATH, R_OK) == -1)
-	    {
+	{
 		(void)fprintf(stderr, "%s missing.\n", IRCDM4_PATH);
 		return -1;
-	    }
+	}
 	if (pipe(pi) == -1)
 		return -1;
 	switch(fork())
 	{
-	case -1 :
+	case -1:
 		return -1;
-	case 0 :
+	case 0:
 		(void)close(pi[0]);
+		(void)close(2);
 		if (pi[1] != 1)
 		    {
+			(void)close(1);
 			(void)dup2(pi[1], 1);
 			(void)close(pi[1]);
 		    }
@@ -117,21 +144,21 @@ static	int	openconf()
 }
 
 /*
-** initconf() 
+** initconf()
 **    Read configuration file.
 **
-**    returns -1, if file cannot be opened
-**             0, if file opened
+**    returns a pointer to the config items chain if successful
+**            NULL if config is invalid (some mandatory fields missing)
 */
 
-static	aConfItem 	*initconf(opt)
-int	opt;
+static	aConfItem 	*initconf()
 {
 	int	fd;
-	char	line[512], *tmp, c[80], *s;
-	int	ccount = 0, ncount = 0, dh, flags = 0;
+	char	line[512], *tmp, *tmp3 = NULL, c[80], *s;
+	int	ccount = 0, ncount = 0, dh, flags = 0, nr = 0;
 	aConfItem *aconf = NULL, *ctop = NULL;
 	int	mandatory_found = 0, valid = 1;
+	struct wordcount *filelist = files;
 
 	(void)fprintf(stderr, "initconf(): ircd.conf = %s\n", configfile);
 	if ((fd = openconf()) == -1)
@@ -160,6 +187,10 @@ int	opt;
 		aconf->passwd = (char *)NULL;
 		aconf->name = (char *)NULL;
 		aconf->class = (aClass *)NULL;
+		aconf->clients = ++nr;
+	    	while (filelist->next && (filelist->max < nr))
+	    		filelist = filelist->next;
+
 		if ((tmp = (char *)index(line, '\n')))
 			*tmp = 0;
 		else while(dgets(fd, c, sizeof(c) - 1))
@@ -209,8 +240,8 @@ int	opt;
 
 		if (line[1] != IRCDCONF_DELIMITER)
 		    {
-                        (void)fprintf(stderr, "ERROR: Bad config line (%s)\n",
-				line);
+                        (void)fprintf(stderr, "%s:%d ERROR: Bad config line (%s)\n",
+				filelist->filename, nr - filelist->min, line);
 			(void)fprintf(stderr,
 			      "\tWrong delimiter? (should be %c)\n",
 				      IRCDCONF_DELIMITER);
@@ -218,13 +249,15 @@ int	opt;
                     }
 
 		if (debugflag)
-			(void)printf("\n%s\n",line);
+			(void)printf("\n%s:%d\n%s\n",
+				filelist->filename, nr - filelist->min, line);
 		(void)fflush(stdout);
 
 		tmp = getfield(line);
 		if (!tmp)
 		    {
-                        (void)fprintf(stderr, "\tERROR: no fields found\n");
+                        (void)fprintf(stderr, "%s:%d ERROR: no field found\n",
+				filelist->filename, nr - filelist->min);
 			continue;
 		    }
 
@@ -242,9 +275,13 @@ int	opt;
 				aconf->status = CONF_BOUNCE;
 				break;
 			case 'C': /* Server where I should try to connect */
-			case 'c': /* in case of lp failures             */
+			  	  /* in case of lp failures             */
 				ccount++;
 				aconf->status = CONF_CONNECT_SERVER;
+				break;
+			case 'c':
+				ccount++;
+				aconf->status = CONF_ZCONNECT_SERVER;
 				break;
 			case 'D': /* auto connect restrictions */
 			case 'd':
@@ -255,13 +292,20 @@ int	opt;
 				aconf->status = CONF_HUB;
 				break;
 			case 'I': /* Just plain normal irc client trying  */
-			case 'i': /* to connect me */
+			          /* to connect me */
 				aconf->status = CONF_CLIENT;
 				mandatory_found |= CONF_CLIENT;
 				break;
+			case 'i' : /* Restricted client */
+				aconf->status = CONF_RCLIENT;
+				mandatory_found |= CONF_CLIENT;
+				break;
+				break;
 			case 'K': /* Kill user line on irc.conf           */
-			case 'k':
 				aconf->status = CONF_KILL;
+				break;
+			case 'k':
+				aconf->status = CONF_OTHERKILL;
 				break;
 			/* Operator. Line should contain at least */
 			/* password and host where connection is  */
@@ -315,9 +359,8 @@ int	opt;
 			        aconf->status = CONF_CLASS;
 		        	break;
 		    default:
-			(void)fprintf(stderr,
-				"\tERROR: unknown conf line letter (%c)\n",
-				*tmp);
+                        (void)fprintf(stderr, "%s:%d\tWARNING: unknown conf line letter (%c)\n",
+				filelist->filename, nr - filelist->min, *tmp);
 			break;
 		    }
 
@@ -340,17 +383,49 @@ int	opt;
 			aconf->port = atoi(tmp);
 			if ((tmp = getfield(NULL)) == NULL)
 				break;
-			if (!(aconf->status & CONF_CLASS))
-				aconf->class = get_class(atoi(tmp));
+			if (aconf->status & CONF_CLIENT_MASK)
+			    {
+				if (!*tmp)
+		                        (void)fprintf(stderr, "%s:%d\tWARNING: No class. Default 0\n",
+						filelist->filename, nr - filelist->min);
+				aconf->class = get_class(atoi(tmp), nr);
+			    }
+			tmp3 = getfield(NULL);
 			break;
 		    }
-		if (!aconf->class && (aconf->status & (CONF_CONNECT_SERVER|
-		     CONF_NOCONNECT_SERVER|CONF_OPS|CONF_CLIENT)))
-		    {
-			(void)fprintf(stderr,
-				"\tWARNING: No class.  Default 0\n");
-			aconf->class = get_class(0);
-		    }
+
+		if ((aconf->status & (CONF_CLIENT|CONF_RCLIENT)))
+		{
+			/* Parse I-line flags */
+			if (tmp3)
+			{
+				for(s = tmp3; *s; ++s)
+				    {
+					switch (*s)
+					    {
+						case 'R':
+							aconf->flags |= CFLAG_RESTRICTED;
+							break;
+						case 'D':
+							aconf->flags |= CFLAG_RNODNS;
+							break;
+						case 'I':
+							aconf->flags |= CFLAG_RNOIDENT;
+							break;
+						case 'E':
+							aconf->flags |= CFLAG_KEXEMPT;
+							break;
+						default:
+				                        (void)fprintf(stderr,
+							"%s:%d\tWARNING: unknown I-line flag: %c\n",
+							filelist->filename, nr - filelist->min, *s);
+					    }
+				    }
+			}
+			else
+				aconf->flags = 0L;
+		}
+
 		/*
                 ** If conf line is a class definition, create a class entry
                 ** for it and make the conf_line illegal and delete it.
@@ -359,21 +434,22 @@ int	opt;
 		    {
 			if (!aconf->host)
 			    {
-				(void)fprintf(stderr,"\tERROR: no class #\n");
+				(void)fprintf(stderr,"%s:%d ERROR: no class #\n",
+					filelist->filename, nr - filelist->min);
 				continue;
 			    }
 			if (!tmp)
 			    {
 				(void)fprintf(stderr,
-					"\tWARNING: missing sendq field\n");
-				(void)fprintf(stderr, "\t\t default: %d\n",
-					QUEUELEN);
+					"%s:%d\tWARNING: missing sendq field\n",
+					filelist->filename, nr - filelist->min);
+				(void)fprintf(stderr, "\t\t default: %d\n", QUEUELEN);
 				(void)sprintf(maxsendq, "%d", QUEUELEN);
 			    }
 			else
 				(void)sprintf(maxsendq, "%d", atoi(tmp));
 			new_class(atoi(aconf->host));
-			aconf->class = get_class(atoi(aconf->host));
+			aconf->class = get_class(atoi(aconf->host), nr);
 			goto print_confline;
 		    }
 
@@ -383,31 +459,30 @@ int	opt;
 			struct	stat	sb;
 
 			if (!aconf->host)
-				(void)fprintf(stderr, "\tERROR: %s\n",
-					"null host field in P-line");
+				(void)fprintf(stderr, "%s:%d ERROR: null host field in P-line\n",
+					filelist->filename, nr - filelist->min);
 			else if (index(aconf->host, '/'))
 			    {
 				if (stat(aconf->host, &sb) == -1)
 				    {
-					(void)fprintf(stderr, "\tERROR: (%s) ",
-						aconf->host);
+					(void)fprintf(stderr, "%s:%d ERROR: (%s)\n",
+						filelist->filename, nr - filelist->min, aconf->host);
 					perror("stat");
 				    }
 				else if ((sb.st_mode & S_IFMT) != S_IFDIR)
-					(void)fprintf(stderr,
-						"\tERROR: %s not directory\n",
-						aconf->host);
+					(void)fprintf(stderr, "%s:%d ERROR: %s not directory\n",
+						filelist->filename, nr - filelist->min, aconf->host);
 			    }
 #else
 			if (!aconf->host)
-				(void)fprintf(stderr, "\tERROR: %s\n",
-					"null host field in P-line");
+				(void)fprintf(stderr, "%s:%d ERROR: null host field in P-line\n",
+					filelist->filename, nr - filelist->min);
 			else if (index(aconf->host, '/'))
-				(void)fprintf(stderr, "\t%s %s\n",
-					"WARNING: / present in P-line", 
-					"for non-UNIXPORT configuration");
+				(void)fprintf(stderr, "%s:%d\tWARNING: %s\n",
+					filelist->filename, nr - filelist->min,
+					"/ present in P-line for non-UNIXPORT configuration");
 #endif
-			aconf->class = get_class(0);
+			aconf->class = get_class(0, nr);
 			goto print_confline;
 		    }
 
@@ -415,20 +490,22 @@ int	opt;
 		    (!aconf->host || index(aconf->host, '*') ||
 		     index(aconf->host, '?')))
 		    {
-			(void)fprintf(stderr, "\tERROR: bad host field\n");
+			(void)fprintf(stderr, "%s:%d ERROR: bad host field\n",
+				filelist->filename, nr - filelist->min);
 			continue;
 		    }
 
 		if (aconf->status & CONF_SERVER_MASK && BadPtr(aconf->passwd))
 		    {
-			(void)fprintf(stderr,
-					"\tERROR: empty/no password field\n");
+			(void)fprintf(stderr, "%s:%d ERROR: empty/no password field\n",
+				filelist->filename, nr - filelist->min);
 			continue;
 		    }
 
 		if (aconf->status & CONF_SERVER_MASK && !aconf->name)
 		    {
-			(void)fprintf(stderr, "\tERROR: bad name field\n");
+			(void)fprintf(stderr, "%s:%d ERROR: bad name field\n",
+				filelist->filename, nr - filelist->min);
 			continue;
 		    }
 
@@ -446,7 +523,7 @@ int	opt;
 			    }
 
 		if (!aconf->class)
-			aconf->class = get_class(0);
+			aconf->class = get_class(0, nr);
 		(void)sprintf(maxsendq, "%d", aconf->class->class);
 
 		if (!aconf->name)
@@ -455,24 +532,53 @@ int	opt;
 			aconf->passwd = nullfield;
 		if (!aconf->host)
 			aconf->host = nullfield;
-		if (aconf->status & (CONF_ME|CONF_ADMIN))
+		if (aconf->status & CONF_ME)
 		    {
 			if (flags & aconf->status)
-				(void)fprintf(stderr,
-					"ERROR: multiple %c-lines\n",
-					toupper(confchar(aconf->status)));
+				(void)fprintf(stderr, "%s:%d ERROR: multiple M-lines\n",
+					filelist->filename, nr - filelist->min);
+
 			else
 				flags |= aconf->status;
+			if (tmp && *tmp)
+			    {
+			    	/* Check for SID at the end of M: line */
+			    	if (debugflag > 2)
+			    		(void)printf("SID is set to: %s\n", tmp);
+			    	if (checkSID(tmp, nr))
+					(void)fprintf(stderr, "%s:%d ERROR: SID invalid\n",
+						filelist->filename, nr - filelist->min);
+			    }
+			else
+				(void)fprintf(stderr, "%s:%d ERROR: no SID in M-line\n",
+					filelist->filename, nr - filelist->min);
+		    }
+		if (aconf->status & CONF_ADMIN)
+		    {
+			if (flags & aconf->status)
+				(void)fprintf(stderr, "%s:%d ERROR: multiple A-lines\n",
+					filelist->filename, nr - filelist->min);
+			else
+				flags |= aconf->status;
+			if (tmp && *tmp)
+			    {
+			    	/* Check for Network at the end of A: line */
+			    	if (debugflag > 2)
+			    		(void)printf("Network is set to: %s\n", tmp);
+			    }
+			else
+				(void)fprintf(stderr, "%s:%d ERROR: no network in A-line\n",
+					filelist->filename, nr - filelist->min);
 		    }
 
 		if (aconf->status & CONF_VER)
 		    {
 			if (*aconf->host && !index(aconf->host, '/'))
-				(void)fprintf(stderr,
-					      "\tWARNING: No / in V line.");
+				(void)fprintf(stderr, "%s:%d\tWARNING: No / in V line.\n",
+					filelist->filename, nr - filelist->min);
 			else if (*aconf->passwd && !index(aconf->passwd, '/'))
-				(void)fprintf(stderr,
-					      "\tWARNING: No / in V line.");
+				(void)fprintf(stderr, "%s:%d\tWARNING: No / in V line.\n",
+					filelist->filename, nr - filelist->min);
 		    }
 print_confline:
 		if (debugflag > 8)
@@ -516,19 +622,18 @@ print_confline:
 		valid = 0;
 	    }
 
-	if (!valid)
-	    {
-		return NULL;
-	    }
-
-	return ctop;
+	if (valid)
+	{
+		return ctop;
+	}
+	return NULL;
 }
 
-static	aClass	*get_class(cn)
-int	cn;
+static	aClass	*get_class(int cn, int ln)
 {
 	static	aClass	cls;
 	int	i = numclasses - 1;
+	struct wordcount *filelist;
 
 	cls.class = -1;
 	for (; i >= 0; i--)
@@ -538,12 +643,15 @@ int	cn;
 			break;
 		    }
 	if (i == -1)
-		(void)fprintf(stderr,"\tWARNING: class %d not found\n", cn);
+	    {
+	    	filelist = findConfLineNumber(ln);
+		(void)fprintf(stderr, "%s:%d\tWARNING: class %d not found\n",
+			filelist->filename, ln - filelist->min, cn);
+	    }
 	return &cls;
 }
 
-static	void	new_class(cn)
-int	cn;
+static	void	new_class(int cn)
 {
 	numclasses++;
 	if (classarr)
@@ -556,12 +664,11 @@ int	cn;
 /*
  * field breakup for ircd.conf file.
  */
-static	char	*getfield(irc_newline)
-char	*irc_newline;
+static	char	*getfield(char *irc_newline)
 {
 	static	char *line = NULL;
 	char	*end, *field;
-	
+
 	if (irc_newline)
 		line = irc_newline;
 	if (line == NULL)
@@ -593,9 +700,7 @@ char	*irc_newline;
 **	dgets(x,y,0);
 ** to mark the buffer as being empty.
 */
-static	int	dgets(fd, buf, num)
-int	fd, num;
-char	*buf;
+static	int	dgets(int fd, char *buf, int num)
 {
 	static	char	dgbuf[8192];
 	static	char	*head = dgbuf, *tail = dgbuf;
@@ -655,7 +760,8 @@ dgetsreturnbuf:
 	    {
 		if (head < tail)
 		    {
-			n = MIN(head - tail, num);
+			n = MIN(tail - head, num);
+			/* File hasn't got a final new line */
 			goto dgetsreturnbuf;
 		    }
 		head = tail = dgbuf;
@@ -692,11 +798,11 @@ dgetsreturnbuf:
 }
 
 
-static	int	validate(top)
-aConfItem *top;
+static	int	validate(aConfItem *top)
 {
 	Reg	aConfItem *aconf, *bconf;
 	u_int	otype = 0, valid = 0;
+	struct wordcount *filelist;
 
 	if (!top)
 		return -1;
@@ -708,7 +814,7 @@ aConfItem *top;
 
 		if (aconf->status & CONF_SERVER_MASK)
 		    {
-			if (aconf->status & CONF_CONNECT_SERVER)
+			if (aconf->status & (CONF_CONNECT_SERVER|CONF_ZCONNECT_SERVER))
 				otype = CONF_NOCONNECT_SERVER;
 			else if (aconf->status & CONF_NOCONNECT_SERVER)
 				otype = CONF_CONNECT_SERVER;
@@ -746,16 +852,130 @@ aConfItem *top;
 		if (aconf->status & CONF_MATCH)
 			valid++;
 		else
-			(void)fprintf(stderr, "Unmatched %c:%s:%s:%s\n",
+		    {
+			filelist = findConfLineNumber(aconf->clients);
+			for(filelist = files; filelist->next && (filelist->max < aconf->clients); filelist = filelist->next);
+			(void)fprintf(stderr, "%s:%d\tWARNING: Unmatched %c:%s:%s:%s\n",
+				filelist->filename, aconf->clients - filelist->min,
 				confchar(aconf->status), aconf->host,
 				SHOWSTR(aconf->passwd), aconf->name);
+		    }
+  /* Return value is non-sense ... It only checks for matching c/N */
 	return valid ? 0 : -1;
 }
 
-static	char	confchar(status)
-u_int	status;
+#ifdef M4_PREPROC
+static int simulateM4Include(struct wordcount *filelist, int nr, char *filename, int fnrmin)
 {
-	static	char	letrs[] = "QIiCcNoOMKARYSLPHV";
+	int	fd, dh, fnr = 0, finalnewline = 0;
+	char	line[512];
+	struct wordcount *listnew;
+#ifdef M4_PREPROC
+	char *inc;
+#endif
+
+	listnew = (struct wordcount *)malloc(sizeof(struct wordcount));
+	filelist->next = listnew;
+	filelist = filelist->next;
+	filelist->min = nr - fnrmin;
+	filelist->filename = strdup(filename);
+	filelist->max = 0;
+	filelist->next = NULL;
+	if ((fd = open(filename, O_RDONLY)) == -1)
+	{
+		perror(filename);
+		return nr;
+	}
+	(void)dgets(-1, NULL, 0);
+	while ((dh = dgets(fd, line, sizeof(line) - 1)) > 0)
+	{
+		if (dh != sizeof(line) - 1)
+		{
+			fnr++;
+			if (fnr > fnrmin)
+			{
+				nr++;
+				if (line[dh - 1] != '\n')
+				{
+					(void)fprintf(stderr, "%s\tWARNING: No final new line.\n",
+						filelist->filename);
+					finalnewline = 0;
+				} else
+					finalnewline = 1;
+				line[dh - 1] = 0;
+#ifdef	M4_PREPROC
+				inc = mystrinclude(line, nr);
+				if (inc)
+				{
+					filelist->max = --nr;
+					nr = simulateM4Include(filelist, nr, inc, 0);
+					while (filelist->next) filelist = filelist->next;
+					nr = simulateM4Include(filelist, nr, filename, fnr);
+					break;
+				}
+#endif
+			}
+		}
+		else
+			if (fnr > fnrmin)
+			{
+				line[dh - 1] = 0;
+
+				(void)fprintf(stderr, "%s:%d\tWARNING: Line too long. Only %d characters allowed\n\t(%s)\n",
+					filelist->filename, nr - filelist->min, sizeof(line), line);
+			}
+	}
+	(void)close(fd);
+#ifdef	M4_PREPROC
+	(void)wait(0);
+#endif
+	nr += finalnewline;
+	if (!filelist->max) filelist->max = nr;
+	return nr;
+}
+#endif
+
+static void	mywc()
+{
+	int	fd, dh, nr = 0;
+	char	line[512];
+	struct wordcount *listtmp;
+#ifdef M4_PREPROC
+	char *inc;
+#endif
+
+	/* Dealing with ircd.m4 */
+	files = listtmp = (struct wordcount *)malloc(sizeof(struct wordcount));
+	listtmp->min = 0;
+#ifdef	M4_PREPROC
+	listtmp->filename = strdup(IRCDM4_PATH);
+	inc = configfile;
+	configfile = 0; /* used to have openconf launch only m4 ircd.m4 */
+#else
+	listtmp->filename = strdup("ircd.conf");
+#endif
+	if ((fd = openconf()) == -1)
+	{
+		(void)wait(0);
+		return;
+	}
+	(void)dgets(-1, NULL, 0);
+	/* We only count lines. No include in ircd.m4 if M4 defined */
+	while ((dh = dgets(fd, line, sizeof(line) - 1)) > 0)
+		if (dh != sizeof(line) - 1)
+			nr++;
+	listtmp->max = nr;
+	(void)close(fd);
+#ifdef	M4_PREPROC
+	(void)wait(0);
+	configfile = inc;
+	nr = simulateM4Include(listtmp, nr, configfile, 0);
+#endif
+}
+
+static	char	confchar(u_int status)
+{
+	static	char	letrs[] = "QIicNCoOMKARYSLPHV";
 	char	*s = letrs;
 
 	status &= ~(CONF_MATCH|CONF_ILLEGAL);
@@ -766,8 +986,74 @@ u_int	status;
 	return '-';
 }
 
-void	outofmemory()
+static	int	checkSID(char *sid, int nr)
 {
-	(void)write(2, "Out of memory\n", 14);
-	exit(-1);
+	char *s = sid;
+	int len = 0, rc = 0;
+	struct wordcount *filelist;
+
+	/* First SID char shall be numeric, rest must be alpha */
+    	filelist = findConfLineNumber(nr);
+	if (!isdigit(*s))
+	    {
+		(void)fprintf(stderr,
+			"%s:%d ERROR: SID invalid: 1st character must be numeric (%s)\n",
+			filelist->filename, nr - filelist->min, sid);
+		++rc;
+	    }
+	++s; ++len;
+    	for (; *s; ++s, ++len)
+		if (!isalnum(*s))
+		    {
+                        (void)fprintf(stderr,
+                        	"%s:%d ERROR: SID invalid: (%s) wrong character (%c)\n",
+				filelist->filename, nr - filelist->min, sid, *s);
+			++rc;
+		}
+	if (!(len == SIDLEN))
+	    {
+		(void)fprintf(stderr,
+			"%s:%d ERROR: SID invalid: wrong size (%d should be %d)\n",
+			filelist->filename, nr - filelist->min, len, SIDLEN);
+		++rc;
+	    }
+	return rc;
+}
+
+#ifdef M4_PREPROC
+/* Do: s/include\((.*)\)/\1/
+ * and checks that it's not "commented out" */
+static	char *	mystrinclude(char *s, int nr)
+{
+	int off;
+	struct wordcount *filelist;
+	char *match = strstr(s, "include(");
+
+	if (!match)
+		return 0;
+	off = match - s;
+	for(; s < match; ++s)
+		if (!isspace(*s))
+			return 0;
+	s += 8; /* length("include(") */
+	for(; match && *match != ')'; ++match);
+	*match = '\0';
+
+	if (off > 0)
+	{
+	    	filelist = findConfLineNumber(nr);
+		(void)fprintf(stderr, "%s:%d\tWARNING: while including %s\n\t\t%s\n",
+			filelist->filename, nr - filelist->min, s,
+			"spaces before include. (First line of include file will be shift)");
+	}
+	return s;
+}
+#endif
+
+/* Locates file and line number of a config line */
+static  struct	wordcount *	findConfLineNumber(int nr)
+{
+	struct wordcount *filelist = files;
+	for(; filelist->next && (filelist->max < nr); filelist = filelist->next);
+	return filelist;
 }
