@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.141 2004/10/07 13:25:31 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.142 2004/11/01 14:35:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2460,7 +2460,7 @@ void do_tkline(char *who, int time, char *user, char *host, char *reason, int st
 			(void) exit_client(acptr, acptr, &me, buff);
 		}
 	}
-	if (count)
+	if (count > 4)
 	{
 		sendto_flag(SCH_NOTICE, "TKill reaped %d souls", count);
 	}
