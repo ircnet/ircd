@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.4 1998/08/08 03:57:39 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.5 1998/08/08 04:30:53 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -164,7 +164,7 @@ u_int cl;
 						free(cldata[cl].authuser);
 					cldata[cl].authuser = mystrdup(ch);
 					cldata[cl].best = cldata[cl].instance;
-					if (unix)
+					if (!other)
 						cldata[cl].state |= A_UNIX;
 					sendto_ircd("%c %d %s %u %s",
 						    (other) ? 'u' : 'U', cl,
