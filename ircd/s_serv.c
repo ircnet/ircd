@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.265 2005/02/08 02:25:33 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.266 2005/02/08 02:47:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -638,7 +638,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			parv[3], get_client_name(cptr, TRUE));
 		return exit_client(cptr, cptr, &me, "Invalid SID");
 	}
-	if (*parv[3] != '$' && find_sid(parv[3],NULL))
+	if (find_sid(parv[3],NULL))
 	{
 		/* check for SID collision */
 		char ecbuf[BUFSIZE];
@@ -1153,7 +1153,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			}
 			return exit_client(cptr, cptr, &me, "Invalid SID");
 		}
-		if (sid[0] != '$' && find_sid(sid, NULL))
+		if (find_sid(sid, NULL))
 		{
 			sendto_flag(SCH_NOTICE,	"Link %s tried to introduce"
 				" already existing SID (%s), dropping link",
@@ -2736,7 +2736,7 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		/* wildcards now allowed only in server/service names */
 		acptr = find_matching_client(parv[1]);
-		if (!acptr && (parv[1][0] != '$'))
+		if (!acptr)
 		{
 			acptr = find_sid(parv[1], NULL);
 			if (acptr)

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_id.c,v 1.28 2004/10/01 20:22:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_id.c,v 1.29 2005/02/08 02:47:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -225,13 +225,11 @@ int	cid_ok(char *name, int n)
 **
 ** Check that the sid is a valid sid.  The first char should be a number in
 ** range of [0-9], the rest should be a char in the range of [0-9A-Z].
-** We also accept fake sids, generated for old servers; they begin with '$'.
 ** It returns 1 if it's a valid sid, 0 if not.
 */
 int	sid_valid(char *sid)
 {
-	if ((isdigit(sid[0]) || sid[0] == '$')
-		&& strlen(sid) == SIDLEN)
+	if (isdigit(sid[0]) && strlen(sid) == SIDLEN)
 	{
 		return cid_ok(sid, SIDLEN - 1);
 	}
