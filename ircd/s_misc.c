@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.92 2004/08/02 15:52:54 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.93 2004/08/02 22:59:02 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1135,6 +1135,7 @@ void	read_motd(char *filename)
 	    }
 	if (Sb.st_mtime <= motd_mtime)
 	{
+		close(fd);
 		return;
 	}
 	motd_mtime = Sb.st_mtime;
