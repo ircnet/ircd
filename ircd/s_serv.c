@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.129 2003/10/17 21:28:20 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.130 2003/10/17 22:10:04 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2835,12 +2835,21 @@ char	*parv[];
 {
 	aClient *acptr;
 	int maskedserv = 0;
+	int showsid = 0;
 	int i = 0;
 	
 	if (parc > 1)
 	{
 		/* wildcards now allowed only in server/service names */
 		acptr = find_matching_client(parv[1]);
+		if (!acptr && (parv[1][0] != '$'))
+		{
+			acptr = find_sid(parv[1], NULL);
+			if (acptr)
+			{
+				showsid = 1;
+			}
+		}
 		if (!acptr)
 		{
 			sendto_one(sptr, replies[ERR_NOSUCHSERVER],
@@ -2851,7 +2860,7 @@ char	*parv[];
 		{
 			if (!match(acptr->name, parv[1]))
 			{
-				/* if we are tracing masked server,
+				/* if we are tracing masked server
 				 * we have to send parv[1], not acptr->name
 				 */
 				maskedserv = 1;
@@ -2874,7 +2883,8 @@ char	*parv[];
 			/* passthru */
               		sendto_one(sptr, replies[RPL_TRACELINK], ME,
 				   BadTo(parv[0]), version, debugmode,
-				   (maskedserv) ? parv[1] : acptr->name,
+				   (maskedserv || showsid) ?
+				   	parv[1] : acptr->name,
 				   acptr->from->name,
 				   acptr->from->serv->version,
 				   (acptr->from->flags & FLAGS_ZIP) ? "z" : "",
@@ -2883,7 +2893,7 @@ char	*parv[];
                         	   (int)DBufLength(&sptr->from->sendQ));
 
 			sendto_one(acptr, ":%s TRACE :%s", sptr->name,
-				(maskedserv) ? parv[1] : acptr->name);
+			      (maskedserv || showsid) ? parv[1] : acptr->name);
 			return 5;
 		}
 		else
@@ -2949,7 +2959,7 @@ char	*parv[];
 		}
 	}
 	sendto_one(sptr, replies[RPL_TRACEEND], ME, BadTo(parv[0]),
-		   acptr->name, version, debugmode);
+		   showsid ? me.serv->sid : acptr->name, version, debugmode);
 	
 	return 2;
 }
@@ -3640,4 +3650,172 @@ void do_emulated_eob(aClient *sptr)
 	}
 	check_split();
 	return;
+}
+
+static void dump_sid_map(aClient *sptr, aClient *root, char *pbuf)
+{
+        int i = 1;
+        aClient *acptr;
+	
+	/* Check if we still have space  */
+	if (pbuf - buf > BUFSIZE - (HOSTLEN + 5
+				    + 1 /* ' ' */
+				    + SIDLEN + 2 /* '(SID)' */
+				    + 1 /* ' ' */
+				    + sizeof(root->serv->verstr)
+				    + 6 /* ' BURST' */
+				    + 1 /* '\0' */
+				  )
+			)
+	{
+		return;
+	}
+
+        *pbuf= '\0';
+	if (IsMasked(root))
+	{
+		sprintf(pbuf, "%s %s%s", root->serv->sid, root->serv->verstr,
+				IsBursting(root) ? " BURST" : "");
+	}
+	else
+	{
+		sprintf(pbuf, "%s (%s)%s%s%s", root->name, root->serv->sid,
+				      	root->serv->verstr[0] ? " " : "",
+				      	root->serv->verstr,
+					IsBursting(root) ? " BURST" : "");
+	}
+
+	sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
+	
+	if (root->serv->down)
+	{
+		/* we have children */
+
+		if (pbuf > buf + 3)
+		{
+			/* we aren't 1st level child of &me */
+			pbuf[-2] = ' ';
+			if (pbuf[-3] == '`')
+			{
+				pbuf[-3] = ' ';
+			}
+		}
+	}
+	
+	for (acptr = root->serv->down; acptr; acptr = acptr->serv->right)
+	{
+		*pbuf = ' ';
+		if (i < root->serv->servers)
+		{
+			*(pbuf + 1) = '|';
+		}
+		else
+		{
+			/* last child  of root */
+			*(pbuf + 1) = '`';
+		}
+		*(pbuf + 2) = '-';
+		*(pbuf + 3) = ' ';
+		dump_sid_map(sptr, acptr, pbuf + 4);
+		i++;
+	}
+}
+static void dump_map(aClient *sptr, aClient *root, aClient **prevserver,
+		     char *pbuf)
+{
+	aClient *prev = NULL;
+        aClient *acptr;
+
+	/* Check if we still have space 5 - tree + \0 */
+	if (pbuf - buf > BUFSIZE - (HOSTLEN + 5))
+	{
+		return;
+	}
+
+	/* Display itself if not masked */
+	if (!IsMasked(root))
+	{
+        	*pbuf= '\0';
+	        strcat(pbuf, root->name);
+		sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
+	}
+	
+	/* Clean up the output line */
+	if (root->serv->down)
+	{
+		/* we have children */
+
+		if (pbuf > buf + 3)
+		{
+			/* we aren't 1st level child of &me*/
+			pbuf[-2] = ' ';
+			if (pbuf[-3] == '`')
+			{
+				pbuf[-3] = ' ';
+			}
+		}
+	}
+	
+	/* Iterate over children */
+	for (acptr = root->serv->down; acptr; acptr = acptr->serv->right)
+	{
+
+		if (!IsMasked(acptr))
+		{
+			/* Check if we already found not masked server
+			 * in this masked tree */
+			if (*prevserver)
+			{
+				*pbuf = ' ';
+				*(pbuf + 1) = '|';
+				*(pbuf + 2) = '-';
+				*(pbuf + 3) = ' ';
+
+				/* prev - with new previous server ptr */
+				dump_map(sptr, *prevserver, &prev, pbuf + 4);
+			}
+			/* store this server */
+			*prevserver = acptr;
+		}
+		else
+		{
+			/* Masked server found - check it's leaves */
+			dump_map(sptr, acptr, prevserver, pbuf);
+		}
+		/* Display the last found server if we are on the correct
+		 * level */
+		if (!acptr->serv->right && *prevserver &&
+			(!acptr->serv->up || !IsMasked(acptr->serv->up)))
+		{
+			*pbuf = ' ';
+			*(pbuf + 1) = '`';
+			*(pbuf + 2) = '-';
+			*(pbuf + 3) = ' ';
+			dump_map(sptr, *prevserver, &prev, pbuf + 4);
+		}
+	}
+}
+
+/* MAP command - prints fancy tree of the network.
+** parv[0] - Requesting user.
+** parv[1] - optional parameter "s" which causes alternate version
+**	     of map with SIDs and versions to be printed.
+*/
+int	m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+	aClient *acptr = NULL;
+	if ((parc > 1) && (*parv[1] == 's'))
+	{
+		/* print full dump of the network */
+		sendto_one(sptr, replies[RPL_MAPSTART], ME, BadTo(sptr->name),
+				"Server name (SID)");
+		dump_sid_map(sptr, &me, buf);
+		sendto_one(sptr, replies[RPL_MAPEND], ME, BadTo(sptr->name));
+		return 2;
+	}
+	sendto_one(sptr, replies[RPL_MAPSTART], ME, BadTo(sptr->name),
+			"Server name");
+	dump_map(sptr, &me, &acptr, buf);
+	sendto_one(sptr, replies[RPL_MAPEND], ME, BadTo(sptr->name));
+	return 2;
 }
