@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.190 2004/03/07 18:28:37 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.191 2004/03/07 18:32:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -808,7 +808,7 @@ int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	/* local clients' nick size can be ONICKLEN max */
 	strncpyzt(nick, parv[1], (MyConnect(sptr) ? ONICKLEN : NICKLEN)+1);
 
-	if (cptr->serv)	/* we later use 'IsServer(sptr), why not here? --B. */
+	if (IsServer(cptr))
 	{
 		if (parc != 8 && parc != 2)
 		{
@@ -2379,7 +2379,8 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				    parv[0], server,
 				    get_client_name(cptr, FALSE));
 			ircstp->is_nosrv++;
-			return exit_client(NULL, sptr, &me, "No Such Server");
+			(void) exit_client(NULL, sptr, &me, "No Such Server");
+			return exit_client(cptr, cptr, &me, "USER without SERVER");
 		    }
 		user->servp = sp;
 		user->servp->refcnt++;
