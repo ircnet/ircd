@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.142 2004/04/15 13:17:36 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.143 2004/04/15 15:25:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2859,9 +2859,16 @@ void	get_my_name(aClient *cptr, char *name, int len)
 			strncpyzt(name, hp->h_name, len);
 		else
 			strncpyzt(name, tmp, len);
+#if 0
+/* If someone puts IP in M:, fine, use it as outgoing ip, but using
+resolved M: name for outgoing ip is... troublesome. It can resolve to IP of
+some other host or 127.0.0.1 (in which case we'd be getting strange errors
+from connect()); if left empty, OS will decide itself what IP to use; 
+if someone wants to control this, use M: or C: adequate fields. --B. */
 		if (BadPtr(aconf->passwd))
 			bcopy(hp->h_addr, (char *)&mysk.SIN_ADDR,
 			      sizeof(struct IN_ADDR));
+#endif
 		Debug((DEBUG_DEBUG,"local name is %s",
 				get_client_name(&me,TRUE)));
 	    }
