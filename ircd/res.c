@@ -24,12 +24,12 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.17 1998/12/13 00:02:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.18 1998/12/13 00:19:03 kalt Exp $";
 #endif
 
 /* #undef	DEBUG	/* because there is a lot of debug code in here :-) */
 
-static	char	hostbuf[HOSTLEN+1+100];
+static	char	hostbuf[HOSTLEN+1+100]; /* +100 for INET6 */
 static	char	dot[] = ".";
 static	int	incache = 0;
 static	CacheTable	hashtable[ARES_CACSIZE];

@@ -55,7 +55,7 @@
 
 /*
  *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id: resolv_def.h,v 1.3 1998/12/13 00:02:36 kalt Exp $
+ *	$Id: resolv_def.h,v 1.4 1998/12/13 00:19:03 kalt Exp $
  */
 
 /*
@@ -80,7 +80,6 @@
 #define	MAXRESOLVSORT		10	/* number of net to sort on */
 #define	RES_MAXNDOTS		15	/* should reflect bit field size */
 
-#ifndef	OSF
 struct __res_state {
 	int	retrans;	 	/* retransmition time interval */
 	int	retry;			/* number of times to retransmit */
@@ -102,7 +101,6 @@ struct __res_state {
 	} sort_list[MAXRESOLVSORT];
 	char	pad[72];		/* on an i386 this means 512b total */
 };
-#endif
 
 /*
  * Resolver options (keep these in synch with res_debug.c, please)
@@ -145,7 +143,7 @@ struct __res_state {
 /*			0x00008000	*/
 
 /* hooks are still experimental as of 4.9.2 */
-#if defined(OSF) && defined(INET6) && defined(__GNUC__)
+#if defined(INET6) && defined(__GNUC__)
 
 #else
 
@@ -167,13 +165,11 @@ typedef res_sendhookact (*res_send_rhook)__P((const struct SOCKADDR_IN *ns,
 					      int *resplen));
 #endif
 
-#ifndef	OSF
 struct res_sym {
 	int	number;		/* Identifying number, like T_MX */
 	char *	name;		/* Its symbolic name, like "MX" */
 	char *	humanname;	/* Its fun name, like "mail exchanger" */
 };
-#endif
 
 /* Private routines shared between libc/net, named, nslookup and others. */
 #define	res_hnok	__res_hnok

@@ -77,7 +77,7 @@
 
 /*
  *      @(#)nameser.h	8.1 (Berkeley) 6/2/93
- *	$Id: nameser_def.h,v 1.2 1998/12/13 00:02:35 kalt Exp $
+ *	$Id: nameser_def.h,v 1.3 1998/12/13 00:19:03 kalt Exp $
  */
 
 /*
@@ -87,8 +87,6 @@
  * compare for equality; rather, use it to determine whether your resolver
  * is new enough to contain a certain feature.
  */
-
-#ifndef	OSF
 
 #define __BIND		19960801	/* interface version stamp */
 
@@ -330,5 +328,3 @@ typedef struct {
 	*t_cp   = t_l; \
 	(cp) += INT32SZ; \
 }
-
-#endif
