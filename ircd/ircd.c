@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.128 2004/04/14 19:52:10 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.129 2004/04/14 21:31:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -286,6 +286,12 @@ static	time_t	try_connections(time_t currenttime)
 				    "Connection to %s[%s] activated.",
 				    con_conf->name, con_conf->host);
 	    }
+	else
+	{
+		/* No suitable conf for AC was found, so why bother checking
+		** again? If some server quits, it'd get reenabled --B. */
+		next = 0;
+	}
 	Debug((DEBUG_NOTICE,"Next connection check : %s", myctime(next)));
 	/*
 	 * calculate preference value based on accumulated stats.
