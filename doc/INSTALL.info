@@ -10,9 +10,9 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.42 2004/03/04 14:01:33 chopin Exp $
+     $Id: INSTALL.info,v 1.43 2004/03/04 14:03:00 chopin Exp $
 
-   This document describes how to install, and configure IRC 2.11.0.
+   This document describes how to install and configure IRC 2.11.0.
 
 * Menu:
 
