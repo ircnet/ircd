@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.114 2002/03/03 21:39:46 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.115 2002/03/03 21:56:05 jv Exp $";
 #endif
 
 #include "os.h"
@@ -661,7 +661,7 @@ char	*nick, *username;
 			   ME, version);
 		
 		isup = isupport;
-		while (**isup)
+		while (*isup)
 		{
 			sendto_one(sptr,replies[RPL_ISUPPORT], ME,
 			BadTo(parv[0]),	*isup);
