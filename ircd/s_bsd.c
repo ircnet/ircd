@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.6 1997/04/16 13:52:26 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.7 1997/04/18 21:32:31 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1903,7 +1903,7 @@ FdAry	*fdp;
 	
 	if (nfds > 0 &&
 #ifndef	_DO_POLL_
-	    resfd >= 0
+	    resfd >= 0 &&
 #else
 	    (pfd = res_pfd) &&
 #endif
@@ -1915,7 +1915,7 @@ FdAry	*fdp;
 	    }
 	if (nfds > 0 &&
 #ifndef	_DO_POLL_
-	    udpfd >= 0
+	    udpfd >= 0 &&
 #else
 	    (pfd = udp_pfd) &&
 #endif
