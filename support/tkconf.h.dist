@@ -10,6 +10,7 @@
 /* This will be shown on ADMIN requests */
 #define TKSERV_ADMIN_NAME    "Admin: Someone Somewhere"
 #define TKSERV_ADMIN_CONTACT "Mail: i.didnt@edit.my.ADMIN.info"
+/* Can be undefined */
 #define TKSERV_ADMIN_OTHER   "SomeAdmin@IRCnet"
 
 /* This is the name of the service which appears on /servlist */

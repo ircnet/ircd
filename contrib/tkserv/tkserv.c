@@ -756,7 +756,9 @@ void service_squery(char **args)
     {
         sendto_user(TKSERV_ADMIN_NAME);
         sendto_user(TKSERV_ADMIN_CONTACT);
+#ifdef TKSERV_ADMIN_OTHER
         sendto_user(TKSERV_ADMIN_OTHER);
+#endif
     }
     else if (!strcasecmp(cmd, "help"))
     {
