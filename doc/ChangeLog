@@ -1,3 +1,9 @@
+2004-04-17  Piotr Kucharski
+
+	* s_conf.c/match_ipmask(): show original mask in error.
+	* s_bsd.c/start_iauth(): send data to iauth in big chunks to save on
+	  metadata overhead (from BitKoenig).
+
 2004-04-14  Piotr Kucharski
 
 	* s_misc.c/exit_client(): if remote server matching C-line exits and
