@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.62 1999/03/08 21:59:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.63 1999/03/08 22:09:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -3192,6 +3192,8 @@ static	void	do_dns_async()
 				    }
 				else
 					sendto_iauth("%d d", cptr->fd);
+				if (iauth_options & XOPT_EXTWAIT)
+					cptr->lasttime = timeofday;
 #endif
 			    }
 			break;
