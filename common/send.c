@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.82 2004/10/01 20:59:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.83 2004/10/09 12:39:03 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1176,8 +1176,8 @@ void	sendto_flag(u_int chan, char *pattern, ...)
 	return;
 }
 
-static int userlog;
-static int connlog;
+static int userlog = -1;
+static int connlog = -1;
 
 void	logfiles_open(void)
 {
@@ -1207,12 +1207,14 @@ void	logfiles_close(void)
 	if (userlog != -1)
 	{
 		(void)close(userlog);
+		userlog = -1;
 	}
 #endif
 #ifdef FNAME_CONNLOG
 	if (connlog != -1)
 	{
 		(void)close(connlog);
+		connlog = -1;
 	}
 #endif
 }
