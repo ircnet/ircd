@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.13 1997/06/02 13:17:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.14 1997/06/05 19:27:31 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -208,6 +208,11 @@ char	*parv[];
 		sendto_one(sptr, err_str(ERR_NOSUCHSERVER, parv[0]), server);
 		return 1;
 	    }
+	if (MyConnect(sptr) && !MyConnect(acptr) && parc < 3)
+	    {
+                sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS,parv[0]), "SQUIT");
+		return 0;
+            }
 	if (IsLocOp(sptr) && !MyConnect(acptr))
 	    {
 		sendto_one(sptr, err_str(ERR_NOPRIVILEGES, parv[0]));
