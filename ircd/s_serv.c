@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.136 2004/02/09 03:19:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.137 2004/02/10 00:46:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -657,14 +657,36 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return exit_client(cptr, cptr, &me, "Server version too old");
 	}
 
-	if (ST_UID(cptr) && parc < 6)
-	{
-		sendto_flag(SCH_ERROR,
-			"Not enough parameters to SERVER (%d < 6), "
-			"dropping link to %s",	parc, 
-			get_client_name(cptr,TRUE));
-		return exit_client(cptr, cptr, &me,
-			"Not enough parameters to SERVER");
+	if (ST_UID(cptr))
+	{ 
+		/* remote is 2.11+ */
+		if (parc < 6)
+		{
+			sendto_flag(SCH_ERROR,
+				"Not enough parameters to SERVER (%d < 6), "
+				"dropping link to %s",	parc, 
+				get_client_name(cptr,TRUE));
+			return exit_client(cptr, cptr, &me,
+				"Not enough parameters to SERVER");
+		}
+		if (!sid_valid(parv[3]))
+		{
+			sendto_flag(SCH_ERROR,
+				"Invalid SID %s from %s, dropping link",
+				parv[3], get_client_name(cptr, TRUE));
+			return exit_client(cptr, cptr, &me, "Invalid SID");
+		}
+		if (*parv[3] != '$' && find_sid(parv[3],NULL))
+		{
+			/* check for SID collision */
+			char ecbuf[BUFSIZE];
+
+			sendto_flag(SCH_NOTICE, "Link %s tried to introduce"
+				" already existing SID (%s), dropping link",
+				get_client_name(cptr, TRUE), parv[3]);
+			sprintf(ecbuf, "SID collision (%s)", parv[3]);
+			return exit_client(cptr, cptr, &me, ecbuf);
+		}
 	}
 
 	host = parv[1];
@@ -828,14 +850,6 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (ST_UID(cptr))
 		{
 			/* remote is 2.11+ */
-			if (!sid_valid(parv[3]))
-			{
-				sendto_flag(SCH_ERROR,
-					"Invalid sid %s from %s, dropping link",
-					parv[3], cptr->name);
-				return exit_client(cptr, cptr, &me,
-					"Invalid SID");
-			}
 			if (*parv[3] == '$')
 			{
 				/* compatibility SID */
@@ -846,21 +860,6 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			}
 			else
 			{
-				/* check for SID collision */
-				if (find_sid(parv[3],NULL))
-				{
-					char ecbuf[BUFSIZE];
-
-					sendto_flag(SCH_NOTICE,
-						"SID collision on %s brought"
-						" by %s, dropping link",
-						parv[3], sptr->name);
-					sprintf(ecbuf, "SID collision (%s)",
-						parv[3]);
-					return exit_client(cptr, cptr, &me,
-						ecbuf);
-				}
-
 				strncpyzt(acptr->serv->sid, parv[3], SIDLEN+1);
 				acptr->serv->stok = idtol(parv[3], SIDLEN);
 				acptr->serv->version |= SV_UID;
@@ -1223,7 +1222,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			}
 			return exit_client(cptr, cptr, &me, "Invalid SID");
 		}
-		if (find_sid(sid, NULL))
+		if (sid[0] != '$' && find_sid(sid, NULL))
 		{
 			sendto_flag(SCH_NOTICE,	"Link %s tried to introduce"
 				" already existing SID (%s), dropping link",
