@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.113 2002/02/02 13:29:30 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.114 2002/03/03 21:39:46 jv Exp $";
 #endif
 
 #include "os.h"
@@ -644,6 +644,8 @@ char	*nick, *username;
 		istat.is_user[0]++;
 	if (MyConnect(sptr))
 	    {
+		char **isup;
+		
 		istat.is_unknown--;
 		istat.is_myclnt++;
 		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
@@ -657,6 +659,15 @@ char	*nick, *username;
 		sendto_one(sptr, replies[RPL_CREATED], ME, BadTo(nick), creation);
 		sendto_one(sptr, replies[RPL_MYINFO], ME, BadTo(parv[0]),
 			   ME, version);
+		
+		isup = isupport;
+		while (**isup)
+		{
+			sendto_one(sptr,replies[RPL_ISUPPORT], ME,
+			BadTo(parv[0]),	*isup);
+			isup++;
+		}
+		
 		sendto_one(sptr, replies[RPL_YOURID], ME, BadTo(parv[0]),
 			sptr->user->uid);
 		(void)m_lusers(sptr, sptr, 1, parv);
