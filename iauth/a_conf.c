@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.26 2003/10/18 15:31:29 q Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.27 2004/09/13 01:17:18 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -68,7 +68,7 @@ char	*conf_read(char *cfile)
 {
 	AnInstance *ident = NULL; /* make sure this module is used */
 	u_char needh = 0; /* do we need hostname information for any host? */
-	u_char o_req = 0, o_dto = 0, o_wup = 0;
+	u_char o_req = 0, o_dto = 0, o_wup = 0, o_del = 0;
 	static char o_all[5];
 	u_int timeout = DEFAULT_TIMEOUT, totto = 0;
 	u_int lnnb = 0, i;
@@ -134,6 +134,11 @@ char	*conf_read(char *cfile)
 			if (!strncmp("extinfo", buffer, 7))
 			  {
 				o_wup = 1;
+				continue;
+			  }
+			if (!strncmp("delayed", buffer, 7))
+			  {
+				o_del = 1;
 				continue;
 			  }
 			if (!strncmp("timeout = ", buffer, 10))
@@ -249,6 +254,7 @@ char	*conf_read(char *cfile)
 			(*last)->address = NULL;
 			(*last)->timeout = timeout;
 			(*last)->reason	= NULL;
+			(*last)->delayed = o_del;
 			if (Mlist[i] == &Module_rfc931)
 				ident = *last;
 
@@ -396,12 +402,26 @@ char	*conf_read(char *cfile)
 		(*last)->in = icount;
 		(*last)->popt = NULL;
 		(*last)->address = NULL;
+		(*last)->delayed = 0;
 	    }
 	ident->timeout = MAX(DEFAULT_TIMEOUT, ident->timeout);
+	if (ident->delayed)
+	{
+		if (cfile)
+		{
+			printf("Warning: rfc913 should not be delayed.\n");
+		}
+		else
+		{
+			sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
+				"Warning: rfc913 should not be delayed.");
+		}
+	}
 
 	itmp = instances;
 	while (itmp)
 	    {
+		if (!itmp->delayed)
 		totto += itmp->timeout;
 		itmp = itmp->nexti;
 	    }
