@@ -4,7 +4,7 @@
 
 <title>IRC Services
 <author>Christophe Kalt
-<date>$Id: SERVICE.sgml,v 1.6 1999/04/15 21:55:52 kalt Exp $
+<date>$Id: SERVICE.sgml,v 1.7 2004/03/19 23:01:17 jv Exp $
 <abstract>
 The IRC protocol described in RFC 1459 defines two types of
 connections (client, and server).  A third type was
@@ -189,11 +189,10 @@ Once the S: line setup on the server, the service connects
 by sending the password (PASS command), and then issuing a
 ``SERVICE'' command:
 <p>
-SERVICE servicename servername distribution servicetype 0 :Information
+SERVICE servicename distribution servicetype :Information
 <descrip>
 <tag/servicename/ This is the name of the service as configured
 by the S line.
-<tag/servername/ This is ignored by the server.
 <tag/distribution/ This is the distribution mask for this
 connection.
 <tag/servicetype/ This is the service type as configured by

@@ -1,6 +1,6 @@
   IRC Services
   Christophe Kalt
-  $Id: SERVICE.txt,v 1.7 1999/04/15 21:56:53 kalt Exp $
+  $Id: SERVICE.txt,v 1.8 2004/03/19 23:01:17 jv Exp $
 
   The IRC protocol described in RFC 1459 defines two types of connec-
   tions (client, and server).  A third type was introduced with version
@@ -206,13 +206,10 @@
   Once the S: line setup on the server, the service connects by sending
   the password (PASS command), and then issuing a ``SERVICE'' command:
 
-  SERVICE servicename servername distribution servicetype 0 :Information
+  SERVICE servicename distribution servicetype :Information
 
      sseerrvviicceennaammee
         This is the name of the service as configured by the S line.
-
-     sseerrvveerrnnaammee
-        This is ignored by the server.
 
      ddiissttrriibbuuttiioonn
         This is the distribution mask for this connection.
@@ -260,6 +257,7 @@
 
      NNoottee
         The ``SERVSET'' command can only be issued once.
+
 
 
   44..  GGeenneerraall nnootteess ffoorr sseerrvveerr aanndd sseerrvviiccee aaddmmiinniissttrraattoorrss
@@ -317,14 +315,6 @@
 
   Services should implement their own flood control (for outgoing
   traffic) to be safe.
-
-
-
-
-
-
-
-
 
 
 
