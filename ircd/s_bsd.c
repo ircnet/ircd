@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.99 2003/10/13 21:48:53 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.100 2003/10/13 23:58:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3047,6 +3047,8 @@ static	void	polludp()
 			return;
 		else
 		    {
+#if 0
+/* seems to create more confusion than it's worth */
 			char buf[100];
 
 			sprintf(buf, "udp port recvfrom() from %s to %%s: %%s",
@@ -3064,6 +3066,7 @@ static	void	polludp()
 #endif
 				);
 			report_error(buf, &me);
+#endif /* confusion */
 			return;
 		    }
 	    }
