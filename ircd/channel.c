@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.6 1997/05/28 13:38:12 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.7 1997/06/27 13:38:37 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -487,6 +487,9 @@ aClient	*mp;
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&LOCAL", CREATE);
+	add_user_to_channel(chptr, mp, CHFL_CHANOP);
+	chptr->mode.mode = smode;
+	chptr = get_channel(mp, "&SERVICES", CREATE);
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&DEBUG", CREATE);

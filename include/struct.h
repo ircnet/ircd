@@ -764,8 +764,9 @@ typedef	struct	{
 #define	SCH_SERVER	6
 #define	SCH_HASH	7
 #define	SCH_LOCAL	8
-#define	SCH_DEBUG	9
-#define	SCH_MAX		9
+#define	SCH_SERVICE	9
+#define	SCH_DEBUG	10
+#define	SCH_MAX		10
 
 /* used for async dns values */
 

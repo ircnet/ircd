@@ -1,3 +1,12 @@
+Thu Jun 26 19:18:24 1997  Christophe Kalt
+
+	* struct.h, channel.c, hash.c, parse.c, send.c, s_misc.c,
+	s_service.c:
+		* cleanup.
+		* added &SERVICES.
+
+	* s_bsd.c: wrong buffer size given to getsockopt().
+
 Thu Jun 19 18:35:37 1997  Christophe Kalt
 
 	* h.h, struct.h, s_debug.c, send.c, dbuf.c:

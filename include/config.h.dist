@@ -182,9 +182,8 @@
 /*
  * Maximum number of network connections your server will allow.  This should
  * never exceed max. number of open file descrpitors and wont increase this.
- * Should remain LOW as possible. Most sites will usually have under 30 or so
- * connections. A busy hub or server may need this to be as high as 50 or 60.
- * Making it over 100 decreases any performance boost gained from it being low.
+ * Should remain LOW as possible. Most sites will usually have under 50 or so
+ * connections.
  * if you have a lot of server connections, it may be worth splitting the load
  * over 2 or more servers.
  * 1 server = 1 connection, 1 user = 1 connection.

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.10 1997/06/26 15:40:45 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.11 1997/06/27 13:38:38 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -322,8 +322,9 @@ char	*parv[];
 	Reg	aConfItem *aconf;
 #endif
 	aServer	*sp = NULL;
-	char	*dist, *server = NULL, *info;
+	char	*dist, *server = NULL, *info, *stok;
 	int	type, metric = 0, i;
+	char	mlname[HOSTLEN+1];
 
 	if (sptr->user)
 	    {
@@ -471,6 +472,9 @@ char	*parv[];
 			      "SERVICE %s %s %s %d %d :%s", sptr->name,
 			      server, dist, type, metric, info);
 #endif
+	sendto_flag(SCH_SERVICE, "Received SERVICE %s from %s (%s %d %s)",
+		    sptr->name, get_client_name(cptr, TRUE), dist, metric,
+		    info);
 
 	for (i = fdas.highest; i >= 0; i--)
 	    {
@@ -481,8 +485,13 @@ char	*parv[];
 			continue;
 		if (acptr->serv->version == SV_OLD)
 			continue;
+		mlname = my_name_for_link(ME, acptr->serv->nline->port);
+		if (*mlname == '*' && match(mlname, sptr->service->server)== 0)
+			stok = me.serv->tok;
+		else
+			stok = sp->tok;
 		sendto_one(acptr, "SERVICE %s %s %s %d %d :%s", sptr->name,
-			   sp->tok, dist, type, metric+1, info);
+			   stok, dist, type, metric+1, info);
 	    }
 	return 0;
 }

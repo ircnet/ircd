@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.6 1997/05/28 13:38:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.7 1997/06/27 13:38:38 kalt Exp $";
 #endif
 
 #include <sys/time.h>
@@ -867,6 +867,8 @@ char	*comment;
 		if (cptr == sptr)
 			sendto_flag(SCH_NOTICE, "Service %s disconnected",
 				    get_client_name(sptr, TRUE));
+		sendto_flag(SCH_SERVICE, "Received QUIT %s from %s (%s)",
+			    sptr->name, from->name, comment);
 		istat.is_service--;
 	    }
 
