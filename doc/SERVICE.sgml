@@ -1,0 +1,270 @@
+<!doctype linuxdoc system>
+
+<article>
+
+<title>IRC Services
+<author>Christophe Kalt
+<date>$Id: SERVICE.sgml,v 1.1 1997/08/07 19:56:01 kalt Exp $
+<abstract>
+The IRC protocol described in RFC 1459 defines two types of
+connections (client, and server).  A third type was
+introduced with version 2.9 of the IRC software: service
+connections.  This document describes what services are, and
+how to use them.
+</abstract>
+
+<sect>A new type of connection
+<p>
+A service connection is something between a client and a
+server connection.  It is not closer from any, as a matter
+of fact, the scope is pretty broad.
+<sect1>A bit client
+<p>
+services are similar to clients because they cannot:
+<itemize>
+<item> introduce other clients, services, or servers.
+<item> change the global state of the net. (kill, squit..)
+</itemize>
+<sect1>A bit server
+<p>
+services are similar to servers because:
+<itemize>
+<item> they cannot join channels.
+<item> they are not limited by flood control or penalty.
+<item> they can see all users, servers, services.
+<item> they can see all channel names.
+<item> they cannot freely connect to a server.
+<item> they may optionally receive a connection burst.
+</itemize>
+<sect1>Really unique
+<p>
+services are unique because:
+<itemize>
+<item> they are not subject to collisions.
+<item> they can be local to one, or more servers, or global.
+<item> they can only send notices, not private messages.
+<item> they can only be contacted by the use of SQUERY.
+</itemize>
+<p>
+Services are not meant to be used interactively, but provide
+adequate support for automatons, statistic gathering,
+monitoring.
+
+<sect>What users see
+<p>
+This section covers the aspects visible to the users.
+<sect1>&amp;SERVICES
+<p>
+This is a special channel, similar to &amp;SERVERS, on which
+are sent notices when a service connects to or quit the net.
+<sect1>SERVLIST
+<p>
+This new command gives the list of services currently
+present on the IRC network.  It can take two arguments.
+<enum>
+<item> a mask to limit the output to the services which
+names matches the mask.
+<item> a type to list only services of a specific type.
+</enum>
+It returns a list of servers using numeric 234, the
+different fields are:
+<itemize>
+<item> The service name.
+<item> The name of the server which introduced it on the
+net.
+<item> The <ref id="dist" name="distribution"> mask.
+<item> The service <ref id="type" name="type">.
+<item> The hop count between you and the service.
+<item> A comment.
+</itemize>
+<sect1>SQUERY
+<p>
+This new command stands for ``Service Query''.  The first
+argument is the serice name, and the second the text to be
+sent to the service.
+
+<sect>How to set up a service
+<sect1>Compile time option for the server
+<p>
+First of all, it is important to note that in order to be
+able to connect a service to a server, this server must have
+been compiled with ``<bf>USE_SERVICES</bf>'' defined in the
+config.h file.  To know if your server has been compiled
+with this option, check the version:
+<p>
+351 Server irc.stealth.net: 2.9.3. AaCeEFiIkMu$_V1
+<p>
+351 Server irc.pvv.unit.no: 2.9.3. AaeEFHiKMp<bf>s</bf>tuYZ_V1
+<p>
+Here, only ``irc.pvv.unit.no'' was compiled with the
+``USE_SERVICES'' defined as the lowercase ``s'' shows in the
+version string.
+<p>
+As they are special clients, services need to be allowed
+access to the server in the configuration file.  Each
+service needs its own access to be setup.  This is gone by
+adding an S: line to the configuration file.  This lines
+defines the name of the service, as well as the type.
+<sect1>Glossary
+<p>
+Services have two main characteristics:
+<descrip>
+<label id="type">
+<tag/Type/  This is a misleading name.  The type is actually
+a bit mask which defines what information the service can
+see.  The server configuration file limits the type allowed
+for a service.  The meaning of the bits is defined in the
+service.h file coming with the IRC software:
+<verb>
+SERVICE_WANT_SERVICE    0x00001 /* other services signing on/off */
+SERVICE_WANT_OPER       0x00002 /* operators, included in umodes too */
+SERVICE_WANT_UMODE      0x00004 /* user modes, iow + local modes */
+SERVICE_WANT_AWAY       0x00008 /* away isn't propaged anymore.. */
+SERVICE_WANT_KILL       0x00010 /* KILLs */
+SERVICE_WANT_NICK       0x00020 /* all NICKs (new user, change) */
+SERVICE_WANT_USER       0x00040 /* USER signing on */
+SERVICE_WANT_QUIT       0x00080 /* all QUITs (users signing off) */
+SERVICE_WANT_SERVER     0x00100 /* servers signing on */
+SERVICE_WANT_WALLOP     0x00200 /* wallops */
+SERVICE_WANT_SQUIT      0x00400 /* servers signing off */
+SERVICE_WANT_RQUIT      0x00800 /* regular user QUITs (these which
+				   are also sent between servers) */
+SERVICE_WANT_MODE       0x01000 /* channel modes (not +ov) */
+SERVICE_WANT_CHANNEL    0x02000 /* channel creations/destructions */
+</verb>
+<label id="dist">
+<tag/Distribution/  This controls the propagation of the
+service.  The distribution is checked against server names,
+the service will only be on servers which names matches the
+distribution.
+<p>
+It also eventually limits the information received by the
+service (depending on the service type).  A service will not
+have any information concerning users or services connected
+to a server which name does not match the distribution.
+<p>
+Examples:
+<descrip>
+<tag/irc.funet.fi/Using a server name as distribution makes
+the service local to the particular server.
+<tag/*.fr/This would match any server in the toplevel ``fr''.
+<tag/*/This is the distribution to be used to make the
+service global.
+</descrip>
+<p>
+It is important to note that the path between the service
+and a server <bf>must</bf> be composed of servers which have
+matching names:
+<verb>
+trondheim.irc.no <----> ircd.funet.fi <-----> oslo.irc.no
+       ^  ^
+       |  |
+       |  +------> bergen.irc.no
+       |  
+       +-------[MyService - Distribution *.no]
+</verb>
+As shown above, if two ``*.no'' servers have a non ``*.no''
+(for example here a ``*.fi'') server connected between them,
+in this case the information related to ``MyService'' will
+not propagate to ``oslo.irc.no''.
+<p>
+This means that the service will see information concerning
+the ``3 *.no'' servers, but ``oslo.irc.no'' will have no
+knowledge of the presence of ``MyService''.  Also, the
+service is unable to send anything thru ``ircd.funet.fi''.
+</descrip>
+<sect1>Signing on as a service
+<p>
+Once the S: line setup on the server, the service connects
+by sending the password (PASS command), and then issuing a
+``SERVICE'' command:
+<p>
+SERVICE servicename servername distribution servicetype 0 :Information
+<descrip>
+<tag/servicename/ This is the name of the service as configured
+by the S line.
+<tag/servername/ This is ignored by the server.
+<tag/distribution/ This is the distribution mask for this
+connection.
+<tag/servicetype/ This is the service type as configured by
+the S line.  (It must match)
+<tag/Information/ This is any information.  It will be sent
+in ``SERVLIST'' replies and should be a short description of
+the service.
+</descrip>
+<p>
+A successfull registering of a service at the server will
+result in a RPL_YOURESERVICE (383) being sent back to
+the service. Any other reply as a result of sending service
+indicates an error has occured.
+<sect1>Requesting data from the server
+<p>
+Once the connection is established, the service needs to
+issue a ``SERVSET'' command to receive the data it wants:
+<p>
+SERVSET mask1 mask2
+<descrip>
+<tag/mask1/ It is a subset of the service type.  It defines
+what the kind of information the service wants to receive
+for this particular connection.
+<p>
+This mask can also have the following bits set, regardless
+of what the S line setting is:
+<verb>
+SERVICE_WANT_PREFIX     0x10000 /* to receive n!u@h instead of n */
+SERVICE_WANT_TOKEN      0x20000 /* use server token instead of name */
+SERVICE_WANT_EXTNICK    0x40000 /* user extended NICK syntax */
+</verb>
+<tag/mask2/ It is optional.  It is a subset of mask1 that
+defines which information the service wants to receive in a
+``connection burst''.  The information is similar to a
+server ``connection burst'', it describe the current set of
+the network.  The service can therefore store the
+information in memory and update it.
+<tag/Note/The ``SERVSET'' command can only be issued once.
+</descrip>
+
+<sect>General notes for server and service administrators
+<sect1>User privacy
+<p>
+Services can see almost as much information as a server.
+This means that granting a service connection should be
+considered with as much care as granting a server
+connection.  In particular, the service type should be
+limited to the strict minimum needed for the service to be
+operational.  In most cases, a service type of 0 is enough.
+<p>
+A great care should be taken to make sure that a service
+cannot be (ab)used to obtain information not normally
+accessible to users (such as showing invisible
+users). <bf>Administrators must remember that the privacy of
+the users is at stake</bf>.
+<sect1>Guidelines
+<p>
+To avoid confusion, it is a good idea to obey the following
+simple rules:
+<descrip>
+<tag/Name/The name should be descriptive, and if possible
+unique on the network.
+<tag/Information/The service ``information'' should be short
+and descriptive.
+<tag/Basic queries/The service should reply to at least 2
+queries:
+<descrip>
+<tag/ADMIN/name and e-mail address of the administrator.
+<tag/HELP/list of queries understood by the service.  Each
+query should also have an help.
+<tag/INFO/This should be a short text explaining what the
+service and its purpose are.
+</descrip>
+</descrip>
+<sect1>Flood control
+<p>
+Also, since services are not affected by flood control, they
+can easily flood the IRC network with information.  They
+should be conceived so this does not happen.
+<p>
+Services should implement their own flood control (for
+outgoing traffic) to be safe.
+
+</article>
