@@ -20,7 +20,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_numeric.c,v 1.4 1998/12/12 23:48:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_numeric.c,v 1.5 2002/04/05 03:05:53 jv Exp $";
 #endif
 
 #include "os.h"
@@ -52,7 +52,7 @@ aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	aClient *acptr;
+	aClient *acptr = NULL;
 	aChannel *chptr;
 	char	*nick, *p;
 	int	i;
@@ -82,8 +82,9 @@ char	*parv[];
 	    }
 	for (; (nick = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	    {
-		if ((acptr = find_client(nick, (aClient *)NULL)))
-		    {
+		acptr = find_target(nick, cptr);	
+		if (acptr)
+		{
 			/*
 			** Drop to bit bucket if for me...
 			** ...one might consider sendto_ops
@@ -95,6 +96,11 @@ char	*parv[];
 			** with numerics which can happen with nick collisions.
 			** - Avalon
 			*/
+			if (IsMe(acptr) && IsBursting(sptr)
+			    && numeric == ERR_NOSUCHSERVER)
+			{
+				do_emulated_eob(sptr);
+			}
 			if (IsMe(acptr) || acptr->from == cptr)
 				sendto_flag(SCH_NUM,
 					    "From %s for %s: %s %d %s %s.",
