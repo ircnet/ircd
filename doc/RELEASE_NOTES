@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.45 2004/04/14 18:08:37 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.46 2004/04/16 23:12:08 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -27,6 +27,7 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* P: can have flags ('D' and 'S'), check INSTALL file for details.
 	* class summary was moved from trace to (separate) stats C.
 	* redundant bans are allowed to be set now.
+	* SERVICE command has been changed slightly, update your services.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================
