@@ -21,8 +21,8 @@ AC_DEFUN([AC_FUNC_ACCEPT_ARGTYPES],
  [AC_CACHE_VAL(ac_cv_func_accept_arg2,dnl
   [AC_CACHE_VAL(ac_cv_func_accept_arg3,dnl
    [for ac_cv_func_accept_arg1 in 'int' 'unsigned int'; do
-     for ac_cv_func_accept_arg2 in 'struct sockaddr *' 'void *'; do
-      for ac_cv_func_accept_arg3 in 'socklen_t *' 'size_t *' 'unsigned int *' 'int *'; do
+     for ac_cv_func_accept_arg2 in 'struct sockaddr' 'const struct sockaddr' 'void'; do
+      for ac_cv_func_accept_arg3 in 'socklen_t' 'size_t' 'unsigned int' 'int'; do
        AC_TRY_COMPILE(dnl
 [#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
@@ -30,7 +30,7 @@ AC_DEFUN([AC_FUNC_ACCEPT_ARGTYPES],
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
-extern accept ($ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2, $ac_cv_func_accept_arg3);],,dnl
+extern accept ($ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2 *, $ac_cv_func_accept_arg3 *);],,dnl
         [ac_not_found=no ; break 3], ac_not_found=yes)
       done
      done
@@ -39,7 +39,7 @@ extern accept ($ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2, $ac_cv_func_acc
   ])dnl AC_CACHE_VAL
  ])dnl AC_CACHE_VAL
  if test "$ac_not_found" = no; then
-   AC_MSG_RESULT([$ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2, $ac_cv_func_accept_arg3])
+   AC_MSG_RESULT([$ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2 *, $ac_cv_func_accept_arg3 *])
 dnl AC_DEFINE_UNQUOTED(ACCEPT_TYPE_ARG1,$ac_cv_func_accept_arg1)
 dnl AC_DEFINE_UNQUOTED(ACCEPT_TYPE_ARG2,$ac_cv_func_accept_arg2)
    AC_DEFINE_UNQUOTED(ACCEPT_TYPE_ARG3,$ac_cv_func_accept_arg3, [Type of the 3rd argument of accept()])
@@ -699,7 +699,7 @@ dnl main
 dnl ----
 
 AC_INIT([irc],[2.11],[ircd-bugs@irc.org])
-AC_REVISION([$Id: configure.in,v 1.68 2005/01/03 17:15:26 q Exp $])
+AC_REVISION([$Id: configure.in,v 1.69 2005/01/03 17:55:41 q Exp $])
 AC_PREREQ(2.59)
 
 AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [[localstatedir/log]]], [

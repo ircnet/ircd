@@ -6005,8 +6005,8 @@ else
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
      for ac_cv_func_accept_arg1 in 'int' 'unsigned int'; do
-     for ac_cv_func_accept_arg2 in 'struct sockaddr *' 'void *'; do
-      for ac_cv_func_accept_arg3 in 'socklen_t *' 'size_t *' 'unsigned int *' 'int *'; do
+     for ac_cv_func_accept_arg2 in 'struct sockaddr' 'const struct sockaddr' 'void'; do
+      for ac_cv_func_accept_arg3 in 'socklen_t' 'size_t' 'unsigned int' 'int'; do
        cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -6019,7 +6019,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
-extern accept ($ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2, $ac_cv_func_accept_arg3);
+extern accept ($ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2 *, $ac_cv_func_accept_arg3 *);
 int
 main ()
 {
@@ -6067,8 +6067,8 @@ fi
 
 fi
  if test "$ac_not_found" = no; then
-   echo "$as_me:$LINENO: result: $ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2, $ac_cv_func_accept_arg3" >&5
-echo "${ECHO_T}$ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2, $ac_cv_func_accept_arg3" >&6
+   echo "$as_me:$LINENO: result: $ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2 *, $ac_cv_func_accept_arg3 *" >&5
+echo "${ECHO_T}$ac_cv_func_accept_arg1, $ac_cv_func_accept_arg2 *, $ac_cv_func_accept_arg3 *" >&6
 
 cat >>confdefs.h <<_ACEOF
 #define ACCEPT_TYPE_ARG3 $ac_cv_func_accept_arg3
