@@ -1,6 +1,6 @@
   IRC Services
   Christophe Kalt
-  $Id: SERVICE.txt,v 1.9 2004/07/02 15:22:59 chopin Exp $
+  $Id: SERVICE.txt,v 1.10 2004/07/02 15:52:06 chopin Exp $
 
   The IRC protocol described in RFC 1459 defines two types of connec-
   tions (client, and server).  A third type was introduced with version
@@ -124,12 +124,12 @@
 
      TTyyppee
         This is a misleading name.  The type is actually a bit mask
-        which defines what information the service can see.  The server
-        configuration file limits the type allowed for a service.  The
-        meaning of the bits is defined in the service.h file coming with
-        the IRC software:
-
-
+        which defines what information the service can see. (With
+        introduction of SERVICE_WANT_TKLINE it is even more misleading,
+        as this does not define information, but rather access control.)
+        The server configuration file limits the type allowed for a
+        service.  The meaning of the bits is defined in the
+        service_def.h file coming with the IRC software:
         SERVICE_WANT_SERVICE    0x00000001 /* other services signing on/off */
         SERVICE_WANT_OPER       0x00000002 /* operators, included in umodes too */
         SERVICE_WANT_UMODE      0x00000004 /* user modes, iow + local modes */
@@ -155,6 +155,8 @@
 
         SERVICE_WANT_USERLOG    0x10000000 /* FNAME_USERLOG */
         SERVICE_WANT_CONNLOG    0x20000000 /* FNAME_CONNLOG */
+
+        SERVICE_WANT_TKLINE     0x40000000 /* service wants to use TKLINE*/
 
 
 
@@ -258,7 +260,6 @@
 
      NNoottee
         The ``SERVSET'' command can only be issued once.
-
 
 
   44..  GGeenneerraall nnootteess ffoorr sseerrvveerr aanndd sseerrvviiccee aaddmmiinniissttrraattoorrss

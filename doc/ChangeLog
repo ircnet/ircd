@@ -8,6 +8,8 @@
 	* s_service.c/check_services_butone(): if WANT_UID, send it, not nick.
 	* s_service.c/sendnum_toone(): if WANT_UID, send appropriate UNICK.
 	* s_service.c/m_service(): send 005 to services.
+	* services_def.h: new SERVICE_WANT_TKLINE.
+	* s_user.c/is_allowed(): check services for being allowed to TKLINE.
 
 2004-07-01  Piotr Kucharski
 

@@ -4,7 +4,7 @@
 
 <title>IRC Services
 <author>Christophe Kalt
-<date>$Id: SERVICE.sgml,v 1.8 2004/07/02 15:22:59 chopin Exp $
+<date>$Id: SERVICE.sgml,v 1.9 2004/07/02 15:52:06 chopin Exp $
 <abstract>
 The IRC protocol described in RFC 1459 defines two types of
 connections (client, and server).  A third type was
@@ -112,9 +112,11 @@ Services have two main characteristics:
 <label id="type">
 <tag/Type/  This is a misleading name.  The type is actually
 a bit mask which defines what information the service can
-see.  The server configuration file limits the type allowed
+see. (With introduction of SERVICE_WANT_TKLINE it is even more
+misleading, as this does not define information, but rather access
+control.) The server configuration file limits the type allowed
 for a service.  The meaning of the bits is defined in the
-service.h file coming with the IRC software:
+service_def.h file coming with the IRC software:
 <verb>
 SERVICE_WANT_SERVICE    0x00000001 /* other services signing on/off */
 SERVICE_WANT_OPER       0x00000002 /* operators, included in umodes too */
@@ -141,6 +143,8 @@ SERVICE_WANT_NUMERICS	0x08000000 /* &amp;NUMERICS */
 
 SERVICE_WANT_USERLOG	0x10000000 /* FNAME_USERLOG */
 SERVICE_WANT_CONNLOG	0x20000000 /* FNAME_CONNLOG */
+
+SERVICE_WANT_TKLINE	0x40000000 /* service wants to use TKLINE*/
 </verb>
 <label id="dist">
 <tag/Distribution/  This controls the propagation of the
