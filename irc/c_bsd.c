@@ -18,29 +18,15 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-char c_bsd_id[] = "c_bsd.c v2.0 (c) 1988 University of Oulu, Computing Center\
- and Jarkko Oikarinen";
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: c_bsd.c,v 1.3 1997/09/03 17:45:31 kalt Exp $";
+#endif
 
-#include "struct.h"
-#include <sys/socket.h>
-#include <sys/file.h>
-#include <sys/ioctl.h>
-#include <signal.h>
-#include <fcntl.h>
-#ifdef HAVE_ARPA_INET_H
-# include <arpa/inet.h>
-#else
-# include "res/inet.h"
-#endif
-#ifndef AUTOMATON
-#include <curses.h>
-#endif
-#include "common.h"
-#include "sys.h"
-#include "sock.h"	/* If FD_ZERO isn't defined up to this point, */
-			/* define it (BSD4.2 needs this) */
-#include "h.h"
-#include "irc.h"
+#include "os.h"
+#include "c_defines.h"
+#define C_BSD_C
+#include "c_externs.h"
+#undef C_BSD_C
 
 #ifdef AUTOMATON
 #ifdef DOCURSES
@@ -52,10 +38,6 @@ char c_bsd_id[] = "c_bsd.c v2.0 (c) 1988 University of Oulu, Computing Center\
 #endif /* AUTOMATON */
 
 #define	STDINBUFSIZE (0x80)
-
-extern	aClient	me;
-extern	int	termtype;
-extern	int	QuitFlag;
 
 int	client_init(host, portnum, cptr)
 char	*host;
@@ -114,7 +96,7 @@ int	sock;
 #endif
 #ifdef DOTERMCAP
 		if (termtype == TERMCAP_TERM)
-			move (-1, i);
+			tcap_move (-1, i);
 #endif
 #ifdef HPUX
 		if (select(32, (int *)&ready, 0, 0, NULL) < 0) {
@@ -147,7 +129,7 @@ int	sock;
 #endif
 #ifdef DOTERMCAP
 				if (termtype == CURSES_TERM)
-					move(-1, i);
+					tcap_move(-1, i);
 #endif
 			}
 		}

@@ -17,35 +17,30 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-char swear_id[]="swear.c v2.0 (c) 1989 Jarkko Oikarinen";
-
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: swear.c,v 1.2 1997/09/03 17:45:43 kalt Exp $";
+#endif
+ 
 /* Curses replacement routines. Uses termcap */
 
-#include <sys/ioctl.h>
-#include <stdio.h>
-#include <sys/file.h>
-#include <ctype.h>
-#include <strings.h>
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#if HPUX
-#include <sys/ttold.h>
-#endif
+#include "os.h"
+#include "c_defines.h"
+#define SWEAR_C
+#include "c_externs.h"
+#undef SWEAR_C
 
 #define LLEN 60
+
+#ifdef DOTERMCAP
 
 static struct sgttyb oldtty, newtty;
 static char termcapentry[1024];
 static char codes[1024], *cls;
 
-extern char *tgoto(), *getenv();
 static char *termname;
 
 static int currow = 0;
-int lines, columns, scroll_ok = 0, scroll_status = 0;
-extern int insert;
-extern char *HEADER;
+int irc_lines, irc_columns, scroll_ok = 0, scroll_status = 0;
 
 tcap_putch(row, col, ch)
 int row, col;
@@ -62,7 +57,7 @@ int row, col;
   cls = codes;
   tgetstr("cm",&cls);
   if (row < 0)
-    row = lines - row;
+    row = irc_lines - row;
   cls = tgoto(codes, col, row);
   printf("%s",cls);
   fflush(stdout);
@@ -105,8 +100,8 @@ int flag;
     fflush(stdout);
   }
   printf("TERMCAP=%s\n",termcapentry);
-  lines = tgetnum("li");
-  columns = tgetnum("co");
+  irc_lines = tgetnum("li");
+  irc_columns = tgetnum("co");
   return(0);
 }
 
@@ -124,7 +119,7 @@ scroll_ok_off()
 {
   cls = codes;
   tgetstr("cs",&cls);
-  cls = tgoto(codes, lines-1, 0);
+  cls = tgoto(codes, irc_lines-1, 0);
   printf("%s",cls); 
   scroll_ok = 0;
 }
@@ -137,7 +132,7 @@ scroll_ok_on()
   printf("%s",cls);
   cls = codes;
   tgetstr("cs",&cls);
-  cls = tgoto(codes, lines-3, 0);
+  cls = tgoto(codes, irc_lines-3, 0);
   printf("%s",cls);
   fflush(stdout);
   scroll_ok = scroll_status = 1;
@@ -147,7 +142,7 @@ put_insflag(flag)
 int flag;
 {
   flag = insert;
-  tcap_move(-2, columns - 5);
+  tcap_move(-2, irc_columns - 5);
     cls = codes;
     tgetstr("mr",&cls);
     printf("%s",codes);
@@ -177,18 +172,18 @@ char *line;
   char *ptr = line, *ptr2, *newl;
   char ch='\0';
   while (ptr) {
-    if (strlen(ptr) > columns-1) {
-      ch = ptr[columns-1];
-      ptr[columns-1] = '\0';
-      ptr2 = &ptr[columns-2];
+    if (strlen(ptr) > irc_columns-1) {
+      ch = ptr[irc_columns-1];
+      ptr[irc_columns-1] = '\0';
+      ptr2 = &ptr[irc_columns-2];
     } 
     else
       ptr2 = NULL;
     if (scroll_ok) {
-      tcap_move(lines-3, 0);
+      tcap_move(irc_lines-3, 0);
     } else {
       tcap_move(currow++,0);
-      if (currow > lines - 4) currow = 0;
+      if (currow > irc_lines - 4) currow = 0;
     }
     while (newl = index(ptr,'\n'))
       *newl = '\0';
@@ -200,8 +195,8 @@ char *line;
 	clear_to_eol(1,0);
 	clear_to_eol(2,0);
       }
-      else if (currow == lines - 4) {
-	clear_to_eol(lines-4,0);
+      else if (currow == irc_lines - 4) {
+	clear_to_eol(irc_lines-4,0);
 	clear_to_eol(0,0);
       }
       else {
@@ -217,3 +212,5 @@ char *line;
   }
   fflush(stdout);
 }
+
+#endif /* DO_TERMCAP */

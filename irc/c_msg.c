@@ -18,34 +18,17 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* -- Jto -- 03 Jun 1990
- * Fixes to allow channels to be strings
- */
- 
 #ifndef lint
-char c_msg_id[] = "c_msg.c v2.0 (c) 1988 University of Oulu, Computing Center\
- and Jarkko Oikarinen";
+static  char rcsid[] = "@(#)$Id: c_msg.c,v 1.2 1997/09/03 17:45:34 kalt Exp $";
 #endif
-
-#include "struct.h"
-#ifdef AUTOMATON
-#include <ctype.h>
-#else
-#ifndef VMSP
-#include <curses.h>
-#endif
-#endif
-
-#include "common.h"
-#include "sys.h"
-#include "msg.h"
-#include "irc.h"
-#include "h.h"
+ 
+#include "os.h"
+#include "c_defines.h"
+#define C_MSG_C
+#include "c_externs.h"
+#undef C_MSG_C
 
 char	mybuf[513];
-
-extern	char	*last_to_me(), userhost[], *querychannel;
-extern	aClient	*client, me; /* 'me' from h.h	Vesa */
 
 void m_die() {
   exit(-1);
@@ -105,8 +88,8 @@ aClient *sptr, *cptr;
 int parc;
 char *parv[];
 {
-  sprintf(mybuf, "*** Received PONG message: %s %s",
-	  parv[1], (parv[2]) ? parv[2] : "");
+  sprintf(mybuf, "*** Received PONG message: %s %s from %s",
+	  parv[1], (parv[2]) ? parv[2] : "", parv[0]);
   putline(mybuf);
   return 0;
 }
@@ -194,7 +177,7 @@ char *parv[];
 
 void m_bye()
 {
-#if !defined(AUTOMATON) && !defined(VMSP)
+#if defined(DOCURSES) && !defined(AUTOMATON) && !defined(VMSP)
   echo();
   nocrmode();
   clear();
@@ -271,9 +254,9 @@ char *channel, *username, *host, *nickname, *away, *realname;
 
     sprintf(mybuf, "%c %s%s %*s %s %*s",
 	away[0], nickname, away+1,
-	21-strlen(nickname)-strlen(away), channel,
+	(int)(21-strlen(nickname)-strlen(away)), channel,
 	realname,
-	53-strlen(realname), uh);
+	(int)(53-strlen(realname)), uh);
   }
 }
 

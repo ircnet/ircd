@@ -17,17 +17,9 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* -- Jto -- 20 Jun 1990
- * extern void free() fixed as suggested by
- * gruner@informatik.tu-muenchen.de
- */
-
-/* -- Jto -- 10 May 1990
- * Changed memcpy into bcopy and removed the declaration of memset
- * because it was unnecessary.
- * Added the #includes for "struct.h" and "sys.h" to get bcopy/memcpy
- * work
- */
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.8 1997/09/03 17:45:13 kalt Exp $";
+#endif
 
 /*
 ** For documentation of the *global* functions implemented here,
@@ -35,18 +27,21 @@
 **
 */
 
-#ifndef lint
-static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.7 1997/06/30 20:21:15 kalt Exp $";
+#include "os.h"
+#ifndef CLIENT_COMPILE
+# include "s_defines.h"
+#else
+# include "c_defines.h"
 #endif
-
-#include <stdio.h>
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "h.h"
+#define DBUF_C
+#ifndef CLIENT_COMPILE
+# include "s_externs.h"
+#else
+# include "c_externs.h"
+#endif
+#undef DBUF_C
 
 #undef VALLOC
-#define	DBUF_INIT	10
 
 #if !defined(VALLOC) && !defined(valloc)
 #define	valloc malloc
@@ -59,8 +54,6 @@ u_int	dbufalloc = 0;
 
 u_int	poolsize = (BUFFERPOOL > 1500000) ? BUFFERPOOL : 1500000;
 dbufbuf	*freelist = NULL;
-
-#ifdef DBUF_INIT
 
 /* dbuf_init--initialize a stretch of memory as dbufs.
    Doing this early on should save virtual memory if not real memory..
@@ -91,8 +84,6 @@ void dbuf_init()
 	istat.is_dbuf = istat.is_dbufnow;
 #endif
 }
-
-#endif /* DBUF_INIT */
 
 /*
 ** dbuf_alloc - allocates a dbufbuf structure either from freelist or
@@ -208,10 +199,19 @@ dbuf *dyn;
     }
 
 
+/*
+** dbuf_put
+**	Append the number of bytes to the buffer, allocating more
+**	memory as needed. Bytes are copied into internal buffers
+**	from users buffer.
+**
+**	returns	> 0, if operation successfull
+**		< 0, if failed (due memory allocation problem)
+*/
 int	dbuf_put(dyn, buf, length)
-dbuf	*dyn;
-char	*buf;
-int	length;
+dbuf	*dyn;          /* Dynamic buffer header */
+char	*buf;          /* Pointer to data to be stored */
+int	length;        /* Number of bytes to store */
 {
 	Reg	dbufbuf	**h;
 	dbufbuf *d;
@@ -295,9 +295,33 @@ int	length;
     }
 
 
+/*
+** dbuf_map, dbuf_delete
+**	These functions are meant to be used in pairs and offer
+**	a more efficient way of emptying the buffer than the
+**	normal 'dbuf_get' would allow--less copying needed.
+**
+**	map	returns a pointer to a largest contiguous section
+**		of bytes in front of the buffer, the length of the
+**		section is placed into the indicated "long int"
+**		variable. Returns NULL *and* zero length, if the
+**		buffer is empty.
+**
+**	delete	removes the specified number of bytes from the
+**		front of the buffer releasing any memory used for them.
+**
+**	Example use (ignoring empty condition here ;)
+**
+**		buf = dbuf_map(&dyn, &count);
+**		<process N bytes (N <= count) of data pointed by 'buf'>
+**		dbuf_delete(&dyn, N);
+**
+**	Note: 	delete can be used alone, there is no real binding
+**		between map and delete functions...
+*/
 char	*dbuf_map(dyn,length)
-dbuf	*dyn;
-int	*length;
+dbuf	*dyn;                   /* Dynamic buffer header */
+int	*length;                /* Return number of bytes accessible */
     {
 	if (dyn->head == NULL)
 	    {
@@ -314,8 +338,8 @@ int	*length;
     }
 
 int	dbuf_delete(dyn,length)
-dbuf	*dyn;
-int	length;
+dbuf	*dyn;                  /* Dynamic buffer header */
+int	length;                /* Number of bytes to delete */
     {
 	dbufbuf *d;
 	int chunk;
@@ -353,10 +377,25 @@ int	length;
 	return 0;
     }
 
+/*
+** dbuf_get
+**	Remove number of bytes from the buffer, releasing dynamic
+**	memory, if applicaple. Bytes are copied from internal buffers
+**	to users buffer.
+**
+**	returns	the number of bytes actually copied to users buffer,
+**		if >= 0, any value less than the size of the users
+**		buffer indicates the dbuf became empty by this operation.
+**
+**		Return 0 indicates that buffer was already empty.
+**
+**		Negative return values indicate some unspecified
+**		error condition, rather fatal...
+*/
 int	dbuf_get(dyn, buf, length)
-dbuf	*dyn;
-char	*buf;
-int	length;
+dbuf	*dyn;            /* Dynamic buffer header */
+char	*buf;            /* Pointer to buffer to receive the data */
+int	length;          /* Max amount of bytes that can be received */
     {
 	int	moved = 0;
 	int	chunk;

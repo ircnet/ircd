@@ -1,3 +1,79 @@
+Tue Aug 19 08:38:54 1997  Christophe Kalt
+
+	* channel.c: m_names() could still have a truncated reply.
+
+	* more cleaning from Alain.Nissen@ulg.ac.be:
+
+		* struct_def.h, bsd.c, s_bsd.c: removed references to "pyr".
+		* res_comp.c: removed res_getshort() [never used].
+		* removed all references to VMS.
+	
+Mon Aug 11 13:34:15 1997  Christophe Kalt
+
+	* The following changes are from Alain.Nissen@ulg.ac.be
+
+	* all files (in short):
+		* include/ was removed.
+		* all .c have a corresponding _ext.h to declare external
+		variables and functions.
+		* [sc]_externs.h are #includes *_ext.h.
+		* [sc]_defines.h are #includes *_def.h.
+		* all .c have the same list of #include.
+		* os.h has all system #includes and portability tests.
+
+	* Also, several bug and portability fixes:
+	
+		* c_bsd.c: move renamed in tcap_move (portability).
+		* c_msg.c:
+			* added test on DOCURSES before including it.
+			* various casts.
+		* edit.c:
+			* return type of suspend_irc() changed to RETSIGTYPE.
+			* added int argument to suspend_irc().
+			* use of signal(SIGTSTP,...) now depends on
+			whether the signal exists rather than the OS.
+		* help.c: helplist rewritten properly.
+		* irc.c:
+			* strdup() replaced with mystrdup().
+			* do_log() takes 2 arguments.
+			* return type of quit_intr() changed to RETSIGTYPE.
+			* added int argument to quit_intr().
+		* screen.c: such a mess
+			* LINES is only present under curses.
+			* idem for refresh().
+			* clear_to_eol() is supposed to take 2 arguments,
+			but what are they?
+		* swear.c: added to clients targets
+		* channel.c: delch renamed in del_ch.
+		* chkconf.c, parse.c: newline renamed in irc_newline.
+		* ircd.c: s_monitor(), s_die(), s_rehash(), s_restart()
+		return type changed from VOIDSIG to RETSIGTYPE.
+		* res.c: now using SOCK_LEN_TYPE.
+		* res_comp.c, res_init.c: various portability changes.
+		* s_auth.c: now using SOCK_LEN_TYPE.
+		* s_bsd.c: now using SOCK_LEN_TYPE.
+		* s_conf.c: several portability fixes.
+		* s_err.c: local_replies[] and local_replies[] rewritten.
+		* s_service.c: changed test on USE_STDARG.
+		* bsd.c:
+			* return type for dummy() is now RETSIGTYPE.
+			* dummy() now takes one int argument.
+		* dbuf.c: removed unused DBUF_INIT.
+		* support.c:
+			* many changes concerning #if tests.
+			* added solaris_gethostbyname() to use instead of
+			Solaris 2.3 broken gethostbyname().
+			* added irc_memcmp() to use if system's memcmp()
+			is broken.
+		* nameser.h: now using WORDS_BIGENDIAN.
+		* configure.in:
+			* simpler solaris 2.x detection when looking for zlib.
+			* added test for cursesX.
+			* added check for sys_errlist definition in sys/errno.h
+			* and more...
+		* Makefile.in: CFLAGS split in S_FLAGS, C_FLAGS and
+		CC_FLAGS (ircd, irc, chkconf).
+	
 Fri Aug  8 10:51:24 1997  Christophe Kalt
 
 	* channel.c: m_names() behaviour wasn't consistent with m_who()

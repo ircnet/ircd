@@ -18,14 +18,15 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-char screen_id[] = "screen.c v2.0 (c) 1988 University of Oulu, Computing\
- Center and Jarkko Oikarinen";
-
-#include <stdio.h>
-#include <curses.h>
-#include "struct.h"
-#include "common.h"
-#include "irc.h"
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: screen.c,v 1.2 1997/09/03 17:45:42 kalt Exp $";
+#endif
+ 
+#include "os.h"
+#include "c_defines.h"
+#define SCREEN_C
+#include "c_externs.h"
+#undef SCREEN_C
 
 #define	SBUFSIZ 240
 
@@ -43,12 +44,6 @@ static	int	pos_in_history = 0;
 
 int	insert = 1;	/* default to insert mode */
 			/* I want insert mode, thazwhat emacs does ! //jkp */
-
-int get_disp();
-void record_line();
-void clear_last_line();
-
-extern int termtype;
 
 int get_char(pos)
 int pos;
@@ -270,10 +265,12 @@ int tulosta_viimeinen_rivi()
       tcap_move(-1, 0);
       for(i3=0; i3<78; i3++)
         if (get_char(i2+i3))
-	  tcap_putch(LINES-1, i3, get_char(i2+i3));
-      clear_to_eol();
+/*	  tcap_putch(LINES-1, i3, get_char(i2+i3)); */
+	  tcap_putch(-1, i3, get_char(i2+i3));
+/*    clear_to_eol(); */
+      clear_to_eol(-1, 78);
       tcap_move(-1, i1-get_disp(paikka));
-      refresh();
+/*      refresh(); */
     }
 #endif
     return (i1-get_disp(paikka));

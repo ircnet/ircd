@@ -18,29 +18,28 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* -- Jto -- 16 Jun 1990
- * Added Armin's PRIVMSG patches...
- */
-
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.17 1997/07/28 01:14:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.18 1997/09/03 17:45:17 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "h.h"
-#include <stdio.h>
-#include <fcntl.h>
-
-#ifdef USE_STDARG
-#include <stdarg.h>
+#include "os.h"
+#ifndef CLIENT_COMPILE
+# include "s_defines.h"
+#else
+# include "c_defines.h"
 #endif
+#define SEND_C
+#ifndef CLIENT_COMPILE
+# include "s_externs.h"
+#else
+# include "c_externs.h"
+#endif
+#undef SEND_C
 
 static	char	sendbuf[2048];
 static	int	send_message __P((aClient *, char *, int));
 
-#ifdef USE_STDARG
+#if USE_STDARG
 static void	vsendto_prefix_one(aClient *, aClient *, char *, va_list);
 #endif
 
@@ -480,7 +479,7 @@ static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 /*
  *
  */
-#ifndef USE_STDARG
+#if ! USE_STDARG
 static	int	sendprep(pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 #else
@@ -490,7 +489,7 @@ static	int	vsendprep(char *pattern, va_list va)
 	int	len;
 
 	Debug((DEBUG_L10, "sendprep(%s)", pattern));
-#ifndef USE_STDARG
+#if ! USE_STDARG
 	len = irc_sprintf(sendbuf, pattern, p1, p2, p3, p4, p5, p6,
 		p7, p8, p9, p10, p11);
 	if (len == -1)
@@ -511,7 +510,7 @@ static	int	vsendprep(char *pattern, va_list va)
 }
 
 #ifndef CLIENT_COMPILE
-#ifndef USE_STDARG
+#if ! USE_STDARG
 static	int	sendpreprep(to, from, pattern,
 			    p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 aClient	*to, *from;
@@ -648,7 +647,7 @@ static	int	vsendpreprep(aClient *to, aClient *from, char *pattern, va_list va)
 /*
 ** send message to single client
 */
-#ifndef USE_STDARG
+#if ! USE_STDARG
 int	sendto_one(to, pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 aClient *to;
 char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
@@ -657,14 +656,8 @@ int	vsendto_one(aClient *to, char *pattern, va_list va)
 #endif
 {
 	int	len;
-#ifdef VMS
-	extern int goodbye;
-	
-	if (StrEq("QUIT", pattern)) 
-		goodbye = 1;
-#endif
 
-#ifndef USE_STDARG
+#if ! USE_STDARG
 	len = sendprep(pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
 #else
 	len = vsendprep(pattern, va);
@@ -674,7 +667,7 @@ int	vsendto_one(aClient *to, char *pattern, va_list va)
 	return len;
 }
 
-#ifdef USE_STDARG
+#if USE_STDARG
 int	sendto_one(aClient *to, char *pattern, ...)
 {
 	int	len;
@@ -687,7 +680,7 @@ int	sendto_one(aClient *to, char *pattern, ...)
 #endif
 
 #ifndef CLIENT_COMPILE
-#ifndef USE_STDARG
+#if ! USE_STDARG
 /*VARARGS*/
 void	sendto_channel_butone(one, from, chptr, pattern,
 			      p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
@@ -704,7 +697,7 @@ void	sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr, char *p
 
 	if (IsAnonymous(chptr) && IsClient(from))
 	    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 		if (p1 && *p1 && !mycmp(p1, from->name))
 			p1 = anon.name;
 #endif
@@ -713,7 +706,7 @@ void	sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr, char *p
 
 	if (one != from && MyConnect(from) && IsRegisteredUser(from))
 	    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 		sendto_prefix_one(from, from, pattern, p1, p2, p3, p4,
 				  p5, p6, p7, p8, p9, p10, p11);
 #else
@@ -724,7 +717,7 @@ void	sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr, char *p
 #endif
 	    }
 
-#ifndef USE_STDARG
+#if ! USE_STDARG
 	len1 = sendprep(pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
 #else
 	{
@@ -745,7 +738,7 @@ void	sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr, char *p
 		    {
 			if (!len2)
 			    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 				len2 = sendpreprep(acptr, lfrm, pattern, p1,
 						   p2, p3, p4, p5, p6, p7, p8,
 						   p9, p10, p11);
@@ -771,7 +764,7 @@ void	sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr, char *p
  *
  * Send a message to all connected servers except the client 'one'.
  */
-#ifndef USE_STDARG
+#if ! USE_STDARG
 /*VARARGS*/
 void	sendto_serv_butone(one, pattern, p1, p2, p3, p4,p5,p6,p7,p8,p9,p10,p11)
 aClient *one;
@@ -788,7 +781,7 @@ void	sendto_serv_butone(aClient *one, char *pattern, ...)
 		    (!one || cptr != one->from) && !IsMe(cptr)) {
 			if (!len)
 			    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 				len = sendprep(pattern, p1, p2, p3, p4, p5,
 					       p6, p7, p8, p9, p10, p11);
 #else
@@ -803,7 +796,7 @@ void	sendto_serv_butone(aClient *one, char *pattern, ...)
 	return;
 }
 
-#ifndef USE_STDARG
+#if ! USE_STDARG
 void	sendto_serv_v(one, ver, pattern, p1, p2, p3, p4,p5,p6,p7,p8,p9,p10,p11)
 aClient *one;
 int	ver;
@@ -821,7 +814,7 @@ void	sendto_serv_v(aClient *one, int ver, char *pattern, ...)
 		    (cptr->serv->version & ver)) {
 			if (!len)
 			    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 				len = sendprep(pattern, p1, p2, p3, p4, p5,
 					       p6, p7, p8, p9, p10, p11);
 #else
@@ -842,7 +835,7 @@ void	sendto_serv_v(aClient *one, int ver, char *pattern, ...)
  * Sends a message to all people (inclusing user) on local server who are
  * in same channel with user.
  */
-#ifndef USE_STDARG
+#if ! USE_STDARG
 /*VARARGS*/
 void	sendto_common_channels(user,pattern,p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11)
 aClient *user;
@@ -869,7 +862,7 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
 	    {
 		if (MyConnect(user))
 		    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 			len = sendpreprep(user, user, pattern,
 				  p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,p11);
 
@@ -895,7 +888,7 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
 						     but breaks the debug code.. */
 #endif
 					    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 					      len = sendpreprep(cptr, user, pattern,
 								p1, p2, p3, p4, p5,
 								p6, p7, p8, p9, p10,
@@ -919,7 +912,7 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
 		bzero((char *)&sentalong[0], sizeof(int) * MAXCONNECTIONS);
 		if (MyConnect(user))
 		    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 			len = sendpreprep(user, user, pattern, p1, p2, p3, p4,
 					  p5, p6, p7, p8, p9, p10, p11);
 #else
@@ -952,7 +945,7 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
 					     but breaks the debug code.. */
 #endif
 				    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 					len = sendpreprep(cptr, user, pattern,
 							  p1, p2, p3, p4, p5,
 							  p6, p7, p8, p9, p10,
@@ -977,7 +970,7 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
  * Send a message to all members of a channel that are connected to this
  * server.
  */
-#ifndef USE_STDARG
+#if ! USE_STDARG
 /*VARARGS*/
 void	sendto_channel_butserv(chptr, from, pattern, p1, p2, p3,
 			       p4, p5, p6, p7, p8, p9, p10, p11)
@@ -994,7 +987,7 @@ void	sendto_channel_butserv(aChannel *chptr, aClient *from, char *pattern, ...)
 
 	if (MyClient(from))
 	    {	/* Always send to the client itself */
-#ifndef USE_STDARG
+#if ! USE_STDARG
 		sendto_prefix_one(from, from, pattern, p1, p2, p3, p4,
 				  p5, p6, p7, p8, p9, p10, p11);
 #else
@@ -1008,7 +1001,7 @@ void	sendto_channel_butserv(aChannel *chptr, aClient *from, char *pattern, ...)
 	    }
 	if (IsAnonymous(chptr) && IsClient(from))
 	    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 		if (p1 && *p1 && !mycmp(p1, from->name))
 			p1 = anon.name;
 #endif
@@ -1020,7 +1013,7 @@ void	sendto_channel_butserv(aChannel *chptr, aClient *from, char *pattern, ...)
 		    {
 			if (!len)
 			    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 				len = sendpreprep(acptr, lfrm, pattern, p1, p2,
 						  p3, p4, p5, p6, p7, p8, p9,
 						  p10, p11);
@@ -1065,7 +1058,7 @@ int	what;
  * send to all servers which match the mask at the end of a channel name
  * (if there is a mask present) or to all if no mask.
  */
-#ifndef USE_STDARG
+#if ! USE_STDARG
 /*VARARGS*/
 void	sendto_match_servs(chptr, from, format, p1, p2, p3, p4, p5, p6, p7,
 			   p8, p9, p10, p11)
@@ -1099,7 +1092,7 @@ void	sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 			continue;
 		if (!len)
 		    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 			len = sendprep(format, p1, p2, p3, p4, p5, p6, p7,
 				       p8, p9, p10, p11);
 #else
@@ -1120,7 +1113,7 @@ void	sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
  * either by user hostname or user servername.
  */
 /*VARARGS*/
-#ifndef USE_STDARG
+#if ! USE_STDARG
 void	sendto_match_butone(one, from, mask, what, pattern,
 			    p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 aClient *one, *from;
@@ -1155,7 +1148,7 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
 		else if (!(IsRegisteredUser(cptr) && 
 			   match_it(cptr, mask, what)))
 			continue;
-#ifndef USE_STDARG
+#if ! USE_STDARG
 		sendto_prefix_one(cptr, from, pattern,
 				  p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,p11);
 #else
@@ -1177,7 +1170,7 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
 ** one - client not to send message to
 ** from- client which message is from *NEVER* NULL!!
 */
-#ifndef USE_STDARG
+#if ! USE_STDARG
 /*VARARGS*/
 void	sendto_ops_butone(one, from, pattern,
 			  p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
@@ -1203,7 +1196,7 @@ void	sendto_ops_butone(aClient *one, aClient *from, char *pattern, ...)
 		if (cptr->from == one)
 			continue;	/* ...was the one I should skip */
 		sentalong[i] = 1;
-#ifndef USE_STDARG
+#if ! USE_STDARG
       		sendto_prefix_one(cptr->from, from, pattern,
 				  p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,p11);
 #else
@@ -1225,7 +1218,7 @@ void	sendto_ops_butone(aClient *one, aClient *from, char *pattern, ...)
  * NOTE: NEITHER OF THESE SHOULD *EVER* BE NULL!!
  * -avalon
  */
-#ifndef USE_STDARG
+#if ! USE_STDARG
 /*VARARGS*/
 void	sendto_prefix_one(to, from, pattern,
 			  p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
@@ -1238,7 +1231,7 @@ void	sendto_prefix_one(aClient *to, aClient *from, char *pattern, ...)
 {
 	int	len;
 
-#ifndef USE_STDARG
+#if ! USE_STDARG
 	len = sendpreprep(to, from, pattern, p1, p2, p3, p4, p5, p6, p7, p8,
 			  p9, p10, p11);
 #else
@@ -1251,7 +1244,7 @@ void	sendto_prefix_one(aClient *to, aClient *from, char *pattern, ...)
 	return;
 }
 
-#ifdef USE_STDARG
+#if USE_STDARG
 static void	vsendto_prefix_one(aClient *to, aClient *from, char *pattern, va_list va)
 {
 	int	len;
@@ -1289,7 +1282,7 @@ void	setup_svchans()
 		shptr->svc_ptr = find_channel(shptr->svc_chname, NULL);
 }
 
-#ifndef USE_STDARG
+#if ! USE_STDARG
 void	sendto_flag(chan, pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,p11)
 u_int	chan;
 char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
@@ -1307,7 +1300,7 @@ void	sendto_flag(u_int chan, char *pattern, ...)
 
 	if ((chptr = shptr->svc_ptr))
 	    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 		(void)sprintf(nbuf, pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
 #else
 		{

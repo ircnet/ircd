@@ -18,16 +18,15 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include <sys/types.h>
-
-#include "struct.h"
-#include "common.h"
-#include "numeric.h"
-#include "msg.h"
-#include "sys.h"
-#include "h.h"
-#include "irc.h"
-#include "patchlevel.h"
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: c_version.c,v 1.2 1997/09/03 17:45:35 kalt Exp $";
+#endif
+ 
+#include "os.h"
+#include "c_defines.h"
+#define C_VERSION_C
+#include "c_externs.h"
+#undef C_VERSION_C
 
 char *intro = "Internet Relay Chat v%s";
 char *version;

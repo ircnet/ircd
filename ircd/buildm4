@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# $Id: buildm4,v 1.5 1997/07/28 17:31:31 kalt Exp $
+# $Id: buildm4,v 1.6 1997/09/03 17:45:46 kalt Exp $
 #
 
 #
@@ -26,7 +26,7 @@ INCLUDE=`../support/config.guess`
 IRCDDIR=$1
 M4=$IRCDDIR/ircd.m4
 /bin/rm -f $M4
-egrep "^#def[^P]*PATCHLEVEL" ../include/patchlevel.h | \
+egrep "^#def[^P]*PATCHLEVEL" ../common/patchlevel.h | \
 sed -e 's/[^\"]*\"\([^\"]*\)\"/define(VERSION,\1)/' >>$M4
 DEBUG=`egrep "^#define[		]*DEBUGMODE" config.h`
 if [ -n "$DEBUG" ] ; then
@@ -44,7 +44,7 @@ PORT=`egrep '^#define[ 	]*PORT[ 	]*[0-9]*' ../$INCLUDE/config.h | \
 echo "define(PORT,$PORT)" >> $M4
 
 PING=`egrep '^#define[ 	]*PINGFREQUENCY[ 	]*[0-9]*' ../$INCLUDE/config.h\
-	| sed -e 's/[^0-9]*\([0-9]*\).*/\1/`
+	| sed -e 's/[^0-9]*\([0-9]*\).*/\1/'`
 echo "define(PFREQ,$PING)" >> $M4
 
 CONT=`egrep '^#define[ 	]*CONNECTFREQUENCY[ 	]*[0-9]*' ../$INCLUDE/config.h\

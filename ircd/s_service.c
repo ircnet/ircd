@@ -22,19 +22,14 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.13 1997/07/28 01:14:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.14 1997/09/03 17:46:04 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "service.h"
-#include "msg.h"
-#include "numeric.h"
-#include "h.h"
-#include "channel.h"
-
-void	channel_modes __P((aClient *, char *, char *, aChannel *));
+#include "os.h"
+#include "s_defines.h"
+#define S_SERVICE_C
+#include "s_externs.h"
+#undef S_SERVICE_C
 
 static	aService	*svctop = NULL;
 
@@ -109,7 +104,7 @@ aClient *cptr;
 **	action	type on notice
 **	server	origin
 */
-#ifndef USE_STDARG
+#if ! USE_STDARG
 void	check_services_butone(action, server, cptr, fmt, p1, p2, p3, p4,
 			      p5, p6, p7, p8)
 long	action;
@@ -139,7 +134,7 @@ void	check_services_butone(long action, char *server, aClient *cptr, char *fmt, 
 			    cptr && IsRegisteredUser(cptr) &&
 			    (action & SERVICE_MASK_PREFIX))
 			    {
-#ifdef USE_STDARG
+#if USE_STDARG
 				char	buf[2048];
 				va_list	va;
 				va_start(va, fmt);
@@ -149,7 +144,7 @@ void	check_services_butone(long action, char *server, aClient *cptr, char *fmt, 
 				sprintf(nbuf, "%s!%s@%s", cptr->name,
 					cptr->user->username,cptr->user->host);
 
-#ifndef USE_STDARG
+#if ! USE_STDARG
 				sendto_one(acptr, fmt, nbuf, p2, p3, p4, p5,
 					   p6, p7, p8);
 #else
@@ -158,7 +153,7 @@ void	check_services_butone(long action, char *server, aClient *cptr, char *fmt, 
 			    }
 			else
 			    {
-#ifndef USE_STDARG
+#if ! USE_STDARG
 				sendto_one(acptr, fmt, p1, p2, p3, p4, p5,
 					   p6, p7, p8);
 #else

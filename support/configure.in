@@ -87,8 +87,7 @@ else
   else
     irc_zlib_library_message="in $irc_zlib_library"
     IRC_ZLIB_LIBRARY=-L$irc_zlib_library
-    if test "`(uname) 2>/dev/null`" = SunOS &&
-      uname -r | grep '^5' >/dev/null; then
+    if test ! "$irc_cv_solaris_2" = no; then
       IRC_ZLIB_LIBRARY="$IRC_ZLIB_LIBRARY -R$irc_zlib_library"
     fi
     IRC_ZLIB_LIBRARY="$IRC_ZLIB_LIBRARY -lz"
@@ -110,36 +109,51 @@ AC_SUBST(IRC_ZLIB_LIBRARY)
 
 
 AC_DEFUN(IRC_CURSES_TERMCAP,
-[AC_MSG_CHECKING([whether ncurses, curses or termcap library will be used])
+[AC_MSG_CHECKING([which curses or termcap library will be used])
 AC_ARG_WITH(ncurses, [  --without-ncurses       does not look for ncurses library, will not use it])
+AC_ARG_WITH(cursesX, [  --without-cursesX       does not look for cursesX library, will not use it])
 AC_ARG_WITH(curses, [  --without-curses        does not look for curses library, will not use it])
 AC_ARG_WITH(termcap, [  --without-termcap       does not look for termcap library, will not use it])
-AC_CACHE_VAL(irc_cv_ncurses_curses_termcap,
+AC_CACHE_VAL(irc_cv_curses_termcap,
 [irc_save_LIBS="$LIBS"
 LIBS="-lncurses $irc_save_LIBS"
 AC_TRY_LINK(,
 [initscr()],
 irc_ncurses=yes,
 irc_ncurses=no)
+LIBS="-lcursesX $irc_save_LIBS"
+AC_TRY_LINK(,
+[initscr()],
+irc_cursesX=yes,
+irc_cursesX=no)
 LIBS="-lcurses $irc_save_LIBS"
 AC_TRY_LINK(,
 [initscr()],
 irc_curses=yes,
 irc_curses=no)
+LIBS="-lcurses -ltermcap $irc_save_LIBS"
+AC_TRY_LINK(,
+[initscr()],
+irc_curses_termcap=yes,
+irc_curses_termcap=no)
 LIBS="-ltermcap $irc_save_LIBS"
 AC_TRY_LINK(,
 [tgetent()],
 irc_termcap=yes,
 irc_termcap=no)
 LIBS="$irc_save_LIBS"
-irc_cv_ncurses_curses_termcap="irc_ncurses=$irc_ncurses irc_curses=$irc_curses irc_termcap=$irc_termcap"
+irc_cv_curses_termcap="irc_ncurses=$irc_ncurses irc_curses=$irc_curses irc_cursesX=$irc_cursesX irc_curses_termcap=$irc_curses_termcap irc_termcap=$irc_termcap"
 ])
-eval $irc_cv_ncurses_curses_termcap
+eval $irc_cv_curses_termcap
 if test "x$with_ncurses" = xno; then
   irc_ncurses=no
 fi
+if test "x$with_cursesX" = xno; then
+  irc_cursesX=no
+fi
 if test "x$with_curses" = xno; then
   irc_curses=no
+  irc_curses_termcap=no
 fi
 if test "x$with_termcap" = xno; then
   irc_termcap=no
@@ -148,17 +162,25 @@ if test $irc_ncurses = yes; then
   AC_MSG_RESULT(ncurses)
   AC_DEFINE(USE_NCURSES)
   IRC_CURSES_TERMCAP_LIBRARY="-lncurses"
+elif test $irc_cursesX = yes; then
+  AC_MSG_RESULT(cursesX)
+  AC_DEFINE(USE_CURSESX)
+  IRC_CURSES_TERMCAP_LIBRARY="-lcursesX"
 elif test $irc_curses = yes; then
   AC_MSG_RESULT(curses)
   AC_DEFINE(USE_CURSES)
   IRC_CURSES_TERMCAP_LIBRARY="-lcurses"
+elif test $irc_curses_termcap = yes; then
+  AC_MSG_RESULT(curses over termcap)
+  AC_DEFINE(USE_CURSES)
+  IRC_CURSES_TERMCAP_LIBRARY="-lcurses -ltermcap"
 elif test $irc_termcap = yes; then
   AC_MSG_RESULT(termcap)
   AC_DEFINE(USE_TERMCAP)
   IRC_CURSES_TERMCAP_LIBRARY="-ltermcap"
 else
   AC_MSG_RESULT(none)
-  AC_MSG_WARN([I can't find either ncurses, curses or termcap library.])
+  AC_MSG_WARN([I can't find either ncurses, cursesX, curses or termcap library.])
   IRC_CURSES_TERMCAP_LIBRARY=
 fi
 AC_SUBST(IRC_CURSES_TERMCAP_LIBRARY)
@@ -168,13 +190,19 @@ AC_SUBST(IRC_CURSES_TERMCAP_LIBRARY)
 AC_DEFUN(IRC_UNION_WAIT,
 [AC_MSG_CHECKING(whether an union wait * is mandatory in waitpid)
 AC_CACHE_VAL(irc_cv_type_union_wait,
-AC_TRY_COMPILE([#include <sys/wait.h>],
+AC_TRY_COMPILE([
+#if HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif],
 [
 int status;
 waitpid(-1, &status, 0);
 ],
 irc_cv_type_union_wait=no,
-AC_TRY_COMPILE([#include <sys/wait.h>],
+AC_TRY_COMPILE([
+#if HAVE_SYS_WAIT_H
+#include <sys/wait.h>
+#endif],
 [
 union wait status;
 waitpid(-1, &status, 0);
@@ -190,76 +218,118 @@ fi
 ])
 
 
-AC_DEFUN(IRC_SOLARIS_2_2,
-[AC_MSG_CHECKING([for Solaris 2.2 (SunOS 5.2)])
-AC_CACHE_VAL(irc_cv_solaris_2_2,
-[if test "`(uname) 2>/dev/null`" = SunOS &&
-  uname -r | grep '5\.2' >/dev/null; then
-  irc_cv_solaris_2_2=yes
-else
-  irc_cv_solaris_2_2=no
-fi
-])
-if test $irc_cv_solaris_2_2 = yes; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(SOLARIS_2_2)
-else
-  AC_MSG_RESULT(no)
-fi
-])
-
-
-AC_DEFUN(IRC_SOLARIS_2_3,
-[AC_MSG_CHECKING([for Solaris 2.3 (SunOS 5.3)])
-AC_CACHE_VAL(irc_cv_solaris_2_3,
-[if test "`(uname) 2>/dev/null`" = SunOS &&
-  uname -r | grep '5\.3' >/dev/null; then
-  irc_cv_solaris_2_3=yes
-else
-  irc_cv_solaris_2_3=no
-fi
-])
-if test $irc_cv_solaris_2_3 = yes; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE(SOLARIS_2_3)
-else
-  AC_MSG_RESULT(no)
-fi
-])
-
-
 AC_DEFUN(IRC_SOLARIS_2,
 [AC_MSG_CHECKING([for Solaris 2.x (SunOS 5.x)])
 AC_CACHE_VAL(irc_cv_solaris_2,
-[if test "`(uname) 2>/dev/null`" = SunOS && 
-  uname -r | grep '^5' >/dev/null; then
-  irc_cv_solaris_2=yes
+[if test "x`(uname) 2>/dev/null`" = "xSunOS" &&
+  uname -r 2>/dev/null | grep "^5" >/dev/null; then
+  irc_cv_solaris_2="`uname -r | sed -e \"s/^5/2/g\"`"
 else
   irc_cv_solaris_2=no
 fi
 ])
-if test $irc_cv_solaris_2 = yes; then
-  AC_MSG_RESULT(yes)
-  IRC_SOLARIS_2_3
-  if test $irc_cv_solaris_2_3 != yes; then
-    IRC_SOLARIS_2_2
-  fi
-else
+if test "$irc_cv_solaris_2" = no; then
   AC_MSG_RESULT(no)
+else
+  AC_MSG_RESULT([yes, $irc_cv_solaris_2])
+  if echo "$irc_cv_solaris_2" | egrep "^2\.(0|1|2)" >/dev/null; then
+    AC_DEFINE(SOLARIS_2_0_2_1_2_2)
+  elif echo "$irc_cv_solaris_2" | grep "^2\.3" >/dev/null; then
+    AC_DEFINE(SOLARIS_2_3)
+  fi
 fi
 ])
 
 
 AC_DEFUN(IRC_DECL_SYS_ERRLIST,
-[AC_CACHE_CHECK([for sys_errlist declaration in stdio.h or errno.h],
+[AC_CACHE_CHECK([for sys_errlist declaration in stdio.h, errno.h or sys/errno.h],
   irc_cv_decl_sys_errlist,
-[AC_TRY_COMPILE([#include <sys/types.h>
+[AC_TRY_COMPILE([
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#if HAVE_STDIO_H
 #include <stdio.h>
-#include <errno.h>],
+#endif
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+#if HAVE_SYS_ERRNO_H
+#include <sys/errno.h>
+#endif],
 [char *msg = sys_errlist[0];],
   irc_cv_decl_sys_errlist=yes, irc_cv_decl_sys_errlist=no)])
 if test $irc_cv_decl_sys_errlist = yes; then
   AC_DEFINE(SYS_ERRLIST_DECLARED)
+fi
+])
+
+
+AC_DEFUN(IRC_DECL_SYS_NERR,
+[AC_CACHE_CHECK([for sys_nerr declaration in stdio.h, errno.h or sys/errno.h],
+  irc_cv_decl_sys_nerr,
+[AC_TRY_COMPILE([
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#if HAVE_STDIO_H
+#include <stdio.h>
+#endif
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+#if HAVE_SYS_ERRNO_H
+#include <sys/errno.h>
+#endif],
+[int num = sys_nerr;],
+  irc_cv_decl_sys_nerr=yes, irc_cv_decl_sys_nerr=no)])
+if test $irc_cv_decl_sys_nerr = yes; then
+  AC_DEFINE(SYS_NERR_DECLARED)
+fi
+])
+
+
+AC_DEFUN(IRC_DECL_ERRNO,
+[AC_CACHE_CHECK([for errno declaration in errno.h or sys/errno.h],
+  irc_cv_decl_errno,
+[AC_TRY_COMPILE([
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+#if HAVE_SYS_ERRNO_H
+#include <sys/errno.h>
+#endif],
+[int num = errno;],
+  irc_cv_decl_errno=yes, irc_cv_decl_errno=no)])
+if test $irc_cv_decl_errno = yes; then
+  AC_DEFINE(ERRNO_DECLARED)
+fi
+])
+
+
+AC_DEFUN(IRC_DECL_H_ERRNO,
+[AC_CACHE_CHECK([for h_errno declaration in errno.h, sys/errno.h or netdb.h],
+  irc_cv_decl_h_errno,
+[AC_TRY_COMPILE([
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#if HAVE_ERRNO_H
+#include <errno.h>
+#endif
+#if HAVE_SYS_ERRNO_H
+#include <sys/errno.h>
+#endif
+#if HAVE_NETDB_H
+#include <netdb.h>
+#endif],
+[int num = h_errno;],
+  irc_cv_decl_h_errno=yes, irc_cv_decl_h_errno=no)])
+if test $irc_cv_decl_h_errno = yes; then
+  AC_DEFINE(H_ERRNO_DECLARED)
 fi
 ])
 
@@ -280,27 +350,11 @@ AC_MSG_RESULT(no))
 ])
 
 
-AC_DEFUN(IRC_AIX_CC,
-[AC_MSG_CHECKING([for AIX's cc])
-AC_EGREP_CPP(yes,
-[#ifdef _AIX
-yes
-#endif],
-if test x$CC = xcc; then
-  AC_MSG_RESULT(yes)
-  CFLAGS="$CFLAGS -O3 -qstrict"
-else
-  AC_MSG_RESULT(no)
-fi,
-AC_MSG_RESULT(no))
-])
-
-
 AC_DEFUN(IRC_ALPHA_BETA,
 [AC_MSG_CHECKING(whether this is an alpha/beta release)
 AC_CACHE_VAL(irc_cv_alpha_beta,
 [AC_EGREP_CPP(^\"......00,
-[#include "../include/patchlevel.h"
+[#include "../common/patchlevel.h"
 #ifdef PATCHLEVEL
 PATCHLEVEL
 #else
@@ -330,6 +384,32 @@ fi
 ])
 
 
+AC_DEFUN(IRC_SELECT_POLL,
+[AC_MSG_CHECKING([whether select or poll system call will be used])
+AC_CACHE_VAL(irc_cv_select_poll,
+[if test x$ac_cv_func_select = xyes; then
+  irc_cv_select_poll=select
+else
+  irc_cv_select_poll=poll
+fi
+AC_EGREP_CPP(yes,[
+#if (defined(sun) && (defined(__SVR4) || defined(__svr4__))) \
+    || defined(sgi) || defined(__sgi) \
+    || defined(_AIX)
+yes
+#endif
+],
+irc_cv_select_poll=poll,
+)])
+if test $irc_cv_select_poll = poll; then
+  AC_MSG_RESULT(poll)
+  AC_DEFINE(USE_POLL)
+else
+  AC_MSG_RESULT(select)
+fi
+])
+
+
 AC_DEFUN(IRC_SIGNAL_IMPLEMENTATION,
 [AC_MSG_CHECKING([for signal implementation])
 AC_CACHE_VAL(irc_cv_signal_implementation,
@@ -339,8 +419,12 @@ elif test x$ac_cv_func_sigset = xyes; then
   irc_cv_signal_implementation=bsd_sigset
 else
   AC_TRY_RUN([
+#if HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif
+#if HAVE_SIGNAL_H
 #include <signal.h>
+#endif
 #ifndef SIGCHLD
 #define SIGCHLD SIGCLD
 #endif
@@ -389,12 +473,24 @@ AC_CACHE_VAL(irc_cv_non_blocking_system,
 [
 changequote(<<, >>)dnl
 <<
-irc_precode='#include <sys/types.h>
+irc_precode='#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif
+#if HAVE_FCNTL_H
 #include <fcntl.h>
+#endif
+#if HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
+#endif
+#if HAVE_SYS_FILE_H
 #include <sys/file.h>
+#endif
+#if HAVE_SIGNAL_H
 #include <signal.h>
+#endif
 
 RETSIGTYPE alarmed()
 {
@@ -452,9 +548,15 @@ AC_CACHE_VAL(irc_cv_stdarg,
 AC_TRY_RUN(
 changequote(<<, >>)dnl
 <<
+#if HAVE_STDIO_H
 #include <stdio.h>
+#endif
+#if HAVE_STDARG_H
 #include <stdarg.h>
+#endif
+#if HAVE_STRING_H
 #include <string.h>
+#endif
 
 char buf1[256];
 
@@ -995,7 +1097,7 @@ AC_CACHE_VAL(ac_cv_path_install,
 	    # AIX install.  It has an incompatible calling convention.
 	    # OSF/1 installbsd also uses dspmsg, but is usable.
 	    :
-	  elif test $ac_prog = installbsd -a "x`uname -sv 2>/dev/null`" = "xAIX 4"; then
+	  elif test $ac_prog = installbsd -a "x`(uname -sv) 2>/dev/null`" = "xAIX 4"; then
             # AIX v4 installbsd. Does not work if the user is not root.
             :
           else
@@ -1041,12 +1143,9 @@ if test -z "$CC"; then
   AC_CHECK_PROG(CC, cc, cc, , , /usr/ucb/cc)
   test -z "$CC" && AC_MSG_ERROR([no acceptable cc found in \$PATH])
 fi
-
 AC_PROG_CC_WORKS
 AC_PROG_CC_GNU
-
 ac_test_CFLAGS="${CFLAGS+set}"
-
 if test $ac_cv_prog_gcc = yes; then
   GCC=yes
   ac_save_CFLAGS="$CFLAGS"
@@ -1063,14 +1162,81 @@ fi
 ])
 
 
+AC_DEFUN(IRC_AIX,
+[AC_BEFORE([$0], [AC_TRY_COMPILE])dnl
+AC_BEFORE([$0], [AC_TRY_RUN])dnl
+AC_MSG_CHECKING(for AIX)
+AC_CACHE_VAL(irc_cv_aix,
+[if test "x`(uname) 2>/dev/null`" = "xAIX"; then
+  irc_cv_aix="`uname -rv`"
+else
+  irc_cv_aix=no
+fi
+])
+if test "$irc_cv_aix" = no; then
+  AC_MSG_RESULT(no)
+else
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(_ALL_SOURCE)
+  if test "x$irc_cv_aix" = "x2 3"; then
+    AC_DEFINE(AIX_3_2)
+  fi
+  if test x$CC = xcc; then
+    CFLAGS="$CFLAGS -O3 -qstrict"
+  fi
+fi
+])
+
+
+AC_DEFUN(IRC_CHECK_TYPE,
+[AC_REQUIRE([AC_HEADER_STDC])dnl
+AC_MSG_CHECKING(for $1)
+AC_CACHE_VAL(ac_cv_type_$1,
+[AC_EGREP_CPP(dnl
+changequote(<<,>>)dnl
+<<$1[^a-zA-Z_0-9]>>dnl
+changequote([,]), [
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#if STDC_HEADERS
+#include <stdlib.h>
+#include <stddef.h>
+#endif
+#if HAVE_SYS_BITYPES_H
+#include <sys/bitypes.h>
+#endif], ac_cv_type_$1=yes, ac_cv_type_$1=no)])dnl
+AC_MSG_RESULT($ac_cv_type_$1)
+if test $ac_cv_type_$1 = no; then
+  AC_DEFINE($1, $2)
+fi
+])
+
+
+AC_DEFUN(IRC_FUNC_MEMCMP,
+[AC_CACHE_CHECK(for 8-bit clean memcmp, irc_cv_func_memcmp_clean,
+[AC_TRY_RUN([
+main()
+{
+  char c0 = 0x40, c1 = 0x80, c2 = 0x81;
+  exit(memcmp(&c0, &c2, 1) < 0 && memcmp(&c1, &c2, 1) < 0 ? 0 : 1);
+}
+], irc_cv_func_memcmp_clean=yes, irc_cv_func_memcmp_clean=no,
+irc_cv_func_memcmp_clean=no)])
+if test $irc_cv_func_memcmp_clean = no; then
+  AC_DEFINE(MEMCMP_BROKEN)
+fi
+])
+
+
 dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.10 1997/08/08 16:17:11 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.11 1997/09/03 17:46:15 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
-AC_CONFIG_HEADER(setup.h:../include/setup.h.in)
+AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
 AC_CONFIG_AUX_DIR(../support)
 
 IRC_PROG_CC
@@ -1080,24 +1246,39 @@ AC_PATH_PROGS(SUM, sum cksum, true)
 AC_PROG_GCC_TRADITIONAL
 IRC_ALPHA_BETA
 
-AC_AIX
+IRC_AIX
 AC_ISC_POSIX
 AC_MINIX
 IRC_SGI_CC
-IRC_AIX_CC
 IRC_SOLARIS_2
 
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(syslog.h sys/syslog.h stdlib.h stddef.h sys/malloc.h sys/param.h unistd.h string.h strings.h sys/cdefs.h arpa/inet.h arpa/nameser.h resolv.h sys/bitypes.h netdb.h memory.h fcntl.h limits.h sys/file.h sys/ioctl.h sys/time.h)
+AC_CHECK_HEADERS(stdio.h stdlib.h sys/types.h sys/bitypes.h stddef.h stdarg.h unistd.h ctype.h memory.h curses.h cursesX.h errno.h sys/errno.h sys/syscall.h pwd.h math.h utmp.h fcntl.h signal.h sys/ioctl.h sys/file.h sys/filio.h sys/socket.h sys/stat.h sys/resource.h sys/select.h sys/poll.h stropts.h netdb.h netinet/in.h sys/un.h arpa/inet.h sys/param.h syslog.h sys/syslog.h string.h strings.h sys/time.h time.h sys/times.h netinet/in_systm.h netinfo/ni.h)
 IRC_DECL_SYS_ERRLIST
+IRC_DECL_SYS_NERR
+IRC_DECL_ERRNO
+IRC_DECL_H_ERRNO
 AC_HEADER_STAT
 AC_HEADER_TIME
 AC_STRUCT_TM
+AC_TYPE_MODE_T
+AC_TYPE_OFF_T
+AC_TYPE_PID_T
 AC_TYPE_SIGNAL
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 IRC_UNION_WAIT
+IRC_CHECK_TYPE(int8_t, char)
+IRC_CHECK_TYPE(u_int8_t, unsigned char)
+IRC_CHECK_TYPE(int16_t, short)
+IRC_CHECK_TYPE(u_int16_t, unsigned short)
+IRC_CHECK_TYPE(int32_t, int)
+IRC_CHECK_TYPE(u_int32_t, unsigned int)
+IRC_CHECK_TYPE(u_char, unsigned char)
+IRC_CHECK_TYPE(u_short, unsigned short)
+IRC_CHECK_TYPE(u_int, unsigned int)
+IRC_CHECK_TYPE(u_long, unsigned long)
 
 AC_C_BIGENDIAN
 AC_C_CONST
@@ -1109,26 +1290,17 @@ AC_CHECK_LIB(nsl, socket)
 IRC_PATH_ZLIB
 IRC_CURSES_TERMCAP
 
-AC_FUNC_MEMCMP
 AC_FUNC_SETPGRP
 AC_FUNC_SETVBUF_REVERSED
 AC_FUNC_VFORK
-AC_FUNC_WAIT3
-AC_CHECK_FUNCS(strchr memcpy gethostname gettimeofday lrand48 mkdir select socket strdup strerror sigaction sigset getrusage times)
-AC_CHECK_FUNC(index, , AC_DEFINE(NOINDEX))
-AC_CHECK_FUNC(strerror, , AC_DEFINE(NEED_STRERROR))
-AC_CHECK_FUNC(strtoken, , AC_DEFINE(NEED_STRTOKEN))
-AC_CHECK_FUNC(strtok, , AC_DEFINE(NEED_STRTOK))
-AC_CHECK_FUNC(inet_addr, , AC_DEFINE(NEED_INET_ADDR))
-AC_CHECK_FUNC(inet_aton, , AC_DEFINE(NEED_INET_ATON))
-AC_CHECK_FUNC(inet_ntoa, , AC_DEFINE(NEED_INET_NTOA))
-AC_CHECK_FUNC(inet_netof, , AC_DEFINE(NEED_INET_NETOF))
-AC_CHECK_FUNC(bcopy, , 
-  AC_FUNC_CHECK(memmove, AC_DEFINE(HAVE_MEMMOVE), AC_DEFINE(NEED_BCOPY)))
-AC_CHECK_FUNC(bzero, , AC_DEFINE(NEED_BZERO))
-AC_CHECK_FUNC(bcmp, , AC_DEFINE(NEED_BCMP))
-AC_CHECK_FUNC(getrusage, AC_DEFINE(GETRUSAGE_2),
-  AC_CHECK_FUNC(times, AC_DEFINE(TIMES_2), ))
+AC_CHECK_FUNCS(setpgrp strchr strrchr memcmp memset memmove memcpy index rindex bcmp bcopy bzero select inet_ntoa inet_aton inet_addr inet_netof getrusage times strerror strtoken strtok)
+dnl ---
+dnl Note: additional tests should be performed and used inside the source code
+dnl       for the following functions:
+dnl       gethostname gettimeofday lrand48 mkdir sigaction sigset socket
+dnl ---
+IRC_FUNC_MEMCMP
+IRC_SELECT_POLL
 
 IRC_SIGNAL_IMPLEMENTATION
 IRC_NON_BLOCKING_SYSTEM

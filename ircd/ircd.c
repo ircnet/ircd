@@ -19,31 +19,19 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.7 1997/07/07 21:23:43 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.8 1997/09/03 17:45:50 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "numeric.h"
-#include "hash.h"
-#include <sys/file.h>
-#include <sys/stat.h>
-#include <pwd.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <math.h>
-#include "h.h"
-
-extern	char	serveropts[];
+#include "os.h"
+#include "s_defines.h"
+#define IRCD_C
+#include "s_externs.h"
+#undef IRCD_C
 
 aClient me;			/* That's me */
 aClient *client = &me;		/* Pointer to beginning of Client list */
 
-void	server_reboot();
-void	restart __P((char *));
 static	void	open_debugfile(), setup_signals();
-time_t	io_loop __P((time_t));
 
 istat_t	istat;
 char	**myargv;
@@ -68,16 +56,17 @@ time_t	nextexpire = 1;	/* next expire run on the dns cache */
 #ifdef	PROFIL
 extern	etext();
 
-VOIDSIG	s_monitor()
+RETSIGTYPE	s_monitor(s)
+int s;
 {
 	static	int	mon = 0;
-#ifdef	POSIX_SIGNALS
+#if POSIX_SIGNALS
 	struct	sigaction act;
 #endif
 
 	(void)moncontrol(mon);
 	mon = 1 - mon;
-#ifdef	POSIX_SIGNALS
+#if POSIX_SIGNALS
 	act.sa_handler = s_rehash;
 	act.sa_flags = 0;
 	(void)sigemptyset(&act.sa_mask);
@@ -89,7 +78,8 @@ VOIDSIG	s_monitor()
 }
 #endif
 
-VOIDSIG s_die()
+RETSIGTYPE s_die(s)
+int s;
 {
 #ifdef	USE_SYSLOG
 	(void)syslog(LOG_CRIT, "Server Killed By SIGTERM");
@@ -99,9 +89,10 @@ VOIDSIG s_die()
 	exit(-1);
 }
 
-static VOIDSIG s_rehash()
+static RETSIGTYPE s_rehash(s)
+int s;
 {
-#ifdef	POSIX_SIGNALS
+#if POSIX_SIGNALS
 	struct	sigaction act;
 
 	act.sa_handler = s_rehash;
@@ -125,9 +116,10 @@ char	*mesg;
 	server_reboot();
 }
 
-VOIDSIG s_restart()
+RETSIGTYPE s_restart(s)
+int s;
 {
-#ifdef	POSIX_SIGNALS
+#if POSIX_SIGNALS
 	struct	sigaction act;
 
 	act.sa_handler = s_restart;
@@ -814,7 +806,9 @@ char	*argv[];
 time_t	io_loop(delay)
 time_t	delay;
 {
+#ifdef HUB
 	static	time_t	nextc = 0, nextactive = 0, lastl = 0;
+#endif
 
 	/*
 	** We only want to connect if a connection is due,
@@ -985,7 +979,7 @@ static	void	open_debugfile()
 
 static	void	setup_signals()
 {
-#ifdef	POSIX_SIGNALS
+#if POSIX_SIGNALS
 	struct	sigaction act;
 
 	act.sa_handler = SIG_IGN;

@@ -1,10 +1,13 @@
-/* $Id: acconfig.h,v 1.3 1997/07/22 12:40:06 kalt Exp $ */
+/* $Id: acconfig.h,v 1.4 1997/09/03 17:46:13 kalt Exp $ */
 
 /* Define if zlib package must be used for compilation/linking. */
 #undef USE_ZLIB
 
 /* Define if ncurses library must be used for compilation/linking. */
 #undef USE_NCURSES
+
+/* Define if cursesX library must be used for compilation/linking. */
+#undef USE_CURSESX
 
 /* Define if curses library must be used for compilation/linking. */
 #undef USE_CURSES
@@ -16,14 +19,45 @@
    of an "int *". */
 #undef USE_UNION_WAIT
 
+/* Define if int8_t, u_int8_t, int16_t, u_int16_t, int32_t, u_int32_t, u_char,
+ * u_short, u_int, u_long are not known types. */
+#undef int8_t
+#undef u_int8_t
+#undef int16_t
+#undef u_int16_t
+#undef int32_t
+#undef u_int32_t
+#undef u_char
+#undef u_short
+#undef u_int
+#undef u_long
+
+/* Define if memcmp is not 8-bit clean. */
+#undef MEMCMP_BROKEN
+
+/* Define if the operating system is AIX 3.2.  */
+#undef AIX_3_2
+
 /* Define if the operating system is Solaris 2.3 (SunOS 5.3).  */
 #undef SOLARIS_2_3
 
-/* Define if the operating system is Solaris 2.2 (SunOS 5.2).  */
-#undef SOLARIS_2_2
+/* Define if the operating system is Solaris 2.[0-2] (SunOS 5.[0-2]).  */
+#undef SOLARIS_2_0_2_1_2_2
 
 /* Define if sys_errlist is declared in stdio.h or errno.h. */
 #undef SYS_ERRLIST_DECLARED
+
+/* Define if sys_nerr is declared in stdio.h or errno.h. */
+#undef SYS_NERR_DECLARED
+
+/* Define if errno is declared in errno.h. */
+#undef ERRNO_DECLARED
+
+/* Define if h_errno is declared in errno.h or netdb.h. */
+#undef H_ERRNO_DECLARED
+
+/* Define if poll(2) must be used instead of select(2). */
+#undef USE_POLL
 
 /* Define if the system provides POSIX sigaction. */
 #undef POSIX_SIGNALS
@@ -49,45 +83,3 @@
 
 /* Define is the system can use variable arguments. */
 #undef USE_STDARG
-
-/* Define if you do not have the index function. */
-#undef NOINDEX
-
-/* Define if the strerror function must be provided by the source code. */
-#undef NEED_STRERROR
-
-/* Define if the strtoken function must be provided by the source code. */
-#undef NEED_STRTOKEN
-
-/* Define if the strtok function must be provided by the source code. */
-#undef NEED_STRTOK
-
-/* Define if the inet_addr function must be provided by the source code. */
-#undef NEED_INET_ADDR
-
-/* Define if the inet_aton function must be provided by the source code. */
-#undef NEED_INET_ATON
-
-/* Define if the inet_netof function must be provided by the source code. */
-#undef NEED_INET_NETOF
-
-/* Define if the inet_ntoa function must be provided by the source code. */
-#undef NEED_INET_NTOA
-
-/* Define if you have the memmove. */
-#undef HAVE_MEMMOVE
-
-/* Define if the bcopy function must be provided by the source code. */
-#undef NEED_BCOPY
-
-/* Define if the bzero function must be provided by the source code. */
-#undef NEED_BZERO
-
-/* Define if the bcmp function must be provided by the source code. */
-#undef NEED_BCMP
-
-/* Define if you have the getrusage function. */
-#undef GETRUSAGE_2
-
-/* Define if you have the times function. */
-#undef TIMES_2

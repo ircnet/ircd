@@ -37,19 +37,14 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.3 1997/06/09 14:50:14 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.4 1997/09/03 17:45:51 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "h.h"
-#include "numeric.h"
-#ifdef	DBMALLOC
-#include "malloc.h"
-#endif
-void	free_link __P((Link *));
-Link	*make_link __P(());
+#include "os.h"
+#include "s_defines.h"
+#define LIST_C
+#include "s_externs.h"
+#undef LIST_C
 
 #ifdef	DEBUGMODE
 static	struct	liststats {
@@ -60,8 +55,6 @@ static	struct	liststats {
 
 anUser	*usrtop = NULL;
 aServer	*svrtop = NULL;
-
-void	outofmemory();
 
 int	numclients = 0;
 

@@ -19,26 +19,28 @@
  */
 
 #ifndef lint
-static  char sccsid[] = "%W% %G% (C) 1988 University of Oulu, \
-Computing Center and Jarkko Oikarinen";
+static  char rcsid[] = "@(#)$Id: bsd.c,v 1.2 1997/09/03 17:45:11 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "h.h"
-#include <signal.h>
-#include <sys/socket.h>
-
-#ifndef SYS_ERRLIST_DECLARED
-extern	int errno; /* ...seems that errno.h doesn't define this everywhere */
-extern	char	*sys_errlist[];
+#include "os.h"
+#ifndef CLIENT_COMPILE
+# include "s_defines.h"
+#else
+# include "c_defines.h"
 #endif
+#define BSD_C
+#ifndef CLIENT_COMPILE
+# include "s_externs.h"
+#else
+# include "c_externs.h"
+#endif
+#undef BSD_C
 
 #ifdef DEBUGMODE
 int	writecalls = 0, writeb[10] = {0,0,0,0,0,0,0,0,0,0};
 #endif
-VOIDSIG dummy()
+RETSIGTYPE dummy(s)
+int s;
 {
 #ifndef HAVE_RELIABLE_SIGNALS
 	(void)signal(SIGALRM, dummy);
@@ -49,7 +51,7 @@ VOIDSIG dummy()
 #  endif
 # endif
 #else
-# ifdef POSIX_SIGNALS
+# if POSIX_SIGNALS
 	struct  sigaction       act;
 
 	act.sa_handler = dummy;
@@ -103,9 +105,6 @@ char	*str;
 #ifndef	NOWRITEALARM
 	(void)alarm(WRITEWAITDELAY);
 #endif
-#ifdef VMS
-	retval = netwrite(cptr->fd, str, len);
-#else
 	retval = send(cptr->fd, str, len, 0);
 	/*
 	** Convert WOULDBLOCK to a return of "0 bytes moved". This
@@ -125,14 +124,8 @@ char	*str;
 		cptr->flags |= FLAGS_BLOCKED;
 	    }
 	else if (retval > 0)
-	    {
-#ifdef	pyr
-		(void)gettimeofday(&cptr->lw, NULL);
-#endif
 		cptr->flags &= ~FLAGS_BLOCKED;
-	    }
 
-#endif
 #ifndef	NOWRITEALARM
 	(void )alarm(0);
 #endif

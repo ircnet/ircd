@@ -55,33 +55,14 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static char rcsid[] = "$Id: res_init.c,v 1.5 1997/07/18 03:04:34 kalt Exp $";
+static char rcsid[] = "$Id: res_init.c,v 1.6 1997/09/03 17:45:55 kalt Exp $";
 #endif /* LIBC_SCCS and not lint */
 
-#include <sys/types.h>
-#include <sys/param.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <netinet/in.h>
-/*#include "inet.h"*/
-#include "nameser.h"
-
-#include <stdio.h>
-#include <ctype.h>
-#include "resolv.h"
-#if defined(BSD) && (BSD >= 199103)
-# include <unistd.h>
-# include <stdlib.h>
-# include <string.h>
-#else
-# include "portability.h"
-#endif
-#include "setup.h"
-#ifdef  NEED_INET_ATON
-extern  int     inetaton __P((const char *, struct in_addr *));
-#else
-# define inetaton inet_aton
-#endif
+#include "os.h"
+#include "s_defines.h"
+#define RES_INIT_C
+#include "s_externs.h"
+#undef RES_INIT_C
 
 /*-------------------------------------- info about "sortlist" --------------
  * Marc Majka		1994/04/16
@@ -105,15 +86,10 @@ extern  int     inetaton __P((const char *, struct in_addr *));
  * - Internal resolver variables can be set from the value of the "options"
  *   property.
  */
-#if defined(NeXT)
-#  include <netinfo/ni.h>
+#if defined(NEXT)
 #  define NI_PATH_RESCONF "/locations/resolver"
 #  define NI_TIMEOUT 10
 static int ircd_netinfo_res_init __P((int *haveenv, int *havesearch));
-#endif
-
-#if defined(USE_OPTIONS_H)
-# include "../conf/options.h"
 #endif
 
 static void ircd_res_setoptions __P((char *, char *));
@@ -260,7 +236,7 @@ ircd_res_init()
 	(line[sizeof(name) - 1] == ' ' || \
 	 line[sizeof(name) - 1] == '\t'))
 
-#ifdef	NeXT
+#ifdef	NEXT
 	if (ircd_netinfo_res_init(&haveenv, &havesearch) == 0)
 #endif
 	if ((fp = fopen(_PATH_RESCONF, "r")) != NULL) {
@@ -496,7 +472,7 @@ ircd_net_mask(in)		/* XXX - should really use system's version of this */
 }
 #endif
 
-#ifdef	NeXT
+#ifdef	NEXT
 static int
 ircd_netinfo_res_init(haveenv, havesearch)
 	int *haveenv;
@@ -649,7 +625,7 @@ ircd_netinfo_res_init(haveenv, havesearch)
     }
     return(0);	/* if not using DNS configuration from NetInfo */
 }
-#endif	/* NeXT */
+#endif	/* NEXT */
 
 u_int
 ircd_res_randomid()

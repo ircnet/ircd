@@ -18,13 +18,14 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: class.c,v 1.2 1997/04/14 15:04:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: class.c,v 1.3 1997/09/03 17:45:48 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "common.h"
-#include "numeric.h"
-#include "h.h"
+#include "os.h"
+#include "s_defines.h"
+#define CLASS_C
+#include "s_externs.h"
+#undef CLASS_C
 
 #define BAD_CONF_CLASS		-1
 #define BAD_PING		-2

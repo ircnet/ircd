@@ -18,30 +18,16 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.2 1997/04/14 15:04:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.3 1997/09/03 17:45:48 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "numeric.h"
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#ifdef PCS
-#include <time.h>
-#endif
-#ifdef	R_LINES
-#include <signal.h>
-#endif
+#include "os.h"
+#include "s_defines.h"
+#define CHKCONF_C
+#include "match_ext.h"
+#undef CHKCONF_C
 
-#ifdef DYNIXPTX
-#include <sys/types.h>
-#include <time.h>
-#endif
-
-#undef	free
-#define	MyMalloc(x)	malloc(x)
+#define MyMalloc(x)     malloc(x)
 
 static	void	new_class();
 static	char	*getfield(), confchar ();
@@ -525,14 +511,14 @@ int	cn;
 /*
  * field breakup for ircd.conf file.
  */
-static	char	*getfield(newline)
-char	*newline;
+static	char	*getfield(irc_newline)
+char	*irc_newline;
 {
 	static	char *line = NULL;
 	char	*end, *field;
 	
-	if (newline)
-		line = newline;
+	if (irc_newline)
+		line = irc_newline;
 	if (line == NULL)
 		return(NULL);
 

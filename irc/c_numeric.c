@@ -17,30 +17,16 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* -- Jto -- 16 Jun 1990
- * Added a couple of other numerics...
- */
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: c_numeric.c,v 1.3 1997/09/03 17:45:35 kalt Exp $";
+#endif
+ 
+#include "os.h"
+#include "c_defines.h"
+#define C_NUMERIC_C
+#include "c_externs.h"
+#undef C_NUMERIC_C
 
-/* -- Jto -- 03 Jun 1990
- * Added ERR_YOUWILLBEBANNED
- */
-
-/* -- Jto -- 12 May 1990
- * Made RPL_LISTEND, RPL_ENDOFWHO, RPL_ENDOFNAMES and RPL_ENDOFLINKS
- * to simply ignore the message and print out nothing
- */
-
-char c_numeric_id[] = "numeric.c (c) 1989 Jarkko Oikarinen";
-
-#include "struct.h"
-#include "common.h"
-#include "numeric.h"
-#include "msg.h"
-#include "sys.h"
-#include "h.h"
-#include "irc.h"
-
-extern char mybuf[];
 /*
 ** DoNumeric (replacement for the old do_numeric)
 **

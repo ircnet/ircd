@@ -18,24 +18,14 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.3 1997/06/08 23:06:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.4 1997/09/03 17:45:56 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "res.h"
-#include "numeric.h"
-#include <sys/socket.h>
-#include <sys/file.h>
-#include <sys/ioctl.h>
-#ifdef	UNIXPORT
-# include <sys/un.h>
-#endif
-#include <fcntl.h>
-#include "sock.h"	/* If FD_ZERO isn't define up to this point,  */
-			/* define it (BSD4.2 needs this) */
-#include "h.h"
+#include "os.h"
+#include "s_defines.h"
+#define S_AUTH_C
+#include "s_externs.h"
+#undef S_AUTH_C
 
 /*
  * start_auth
@@ -51,7 +41,7 @@ Reg	aClient	*cptr;
 {
 #ifndef	NO_IDENT
 	struct	sockaddr_in	us, them;
-	int     ulen, tlen;
+	SOCK_LEN_TYPE ulen, tlen;
 
 	Debug((DEBUG_NOTICE,"start_auth(%x) fd %d status %d",
 		cptr, cptr->fd, cptr->status));
@@ -150,7 +140,7 @@ aClient	*cptr;
 {
 	struct	sockaddr_in	us, them;
 	char	authbuf[32];
-	int	ulen, tlen;
+	SOCK_LEN_TYPE ulen, tlen;
 
 	Debug((DEBUG_NOTICE,"write_authports(%x) fd %d authfd %d stat %d",
 		cptr, cptr->fd, cptr->authfd, cptr->status));
@@ -270,7 +260,7 @@ Reg	aClient	*cptr;
 	    { /* OTHER type of identifier */
  		*cptr->username = '-';	/* -> add '-' prefix into ident */
  		strncpy(&cptr->username[1], ruser, USERLEN);
-		if (strlen(ruser) > USERLEN)
+		if ((unsigned)strlen(ruser) > USERLEN)
 		    {
 			if (cptr->auth != cptr->username)/*impossible, but...*/
 			    {

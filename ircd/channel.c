@@ -32,14 +32,14 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.11 1997/08/08 16:15:34 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.12 1997/09/03 17:45:47 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "sys.h"
-#include "numeric.h"
-#include "channel.h"
-#include "h.h"
+#include "os.h"
+#include "s_defines.h"
+#define CHANNEL_C
+#include "s_externs.h"
+#undef CHANNEL_C
 
 aChannel *channel = NullChn;
 
@@ -54,9 +54,6 @@ static	Link	*is_banned __P((aClient *, aChannel *));
 static	int	set_mode __P((aClient *, aClient *, aChannel *, int *, int,\
 				char **, char *,char *));
 static	void	sub1_from_channel __P((aChannel *));
-
-void	clean_channelname __P((char *));
-void	del_invite __P((aClient *, aChannel *));
 
 static	char	*PartFmt = ":%s PART %s :%s";
 /*
@@ -2039,7 +2036,8 @@ char	*parv[];
 	    hunt_server(cptr, sptr, ":%s NAMES %s %s", 2, parc, parv))
 		return 10;
 
-	mlen = strlen(ME) + 10;
+	mlen = strlen(ME) + 10; /* server names + : : + spaces + "353" */
+	mlen += strlen(parv[0]);
 	if (!BadPtr(para))
 	    {
 		s = index(para, ',');
@@ -2095,7 +2093,7 @@ char	*parv[];
 			sendto_one(sptr, rpl_str(RPL_NAMREPLY, parv[0]), buf);
 			continue;
 		    }
-		idx = len + 4;
+		idx = len + 4; /* channel name + [@=] + 2?? */
 		flag = 1;
 		for (lp = chptr->members; lp; lp = lp->next)
 		    {
@@ -2116,7 +2114,7 @@ char	*parv[];
 			idx += strlen(c2ptr->name) + 1;
 			flag = 1;
 			(void)strcat(buf," ");
-			if (mlen + idx + NICKLEN > BUFSIZE - 2)
+			if (mlen + idx + NICKLEN + 1 > BUFSIZE - 2)
 			    {
 				sendto_one(sptr, rpl_str(RPL_NAMREPLY,
 					   parv[0]), buf);
@@ -2281,7 +2279,7 @@ time_t	now;
 	static	u_char	split = 0;
 	Reg	aChannel *chptr = channel;
 	Reg	u_int	cur_nb = 1, curh_nb = 0;
-	aChannel *delch;
+	aChannel *del_ch;
 #ifdef DEBUGMODE
 	u_int	del = istat.is_hchan;
 #endif
@@ -2340,18 +2338,18 @@ time_t	now;
 
 		if ((chptr->users == 0) && (chptr->history <= now))
 		    {
-			delch = chptr;
-			if (delch->prevch)
-				chptr = delch->prevch->nextch = delch->nextch;
+			del_ch = chptr;
+			if (del_ch->prevch)
+				chptr = del_ch->prevch->nextch = del_ch->nextch;
 			else
-				chptr = channel = delch->nextch;
-			if (delch->nextch)
-				delch->nextch->prevch = delch->prevch;
-			(void)del_from_channel_hash_table(delch->chname,delch);
+				chptr = channel = del_ch->nextch;
+			if (del_ch->nextch)
+				del_ch->nextch->prevch = del_ch->prevch;
+			(void)del_from_channel_hash_table(del_ch->chname,del_ch);
 			istat.is_hchan--;
 			istat.is_hchanmem -= sizeof(aChannel) 
-				+ strlen(delch->chname);
-			MyFree((char *)delch);
+				+ strlen(del_ch->chname);
+			MyFree((char *)del_ch);
 		    }
 		else
 			chptr = chptr->nextch;

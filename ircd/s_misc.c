@@ -22,27 +22,14 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.9 1997/07/28 01:14:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.10 1997/09/03 17:46:02 kalt Exp $";
 #endif
 
-#include <sys/time.h>
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "numeric.h"
-#include <sys/stat.h>
-#include <fcntl.h>
-#if defined(PCS) || defined(AIX) || defined(SVR3)
-# include <time.h>
-#endif
-#ifdef HPUX
-#include <unistd.h>
-#endif
-#ifdef DYNIXPTX
-#include <sys/types.h>
-#include <time.h>
-#endif
-#include "h.h"
+#include "os.h"
+#include "s_defines.h"
+#define S_MISC_C
+#include "s_externs.h"
+#undef S_MISC_C
 
 static	void	exit_one_client __P((aClient *,aClient *,aClient *,char *));
 

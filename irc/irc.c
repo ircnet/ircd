@@ -18,56 +18,19 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* -- Jto -- 20 Jun 1990
- * Changed debuglevel to have a default value
- */
-
-/* -- Jto -- 03 Jun 1990
- * Channel string changes...
- */
-
-/* -- Jto -- 24 May 1990
- * VMS version changes from LadyBug (viljanen@cs.helsinki.fi)
- */
-
-char irc_id[]="irc.c v2.0 (c) 1988 University of Oulu, Computing\
- Center and Jarkko Oikarinen";
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: irc.c,v 1.3 1997/09/03 17:45:40 kalt Exp $";
+#endif
+ 
+#include "os.h"
+#include "c_defines.h"
+#define IRC_C
+#include "c_externs.h"
+#undef IRC_C
 
 #define DEPTH 10
 #define KILLMAX 2  /* Number of kills to accept to really die */
                     /* this is to prevent looping with /unkill */
-
-#include "struct.h"
-#ifdef DOCURSES
-#include <curses.h>
-#endif
-#include <signal.h>
-
-#include "common.h"
-#include "msg.h"
-#include "sys.h"
-#define IRCCMDS
-#include "irc.h"
-#undef IRCCMDS
-#include "h.h"
-
-#include <pwd.h>
-
-#if VMS
-#include stdlib
-#if MAIL50
-#include "maildef.h"
-
-struct itmlst
-{
-  short buffer_length;
-  short item_code;
-  long buffer_address;
-  long return_length_address;
-};
-#endif
-#endif
-#include <stdio.h>
 
 #ifdef AUTOMATON
 #ifdef DOCURSES
@@ -76,29 +39,86 @@ struct itmlst
 #ifdef DOTERMCAP
 #undef DOTERMCAP
 #endif
-char	*a_myname();
-char	*a_myreal();
-char	*a_myuser();
 #endif /* AUTOMATON */
 
-extern	char	*HEADER;
+struct Command commands[] = {
+  { (void (*)()) 0, "SIGNOFF", SERVER_CMD, "\0\0", MSG_QUIT },
+  { do_bye,         "QUIT",    LOCAL_FUNC, "\0\0", MSG_QUIT },
+  { do_bye,         "EXIT",    LOCAL_FUNC, "\0\0", MSG_QUIT },
+  { do_bye,         "BYE",     LOCAL_FUNC, "\0\0", MSG_QUIT },
+  { do_kill,        "KILL",    LOCAL_FUNC, "\0\0", MSG_KILL },
+  { (void (*)()) 0, "SUMMON",  SERVER_CMD, "\0\0", MSG_SUMMON },
+  { (void (*)()) 0, "STATS",   SERVER_CMD, "\0\0", MSG_STATS },
+  { (void (*)()) 0, "USERS",   SERVER_CMD, "\0\0", MSG_USERS },
+  { (void (*)()) 0, "TIME",    SERVER_CMD, "\0\0", MSG_TIME },
+  { (void (*)()) 0, "DATE",    SERVER_CMD, "\0\0", MSG_TIME },
+  { (void (*)()) 0, "NAMES",   SERVER_CMD, "\0\0", MSG_NAMES },
+  { (void (*)()) 0, "NICK",    SERVER_CMD, "\0\0", MSG_NICK },
+  { (void (*)()) 0, "WHO",     SERVER_CMD, "\0\0", MSG_WHO },
+  { (void (*)()) 0, "WHOIS",   SERVER_CMD, "\0\0", MSG_WHOIS },
+  { (void (*)()) 0, "WHOWAS",  SERVER_CMD, "\0\0", MSG_WHOWAS },
+  { do_kill,	    "LEAVE",   LOCAL_FUNC, "\0\0", MSG_PART },
+  { do_kill,	    "PART",    LOCAL_FUNC, "\0\0", MSG_PART },
+  { (void (*)()) 0, "WOPS",    SERVER_CMD, "\0\0", MSG_WALLOPS },
+  { do_channel,     "JOIN",    LOCAL_FUNC, "\0\0", MSG_JOIN },
+  { do_channel,     "CHANNEL", LOCAL_FUNC, "\0\0", MSG_JOIN },
+#ifdef VMSP
+  { do_exec,        "EXEC",    LOCAL_FUNC, "\0\0", "EXEC" },
+  { do_oper,        "OPER",    LOCAL_FUNC, "\0\0", "OPER" },
+#endif
+#ifdef GETPASS
+  { do_oper,        "OPER",    LOCAL_FUNC, "\0\0", "OPER" },
+#else
+  { (void (*)()) 0, "OPER",    SERVER_CMD, "\0\0", MSG_OPER },
+#endif
+  { do_away,	    "AWAY",    LOCAL_FUNC, "\0\0", MSG_AWAY },
+  { do_mypriv,      "MSG",     LOCAL_FUNC, "\0\0", MSG_PRIVATE },
+  { do_kill,        "TOPIC",   LOCAL_FUNC, "\0\0", MSG_TOPIC },
+  { do_cmdch,       "CMDCH",   LOCAL_FUNC, "\0\0", "CMDCH" },
+  { (void (*)()) 0, "INVITE",  SERVER_CMD, "\0\0", MSG_INVITE },
+  { (void (*)()) 0, "INFO",    SERVER_CMD, "\0\0", MSG_INFO },
+  { (void (*)()) 0, "LIST",    SERVER_CMD, "\0\0", MSG_LIST },
+  { (void (*)()) 0, "KILL",    SERVER_CMD, "\0\0", MSG_KILL },
+  { do_quote,       "QUOTE",   LOCAL_FUNC, "\0\0", "QUOTE" },
+  { (void (*)()) 0, "LINKS",   SERVER_CMD, "\0\0", MSG_LINKS },
+  { (void (*)()) 0, "ADMIN",   SERVER_CMD, "\0\0", MSG_ADMIN },
+  { do_ignore,      "IGNORE",  LOCAL_FUNC, "\0\0", "IGNORE" },
+  { (void (*)()) 0, "TRACE",   SERVER_CMD, "\0\0", MSG_TRACE },
+  { do_help,        "HELP",    LOCAL_FUNC, "\0\0", "HELP" },
+  { do_log,         "LOG",     LOCAL_FUNC, "\0\0", "LOG" },
+  { (void (*)()) 0, "VERSION", SERVER_CMD, "\0\0", MSG_VERSION },
+  { do_clear,       "CLEAR",   LOCAL_FUNC, "\0\0", "CLEAR" },
+  { (void (*)()) 0, "REHASH",  SERVER_CMD, "\0\0", MSG_REHASH },
+  { do_query,       "QUERY",   LOCAL_FUNC, "\0\0", "QUERY" },
+  { (void (*)()) 0, "LUSERS",  SERVER_CMD, "\0\0", MSG_LUSERS },
+  { (void (*)()) 0, "MOTD",    SERVER_CMD, "\0\0", MSG_MOTD },
+  { do_unkill,      "UNKILL",  LOCAL_FUNC, "\0\0", "UNKILL" },
+  { do_server,      "SERVER",  LOCAL_FUNC, "\0\0", "SERVER" },
+  { (void (*)()) 0, "MODE",    SERVER_CMD, "\0\0", MSG_MODE },
+#ifdef MSG_MAIL
+  { (void (*)()) 0, "MAIL",    SERVER_CMD, "\0\0", MSG_MAIL },
+#endif
+  { do_kick,        "KICK",    LOCAL_FUNC, "\0\0", MSG_KICK },
+  { (void (*)()) 0, "USERHOST",SERVER_CMD, "\0\0", MSG_USERHOST },
+  { (void (*)()) 0, "ISON",    SERVER_CMD, "\0\0", MSG_ISON },
+  { (void (*)()) 0, "CONNECT", SERVER_CMD, "\0\0", MSG_CONNECT },
+  { do_kill,        "SQUIT",   LOCAL_FUNC, "\0\0", MSG_SQUIT },
+  { (void (*)()) 0, "SERVLIST",SERVER_CMD, "\0\0", MSG_SERVLIST },
+  { do_kill,        "SQUERY",  LOCAL_FUNC, "\0\0", MSG_SQUERY },
+  { do_kill,        "NOTICE",  LOCAL_FUNC, "\0\0", MSG_NOTICE },
+  { (void (*)()) 0, (char *) 0, 0,         "\0\0", (char *) 0 }
+};
 
 aChannel *channel = NULL;
 aClient	me, *client = &me;
 anUser	meUser;	/* User block for 'me' --msa */
 FILE	*logfile = NULL;
-char	*real_name(), *last_to_me(), *last_from_me();
 char	buf[BUFSIZE];
 char	*querychannel;
 int	portnum, termtype = CURSES_TERM;
 int	debuglevel = DEBUG_ERROR;
 int	unkill_flag = 0, cchannel = 0;
 int	QuitFlag = 0;
-
-void	intr();
-void	quit_intr();
-void	myloop();
-void	write_statusline();
 
 static	int	KillCount = 0;
 static	int	apu = 0;  /* Line number we're currently on screen */
@@ -283,7 +303,7 @@ char	*argv[];
 			strncpy(meUser.username,userdata->pw_name,USERLEN);
 #endif
 		}
-		meUser.server = strdup(me.sockhost);
+		meUser.server = mystrdup(me.sockhost);
 		meUser.username[USERLEN] = '\0';
 		me.info[REALLEN] = '\0';
 		me.fd = sock;
@@ -319,7 +339,7 @@ char	*argv[];
 			do_channel(channel, "JOIN");
 		myloop(sock);
 		if (logfile)
-			do_log(NULL);
+			do_log(NULL, NULL);
 		printf("Press any key.");
         	getchar();
 		printf("\n");
@@ -342,7 +362,7 @@ char	*argv[];
 void intr()
 {
 	if (logfile)
-		do_log(NULL);
+		do_log(NULL, NULL);
 
 #ifdef DOCURSES
 	if (termtype == CURSES_TERM) {
@@ -480,20 +500,6 @@ char	*buf, *tmp;
 {
 	unkill_flag = 0;
 	sendto_one(&me, "%s :%s", tmp, buf);
-#if VMS
-#ifdef DOCURSES
-	if (termtype == CURSES_TERM) {
-		echo();
-		nocrmode();
-		endwin();
-	} 
-#endif
-#ifdef DOTERMCAP
-	if (termtype == TERMCAP_TERM)
-		io_off();
-#endif
-	exit(0);
-#endif
 }
 
 /* KILL, PART, SQUIT, TOPIC	"CMD PARA1 [:PARA2]" */
@@ -679,9 +685,6 @@ char *line;
 /* move cursor to correct position and place line */
 
 			move(apu,0);
-#if VMS
-			clrtoeol();
-#endif
 			addstr(ptr);
 			if (logfile)
 				fprintf(logfile, "%s\n", ptr);
@@ -690,12 +693,7 @@ char *line;
 
 #ifndef SCROLLINGCLIENT
 			/* clear one line. */
-#if VMS
-			addstr("\n");
-			clrtoeol();
-#else
 			addstr("\n\n");
-#endif
 			if (++apu > LINES - 4) {
 				apu = 0;
 				move(0,0);
@@ -750,11 +748,7 @@ char *line;
 
 int	unixuser()
 {
-#ifdef VMS
-	return 1;
-#else
 	return(!StrEq(me.sockhost,"OuluBox"));
-#endif
 }
 
 void do_log(ptr, temp)
@@ -764,31 +758,23 @@ char	*ptr, *temp;
 	char	buf[150];
 	char	*ptr2;
 
-#if VMS
-#define LOGFILEOPT  ,"rat=cr", "rfm=var"
-#else
-#define LOGFILEOPT 
-#endif
-
 	if (!unixuser())
 		return;
 	if (!logfile) {		          /* logging currently off */
 		if (BadPtr(ptr))
 			putline("*** You must specify a filename to log to.");
 		else {
-			if (!(logfile = fopen(ptr, "a" LOGFILEOPT))) {
+			if (!(logfile = fopen(ptr, "a"))) {
 				sprintf(buf,
 					"*** Error: Can't open log file %s.\n",
 					ptr);
 				putline(buf);
 			} else {
-#ifndef VMS
-# if defined(HPUX) || defined(SVR3) || defined(SVR4)
+#if defined(HPUX) || defined(SVR3) || defined(SVR4)
 				setvbuf(logfile,logbuf,_IOLBF,sizeof(logbuf));
-# else
-#  if !defined(_SEQUENT_) && !defined(SVR4)
+#else
+# if !defined(_SEQUENT_) && !defined(SVR4)
 				setlinebuf(logfile);
-#  endif
 # endif
 #endif
 				time(&tloc);
@@ -801,11 +787,8 @@ char	*ptr, *temp;
 			}
 		}
 	} else {                            /* logging currently on */
-#if VMS
-		if (!ptr) { /* vax 'c' hates the next line.. */
-#else
 		if (BadPtr(ptr)) {
-#endif
+
 			time(&tloc);
 			sprintf(buf, "*** IRC session log ended at %s",
 				ctime(&tloc));
@@ -906,7 +889,8 @@ void write_statusline()
 #endif
 }
 
-void	quit_intr()
+RETSIGTYPE quit_intr(s)
+int s;
 {
 	signal(SIGINT, SIG_IGN);
 #ifdef DOCURSES

@@ -18,47 +18,22 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-char edit_id[] = "edit.c v2.0 (c) 1988 University of Oulu, Computing\
- Center and Jarkko Oikarinen";
-
-#include <curses.h>
-#include <signal.h>
-#include "struct.h"
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: edit.c,v 1.2 1997/09/03 17:45:37 kalt Exp $";
 #endif
-#include "common.h"
-#include "irc.h"
+ 
+#include "os.h"
+#include "c_defines.h"
+#define EDIT_C
+#include "c_externs.h"
+#undef EDIT_C
 
 #define FROM_START 0
 #define FROM_END   1
 #define RELATIVE   2
 
-extern int termtype;
 static int esc=0;
 static int literal=0;
-
-void word_back();
-void word_forw();
-void del_word_left();
-void del_word_right();
-void toggle_ins();
-void do_after_esc();
-void back_ch();
-void rev_line();
-void del_ch_right();
-void eol();
-void forw_ch();
-void add_ch();
-void del_ch_left();
-void kill_eol();
-void refresh_screen();
-void next_in_history();
-void previous_in_history();
-void kill_whole_line();
-void literal_next();
-void got_esc();
-void set_position();
 
 int do_char(ch)
 char ch;
@@ -151,7 +126,7 @@ char ch;
 		yank();			/* yank */
 		break;
 	case '\032':		/* ^Z */
-		suspend_irc();		/* suspend irc */
+		suspend_irc(0);		/* suspend irc */
 		break;
 	case '\033':		/* ESC */
 		got_esc();
@@ -238,11 +213,11 @@ void del_ch_left()
 	set_position(-1, RELATIVE);
 }
 
-void suspend_irc()
+RETSIGTYPE suspend_irc(s)
+int s;
 {
-#if defined(HPUX) || defined(BSD) || defined(AIX) || defined(SGI) || \
-    defined(_SEQUENT_) || defined(linux) || defined(SVR4)
-	signal(SIGTSTP, (void(*)__P((int)))suspend_irc);
+#ifdef SIGTSTP
+	signal(SIGTSTP, suspend_irc);
 # ifdef DOCURSES
                 if (termtype == CURSES_TERM) {
                         echo();
@@ -273,9 +248,9 @@ void suspend_irc()
 # endif /* DOTERMCAP */
 		write_statusline();
 #else /* || */
-# if !defined(VMS) && !defined(SVR3)
+# if !defined(SVR3)
 	tstp(); 
-# endif /* !VMS */
+# endif
 #endif /* || */
 }
 

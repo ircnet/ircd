@@ -55,24 +55,14 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_comp.c	8.1 (Berkeley) 6/4/93";
-static char rcsid[] = "$Id: res_comp.c,v 1.3 1997/05/15 20:31:40 kalt Exp $";
+static char rcsid[] = "$Id: res_comp.c,v 1.4 1997/09/03 17:45:53 kalt Exp $";
 #endif /* LIBC_SCCS and not lint */
 
-#include <sys/types.h>
-#include <sys/param.h>
-#include <netinet/in.h>
-#include "nameser.h"
-
-#include <stdio.h>
-#include "resolv.h"
-#include <ctype.h>
-
-#if defined(BSD) && (BSD >= 199103)
-# include <unistd.h>
-# include <string.h>
-#else
-# include "portability.h"
-#endif
+#include "os.h"
+#include "s_defines.h"
+#define RES_COMP_C
+#include "s_externs.h"
+#undef RES_COMP_C
 
 static int	ircd_dn_find __P((u_char *exp_dn, u_char *msg,
 			     u_char **dnptrs, u_char **lastdnptr));
@@ -102,7 +92,7 @@ ircd_dn_expand(msg, eomorig, comp_dn, exp_dn, length)
 	/*
 	 * fetch next label in domain name
 	 */
-	while (n = *cp++) {
+	while ((n = *cp++)) {
 		/*
 		 * Check for indirection
 		 */
@@ -302,7 +292,7 @@ ircd_dn_find(exp_dn, msg, dnptrs, lastdnptr)
 	for (cpp = dnptrs; cpp < lastdnptr; cpp++) {
 		dn = exp_dn;
 		sp = cp = *cpp;
-		while (n = *cp++) {
+		while ((n = *cp++)) {
 			/*
 			 * check for indirection
 			 */
@@ -467,18 +457,6 @@ ircd_getshort(msgp)
 	return (u);
 }
 
-#ifdef NeXT
-/*
- * nExt machines have some funky library conventions, which we must maintain.
- */
-u_int16_t
-res_getshort(msgp)
-	register const u_char *msgp;
-{
-	return (_getshort(msgp));
-}
-#endif
-
 u_int32_t
 ircd_getlong(msgp)
 	register const u_char *msgp;
@@ -490,7 +468,7 @@ ircd_getlong(msgp)
 }
 
 void
-#if defined(__STDC__) || defined(__cplusplus)
+#if __STDC__
 ircd__putshort(register u_int16_t s, register u_char *msgp)	/* must match proto */
 #else
 ircd__putshort(s, msgp)

@@ -17,28 +17,17 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "numeric.h"
-#include "h.h"
-
-#include <signal.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include "nameser.h"
-#include "resolv.h"
-#include "res.h"
+#include "os.h"
+#include "s_defines.h"
+#define RES_C
+#include "s_externs.h"
+#undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.9 1997/07/23 16:37:00 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.10 1997/09/03 17:45:52 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
-
-extern	int	errno, h_errno;
-extern	int	highest_fd;
-extern	aClient	*local[];
 
 static	char	hostbuf[HOSTLEN+1];
 static	char	dot[] = ".";
@@ -666,7 +655,8 @@ char	*lp;
 	Reg	ResRQ	*rptr = NULL;
 	aCache	*cp = NULL;
 	struct	sockaddr_in	sin;
-	int	rc, a, len = sizeof(sin), max;
+	int	rc, a, max;
+	SOCK_LEN_TYPE len = sizeof(sin);
 
 	(void)alarm((unsigned)4);
 	rc = recvfrom(resfd, buf, sizeof(buf), 0, (SAP)&sin, &len);

@@ -22,25 +22,23 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.18 1997/08/03 22:26:29 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.19 1997/09/03 17:46:05 kalt Exp $";
 #endif
 
-#include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
-#include <utmp.h>	/* Read system file paths before locals in netdb.h */
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "numeric.h"
-#include "msg.h"
-#include "channel.h"
-#include <sys/stat.h>
-#include <fcntl.h>
-#include "h.h"
-
-void	send_umode_out __P((aClient*, aClient *, int));
-void	send_umode __P((aClient *, aClient *, int, int, char *));
+#include "os.h"
+#include "s_defines.h"
+#define S_USER_C
+#include "s_externs.h"
+#undef S_USER_C
 
 static char buf[BUFSIZE], buf2[BUFSIZE];
+
+static int user_modes[]	     = { FLAGS_OPER, 'o',
+				 FLAGS_LOCOP, 'O',
+				 FLAGS_INVISIBLE, 'i',
+				 FLAGS_WALLOP, 'w',
+				 FLAGS_RESTRICTED, 'r',
+				 0, 0 };
 
 /*
 ** m_functions execute protocol messages on this server:
@@ -1204,9 +1202,9 @@ Link *lp;
 **	parv[1] = nickname mask list
 **	parv[2] = additional selection flag, only 'o' for now.
 */
-int	m_who(cptr, sptr, parc, parv, depth)
+int	m_who(cptr, sptr, parc, parv)
 aClient *cptr, *sptr;
-int	parc, depth;
+int	parc;
 char	*parv[];
 {
 	Reg	aClient *acptr;
@@ -2346,13 +2344,6 @@ char	*parv[];
 	sendto_one(sptr, "%s", buf);
 	return 1;
 }
-
-static int user_modes[]	     = { FLAGS_OPER, 'o',
-				 FLAGS_LOCOP, 'O',
-				 FLAGS_INVISIBLE, 'i',
-				 FLAGS_WALLOP, 'w',
-				 FLAGS_RESTRICTED, 'r',
-				 0, 0 };
 
 /*
  * m_umode() added 15/10/91 By Darren Reed.

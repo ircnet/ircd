@@ -22,25 +22,14 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.19 1997/07/28 01:14:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.20 1997/09/03 17:46:03 kalt Exp $";
 #endif
 
-#include <sys/types.h>
-#include <utmp.h>
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "numeric.h"
-#include "msg.h"
-#include "channel.h"
-#if defined(PCS) || defined(AIX) || defined(DYNIXPTX) || defined(SVR3)
-#include <time.h>
-#endif
-#include <sys/stat.h>
-#include <fcntl.h>
-#include "h.h"
-
-extern  char    serveropts[];
+#include "os.h"
+#include "s_defines.h"
+#define S_SERV_C
+#include "s_externs.h"
+#undef S_SERV_C
 
 static	char	buf[BUFSIZE];
 
@@ -2214,7 +2203,7 @@ char	*parv[];
 			sendto_one(acptr, ":%s ERROR :Terminated by %s",
 				   ME, killer);
 	    }
-	(void)s_die();
+	(void)s_die(0);
 	return 0;
 }
 #endif

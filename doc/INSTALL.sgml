@@ -4,9 +4,9 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.9 1997/07/18 03:13:03 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.10 1997/09/03 17:45:21 kalt Exp $
 <abstract>
-This document describes how to install, and configure IRC 2.9.3.
+This document describes how to install, and configure IRC 2.9.4.
 </abstract>
 
 <sect>Installing IRC.
@@ -28,7 +28,11 @@ irc files will go. (default is prefix/lib/ircd)
 <tag/--zlib-include=DIR/ specifies in which directory the
 include file from the zlib is located.
 <tag/--zlib-library=DIR/ specifies in which directory the
-zlib library is locate.
+zlib library is located.
+<tag/--zlib-prefix=DIR/ specifies the prefix for zlib
+location.  It overrides the 2 previous options.  (The
+include directory is supposed to be in prefix/include, and
+the library in prefix/lib).
 <tag/--with-zlib/ is the default.  ``configure'' looks on your
 system to find the zlib.  If found, ircd will be linked using
 it.  This does NOT mean you can use server link compression,

@@ -18,19 +18,16 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-char debug_id[] = "debug.c v2.0 (c) 1988 University of Oulu, Computing Center and Jarkko Oikarinen";
-
-#include <sys/types.h>
-#include <sys/file.h>
-#include <stdio.h>
-#include "struct.h"
-#include "common.h"
-#ifdef HPUX
-#include <fcntl.h>
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: c_debug.c,v 1.2 1997/09/03 17:45:32 kalt Exp $";
 #endif
-#include "irc.h"
+ 
+#include "os.h"
+#include "c_defines.h"
+#define C_DEBUG_C
+#include "c_externs.h"
+#undef C_DEBUG_C
 
-extern int debuglevel;
 struct	stats	ircst, *ircstp = &ircst;
 
 #ifdef DEBUGMODE

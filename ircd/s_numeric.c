@@ -20,14 +20,14 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_numeric.c,v 1.2 1997/04/14 15:04:31 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_numeric.c,v 1.3 1997/09/03 17:46:02 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "common.h"
-#include "sys.h" 
-#include "numeric.h"
-#include "h.h"
+#include "os.h"
+#include "s_defines.h"
+#define S_NUMERIC_C
+#include "s_externs.h"
+#undef S_NUMERIC_C
 
 static char buffer[1024];
 

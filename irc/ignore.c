@@ -17,18 +17,18 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-char ignore_id[]="ignore.c v2.0 (c) 1988, 1989 Jarkko Oikarinen";
-
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "irc.h"
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: ignore.c,v 1.2 1997/09/03 17:45:39 kalt Exp $";
+#endif
+ 
+#include "os.h"
+#include "c_defines.h"
+#define IGNORE_C
+#include "c_externs.h"
+#undef IGNORE_C
 
 anIgnore *ignore = (anIgnore *) 0;
 char ibuf[80];
-
-int kill_ignore();
-int add_ignore();
 
 void do_ignore(user, temp)
 char *user, *temp;
@@ -97,8 +97,8 @@ anIgnore *para;
 {
   anIgnore *iptr;
   for (iptr = ignore; iptr; iptr=iptr->next)
-    if ((matches(iptr->user, user) == 0) &&
-	(matches(iptr->from, fromhost)==0))
+    if ((match(iptr->user, user) == 0) &&
+	(match(iptr->from, fromhost)==0))
       break;
 
   return iptr ? iptr : para;

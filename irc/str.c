@@ -18,12 +18,15 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-char str_id[] = "str.c v2.0 (c) 1988 University of Oulu, Computing Center and Jarkko Oikarinen";
-
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include <pwd.h>
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: str.c,v 1.2 1997/09/03 17:45:43 kalt Exp $";
+#endif
+ 
+#include "os.h"
+#include "c_defines.h"
+#define STR_C
+#include "c_externs.h"
+#undef STR_C
 
 char * center(buf,str,len)
 char *buf, *str;

@@ -17,16 +17,14 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.3 1997/06/26 15:40:44 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.4 1997/09/03 17:45:49 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "hash.h"
-#include "h.h"
-
-#include <math.h>
+#include "os.h"
+#include "s_defines.h"
+#define HASH_C
+#include "s_externs.h"
+#undef HASH_C
 
 static	aHashEntry	*clientTable = NULL;
 static	aHashEntry	*channelTable = NULL;

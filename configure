@@ -32,7 +32,7 @@ else
   if test ! -f config.h
   then
     echo "copying config.h from config.h.dist..."
-    cp -p ../include/config.h.dist config.h
+    cp -p ../support/config.h.dist config.h
   fi
   ./configure $*
   if test $? = 0

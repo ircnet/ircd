@@ -51,11 +51,14 @@ cat >version.c <<!SUB!THIS!
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.5 1997/07/21 21:07:42 kalt Exp $";
+static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.6 1997/09/03 17:46:08 kalt Exp $";
 #endif
 
-#include "struct.h"
-#include "patchlevel.h"
+#include "os.h"
+#include "s_defines.h"
+#define VERSION_C
+#include "s_externs.h"
+#undef VERSION_C
 
 char *generation = "$generation";
 char *creation = "$creation";

@@ -19,15 +19,23 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: packet.c,v 1.2 1997/04/14 15:04:05 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: packet.c,v 1.3 1997/09/03 17:45:16 kalt Exp $";
 #endif
- 
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "msg.h"
-#include "h.h"
- 
+
+#include "os.h"
+#ifndef CLIENT_COMPILE
+# include "s_defines.h"
+#else
+# include "c_defines.h"
+#endif
+#define PACKET_C
+#ifndef CLIENT_COMPILE
+# include "s_externs.h"
+#else
+# include "c_externs.h"
+#endif
+#undef PACKET_C
+
 /*
 ** dopacket
 **	cptr - pointer to client structure for which the buffer data
@@ -54,7 +62,10 @@ Reg	int	length;
 	Reg	char	*ch1;
 	Reg	char	*ch2, *bufptr;
 	aClient	*acpt = cptr->acpt;
-	int	r = 1, zipped = 0;
+	int	r = 1;
+#ifdef ZIP_LINKS
+	int	zipped = 0;
+#endif
  
 	me.receiveB += length; /* Update bytes received */
 	cptr->receiveB += length;

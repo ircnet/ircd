@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.4 1997/06/09 15:24:10 kalt Exp $
+# $Id: ircd.conf.example,v 1.5 1997/09/03 17:45:22 kalt Exp $
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -74,9 +74,9 @@ A:Boston University CS Department:Main Client Server:Helen Rose <hrose@cs.bu.edu
 #
 # P: [MANDATORY]. This field allows the server to listen on various ports
 # for connections. Any internet domain port that is below 1024 means the
-# ircd has to be run from inetd. The server can listen to ports in the
-# UNIX domain or the internet domain. If you wish to create a port in the
-# UNIX domain you must compile with UNIXPORT defined in include/config.h.
+# ircd has to be run as root, or from inetd. The server can listen to ports
+# in the UNIX domain or the internet domain. If you wish to create a port
+# in the UNIX domain you must compile with UNIXPORT defined in config.h.
 #
 # The fields are as follows::
 # P:<Internet IP#>:<*>:<Internet IP Mask>:<Port>:
@@ -109,7 +109,7 @@ P:/tmp/.ircd:*:*:6666:
 # For server classes, the fields in order are: class number, ping frequency
 # (in seconds), connect frequency (in seconds), maximum number of links
 # (used for auto-connecting and sendq (this overrides any value set in
-# include/config.h for #define MAXSENDQLENGTH).
+# config.h for #define MAXSENDQLENGTH).
 #
 # Note that it is a good idea to have ping frequency the same at both ends
 # of the link.
@@ -165,12 +165,12 @@ I:NOMATCH::hrose@csa.bu.edu::1
 # administrator can use kill -HUP on the ircd to reload the configuration
 # file. 
 # The fields are as follows:
-# O:hostname (ident "@" permitted):password:NickName::connection class(opt)
-# if the person in "NickName" is not coming from the hostname defined in
+# O:hostname (ident "@" permitted):password:OperName::connection class(opt)
+# if the person in "OperName" is not coming from the hostname defined in
 # the first field then the person will get the error message "No O: lines
 # for your host". 
 # NOTE that since Crypted Passwords are defined by default in
-# include/config.h this text probably will not be plaintext. See
+# config.h this text probably will not be plaintext. See
 # ircd/crypt/README for more information.
 #
 O:*.bu.edu:Zaphod:Trillian::10
@@ -199,7 +199,7 @@ O:rocker@csa.bu.edu:T0eiVgHrqeKTQ:Rocker::10
 # U: [NOT NECESSARY]. This line defines the default server for the IRC
 # client that ships with the server -- the default client is in irc/irc
 # You should not use U: lines but instead use the UPHOST definition in
-# include/config.h 
+# config.h 
 U:csa.bu.edu:foobar:csa.bu.edu
 #
 # C: [NETWORKED]. These lines define what servers your server tries to
@@ -281,7 +281,7 @@ K:toto.fr:Use port 6666:*:6667:
 # Again, like K: lines, R: lines are local and thus not very effective in
 # blocking certain machines from having IRC access.
 #
-# Use of R: requires that you have defined R_LINES in include/config.h
+# Use of R: requires that you have defined R_LINES in config.h
 #
 # The fields are as follows:
 # R:hostmask:/full/path/to/program:username

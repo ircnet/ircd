@@ -35,64 +35,18 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.15 1997/07/28 01:14:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.16 1997/09/03 17:45:57 kalt Exp $";
 #endif
 
-#include <sys/types.h>
-#include <utmp.h>
-#include "struct.h"
-#include "common.h"
-#include "sys.h"
-#include "res.h"
-#include "numeric.h"
-#include <math.h>
-#include <sys/socket.h>
-#include <sys/file.h>
-#include <sys/ioctl.h>
-#if defined(SVR4)
-#include <sys/filio.h>
-#endif
-#if defined(UNIXPORT) && (!defined(SVR3) || defined(SGI) || \
-    defined(_SEQUENT_))
-# include <sys/un.h>
-#endif
-#ifdef HAVE_ARPA_INET_H
-# include <arpa/inet.h>
-#endif
-#include <stdio.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <unistd.h>		/* Linux - mkdir() */
-#include <sys/stat.h>		/* Linux - chmod() */
-#include <sys/resource.h>
-
-#ifdef _DO_POLL_
-#include <stropts.h>
-#include <poll.h>
-#endif /* _DO_POLL_ */
-
-#ifdef HAVE_ARPA_NAMESER_H
-# ifdef	AIX
-#  include <time.h>
-# endif
-# include <arpa/nameser.h>
-#else
-# include "nameser.h"
-#endif /* HAVE_ARPA_NAMESER_H */
-#ifdef HAVE_RESOLV_H
-# include <resolv.h>
-#else
-# include "resolv.h"
-#endif
-#include "sock.h"	/* If FD_ZERO isn't define up to this point,  */
-			/* define it (BSD4.2 needs this) */
-#include "h.h"
+#include "os.h"
+#include "s_defines.h"
+#define S_BSD_C
+#include "s_externs.h"
+#undef S_BSD_C
 
 #ifndef IN_LOOPBACKNET
 #define IN_LOOPBACKNET	0x7f
 #endif
-
-extern  char    serveropts[];
 
 aClient	*local[MAXCONNECTIONS];
 FdAry	fdas, fdaa, fdall;
@@ -121,7 +75,7 @@ static	char	readbuf[READBUF_SIZE];
  * Try and find the correct name to use with getrlimit() for setting the max.
  * number of files allowed to be open by this process.
  */
-#ifndef _DO_POLL_
+#if ! USE_POLL
 # ifdef RLIMIT_FDMAX
 #  define RLIMIT_FD_MAX   RLIMIT_FDMAX
 # else
@@ -135,7 +89,7 @@ static	char	readbuf[READBUF_SIZE];
 #   endif
 #  endif
 # endif
-#endif /* _DO_POLL_ */
+#endif /* USE_POLL */
 
 /*
 ** add_local_domain()
@@ -191,7 +145,8 @@ aClient *cptr;
 {
 	Reg	int	errtmp = errno; /* debug may change 'errno' */
 	Reg	char	*host;
-	int	err, len = sizeof(err);
+	int	err;
+	SOCK_LEN_TYPE len = sizeof(err);
 	extern	char	*strerror();
 
 	host = (cptr) ? get_client_name(cptr, FALSE) : "";
@@ -230,7 +185,8 @@ char	*ipmask, *ip;
 int	port;
 {
 	static	struct sockaddr_in server;
-	int	ad[4], len = sizeof(server);
+	int	ad[4];
+	SOCK_LEN_TYPE len = sizeof(server);
 	char	ipname[20];
 
 	ad[0] = ad[1] = ad[2] = ad[3] = 0;
@@ -466,17 +422,13 @@ void	close_listeners()
 void	init_sys()
 {
 	Reg	int	fd;
-#ifndef _DO_POLL_
+#if ! USE_POLL
 # ifdef RLIMIT_FD_MAX
 	struct rlimit limit;
 
 	if (!getrlimit(RLIMIT_FD_MAX, &limit))
 	    {
-#  ifdef	pyr
-		if (limit.rlim_cur < MAXCONNECTIONS)
-# else
 		if (limit.rlim_max < MAXCONNECTIONS)
-#  endif
 		    {
 			(void)fprintf(stderr,"ircd fd table too big\n");
 			(void)fprintf(stderr,"Hard Limit: %d IRC max: %d\n",
@@ -484,7 +436,6 @@ void	init_sys()
 			(void)fprintf(stderr,"Fix MAXCONNECTIONS\n");
 			exit(-1);
 		    }
-#  ifndef	pyr
 		limit.rlim_cur = limit.rlim_max; /* make soft limit the max */
 		if (setrlimit(RLIMIT_FD_MAX, &limit) == -1)
 		    {
@@ -492,7 +443,6 @@ void	init_sys()
 					(int) limit.rlim_cur);
 			exit(-1);
 		    }
-#  endif
 	    }
 # endif
 # ifdef sequent
@@ -510,7 +460,7 @@ void	init_sys()
 	    }
 #  endif
 # endif
-#endif /* _DO_POLL_ */
+#endif /* USE_POLL */
 
 #if defined(PCS) || defined(DYNIXPTX) || defined(SVR3)
 	char	logbuf[BUFSIZ];
@@ -608,7 +558,7 @@ Reg	aClient	*cptr;
 Reg	char	*sockn;
 {
 	struct	sockaddr_in sk;
-	int	len = sizeof(struct sockaddr_in);
+	SOCK_LEN_TYPE len = sizeof(struct sockaddr_in);
 
 #ifdef	UNIXPORT
 	if (IsUnixSocket(cptr))
@@ -980,12 +930,15 @@ aClient	*cptr;
 int	hold_server(cptr)
 aClient	*cptr;
 {
+	return -1; /* needs to be fixed, don't forget virtual hosts */
+
+#if 0              /* code and variables declarations are removed, this
+		      avoids compiler warnings */
+
 	struct	sockaddr_in	sin;
 	aConfItem	*aconf;
 	aClient	*acptr;
 	int	fd;
-
-	return -1; /* needs to be fixed, don't forget virtual hosts */
 
 #ifdef	ZIP_LINKS
 	/*
@@ -1054,6 +1007,7 @@ aClient	*cptr;
 	Debug((DEBUG_NOTICE, "Reconnect %s %#x via %#x %d", cptr->name, cptr,
 		acptr, acptr->fd));
 	return 0;
+#endif
 #endif
 }
 
@@ -1290,7 +1244,9 @@ aClient	*cptr;
 int	get_sockerr(cptr)
 aClient	*cptr;
 {
-	int errtmp = errno, err = 0, len = sizeof(err);
+	int errtmp = errno, err = 0;
+	SOCK_LEN_TYPE len = sizeof(err);
+
 #ifdef	SO_ERROR
 	if (cptr->fd >= 0)
 		if (!GETSOCKOPT(cptr->fd, SOL_SOCKET, SO_ERROR, &err, &len))
@@ -1320,13 +1276,13 @@ aClient *cptr;
 	**	 as can be seen by the PCS one.  They are *NOT* all the same.
 	**	 Heed this well. - Avalon.
 	*/
-#ifdef	NBLOCK_POSIX
+#if NBLOCK_POSIX
 	nonb |= O_NONBLOCK;
 #endif
-#ifdef	NBLOCK_BSD
+#if NBLOCK_BSD
 	nonb |= O_NDELAY;
 #endif
-#ifdef	NBLOCK_SYSV
+#if NBLOCK_SYSV
 	/* This portion of code might also apply to NeXT.  -LynX */
 	res = 1;
 
@@ -1364,7 +1320,7 @@ aClient *cptr;
 	    {
 		if ((*blscn)->PT+CLONE_PERIOD < timeofday)
 		    {
-			blptr=*blscn;
+			blptr= *blscn;
 			*blscn=blptr->next;
 			MyFree((char *)blptr);
 		    }
@@ -1415,7 +1371,7 @@ int	fd;
 	else
 	    {
 		struct	sockaddr_in addr;
-		int	len = sizeof(struct sockaddr_in);
+		SOCK_LEN_TYPE len = sizeof(struct sockaddr_in);
 
 		if (getpeername(fd, (SAP)&addr, &len) == -1)
 		    {
@@ -1681,7 +1637,7 @@ time_t	delay; /* Don't ever use ZERO here, unless you mean to poll and then
 		*/
 FdAry	*fdp;
 {
-#ifndef _DO_POLL_
+#if ! USE_POLL
 # define SET_READ_EVENT( thisfd )	FD_SET( thisfd, &read_set)
 # define SET_WRITE_EVENT( thisfd )	FD_SET( thisfd, &write_set)
 # define CLR_READ_EVENT( thisfd )	FD_CLR( thisfd, &read_set)
@@ -1726,23 +1682,14 @@ FdAry	*fdp;
 	Reg	aClient	*cptr;
 	Reg	int	nfds;
 	struct	timeval	wait;
-#ifdef	pyr
-	struct	timeval	nowt;
-	u_long	us;
-#endif
 	time_t	delay2 = delay;
 	u_long	usec = 0;
 	int	res, length, fd, i, fdnew;
 	int	auth;
 
-#ifdef	pyr
-	(void) gettimeofday(&nowt, NULL);
-	timeofday = nowt.tv_sec;
-#endif
-
 	for (res = 0;;)
 	    {
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 		FD_ZERO(&read_set);
 		FD_ZERO(&write_set);
 #else
@@ -1752,10 +1699,10 @@ FdAry	*fdp;
 		pfd->fd  = -1;
 		res_pfd  = NULL;
 		udp_pfd  = NULL;
-#endif	/* _DO_POLL_ */
+#endif	/* USE_POLL */
 		auth = 0;
 
-#ifdef	_DO_POLL_
+#if USE_POLL
 		if ( auth == 0 )
 			bzero((char *) authclnts, sizeof( authclnts ));
 #endif
@@ -1775,7 +1722,7 @@ FdAry	*fdp;
 					fd));
 				if (cptr->flags & FLAGS_WRAUTH)
 					SET_WRITE_EVENT(cptr->authfd);
-#ifdef	_DO_POLL_
+#if USE_POLL
 				authclnts[cptr->authfd] = cptr;
 #else
 				if (cptr->authfd > highfd)
@@ -1784,7 +1731,7 @@ FdAry	*fdp;
 			    }
 			if (DoingDNS(cptr) || DoingAuth(cptr))
 				continue;
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 			if (fd > highfd)
 				highfd = fd;
 #endif
@@ -1822,30 +1769,13 @@ FdAry	*fdp;
 			    IsReconnect(cptr)
 #endif
 			    ) /* for emacs auto-indentation */
-#ifndef	pyr
 				SET_WRITE_EVENT( fd );
-#else
-			    {
-				if (!(cptr->flags & FLAGS_BLOCKED))
-					SET_WRITE_EVENT( fd );
-				else
-					delay2 = 0, usec = 500000;
-			    }
-			if (timeofday - cptr->lw.tv_sec &&
-			    nowt.tv_usec - cptr->lw.tv_usec < 0)
-				us = 1000000;
-			else
-				us = 0;
-			us += nowt.tv_usec;
-			if (us - cptr->lw.tv_usec > 500000)
-				cptr->flags &= ~FLAGS_BLOCKED;
-#endif
 		    }
 
 		if (udpfd >= 0)
 		    {
 			SET_READ_EVENT(udpfd);
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 			if (udpfd > highfd)
 				highfd = udpfd;
 #else
@@ -1855,7 +1785,7 @@ FdAry	*fdp;
 		if (resfd >= 0)
 		    {
 			SET_READ_EVENT(resfd);
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 			if (resfd > highfd)
 				highfd = resfd;
 #else
@@ -1863,13 +1793,13 @@ FdAry	*fdp;
 #endif			
 		    }
 		Debug((DEBUG_L11, "udpfd %d resfd %d", udpfd, resfd));
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 		Debug((DEBUG_L11, "highfd %d", highfd));
 #endif
 		
 		wait.tv_sec = MIN(delay2, delay);
 		wait.tv_usec = usec;
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 # ifdef	HPUX
 		nfds = select(highfd + 1, (int *)&read_set, (int *)&write_set,
 			      0, &wait);
@@ -1884,7 +1814,7 @@ FdAry	*fdp;
 			return -1;
 		else if (nfds >= 0)
 			break;
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 		report_error("select %s:%s", &me);
 #else
 		report_error("poll %s:%s", &me);
@@ -1897,7 +1827,7 @@ FdAry	*fdp;
 	    } /* for(res=0;;) */
 	
 	if (nfds > 0 &&
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 	    resfd >= 0 &&
 #else
 	    (pfd = res_pfd) &&
@@ -1909,7 +1839,7 @@ FdAry	*fdp;
 		CLR_READ_EVENT(resfd);
 	    }
 	if (nfds > 0 &&
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 	    udpfd >= 0 &&
 #else
 	    (pfd = udp_pfd) &&
@@ -1921,25 +1851,25 @@ FdAry	*fdp;
 		CLR_READ_EVENT(udpfd);
 	    }
 
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 	for (i = fdp->highest; i >= 0; i--)
 #else
 	for (pfd = poll_fdarray, i = 0; i < nbr_pfds; i++, pfd++ )
 #endif
 	    {
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 		if (!(cptr = local[fd = fdp->fd[i]]))
 			continue;
 #else
 		fd = pfd->fd;
-		if (cptr = authclnts[fd])
+		if ((cptr = authclnts[fd]))
 		    {
 #endif
 			/*
 			 * check for the auth fd's
 			 */
 			if (auth > 0 && nfds > 0
-#ifndef	_DO_POLL_
+#if ! USE_POLL
 			    && cptr->authfd >= 0
 #endif
 			    )
@@ -1957,7 +1887,7 @@ FdAry	*fdp;
 				    }
 				continue;
 			    }
-#ifdef	_DO_POLL_
+#if USE_POLL
 		    }
 		fd = pfd->fd;
 		if (!(cptr = local[fd]))
@@ -2766,7 +2696,8 @@ static	void	polludp()
 	Reg	char	*s;
 	struct	sockaddr_in	from;
 	Ping	pi;
-	int	n, fromlen = sizeof(from);
+	int	n;
+	SOCK_LEN_TYPE fromlen = sizeof(from);
 
 	/*
 	 * find max length of data area of packet.

@@ -18,21 +18,107 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/* -- Jto -- 03 Jun 1990
- * Changed the order of defines...
- */
-
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.5 1997/06/26 15:40:47 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.6 1997/09/03 17:45:16 kalt Exp $";
 #endif
-#include "struct.h"
-#include "common.h"
-#define MSGTAB
-#include "msg.h"
-#undef MSGTAB
-#include "sys.h"
-#include "numeric.h"
-#include "h.h"
+
+#include "os.h"
+#ifndef CLIENT_COMPILE
+# include "s_defines.h"
+#else
+# include "c_defines.h"
+#endif
+#define PARSE_C
+#ifndef CLIENT_COMPILE
+# include "s_externs.h"
+#else
+# include "c_externs.h"
+#endif
+#undef PARSE_C
+
+struct Message msgtab[] = {
+  { MSG_PRIVATE, m_private,  0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_NICK,    m_nick,     0, MAXPARA, MSG_LAG, 0L},
+  { MSG_NOTICE,  m_notice,   0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_JOIN,    m_join,     0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_MODE,    m_mode,     0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_QUIT,    m_quit,     0, MAXPARA, MSG_LAG, 0L},
+  { MSG_PART,    m_part,     0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_TOPIC,   m_topic,    0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_INVITE,  m_invite,   0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_KICK,    m_kick,     0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_WALLOPS, m_wallops,  0, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0L},
+  { MSG_PING,    m_ping,     0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_PONG,    m_pong,     0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_ERROR,   m_error,    0, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0L},
+#ifdef	OPER_KILL
+  { MSG_KILL,    m_kill,     0, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0L},
+#else
+  { MSG_KILL,    m_kill,     0, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0L},
+#endif
+#ifndef CLIENT_COMPILE
+  { MSG_USER,    m_user,     0, MAXPARA, MSG_LAG|MSG_NOU, 0L},
+  { MSG_AWAY,    m_away,     0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_UMODE,   m_umode,    0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_ISON,    m_ison,     0, 1,	 MSG_LAG|MSG_REG, 0L},
+  { MSG_SERVER,  m_server,   0, MAXPARA, MSG_LAG|MSG_NOU, 0L},
+  { MSG_SQUIT,   m_squit,    0, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0L},
+  { MSG_WHOIS,   m_whois,    0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_WHO,     m_who,      0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_WHOWAS,  m_whowas,   0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_LIST,    m_list,     0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_NAMES,   m_names,    0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_USERHOST,m_userhost, 0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_TRACE,   m_trace,    0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_PASS,    m_pass,     0, MAXPARA, MSG_LAG|MSG_NOU, 0L},
+  { MSG_LUSERS,  m_lusers,   0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_TIME,    m_time,     0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_OPER,    m_oper,     0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_CONNECT, m_connect,  0, MAXPARA,
+				MSG_LAG|MSG_REGU|MSG_OP|MSG_LOP, 0L},
+  { MSG_VERSION, m_version,  0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_STATS,   m_stats,    0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_LINKS,   m_links,    0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_ADMIN,   m_admin,    0, MAXPARA, MSG_LAG, 0L},
+  { MSG_USERS,   m_users,    0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_SUMMON,  m_summon,   0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_HELP,    m_help,     0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_INFO,    m_info,     0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_MOTD,    m_motd,     0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
+  { MSG_CLOSE,   m_close,    0, MAXPARA, MSG_LAG|MSG_REGU|MSG_OP, 0L},
+  { MSG_RECONECT,m_reconnect,0, MAXPARA, MSG_LAG|MSG_NOU, 0L},
+  { MSG_SERVICE, m_service,  0, MAXPARA, MSG_LAG|MSG_NOU, 0L},
+#ifdef	USE_SERVICES
+  { MSG_SERVSET, m_servset,  0, MAXPARA, MSG_LAG|MSG_SVC|MSG_NOU, 0L},
+#endif
+  { MSG_SQUERY,  m_squery,   0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_SERVLIST,m_servlist, 0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_HASH,    m_hash,     0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+  { MSG_DNS,     m_dns,      0, MAXPARA, MSG_LAG|MSG_REG, 0L},
+#if defined(OPER_REHASH) || defined(LOCOP_REHASH)
+  { MSG_REHASH,  m_rehash,   0, MAXPARA, MSG_REGU|MSG_OP
+# ifdef	LOCOP_REHASH
+					 |MSG_LOP
+# endif
+					, 0L},
+#endif
+#if defined(OPER_RESTART) || defined(LOCOP_RESTART)
+  { MSG_RESTART,  m_restart,   0, MAXPARA, MSG_REGU|MSG_OP
+# ifdef	LOCOP_RESTART
+					 |MSG_LOP
+# endif
+					, 0L},
+#endif
+#if defined(OPER_DIE) || defined(LOCOP_DIE)
+  { MSG_DIE,  m_die,   0, MAXPARA, MSG_REGU|MSG_OP
+# ifdef	LOCOP_DIE
+					 |MSG_LOP
+# endif
+					, 0L},
+#endif
+#endif /* !CLIENT_COMPILE */
+  { (char *) 0, (int (*)()) 0, 0, 0, 0, 0L}
+};
 
 /*
  * NOTE: parse() should not be called recursively by other functions!
@@ -580,14 +666,14 @@ char	*buffer, *bufend;
 /*
  * field breakup for ircd.conf file.
  */
-char	*getfield(newline)
-char	*newline;
+char	*getfield(irc_newline)
+char	*irc_newline;
 {
 	static	char *line = NULL;
 	char	*end, *field;
 	
-	if (newline)
-		line = newline;
+	if (irc_newline)
+		line = irc_newline;
 	if (line == NULL)
 		return(NULL);
 
