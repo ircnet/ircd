@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.51 2002/01/06 02:18:32 chopin Exp $
+ *   $Id: struct_def.h,v 1.52 2002/01/08 03:38:42 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -863,4 +863,9 @@ typedef	struct	Ignore {
 #if ! (UIDLEN > SIDLEN)
 #   error UIDLEN must be bigger than SIDLEN
 #endif
+
+/*
+ * base for channel IDs and UIDs
+ */
+#define CHIDNB 36
 
