@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.14 1997/09/09 20:42:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.15 1997/09/10 21:56:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -943,9 +943,11 @@ int	opt;
                 */
 		if (aconf->status & CONF_CLASS)
 		    {
-			add_class(atoi(aconf->host), atoi(aconf->passwd),
-				  atoi(aconf->name), aconf->port,
-				  tmp ? atoi(tmp) : 0);
+			if (atoi(aconf->host) >= 0)
+				add_class(atoi(aconf->host),
+					  atoi(aconf->passwd),
+					  atoi(aconf->name), aconf->port,
+					  tmp ? atoi(tmp) : 0);
 			continue;
 		    }
 		/*
