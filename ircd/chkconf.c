@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.12 1999/03/11 23:37:54 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.13 1999/03/11 23:40:12 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -195,7 +195,7 @@ int	opt;
 				if (!*(tmp+1))
 					break;
 				else
-					for (s = tmp; (*s = *++s); )
+					for (s = tmp; (*s = *(s+1)); s++)
 						;
 				tmp++;
 			    }
