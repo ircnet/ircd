@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.20 1998/05/05 21:26:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.21 1998/06/12 23:35:19 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -650,13 +650,6 @@ char	*argv[];
 			strncpyzt(me.name, p, sizeof(me.name));
 			break;
 		    case 'i':
-			/* otherwise people wonder why it doesn't work,
-			   and since they don't RTFS (see below) -krys */
-			(void)fprintf(stderr,
-				      "%s: inetd support is not functional\n",
-				      myargv[0]);
-			exit(0);
-
 			bootopt |= BOOT_INETD|BOOT_AUTODIE;
 		        break;
 		    case 'p':
@@ -785,10 +778,10 @@ char	*argv[];
 	setup_me(&me);
 	check_class();
 	ircd_writetune(tunefile);
-/* This cannot be right anymore..
 	if (bootopt & BOOT_INETD)
 	    {
 		aClient	*tmp;
+		aConfItem *aconf;
 
 		tmp = make_client(NULL);
 
@@ -796,12 +789,32 @@ char	*argv[];
 		tmp->flags = FLAGS_LISTEN;
 		tmp->acpt = tmp;
 		tmp->from = tmp;
-		SetMe(tmp);
-		(void)strcpy(tmp->name, "*");
-		(void)inetport(tmp, "", "*", 0);
-		local[0] = tmp;
+	        tmp->firsttime = time(NULL);
+
+                SetMe(tmp);
+
+                (void)strcpy(tmp->name, "*");
+
+                if (inetport(tmp, 0, "0.0.0.0", 0))
+                        tmp->fd = -1;
+		if (tmp->fd == 0) 
+		    {
+			aconf = make_conf();
+			aconf->status = CONF_LISTEN_PORT;
+			aconf->clients++;
+	                aconf->next = conf;
+        	        conf = aconf;
+
+                        tmp->confs = make_link();
+        	        tmp->confs->next = NULL;
+	               	tmp->confs->value.aconf = aconf;
+	                add_fd(tmp->fd, &fdas);
+	                add_fd(tmp->fd, &fdall);
+	                set_non_blocking(tmp->fd, tmp);
+		    }
+		else
+		    exit(5);
 	    }
-*/
 	if (bootopt & BOOT_OPER)
 	    {
 		aClient *tmp = add_connection(&me, 0);
