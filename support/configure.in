@@ -11,11 +11,11 @@ AC_DEFUN(IRC_MATHLIB, [
 	AC_MSG_CHECKING([library containing pow])
 	AC_CACHE_VAL([irc_cv_mathlib], [
 		irc_cv_mathlib=""
-		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[pow(1.0, 1.0)]])],[MATHLIBS=],[
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[double x = 2.0; pow(x, 2.0)]])],[MATHLIBS=],[
 			irc_save_LIBS="$LIBS"
 			irc_cv_mathlib="-lm"
 			LIBS="-lm $LIBS"
-			AC_LINK_IFELSE([AC_LANG_PROGRAM([[[]]], [[[pow(1.0, 1.0)]]])],[MATHLIBS=-lm],[])
+			AC_LINK_IFELSE([AC_LANG_PROGRAM([[[]]], [[[double x = 2.0; pow(x, 2.0)]]])],[MATHLIBS=-lm],[])
 			LIBS=$irc_save_LIBS
 		])
 	])
@@ -793,7 +793,7 @@ dnl main
 dnl ----
 
 AC_INIT([irc],[2.11],[ircd-bugs@irc.org])
-AC_REVISION([$Id: configure.in,v 1.58 2004/07/07 15:29:55 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.59 2004/07/07 16:27:01 chopin Exp $])
 AC_PREREQ(2.59)
 
 AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [PREFIX/var/log/ircd]], [
