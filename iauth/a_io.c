@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.28 2004/09/21 13:38:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.29 2004/09/21 22:29:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -170,14 +170,14 @@ static	void	next_io(int cl, AnInstance *last)
 	    /* sixth, we've got an instance to try */
 	{
 	    int r;
-	    static delayedsent = 0;	/* one fake is enough */
 
-	    if (!delayedsent && cldata[cl].instance->delayed)
+	    if (cldata[cl].instance->delayed &&
+			!(cldata[cl].state & A_DELAYEDSENT))
 		{
 		    /* fake to ircd that we're done */
 		    sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip,
 				cldata[cl].itsport);
-		    delayedsent = 1;
+		    cldata[cl].state |= A_DELAYEDSENT;
 		}
 
 	    cldata[cl].timeout = time(NULL) + cldata[cl].instance->timeout;

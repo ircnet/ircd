@@ -65,6 +65,7 @@ struct AuthData
 #define	A_NOH		0x0800	/* no hostname available */
 
 #define A_UNIX		0x1000	/* authuser is suitable for use by ircd */
+#define A_DELAYEDSENT	0x2000	/* client already has been let in to ircd */
 #define A_DENY		0x8000	/* connection should be denied access */
 
 #define SetBit(v,n)	v[n/8] |=  (1 << (n % 8))
