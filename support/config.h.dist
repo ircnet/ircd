@@ -233,9 +233,6 @@
  * Define this correctly for performance reasons. If defined, value of 0
  * creates biggest load on cpu, and bigger values decrease the cpu load
  * on price of user-friendlyness.
- *
- * The higher value (in seconds), the less often users will be polled (giving
- * a greater precedence to traffic to and from servers).
  */
 #define PREFER_SERVER 1
 
