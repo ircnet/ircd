@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: iauth.c,v 1.4 1998/08/07 02:04:23 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: iauth.c,v 1.5 1998/08/07 03:28:17 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -168,6 +168,7 @@ char	*argv[];
 
 	init_signals();
 	init_syslog();
+	init_filelogs();
 	sendto_log(ALOG_DMISC, LOG_NOTICE, "Daemon starting (%s%s).",
 		   make_version(),
 #if defined(IAUTH_DEBUG)
