@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.181 2004/03/24 23:25:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.182 2004/03/30 13:25:03 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3775,20 +3775,17 @@ static void report_listeners(aClient *sptr, char *to)
 	}
 }
 
+/* Reports class usage */
 static void report_class(aClient *sptr, char *to)
 {
-	/* Report Class usage */
-	if (IsPerson(sptr))
-	{
-		aClass  *tmp;
+	aClass  *tmp;
 
-	    	for (tmp = FirstClass(); tmp; tmp = NextClass(tmp))
-	    	{
-			if (Links(tmp) > 0)
-			{
-				sendto_one(sptr, replies[RPL_TRACECLASS],
-					ME, to, Class(tmp), Links(tmp));
-			}
-   		}
+	for (tmp = FirstClass(); tmp; tmp = NextClass(tmp))
+	{
+		if (Links(tmp) > 0)
+		{
+			sendto_one(sptr, replies[RPL_TRACECLASS],
+				ME, to, Class(tmp), Links(tmp));
+		}
 	}
 }
