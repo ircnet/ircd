@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.194 2004/03/08 14:23:09 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.195 2004/03/11 02:32:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -746,11 +746,23 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 					   me.serv->tok, (*buf) ? buf : "+",
 					   sptr->info);
 			else
+				if (ST_UID(acptr))
+				{
 				sendto_one(acptr, "NICK %s %d %s %s %s %s :%s",
 					   nick, sptr->hopcount+1, 
 					   user->username, user->host, 
-					   user->servp->maskedby->serv->tok, 
+					   user->servp->tok,
 					   (*buf) ? buf : "+", sptr->info);
+				}
+				else
+				{ /* 2.10 */
+				sendto_one(acptr, "NICK %s %d %s %s %s %s :%s",
+					   nick, sptr->hopcount+1,
+					   user->username, user->host,
+					   user->servp->maskedby->serv->tok,
+					   (*buf) ? buf : "+", sptr->info);
+
+				}
 	    }	/* for(my-leaf-servers) */
 #ifdef	USE_SERVICES
 #if 0
