@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.77 2001/12/23 01:51:11 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.78 2001/12/29 20:54:07 q Exp $";
 #endif
 
 #include "os.h"
@@ -2418,7 +2418,7 @@ struct	hostent	*hp;
 	    }
 	else
 		(void)strcpy(cptr->serv->by, "AutoConn.");
-	cptr->serv->up = ME;
+	cptr->serv->up = &me;
 	cptr->serv->nline = aconf;
 	if (cptr->fd > highest_fd)
 		highest_fd = cptr->fd;

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.76 2001/12/27 21:50:23 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.77 2001/12/29 20:54:07 q Exp $";
 #endif
 
 #include "os.h"
@@ -613,7 +613,7 @@ char	*parv[];
 		if (acptr->info != DefInfo)
 			MyFree(acptr->info);
 		acptr->info = mystrdup(info);
-		acptr->serv->up = sptr->name;
+		acptr->serv->up = sptr;
 		acptr->serv->stok = token;
 		acptr->serv->snum = find_server_num(acptr->name);
 		SetServer(acptr);
@@ -874,7 +874,7 @@ Reg	aClient	*cptr;
 	(void)add_to_client_hash_table(cptr->name, cptr);
 	/* doesnt duplicate cptr->serv if allocted this struct already */
 	(void)make_server(cptr);
-	cptr->serv->up = me.name;
+	cptr->serv->up = &me;
 	cptr->serv->nline = aconf;
 	cptr->serv->version = cptr->hopcount;   /* temporary location */
 	cptr->hopcount = 1;			/* local server connection */
@@ -945,12 +945,12 @@ Reg	aClient	*cptr;
 		stok = acptr->serv->tok;
 		if (split)
 			sendto_one(cptr, ":%s SERVER %s %d %s :[%s] %s",
-				   acptr->serv->up,
+				   acptr->serv->up->name,
 				   acptr->name, acptr->hopcount+1, stok,
 				   acptr->sockhost, acptr->info);
 		else
 			sendto_one(cptr, ":%s SERVER %s %d %s :%s",
-				   acptr->serv->up, acptr->name,
+				   acptr->serv->up->name, acptr->name,
 				   acptr->hopcount+1, stok, acptr->info);
 	    }
 
@@ -1113,7 +1113,7 @@ char	*parv[];
 		if (!BadPtr(mask) && match(mask, acptr->name))
 			continue;
 		sendto_one(sptr, replies[RPL_LINKS], ME, BadTo(parv[0]),
-			   acptr->name, acptr->serv->up,
+			   acptr->name, acptr->serv->up->name,
 			   acptr->hopcount, (acptr->info[0] ? acptr->info :
 			   "(Unknown Location)"));
 	    }

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.36 2001/12/27 18:47:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.37 2001/12/29 20:54:07 q Exp $";
 #endif
 
 #include "os.h"
@@ -531,7 +531,7 @@ char	*comment;	/* Reason for the exit */
 			(void)strcpy(comment1, from->name);
 		else
 			/* this is right */
-			(void)strcpy(comment1, sptr->serv->up);
+			(void)strcpy(comment1, sptr->serv->up->name);
  		(void)strcat(comment1, " ");
  		(void)strcat(comment1, sptr->name);
 

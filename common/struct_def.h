@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.47 2001/12/25 23:53:24 q Exp $
+ *   $Id: struct_def.h,v 1.48 2001/12/29 20:54:06 q Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -376,7 +376,7 @@ struct	User	{
 
 struct	Server	{
 	anUser	*user;		/* who activated this connection */
-	char	*up;	/* uplink for this server */
+	aClient	*up;	/* uplink for this server */
 	aConfItem *nline;	/* N-line pointer for this server */
 	int	version;        /* version id for local client */
 	int	snum;

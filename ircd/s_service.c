@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.32 2001/10/20 17:57:30 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.33 2001/12/29 20:54:08 q Exp $";
 #endif
 
 #include "os.h"
@@ -591,13 +591,13 @@ char	*parv[];
 				 mycmp(acptr->name, acptr->sockhost));
 			if (split)
 				sendto_one(sptr,":%s SERVER %s %d %s :[%s] %s",
-					   acptr->serv->up, acptr->name,
+					   acptr->serv->up->name, acptr->name,
 					   acptr->hopcount+1,
 					   acptr->serv->tok,
 					   acptr->sockhost, acptr->info);
 			else
 				sendto_one(sptr, ":%s SERVER %s %d %s :%s",
-					   acptr->serv->up, acptr->name,
+					   acptr->serv->up->name, acptr->name,
 					   acptr->hopcount+1,
 					   acptr->serv->tok,
 					   acptr->info);
