@@ -1,3 +1,37 @@
+Fri Apr 24 20:30:21 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* irc.c: missing refresh() (from Dave Hill <ddhill@zk3.dec.com>).
+
+	* s_conf.c, s_service.c: portability fixes from Avalon.
+
+	* channel.c, s_user.c: adapted undernet's Bquiet.
+
+Sun Apr  5 17:50:08 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* configure, configure.in, config.h.dist: added --logdir option.
+	
+	* s_serv.c:
+		* moved user wallops from #wallops to +wallops.
+		* stricter m_server() check for unregistered users.
+
+	* send.c: wallops were sent to services and unregistered clients.
+
+Sat Apr  4 19:05:26 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* struct_def.h, packet.c, s_bsd.c: (never triggered) link
+	compression bugfix (Roger Espel Llima <espel@llaic.u-clermont1.fr>).
+
+	* config.h.dist, ircd.c, s_debug.c: added PREFER_SERVER #define.
+
+	* s_user.c:
+		* m_oper() notice bug fix (Michael 'Eumel' Neumayer).
+		* completely disabled AWAY.
+
+	* struct_def.h, parse.c, channel.c, ircd.c, s_debug.c, s_misc.c,
+	s_serv.c, s_user.c, whowas.c, config.h.dist: added BIG_NET #define.
+
+	* s_misc.c; Y2K fix.
+
 Tue Mar 31 18:52:41 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* s_serv.c: removed now obsolete USE_NJOIN.
