@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.29 1997/09/23 19:12:44 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.30 1997/10/06 15:04:46 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -996,7 +996,8 @@ int	parc, notice;
 		/*
 		** channel msg?
 		*/
-		if (IsPerson(sptr) && (chptr = find_channel(nick, NullChn)))
+		if ((IsPerson(sptr) || IsService(sptr)) &&
+		    (chptr = find_channel(nick, NullChn)))
 		    {
 			if (can_send(sptr, chptr) == 0)
 				sendto_channel_butone(cptr, sptr, chptr,
