@@ -1,16 +1,16 @@
-2003-01-02  Piotr Kucharski
+2004-01-02  Piotr Kucharski
 
-	* reverting Kurt's changes #2 and #3 from 2003-01-01 (too much
+	* reverting Kurt's changes #2 and #3 from 2004-01-01 (too much
 	  champagne?)
 	* channel.c/m_join(): allowing to join +q channels regardless
 	  of MAXCHANNELSPERUSER.
 
-2003-01-01  Jakub Vlasek
+2004-01-01  Jakub Vlasek
 
 	* s_serv.c/do_emulated_eob(): The value of istat.is_eobservers should
 	  have been incremented before SetEOB().
 	
-2003-01-01  Kurt Roeckx
+2004-01-01  Kurt Roeckx
 
 	* support.c/make_isupport(): Replace MAXCHANNEL by CHANLIMIT.
 	* channel.c:add_user_to_channel(), remove_user_from_channel()
