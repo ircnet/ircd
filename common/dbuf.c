@@ -36,7 +36,7 @@
 */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.5 1997/06/19 15:07:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.6 1997/06/28 05:13:39 kalt Exp $";
 #endif
 
 #include <stdio.h>
@@ -54,15 +54,6 @@ static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.5 1997/06/19 15:07:09 kalt Exp $";
 
 u_int	poolsize = (BUFFERPOOL > 1500000) ? BUFFERPOOL : 1500000;
 dbufbuf	*freelist = NULL;
-
-
-/* This is a dangerous define because a broken compiler will set DBUFSIZ
-** to 4, which will work but will be very inefficient. However, there
-** are other places where the code breaks badly if this is screwed
-** up, so... -- Wumpus
-*/
-
-#define DBUFSIZ sizeof(((dbufbuf *)0)->data)
 
 #ifdef DBUF_INIT
 

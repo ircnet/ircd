@@ -234,6 +234,17 @@
  */
 #define	HUB	1
 
+#ifdef HUB
+/*
+ * MAXSERVERS is the maximum number of servers that will be linked
+ * to your server at the same time.  This number is not a limit,
+ * it is used to allocate memory when ircd is started.
+ */
+# define	MAXSERVERS 3
+#else
+# define	MAXSERVERS 1
+#endif
+
 /* R_LINES:  The conf file now allows the existence of R lines, or
  * restrict lines.  These allow more freedom in the ability to restrict
  * who is to sign on and when.  What the R line does is call an outside
