@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.154 2004/02/17 16:25:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.155 2004/02/17 16:27:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -37,6 +37,7 @@ static	int	check_link (aClient *);
 static	int	get_version (char *version, char *id);
 static	void	trace_one (aClient *sptr, aClient *acptr);
 static	int	check_servername (char *hostname);
+static	void	report_listeners(aClient *sptr, char *to);
 const	char	*check_servername_errors[3][2] = {
 	{ "too long", "Bogus servername - too long" },
 	{ "invalid", "Bogus servername - invalid hostname" },
@@ -1958,6 +1959,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* These stats are available with no penalty for all. */
 		case 'd': case 'D':	/* defines */
 		case 'p': 		/* ping stats */
+		case 'P': 		/* ports listening */
 		case 'q': case 'Q':	/* Q:lines */
 		case 's': case 'S':	/* services */
 		case 'u': case 'U':	/* uptime */
@@ -2126,7 +2128,10 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	case 'o' : case 'O' : /* O (and o) lines */
 		report_configured_links(cptr, parv[0], CONF_OPS);
 		break;
-	case 'p' : case 'P' : /* ircd ping stats */
+	case 'P': /* ports listening */
+		report_listeners(sptr, parv[0]);
+		break;
+	case 'p' : /* ircd ping stats */
 		report_ping(sptr, parv[0]);
 		break;
 	case 'Q' : case 'q' : /* Q lines */
@@ -3776,3 +3781,17 @@ int	m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	return 2;
 }
 
+static void report_listeners(aClient *sptr, char *to)
+{
+	aConfItem *tmp;
+
+	for (tmp = conf; tmp; tmp = tmp->next)
+	{
+		if ((tmp->status & CONF_LISTEN_PORT))
+		{
+			sendto_one(sptr, ":%s %d %s :%s %d %d", ME,
+				RPL_STATSDEFINE, to, BadTo(tmp->host), tmp->port,
+				tmp->clients);
+		}
+	}
+}
