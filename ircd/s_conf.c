@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.79 2004/03/04 11:46:48 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.80 2004/03/04 11:54:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -251,6 +251,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 	Reg	int	i;
 	static	char	uhost[HOSTLEN+USERLEN+3];
 	static	char	fullname[HOSTLEN+1];
+	int	namematched;
 
 	for (aconf = conf; aconf; aconf = aconf->next)
 	    {
@@ -266,6 +267,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		if (!aconf->host || !aconf->name)
 			continue;	/* Try another I:line. */
 
+		namematched = 0;
 		if (hp)
 			for (i = 0, hname = hp->h_name; hname;
 			     hname = hp->h_aliases[i++])
@@ -286,8 +288,15 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 				(void)strncat(uhost, fullname,
 					sizeof(uhost) - strlen(uhost));
 				if (!match(aconf->name, uhost))
-					goto attach_iline;
+				{
+					namematched = 1;
+					break;
+				}
 			    }
+
+		/* Require name to match before checking addr fields. */
+		if (!namematched)
+			continue;	/* Try another I:line. */
 
 		if (index(aconf->host, '@'))
 		    {
@@ -308,7 +317,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 			strncpyzt(uhost, hp->h_name, sizeof(uhost));
 			add_local_domain(uhost, sizeof(uhost) - strlen(uhost));
 		    }
-attach_iline:
+
 		if (!BadPtr(aconf->passwd) &&
 			!StrEq(cptr->passwd, aconf->passwd))
 		{
