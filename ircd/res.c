@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.24 2002/07/30 00:14:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.25 2002/08/24 01:16:05 chopin Exp $";
 #endif
 
 /* #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -636,7 +636,6 @@ HEADER	*hptr;
 		cp += 4; /* INT32SZ */
 		dlen =  (int)ircd_getshort((u_char *)cp);
 		cp += 2; /* INT16SZ */
-		rptr->type = type;
 
 		len = strlen(hostbuf);
 		/* name server never returns with trailing '.' */
@@ -649,6 +648,16 @@ HEADER	*hptr;
 			len = MIN(len + strlen(ircd_res.defdname),
 				  sizeof(hostbuf) - 1);
 		    }
+
+		/* Check that it's a possible reply to the request we send. */
+		if (rptr->type != type && type != T_CNAME)
+		{
+			sendto_flag(SCH_ERROR, "Wrong reply type looking up %s. "
+				"Got: %d, expected %d.", hostbuf,
+				type, rptr->type);
+			cp += dlen;
+			continue;
+		}
 
 		switch(type)
 		{
