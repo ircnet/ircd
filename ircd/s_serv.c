@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.42 1998/08/07 02:04:10 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.43 1998/08/12 19:28:26 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -767,7 +767,7 @@ Reg	aClient	*cptr;
 			return exit_client(cptr, cptr, &me,
 					   "zip_init() failed");
 		    }
-		cptr->flags |= FLAGS_ZIP;
+		cptr->flags |= FLAGS_ZIP|FLAGS_ZIPSTART;
 	    }
 #endif
 
