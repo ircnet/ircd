@@ -93,38 +93,19 @@
  */
 #define TKLINE
 
-/* OPER_KILL
- *
- * If you dont believe operators should be allowed to use the /KILL command
- * or believe it is uncessary for them to use it, then leave OPER_KILL
- * undefined. This will not affect other operators or servers issuing KILL
- * commands however.  OPER_REHASH and OPER_RESTART allow operators to
- * issue the REHASH and RESTART commands when connected to your server.
- * Left undefined they increase the security of your server from wayward
- * operators and accidents.
- * OPER_SET enables SET command which can be used for fine-tuning of certain
- * aspects of ircd behaviour during runtime.
- * OPER_TKLINE allows opers to use TKLINE and UNTKLINE commands if TKLINE
- * has been enabled.
- * The 'LOCOP_' #defines are for making the respective commands available
- * to 'local' operators. Note that the 'OPER_' #defines affect both global
- * (little o) and local (big O) operators.  Defining 'LOCOP_x' has no effect
- * if 'OPER_x' is undefined so you can't give local operators more rights
- * than global ones.
+/* 
+ * Operator rights can be precisely defined in O:line flags. However
+ * if you undefine any of the following, it will make given function
+ * unaccessible to local operators, disregarding their O:line flags.
  */
-#undef	OPER_KILL
-#define	OPER_REHASH
-#undef	OPER_RESTART
+#define	OPER_CONNECT
 #define	OPER_DIE
+#define	OPER_KILL
+#define	OPER_REHASH
+#define	OPER_RESTART
 #define	OPER_SET
-#undef	LOCOP_REHASH
-#undef	LOCOP_RESTART
-#undef	LOCOP_DIE
-#undef	LOCOP_SET
-#ifdef TKLINE
+#define	OPER_SQUIT
 #define	OPER_TKLINE
-#undef	LOCOP_TKLINE
-#endif
 
 /*
  * Maximum number of network connections your server will allow.  This must
@@ -716,4 +697,8 @@
 
 #if defined(CONFIG_DIRECTIVE_INCLUDE) && !defined(HAVE_MMAP)
 #error CONFIG_DIRECTIVE_INCLUDE requires mmap()
+#endif
+
+#ifndef TKLINE
+#undef OPER_TKLINE
 #endif
