@@ -1,3 +1,7 @@
+2004-04-18  Jakub Vlasek
+
+	* s_bsd.c/read_message(): Do not check cptrs of delayed listeners.
+
 2004-04-17  Piotr Kucharski
 
 	* s_conf.c/match_ipmask(): show original mask in error.
