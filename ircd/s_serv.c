@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.257 2004/12/12 19:26:11 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.258 2004/12/15 01:25:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3433,6 +3433,7 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 						iconf.split_minusers, tmp);
 					iconf.split_minusers = tmp;
 				}
+				check_split();
 				break;
 			}
 		} /* switch(acmd) */
