@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.5 1997/04/18 21:33:29 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.6 1997/05/28 13:38:13 kalt Exp $";
 #endif
 
 #include <sys/time.h>
@@ -711,14 +711,12 @@ char	*comment;
 				continue;
 			sendto_one(acptr, ":%s SQUIT %s :%s",
 				   from->name, sptr->name, comment);
-#ifdef	USE_SERVICES
-			check_services_butone(SERVICE_WANT_SQUIT, 
-					      sptr->name, sptr,
-					      ":%s SQUIT %s :%s",
-					      from->name,
-					      sptr->name, comment);
-#endif
 		    }
+#ifdef	USE_SERVICES
+		check_services_butone(SERVICE_WANT_SQUIT, sptr->name, sptr,
+				      ":%s SQUIT %s :%s", from->name,
+				      sptr->name, comment);
+#endif
 		(void) del_from_server_hash_table(sptr->serv, cptr ? cptr :
 						  sptr->from);
 	} else if (!IsPerson(sptr) && !IsService(sptr))
@@ -737,10 +735,21 @@ char	*comment;
 		if ((sptr->flags & FLAGS_KILLED) == 0)
 		    {
 			if ((sptr->flags & FLAGS_SPLIT) == 0)
+			    {
 				sendto_serv_butone(cptr, ":%s QUIT :%s",
-					   sptr->name, comment);
+						   sptr->name, comment);
+#ifdef	USE_SERVICES
+				check_services_butone(SERVICE_WANT_QUIT|
+						      SERVICE_WANT_RQUIT, 
+						      (sptr->user) ?
+						      sptr->user->server
+						      : NULL, cptr,
+						      ":%s QUIT :%s",
+						      sptr->name, comment);
+#endif
+			    }
 			else
-			{
+			    {
 #ifndef NoV28Links
 				sendto_serv_v(cptr, SV_OLD, ":%s QUIT :%s",
 					   sptr->name, comment);
@@ -760,14 +769,14 @@ char	*comment;
 								   sptr->name,
 								   comment);
 					}
-			}
 #ifdef	USE_SERVICES
-			check_services_butone(SERVICE_WANT_QUIT, 
+				check_services_butone(SERVICE_WANT_QUIT, 
 					      (sptr->user) ? sptr->user->server
-					      : NULL, cptr,
-					      ":%s QUIT :%s", sptr->name,
-					      comment);
+						      : NULL, cptr,
+						      ":%s QUIT :%s",
+						      sptr->name, comment);
 #endif
+			    }
 		    }
 		/*
 		** If a person is on a channel, send a QUIT notice

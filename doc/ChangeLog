@@ -1,3 +1,15 @@
+Wed May 28 19:24:45 1997  Christophe Kalt
+
+	* send.c: missing arg to dead_link(). (Olivier Galibert)
+
+	* s_serv.c: added /stats B to see B lines.
+
+	* service.h, channel.c, s_misc.c, s_service.c, s_serv.c, s_user.c:
+		* numerous bugfixes related to local services (if
+		USE_SERVICES is defined).
+		* extended services option to allow 2.9 NICK syntax, and
+		let them see tokens if they want. (adapted from O.Galibert) 
+
 Wed May 21 21:17:51 1997  Christophe Kalt
 
 	* channel.c, s_service.c, service.h: finished service code (whee).

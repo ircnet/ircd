@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.5 1997/05/21 20:29:29 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.6 1997/05/28 13:38:12 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -288,13 +288,14 @@ int	flags;
 			** servers that don't do channel delay) - krys
 			*/
 			bzero((char *)&chptr->mode, sizeof(Mode));
+		    }
+
 #ifdef USE_SERVICES
+		if (chptr->users == 1)
 			check_services_butone(SERVICE_WANT_CHANNEL,
 					      NULL, &me, "CHANNEL %s %d",
 					      chptr->chname, chptr->users);
 #endif
-		    }
-
 		ptr = make_link();
 		ptr->flags = flags;
 		ptr->value.chptr = chptr;
@@ -731,7 +732,7 @@ char	*parv[];
 				check_services_butone(SERVICE_WANT_MODE,
 						      NULL, sptr,
 						      "MODE %s %s",
-						      parv[0], name, modebuf);
+						      name, modebuf);
 #endif
 				    }
 			   } /* if(modebuf) */

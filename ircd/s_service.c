@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.4 1997/05/21 20:29:29 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.5 1997/05/28 13:38:14 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -110,10 +110,16 @@ aClient *cptr;
  
 
 #ifdef	USE_SERVICES
+/*
+** check_services_butone
+**	check all local services except `cptr', and send `fmt' according to:
+**	action	type on notice
+**	server	origin
+*/
 void	check_services_butone(action, server, cptr, fmt, p1, p2, p3, p4,
 			      p5, p6, p7, p8)
 long	action;
-aClient	*cptr;
+aClient	*cptr; /* shouldn't this be named sptr? */
 char	*fmt, *server;
 void	*p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8;
 {
@@ -133,7 +139,8 @@ void	*p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8;
 		if ((acptr->service->wants & action)
 		    && (!server || !match(acptr->service->dist, server)))
 			if ((acptr->service->wants & SERVICE_WANT_PREFIX) && 
-			    IsRegisteredUser(cptr))
+			    cptr && IsRegisteredUser(cptr) &&
+			    (action & SERVICE_MASK_PREFIX))
 			    {
 				sprintf(nbuf, "%s!%s@%s", cptr->name,
 					cptr->user->username,cptr->user->host);
@@ -145,6 +152,89 @@ void	*p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8;
 					   p6, p7, p8);
 	    }
 	return;
+}
+
+/*
+** sendnum_toone
+**	send the NICK + USER + UMODE for sptr to cptr according to wants
+*/
+static void	sendnum_toone (cptr, wants, sptr, umode)
+aClient *cptr, *sptr;
+char   *umode;
+int	wants;
+{
+
+	if (!*umode)
+		umode = "+";
+
+	if (wants & SERVICE_WANT_EXTNICK)
+		/* extended NICK syntax */
+		sendto_one(cptr, "NICK %s %d %s %s %s %s :%s",
+			   (wants & SERVICE_WANT_NICK) ? sptr->name : ".",
+			   sptr->hopcount + 1,
+			   (wants & SERVICE_WANT_USER) ? sptr->user->username
+			   : ".",
+			   (wants & SERVICE_WANT_USER) ? sptr->user->host :".",
+			   (wants & SERVICE_WANT_USER) ?
+			   ((wants & SERVICE_WANT_TOKEN) ?
+			    sptr->user->servp->tok : sptr->user->server) : ".",
+			   (wants & SERVICE_WANT_UMODE) ? umode : "+",
+			   (wants & SERVICE_WANT_USER) ? sptr->info : "");
+	else
+		/* old style NICK + USER + UMODE */
+	    {
+		char    nbuf[NICKLEN + USERLEN + HOSTLEN + 3];
+		char    *prefix;
+
+		if (wants & SERVICE_WANT_PREFIX)
+		    {
+			sprintf(nbuf, "%s!%s@%s", sptr->name,
+				sptr->user->username, sptr->user->host);
+			prefix = nbuf;
+		    }
+		else
+			prefix = sptr->name;
+
+		if (wants & SERVICE_WANT_NICK)
+			sendto_one(cptr, "NICK %s :%d", sptr->name,
+				   sptr->hopcount+1);
+		if (wants & SERVICE_WANT_USER)
+			sendto_one(cptr, ":%s USER %s %s %s :%s", prefix, 
+				   sptr->user->username, sptr->user->host,
+				   (wants & SERVICE_WANT_TOKEN)?
+				   sptr->user->servp->tok : sptr->user->server,
+				   sptr->info);
+		if (wants & SERVICE_WANT_UMODE)
+			sendto_one(cptr, ":%s MODE %s %s", prefix, sptr->name,
+				   umode);
+	    }
+}
+
+/*
+** check_services_num
+**	check all local services to eventually send NICK + USER + UMODE
+**	for new client sptr
+*/
+void	check_services_num(sptr, umode)
+aClient *sptr;
+char   *umode;
+{
+	Reg	aClient	*acptr;
+	Reg	int	i;
+
+	for (i = 0; i <= highest_fd; i++)
+	    {
+		if (!(acptr = local[i]) || !IsService(acptr))
+			continue;
+		/*
+		** found a (local) service, check if action matches what's
+		** wanted AND if it comes from a server matching the dist
+		*/
+		if ((acptr->service->wants & SERVICE_MASK_NUM)
+		    && !match(acptr->service->dist, sptr->user->server))
+			sendnum_toone(acptr, acptr->service->wants, sptr,
+				      umode);
+	    }
 }
 
 
@@ -417,6 +507,7 @@ aClient	*cptr, *sptr;
 int	parc;
 char	*parv[];
 {
+	aClient *acptr;
 	int burst = 0;
 
 	if (!MyConnect(sptr))
@@ -436,131 +527,114 @@ char	*parv[];
 			   "SERVSET");
 		return 1;
 	    }
-	if (!sptr->service->wants)
-		sptr->service->wants = atoi(parv[1]) & sptr->service->type;
+	if (sptr->service->wants)
+		return 1;
+
+	/* check against configuration */
+	sptr->service->wants = atoi(parv[1]) & sptr->service->type;
+	/* check that service is global for some requests */
 	if (strcmp(sptr->service->dist, "*"))
-		sptr->service->wants &= ~SERVICE_WANT_GLOBAL;
+		sptr->service->wants &= ~SERVICE_MASK_GLOBAL;
+	/* allow options */
+	sptr->service->wants |= (atoi(parv[1]) & ~SERVICE_MASK_ALL);
+	/* send accepted SERVSET */
 	sendto_one(sptr, ":%s SERVSET %s :%d", sptr->name, sptr->name,
 		   sptr->service->wants);
 
-	burst = sptr->service->wants & atoi(parv[2]);
-	if (burst)
+	if (parc < 3 ||
+	    ((burst = sptr->service->wants & atoi(parv[2])) == 0))
+		return 0;
+
+	/*
+	** services can request a connect burst.
+	** it is optional, because most services should not need it,
+	** so let's save some bandwidth.
+	**
+	** tokens are NOT used. (2.8.x like burst)
+	** distribution code is respected.
+	** service type also respected.
+	*/
+	if (burst & SERVICE_WANT_SERVER)
 	    {
-		/*
-	        ** services can request a connect burst.
-		** it is optional, because most services should not need it,
-		** so let's save some bandwidth.
-		**
-		** tokens are NOT used. (2.8.x like burst)
-		** distribution code is respected.
-		** service type also respected.
-		*/
-		aClient *acptr;
-
-		if (burst & SERVICE_WANT_SERVER)
+		int	split;
+		
+		for (acptr = &me; acptr; acptr = acptr->prev)
 		    {
-			int	split;
+			if (!IsServer(acptr) && !IsMe(acptr))
+				continue;
+			if (match(sptr->service->dist, acptr->name))
+				continue;
+			split = (MyConnect(acptr) &&
+				 mycmp(acptr->name, acptr->sockhost));
+			if (split)
+				sendto_one(sptr,":%s SERVER %s %d %s :[%s] %s",
+					   acptr->serv->up, acptr->name,
+					   acptr->hopcount+1,
+					   acptr->user->servp->tok,
+					   acptr->sockhost, acptr->info);
+			else
+				sendto_one(sptr, ":%s SERVER %s %d %s :%s",
+					   acptr->serv->up, acptr->name,
+					   acptr->hopcount+1,
+					   acptr->user->servp->tok,
+					   acptr->info);
+		    }
+	    }
 
-			for (acptr = &me; acptr; acptr = acptr->prev)
+	if (burst & (SERVICE_WANT_NICK|SERVICE_WANT_USER|SERVICE_WANT_SERVICE))
+	    {
+		char	buf[BUFSIZE] = "+";
+		
+		for (acptr = &me; acptr; acptr = acptr->prev)
+		    {
+			/* acptr->from == acptr for acptr == cptr */
+			if (acptr->from == cptr)
+				continue;
+			if (IsPerson(acptr))
 			    {
-				if (!IsServer(acptr))
+				if (match(sptr->service->dist,
+					  acptr->user->server))
 					continue;
-				if (match(sptr->service->dist, acptr->name))
+				if (burst & SERVICE_WANT_UMODE)
+					send_umode(NULL, acptr, 0, SEND_UMODES,
+						   buf);
+				sendnum_toone(sptr, burst, acptr, buf);
+			    }
+			else if (IsService(acptr))
+			    {
+				if (!(burst & SERVICE_WANT_SERVICE))
 					continue;
-				split = (MyConnect(acptr) &&
-					 mycmp(acptr->name, acptr->sockhost));
-				if (split)
-					sendto_one(sptr,
-						   ":%s SERVER %s %d :[%s] %s",
-						   acptr->serv->up,
-						   acptr->name,
-						   acptr->hopcount+1,
-						   acptr->sockhost,
-						   acptr->info);
-				else
-					sendto_one(sptr,":%s SERVER %s %d :%s",
-						   acptr->serv->up,
-						   acptr->name,
-						   acptr->hopcount+1,
-						   acptr->info);
+				if (match(sptr->service->dist,
+					  acptr->service->server))
+					continue;
+				sendto_one(sptr, "SERVICE %s %s %s %d %d :%s",
+					   acptr->name, acptr->service->server,
+					   acptr->service->dist,
+					   acptr->service->type,
+					   acptr->hopcount + 1, acptr->info);
 			    }
 		    }
-
-		if (burst & (SERVICE_WANT_NICK|SERVICE_WANT_USER|SERVICE_WANT_SERVICE))
+	    }
+	
+	if (burst & (SERVICE_WANT_CHANNEL|SERVICE_WANT_MODE))
+	    {
+		char    modebuf[MODEBUFLEN], parabuf[MODEBUFLEN];
+		aChannel	*chptr;
+		
+		for (chptr = channel; chptr; chptr = chptr->nextch)
 		    {
-			char	buf[BUFSIZE];
-
-			for (acptr = &me; acptr; acptr = acptr->prev)
+			if (chptr->users == 0)
+				continue;
+			if (burst & SERVICE_WANT_CHANNEL)
+				sendto_one(sptr, "CHANNEL %s %d",
+					   chptr->chname, chptr->users);
+			if (burst & SERVICE_WANT_MODE)
 			    {
-				/* acptr->from == acptr for acptr == cptr */
-				if (acptr->from == cptr)
-					continue;
-				if (IsPerson(acptr))
-				    {
-					if (match(sptr->service->dist,
-						  acptr->user->server))
-						continue;
-			/*
-			** IsPerson(x) is true only when IsClient(x) is true.
-			** These are only true when *BOTH* NICK and USER have
-			** been received. -avalon
-			*/
-					if (burst & SERVICE_WANT_NICK)
-						sendto_one(cptr, "NICK %s :%d",
-							   acptr->name,
-							   acptr->hopcount+1);
-					if (burst & SERVICE_WANT_USER)
-						sendto_one(cptr,
-						   ":%s USER %s %s %s :%s",
-							   acptr->name,
-						   acptr->user->username,
-							   acptr->user->host,
-							   acptr->user->server,
-							   acptr->info);
-					if (burst & SERVICE_WANT_UMODE)
-						send_umode(cptr, acptr, 0,
-							   SEND_UMODES, buf);
-				    }
-				else if (IsService(acptr))
-				    {
-					if (!(burst & SERVICE_WANT_SERVICE))
-						continue;
-					if (match(sptr->service->dist,
-                                                  acptr->service->server))
-                                                continue;
-					sendto_one(sptr,
-					   "SERVICE %s %s %s %d %d :%s",
-						   acptr->name,
-						   acptr->service->server,
-						   acptr->service->dist,
-						   acptr->service->type,
-						   acptr->hopcount + 1,
-						   acptr->info);
-				    }
-			    }
-		    }
-
-		if (burst & (SERVICE_WANT_CHANNEL|SERVICE_WANT_MODE))
-		    {
-			char    modebuf[MODEBUFLEN], parabuf[MODEBUFLEN];
-			aChannel	*chptr;
-
-			for (chptr = channel; chptr; chptr = chptr->nextch)
-			    {
-				if (chptr->users == 0)
-					continue;
-				if (burst & SERVICE_WANT_CHANNEL)
-					sendto_one(sptr, "CHANNEL %s %d",
-						   chptr->chname,chptr->users);
-				if (burst & SERVICE_WANT_MODE)
-				    {
-					*modebuf = *parabuf = '\0';
-                                        modebuf[1] = '\0';
-                                        channel_modes(&me, modebuf, parabuf,
-                                                      chptr);
-					sendto_one(sptr, "MODE %s %s",
-						   chptr->chname, modebuf);
-				    }
+				*modebuf = *parabuf = '\0';
+				modebuf[1] = '\0';
+				channel_modes(&me, modebuf, parabuf, chptr);
+				sendto_one(sptr, "MODE %s %s", chptr->chname,
+					   modebuf);
 			    }
 		    }
 	    }

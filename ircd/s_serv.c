@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.11 1997/05/21 20:19:30 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.12 1997/05/28 13:38:13 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -543,8 +543,9 @@ char	*parv[];
 		    }
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_SERVER, acptr->name, acptr,
-					":%s SERVER %s %d :%s", parv[0],
-					acptr->name, hop+1, acptr->info);
+				      ":%s SERVER %s %d %s :%s", parv[0],
+				      acptr->name, hop+1, acptr->serv->tok,
+				      acptr->info);
 #endif
 		sendto_flag(SCH_SERVER, "Received SERVER %s from %s (%d %s)",
 			    acptr->name, parv[0], hop+1, acptr->info);
@@ -1201,6 +1202,7 @@ static int report_array[15][3] = {
 		{ CONF_LOCOP,		  RPL_STATSOLINE, 'o'},
 		{ CONF_SERVICE,		  RPL_STATSSLINE, 'S'},
 		{ CONF_VER,		  RPL_STATSSLINE, 'V'},
+		{ CONF_BOUNCE,		  RPL_STATSSLINE, 'B'},
 		{ 0, 0, 0}
 	};
 
@@ -1350,6 +1352,9 @@ char	*parv[];
 				   (int)acptr->receiveM, (int)acptr->receiveK,
 				   timeofday - acptr->firsttime);
 		    }
+		break;
+	case 'B' : case 'b' : /* B conf lines */
+		report_configured_links(cptr, parv[0], CONF_BOUNCE);
 		break;
 	case 'c' : case 'C' : /* C and N conf lines */
 		report_configured_links(cptr, parv[0], CONF_CONNECT_SERVER|

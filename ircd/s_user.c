@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.9 1997/05/15 13:49:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.10 1997/05/28 13:38:14 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -582,8 +582,9 @@ char	*nick, *username;
 		istat.is_myclnt++;
 	    }
 #ifdef	USE_SERVICES
+#if 0
 	check_services_butone(SERVICE_WANT_NICK, user->server, NULL,
-			      "NICK %s :%d", nick, sptr->hopcount);
+			      "NICK %s :%d", nick, sptr->hopcount+1);
 	check_services_butone(SERVICE_WANT_USER, user->server, sptr,
 			      ":%s USER %s %s %s :%s", nick, user->username, 
 			      user->host, user->server, sptr->info);
@@ -591,6 +592,10 @@ char	*nick, *username;
 		send_umode(NULL, sptr, 0, ALL_UMODES, buf);
 	check_services_butone(SERVICE_WANT_UMODE, user->server, sptr,
 			      ":%s MODE %s :%s", nick, nick, buf);
+#endif
+	if (MyConnect(sptr))	/* all modes about local users */
+		send_umode(NULL, sptr, 0, ALL_UMODES, buf);
+	check_services_num(sptr, buf);
 #endif
 #ifdef NPATH
 	note_signon(sptr);
@@ -2103,6 +2108,7 @@ char	*parv[];
 	    
 	if ((IsServer(cptr) || IsMe(cptr)) && !IsOper(sptr))
 	    {
+		/* we never get here, do we?? (counters!) -krys */
 		sptr->user->flags |= FLAGS_OPER;
 		sendto_serv_butone(cptr, ":%s MODE %s :+o", parv[0], parv[0]);
 		if (IsMe(cptr))
