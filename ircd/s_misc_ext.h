@@ -46,7 +46,7 @@ EXTERN char *get_client_name __P((aClient *sptr, int showip));
 EXTERN char *get_client_host __P((aClient *cptr));
 EXTERN void get_sockhost __P((Reg aClient *cptr, Reg char *host));
 EXTERN char *my_name_for_link __P((char *name, Reg int count));
-EXTERN int mark_blind_servers __P((aClient *cptr, char *name));
+EXTERN int mark_blind_servers __P((aClient *cptr, aClient *server));
 EXTERN int exit_client __P((aClient *cptr, aClient *sptr, aClient *from,
 			    char *comment));
 EXTERN void checklist();

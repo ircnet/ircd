@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.37 2001/12/29 20:54:07 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.38 2002/01/06 02:43:38 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -303,14 +303,11 @@ Reg	int	count;
 
 /*
  * Goes thru the list of locally connected servers (except cptr),
- * check if my neighbours can see the server "name" (or if it is hidden
+ * check if my neighbours can see the server "server" (or if it is hidden
  * by a hostmask)
  * Returns the number of marked servers
  */
-int
-mark_blind_servers (cptr, name)
-aClient	*cptr;
-char	*name;
+int	mark_blind_servers (aClient *cptr, *aClient server)
 {
 	Reg	int		i, j = 0;
 	Reg	aClient		*acptr;
@@ -320,13 +317,17 @@ char	*name;
 	{
 		if (!(acptr = local[fdas.fd[i]]) || !IsServer(acptr))
 			continue;
-		if (acptr == cptr || IsMe(acptr))
+		if (acptr == cptr->from || IsMe(acptr))
 		{
 			acptr->flags &= ~FLAGS_HIDDEN;
 			continue;
 		}
 		if ((aconf = acptr->serv->nline) &&
-		    (match(my_name_for_link(ME, aconf->port), name) == 0))
+			!match(my_name_for_link(ME, aconf->port), server->name)
+			|| (IsMasked(server) &&
+			server->serv->maskedby == cptr->serv->maskedby
+			&& !ST_UID(acptr)
+			))
 		{
 			acptr->flags |= FLAGS_HIDDEN;
 			j++;
@@ -488,7 +489,7 @@ char	*comment;	/* Reason for the exit */
 				*/
 				flags = FLAGS_SPLIT;
 				if (mark_blind_servers(NULL,
-						       asptr->bcptr->name))
+						       asptr->bcptr))
 					flags |= FLAGS_HIDDEN;
 				while (GotDependantClient(asptr->bcptr))
 				    {
@@ -523,7 +524,7 @@ char	*comment;	/* Reason for the exit */
 		** check for hostmasking.
  		*/
  		flags = FLAGS_SPLIT;
- 		if (mark_blind_servers(cptr, sptr->name))
+ 		if (mark_blind_servers(cptr, sptr))
  			flags |= FLAGS_HIDDEN;
 
 		if (IsServer(from))
