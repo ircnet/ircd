@@ -52,7 +52,7 @@ $spitshell >version.c <<!SUB!THIS!
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: version.c.SH.in,v 1.2 1997/04/14 15:04:39 kalt Exp $";
+static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.3 1997/04/21 00:25:35 kalt Exp $";
 #endif
 
 #include "struct.h"
