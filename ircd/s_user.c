@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.118 2002/03/28 22:55:24 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.119 2002/04/05 03:07:57 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2595,28 +2595,43 @@ char	*parv[];
 
 	origin = parv[1];
 	destination = parv[2];
-	cptr->flags &= ~FLAGS_PINGSENT;
-	sptr->flags &= ~FLAGS_PINGSENT;
 
-	if (!BadPtr(destination) && mycmp(destination, ME) != 0)
-	    {
-		if ((acptr = find_client(destination, NULL)) ||
-		    (acptr = find_server(destination, NULL))) {
-			if (!(MyClient(sptr) && mycmp(origin, sptr->name)))
-				sendto_one(acptr,":%s PONG %s %s",
-					   parv[0], origin, destination);
-		} else
-			sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]),
-				   destination);
-		return 2;
-	    }
-#ifdef	DEBUGMODE
+	sptr->flags &= ~FLAGS_PINGSENT;
+	if (destination)
+	{
+		acptr = find_target(destination, cptr);
+	}
 	else
+	{
+		acptr = &me;
+	}
+	if (!acptr)
+	{
+		sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]),
+			   destination);
+		return 2;	
+	}
+	if (IsMe(acptr))
+	{
+		if (IsBursting(sptr))
+		{
+			do_emulated_eob(sptr);
+		}
+
+#ifdef DEBUGMODE
 		Debug((DEBUG_NOTICE, "PONG: %s %s", origin,
 		      destination ? destination : "*"));
 #endif
+	}
+	else
+	{
+		if (!(MyClient(sptr) && mycmp(origin, sptr->name)))
+			sendto_one(acptr,":%s PONG %s %s",
+					   parv[0], origin, destination);
+		return 2;
+	}
 	return 1;
-    }
+}
 
 
 /*
