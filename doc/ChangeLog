@@ -1,3 +1,20 @@
+2004-03-05  Piotr Kucharski
+
+	* res.c/proc_answer(), get_res(): fix CNAMEs resolving; now we use the
+	  the name that client IP has "IN PTR" to, not the name that "IN A" 
+	  points to client IP (patch from BitKoenig).
+
+2004-03-04  Piotr Kucharski
+
+	* s_conf.c/attach_Iline(): rewritten, now it requires both addr and name
+	  to match (if you want old behaviour of "put x in name to disable 
+	  clients resolve", just use 'N' flag).
+	* s_conf.c/attach_Iline(): 'N' flag working now.
+	* s_conf.c/attach_Iline(): moved strcpy/strcat out of aconf loop, that
+	  should make it significantly faster.
+	* s_conf.c/attach_Iline(): no longer match aconf->name to each alias
+	  of a host, use only its hostname.
+
 2004-02-29  Piotr Kucharski
 
 	* s_serv.c/m_squit(): squit without comment bug (noted by Marcin Krol).
