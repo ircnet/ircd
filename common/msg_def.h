@@ -77,6 +77,7 @@
 #define	MSG_SMASK    "SMASK"
 #define MSG_EOB	     "EOB"
 #define MSG_SET      "SET"
+#define MSG_MAP	     "MAP"
 
 #define MAXPARA		15
 
