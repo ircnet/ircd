@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.43 2004/11/02 21:54:37 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.44 2004/11/02 22:16:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -491,6 +491,10 @@ int	add_to_client_hash_table(char *name, aClient *cptr)
 	Reg	u_int	hashv;
 
 	hashv = hash_nick_name(name, &cptr->hashv);
+	if (clientTable[hashv].list == cptr)
+	{
+		abort();
+	}
 	cptr->hnext = (aClient *)clientTable[hashv].list;
 	clientTable[hashv].list = (void *)cptr;
 	clientTable[hashv].links++;
@@ -509,6 +513,10 @@ int	add_to_uid_hash_table(char *uid, aClient *cptr)
 	Reg	u_int	hashv;
 
 	hashv = hash_uid(uid, &cptr->user->hashv);
+	if (uidTable[hashv].list == cptr)
+	{
+		abort();
+	}
 	cptr->user->uhnext = (aClient *)uidTable[hashv].list;
 	uidTable[hashv].list = (void *)cptr;
 	uidTable[hashv].links++;
@@ -527,6 +535,10 @@ int	add_to_channel_hash_table(char *name, aChannel *chptr)
 	Reg	u_int	hashv;
 
 	hashv = hash_channel_name(name, &chptr->hashv, 0);
+	if (channelTable[hashv].list == chptr)
+	{
+		abort();
+	}
 	chptr->hnextch = (aChannel *)channelTable[hashv].list;
 	channelTable[hashv].list = (void *)chptr;
 	channelTable[hashv].links++;
@@ -548,6 +560,10 @@ int	add_to_server_hash_table(aServer *sptr, aClient *cptr)
 		sptr->bcptr->name, sptr->stok, sptr->ltok, sptr->tok, cptr));
 	hashv = sptr->stok * 15053;
 	hashv %= _SERVERSIZE;
+	if (serverTable[hashv].list == sptr)
+	{
+		abort();
+	}
 	sptr->shnext = (aServer *)serverTable[hashv].list;
 	serverTable[hashv].list = (void *)sptr;
 	serverTable[hashv].links++;
@@ -566,6 +582,10 @@ int	add_to_sid_hash_table(char *sid, aClient *cptr)
 	Reg	u_int	hashv;
 
 	hashv = hash_sid(sid, &cptr->serv->sidhashv);
+	if (sidTable[hashv].list == cptr->serv)
+	{
+		abort();
+	}
 	cptr->serv->sidhnext = (aServer *)sidTable[hashv].list;
 	sidTable[hashv].list = (void *)cptr->serv;
 	sidTable[hashv].links++;
@@ -586,6 +606,10 @@ int	add_to_hostname_hash_table(char *hostname, anUser *user)
 	Reg	u_int	hashv;
 
 	hashv = hash_host_name(hostname, &user->hhashv);
+	if (hostnameTable[hashv].list == user)
+	{
+		abort();
+	}
 	user->hhnext = (anUser *)hostnameTable[hashv].list;
 	hostnameTable[hashv].list = (void *)user;
 	hostnameTable[hashv].links++;
