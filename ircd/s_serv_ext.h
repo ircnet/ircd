@@ -55,6 +55,7 @@ EXTERN int m_admin __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_trace __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_motd __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_close __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
+EXTERN int m_eob __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN char *find_server_string __P((int snum));
 EXTERN int find_server_num __P((char *sname));
 #if defined(OPER_REHASH) || defined(LOCOP_REHASH)
@@ -70,4 +71,5 @@ EXTERN int m_die __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 #endif /* OPER_DIE || LOCOP_DIE */
 void	add_server_to_tree(aClient *cptr);
 void	remove_server_from_tree(aClient *cptr);
+void	do_emulated_eob(aClient *sptr);
 #undef EXTERN
