@@ -1,3 +1,40 @@
+1999-06-07  Christophe Kalt
+
+	* s_user.c:
+		* m_nick(): added notice to warn of NICK messages coming
+		from servers with parc != 8.
+		* register_user(): fixed unaccurate notices about iauth.
+
+	* config.h.dist: increased HANGONRETRYDELAY & HANGONGOODLINK values.
+
+1999-06-06  Christophe Kalt
+
+	* struct_def.h, send.c/sendto_match_butone(), list_ext.h,
+	list.c/make_client(), ircd.c/setup_me(), s_misc.c/exit_client(),
+	s_serv.c, s_service.c/m_service(), s_user.c/m_user(): added
+	reorder_client_list() and NO_USRTOP defines.  This reduces memory
+	usage  (Original code from Michal Svoboda).
+	
+	* channel.c/reop_channel(): desynched could be caused by server
+	reops (channel mode +r) (reported by Thomas Kuiper).
+
+1999-05-01  Christophe Kalt
+
+	* s_conf_ext.h, s_conf.c, s_serv.c: added a new list for K/k lines
+	only as an easy way to improve overall performance.
+
+	* service_def.h: updated SERVICE_MASK_ALL.
+
+1999-04-19  Christophe Kalt
+
+	* channel.c/m_njoin(): need to use sendto_match_servs*(); duh!
+
+	* send_ext.h, send.c: added sendto_match_servs_notv().
+
+	* s_serv.c/m_squit(): fixed logic in previous change.
+
+	* packet.c/dopacket(): fixed uncompression code.
+
 1999-04-15  Christophe Kalt
 
 	* service_def.h, channel.c/m_topic(), s_service.c/m_servset():
