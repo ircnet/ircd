@@ -1,8 +1,10 @@
 /* portability.h - include or define things that aren't present on all systems
  * vixie@decwrl 26dec92 [new]
  *
- * $Id: portability.h,v 1.1 1997/05/15 20:31:38 kalt Exp $
+ * $Id: portability.h,v 1.2 1997/05/21 20:21:21 kalt Exp $
  */
+
+#include "sys.h"
 
 /*
  * Copyright (c) 
@@ -137,7 +139,7 @@
 
 /* SCO UNIX defines only this unique symbol, apparently. */
 #if defined(M_UNIX)
-# define POSIX_SIGNALS
+/*# define POSIX_SIGNALS*/
 # if !defined(_SCO_DS)
 /* This section is for 3.2v4.2/ODT3.0 and maybe also for 3.2v4.1/3.2v4.0 */
 /* XXX - why is this POSIX_SOURCE instead of _POSIX_SOURCE? */
@@ -369,6 +371,7 @@ extern int	close(), setitimer(), recv(), sendto(), sigsetmask(),
 # endif
 #endif
 
+#if 0
 #if !defined(bcopy)	/* some machines have their own macros for this */
 # if (defined(USE_POSIX) && !defined(SUNOS4)) || \
 	 (defined(__STDC__) && !defined(sun) && !defined(sequent) \
@@ -451,6 +454,7 @@ extern int bcmp();
 #if !defined(SIGCHLD)
 # define SIGCHLD SIGCLD
 #endif
+#endif
 
 #if !defined(ntohl) && !defined(htonl) && defined(BSD) && (BSD <= 43)
 /* if these aren't null macros in netinet/in.h, extern them here. */
@@ -458,6 +462,7 @@ extern u_short htons __P((u_short)), ntohs __P((u_short));
 extern u_long htonl __P((u_long)), ntohl __P((u_long));
 #endif
 
+#if 0
 #if defined(USE_POSIX) && !defined(sun) && !defined(__sgi) \
 	&& !defined(__convex__) && !defined(__ultrix) && !defined(_AUX_SOURCE)
 # define PORT_NONBLOCK	O_NONBLOCK
@@ -597,6 +602,7 @@ extern u_long htonl __P((u_long)), ntohl __P((u_long));
 #if !defined(HAVE_FCHMOD)
 # define HAVE_FCHMOD 1
 #endif
+#endif
 
 /*
  * Some systems need _res to be linked into text rather than bss.
@@ -620,6 +626,7 @@ extern u_long htonl __P((u_long)), ntohl __P((u_long));
 /*
  * Prototype the functions we'll be supplying.
  */
+#if 0
 #ifdef NEED_PUTENV
 extern int putenv __P((char *));
 #endif
@@ -634,6 +641,7 @@ extern int gethostname __P((char *, size_t));
 
 #ifdef NEED_STRDUP
 extern char *strdup __P((const char *));
+#endif
 #endif
 
 #endif /*__BIND_PORTABILITY_H*/
