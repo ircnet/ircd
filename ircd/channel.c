@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.192 2004/03/01 02:19:10 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.193 2004/03/05 17:05:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2864,6 +2864,9 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	*comment, *name, *p = NULL, *user, *p2 = NULL;
 	char	*tmp, *tmp2;
 	char	*sender;
+	char	nbuf[BUFSIZE+1];
+	char	obuf[BUFSIZE+1];
+	int	clen, maxlen;
 
 	if (parc < 3 || *parv[1] == '\0')
 	    {
@@ -2873,9 +2876,16 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (IsServer(sptr))
 		sendto_flag(SCH_NOTICE, "KICK from %s for %s %s",
 			    parv[0], parv[1], parv[2]);
-	comment = (BadPtr(parv[3])) ? parv[0] : parv[3];
-	if (strlen(comment) > (size_t) TOPICLEN)
-		comment[TOPICLEN] = '\0';
+	if (BadPtr(parv[3]))
+	{
+		comment = "no reason";
+	}
+	else
+	{
+		comment = parv[3];
+		if (strlen(comment) > (size_t) TOPICLEN)
+			comment[TOPICLEN] = '\0';
+	}
 
 	if (IsServer(sptr))
 	{
@@ -2889,6 +2899,10 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		sender = sptr->name;
 	}
+
+	/* we'll decrease it for each channel later */
+	maxlen = BUFSIZE - MAX(strlen(sender), strlen(sptr->name))
+		- strlen(comment) - 10; /* ":", " KICK ", " " and " :" */
 
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	    {
@@ -2926,6 +2940,9 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			continue;
 		    }
 
+		clen = maxlen - strlen(name) - 1; /* for comma, see down */
+		nbuf[0] = '\0';
+		obuf[0] = '\0';
 		tmp = mystrdup(parv[2]);
 		for (tmp2 = tmp; (user = strtoken(&p2, tmp2, ",")); tmp2 = NULL)
 		    {
@@ -2939,15 +2956,41 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				sendto_channel_butserv(chptr, sptr,
 					":%s KICK %s %s :%s", sptr->name,
 					name, who->name, comment);
-				/* 2.11 servers. */
-				sendto_match_servs_v(chptr, cptr, SV_UID,
-					":%s KICK %s %s :%s", sender, name,
-					HasUID(who) ? who->user->uid : 
-					who->name, comment);
-				/* 2.10 servers. */
-				sendto_match_servs_notv(chptr, cptr, SV_UID,
-					":%s KICK %s %s :%s", sptr->name, name,
-					 who->name, comment);
+
+				/* nick buffer to kick out, build for 2.11 */
+				/* as we need space for ",nick", we should add
+				** 1 on the left side; instead we subtracted 1
+				** on the right side, before the loop. */
+				if (strlen(nbuf) + (HasUID(who) ? UIDLEN :
+					strlen(who->name)) >= clen)
+				{
+					sendto_match_servs_v(chptr, cptr,
+						SV_UID, ":%s KICK %s %s :%s",
+						sender, name, nbuf, comment);
+					nbuf[0] = '\0';
+				}
+				if (*nbuf)
+				{
+					strcat(nbuf, ",");
+				}
+				strcat(nbuf, HasUID(who) ? who->user->uid :
+					who->name);
+
+				/* nick buffer to kick out, build for 2.10 */
+				/* same thing with +/- 1 for comma as above */
+				if (strlen(obuf) + strlen(who->name) >= clen)
+				{
+					sendto_match_servs_notv(chptr, cptr,
+						SV_UID, ":%s KICK %s %s :%s",
+						sptr->name, name, obuf,
+						comment);
+					obuf[0] = '\0';
+				}
+				if (*obuf)
+				{
+					strcat(obuf, ",");
+				}
+				strcat(obuf, who->name);
 
 				remove_user_from_channel(who,chptr);
 				penalty += 2;
@@ -2967,6 +3010,19 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					   ME, BadTo(parv[0]), user, name);
 		    } /* loop on parv[2] */
 		MyFree(tmp);
+		/* finish sending KICK for given channel */
+		if (*nbuf)
+		{
+			sendto_match_servs_v(chptr, cptr, SV_UID,
+				":%s KICK %s %s :%s", sender, name,
+				nbuf, comment);
+		}
+		if (*obuf)
+		{
+			sendto_match_servs_notv(chptr, cptr, SV_UID,
+				":%s KICK %s %s :%s", sptr->name, name,
+				 obuf, comment);
+		}
 	    } /* loop on parv[1] */
 
 	return penalty;
