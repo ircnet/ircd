@@ -96,7 +96,7 @@
 /* 
  * Operator rights can be precisely defined in O:line flags. However
  * if you undefine any of the following, it will make given function
- * unaccessible to local operators, disregarding their O:line flags.
+ * unaccessible to your operators, disregarding their O:line flags.
  */
 #define	OPER_CONNECT
 #define	OPER_DIE
