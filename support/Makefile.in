@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.61 2004/09/09 16:09:43 chopin Exp $
+#*   $Id: Makefile.in,v 1.62 2004/09/09 17:18:25 chopin Exp $
 #*
 #*/
 
@@ -119,8 +119,8 @@ FNAME_CONNLOG = $(ircd_log_dir)/$(IRCD).rejects
 FNAME_AUTHLOG = $(ircd_log_dir)/$(IRCD).auth
 
 # files used for debugging purposes
-IRCDDBG_PATH = $(ircd_log_dir)/$(IRCD).log
-IAUTHDBG_PATH = $(ircd_log_dir)/$(IAUTH).log
+IRCDDBG_PATH = $(ircd_log_dir)/$(IRCD).debug
+IAUTHDBG_PATH = $(ircd_log_dir)/$(IAUTH).debug
 
 # Access mode for irc.
 irc_mode = 755
@@ -243,6 +243,7 @@ install-server: install-ircd server
 	$(INSTALL_DATA) ../doc/iauth.conf.5 $(conf_man_dir)
 	$(INSTALL_DATA) ../contrib/ircdwatch/ircdwatch.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/example.conf $(ircd_conf_dir)/ircd.conf.example
+	$(INSTALL_DATA) ../support/iauth.conf $(ircd_conf_dir)/iauth.conf.example
 	-@if [ ! -f $(IAUTHCONF_PATH) ]; then \
 		$(INSTALL_DATA) ../support/iauth.conf $(IAUTHCONF_PATH); \
 	fi
