@@ -1,3 +1,10 @@
+2002-06-01  Kurt Roeckx
+
+	* class.c, class_ext.h, class_def.h: Make maxSendq an int.
+	* send.c, channel.c, support.c: Add extra {} and () to stop compiler 
+	  warnings.  Also removed some unused variables.
+	* ircd.c: Make variables used in signal handlers volatile.
+
 2002-06-01  Piotr Kucharski
 
 	* a_conf.c/conf_err(): exit iauth on config error.
@@ -295,6 +302,11 @@
 	  use it wherever possible; this is for allowing longer nicks without
 	  having to have longer uids.
 
+2001-12-29  Kurt Roeckx
+
+	* struct_def.h, ircd.c, s_bsd.c, s_misc.c, s_serv.c, s_service.c:
+	  Convert up from a string to a pointer to a client. (from jv)
+
 2001-12-28  Piotr Kucharski
 
 	* s_conf.c/find_kill(): make K:user@host remove also +r clients
@@ -304,6 +316,10 @@
 	* s_user.c/m_unick(): cleanup, remove m_user() call, fill whatever
 	  we need to fill in this function directly.
 	* s_id.c/sid_valid(): allow fake sids.
+
+2001-12-26  Kurt Roeckx
+
+	* channel.c/m_kick(): Add support for UIDs in KICK.
 
 2001-12-25  Kurt Roeckx
 
