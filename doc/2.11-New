@@ -74,7 +74,10 @@ Admin:
 	* SERVICE command changed, it uses SID now.
 	* O:line flags for better control
 		L - local operator (disables all remote functions)
-		A - enables all flags (except local operator)
+		P - removes penalty
+		p - allows flooding
+		& - allows joining &CLIENTS
+		A - enables all flags below
 		K - allows KILL (local and remote)
 		k - allows only local KILL
 		S - allows SQUIT (local and remote)
@@ -89,5 +92,5 @@ Admin:
 		D - allows DIE
 		e - allows SET
 		T - allows TKLINE
-		& - allows joining &CLIENTS
+		t - enables full TRACE and STATS L
 	* New config X-line.
