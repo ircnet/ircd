@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.3 1997/04/15 19:53:53 kalt Exp $
+  $Id: INSTALL.txt,v 1.4 1997/05/14 19:53:08 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.3.
 
@@ -724,6 +724,12 @@
 
 
 
+     FFoorrmmaatt
+
+        k:<Host Name>:<time interval(s)|comment>:<Auth>:<port>:
+
+
+
      KK  ``K'' tells the IRCD that you are making a KILL USER command
         entry.
 
@@ -748,6 +754,16 @@
         The USERNAME of the user you want removed from IRC.  For example
         ``root''.
 
+     AAuutthh
+        If the user's ident server replies with the OTHER type (as
+        opposed to the UNIX type), the reply is not used to set the
+        user's username.  (lowercase) k lines can be used in these case
+        to reject users based on their ident reply.
+
+        This field will be matched against the ident server reply.  It
+        is important to note that OTHER replies are prefixed with a
+        ``-'' by the ircd, while UNIX replies are not.
+
      PPoorrtt
         The port on which the Kill line will be effective. 0 means all
         ports.
@@ -758,6 +774,12 @@
 
         If user ``jtrim'' connects to IRC from host
         ``orion.cair.du.edu'' then IMMEDIATELY REMOVE HIM from my IRCD.
+
+        K:*.stealth.net::-43589:0:
+
+        If a user connects from any host that has the suffix
+        ``stealth.net'' and if that host ident server returns ``-43589''
+        - then IMMEDIATELY REMOVE THEM from my IRCD.
 
         K:*.cair.du.edu::root:0:
 
@@ -790,6 +812,7 @@
   you want to connect to them in.  For my example let us assume I am on
   the machine "rieska.oulu.fi" and I want to connect to irc daemons on 3
   other machines:
+
   +o  ``garfield.mit.edu''        - Tertiary Connection
 
   +o  ``irc.nada.kth.se''         - Secondary Connection
@@ -833,7 +856,6 @@
      C:root@nic.funet.fi:passwd:nic.funet.fi:6667:1
 
      Each field is separated with a ":" charcter:
-
      CC  This field tells the IRC program which option is being
         configured. "C" corresponds to a server Connect option.
 
@@ -921,6 +943,8 @@
         The format for the NOCONNECT entry in the ``ircd.conf'' is:
 
         N:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<Domain Mask>:<Class>
+
+
 
      Let us assume that ``garfield.mit.edu'' connects to your server and
      you want to place password authorization authorization on garfield.
@@ -1030,7 +1054,6 @@
 
         Allows a server named ``*.bu.edu'' to introduce only servers
         that match the ``*.edu'' name mask.
-
         H:*::eff.org::
 
         Allows ``eff.org'' to introduce (and act as a hub for) any
@@ -1094,6 +1117,9 @@
         this new server.
 
 
+
+
+
   44..1122..  VVeerrssiioonn lliimmiittaattiioonnss
 
 
@@ -1118,7 +1144,6 @@
         If any of the flags present in this field are found in the
         RPL_VERSION of a server, this server will be denied connection.
         This must be used with care.
-
 
      SSeerrvveerr MMaasskk
         This field is used to match server names.  The V line will be
@@ -1161,7 +1186,6 @@
         your server probably results in yyoouurr sseerrvveerr being left alone,
         unless other servers have agreed to have the same Q-line in
         their ircd configuration files as well.
-
      EExxaammppllee
         Q::of the security holes:foo.bar.baz::
 
@@ -1294,7 +1318,6 @@
         define this command to connect to your own host.  If your site
         is not running a server then this command should contain the
         TARGET host's connection information and password (if any).
-
      FFoorrmmaatt
 
         U:<TARGET Host addr>:<Password>:<TARGET Host NAME>:<Internet Port>
@@ -1330,29 +1353,6 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

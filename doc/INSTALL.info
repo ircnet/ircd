@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info2167tmp2.
+input file /tmp/sgml2info9119tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.3 1997/04/15 19:53:53 kalt Exp $
+     $Id: INSTALL.info,v 1.4 1997/05/14 19:53:08 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.3.
 
@@ -795,6 +795,9 @@ Excluded accounts
 `Format'
      K:<Host Name>:<time interval(s)|comment>:<User>:<port>:
 
+`Format'
+     k:<Host Name>:<time interval(s)|comment>:<Auth>:<port>:
+
 `K'
      "K" tells the IRCD that you are making a KILL USER command entry.
 
@@ -819,6 +822,16 @@ Excluded accounts
      The USERNAME of the user you want removed from IRC.  For example
      "root".
 
+`Auth'
+     If the user's ident server replies with the OTHER type (as opposed
+     to the UNIX type), the reply is not used to set the user's
+     username.  (lowercase) k lines can be used in these case to reject
+     users based on their ident reply.
+
+     This field will be matched against the ident server reply.  It is
+     important to note that OTHER replies are prefixed with a "-" by
+     the ircd, while UNIX replies are not.
+
 `Port'
      The port on which the Kill line will be effective. 0 means all
      ports.
@@ -828,6 +841,12 @@ Excluded accounts
 
      If user "jtrim" connects to IRC from host "orion.cair.du.edu" then
      IMMEDIATELY REMOVE HIM from my IRCD.
+
+     K:*.stealth.net::-43589:0:
+
+     If a user connects from any host that has the suffix "stealth.net"
+     and if that host ident server returns "-43589" - then IMMEDIATELY
+     REMOVE THEM from my IRCD.
 
      K:*.cair.du.edu::root:0:
 
@@ -1405,14 +1424,14 @@ Node: Client connections21730
 Node: Operator priviliges25212
 Node: Restrict connections27332
 Node: Excluded accounts28647
-Node: Server connections31229
-Node: Hub connections39662
-Node: Leaf connections40875
-Node: Version limitations42958
-Node: Excluded machines44191
-Node: Service connections (Not Fully Implemented Yet)45526
-Node: Bounce server47877
-Node: Default local server (for local clients) `*OBSOLETED*'49570
-Node: Related resources50453
+Node: Server connections31947
+Node: Hub connections40380
+Node: Leaf connections41593
+Node: Version limitations43676
+Node: Excluded machines44909
+Node: Service connections (Not Fully Implemented Yet)46244
+Node: Bounce server48595
+Node: Default local server (for local clients) `*OBSOLETED*'50288
+Node: Related resources51171
 
 End Tag Table

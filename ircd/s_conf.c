@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.6 1997/05/05 18:27:02 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.7 1997/05/14 19:52:48 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -853,8 +853,10 @@ int	opt;
 				aconf->status = CONF_RCLIENT;
 				break;
 			case 'K': /* Kill user line on irc.conf           */
-			case 'k':
 				aconf->status = CONF_KILL;
+				break;
+			case 'k':
+				aconf->status = CONF_OTHERKILL;
 				break;
 			/* Operator. Line should contain at least */
 			/* password and host where connection is  */
@@ -1129,7 +1131,7 @@ int	doall;
 char	**comment;
 {
 	static char	reply[256];
-	char *host, *name;
+	char *host, *name, *ident, *check;
 	aConfItem *tmp;
 	int	now;
 
@@ -1138,6 +1140,7 @@ char	**comment;
 
 	host = cptr->sockhost;
 	name = cptr->user->username;
+	ident = cptr->auth;
 
 	if (strlen(host)  > (size_t) HOSTLEN ||
             (name ? strlen(name) : 0) > (size_t) HOSTLEN)
@@ -1149,9 +1152,15 @@ char	**comment;
 	    {
 		if (!doall && (BadPtr(tmp->passwd) || !isdigit(*tmp->passwd)))
 			continue;
- 		if ((tmp->status == CONF_KILL) && tmp->host && tmp->name &&
+		if (!(tmp->status & (CONF_KILL | CONF_OTHERKILL)))
+			continue;
+		if (tmp->status == CONF_KILL)
+			check = name;
+		else
+			check = ident;
+ 		if (tmp->host && tmp->name &&
 		    (match(tmp->host, host) == 0) &&
- 		    (!name || match(tmp->name, name) == 0) &&
+ 		    (!check || match(tmp->name, check) == 0) &&
 		    (!tmp->port || (tmp->port == cptr->acpt->port)))
 		    {
 			now = 0;

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.8 1997/05/13 12:54:03 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.9 1997/05/14 19:52:49 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1185,12 +1185,13 @@ char	*parv[];
 **	      it--not reversed as in ircd.conf!
 */
 
-static int report_array[14][3] = {
+static int report_array[15][3] = {
 		{ CONF_ZCONNECT_SERVER,	  RPL_STATSCLINE, 'c'},
 		{ CONF_CONNECT_SERVER,	  RPL_STATSCLINE, 'C'},
 		{ CONF_NOCONNECT_SERVER,  RPL_STATSNLINE, 'N'},
 		{ CONF_CLIENT,		  RPL_STATSILINE, 'I'},
 		{ CONF_RCLIENT,		  RPL_STATSILINE, 'i'},
+		{ CONF_OTHERKILL,	  RPL_STATSKLINE, 'k'},
 		{ CONF_KILL,		  RPL_STATSKLINE, 'K'},
 		{ CONF_QUARANTINED_SERVER,RPL_STATSQLINE, 'Q'},
 		{ CONF_LEAF,		  RPL_STATSLLINE, 'L'},
@@ -1229,7 +1230,9 @@ int	mask;
 			 * On K/V lines the passwd contents can be
 			 * displayed on STATS reply. 	-Vesa
 			 */
-			if (tmp->status == CONF_KILL || tmp->status == CONF_VER)
+			if (tmp->status == CONF_KILL
+			    || tmp->status == CONF_OTHERKILL
+			    || tmp->status == CONF_VER)
 				sendto_one(sptr, rpl_str(p[1], to), c, host,
 					   (pass) ? pass : null,
 					   name, port, get_conf_class(tmp));
@@ -1363,7 +1366,8 @@ char	*parv[];
 					CONF_CLIENT|CONF_RCLIENT);
 		break;
 	case 'K' : case 'k' : /* K lines */
-		report_configured_links(cptr, parv[0], CONF_KILL);
+		report_configured_links(cptr, parv[0],
+					(CONF_KILL|CONF_OTHERKILL));
 		break;
 	case 'M' : case 'm' : /* commands use/stats */
 		for (mptr = msgtab; mptr->cmd; mptr++)
