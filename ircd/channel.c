@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.170 2004/02/08 04:02:51 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.171 2004/02/10 23:39:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -352,7 +352,7 @@ static	Link	*match_modeid(int type, aClient *cptr, aChannel *chptr)
 					continue;
 				}
 			}
-			if (match(tmp->value.alist->user, cptr->username) != 0)
+			if (match(tmp->value.alist->user, cptr->user->username) != 0)
 			{
 				/* no match on user part */
 				continue;
