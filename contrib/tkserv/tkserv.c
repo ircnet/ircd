@@ -568,20 +568,20 @@ int add_tkline(char *host, char *user, char *reason, int lifetime)
 
         now = time(NULL);
 
-#ifdef INET6
-        fprintf(iconf, "K%%%s%%%s%%%s%%0 # %d %u tkserv\n", host, reason, user, lifetime, now);
-#else
-        fprintf(iconf, "K:%s:%s:%s:0 # %d %u tkserv\n", host, reason, user, lifetime, now);
-#endif
+        fprintf(iconf, "K%c%s%c%s%c%s%c0%c # %d %u tkserv\n",
+		IRCDCONF_DELIMITER, host,
+		IRCDCONF_DELIMITER, reason,
+		IRCDCONF_DELIMITER, user,
+		IRCDCONF_DELIMITER, IRCDCONF_DELIMITER,
+		lifetime, now);
         fclose(iconf);
         rehash(1);
-#ifdef INET6
-        tks_log("K%%%s%%%s%%%s%%0 added for %d hour(s) by %s.",
-#else
-        tks_log("K:%s:%s:%s:0 added for %d hour(s) by %s.",
-#endif
-            host, reason, user, lifetime, nuh);
-
+        tks_log("K%c%s%c%s%c%s%c0%c added for %d hour(s) by %s.",
+		IRCDCONF_DELIMITER, host,
+		IRCDCONF_DELIMITER, reason,
+		IRCDCONF_DELIMITER, user,
+		IRCDCONF_DELIMITER, IRCDCONF_DELIMITER,
+		lifetime, nuh);
         return(1);
     }
     else
