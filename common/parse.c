@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.63 2004/05/19 14:39:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.64 2004/06/11 17:04:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -37,107 +37,107 @@ static  char rcsid[] = "@(#)$Id: parse.c,v 1.63 2004/05/19 14:39:49 chopin Exp $
 #undef PARSE_C
 
 struct Message msgtab[] = {
-  { MSG_PRIVATE, m_private,  MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_PRIVATE, m_private,  2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
 #ifndef CLIENT_COMPILE
-  { MSG_NJOIN,   m_njoin,    MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+  { MSG_NJOIN,   m_njoin,    2, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
 #endif
-  { MSG_JOIN,    m_join,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_MODE,    m_mode,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_JOIN,    m_join,     1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_MODE,    m_mode,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
 #ifndef CLIENT_COMPILE
-  { MSG_UNICK,   m_unick,    MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+  { MSG_UNICK,   m_unick,    7, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
 #endif
-  { MSG_NICK,    m_nick,     MAXPARA, MSG_LAG, 0, 0, 0L},
-  { MSG_PART,    m_part,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_QUIT,    m_quit,     MAXPARA, MSG_LAG, 0, 0, 0L},
-  { MSG_NOTICE,  m_notice,   MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_KICK,    m_kick,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_SERVER,  m_server,   MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+  { MSG_NICK,    m_nick,     1, MAXPARA, MSG_LAG, 0, 0, 0L},
+  { MSG_PART,    m_part,     1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_QUIT,    m_quit,     0, MAXPARA, MSG_LAG, 0, 0, 0L},
+  { MSG_NOTICE,  m_notice,   2, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_KICK,    m_kick,     2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_SERVER,  m_server,   2, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
 #ifndef CLIENT_COMPILE
-  { MSG_SMASK,   m_smask,    MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-  { MSG_TRACE,   m_trace,    MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_SMASK,   m_smask,    3, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+  { MSG_TRACE,   m_trace,    0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
 #endif
-  { MSG_TOPIC,   m_topic,    MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_INVITE,  m_invite,   MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_WALLOPS, m_wallops,  MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-  { MSG_PING,    m_ping,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_PONG,    m_pong,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_ERROR,   m_error,    MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+  { MSG_TOPIC,   m_topic,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_INVITE,  m_invite,   2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_WALLOPS, m_wallops,  1, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+  { MSG_PING,    m_ping,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_PONG,    m_pong,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_ERROR,   m_error,    1, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
 #ifdef	OPER_KILL
-  { MSG_KILL,    m_kill,     MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
+  { MSG_KILL,    m_kill,     1, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
 #else
-  { MSG_KILL,    m_kill,     MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+  { MSG_KILL,    m_kill,     2, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
 #endif
 #ifndef CLIENT_COMPILE
-  { MSG_SAVE,    m_save,     MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-  { MSG_USER,    m_user,     MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-  { MSG_AWAY,    m_away,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_UMODE,   m_umode,    MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_ISON,    m_ison,     1,	 MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_SQUIT,   m_squit,    MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
-  { MSG_WHOIS,   m_whois,    MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_WHO,     m_who,      MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_WHOWAS,  m_whowas,   MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_LIST,    m_list,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_NAMES,   m_names,    MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_USERHOST,m_userhost, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_PASS,    m_pass,     MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-  { MSG_LUSERS,  m_lusers,   MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_TIME,    m_time,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_OPER,    m_oper,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_CONNECT, m_connect,  MAXPARA,
+  { MSG_SAVE,    m_save,     1, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+  { MSG_USER,    m_user,     4, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+  { MSG_AWAY,    m_away,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_UMODE,   m_umode,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_ISON,    m_ison,     1, 1,	 MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_SQUIT,   m_squit,    0, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
+  { MSG_WHOIS,   m_whois,    1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_WHO,     m_who,      1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_WHOWAS,  m_whowas,   1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_LIST,    m_list,     0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_NAMES,   m_names,    0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_USERHOST,m_userhost, 1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_PASS,    m_pass,     1, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+  { MSG_LUSERS,  m_lusers,   0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_TIME,    m_time,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_OPER,    m_oper,     2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_CONNECT, m_connect,  1, MAXPARA,
 				MSG_LAG|MSG_REGU|MSG_OP|MSG_LOP, 0, 0, 0L},
-  { MSG_VERSION, m_version,  MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_STATS,   m_stats,    MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_LINKS,   m_links,    MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_ADMIN,   m_admin,    MAXPARA, MSG_LAG, 0, 0, 0L},
-  { MSG_USERS,   m_users,    MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_SUMMON,  m_summon,   MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_HELP,    m_help,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_INFO,    m_info,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_MOTD,    m_motd,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_CLOSE,   m_close,    MAXPARA, MSG_LAG|MSG_REGU|MSG_OP, 0, 0, 0L},
-  { MSG_SERVICE, m_service,  MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-  { MSG_EOB,     m_eob,      MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
-  { MSG_EOBACK,  m_eoback,   MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
-  { MSG_ENCAP,   m_encap,    MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
-  { MSG_SDIE,    m_sdie,     MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
+  { MSG_VERSION, m_version,  0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_STATS,   m_stats,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_LINKS,   m_links,    0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_ADMIN,   m_admin,    0, MAXPARA, MSG_LAG, 0, 0, 0L},
+  { MSG_USERS,   m_users,    0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_SUMMON,  m_summon,   0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_HELP,    m_help,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_INFO,    m_info,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_MOTD,    m_motd,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_CLOSE,   m_close,    0, MAXPARA, MSG_LAG|MSG_REGU|MSG_OP, 0, 0, 0L},
+  { MSG_SERVICE, m_service,  4, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+  { MSG_EOB,     m_eob,      0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
+  { MSG_EOBACK,  m_eoback,   0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
+  { MSG_ENCAP,   m_encap,    1, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
+  { MSG_SDIE,    m_sdie,     0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
 #ifdef	USE_SERVICES
-  { MSG_SERVSET, m_servset,  MAXPARA, MSG_LAG|MSG_SVC, 0, 0, 0L},
+  { MSG_SERVSET, m_servset,  1, MAXPARA, MSG_LAG|MSG_SVC, 0, 0, 0L},
 #endif
-  { MSG_SQUERY,  m_squery,   MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_SERVLIST,m_servlist, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_HASH,    m_hash,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_DNS,     m_dns,      MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0, 0, 0L},
+  { MSG_SQUERY,  m_squery,   2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+  { MSG_SERVLIST,m_servlist, 0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+  { MSG_HASH,    m_hash,     1, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0, 0, 0L},
+  { MSG_DNS,     m_dns,      0, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0, 0, 0L},
 #ifdef	OPER_REHASH
-  { MSG_REHASH,  m_rehash,   MAXPARA, MSG_REGU|MSG_OP
+  { MSG_REHASH,  m_rehash,   0, MAXPARA, MSG_REGU|MSG_OP
 # ifdef	LOCOP_REHASH
 					 |MSG_LOP
 # endif
 					, 0, 0, 0L},
 #endif
 #ifdef	OPER_RESTART
-  { MSG_RESTART,  m_restart,   MAXPARA, MSG_REGU|MSG_OP
+  { MSG_RESTART,  m_restart,   0, MAXPARA, MSG_REGU|MSG_OP
 # ifdef	LOCOP_RESTART
 					 |MSG_LOP
 # endif
 					, 0, 0, 0L},
 #endif
 #ifdef	OPER_DIE
-  { MSG_DIE,  m_die,   MAXPARA, MSG_REGU|MSG_OP
+  { MSG_DIE,  m_die,   0, MAXPARA, MSG_REGU|MSG_OP
 # ifdef	LOCOP_DIE
 					 |MSG_LOP
 # endif
 					, 0, 0, 0L},
 #endif
 #ifdef OPER_SET
-  { MSG_SET,  m_set,   MAXPARA, MSG_REGU|MSG_OP
+  { MSG_SET,  m_set,   0, MAXPARA, MSG_REGU|MSG_OP
 #ifdef LOCOP_SET
 					| MSG_LOP
 #endif
 					, 0, 0, 0L},
 #endif /* OPER_SET */
-  { MSG_MAP,  m_map,   MAXPARA, MSG_LAG | MSG_REG, 0, 0, 0L},
-  { MSG_POST,    m_post,     MAXPARA, MSG_NOU, 0, 0, 0L},
+  { MSG_MAP,  m_map,   0, MAXPARA, MSG_LAG | MSG_REG, 0, 0, 0L},
+  { MSG_POST,    m_post,     0, MAXPARA, MSG_NOU, 0, 0, 0L},
 #endif /* !CLIENT_COMPILE */
   { NULL, NULL, 0, 0, 0, 0, 0L}
 };
@@ -883,6 +883,14 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 			sendto_one(from, replies[ERR_NOPRIVILEGES], ME, BadTo(para[0]));
 			return -1;
 		    }
+	if (i <= mptr->minparams || (i > 0 && para[i-1][0] == '\0'))
+	{
+		sendto_one(from, replies[ERR_NEEDMOREPARAMS], 
+			ME, BadTo(para[0]), mptr->cmd);
+		ret = 1;
+	}
+	else
+	{
 #endif
 	/*
 	** ALL m_functions return now UNIFORMLY:
@@ -895,6 +903,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	ret = (*mptr->func)(cptr, from, i, para);
 
 #ifndef       CLIENT_COMPILE
+	}
 	/*
         ** Add penalty score for sucessfully parsed command if issued by
 	** a LOCAL user client.
