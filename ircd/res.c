@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.40 2004/10/01 20:22:14 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.41 2004/10/29 13:45:48 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -795,8 +795,13 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 				return -1;
 			    }
 			Debug((DEBUG_INFO,"got cname %s",hostbuf));
+#if 0
+			/* This is overcautious (we do not use CNAME in any
+			   other way than follow it to get the PTR) and breaks
+			   RFC2317 (we do not allow '/' in PTRs). */
 			if (bad_hostname(hostbuf, len))
 				return -1; /* a break would be enough here */
+#endif
 			if (alias >= &(hp->h_aliases[MAXALIASES-1]))
 				break;
 			/* if we already have this alias as hostname,
