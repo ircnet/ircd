@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.214 2004/06/11 17:07:56 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.215 2004/06/13 12:32:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1480,6 +1480,12 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				      sendto_channel_butone(NULL, &me, chptr, ":%s NOTICE %s :Be aware that anonymity on IRC is NOT securely enforced!", ME, chptr->chname);
 				  }
 			  }
+			/* +r coming from server must trigger reop. If not
+			** needed, it will be reset to 0 elsewhere, --B. */
+			if (*ip == MODE_REOP && IsServer(sptr))
+			{
+				chptr->reop = timeofday + LDELAYCHASETIMELIMIT;
+			}
 			*mbuf++ = *(ip+1);
 		    }
 
