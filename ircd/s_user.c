@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.220 2004/06/24 17:53:27 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.221 2004/06/26 12:57:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2576,7 +2576,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	user = parv[1];
 	path = parv[2];
 
-	if (strlen(path) > (size_t) TOPICLEN)
+	if (IsAnOper(cptr) && strlen(path) > (size_t) TOPICLEN)
 		path[TOPICLEN] = '\0';
 
 	/* first, _if coming from a server_ check for kill on UID */
