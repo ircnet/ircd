@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.185 2004/02/19 00:25:41 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.186 2004/02/19 00:48:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2745,6 +2745,7 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aChannel *chptr;
 	char	*p = NULL, *name, *comment = "";
+	int	size;
 
 	if (parc < 2 || parv[1][0] == '\0')
 	    {
@@ -2759,6 +2760,15 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (strlen(comment) > TOPICLEN)
 		comment[TOPICLEN] = '\0';
 
+	/*
+	** Broadcasted to other servers is ":nick PART #chan,#chans :comment",
+	** so we must make sure buf does not contain too many channels or later
+	** they get truncated! "10" comes from all fixed chars: ":", " PART "
+	** and ending "\r\n\0". We could subtract strlen(comment)+2 here too, 
+	** but it's not something we care, is it? :->
+	** Btw: if we ever change m_part to have UID as source, fix this! --B.
+	*/
+	size = BUFSIZE - strlen(parv[0]) - 10;
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	    {
 		convert_scandinavian(name, cptr);
@@ -2786,6 +2796,18 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    {	/* channel:*.mask */
 			if (*name != '&')
 			    {
+				/* We could've decreased size by 1 when
+				** calculating it, but I left it like that
+				** for the sake of clarity. --B. */
+				if (strlen(buf) + strlen(name) + 1
+					> size)
+				{
+					/* Anyway, if it would not fit in the
+					** buffer, send it right away. --B */
+					sendto_serv_butone(cptr, PartFmt,
+						parv[0], buf, comment);
+					*buf = '\0';
+				}
 				if (*buf)
 					(void)strcat(buf, ",");
 				(void)strcat(buf, name);
