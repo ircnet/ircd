@@ -1,15 +1,18 @@
-# @(#)$Id: RELEASE_NOTES,v 1.31 1999/03/05 02:19:07 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.32 1999/03/12 00:10:05 kalt Exp $
 
 This is a development version of the IRC software.
 
 ===============================================================================
+
+New features in 2.10.3:
+	* iauth now supports dynamically shared modules.
 
 Important changes in 2.10.3 (since 2.10.2):
 	* default PATHs have changed, see INSTALL file and Makefile.
 
 ===============================================================================
 
-This version of the software adds support for IPv6.
+Version 2.10.2 of the software adds support for IPv6.
 
 Important changes in 2.10.2 (since 2.10.1):
 	* iauth's socks module now uses an internal cache.

@@ -1,3 +1,62 @@
+1999-03-11  Christophe Kalt
+
+	* chkconf.c:
+		* finally shut off MyFree() redefinition warning.
+		* fixed undefined behaviour with ++ operator (effet de bord).
+
+	* a_io.c/init_io(): bzero bugfix (reported by Tomas Edwardsson).
+
+	* a_conf_def.h, a_conf.c:
+		* conf_err(): send conf errors to ircd as well.
+		* conf_match(): extended iauth.conf syntax for hostname
+		and IP matching.
+		* added conf_ipmask() to allow use of a.b.c.d/z format for IP.
+
+	* configure.in: use "cc -Ae" on HPUX (reported by Jens Riecken).
+
+	* ircd.c/main(): iauth's presence needs to be checked before
+	setting up the signal handlers.
+
+1999-03-09  Christophe Kalt
+
+	* a_struct_def.h, a_conf_ext.h, a_conf_def.h, a_conf.c, a_io.c,
+	mod_pipe.c, mod_rfc931.c, mod_socks.c: rewrote next_io() and
+	conf_match() to use new more flexible logic.
+
+	* os.h, a_conf.c, iauth.c, configure.in, Makefile.in, acconfig.h:
+	added DSM support.
+
+1999-03-08  Christophe Kalt
+
+	* struct_def.h, a_conf.c, a_conf_ext.h, iauth.c, ircd.c, s_auth.c,
+	s_auth_ext.h, s_bsd.c, s_user.c, s_user_exit.c: added
+	XOPT_{REQUIRED,NOTIMEOUT,EXTWAIT}, added iauth_spawn counter;
+	removed iauth_required variable.
+
+	* struct_def.h, s_auth.c, s_user.c: added FLAGS_DONEXAUTH to get
+	rid of the approximation from yesterday.
+
+	* s_bsd.c/read_message(): use CLR_READ_EVENT() before modifying fd.
+
+1999-03-07  Christophe Kalt
+
+	* res_comp.c: added missing prototypes.
+	
+	* struct_def.h, a_conf.c, a_conf_ext.h, iauth.c, s_auth_ext.h,
+	s_auth.c, s_user.c: added option to reject new user connections if
+	iauth is dead (approximate!).
+
+	* struct_def.h, ircd.c, res.c, s_auth.c, s_bsd.c: removed all
+	references to {Set,Clear,Do}Access macros (unused for a LONG time).
+
+	* ircd.c:
+		* check_pings(): fixed "immediate ping timeout" bug.
+		* main(): check for iauth's presence after changing [ug]id.
+
+	* s_bsd.c/do_dns_async(): notify iauth when no PTR record is found.
+
+	* Makefile.in: fix for M4 file path (Matthew Sullivan).
+
 1999-03-04  Christophe Kalt
 
 	* ircd.c/io_loop(), s_bsd.c/start_iauth(): keep trying to restart
