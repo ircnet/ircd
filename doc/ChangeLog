@@ -5,6 +5,8 @@
 	* s_user.c/m_nick(): silently cut longer nicks from clients (instead
 	  of rejecting).
 	* swap return values of is_allowed, 1 for ok, 0 for forbidden now.
+	* s_serv.c/m_server_estab(): moved sending PASS/SERVER after checking
+	  if server exists.
 
 2004-08-18  Piotr Kucharski
 
