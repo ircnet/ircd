@@ -1,3 +1,13 @@
+2004-10-04  Piotr Kucharski
+
+	* moved support/iauth.conf to doc/iauth.conf.example and
+	  renamed example.conf to ircd.conf.example
+	* Makefile.in: appropriate changes.
+	* struct_def.h: change Zdata->outbuf type to Bytef (as defined
+	  in zlib headers).
+	* s_zip.c: add some casts to get rid of warnings.
+	* a_conf.c: add "exit" keyword.
+
 2004-10-03  Piotr Kucharski
 
 	* get rid of more warnings.
