@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-27725/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-20106/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.53 2004/03/14 18:46:02 chopin Exp $
+     $Id: INSTALL.info,v 1.54 2004/03/15 18:31:28 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0.
 
@@ -127,11 +127,7 @@ File: INSTALL.info,  Node: Notes concerning IPv6 support,  Prev: Notes for Cygwi
 Notes concerning IPv6 support
 =============================
 
-The only part of the software that doesn't use IPv6 is the server
-internal resolver.  It relies on the name servers defined in
-"/etc/resolv.conf" to be IPv4 addresses.
-
-   This version was tested on the following IPv6 systems: BSD/OS+KAME,
+This version was tested on the following IPv6 systems: BSD/OS+KAME,
 Digital Unix, FreeBSD+KAME, Linux, NetBSD+INRIA.
 
    Because IPv6 numeric addresses contain ":" characters, `the default
@@ -1662,36 +1658,36 @@ Node: Installing IRC-652
 Node: The configure script877
 Node: Notes for Cygwin32 users3163
 Node: Notes concerning IPv6 support3896
-Node: The config-h file4499
-Node: DEBUGMODE5067
-Node: CHROOTDIR5644
-Node: ENABLE_SUMMON ENABLE_USERS6013
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6546
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7235
-Node: ZIP_LINKS ZIP_LEVEL7896
-Node: SLOW_ACCEPT8924
-Node: CLONE_CHECK9554
-Node: Other #define's9917
-Node: Editing the Makefile and compiling10239
-Node: The ircd-conf file11224
-Node: Machine information13073
-Node: Administrative info15688
-Node: Port connections17839
-Node: Connection Classes19670
-Node: Client connections24797
-Node: Operator priviliges30531
-Node: Excluded accounts32704
-Node: Server connections36616
-Node: Deny auto-connections45244
-Node: Hub connections46618
-Node: Leaf connections48106
-Node: Version limitations50190
-Node: Excluded machines51948
-Node: Service connections53253
-Node: Bounce server54847
-Node: Related resources56487
-Node: Reporting a bug57526
-Node: How to report a bug57783
-Node: Where to send a bug report58794
+Node: The config-h file4327
+Node: DEBUGMODE4895
+Node: CHROOTDIR5472
+Node: ENABLE_SUMMON ENABLE_USERS5841
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6374
+Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7063
+Node: ZIP_LINKS ZIP_LEVEL7724
+Node: SLOW_ACCEPT8752
+Node: CLONE_CHECK9382
+Node: Other #define's9745
+Node: Editing the Makefile and compiling10067
+Node: The ircd-conf file11052
+Node: Machine information12901
+Node: Administrative info15516
+Node: Port connections17667
+Node: Connection Classes19498
+Node: Client connections24625
+Node: Operator priviliges30359
+Node: Excluded accounts32532
+Node: Server connections36444
+Node: Deny auto-connections45072
+Node: Hub connections46446
+Node: Leaf connections47934
+Node: Version limitations50018
+Node: Excluded machines51776
+Node: Service connections53081
+Node: Bounce server54675
+Node: Related resources56315
+Node: Reporting a bug57354
+Node: How to report a bug57611
+Node: Where to send a bug report58622
 
 End Tag Table
