@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.139 2004/04/07 17:02:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.140 2004/04/14 18:34:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1244,7 +1244,7 @@ void	close_connection(aClient *cptr)
 		 * If nextconnect is still 0, reset it, nevertheless
 		 * I see no way for this to happen. :-) --B.
 		 */
-		nextconnect = timeofday;
+		nextconnect = timeofday + HANGONRETRYDELAY;
 	}
 
 	if (cptr->authfd >= 0)
