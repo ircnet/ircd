@@ -1,3 +1,10 @@
+2.11.0p1
+
+2004-11-03  Piotr Kucharski
+
+	* hash.c/bigger_hash_table(): fix serverTable grow bug.
+	* channel.c/send_mode_list(), send_channel_modes(): use sid, not ME,
+	  where appropriate.
 2.11.0
 
 2004-11-02  Piotr Kucharski
