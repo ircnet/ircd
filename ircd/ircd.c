@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.16 1998/04/03 17:12:19 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.17 1998/04/07 21:01:43 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -813,8 +813,11 @@ char	*argv[];
 time_t	io_loop(delay)
 time_t	delay;
 {
+#ifdef PREFER_SERVER
+	static	time_t	nextc = 0;
+#endif
 #ifdef HUB
-	static	time_t	nextc = 0, nextactive = 0, lastl = 0;
+	static	time_t	nextactive = 0, lastl = 0;
 #endif
 
 	/*
