@@ -67,8 +67,6 @@
  *       the maintainer.
  */
 
-#undef	DEBUGMODE		/* define DEBUGMODE to enable debugging mode.*/
-
 /*
  * If you have curses, and wish to use it, then define HAVECURSES. This is the
  * default mode. If you do not have termcap, then undefine HAVETERMCAP. This is
@@ -456,7 +454,10 @@
 #define	PORTNUM	6667
 
 /* Maximum length the queue of pending connections to one port may grow to. */ 
-#define LISTENQUEUE 5
+#define LISTENQUEUE 128
+
+/* define DEBUGMODE to enable debugging mode.*/
+#undef	DEBUGMODE
 
 /*
  * Time interval to wait and if no messages have been received, then check for
