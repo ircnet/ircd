@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: a_conf.c,v 1.35 2004/10/01 20:22:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: a_conf.c,v 1.36 2004/10/04 20:27:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -215,6 +215,10 @@ char	*conf_read(char *cfile)
 				continue;
 			    }
 #endif
+			if (!strncmp("exit", buffer, 4))
+			{
+				break;
+			}
 			if (buffer[0] == '\t')
 			    {
 				conf_err(lnnb, "Ignoring unexpected property.",
