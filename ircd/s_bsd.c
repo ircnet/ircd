@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.23 1998/03/22 19:01:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.24 1998/03/26 13:59:24 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -75,21 +75,19 @@ static	char	readbuf[READBUF_SIZE];
  * Try and find the correct name to use with getrlimit() for setting the max.
  * number of files allowed to be open by this process.
  */
-#if ! USE_POLL
-# ifdef RLIMIT_FDMAX
-#  define RLIMIT_FD_MAX   RLIMIT_FDMAX
+#ifdef RLIMIT_FDMAX
+# define RLIMIT_FD_MAX   RLIMIT_FDMAX
+#else
+# ifdef RLIMIT_NOFILE
+#  define RLIMIT_FD_MAX RLIMIT_NOFILE
 # else
-#  ifdef RLIMIT_NOFILE
-#   define RLIMIT_FD_MAX RLIMIT_NOFILE
+#  ifdef RLIMIT_OPEN_MAX
+#   define RLIMIT_FD_MAX RLIMIT_OPEN_MAX
 #  else
-#   ifdef RLIMIT_OPEN_MAX
-#    define RLIMIT_FD_MAX RLIMIT_OPEN_MAX
-#   else
-#    undef RLIMIT_FD_MAX
-#   endif
+#   undef RLIMIT_FD_MAX
 #  endif
 # endif
-#endif /* USE_POLL */
+#endif
 
 /*
 ** add_local_domain()
@@ -422,29 +420,31 @@ void	close_listeners()
 void	init_sys()
 {
 	Reg	int	fd;
-#if ! USE_POLL
-# ifdef RLIMIT_FD_MAX
+
+#ifdef RLIMIT_FD_MAX
 	struct rlimit limit;
 
 	if (!getrlimit(RLIMIT_FD_MAX, &limit))
 	    {
 		if (limit.rlim_max < MAXCONNECTIONS)
 		    {
-			(void)fprintf(stderr,"ircd fd table too big\n");
-			(void)fprintf(stderr,"Hard Limit: %d IRC max: %d\n",
-				(int) limit.rlim_max, MAXCONNECTIONS);
-			(void)fprintf(stderr,"Fix MAXCONNECTIONS\n");
+			(void)fprintf(stderr, "ircd fd table is too big\n");
+			(void)fprintf(stderr, "Hard Limit: %d IRC max: %d\n",
+				      (int) limit.rlim_max, MAXCONNECTIONS);
+			(void)fprintf(stderr,
+				      "Recompile and fix MAXCONNECTIONS\n");
 			exit(-1);
 		    }
 		limit.rlim_cur = limit.rlim_max; /* make soft limit the max */
 		if (setrlimit(RLIMIT_FD_MAX, &limit) == -1)
 		    {
-			(void)fprintf(stderr,"error setting max fd's to %d\n",
-					(int) limit.rlim_cur);
+			(void)fprintf(stderr, "error setting max fd's to %d\n",
+				      (int) limit.rlim_cur);
 			exit(-1);
 		    }
 	    }
-# endif
+#endif
+#if ! USE_POLL
 # ifdef sequent
 #  ifndef	DYNIXPTX
 	int	fd_limit;
