@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.10 1998/12/12 23:48:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.11 1999/01/17 00:36:40 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -602,9 +602,6 @@ aClient *cptr;
 
 /*
  * hash_find_channel
- *
- * If the name doesn't begin with #, or & or !, then we're looking for
- * !?????name instead of a real match.
  */
 aChannel	*hash_find_channel(name, chptr)
 char	*name;
@@ -612,20 +609,13 @@ aChannel *chptr;
 {
 	Reg	aChannel	*tmp, *prv = NULL;
 	Reg	aHashEntry	*tmp3;
-	u_int	hashv, hv, exact;
+	u_int	hashv, hv;
 
 	hashv = hash_channel_name(name, &hv);
 	tmp3 = &channelTable[hashv];
 
-	if (IsChannelName(name))
-		exact = 1;
-	else
-		exact = 0;
 	for (tmp = (aChannel *)tmp3->list; tmp; prv = tmp, tmp = tmp->hnextch)
-		if (hv == tmp->hashv &&
-		    ((exact == 1 && mycmp(name, tmp->chname) == 0) ||
-		     (exact == 0 && *tmp->chname == '!' &&
-		      mycmp(name, tmp->chname + CHIDLEN + 1) == 0)))
+		if (hv == tmp->hashv && mycmp(name, tmp->chname) == 0)
 		    {
 			chhits++;
 			if (prv)
@@ -641,6 +631,41 @@ aChannel *chptr;
 		    }
 	chmiss++;
 	return chptr;
+}
+
+/*
+ * hash_find_channels
+ *
+ * look up matches for !?????name instead of a real match.
+ */
+aChannel	*hash_find_channels(name)
+char	*name;
+{
+	Reg	aChannel	*tmp, *prv = NULL;
+	Reg	aHashEntry	*tmp3;
+	u_int	hashv, hv;
+
+	hashv = hash_channel_name(name, &hv);
+	tmp3 = &channelTable[hashv];
+
+	for (tmp = (aChannel *)tmp3->list; tmp; prv = tmp, tmp = tmp->hnextch)
+		if (hv == tmp->hashv && *tmp->chname == '!' &&
+		    mycmp(name, tmp->chname + CHIDLEN + 1) == 0)
+		    {
+			chhits++;
+			if (prv)
+			    {
+				register aChannel *tmp2;
+
+				tmp2 = (aChannel *)tmp3->list;
+				tmp3->list = (void *)tmp;
+				prv->hnextch = tmp->hnextch;
+				tmp->hnextch = tmp2;
+			    }
+			return (tmp);
+		    }
+	chmiss++;
+	return NULL;
 }
 
 /*
