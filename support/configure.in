@@ -371,15 +371,21 @@ if test x$irc_cv_alpha_beta = xyes; then
 This is a development version of the package,
 it is not intended to be used in a production environment.
 ])
-  if test ! "$ac_test_CFLAGS" = set; then
-    if test x$ac_cv_prog_cc_g = xyes -o x$GCC = x; then
-      CFLAGS="$CFLAGS -g"
-    fi
-  fi
+#  if test ! "$ac_test_CFLAGS" = set; then
+#    if test x$ac_cv_prog_cc_g = xyes -o x$GCC = x; then
+#      CFLAGS="$CFLAGS -g"
+#    fi
+#  fi
 else
   AC_MSG_RESULT(no)
-  if test ! "${LDFLAGS+set}" = set; then
-    LDFLAGS="-s"
+#  if test ! "${LDFLAGS+set}" = set; then
+#    LDFLAGS="-s"
+#  fi
+fi
+
+if test ! "$ac_test_CFLAGS" = set; then
+  if test x$ac_cv_prog_cc_g = xyes -o x$GCC = x; then
+    CFLAGS="$CFLAGS -g"
   fi
 fi
 ])
@@ -1317,7 +1323,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.25 1998/09/24 17:34:48 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.26 1998/10/08 12:20:04 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)

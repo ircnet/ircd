@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Id: configure.in,v 1.24 1998/09/20 19:36:16 kalt Exp 
+# From configure.in Id: configure.in,v 1.25 1998/09/24 17:34:48 kalt Exp 
 
 # Guess values for system-dependent variables and create Makefiles.
 # Generated automatically using autoconf version 2.12 
@@ -3824,15 +3824,21 @@ if test x$irc_cv_alpha_beta = xyes; then
 This is a development version of the package,
 it is not intended to be used in a production environment.
 " 1>&2
-  if test ! "$ac_test_CFLAGS" = set; then
-    if test x$ac_cv_prog_cc_g = xyes -o x$GCC = x; then
-      CFLAGS="$CFLAGS -g"
-    fi
-  fi
+#  if test ! "$ac_test_CFLAGS" = set; then
+#    if test x$ac_cv_prog_cc_g = xyes -o x$GCC = x; then
+#      CFLAGS="$CFLAGS -g"
+#    fi
+#  fi
 else
   echo "$ac_t""no" 1>&6
-  if test ! "${LDFLAGS+set}" = set; then
-    LDFLAGS="-s"
+#  if test ! "${LDFLAGS+set}" = set; then
+#    LDFLAGS="-s"
+#  fi
+fi
+
+if test ! "$ac_test_CFLAGS" = set; then
+  if test x$ac_cv_prog_cc_g = xyes -o x$GCC = x; then
+    CFLAGS="$CFLAGS -g"
   fi
 fi
 
