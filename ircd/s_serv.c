@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.223 2004/07/10 16:36:24 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.224 2004/07/11 18:39:52 jv Exp $";
 #endif
 
 #include "os.h"
@@ -3760,12 +3760,8 @@ static void report_listeners(aClient *sptr, char *to)
 	aClient	*acptr;
 	int	i;
 
-	for (i = 0; i <= highest_fd; i++)
+	for (acptr = ListenerLL; acptr; acptr = acptr->next)
 	{
-		if (!(acptr = local[i]))
-			continue;
-		if (!IsListener(acptr))
-			continue;
 		tmp = acptr->confs->value.aconf;
 		sendto_one(sptr, ":%s %d %s %d %s %s %u %lu %llu %lu %llu %u"
 				 " %u %s",
@@ -3777,6 +3773,7 @@ static void report_listeners(aClient *sptr, char *to)
 			acptr->receiveM, acptr->receiveB,
 			timeofday - acptr->firsttime,
 			acptr->confs->value.aconf->clients,
+			IsIllegal(acptr->confs->value.aconf) ? "dead" :
 			IsListenerInactive(acptr) ? "inactive" : "active" );
 	}
 }
