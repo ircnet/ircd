@@ -26,12 +26,13 @@
 #define	ALOG_FLOG	0x01	/* file log */
 #define	ALOG_IRCD	0x02	/* notice sent to ircd (then sent to &AUTH) */
 
-#define	ALOG_DMISC	0x0100	/* debug: misc stuff */
-#define	ALOG_DIO	0x0200	/* debug: IO stuff */
-#define	ALOG_DSPY	0x0400	/* debug: show ircd stream */
-#define	ALOG_DCONF	0x0800	/* debug: configuration file */
+#define	ALOG_DCONF	0x00100	/* debug: configuration file */
+#define	ALOG_DMISC	0x00200	/* debug: misc stuff */
+#define	ALOG_DIO	0x00400	/* debug: IO stuff */
+#define	ALOG_DSPY	0x01000	/* debug: show ircd stream */
+#define	ALOG_DIRCD	0x02000	/* debug: errors reported by ircd */
 
-#define	ALOG_D931	0x1000	/* debug: module rfc931 */
-#define	ALOG_DSOCKS	0x2000	/* debug: module socks */
+#define	ALOG_D931	0x10000	/* debug: module rfc931 */
+#define	ALOG_DSOCKS	0x20000	/* debug: module socks */
 
-#define	ALOG_DALL	0x3F00	/* any debug flag */
+#define	ALOG_DALL	0x33700	/* any debug flag */

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.4 1998/08/05 03:16:27 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.5 1998/08/05 22:15:50 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -238,6 +238,7 @@ parse_ircd()
 		case 'O': /* old connection: do nothing, just update data */
 			if (cldata[cl].state & A_ACTIVE)
 			    {
+				/* this is not supposed to happen!!! */
                                 sendto_log(ALOG_IRCD, LOG_CRIT,
 			   "Entry %d [%c] is already active (fatal)!",
 					   chp[0], cl);
@@ -249,12 +250,6 @@ parse_ircd()
 				sendto_log(ALOG_IRCD, LOG_CRIT,
 				   "Entry %d [%c] is already active! (fatal)",
 					   chp[0], cl);
-				/*
-				** Ok, I don't think this is actually fatal,
-				** cleaning up already active entry and going
-				** on should work; but this should really never
-				** happen, so let's forbid it. -kalt
-				*/
 				exit(1);
 			    }
 			if (cldata[cl].authuser)
@@ -292,11 +287,14 @@ parse_ircd()
 			break;
 		case 'D': /* client disconnect */
 			if (!(cldata[cl].state & A_ACTIVE))
-			    {
-                                sendto_log(ALOG_IRCD, LOG_CRIT,
-				   "Entry %d [D] is not active! (fatal)", cl);
-				exit(1);
-			    }
+				/*
+				** this is not fatal, it happens with servers
+				** we connected to (and more?).
+				** It's better/safer to ignore here rather
+				** than try to filter in ircd. -kalt
+				*/
+                                sendto_log(ALOG_IRCD, LOG_WARNING,
+				   "Warning: Entry %d [D] is not active.", cl);
 			cldata[cl].state = 0;
 			if (cldata[cl].rfd > 0 || cldata[cl].wfd > 0)
 				cldata[cl].instance->mod->clean(cl);
@@ -309,6 +307,7 @@ parse_ircd()
 		case 'R': /* fd remap */
 			if (!(cldata[cl].state & A_ACTIVE))
 			    {
+				/* this should really not happen */
                                 sendto_log(ALOG_IRCD, LOG_CRIT,
 					   "Entry %d [R] is not active!", cl);
 				break;
@@ -316,6 +315,7 @@ parse_ircd()
 			ncl = atoi(chp+2);
 			if (cldata[ncl].state & A_ACTIVE)
 			    {
+				/* this is not supposed to happen!!! */
                                 sendto_log(ALOG_IRCD, LOG_CRIT,
 			   "Entry %d [R] is already active (fatal)!", ncl);
 				exit(1);
@@ -326,12 +326,6 @@ parse_ircd()
 				sendto_log(ALOG_IRCD, LOG_CRIT,
 				   "Entry %d is already active! (fatal)",
 					   ncl);
-				/*
-				** Ok, I don't think this is actually fatal,
-				** cleaning up already active entry and going
-				** on should work; but this should really never
-				** happen, so let's forbid it. -kalt
-				*/
 				exit(1);
 			    }
 			if (cldata[ncl].authuser)
@@ -352,9 +346,10 @@ parse_ircd()
 		case 'N': /* hostname */
 			if (!(cldata[cl].state & A_ACTIVE))
 			    {
-                                sendto_log(ALOG_IRCD, LOG_CRIT,
-				   "Entry %d [N] is not active! (fatal)", cl);
-				exit(1);
+				/* let's be conservative and just ignore */
+                                sendto_log(ALOG_IRCD, LOG_WARNING,
+				   "Warning: Entry %d [N] is not active.", cl);
+				break;
 			    }
 			strcpy(cldata[cl].host, chp+2);
 			cldata[cl].state |= A_GOTH|A_START;
@@ -364,18 +359,20 @@ parse_ircd()
 		case 'A': /* host alias */
 			if (!(cldata[cl].state & A_ACTIVE))
 			    {
-                                sendto_log(ALOG_IRCD, LOG_CRIT,
-				   "Entry %d [A] is not active! (fatal)", cl);
-				exit(1);
+				/* let's be conservative and just ignore */
+                                sendto_log(ALOG_IRCD, LOG_WARNING,
+				   "Warning: Entry %d [A] is not active.", cl);
+				break;
 			    }
 			/* hmmpf */
 			break;
 		case 'U': /* user provided username */
 			if (!(cldata[cl].state & A_ACTIVE))
 			    {
-                                sendto_log(ALOG_IRCD, LOG_CRIT,
-				   "Entry %d [U] is not active! (fatal)", cl);
-				exit(1);
+				/* let's be conservative and just ignore */
+                                sendto_log(ALOG_IRCD, LOG_WARNING,
+				   "Warning: Entry %d [U] is not active.", cl);
+				break;
 			    }
 			cldata[cl].state |= A_GOTU;
 			/* hmmpf */
@@ -386,15 +383,20 @@ parse_ircd()
 		case 'd': /* DNS timeout */
 			if (!(cldata[cl].state & A_ACTIVE))
 			    {
-                                sendto_log(ALOG_IRCD, LOG_CRIT,
-				   "Entry %d [d] is not active! (fatal)", cl);
-				exit(1);
+				/* let's be conservative and just ignore */
+                                sendto_log(ALOG_IRCD, LOG_WARNING,
+				   "Warning: Entry %d [d] is not active.", cl);
+				break;
 			    }
 			cldata[cl].state |= A_NOH;
 			break;
+		case 'E': /* error message from ircd */
+			sendto_log(ALOG_DIRCD, LOG_DEBUG,
+				   "Error from ircd: %s", chp);
+			break;
 		default:
 			sendto_log(ALOG_IRCD, LOG_ERR, "Unexpected data [%s]",
-				   buf);
+				   chp);
 			break;
 		    }
 
