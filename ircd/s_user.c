@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.87 1999/08/15 21:28:19 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.88 1999/08/31 20:31:44 q Exp $";
 #endif
 
 #include "os.h"
@@ -2121,7 +2121,7 @@ aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	aClient *acptr;
+	aClient *acptr = NULL;
 	char	*inpath = get_client_name(cptr,FALSE);
 	char	*user, *path, *killer;
 	int	chasing = 0;
