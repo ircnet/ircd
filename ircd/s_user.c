@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.85 1999/07/04 21:13:04 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.86 1999/07/17 11:47:49 q Exp $";
 #endif
 
 #include "os.h"
@@ -2065,11 +2065,9 @@ char	*parv[];
 	    {
 		if ((killer = index(path, ' ')))
 		    {
-			while (*killer && *killer != '!')
+			while (killer > path && *killer != '!')
 				killer--;
-			if (!*killer)
-				killer = path;
-			else
+			if (killer != path)
 				killer++;
 		    }
 		else

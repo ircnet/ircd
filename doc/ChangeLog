@@ -1,3 +1,7 @@
+1999-07-17  Kurt Roeckx
+
+        * s_user.c/m_kill(): killer could end up < path
+
 1999-07-14  Christophe Kalt
 
 	* configure.in, os.h: use ncurses.h (from KIKUCHI Takahiro).
