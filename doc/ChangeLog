@@ -1,4 +1,9 @@
-2003-02-19  Jakub Vlasek
+2003-02-10  Piotr Kucharski
+
+	* channel.c/match_modeid(): added support for CIDR.
+	* Makefile.in: added install-ircd target.
+
+2003-02-09  Jakub Vlasek
 	
 	* s_bsd.c/connect_inet(): Fixed compile error. (from Shigeru Okumura)
 
@@ -64,7 +69,7 @@
 	
 	* s_err.c: Changed text of ERR_TOOMANYMATCHES.
 	* channel.c/m_list(): Terminate LIST output when the client has less 
-	  than 10% of avaible sendQ free.
+	  than 10% of available sendQ free.
 	
 2002-10-13  Jakub Vlasek
 
@@ -89,7 +94,7 @@
 
 2002-09-13  Jakub Vlasek
 
-	* ircd.c, s_ircd.c: Make -t (don't fork) avaible even when not
+	* ircd.c, s_ircd.c: Make -t (don't fork) available even when not
 	  DEBUGMODE used.
 	* s_serv.c/report_configured_links(): Show * in I-line flag
 	  field if no flag defined.
