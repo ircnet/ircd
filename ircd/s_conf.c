@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.101 2004/03/20 21:16:06 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.102 2004/03/20 22:10:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1412,9 +1412,10 @@ int 	initconf(int opt)
 			if ((tmp = getfield(NULL)) == NULL)
 				break;
 			Class(aconf) = find_class(atoi(tmp));
-			/* the following are only used for Y: */
+			/* used in Y: local limits and I: and P: flags */
 			if ((tmp3 = getfield(NULL)) == NULL)
 				break;
+			/* used in Y: global limits */
 			tmp4 = getfield(NULL);
 			break;
 		    }
@@ -1458,41 +1459,53 @@ int 	initconf(int opt)
 				Class(aconf) = find_class(0);
 		    }
 		if (aconf->status & (CONF_LISTEN_PORT|CONF_CLIENT))
-		    {
+		{
 			aConfItem *bconf;
+
+			/* trying to find exact conf line in already existing
+			 * conf, so we don't delete old one, just update it */
 			if ((bconf = find_conf_entry(aconf, aconf->status)))
-			    {
+			{
+				/* we remove bconf (already existing) from conf
+				 * so that we can add it back uniformly at the
+				 * end of while(dgets) loop. --B. */
 				delist_conf(bconf);
 				bconf->status &= ~CONF_ILLEGAL;
-				if (aconf->status == CONF_CLIENT)
-				    {
+				/* aconf is a new item, it can contain +r flag
+				 * (from lowercase i:lines). In any case we
+				 * don't want old flags to remain. --B. */
+				bconf->flags = aconf->flags;
+				/* in case class was changed */
+				if (aconf->status == CONF_CLIENT &&
+					aconf->class != bconf->class)
+				{
 					bconf->class->links -= bconf->clients;
 					bconf->class = aconf->class;
 					bconf->class->links += bconf->clients;
-					bconf->flags = aconf->flags;
-				    }
+				}
+				/* free new one, assign old one to aconf */
 				free_conf(aconf);
 				aconf = bconf;
-			    }
-			else if (aconf->host &&
-				 aconf->status == CONF_LISTEN_PORT)
-				(void)add_listener(aconf);
-		    }
-		if ((aconf->status & CONF_CLIENT))
-		{
-			/* Parse I-line flags */
+			}
+			else	/* no such conf line was found */
+			{
+				if (aconf->host &&
+					aconf->status == CONF_LISTEN_PORT)
+				{
+					(void)add_listener(aconf);
+				}
+			}
+
+			/* any flags in this line? */
 			if (tmp3)
 			{
-				aconf->flags |= iline_flags_parse(tmp3);
+				aconf->flags |=
+					((aconf->status == CONF_CLIENT) ?
+					iline_flags_parse(tmp3) :
+					pline_flags_parse(tmp3));
 			}
 		}
-		
-		if ((aconf->status & CONF_LISTEN_PORT) && tmp3)
-		{
-			/* Parse P-line flags */
-			aconf->flags = pline_flags_parse(tmp3);
-		}
-		
+
 		if (aconf->status & CONF_SERVICE)
 			aconf->port &= SERVICE_MASK_ALL;
 		if (aconf->status & (CONF_SERVER_MASK|CONF_SERVICE))
