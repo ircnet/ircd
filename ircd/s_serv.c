@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.243 2004/10/06 14:36:41 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.244 2004/10/06 14:40:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2380,6 +2380,7 @@ int	m_help(aClient *cptr, aClient *sptr, int parc, char *parv[])
  */
 int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
+	int		all = 0;	/* showing counts of all clients */
 	int		s_count = 0,	/* server */
 			c_count = 0,	/* client (visible) */
 			u_count = 0,	/* unknown */
@@ -2404,6 +2405,7 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (parc == 1 || (parv[1][0] == '*' && parv[1][1] == '\0'))
 	{
+		all = 1;
 		s_count = istat.is_serv;
 		c_count = istat.is_user[0];
 		i_count = istat.is_user[1];
@@ -2493,7 +2495,8 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	
 	sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]), m_clients,
 		   m_services, m_servers);
-	(void) send_users(cptr, sptr, parc, parv);
+	if (all)
+		(void) send_users(cptr, sptr, parc, parv);
 	return 2;
 }
 
