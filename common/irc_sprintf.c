@@ -2,23 +2,12 @@
  *   IRC - Internet Relay Chat, common/irc_sprintf.c
  *   Copyright (C) 2002 Piotr Kucharski
  *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 1, or (at your option)
- *   any later version.
+ *   BSD licence applies. Yeah!
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: irc_sprintf.c,v 1.2 2002/07/30 23:13:22 chopin Exp $";
+char rcsid[] = "$Id: irc_sprintf.c,v 1.3 2002/08/23 16:31:32 chopin Exp $";
 #endif
 
 #define IRC_SPRINTF_C
@@ -26,19 +15,45 @@ static  char rcsid[] = "@(#)$Id: irc_sprintf.c,v 1.2 2002/07/30 23:13:22 chopin 
 #undef IRC_SPRINTF_C
 
 /*
- * Our sprintf, only basic support (%s and %d is 95% we use), plus
- * handles %y/%Y, which return (for an aClient pointer) ->name or
- * ->uid, depending on target
+ * Our sprintf. Currently supports:
+ * formats: %s, %d, %i, %u, %c, %%, %x, %X, %o
+ * flags: l, ll, '-', '+', space, 0 (zeropadding), 0-9 (width),
+ * '#' (for o,x,X only), '*' (width), '.' (precision)
+ * 
+ * Soon will handle: %y/%Y returning ->name or ->uid
+ * from an aClient pointer, depending on target.
  */
 
+#define	MAXDIGS	32
+#undef _NOLONGLONG
+
+#define	MEMSET(c, n){register int k = n; while (k--) *buf++ = c;}
+#define	MEMCPY(s, n){register int k = n; while (k--) *buf++ = *s++;}
+
+static char	dtmpbuf[MAXDIGS];	/* scratch buffer for numbers */
+
 int irc_sprintf(aClient *target, char *buf, char *format, ...)
-{
-	va_list ap;
-	int i;
+#include "b_sprintf_body.c"
 
-	va_start(ap, format);
-	i = vsprintf(buf, format, ap);
-	va_end(ap);
+#define IRC_SPRINTF_V 1
 
-	return i;
-}
+int irc_vsprintf(aClient *target, char *buf, char *format, va_list ap)
+#include "b_sprintf_body.c"
+
+#if 0
+error SN version is unsafe so far, sorry
+
+#define IRC_SPRINTF_SN 1
+
+int irc_vsnprintf(aClient *target, char *buf, size_t size, char *format, va_list ap)
+#include "b_sprintf_body.c"
+
+#undef IRC_SPRINTF_V
+
+int irc_snprintf(aClient *target, char *buf, size_t size, char *format, va_list ap)
+#include "b_sprintf_body.c"
+
+#undef IRC_SPRINTF_SN
+
+#endif /* 0 */
+
