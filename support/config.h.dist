@@ -22,7 +22,7 @@
  */
 
 /* how often (in seconds) should we check that ircd runs? */
-#define IRCDWATCH_POLLING_INTERVAL  30
+#define IRCDWATCH_POLLING_INTERVAL 30
 
 /* 
  * should we check for config file changes and HUP the server
@@ -82,7 +82,7 @@
  * mode "i" (i == invisible). Invisibility means people dont showup in
  * WHO or NAMES unless they are on the same channel as you.
  */
-#undef	NO_DEFAULT_INVISIBLE
+#define	NO_DEFAULT_INVISIBLE
 
 /*
  * Define this if you want to have TKLINE and UNTKLINE commands
@@ -98,6 +98,7 @@
 #define	OPER_CONNECT
 #define	OPER_DIE
 #define	OPER_KILL
+#define	LOCAL_KILL_ONLY
 #define	OPER_REHASH
 #define	OPER_RESTART
 #define	OPER_SET
@@ -170,11 +171,7 @@
  *
  * Advised not to use it ;-) --Beeth
  */
-#undef TIMEDKLINES
-
-/* 
- * R lines were removed. Use iauth module instead.
- */
+/* #define TIMEDKLINES 300 */
 
 /*
  * NOTE: defining CMDLINE_CONFIG and installing ircd SUID or SGID is a MAJOR
@@ -184,7 +181,8 @@
  *       starts up the server with a new conf file that has some extra
  *       O-lines. So don't use this unless you're debugging.
  */
-#undef	CMDLINE_CONFIG /* allow conf-file to be specified on command line */
+/* allow conf-file to be specified on command line */
+#undef	CMDLINE_CONFIG
 
 /*
  * To use m4 as a preprocessor on the ircd.conf file, define M4_PREPROC.
@@ -401,7 +399,6 @@
 */
 #define CLIENTS_CHANNEL_LEVEL (CCL_CONN|CCL_QUIT)
 
-
 /*
 ** This adds ability to ban users with specified realnames from
 ** connecting to the server. May be useful for various drones.
@@ -446,26 +443,87 @@
 # define IRCDCONF_DELIMITER ':'
 #endif
 
+/*
+ * Max number of channels a user is allowed to join.
+ */
+#define MAXCHANNELSPERUSER  21	/* Recommended value: 21 */
+
+/*
+ * USE_IAUTH makes ircd use the iauth program for authentication.
+ * it can always be overriden by using the -s switch
+ */
+#define USE_IAUTH
+
+/* Following notice is sent before and after /LIST output.
+ * If you do not want such behaviour, undefine.
+ */
+#define LIST_ALIS_NOTE "Usage of /list for listing all channels is " \
+		       "deprecated. Please use \"/squery alis help\" instead."
+
+/* Define this to see when a channel topic was set and who it was set by.
+** Warning: eats memory (around 5MB)
+*/
+#define TOPIC_WHO_TIME
+
+/*
+** Define this to show local clients signon time in whois
+*/
+#define WHOIS_SIGNON_TIME
+
+/*
+ * Split detection
+ * This defines thresholds for turning on and off the split-mode,
+ * where joins to new channels do not give chanop status.
+ * Note that this should always be bigger than the max counts of
+ * users/servers in your TLD (or some other close group).
+ * Defining to 0 disables entering split-mode.
+ */
+#define SPLIT_USERS	40000
+#define SPLIT_SERVERS	20
+
+/*
+** Notice sent to connecting users if the server is in the split-mode.
+*/
+#define SPLIT_CONNECT_NOTICE "Server is currently in split-mode."
+
+/*
+ * Undefining NO_OPER_REMOTE removes the restriction that O-lines only become
+ * fully effective for people on the 'same network' as the server.
+ * Defined, it slightly increases the security of the server by
+ * placing restrictions on where people can become operator from.
+ * Dubious consideration, IMO.
+ */
+#undef	NO_OPER_REMOTE
+
+/*
+** CLCHNO defines changes in local clients count, which are shown
+** as "Local in/de-crease"
+** I guess rule of thumb would be 5% of your average user count. --B.
+*/
+#define CLCHNO 100
+
+/*
+** CLCHSEC defines minimum time in seconds between two consecutive
+** "New highest local/global clients count" messages (prevents flood).
+*/
+#define CLCHSEC 300
 
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
-/*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
-/*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
-
 /* You shouldn't change anything below this line, unless absolutely needed. */
 
-#ifdef	OPER_KILL
-/* LOCAL_KILL_ONLY
- *
- * To be used, OPER_KILL must be defined.
- * LOCAL_KILL_ONLY restricts KILLs to clients which are connected to the
- * server the Operator is connected to (ie lets them deal with local
- * problem users or 'ghost' clients
- */
-#define	LOCAL_KILL_ONLY
-#endif
+/*
+** Accept only hostnames conforming to RFC1034/1035/1123.
+** Conformance of the internal resolver to RFC1123.
+*/
+#define	RESTRICT_HOSTNAMES
 
-/* Default server port, used by client. */
-#define	PORTNUM	6667
+/*
+** Allow only "proper" chars in username.
+** Disallow '^', '~', '+', '=', '-' as a first char.
+** Require at least one alphanum and no more than one nonalphanum.
+*/
+#define	RESTRICT_USERNAMES
+
 
 /* Maximum length the queue of pending connections to one port may grow to.
  * Note that your system limits this, too. FreeBSD, for instance, has sysctl
@@ -543,17 +601,6 @@
  */
 #define LDELAYCHASETIMELIMIT	5400	/* Recommended value: 5400 */
 
-/*
- * Max number of channels a user is allowed to join.
- */
-#define MAXCHANNELSPERUSER  21	/* Recommended value: 21 */
-
-/*
- * USE_IAUTH makes ircd use the iauth program for authentication.
- * it can always be overriden by using the -s switch
- */
-#define USE_IAUTH
-
 #ifdef ZIP_LINKS
 /*
  * the compression level used. (Suggested values: 3, 4, 5)
@@ -567,6 +614,8 @@
 /*
  * If CLONE_CHECK has been defined, these control how the checks are performed,
  * and how the alarm is triggered.
+ * This triggers alarm when more than 10 clients in 2 seconds from the same host
+ * try to connect to ircd.
  */
 # define	CLONE_MAX	10
 # define	CLONE_PERIOD	2
@@ -581,43 +630,11 @@
 /* #undef	NO_IDENT */
 /* #undef	NO_PREFIX */
 
-/* Following notice is sent before and after /LIST output.
- * If you do not want such behaviour, undefine.
- */
-#define LIST_ALIS_NOTE "Usage of /list for listing all channels is " \
-		       "deprecated. Please use \"/squery alis help\" instead."
-
-/* Define this to see when a channel topic was set and who it was set by.
-** Warning: eats memory (around 5MB)
-*/
-#define TOPIC_WHO_TIME 1
-
-/*
-** Define this to see local clients signon time
-*/
-#define WHOIS_SIGNON_TIME 1
-
-/*
-** Split detection
-*/
-#define SPLIT_USERS	15000
-#define SPLIT_SERVERS	15
-
-/*
-** Notice sent to connecting users if the server is in the split-mode.
-*/
-#define SPLIT_CONNECT_NOTICE "Server is currently in split-mode."
-
-/*
- * Undefining NO_OPER_REMOTE removes the restriction that O-lines only become
- * fully effective for people on the 'same network' as the server.
- * Defined, it increases the security of the server by
- * placing restrictions on where people can use operator powers from.
- * Dubious consideration, IMO.
- */
-#undef	NO_OPER_REMOTE
-
+/*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
+/*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
+/*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* ------------------------- END CONFIGURATION SECTION -------------------- */
+
 #ifndef ENABLE_SUMMON
 #  undef LEAST_IDLE
 #endif
@@ -648,7 +665,7 @@
 /* sanity check */
 #if defined(DELAY_CLOSE)
 #  if defined(SLOW_ACCEPT) || !defined(CLONE_CHECK)
-#    error redefine CLONE_CHECK and undefine SLOW_ACCEPT to use DELAY_CLOSE.
+#    error define CLONE_CHECK and undefine SLOW_ACCEPT to use DELAY_CLOSE.
 #  endif
 #  if (DELAY_CLOSE < 1)
 #    error DELAY_CLOSE needs redefining.
@@ -705,39 +722,6 @@
 # error TIMEDKLINES must be bigger than 60 seconds
 # endif
 #endif
-
-/*
-** Accept only hostnames conforming to RFC1034/1035/1123.
-** Conformance of the internal resolver to RFC1123.
-*/
-#define	RESTRICT_HOSTNAMES
-
-/*
-** Allow only "proper" chars in username.
-** Disallow '^', '~', '+', '=', '-' as a first char.
-** Require at least one alphanum and no more than one nonalphanum.
-*/
-#define	RESTRICT_USERNAMES
-
-/*
-** CLCHNO defines changes in local clients count, which are shown
-** as "Local in/de-crease"
-*/
-# if (MAXCONNECTIONS <= 200)
-  #define CLCHNO 10
-# else
-  # if (MAXCONNECTIONS <= 1000)
-     #define CLCHNO 50
-  # else
-     #define CLCHNO 100
-  # endif
-# endif
-
-/*
-** CLCHSEC defines minimum time in seconds between two consecutive
-** "New highest local/global clients count" messages
-*/
-#define CLCHSEC 300
 
 #ifndef SPLIT_USERS
 #error SPLIT_USERS must be defined
