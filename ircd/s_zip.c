@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_zip.c,v 1.6 1998/12/21 14:52:10 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_zip.c,v 1.7 1998/12/24 16:29:17 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -31,7 +31,7 @@ static  char rcsid[] = "@(#)$Id: s_zip.c,v 1.6 1998/12/21 14:52:10 kalt Exp $";
 
 /*
 ** Important note:
-**	The provided buffers for uncompression and compression *MUST* be big
+**	The provided buffers for compression *MUST* be big
 **	enough for any operation to complete.
 **
 **	s_bsd.c current settings are that the biggest packet size is 16k
@@ -45,19 +45,23 @@ static  char rcsid[] = "@(#)$Id: s_zip.c,v 1.6 1998/12/21 14:52:10 kalt Exp $";
 **	must be enough to hold compressed data resulting of the compression
 **	of up to ZIP_MAXIMUM bytes
 ** incoming data:
-**	must be enough to hold cptr->zip->inbuf + what was just read
+**	must be enough to hold what was just read
 **	(cptr->zip->inbuf should never hold more than ONE compression block.
 **	The biggest block allowed for compression is ZIP_MAXIMUM bytes)
 */
-#define	ZIP_BUFFER_SIZE		(ZIP_MAXIMUM + READBUF_SIZE)
+#define	ZIP_BUFFER_SIZE		(MAX(ZIP_MAXIMUM, READBUF_SIZE))
 
 /*
 ** size of the buffer where zlib puts compressed data
-**	must be enough to hold uncompressed data resulting of the
+**	should be enough to hold uncompressed data resulting of the
 **	uncompression of zipbuffer
 **
-**	I'm assuming that at best, ratio will be 25%. (tests show that
-**	best ratio is around 40%).
+**	tests show that an average ratio is around 40%,
+**	in some very particular cases, ratio can be VERY low, BUT:
+**
+**	s_bsd.c/read_packet() is now smart enough to detect when uncompression
+**	stopped because the buffer is too small, and calls dopacket() again
+**	to finish the work (as many times as needed).
 */
 #define	UNZIP_BUFFER_SIZE	4*ZIP_BUFFER_SIZE
 
@@ -74,10 +78,10 @@ int	zip_init(cptr)
 aClient	*cptr;
 {
 	cptr->zip  = (aZdata *) MyMalloc(sizeof(aZdata));
-	cptr->zip->incount = 0;
 	cptr->zip->outcount = 0;
 
 	cptr->zip->in  = (z_stream *) MyMalloc(sizeof(z_stream));
+	cptr->zip->in->avail_in = 0;
 	cptr->zip->in->total_in = 0;
 	cptr->zip->in->total_out = 0;
 	cptr->zip->in->zalloc = (alloc_func)0;
@@ -123,8 +127,7 @@ aClient	*cptr;
 
 /*
 ** unzip_packet
-** 	Unzip the content of cptr->zip->inbuf and of the buffer,
-**	put anything left in cptr->zip->inbuf, update cptr->zip->incount
+** 	Unzip the content of the buffer, don't worry about any leftover.
 **
 **	will return the uncompressed buffer, length will be updated.
 **	if a fatal error occurs, length will be set to -1
@@ -137,32 +140,26 @@ int	*length;
 	Reg	z_stream *zin = cptr->zip->in;
 	int	r;
 
-	if (cptr->zip->incount + *length > ZIP_BUFFER_SIZE) /* sanity check */
+	if (*length != 0 && zin->avail_in != 0)
 	    {
-	      sendto_flag(SCH_ERROR, "overflow in unzip_packet(): %d %d",
-			  cptr->zip->incount, *length);
-	      sendto_flag(SCH_ERROR, "Please report to ircd-bugs@irc.org");
-	      *length = -1;
-	      return NULL;
+		sendto_flag(SCH_ERROR,
+			    "assertion failed in unzip_packet(): %d %d",
+			    *length, zin->avail_in);
+		sendto_flag(SCH_ERROR, "Please report to ircd-bugs@irc.org");
+		*length = -1;
+		return NULL;
 	    }
-	/* put everything in zipbuf */
-	bcopy(cptr->zip->inbuf, zipbuf, cptr->zip->incount);
-	bcopy(buffer, zipbuf + cptr->zip->incount, *length);
-
-	zin->next_in = zipbuf;
-	zin->avail_in = cptr->zip->incount + *length;
+	if (*length)
+	    {
+		zin->next_in = buffer;
+		zin->avail_in = *length;
+	    }
 	zin->next_out = unzipbuf;
 	zin->avail_out = UNZIP_BUFFER_SIZE;
 	switch (r = inflate(zin, Z_PARTIAL_FLUSH))
 	  {
 	  case Z_OK:
 		cptr->flags &= ~FLAGS_ZIPRQ;
-		if (zin->avail_in)
-		    {
-			/* put the leftover in cptr->zip->inbuf */
-			bcopy(zin->next_in, cptr->zip->inbuf, zin->avail_in);
-			cptr->zip->incount = zin->avail_in;
-		    }
 		*length = UNZIP_BUFFER_SIZE - zin->avail_out;
 		return unzipbuf;
 

@@ -324,9 +324,7 @@ typedef	struct	{
 struct Zdata {
 	z_stream	*in;		/* input zip stream data */
 	z_stream	*out;		/* output zip stream data */
-	char		inbuf[ZIP_MAXIMUM]; /* incoming zipped buffer */
 	char		outbuf[ZIP_MAXIMUM]; /* outgoing (unzipped) buffer */
-	int		incount;	/* size of inbuf content */
 	int		outcount;	/* size of outbuf content */
 };
 #endif
