@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.102 2001/12/30 05:43:13 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.103 2001/12/30 06:15:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1159,62 +1159,29 @@ char	*parv[];
 	 */
 	do_nick_name(nick, 1);
 	if (strcmp(nick, parv[1]))
-	    {
+	{
 		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, BadTo(parv[0]),
-			   parv[1]);
+			parv[1]);
 		
 		ircstp->is_kill++;
 		sendto_flag(SCH_KILL, "Bad UNick: %s From: %s %s", parv[1],
-			    parv[0], get_client_name(cptr, FALSE));
+			parv[0], get_client_name(cptr, FALSE));
 		sendto_one(cptr, ":%s KILL %s :%s (%s <- %s[%s])", ME, uid, ME,
-			   parv[1], nick, cptr->name);
-		return 2;
-	    }
-
-	if (!check_uid(uid))
-	{
-		/* Any better numeric? */
-		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, 
-			BadTo(parv[0]), parv[1]);
-		ircstp->is_kill++;
-		sendto_flag(SCH_KILL, "Bad UID: %s From: %s %s", uid,
-			    parv[0], get_client_name(cptr, FALSE));
-		sendto_one(cptr, ":%s KILL %s :%s (%s <- %s[%s])", ME, uid, ME,
-			   parv[1], nick, cptr->name);
+			parv[1], nick, cptr->name);
 		return 2;
 	}
 
 	/*
-	** Check against nick name collisions.
-	**
-	** Put this 'if' here so that the nesting goes nicely on the screen :)
-	** We check against server name list before determining if the nickname
-	** is present in the nicklist (due to the way the below for loop is
-	** constructed). -avalon
+	** Check validity of UID.
 	*/
-	acptr = find_server(nick, NULL);
-	if (acptr)
-	    {
-		/*
-		** We have a nickname trying to use the same name as
-		** a server. Send out a nick collision KILL to remove
-		** the nickname. As long as only a KILL is sent out,
-		** there is no danger of the server being disconnected.
-		** Ultimate way to jupiter a nick ? >;-). -avalon
-		*/
-		sendto_flag(SCH_KILL,
-			    "Nick collision on %s (%s@%s)%s <- (%s@%s)%s",
-			    sptr->name,
-			    (acptr->user) ? acptr->user->username : "???",
-			    (acptr->user) ? acptr->user->host : "???",
-			    acptr->from->name, user, host,
-			    get_client_name(cptr, FALSE));
-		ircstp->is_kill++;
-		sendto_one(cptr, ":%s KILL %s :%s (%s <- %s)",
-			   ME, sptr->name, ME, acptr->from->name,
-			   get_client_name(cptr, FALSE));
-		return 0;
-	    }
+	if (!check_uid(uid))
+	{
+		/* This is so bad, that I really don't want to deal with it! */
+		sendto_ops_butone(NULL, &me,
+			":%s WALLOPS :Bad UID (%s) from %s",
+			ME, uid, get_client_name(cptr, FALSE));
+		return exit_client(cptr, cptr, &me, "Bad UID");
+	}
 
 	/*
 	** Check against UID collisions,
@@ -1222,13 +1189,13 @@ char	*parv[];
 	*/
 	acptr = find_uid(uid, NULL);
 	if (acptr)
-	    {
+	{
 		/* This is so bad, that I really don't want to deal with it! */
 		sendto_ops_butone(NULL, &me,
-				  ":%s WALLOPS :UID collision for %s from %s",
-				  ME, uid, get_client_name(cptr, FALSE));
+			":%s WALLOPS :UID collision for %s from %s",
+			ME, uid, get_client_name(cptr, FALSE));
 		return exit_client(cptr, cptr, &me, "UID collision");
-	    }
+	}
 
 	/*
 	** Check against NICK collisions,
