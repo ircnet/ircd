@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.140 2004/10/03 17:13:43 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.141 2004/10/07 13:25:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2345,7 +2345,7 @@ void do_tkline(char *who, int time, char *user, char *host, char *reason, int st
 	char buff[BUFSIZE];
 	aClient	*acptr;
 	aConfItem *aconf;
-	int i;
+	int i, count = 0;
 
 	buff[0] = '\0';
 
@@ -2445,6 +2445,7 @@ void do_tkline(char *who, int time, char *user, char *host, char *reason, int st
 			acptr->user->username+1 :
 			acptr->user->username)) == 0)
 		{
+			count++;
 			sendto_one(acptr, replies[ERR_YOUREBANNEDCREEP],
 				ME, acptr->name, aconf->name, aconf->host,
 				": ", aconf->passwd);
@@ -2458,6 +2459,10 @@ void do_tkline(char *who, int time, char *user, char *host, char *reason, int st
 			}
 			(void) exit_client(acptr, acptr, &me, buff);
 		}
+	}
+	if (count)
+	{
+		sendto_flag(SCH_NOTICE, "TKill reaped %d souls", count);
 	}
 
 	/* do next tkexpire, but not more often than once a minute */
