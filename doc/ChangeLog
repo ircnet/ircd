@@ -1,3 +1,11 @@
+2001-12-13  Piotr Kucharski
+
+	* configure: a typo made FreeBSD 5.0 be taken for Solaris 2.0
+
+2001-10-25  Piotr Kucharski
+
+	* config.h.dist: minor explanatory changes
+
 2001-06-09  Kurt Roeckx
 
 	* s_err.c: Change RPL_BOUNCE to use a %d instead of %s
