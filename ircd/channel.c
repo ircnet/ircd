@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.18 1997/10/18 13:43:20 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.19 1997/11/11 19:11:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1617,7 +1617,7 @@ char	*parv[];
 			sendto_channel_butserv(chptr, sptr,
 					       ":%s MODE %s +%c%c %s %s",
 					       cptr->name, name, *s,
-					       *(s+1) == 'v' ? 'v' : '+',
+					       *(s+1) == 'v' ? 'v' : ' ',
 					       parv[0],
 					       *(s+1) == 'v' ? parv[0] : "");
 			*--s = '\007';
@@ -1755,7 +1755,8 @@ char	*parv[];
 
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	    {
-		penalty++;
+		if (penalty++ >= MAXPENALTY)
+			break;
 		chptr = get_channel(sptr, name, !CREATE);
 		if (!chptr)
 		    {
@@ -1803,8 +1804,9 @@ char	*parv[];
 						(void)strcat(nickbuf, ",");
 					(void)strcat(nickbuf, who->name);
 					nlen += strlen(who->name);
-				} else
-				  sendto_match_servs(chptr, cptr,
+				    }
+				else
+					sendto_match_servs(chptr, cptr,
 						   ":%s KICK %s %s :%s",
 						   parv[0], name,
 						   who->name, comment);
