@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.256 2005/02/20 23:07:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.257 2005/03/28 23:33:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1092,7 +1092,7 @@ nickkilldone:
 			sendto_flag(SCH_NOTICE,
 				    "Illegal NICK change: %s -> %s from %s",
 				    parv[0], nick, get_client_name(cptr,TRUE));
-		sendto_serv_butone(cptr, ":%s NICK :%s", parv[0], nick);
+		sendto_serv_butone(cptr, ":%s NICK :%s", sptr->user->uid, nick);
 		if (sptr->name[0])
 			(void)del_from_client_hash_table(sptr->name, sptr);
 		(void)strcpy(sptr->name, nick);
@@ -1255,7 +1255,7 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			*/
 			sendto_one(cptr,
 				":%s SAVE %s :%s (%s@%s)%s <- (%s@%s)%s", 
-				ME, uid, ME, 
+				me.serv->sid, uid, ME, 
 				acptr->user->username, acptr->user->host,
 				acptr->user->server, user, host, cptr->name);
 
@@ -2505,8 +2505,8 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			sptr->user->away = NULL;
 		    }
 		if (sptr->user->flags & FLAGS_AWAY)
-			sendto_serv_butone(cptr, ":%s MODE %s :-a", parv[0],
-					   parv[0]);
+			sendto_serv_butone(cptr, ":%s MODE %s :-a",
+				sptr->user->uid, parv[0]);
 		/* sendto_serv_butone(cptr, ":%s AWAY", parv[0]); */
 		if (MyConnect(sptr))
 			sendto_one(sptr, replies[RPL_UNAWAY], ME, BadTo(parv[0]));
@@ -2543,7 +2543,8 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		istat.is_away++;
 		istat.is_awaymem += len;
 		away = (char *)MyMalloc(len);
-		sendto_serv_butone(cptr, ":%s MODE %s :+a", parv[0], parv[0]);
+		sendto_serv_butone(cptr, ":%s MODE %s :+a",
+			sptr->user->uid, parv[0]);
 	    }
 
 	sptr->user->flags |= FLAGS_AWAY;
@@ -3201,7 +3202,7 @@ void	send_umode_out(aClient *cptr, aClient *sptr, int old)
 			if (acptr == cptr || acptr == sptr)
 				continue;
 			sendto_one(acptr, ":%s MODE %s :%s",
-				   sptr->name, sptr->name, buf);
+				   sptr->user->uid, sptr->name, buf);
 		    }
 
 	if (cptr && MyClient(cptr))
@@ -3246,7 +3247,7 @@ static	void	save_user(aClient *cptr, aClient *sptr, char *path)
 			      ":%s NICK :%s", sptr->name, sptr->user->uid);
 #endif
 	sendto_serv_v(cptr, SV_UID, ":%s SAVE %s :%s%c%s", 
-		cptr ? cptr->name : ME, sptr->user->uid, 
+		cptr ? cptr->serv->sid : me.serv->sid, sptr->user->uid, 
 		cptr ? cptr->name : ME, cptr ? '!' : ' ', path);
 	sendto_flag(SCH_SAVE, "Received SAVE message for %s. Path: %s!%s",
 		    sptr->name, cptr ? cptr->name : ME, path);

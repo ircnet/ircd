@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.256 2005/02/19 20:19:52 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.257 2005/03/28 23:33:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2189,7 +2189,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				remove_user_from_channel(sptr, chptr);
 			}
 			sendto_match_servs(NULL, cptr, ":%s JOIN 0 :%s",
-				parv[0], key ? key : parv[0]);
+				sptr->user->uid, key ? key : parv[0]);
 		}
 		else
 		{
@@ -2341,7 +2341,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				remove_user_from_channel(sptr, chptr);
 			}
 			sendto_match_servs(NULL, cptr, ":%s JOIN 0 :%s",
-				parv[0], key ? key : parv[0]);
+				sptr->user->uid, key ? key : parv[0]);
 			continue;
 		}
 
@@ -2773,7 +2773,7 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					/* Anyway, if it would not fit in the
 					** buffer, send it right away. --B */
 					sendto_serv_butone(cptr, PartFmt,
-						parv[0], buf, comment);
+						sptr->user->uid, buf, comment);
 					*buf = '\0';
 				}
 				if (*buf)
@@ -2783,13 +2783,13 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    }
 		else
 			sendto_match_servs(chptr, cptr, PartFmt,
-				   	   parv[0], name, comment);
+				   	   sptr->user->uid, name, comment);
 		sendto_channel_butserv(chptr, sptr, PartFmt,
 				       parv[0], name, comment);
 		remove_user_from_channel(sptr, chptr);
 	    }
 	if (*buf)
-		sendto_serv_butone(cptr, PartFmt, parv[0], buf, comment);
+		sendto_serv_butone(cptr, PartFmt, sptr->user->uid, buf, comment);
 	return 4;
 }
 
@@ -3035,7 +3035,7 @@ int	m_topic(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			chptr->topic_t = timeofday;
 #endif
 			sendto_match_servs(chptr, cptr,":%s TOPIC %s :%s",
-					   parv[0], chptr->chname,
+					   sptr->user->uid, chptr->chname,
 					   chptr->topic);
 			sendto_channel_butserv(chptr, sptr, ":%s TOPIC %s :%s",
 					       parv[0],
