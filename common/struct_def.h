@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.81 2003/10/18 15:31:28 q Exp $
+ *   $Id: struct_def.h,v 1.82 2003/11/03 19:27:29 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -667,22 +667,22 @@ struct Channel	{
 #define	MODE_UNIQOP	CHFL_UNIQOP
 #define	MODE_CHANOP	CHFL_CHANOP
 #define	MODE_VOICE	CHFL_VOICE
-#define	MODE_PRIVATE	0x0008
-#define	MODE_SECRET	0x0010
-#define	MODE_MODERATED  0x0020
-#define	MODE_TOPICLIMIT 0x0040
-#define	MODE_INVITEONLY 0x0080
-#define	MODE_NOPRIVMSGS 0x0100
-#define	MODE_KEY	0x0200
-#define	MODE_BAN	0x0400
-#define	MODE_LIMIT	0x0800
-#define	MODE_ANONYMOUS	0x1000
-#define	MODE_QUIET	0x2000
-#define	MODE_EXCEPTION	0x4000
-#define	MODE_INVITE	0x8000
+#define	MODE_PRIVATE	0x00008
+#define	MODE_SECRET	0x00010
+#define	MODE_MODERATED  0x00020
+#define	MODE_TOPICLIMIT 0x00040
+#define	MODE_INVITEONLY 0x00080
+#define	MODE_NOPRIVMSGS 0x00100
+#define	MODE_KEY	0x00200
+#define	MODE_BAN	0x00400
+#define	MODE_LIMIT	0x00800
+#define	MODE_ANONYMOUS	0x01000
+#define	MODE_QUIET	0x02000
+#define	MODE_EXCEPTION	0x04000
+#define	MODE_INVITE	0x08000
 #define	MODE_REOP	0x10000
 #define	MODE_REOPLIST	0x20000
-#define	MODE_FLAGS	0x1ffff
+#define	MODE_FLAGS	0x3ffff
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */
@@ -951,7 +951,7 @@ typedef	struct	Ignore {
 #define TSET_POOLSIZE 0x002
 #define TSET_SHOWALL (int) ~0
 
-/* Runtime onfiguration structure */
+/* Runtime configuration structure */
 typedef struct
 {
 	int aconnect;	/* 0 - OFF 1 - ON */
