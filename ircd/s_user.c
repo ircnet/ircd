@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.168 2004/02/11 14:14:23 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.169 2004/02/12 19:32:48 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2898,7 +2898,7 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 		s = index(aconf->host, '@');
 		*s++ = '\0';
-#ifdef	OPER_REMOTE
+#ifndef	NO_OPER_REMOTE
 		if (aconf->status == CONF_LOCOP)
 #else
 		if ((match(s,me.sockhost) && !IsLocal(sptr)) ||
