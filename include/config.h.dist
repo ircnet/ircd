@@ -56,21 +56,6 @@
 				     behaviour (apollo sr10.1/bsd4.3 needs
 				     this) */
 
-/* 
- * NPATH is path to backup file for NOTE. If both this and EPATH is defined, 
- * a real channel structure (news-similar) may be created by operators 
- * (read doc/NOTE). EPATH points to a script for sending password to
- * users of serious channels (like comp.unix.wizards :) Each user of your
- * server does only get one single password for all password protected 
- * channels. Be sure to test this script to verify that you get the mail:
- * Usage: <EPATH> <YOUR@EMAIL.ADDY> dummy@host password 
- * If you don't want your server to send EMAIL, users of your server can't 
- * join such channels. In that case be sure EPATH remains UNDEFINED!
- */
-
-#undef	EPATH /* "/local/gnu/icn/password_mail" */
-#undef	NPATH /* "/local/gnu/icn/.ircdnote" */
-
 /*
  * Pathnames and defaults of irc system's support files. Please note that
  * these are only the recommened names and paths. Change as needed.
@@ -594,7 +579,6 @@
 
 #ifdef	CLIENT_COMPILE
 #undef	SENDQ_ALWAYS
-#undef	NPATH		/* _dl */
 #undef	ZIP_LINKS
 #endif
 

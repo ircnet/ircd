@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.8 1997/07/15 04:35:47 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.9 1997/07/25 20:26:48 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -89,7 +89,7 @@ char	serveropts[] = {
 #ifdef	IDLE_FROM_MSG
 'M',
 #endif
-#ifdef	NPATH
+#ifdef	NPATH /* gone */
 'N',
 #endif
 #ifdef	BETTER_NDELAY

@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.8 1997/07/18 03:08:13 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.9 1997/07/25 20:26:46 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -40,13 +40,6 @@ static	char rcsid[] = "@(#)$Id: channel.c,v 1.8 1997/07/18 03:08:13 kalt Exp $";
 #include "numeric.h"
 #include "channel.h"
 #include "h.h"
-
-#ifdef EPATH
-#define m_names n_names
-#define m_list n_list
-#define m_join n_join
-#define m_mode n_mode
-#endif
 
 aChannel *channel = NullChn;
 
@@ -315,9 +308,6 @@ int	flags;
 			chptr->clist = ptr;
 		    }
 		ptr->flags++;
-#ifdef NPATH            
-                note_join(who, chptr);
-#endif
 	    }
 }
 
@@ -362,9 +352,6 @@ aChannel *chptr;
 #ifdef USE_SERVICES
 	check_services_butone(SERVICE_WANT_CHANNEL, NULL, &me, "CHANNEL %s %d",
 			      chptr->chname, chptr->users-1);
-#endif
-#ifdef NPATH            
-        note_leave(sptr, chptr);
 #endif
 	if (--chptr->users <= 0)
 		sub1_from_channel(chptr);

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.7 1997/06/27 13:38:38 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.8 1997/07/25 20:26:49 kalt Exp $";
 #endif
 
 #include <sys/time.h>
@@ -792,9 +792,6 @@ char	*comment;
 				istat.is_user[0]--;
 			if (IsAnOper(sptr))
 				istat.is_oper--;
-#ifdef NPATH
-			note_signoff(sptr);
-#endif
 			sendto_common_channels(sptr, ":%s QUIT :%s",
 						sptr->name, comment);
 

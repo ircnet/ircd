@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.15 1997/07/15 20:58:00 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.16 1997/07/25 20:26:49 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -597,9 +597,6 @@ char	*nick, *username;
 		send_umode(NULL, sptr, 0, ALL_UMODES, buf);
 	check_services_num(sptr, buf);
 #endif
-#ifdef NPATH
-	note_signon(sptr);
-#endif
 	return 1;
     }
 
@@ -913,9 +910,6 @@ nickkilldone:
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_NICK, sptr->user->server,
 				      sptr, ":%s NICK :%s", parv[0], nick);
-#endif
-#ifdef NPATH
-                note_nickchange(sptr, nick);
 #endif
 		if (sptr->name[0])
 			(void)del_from_client_hash_table(sptr->name, sptr);
@@ -2128,9 +2122,6 @@ char	*parv[];
 				      sptr, ":%s MODE %s :+o", parv[0], 
 				      parv[0]);
 #endif
-#ifdef NPATH
-                note_oper(sptr);
-#endif
 		return 1;
 	    }
 	else if (IsOper(sptr))
@@ -2231,9 +2222,6 @@ char	*parv[];
 		check_services_butone(SERVICE_WANT_OPER, sptr->user->server, 
 				      sptr, ":%s MODE %s :+%c", parv[0],
 				      parv[0], IsOper(sptr) ? 'O' : 'o');
-#endif
-#ifdef NPATH
-                note_oper(sptr);
 #endif
 		if (IsAnOper(sptr))
 			istat.is_oper++;
@@ -2556,10 +2544,6 @@ char	*parv[];
 				      parv[0]);
 #endif
 	    }
-#ifdef NPATH
-	if (IsOper(sptr) && !(setflags & FLAGS_OPER))
-		note_oper(sptr);
-#endif
 	return penalty;
 }
 	

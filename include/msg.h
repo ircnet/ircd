@@ -157,9 +157,6 @@ struct Message msgtab[] = {
   { MSG_MOTD,    m_motd,     0, MAXPARA, MSG_LAG|MSG_REGU, 0L},
   { MSG_CLOSE,   m_close,    0, MAXPARA, MSG_LAG|MSG_REGU|MSG_OP, 0L},
   { MSG_RECONECT,m_reconnect,0, MAXPARA, MSG_LAG|MSG_NOU, 0L},
-#if defined(NPATH) && !defined(CLIENT_COMPILE)
-  { MSG_NOTE,    m_note,     0, 1, MSG_LAG|MSG_REG, 0L},
-#endif
   { MSG_SERVICE, m_service,  0, MAXPARA, MSG_LAG|MSG_NOU, 0L},
 #ifdef	USE_SERVICES
   { MSG_SERVSET, m_servset,  0, MAXPARA, MSG_LAG|MSG_SVC|MSG_NOU, 0L},

@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.13 1997/07/25 20:14:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.14 1997/07/25 20:26:48 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1738,9 +1738,6 @@ FdAry	*fdp;
 	int	res, length, fd, i, fdnew;
 	int	auth;
 
-#ifdef NPATH
-         note_delay(&delay);
-#endif
 #ifdef	pyr
 	(void) gettimeofday(&nowt, NULL);
 	timeofday = nowt.tv_sec;
