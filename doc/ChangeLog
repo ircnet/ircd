@@ -1,3 +1,15 @@
+2002-01-07  Piotr Kucharski
+
+	* list.c/make_server(): introduced used_tokens table and IsBitSet,
+	  SetBit, ClearBit defines (from Q).
+	* s_serv.c/m_links(): don't show masked servers.
+	* s_id.c: moved CHIDNB define to struct_def.h (we need it in list.c).
+	* list.c/make_server(): return NULL, do not abort, if used_tokens array
+	  is exhausted.
+	* s_serv.c/m_server(),m_smask(),m_server_estab(),ircd.c/setup_me(),
+	  s_bsd.c/connect_server(): deal with return value of make_server().
+	* list.c/make_server(),list_ext.h: remove unused 'add' parameter.
+
 2002-01-06  Piotr Kucharski
 
 	* s_serv.c/m_server_estab(),s_service.c/m_service(),
