@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.31 2003/10/18 15:31:24 q Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.32 2003/10/18 16:28:54 q Exp $";
 #endif
 
 #include "os.h"
@@ -177,7 +177,7 @@ static	u_int	hash_channel_name(char *hname, int *store, int shortname)
 /*
  * hash_host_name
  */
-static	u_int	hash_host_name(char *hname, int *store)
+static	u_int	hash_host_name(char *hname, u_int *store)
 {
 
 	Reg	u_char	*name = (u_char *)hname;
