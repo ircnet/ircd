@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.175 2004/02/20 01:55:23 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.176 2004/02/22 02:02:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -659,7 +659,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		{
 			strncpyzt(nick, sptr->user->uid, UIDLEN + 1);
 			(void)strcpy(sptr->name, nick);
-			(void)add_to_client_hash_table(nick, sptr);
 		}
 		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
 		add_to_uid_hash_table(sptr->user->uid, sptr);
@@ -835,6 +834,13 @@ badparamcountkills:
 	if (MyConnect(sptr) && IsUnknown(sptr)
 		&& nick[0] == '0' && nick[1] == '\0')
 	{
+		if (!sptr->user)
+		{
+			/* Sorry, too much fuss with client hash tables
+			** about making "NICK 0" work before USER --B. */
+			sendto_one(sptr, replies[ERR_NOTREGISTERED], ME, "*");
+			return 1;
+		}
 		/* Allow registering with nick "0", this will be
 		** overwritten in register_user() */
 		goto nickkilldone;
@@ -1202,15 +1208,8 @@ nickkilldone:
 			    == FLUSH_BUFFER)
 				return FLUSH_BUFFER;
 	    }
-	/* Nick can get changed to UID in register_user()! Check parv[1], it
-	** keeps the original nick. If it was "0", add_to_client_hash_table()
-	** in register_user() does the work after changing nick to UID, so
-	** do not add it twice to hash! --B. */
-	if (!(parv[1][0] == '0' && parv[1][1] == '\0'))
-	{
-		/* Finally set new nick name. */
-		(void)add_to_client_hash_table(nick, sptr);
-	}
+	/* Finally set new nick name. */
+	(void)add_to_client_hash_table(nick, sptr);
 	if (lp)
 		return 15;
 	else
