@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.179 2004/02/16 01:29:42 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.180 2004/02/16 02:13:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1697,13 +1697,29 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				case MODE_REOPLIST :
 					tmp_chfl = CHFL_REOPLIST; break;
 				}
-				/* XXX: fix this in 2.11.1 */
-				if ((whatt & MODE_ADD) &&
-					tmp_chfl == CHFL_REOPLIST &&
-					MyClient(sptr))
+				if (tmp_chfl == CHFL_REOPLIST &&
+					(whatt & MODE_ADD))
 				{
-					/* ignore +R from a local client. */
-					break;
+					/* Just restarted servers will not have
+					** chanops leaving, so no other way to
+					** set ->reop. As we prefer not to op
+					** remote clients, set this here, upon
+					** each +R, so reop_channel has a chance
+					** to work. It's mostly harmless, as it
+					** will be reset to 0 with every MODE +o
+					** and even if not, reop_channel will
+					** NOT give ops if ops are already on
+					** the channel. --B. */
+					if (ischop)
+					{
+						chptr->reop = timeofday +
+							LDELAYCHASETIMELIMIT;
+					}
+					/* XXX: fix this in 2.11.1 */
+					if (MyClient(sptr))
+					{
+						break;
+					}
 				}
 				if (ischop &&
 					(((whatt & MODE_ADD) &&
