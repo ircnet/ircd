@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.230 2004/08/04 11:04:11 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.231 2004/08/21 20:54:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -254,6 +254,7 @@ int	do_nick_name(char *nick, int server)
 	if (strcasecmp(nick, "anonymous") == 0)
 		return 0;
 
+	/* when no 2.10, allow NICKLEN */
 	for (ch = nick; *ch && (ch - nick) < (server?NICKLEN:ONICKLEN); ch++)
 	{
 		/* Transition period. Until all 2.10 are gone, disable
@@ -969,7 +970,9 @@ badparamcountkills:
 	 * creation) then reject it. If from a server and we reject it,
 	 * we have to KILL it. -avalon 4/4/92
 	 */
-	if (donickname == 0 || strcmp(nick, parv[1]))
+	/* when no 2.10, allow NICKLEN */
+	if (donickname == 0 || strncmp(nick, parv[1], 
+		IsServer(cptr)?NICKLEN:ONICKLEN))
 	    {
 		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, BadTo(parv[0]),
 			   parv[1]);
