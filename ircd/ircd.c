@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.15 1998/04/02 19:58:56 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.16 1998/04/03 17:12:19 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -864,7 +864,7 @@ time_t	delay;
 	else
 		delay = MIN(delay, TIMESEC);
 
-#ifdef	HUB
+#if defined(PREFER_SERVER)
 	(void)read_message(1, &fdas);
 	flush_connections(me.fd);
 	Debug((DEBUG_DEBUG, "delay for %d", delay));

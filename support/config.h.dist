@@ -184,15 +184,21 @@
  * A pure non-routing leaf server can undefine HUB for best performance.
  * If your server is running as a a HUB Server then define this.
  * A HUB Server has many servers connect to it at the same as opposed
- * to a leaf which just has 1 server (typically the uplink). Define this
- * correctly for performance reasons. If defined, value of 0 creates
- * biggest load on cpu, and bigger values decrease the cpu load on price
- * of user-friendlyness.
+ * to a leaf which just has 1 server (typically the uplink).
+ */
+/* #define	HUB */
+
+/* 
+ * Defining PREFER_SERVER will give priority to server traffic over
+ * client traffic.
+ * Define this correctly for performance reasons. If defined, value of 0
+ * creates biggest load on cpu, and bigger values decrease the cpu load
+ * on price of user-friendlyness.
  *
  * The higher value (in seconds), the less often users will be polled (giving
  * a greater precedence to traffic to and from servers).
  */
-/* #define	HUB	1 */
+#define PREFER_SERVER 1
 
 #ifdef HUB
 /*
