@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.49 2004/03/04 14:01:33 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.50 2004/03/05 15:31:00 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0.
 </abstract>
@@ -535,9 +535,9 @@ the remote username returned by the ident server be the same
 as the one given before the ``@''.  Wildcards are permitted,
 but <bf>please</bf> rather leave this field empty and use bitmask
 in <bf>Host Addr</bf> field.
-<p>Empty field is equal to '*' (matches any).
+<p>Empty field matches any. ``*'' also matches any, but it requires working DNS for a client.
 <p>Using this field to enforce that clients have no Host Name set
-is not working. Use ``N'' <bf>flag</bf>.
+is not working (they will rather be denied connection). Use ``N'' <bf>flag</bf>.
 <tag/Port/Specifies the port number for which this
 configuration line is valid.  An empty field, or ``0''
 matches all ports.
@@ -559,8 +559,8 @@ clients matching such I line will not be able to use their operator
 privileges (no nick/mode change, no kick). Such users will also
 have their username prefixed by +, = or - depending on the ident reply.
 
-<tag/Note/The server checks if the client hostname (or
-any aliases) matches the <bf>TARGET Host NAME</bf> field.
+<tag/Note/The server checks if the client hostname 
+matches the <bf>TARGET Host NAME</bf> field.
 If a match is found, server checks <bf>TARGET Host Addr</bf> field.
 If a match is found, the client is accepted.
 If ``N'' flag is not used and the host name is available, it

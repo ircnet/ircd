@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-22866/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-5757/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,9 +10,9 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.43 2004/03/04 14:03:00 chopin Exp $
+     $Id: INSTALL.info,v 1.50 2004/03/05 15:29:19 chopin Exp $
 
-   This document describes how to install and configure IRC 2.11.0.
+   This document describes how to install, and configure IRC 2.11.0.
 
 * Menu:
 
@@ -745,10 +745,12 @@ How to let clients connect to your IRCD.
      but `please' rather leave this field empty and use bitmask in
      `Host Addr' field.
 
-     Empty field is equal to '*' (matches any).
+     Empty field matches any. "*" also matches any, but it requires
+     working DNS for a client.
 
      Using this field to enforce that clients have no Host Name set is
-     not working. Use "N" `flag'.
+     not working (they will rather be denied connection). Use "N"
+     `flag'.
 
 `Port'
      Specifies the port number for which this configuration line is
@@ -781,13 +783,13 @@ How to let clients connect to your IRCD.
      = or - depending on the ident reply.
 
 `Note'
-     The server checks if the client hostname (or any aliases) matches
-     the `TARGET Host NAME' field.  If a match is found, server checks
-     `TARGET Host Addr' field.  If a match is found, the client is
-     accepted.  If "N" flag is not used and the host name is available,
-     it is used - either matching `TARGET Host NAME' field or, if this
-     field is empty, first returned by DNS. Using "N" flag sets the
-     name of the client to its IP.
+     The server checks if the client hostname matches the `TARGET Host
+     NAME' field.  If a match is found, server checks `TARGET Host
+     Addr' field.  If a match is found, the client is accepted.  If "N"
+     flag is not used and the host name is available, it is used -
+     either matching `TARGET Host NAME' field or, if this field is
+     empty, first returned by DNS. Using "N" flag sets the name of the
+     client to its IP.
 
 `Examples'
      For example, if you were installing IRC on tolsun.oulu.fi and you
@@ -1661,42 +1663,42 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top128
-Node: Installing IRC-652
-Node: The configure script877
-Node: Notes for Cygwin32 users3163
-Node: Notes concerning IPv6 support3896
-Node: The config-h file4499
-Node: DEBUGMODE5083
-Node: CACHED_MOTD5662
-Node: CHROOTDIR6103
-Node: ENABLE_SUMMON ENABLE_USERS6474
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7007
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7696
-Node: ZIP_LINKS ZIP_LEVEL8357
-Node: SLOW_ACCEPT9385
-Node: CLONE_CHECK10015
-Node: Other #define's10378
-Node: Editing the Makefile and compiling10700
-Node: The ircd-conf file11685
-Node: Machine information13534
-Node: Administrative info15960
-Node: Port connections18111
-Node: Connection Classes19942
-Node: Client connections25069
-Node: Operator priviliges30591
-Node: Excluded accounts32764
-Node: Server connections36676
-Node: Deny auto-connections45338
-Node: Hub connections46712
-Node: Leaf connections48200
-Node: Version limitations50284
-Node: Excluded machines52042
-Node: Service connections53347
-Node: Bounce server54941
-Node: Related resources56581
-Node: Reporting a bug57620
-Node: How to report a bug57877
-Node: Where to send a bug report58888
+Node: Top127
+Node: Installing IRC-651
+Node: The configure script876
+Node: Notes for Cygwin32 users3162
+Node: Notes concerning IPv6 support3895
+Node: The config-h file4498
+Node: DEBUGMODE5082
+Node: CACHED_MOTD5661
+Node: CHROOTDIR6102
+Node: ENABLE_SUMMON ENABLE_USERS6473
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7006
+Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7695
+Node: ZIP_LINKS ZIP_LEVEL8356
+Node: SLOW_ACCEPT9384
+Node: CLONE_CHECK10014
+Node: Other #define's10377
+Node: Editing the Makefile and compiling10699
+Node: The ircd-conf file11684
+Node: Machine information13533
+Node: Administrative info15959
+Node: Port connections18110
+Node: Connection Classes19941
+Node: Client connections25068
+Node: Operator priviliges30669
+Node: Excluded accounts32842
+Node: Server connections36754
+Node: Deny auto-connections45416
+Node: Hub connections46790
+Node: Leaf connections48278
+Node: Version limitations50362
+Node: Excluded machines52120
+Node: Service connections53425
+Node: Bounce server55019
+Node: Related resources56659
+Node: Reporting a bug57698
+Node: How to report a bug57955
+Node: Where to send a bug report58966
 
 End Tag Table

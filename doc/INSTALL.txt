@@ -1,8 +1,8 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.45 2004/03/04 14:02:29 chopin Exp $
+  $Id: INSTALL.txt,v 1.50 2004/03/05 15:30:28 chopin Exp $
 
-  This document describes how to install and configure IRC 2.11.0.
+  This document describes how to install, and configure IRC 2.11.0.
 
   11..  IInnssttaalllliinngg IIRRCC..
 
@@ -649,14 +649,18 @@
         are permitted, but pplleeaassee rather leave this field empty and use
         bitmask in HHoosstt AAddddrr field.
 
-        Empty field is equal to '*' (matches any).
+        Empty field matches any. ``*'' also matches any, but it requires
+        working DNS for a client.
 
         Using this field to enforce that clients have no Host Name set
-        is not working. Use ``N'' ffllaagg.
+        is not working (they will rather be denied connection). Use
+        ``N'' ffllaagg.
+
 
      PPoorrtt
         Specifies the port number for which this configuration line is
         valid.  An empty field, or ``0'' matches all ports.
+
      CCllaassss
         This field should refer to an existing class.  Connections
         classes are usefull to limit the number of users allowed on the
@@ -687,13 +691,13 @@
 
 
      NNoottee
-        The server checks if the client hostname (or any aliases)
-        matches the TTAARRGGEETT HHoosstt NNAAMMEE field.  If a match is found, server
-        checks TTAARRGGEETT HHoosstt AAddddrr field.  If a match is found, the client
-        is accepted.  If ``N'' flag is not used and the host name is
-        available, it is used -- either matching TTAARRGGEETT HHoosstt NNAAMMEE field
-        or, if this field is empty, first returned by DNS. Using ``N''
-        flag sets the name of the client to its IP.
+        The server checks if the client hostname matches the TTAARRGGEETT HHoosstt
+        NNAAMMEE field.  If a match is found, server checks TTAARRGGEETT HHoosstt AAddddrr
+        field.  If a match is found, the client is accepted.  If ``N''
+        flag is not used and the host name is available, it is used --
+        either matching TTAARRGGEETT HHoosstt NNAAMMEE field or, if this field is
+        empty, first returned by DNS. Using ``N'' flag sets the name of
+        the client to its IP.
 
      EExxaammpplleess
         For example, if you were installing IRC on tolsun.oulu.fi and
@@ -719,10 +723,10 @@
 
         Allow clients from machines matching ``*.tut.fi'' to connect
         with the password ``secret''.
-
         I:::*::1
 
         Allow anyone from anywhere to connect to your server.
+
         I:::*.fi:6667:1
 
         Allow clients from machines matching ``*.fi'' to connect on the
@@ -851,10 +855,10 @@
         you can use ``*'' (Wild Card notation) and no matter what host
         the USERNAME (specified in Field 4) connects from s/he will be
         denied access.
-
         If you specify an IP address, IP mask, or an IP bitmask, it will
         match clients connecting from the matching addresses, no matter
         if they resolve or not.
+
         You can prefix an IP address, an IP mask, or IP bitmask by ``=''
         in which case only non resolving matching hosts will be banned.
 
@@ -982,6 +986,7 @@
      C:root@nic.funet.fi:passwd:nic.funet.fi:6667:1
 
 
+
      CC  This field tells the IRC program which option is being
         configured. "C" corresponds to a server Connect option.
 
@@ -1046,6 +1051,7 @@
      ``garfield.mit.edu''.  You will connect to Internet Port 6667 on
      this host. This connection will use (your) source IP of
      ``192.168.0.18''.
+
 
   +o  C:irc.nada.kth.se::irc.nada.kth.se:1
 
@@ -1118,7 +1124,6 @@
         ``nic.funet.fi'' and that is what you should place in this
         field.
 
-
      DDoommaaiinn MMaasskk
         Domain masking, see below.
 
@@ -1180,7 +1185,6 @@
      DDeenniieedd SSeerrvveerr MMaasskk
         This field is matched against all servers currently present on
         the network.
-
      DDeenniieedd CCllaassss
         If this field contains a class number, it will match if any
         server in that class is currently present on the network.  Note
@@ -1312,9 +1316,6 @@
         fields, 2 and 4, must match up with the new server being
         introduced and the server which is responsible for introducing
         this new server.
-
-
-
   44..1122..  VVeerrssiioonn lliimmiittaattiioonnss
 
 
