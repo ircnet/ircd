@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: packet.c,v 1.7 1999/02/19 20:46:38 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: packet.c,v 1.8 1999/04/19 22:26:22 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -107,10 +107,10 @@ Reg	int	length;
 		if (cptr->flags & FLAGS_ZIPSTART)
 		    {
 			/*
-			 ** beginning of server connection, the buffer
-			 ** contained PASS/SERVER and is now zipped!
-			 ** Ignore the '\n' that should be here.
-			 */
+			** beginning of server connection, the buffer
+			** contained PASS/SERVER and is now zipped!
+			** Ignore the '\n' that should be here.
+			*/
 			if (*ch2 == '\n') /* also check \r ? */
 			    {
 				ch2++;
@@ -132,6 +132,8 @@ Reg	int	length;
 			if (length == -1)
 				return exit_client(cptr, cptr, &me,
 					"fatal error in unzip_packet()");
+			if (length == 0 || *ch2 == '\0')
+				break;
 		    }
 #endif
 		length--;
