@@ -1,10 +1,13 @@
 #
 # Default iauth configuration file
 #
-# $Id: iauth.conf.example,v 1.1 1999/03/11 17:31:36 kalt Exp $
+# $Id: iauth.conf.example,v 1.2 1999/07/04 22:15:43 kalt Exp $
 #
 
-# Have the IRC server reject user connections if iauth is unavailable
+# If iauth timeouts, then reject user
+notimeout
+# This makes the IRC server require that iauth performs the authentication
+# in order for a new user connection to be accepted
 required
 
 # Perform ident lookups
