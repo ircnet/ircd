@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.123 2004/06/30 19:02:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.124 2004/06/30 19:05:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -533,6 +533,12 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		{
 			SetKlineExempt(cptr);
 		}
+#ifdef XLINE
+		if (IsConfXlineExempt(aconf))
+		{
+			ClearXlined(cptr);
+		}
+#endif
 
 		/* Copy uhost (hostname) over sockhost, if conf flag permits. */
 		if (hp && !IsConfNoResolve(aconf))
