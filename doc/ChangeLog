@@ -1,3 +1,17 @@
+2004-05-18  Piotr Kucharski
+
+	* channel.c/m_njoin(): properly end buffers before sending.
+	* channel.c/m_njoin(): send SID as source to 2.11 servers.
+	* send.c/setup_svchans(), channel.c/setup_server_channels(),
+	  struct_def.h: new server channel &WALLOPS.
+	* send.c/sendto_ops_butone(): rewritten, not sending to +w users,
+	  not traversing all fds, simply send to servers and &WALLOPS.
+	* s_serv.c/m_squit(), m_server(), m_connect(), m_wallops(), 
+	  s_user.c/m_unick(), m_umode(): parameters fix to match rewritten
+	  sendto_ops_butone().
+	* s_serv.c/m_wallops(): no more +wallops channel, just send notice
+	  to &ERRORS about user-issued wallops.
+
 2004-05-16  Piotr Kucharski
 
 	* ircd.c/try_connections(): yet another condition, which could lead to
