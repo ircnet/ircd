@@ -449,7 +449,13 @@
 ** do not want to show it at all), define this.
 ** Note that operators will get list of K anyway.
 */
-/* #undef TXT_NOSTATSK "Please use http://example.org/klines instead" */
+/* #define TXT_NOSTATSK "Please use http://example.org/klines instead" */
+
+/*
+** If you don't want non-oper clients to see tkline list (like when you run
+** some service which automatically tklines open proxies), define this.
+*/
+/* #undef DISABLE_STATSTKLINE */
 
 /*
 ** If you have problems with two servers autoconnecting to each other

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.253 2004/10/27 14:08:39 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.254 2004/11/02 12:47:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2170,6 +2170,20 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		report_configured_links(cptr, parv[0], CONF_CLIENT);
 		break;
 	case 'k' : /* temporary K lines */
+#ifdef TKLINE
+#ifdef DISABLE_STATSTKLINE
+		if (!IsAnOper(sptr))
+		{
+			sendto_one(sptr, replies[ERR_NOPRIVILEGES],
+				ME, BadTo(parv[0]));
+			return 2;
+		}
+		else
+#endif
+		report_configured_links(cptr, parv[0],
+			(CONF_TKILL|CONF_TOTHERKILL));
+		break;
+#endif
 	case 'K' : /* K lines */
 #ifdef TXT_NOSTATSK
 		if (!IsAnOper(sptr))
@@ -2181,10 +2195,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		else
 #endif
 		report_configured_links(cptr, parv[0],
-#ifdef TKLINE
-			stat == 'k' ? (CONF_TKILL|CONF_TOTHERKILL) :
-#endif
-				(CONF_KILL|CONF_OTHERKILL));
+			(CONF_KILL|CONF_OTHERKILL));
 		break;
 	case 'M' : case 'm' : /* commands use/stats */
 		for (mptr = msgtab; mptr->cmd; mptr++)
