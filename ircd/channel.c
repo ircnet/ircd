@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.14 1997/09/11 03:50:30 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.15 1997/10/01 17:42:59 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -238,6 +238,22 @@ aChannel *chptr;
 	for (tmp = chptr->banlist; tmp; tmp = tmp->next)
 		if (match(tmp->value.cp, s) == 0)
 			break;
+
+	if (!tmp)
+	    {
+		char *ip = inetntoa((char *)&cptr->ip);
+
+		if (strcmp(ip, cptr->user->host))
+		    {
+			s = make_nick_user_host(cptr->name,
+						cptr->user->username, ip);
+	    
+			for (tmp = chptr->banlist; tmp; tmp = tmp->next)
+				if (match(tmp->value.cp, s) == 0)
+					break;
+		    }
+	  }
+
 	return (tmp);
 }
 
