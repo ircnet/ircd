@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.171 2004/02/13 20:40:44 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.172 2004/02/14 19:50:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1148,7 +1148,7 @@ nickkilldone:
 			if (IsRestricted(sptr) && !isdigit(*parv[0]))
 			{
 				sendto_one(sptr,
-					replies[ERR_RESTRICTED], ME, BadTo(nick));
+					replies[ERR_RESTRICTED], ME, BadTo(parv[0]));
 				return 2;
 			}
 			/* Can the user speak on all channels? */
