@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.115 2004/06/24 17:01:56 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.116 2004/06/24 17:09:48 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1628,6 +1628,40 @@ int 	initconf(int opt)
 				aconf->host = newhost;
 				istat.is_confmem += 2;
 			    }
+		if (tmp3 && (aconf->status & (CONF_OPERATOR|CONF_LOCOP)))
+		{
+			aconf->flags |= oline_flags_parse(tmp3);
+			if (aconf->flags & ACL_LOCOP)
+				aconf->flags &= ACL_LOCOP_MASK;
+#ifdef OPER_KILL
+# ifdef LOCAL_KILL_ONLY
+			aconf->flags &= ~ACL_KILLREMOTE;
+# endif
+#else
+			aconf->flags &= ~ACL_KILL;
+#endif
+#ifndef OPER_REHASH
+			aconf->flags &= ~ACL_REHASH;
+#endif
+#ifndef OPER_SQUIT
+			aconf->flags &= ~ACL_SQUIT;
+#endif
+#ifndef OPER_CONNECT
+			aconf->flags &= ~ACL_CONNECT;
+#endif
+#ifndef OPER_RESTART
+			aconf->flags &= ~ACL_RESTART;
+#endif
+#ifndef OPER_DIE
+			aconf->flags &= ~ACL_DIE;
+#endif
+#ifndef OPER_SET
+			aconf->flags &= ~ACL_SET;
+#endif
+#ifndef OPER_TKLINE
+			aconf->flags &= ~ACL_TKLINE;
+#endif
+		}
 		if (aconf->status & CONF_SERVER_MASK)
 		    {
 			if (BadPtr(aconf->passwd))
