@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.53 2002/06/06 14:01:14 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.54 2002/07/05 23:12:27 jv Exp $";
 #endif
 
 #include "os.h"
@@ -380,7 +380,7 @@ aClient *to;
 static	anUser	ausr = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL,
 			 0, NULL, NULL,
 			 "anonymous", "0", "anonymous.", "anonymous.",
-			 0,NULL, "127.0.0.0"};
+			 0,NULL, ""};
 
 static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 			 &anon, -2, 0, STAT_CLIENT, "anonymous", "anonymous",
