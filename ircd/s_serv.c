@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.220 2004/06/30 18:06:28 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.221 2004/06/30 20:05:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2169,6 +2169,15 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		break;
 #endif
 	case 'K' : /* K lines */
+#ifdef TXT_NOSTATSK
+		if (!IsAnOper(sptr))
+		{
+			sendto_one(sptr, replies[ERR_STATSKLINE],
+				ME, BadTo(parv[0]));
+			return 2;
+		}
+		else
+#endif
 		report_configured_links(cptr, parv[0],
 					(CONF_KILL|CONF_OTHERKILL));
 		break;

@@ -430,6 +430,14 @@
 */
 #define TXT_YOUREOPER "You are now an IRC Operator"
 
+/*
+** If you have huge number of K-lines and provide your users with
+** some other means of looking at them (or you are mean and simply
+** do not want to show it at all), define this.
+** Note that operators will get list of K anyway.
+*/
+/* #undef TXT_NOSTATSK "Please use http://example.org/klines instead" */
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
