@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.41 2002/01/06 08:58:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.42 2002/01/06 18:28:38 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -625,7 +625,7 @@ char	*comment;
 	 ** need to send different names to different servers
 	 ** (domain name matching)
 	 */
-		if (!IsMasked(sptr)
+		if (!IsMasked(sptr))
 		{
 			istat.is_serv--;
 		}
