@@ -1,3 +1,7 @@
+2002-10-13  Jakub Vlasek
+
+	* ircdwatch.c/sig_handler(): Removed extra semicolon after #endif.
+
 2002-10-09  Kurt Roeckx
 
 	* support.c, support_ext.h, channel.c, list.c res.c, s_bsd.c, s_id.c,
