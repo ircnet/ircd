@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.48 1999/03/07 22:44:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.49 1999/03/07 23:01:13 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -427,7 +427,6 @@ time_t	currenttime;
 #endif
 				ClearDNS(cptr);
 				ClearXAuth(cptr);
-				SetAccess(cptr);
 				cptr->firsttime = currenttime;
 				cptr->lasttime = currenttime;
 				continue;

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.27 1999/03/05 01:53:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.28 1999/03/07 23:01:13 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -395,8 +395,6 @@ Reg	aClient	*cptr;
 		Debug((DEBUG_ERROR, "Unable to create auth socket for %s:%s",
 			get_client_name(cptr, TRUE),
 			strerror(get_sockerr(cptr))));
-		if (!DoingDNS(cptr))
-			SetAccess(cptr);
 		ircstp->is_abad++;
 		return;
 	    }
@@ -490,8 +488,6 @@ Reg	aClient	*cptr;
 			(void)alarm((unsigned)0);
 			(void)close(cptr->authfd);
 			cptr->authfd = -1;
-			if (!DoingDNS(cptr))
-				SetAccess(cptr);
 			return;
 		    }
 		(void)alarm((unsigned)0);
@@ -571,8 +567,6 @@ authsenderr:
 				highest_fd--;
 		cptr->authfd = -1;
 		cptr->flags &= ~(FLAGS_AUTH|FLAGS_WRAUTH);
-		if (!DoingDNS(cptr))
-			SetAccess(cptr);
 		return;
 	    }
 	cptr->flags &= ~FLAGS_WRAUTH;
@@ -643,8 +637,6 @@ Reg	aClient	*cptr;
 	cptr->count = 0;
 	cptr->authfd = -1;
 	ClearAuth(cptr);
-	if (!DoingDNS(cptr))
-		SetAccess(cptr);
 	if (len > 0)
 		Debug((DEBUG_INFO,"ident reply: [%s]", cptr->buffer));
 

@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.59 1999/03/07 22:45:49 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.60 1999/03/07 23:01:13 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -701,7 +701,6 @@ Reg	aClient	*cptr;
 	Reg	struct	hostent *hp = NULL;
 	Reg	int	i;
  
-	ClearAccess(cptr);
 #ifdef INET6
 	Debug((DEBUG_DNS, "ch_cl: check access for %s[%s]",
 		cptr->name, inet_ntop(AF_INET6, (char *)&cptr->ip, mydummy,
@@ -854,7 +853,6 @@ aClient	*cptr;
 			** get us here and we can't interrupt that very
 			** well.
 			*/
-			ClearAccess(cptr);
 			lin.value.aconf = aconf;
 			lin.flags = ASYNC_CONF;
 			nextdnscheck = 1;
@@ -881,7 +879,6 @@ int	estab;
 	Link	*lp = cptr->confs;
 	int	i;
 
-	ClearAccess(cptr);
 	if (check_init(cptr, sockname))
 		return -2;
 
@@ -1695,7 +1692,6 @@ int	fd;
 	add_client_to_list(acptr);
 	set_non_blocking(acptr->fd, acptr);
 	(void)set_sock_opts(acptr->fd, acptr);
-	SetAccess(acptr);
 	return;
 }
 #endif
@@ -3179,8 +3175,6 @@ static	void	do_dns_async()
 			    {
 				del_queries((char *)cptr);
 				ClearDNS(cptr);
-				if (!DoingAuth(cptr))
-					SetAccess(cptr);
 				cptr->hostp = hp;
 #if defined(USE_IAUTH)
 				if (hp)
