@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.45 2004/02/13 20:40:44 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.46 2004/02/27 15:42:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -48,7 +48,7 @@ char *	replies[] = {
 /* 017 RPL_MAPEND */	":%s 017 %s :End of MAP",
 /* 018 RPL_MAPSTART */	":%s 018 %s :%s",
 /* 019 */ (char *)NULL,
-/* 020 */ (char *)NULL,
+/* 020 RPL_HELLO */	":%s 020 * :%s",
 /* 021 */ (char *)NULL,
 /* 022 */ (char *)NULL,
 /* 023 */ (char *)NULL,

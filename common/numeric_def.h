@@ -129,6 +129,7 @@
 #define RPL_MAP               15
 #define RPL_MAPEND            17
 #define RPL_MAPSTART          18
+#define	RPL_HELLO            020
 #define	RPL_YOURID            42
 #define RPL_SAVENICK          43
 
