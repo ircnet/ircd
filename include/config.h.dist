@@ -112,6 +112,13 @@
 #define	TPATH	"ircd.tune"
 
 /*
+ * If you don't want the server to keep reading the MOTD file from the disk,
+ * define CACHED_MOTD.  The server will store the MOTD in memory, and only
+ * read it again from the disk when rehashing if the file has changed.
+ */
+#define	CACHED_MOTD
+
+/*
  * Define these filenames to maintain a list of persons who log
  * into this server. Logging will stop when the file does not exist.
  * Logging will be disable also if you do not define this.
@@ -399,6 +406,29 @@
 #undef BETTER_NDELAY
 #undef BETTER_CDELAY
 
+/*
+ * Defining this will enable the use of compressed server-server links.
+ * In order to have it work, you must have the zlib version 1.0 or higher.
+ */
+/* #define ZIP_LINKS */
+
+/*
+ * Defining this will add an artificial 2 seconds delay for accepting
+ * connections.  This is the OLD behaviour of the server.
+ *
+ * NOTE: this leads of a significant increase in CPU usage if you reject a
+ * client which keeps connecting.
+ */
+#define	SLOW_ACCEPT
+
+/*
+ * Defining this will make the server check for rapid connections from a single
+ * host and reject new connections from this host if the limit is reached.
+ *
+ * IMPORTANT: This **MUST** defined if SLOW_ACCEPT is NOT defined
+ */
+#define	CLONE_CHECK
+
 /* For broken mirc (win/pc) client. Enables old features:
  * 1) Send start-of-list numeric before LIST reply
  * 2) Revert combined "n JOIN #^Go" -> "n JOIN #" "MODE # o n"
@@ -418,11 +448,6 @@
  * LOCAL_KILL_ONLY restricts KILLs to clients which are connected to the
  * server the Operator is connected to (ie lets them deal with local
  * problem users or 'ghost' clients
- *
- * NOTE: #define'ing this on an IRC net with servers which have a version
- *	 earlier than 2.7 is prohibited.  Such an action and subsequent use
- *	 of KILL for non-local clients should be punished by removal of the
- *	 server's links (if only for ignoring this warning!).
  */
 #undef	LOCAL_KILL_ONLY
 #endif
@@ -506,18 +531,44 @@
 #define	SENDQ_ALWAYS
 
 /*
- * V28PlusOnly enables features which are NOT backward compatible with
- * 2.7 (or earlier versions) servers. If you define it, make SURE the
- * only have 2.8 (and above) servers.
- */
-#define V28PlusOnly
-
-/*
  * Defining this will save some CPU cycles but will make the server unable
  * to understand the old protocol. If you define the following, you can only
  * link to servers with a version 2.9 or higher.
  */
-/* #define NoV28Links */
+#define NoV28Links
+
+#ifdef ZIP_LINKS
+/*
+ * the compression level used. (Suggested values: 3, 4, 5)
+ * Above 5 will only give a *very* marginal increase in compression for a
+ * *very* large increase in CPU usage.
+ */ 
+# define	ZIP_LEVEL	5
+#endif
+
+#ifdef	CLONE_CHECK
+/*
+ * If CLONE_CHECK has been defined, these control how the checks are performed,
+ * and how the alarm is triggered.
+ */
+# define	CLONE_MAX	2
+# define	CLONE_PERIOD	10
+#endif
+
+/*
+ * define NO_IDENT if you don't want to support ident (RFC1413).
+ * it is a VERY bad idea to do so, since this will make it impossible to
+ * efficientely track abusers.
+ * NO_PREFIX should always be undefined.
+ */
+/* #undef	NO_IDENT */
+/* #undef	NO_PREFIX */
+
+/*
+ * This define activates some old memory optimization code which appeared
+ * in 2.9.1 but was never made default.
+ */
+#define KRYS
 
 /* ------------------------- END CONFIGURATION SECTION -------------------- */
 #define	MYNAME SPATH
@@ -528,7 +579,7 @@
 #define	AIX
 #endif
 
-#if defined(__sysv__) || defined(__SVR4)
+#if defined(__sysv__) || defined(__SVR4) || defined (__svr4__)
 #define	SVR4
 #endif
 
@@ -563,6 +614,7 @@
 #ifdef	CLIENT_COMPILE
 #undef	SENDQ_ALWAYS
 #undef	NPATH		/* _dl */
+#undef	ZIP_LINKS
 #endif
 
 #ifdef DEBUGMODE
@@ -628,10 +680,22 @@ extern	void	debug();
 
 #if defined(CLIENT_FLOOD)
 # if	(CLIENT_FLOOD > 8000) || (CLIENT_FLOOD < 512)
-error CLIENT_FLOOD needs redefining.
+#  error CLIENT_FLOOD needs redefining.
 # endif
 #else
-error CLIENT_FLOOD undefined
+# error CLIENT_FLOOD undefined
+#endif
+
+#if defined(ZIP_LINKS)
+# if	(ZIP_MINIMUM > ZIP_MAXIMUM)
+#  error ZIP_MINIMUM needs redefining.
+# endif
+#endif
+
+#if !defined(SLOW_ACCEPT) && !defined(CLONE_CHECK)
+# define	CLONE_CHECK
+# define	CLONE_MAX       2                                     
+# define	CLONE_PERIOD    10       
 #endif
 
 /*
@@ -653,7 +717,16 @@ error CLIENT_FLOOD undefined
 
 #define Reg register
 
-#if (defined(sun) && (defined(__SVR4) || defined(__svr4__))) || defined(SGI)
+/*
+** you wouldn't want to compress messages one by one.. would you?
+** (it's not implemented anyways)
+*/
+#ifdef	ZIP_LINKS
+# define	SENDQ_ALWAYS
+#endif
+
+#if (defined(sun) && (defined(__SVR4) || defined(__svr4__))) || defined(SGI) \
+	|| defined(AIX)
 # define _DO_POLL_
 #endif
 
