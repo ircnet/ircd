@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.36 1999/07/02 16:49:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.37 1999/07/02 17:07:18 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1247,6 +1247,8 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
 				    match_it(srch, mask, what))
 					break;
 			}
+			if (srch == NULL)
+				continue;
 		    }
 		/* my client, does he match ? */
 		else if (!(IsRegisteredUser(cptr) && 
