@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.173 2004/02/12 20:13:50 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.174 2004/02/12 21:22:39 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3504,119 +3504,101 @@ int	m_names(aClient *cptr, aClient *sptr, int parc, char *parv[])
 }
 
 #define CHECKFREQ	300
-/* consider reoping an opless !channel */
-static int	reop_channel(time_t now, aChannel *chptr)
+/* consider reoping an opless channel */
+static int	reop_channel(time_t now, aChannel *chptr, int reopmode)
 {
-    Link *lp, op;
+	Link *lp, op;
 
-    op.value.chptr = NULL;
-    if (chptr->users <= 5 && (now - chptr->history > DELAYCHASETIMELIMIT))
+	if (IsSplit() || chptr->reop == 0)
 	{
-	    /* few users, no recent split: this is really a small channel */
-	    char mbuf[MAXMODEPARAMS + 1], nbuf[MAXMODEPARAMS*(NICKLEN+1)+1];
-	    int cnt;
-	    
-		mbuf[0] = nbuf[0] = '\0';
-	    lp = chptr->members;
-	    while (lp)
+		/* Should never happen. */
+		sendto_flag(SCH_DEBUG, "reop_channel should not happen");
+		return 0;
+	}
+
+	op.value.chptr = NULL;
+	if (now - chptr->history > DELAYCHASETIMELIMIT)
+	{
+		int idlelimit1, idlelimit2;
+
+		/*
+		** This selects random idle limits in the range
+		** from CHECKFREQ to 4*CHECKFREQ
+		*/
+		idlelimit1 = CHECKFREQ + myrand() % (2*CHECKFREQ);
+		idlelimit2 = idlelimit1 + CHECKFREQ + myrand() % (2*CHECKFREQ);
+
+		for (lp = chptr->members; lp; lp = lp->next)
 		{
-		    if (lp->flags & CHFL_CHANOP)
+			if (lp->flags & CHFL_CHANOP)
 			{
-			    chptr->reop = 0;
-			    return 0;
+				chptr->reop = 0;
+				return 0;
 			}
-		    if (MyConnect(lp->value.cptr) && !IsRestricted(lp->value.cptr))
-			    op.value.cptr = lp->value.cptr;
-		    lp = lp->next;
-		}
-	    if (op.value.cptr == NULL &&
-		((now - chptr->reop) < LDELAYCHASETIMELIMIT))
-		    /*
-		    ** do nothing if no unrestricted local users, 
-		    ** unless the reop is really overdue.
-		    */
-		    return 0;
-	    sendto_channel_butone(&me, &me, chptr,
-			   ":%s NOTICE %s :Enforcing channel mode +r (%d)",
-				   ME, chptr->chname, now - chptr->reop);
-	    op.flags = MODE_ADD|MODE_CHANOP;
-	    lp = chptr->members;
-	    cnt = 0;
-	    while (lp)
-		{
-		    if (cnt == MAXMODEPARAMS)
+			/* Our client */
+			if (!MyConnect(lp->value.cptr))
 			{
-			    mbuf[cnt] = '\0';
-			    if (lp != chptr->members)
+				continue;
+			}
+			/* not restricted */
+			if (IsRestricted(lp->value.cptr))
+			{
+				continue;
+			}
+			/* matching +R list */
+			if (reopmode == CHFL_REOPLIST &&
+				NULL == match_modeid(CHFL_REOPLIST,
+				lp->value.cptr, chptr))
+			{
+				continue;
+			}
+			/* If channel reop is heavily overdue, don't care about
+			** idle. Find the least idle client possible.
+			*/
+			if (now - chptr->history > 7*LDELAYCHASETIMELIMIT)
+			{
+				if (op.value.cptr == NULL ||
+					lp->value.cptr->user->last >
+					op.value.cptr->user->last)
 				{
-				    sendto_match_servs(chptr, NULL,
-							 ":%s MODE %s +%s %s",
-							 ME, chptr->chname,
-							 mbuf, nbuf);
-				    sendto_channel_butserv(chptr, &me,
-						   ":%s MODE %s +%s %s",
-							   ME, chptr->chname,
-							   mbuf, nbuf);
+					op.value.cptr = lp->value.cptr;
+					continue;
 				}
-			    cnt = 0;
-			    mbuf[0] = nbuf[0] = '\0';
+				continue;
 			}
-		    if (!(MyConnect(lp->value.cptr) 
-			&& IsRestricted(lp->value.cptr)))
-			{
-			    op.value.cptr = lp->value.cptr;
-			    change_chan_flag(&op, chptr);
-			    mbuf[cnt++] = 'o';
-			    strcat(nbuf, lp->value.cptr->name);
-			    strcat(nbuf, " ");
-			}
-		    lp = lp->next;
-		}
-	    if (cnt)
-		{
-		    mbuf[cnt] = '\0';
-		    sendto_match_servs(chptr, NULL,
-					 ":%s MODE %s +%s %s",
-					 ME, chptr->chname, mbuf, nbuf);
-		    sendto_channel_butserv(chptr, &me, ":%s MODE %s +%s %s",
-					   ME, chptr->chname, mbuf, nbuf);
-		}
-	}
-    else
-	{
-	    time_t idlelimit = now - 
-		    MIN((LDELAYCHASETIMELIMIT/2), (2*CHECKFREQ));
+			/* else hidden in above continue,
+			** not to indent too much :> --B. */
 
-	    lp = chptr->members;
-	    while (lp)
-		{
-		    if (lp->flags & CHFL_CHANOP)
+			/* Channel reop is not heavily overdue. So pick
+			** a client, which is a bit idle, but not too much.
+			** Find the least idle client possible, though.
+			*/
+			if (now - lp->value.cptr->user->last >= idlelimit1 &&
+				now - lp->value.cptr->user->last < idlelimit2 &&
+				(op.value.cptr == NULL ||
+				lp->value.cptr->user->last >
+					op.value.cptr->user->last))
 			{
-			    chptr->reop = 0;
-			    return 0;
+				op.value.cptr = lp->value.cptr;
 			}
-		    if (MyConnect(lp->value.cptr) &&
-			!IsRestricted(lp->value.cptr) &&
-			lp->value.cptr->user->last > idlelimit &&
-			(op.value.cptr == NULL ||
-			 lp->value.cptr->user->last>op.value.cptr->user->last))
-			    op.value.cptr = lp->value.cptr;
-		    lp = lp->next;
 		}
-	    if (op.value.cptr == NULL)
-		    return 0;
-	    sendto_channel_butone(&me, &me, chptr,
-			   ":%s NOTICE %s :Enforcing channel mode +r (%d)", ME,
-					   chptr->chname, now - chptr->reop);
-	    op.flags = MODE_ADD|MODE_CHANOP;
-	    change_chan_flag(&op, chptr);
-	    sendto_match_servs(chptr, NULL, ":%s MODE %s +o %s",
-				 ME, chptr->chname, op.value.cptr->name);
-	    sendto_channel_butserv(chptr, &me, ":%s MODE %s +o %s",
-				   ME, chptr->chname, op.value.cptr->name);
+		if (op.value.cptr == NULL)
+		{
+			return 0;
+		}
+		sendto_channel_butone(&me, &me, chptr,
+			":%s NOTICE %s :Enforcing channel mode +%c (%d)", ME,
+			chptr->chname, reopmode == CHFL_REOPLIST ? 'R' : 'r',
+			now - chptr->reop);
+		op.flags = MODE_ADD|MODE_CHANOP;
+		change_chan_flag(&op, chptr);
+		sendto_match_servs(chptr, NULL, ":%s MODE %s +o %s",
+			ME, chptr->chname, op.value.cptr->name);
+		sendto_channel_butserv(chptr, &me, ":%s MODE %s +o %s",
+			ME, chptr->chname, op.value.cptr->name);
 	}
-    chptr->reop = 0;
-    return 1;
+	chptr->reop = 0;
+	return 1;
 }
 
 /*
@@ -3673,11 +3655,11 @@ time_t	collect_channel_garbage(time_t now)
 			}
 			if (tmp && tmp->flags == CHFL_REOPLIST)
 			{
-				r_cnt += reop_channel(now, chptr);
+				r_cnt += reop_channel(now, chptr, CHFL_REOPLIST);
 			}
 			else if (chptr->mode.mode & MODE_REOP)
 			{
-				r_cnt += reop_channel(now, chptr);
+				r_cnt += reop_channel(now, chptr, !CHFL_REOPLIST);
 			}
 		}
 	}
