@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.27 1998/02/10 23:19:01 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.28 1998/03/21 19:22:22 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -89,7 +89,10 @@ aClient *cptr;
 {
         int i1, i2, i3, i4, m;
         u_long lmask, baseip;
+	char *at;
  
+	if (at = index(mask, '@'))
+		mask = at + 1;
         if (sscanf(mask, "%d.%d.%d.%d/%d", &i1, &i2, &i3, &i4, &m) != 5 ||
            m < 1 || m > 31) {
                sendto_flag(SCH_LOCAL, "Ignoring bad mask: %s", mask);
