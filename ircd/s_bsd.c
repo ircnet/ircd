@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.149 2004/07/15 06:05:28 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.150 2004/08/01 06:34:06 jv Exp $";
 #endif
 
 #include "os.h"
@@ -457,35 +457,31 @@ int	unixport(aClient *cptr, char *path, int port)
  */
 void	close_listeners(void)
 {
-	Reg	aClient	*cptr;
-	Reg	int	i;
-	Reg	aConfItem *aconf;
+	aClient	*acptr, *bcptr;
+	aConfItem *aconf;
 
 	/*
 	 * close all 'extra' listening ports we have and unlink the file
 	 * name if it was a unix socket.
 	 */
-	for (i = highest_fd; i >= 0; i--)
-	    {
-		if (!(cptr = local[i]))
-			continue;
-		if (cptr == &me || !IsListener(cptr))
-			continue;
-		aconf = cptr->confs->value.aconf;
+	for (acptr = ListenerLL; acptr; acptr = bcptr)
+	{
+		aconf = acptr->confs->value.aconf;
+		bcptr = acptr->next; // might get deleted by close_connection
 
 		if (IsIllegal(aconf) && aconf->clients == 0)
-		    {
+		{
 #ifdef	UNIXPORT
-			if (IsUnixSocket(cptr))
-			    {
+			if (IsUnixSocket(acptr))
+			{
 				sprintf(unixpath, "%s/%d",
 					aconf->host, aconf->port);
 				(void)unlink(unixpath);
-			    }
+			}
 #endif
-			close_connection(cptr);
-		    }
-	    }
+			close_connection(acptr);
+		}
+	}
 }
 void	activate_delayed_listeners(void)
 {
