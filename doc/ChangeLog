@@ -1,3 +1,23 @@
+2004-09-21  Piotr Kucharski
+
+	* mod_webproxy.c, mod_webproxy_ext.h: new files.
+	* new command 'M' in ircd>iauth communication, passing ircd name.
+	* a_conf.c: "port" setting mandatory for webproxy.
+
+2004-09-20  Piotr Kucharski
+
+	* a_conf.c: add "port" setting to modules (mandatory for socks).
+	* mod_socks.c: use port from configuration, not hardcoded 1080.
+
+2004-09-16  Piotr Kucharski
+
+	* s_misc.c/exit_one_client(): squit bouncing back to 2.10 with incorrect
+	  prefix resulted in "fake prefix" (reported by ZZyZZ).
+
+2004-09-13  Piotr Kucharski
+
+	* mod_socks.c: cleaned and simplified.
+
 2004-09-12  Piotr Kucharski
 
 	* changed LOCAL_KILL_ONLY to OPER_KILL_REMOTE and moved it to other
