@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.2 1997/04/14 15:04:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.3 1997/06/26 15:40:44 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -526,29 +526,6 @@ aClient	*cptr;
 		    }
 	clmiss++;
 	return (cptr);
-}
-
-/*
- * hash_find_nickserv
- */
-aClient	*hash_find_nickserv(name, cptr)
-char	*name;
-aClient *cptr;
-{
-	aClient	*c2ptr = cptr;
-	char	*serv;
-
-	if ((serv = (char *)index(name, '@')))
-	    {
-		*serv++ = '\0';
-		c2ptr = hash_find_server(serv, cptr);
-		if (c2ptr && IsMe(c2ptr))
-			c2ptr = hash_find_client(name, cptr);
-		*--serv = '@';
-	    }
-	else
-		c2ptr = hash_find_client(name, cptr);
-	return (c2ptr);
 }
 
 /*

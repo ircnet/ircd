@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.9 1997/06/08 23:06:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.10 1997/06/26 15:40:45 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -88,8 +88,7 @@ aClient *cptr;
 	Reg	aClient	*acptr = NULL;
 	Reg	aClient	*bcptr;
 	Reg	aService *sp;
-	int	metric = -1;
-	int	type = -1, len = strlen(name);
+	int	len = strlen(name);
 
 	if (!index(name, '@') || !(acptr = find_service(name, cptr)))
 		for (sp = svctop; sp; sp = sp->nexts)
@@ -99,12 +98,6 @@ aClient *cptr;
 				acptr = bcptr;
 				break;
 			    }
-	if (acptr && acptr->hopcount > 1)
-		for (type = acptr->service->type, metric = acptr->hopcount,
-		     sp = svctop; sp; sp = sp->nexts)
-			if (sp->type == type && (bcptr = sp->bcptr) &&
-			    bcptr->hopcount < metric)
-				acptr = bcptr;
 	return (acptr ? acptr : cptr);
 }
  

@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.4 1997/04/18 20:05:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.5 1997/06/26 15:40:47 kalt Exp $";
 #endif
 #include "struct.h"
 #include "common.h"
@@ -75,36 +75,14 @@ char	*name;
 Reg	aClient *cptr;
     {
 	aClient *acptr = cptr;
-	char	*serv;
 
-	if (name && *name)
-		if ((serv = (char *)index(name, '@'))) {
-			if (*name == '@' || !*(serv+1))	/* NULL@ or @NULL */
-				return acptr;
-			*serv++ = '\0';
-			acptr = hash_find_server(serv, cptr);
-			if (acptr && IsMe(acptr))
-				acptr = hash_find_client(name, cptr);
-			*--serv = '@';
-		} else
-			acptr = hash_find_client(name, cptr);
+	if (index(name, '@'))
+		acptr = hash_find_client(name, cptr);
 	return acptr;
     }
 
-/* Obsoleted as of 2.9.3/970114/Vesa by find_service() */
-aClient	*find_nickserv(name, cptr)
-char	*name;
-Reg	aClient *cptr;
-    {
-	aClient *acptr = cptr;
+#else /* CLIENT_COMPILE */
 
-	if (name && *name)
-		acptr = hash_find_nickserv(name, cptr);
-
-	return acptr;
-    }
-
-#else
 aClient *find_client(name, cptr)
 char *name;
 aClient *cptr;
@@ -119,7 +97,7 @@ aClient *cptr;
 			return c2ptr;
 	return cptr;
     }
-#endif
+#endif /* CLIENT_COMPILE */
 
 /*
 **  Find a user@host (server or user).
@@ -363,6 +341,7 @@ char	*buffer, *bufend;
 				from = find_server(sender, (aClient *)NULL);
 #ifndef	CLIENT_COMPILE
 			/* Is there svc@server prefix ever? -Vesa */
+			/* every time a service talks -krys */
 			if (!from && index(sender, '@'))
 				from = find_service(sender, (aClient *)NULL);
 			if (!from)
