@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.9 1999/01/14 19:20:43 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.10 1999/01/14 20:22:27 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -26,6 +26,8 @@ static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.9 1999/01/14 19:20:43 kalt Exp
 #define MOD_RFC931_C
 #include "a_externs.h"
 #undef MOD_RFC931_C
+
+static u_char notify_protocol = 0;
 
 struct _stats
 {
@@ -50,6 +52,14 @@ AnInstance *self;
 {
 	self->data = (void *) malloc(sizeof(struct _stats));
 	bzero((char *) self->data, sizeof(struct _stats));
+
+	/* undocumented option */
+	if (self->opt && strstr(self->opt, "protocol"))
+	    {
+		notify_protocol = 1;
+		self->popt = "protocol";
+		return "Will notify upon protocol errors.";
+	    }
 	return NULL;
 }
 
@@ -162,6 +172,7 @@ u_int cl;
 	    {
 		/* data's in from the ident server */
 		char *ch;
+		u_char bad = 0;
 
 		cldata[cl].inbuffer[cldata[cl].buflen] = '\0';
 		ch = index(cldata[cl].inbuffer, '\r');
@@ -239,10 +250,37 @@ u_int cl;
 						    cldata[cl].authuser);
 				    }
 				else
-					st->bad += 1;
+					bad = 1;
 			    }
 			else
+				bad = 1;
+			if (bad)
+			    {
 				st->bad += 1;
+
+				if (notify_protocol)
+				    {
+					ch = cldata[cl].inbuffer;
+					while (*ch)
+					    {
+						if (!(isalnum || 
+						      ispunct(*ch) ||
+						      isspace(*ch)))
+							break;
+						ch += 1;
+					    }
+					*ch = '\0';
+					sendto_log(ALOG_IRCD|ALOG_FLOG,
+						   LOG_WARNING,
+		   "rfc931: bad reply from %s[%s] to \"%u, %u\": %u, \"%s\"",
+						   cldata[cl].host,
+						   cldata[cl].itsip,
+						   cldata[cl].itsport,
+						   cldata[cl].ourport,
+						   cldata[cl].buflen,
+						   cldata[cl].inbuffer);
+				    }
+			    }
 			/*
 			** In any case, our job is done, let's cleanup.
 			*/
