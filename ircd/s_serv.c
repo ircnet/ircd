@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.258 2004/12/15 01:25:31 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.259 2005/01/30 13:43:40 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -145,24 +145,8 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		server = cptr->name;
 	}
-	/*
-	** Find server matching (compatibility) SID
-	*/
-	if (server[0]=='$')
-	{
-		aServer *servptr;
-
-		servptr = find_tokserver(idtol(server + 1, SIDLEN - 1),
-			cptr, NULL);
-		if (servptr)
-		{
-			acptr = servptr->bcptr;
-		}
-	}
-	else	/* if (strlen(server)==SIDLEN) perhaps? --Beeth */
-	{
+	/* Try finding by sid. */
 		acptr = find_sid(server, NULL);
-	}
 	/*
 	** The following allows wild cards in SQUIT. Only useful
 	** when the command is issued by an oper.
@@ -502,14 +486,6 @@ static	void	send_server(aClient *cptr, aClient *server)
 			server->hopcount + 1, server->serv->sid,
 			server->serv->verstr, server->info);
 	}
-	else
-	{
-		/* 2.10 */
-		sendto_one(cptr,":%s SERVER %s %d %s :%s",
-			server->serv->up->serv->maskedby->name,
-			server->name, server->hopcount + 1,
-			server->serv->tok, server->info);
-	}
 
 	return;
 }
@@ -588,10 +564,7 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 
 	acptr = make_client(cptr);
-	if (!make_server(acptr))
-	{
-		return exit_client(cptr, cptr, &me, "No more tokens");
-	}
+	make_server(acptr);
 	acptr->hopcount = sptr->hopcount + 1;
 	strncpyzt(acptr->serv->namebuf, sptr->name, sizeof(acptr->serv->namebuf));
 	acptr->info = mystrdup("Masked Server");
@@ -611,19 +584,8 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	add_client_to_list(acptr);
 	register_server(acptr);
 
-	if (*parv[1] == '$')
-	{
-		acptr->serv->stok = idtol(parv[1] + 1, SIDLEN - 1);
-		sprintf(acptr->serv->sid, "$%s",
-			ltoid(acptr->serv->ltok, SIDLEN - 1));
-		add_to_server_hash_table(acptr->serv, cptr);
-	}
-	else
-	{
-		acptr->serv->stok = idtol(parv[3], SIDLEN);
 		strncpyzt(acptr->serv->sid, parv[1], SIDLEN + 1);
 		add_to_sid_hash_table(parv[1], acptr);
-	}
 
 	add_server_to_tree(acptr);
 
@@ -849,10 +811,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    }
 
 		acptr = make_client(cptr);
-		if (!make_server(acptr))
-		{
-			return exit_client(cptr, cptr, &me, "No more tokens");
-		}
+		make_server(acptr);
 		acptr->hopcount = hop;
 		strncpyzt(acptr->serv->namebuf, host, sizeof(acptr->serv->namebuf));
 		if (acptr->info != DefInfo)
@@ -868,56 +827,23 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 		if (ST_UID(cptr))
 		{
-			/* remote is 2.11+ */
-			if (*parv[3] == '$')
-			{
-				/* compatibility SID */
-				acptr->serv->stok = idtol(parv[3] + 1,
-					SIDLEN - 1);
-				sprintf(acptr->serv->sid, "$%s",
-					ltoid(acptr->serv->ltok, SIDLEN - 1));
-			}
-			else
-			{
 				strncpyzt(acptr->serv->sid, parv[3], SIDLEN+1);
-				acptr->serv->stok = idtol(parv[3], SIDLEN);
 				acptr->serv->version |= SV_UID;
 				add_to_sid_hash_table(parv[3], acptr);
-			}
 
 			strncpyzt(acptr->serv->verstr,
 				parv[4], sizeof(acptr->serv->verstr));
 			acptr->serv->version = get_version(parv[4],NULL);
 		}
-		else
-		{
-			/* remote is 2.10 */
-			acptr->serv->stok = atoi(parv[3]);
-			strcpy(acptr->serv->verstr,"0");
-
-			sprintf(acptr->serv->sid, "$%s",
-				ltoid(acptr->serv->ltok, SIDLEN - 1));
-			
-			aconf = cptr->serv->nline;
-			/* Send PING for EOB emulation */
-			sendto_one(cptr, ":%s PING %s :%s",
-				my_name_for_link(ME, aconf->port),
-				my_name_for_link(ME, aconf->port),
-				acptr->name);
-		}
 
 		add_server_to_tree(acptr);
 		(void)add_to_client_hash_table(acptr->name, acptr);
-		if (ST_NOTUID(acptr))
-		{
-			(void)add_to_server_hash_table(acptr->serv, cptr);
-		}
 
 		introduce_server(cptr, acptr);
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_SERVER, acptr->name, acptr,
 				      ":%s SERVER %s %d %s :%s", parv[0],
-				      acptr->name, hop+1, acptr->serv->tok,
+				      acptr->name, hop+1, acptr->serv->sid,
 				      acptr->info);
 #endif
 		sendto_flag(SCH_SERVER, "Received SERVER %s from %s (%d %s)",
@@ -938,12 +864,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	 * use cptr->name, only cptr->serv->namebuf, which is allocated
 	 * in make_server()... --B. */
 	/* doesnt duplicate cptr->serv if allocated this struct already */
-	if (!make_server(cptr))
-	{
-		sendto_flag(SCH_ERROR, "Ran out of compatibility tokens for %s"
-				", dropping link", inpath);
-		return exit_client(cptr, cptr, &me, "No more tokens");
-	}
+	make_server(cptr);
 	strncpyzt(cptr->serv->namebuf, host, sizeof(cptr->serv->namebuf));
 	/* cptr->name has to exist before check_version(), and cptr->info
 	 * may not be filled before check_version(). */
@@ -982,7 +903,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 #endif
 	
 	Reg	aConfItem	*aconf, *bconf;
-	char	mlname[HOSTLEN+1], *inpath, *host, *s, *encr, *stok;
+	char	mlname[HOSTLEN+1], *inpath, *host, *s, *encr;
 
 	host = cptr->name;
 	inpath = get_client_name(cptr,TRUE); /* "refresh" inpath with host */
@@ -1319,7 +1240,6 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	cptr->serv->version = cptr->hopcount;   /* temporary location */
 	cptr->hopcount = 1;			/* local server connection */
 	cptr->serv->snum = find_server_num(cptr->name);
-	cptr->serv->stok = 1;
 
 	strncpyzt(cptr->serv->verstr, versionbuf, sizeof(cptr->serv->verstr));
 	if (ST_UID(cptr))
@@ -1327,27 +1247,18 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		strcpy(cptr->serv->sid, sid);
 		add_to_sid_hash_table(sid, cptr);
 	}
-	else
-	{
-		sprintf(cptr->serv->sid,"$%s", 
-			ltoid(cptr->serv->ltok, SIDLEN-1));
-	}
 
 	cptr->flags |= FLAGS_CBURST;
 	register_server(cptr);
 	add_server_to_tree(cptr);
 	/* why no add_client_to_list() here? --B. */
-	if (ST_NOTUID(cptr))
-	{
-		(void) add_to_server_hash_table(cptr->serv, cptr);
-	}
-	Debug((DEBUG_NOTICE, "Server link established with %s V%X %d",
-		cptr->name, cptr->serv->version, cptr->serv->stok));
+	Debug((DEBUG_NOTICE, "Server link established with %s V%X %s",
+		cptr->name, cptr->serv->version, cptr->serv->sid));
 	add_fd(cptr->fd, &fdas);
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_SERVER, cptr->name, cptr,
 			      ":%s SERVER %s %d %s :%s", ME, cptr->name,
-			      cptr->hopcount+1, cptr->serv->tok, cptr->info);
+			      cptr->hopcount+1, cptr->serv->sid, cptr->info);
 #endif
 	sendto_flag(SCH_SERVER, "Received SERVER %s (%d %s)", cptr->name,
 		    1, cptr->info);
@@ -1385,15 +1296,9 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			** These are only true when *BOTH* NICK and USER have
 			** been received. -avalon
 			*/
-			if (ST_NOTUID(cptr) && *mlname == '*' &&
-			    match(mlname, acptr->user->server) == 0)
-				stok = me.serv->tok;
-			else
-				stok = ST_UID(cptr) ?
-					acptr->user->servp->tok :
-					acptr->user->servp->maskedby->serv->tok;
 			send_umode(NULL, acptr, 0, SEND_UMODES, buf);
 			if (ST_UID(cptr) && *acptr->user->uid)
+			{
 				sendto_one(cptr,
 					   ":%s UNICK %s %s %s %s %s %s :%s",
 					   acptr->user->servp->sid,
@@ -1402,12 +1307,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 					   acptr->user->host,
 					   acptr->user->sip,
 					   (*buf) ? buf : "+", acptr->info);
-			else
-				sendto_one(cptr,"NICK %s %d %s %s %s %s :%s",
-					   acptr->name, acptr->hopcount + 1,
-					   acptr->user->username,
-					   acptr->user->host, stok,
-					   (*buf) ? buf : "+", acptr->info);
+			}
 		    }
 		else if (IsService(acptr) &&
 			 match(acptr->service->dist, cptr->name) == 0)
@@ -1420,25 +1320,6 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 						acptr->service->dist,
 						acptr->service->type,
 				   		acptr->info);
-			}
-			else
-			{
-				if (*mlname == '*' &&
-			    	    match(mlname, acptr->service->server) == 0)
-				{
-					stok = me.serv->tok;
-				}
-				else
-				{
-					stok = acptr->service->servp->maskedby->serv->tok;
-				}
-				
-				sendto_one(cptr, "SERVICE %s %s %s %d %d :%s",
-				   		acptr->name, stok,
-						acptr->service->dist,
-						acptr->service->type,
-						acptr->hopcount + 1,
-						acptr->info);
 			}
 		}
 		/* the previous if does NOT catch all services.. ! */
@@ -3155,21 +3036,7 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		acptr = NULL;
 		
-		if (sid[0] == '$')
-		{
-			aServer *asptr;
-			/* Fake sid (comes from EOB emulation */
-			asptr = find_tokserver(idtol(sid + 1, SIDLEN - 1),
-				cptr, NULL);
-			if (asptr)
-			{
-				acptr = asptr->bcptr;
-			}
-		}
-		else
-		{
 			acptr = find_sid(sid, NULL);
-		}
 		if (!acptr)
 		{
 			sendto_flag(SCH_SERVER,
