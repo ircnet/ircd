@@ -126,6 +126,9 @@
 #define	RPL_MYINFO           004
 #define RPL_ISUPPORT         005
 #define	RPL_BOUNCE            10
+#define RPL_MAP               15
+#define RPL_MAPEND            17
+#define RPL_MAPSTART          18
 #define	RPL_YOURID            42
 #define RPL_SAVENICK          43
 
