@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.122 2004/03/17 21:03:09 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.123 2004/03/20 23:54:00 jv Exp $";
 #endif
 
 #include "os.h"
@@ -46,6 +46,8 @@ char	*configfile = IRCDCONF_PATH;	/* Server configuration file */
 int	debuglevel = -1;		/* Server debug level */
 int	bootopt = BOOT_PROT|BOOT_STRICTPROT;	/* Server boot option flags */
 int	serverbooting = 1;
+int	firstrejoin = 0;		/* Server rejoined the network after
+					   start */
 char	*debugmode = "";		/*  -"-    -"-   -"-   -"- */
 char	*sbrk0;				/* initial sbrk(0) */
 char	*tunefile = IRCDTUNE_PATH;
