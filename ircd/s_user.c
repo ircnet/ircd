@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.211 2004/06/12 23:25:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.212 2004/06/19 17:47:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3634,6 +3634,18 @@ int	is_allowed(aClient *cptr, ACL function)
 # endif
 		ret = 0;
 		break;
+#endif
+
+#ifdef TKLINE
+#ifdef OPER_TKLINE
+	case ACL_TKLINE:
+	case ACL_UNTKLINE:
+# ifndef LOCOP_TKLINE
+		if (IsOper(cptr))
+# endif
+		ret = 0;
+		break;
+#endif
 #endif
 
 	default:
