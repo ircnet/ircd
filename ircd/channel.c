@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.83 1998/12/21 15:06:08 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.84 1998/12/29 20:14:15 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -215,8 +215,8 @@ char	*modeid;
 }
 
 /*
- * del_modeid - delete an id belonging to cptr
- * if modeid is null, delete all ids belonging to cptr.
+ * del_modeid - delete an id belonging to chptr
+ * if modeid is null, delete all ids belonging to chptr.
  */
 static	int	del_modeid(type, chptr, modeid)
 int type;
@@ -226,9 +226,21 @@ char	*modeid;
 	Reg	Link	**mode;
 	Reg	Link	*tmp;
 
-	if (!modeid)
-		return -1;
-	for (mode = &(chptr->mlist); *mode; mode = &((*mode)->next))
+	if (modeid == NULL)
+	    {
+	        for (mode = &(chptr->mlist); *mode; mode = &((*mode)->next))
+		    if (type == (*mode)->flags)
+		        {
+			    tmp = *mode;
+			    *mode = tmp->next;
+			    istat.is_banmem -= (strlen(modeid) + 1);
+			    istat.is_bans--;
+			    MyFree(tmp->value.cp);
+			    free_link(tmp);
+			    break;
+			}
+	    }
+	else for (mode = &(chptr->mlist); *mode; mode = &((*mode)->next))
 		if (type == (*mode)->flags &&
 		    mycmp(modeid, (*mode)->value.cp)==0)
 		    {
