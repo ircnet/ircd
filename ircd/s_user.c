@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.131 2002/07/05 23:16:17 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.132 2002/07/06 03:16:54 jv Exp $";
 #endif
 
 #include "os.h"
@@ -555,7 +555,7 @@ char	*nick, *username;
 		/*
 		 * following block for the benefit of time-dependent K:-lines
 		 */
-		if (find_kill(sptr, 1, &reason))
+		if (!IsKlineExempt(sptr) && find_kill(sptr, 1, &reason))
 		    {
 			/*char buf[100];*/
 
