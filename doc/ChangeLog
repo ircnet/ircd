@@ -1,3 +1,24 @@
+Fri Aug  8 10:51:24 1997  Christophe Kalt
+
+	* channel.c: m_names() behaviour wasn't consistent with m_who()
+	concerning +p channels (Michael 'Eumel' Neumayer).
+
+	* configure.in: minor changes (Alain Nissen).
+
+	* s_user.c: missing argument to err_str() (Kai Seidler).
+
+	* config.h.dist, h.h, struct.h, common.c, channel.c, s_bsd.c,
+	s_debug.c, s_err.c, s_misc.c, s_serv.c, s_service.c, s_user.c:
+	removed support for 2.8 protocol.
+
+	* config.h.dist, msg.h, channel.c, note.c, s_bsd.c, s_debug.c,
+	s_misd.c, s_user.c: removed NOTE.
+
+	* s_bsd.c: wrong argument to bzero().
+
+	* Makefile.in, buildm4: rev.sh replaced by config.guess and
+	buildm4 wasn't ran by `make install-server'.
+
 2.9.3
 
 Wed Jul 23 11:23:30 1997  Christophe Kalt
