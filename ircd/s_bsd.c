@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.91 2002/11/24 15:29:53 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.92 2003/02/09 23:39:18 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2462,7 +2462,7 @@ int	*lenp;
 		outip.SIN_PORT = 0;
 		outip.SIN_FAMILY = AFINET;
 #ifdef INET6
-		if (!inetpton(AF_INET6, aconf->source_ip, outip.sin_addr.s6_addr))
+		if (!inetpton(AF_INET6, aconf->source_ip, outip.sin6_addr.s6_addr))
 #else
 		if ((outip.sin_addr.s_addr = inetaddr(aconf->source_ip)) == -1)
 #endif
