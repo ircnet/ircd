@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.15 1997/09/24 18:38:08 kalt Exp $
+#*   $Id: Makefile.in,v 1.16 1997/11/13 01:18:33 kalt Exp $
 #*
 #*/
 
@@ -87,7 +87,7 @@ CHKCONF_COMMON_OBJS = match.o
 CHKCONF_OBJS = chkconf.o
 CHKCONF = chkconf
 
-all: client server
+all: server client
 
 client: $(CLIENT)
 
