@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.70 2002/01/05 02:49:07 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.71 2002/01/05 02:53:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -568,7 +568,7 @@ aClient	*mp;
 	(void)add_to_client_hash_table(mp->name, mp);
 
 	setup_server_channels(mp);
-	strcpy(me.serv->sid, SERVER_ID);
+	strncpyzt(me.serv->sid, SERVER_ID, SIDLEN+1);
 }
 
 /*
@@ -601,6 +601,11 @@ char	*argv[];
 {
 	uid_t	uid, euid;
 
+	if (!sid_valid(SERVER_ID))
+	{
+		fprintf(stderr,"Invalid SERVER_ID (%s).\n", SERVER_ID);
+		exit(6);
+	}
 	(void) myctime(time(NULL));	/* Don't ask, just *don't* ask */
 	sbrk0 = (char *)sbrk((size_t)0);
 	uid = getuid();
