@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.246 2004/10/06 20:11:55 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.247 2004/10/13 16:28:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3249,6 +3249,7 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{ TSET_POOLSIZE, "POOLSIZE" },
 		{ TSET_ACONNECT, "ACONNECT" },
 		{ TSET_CACCEPT, "CACCEPT" },
+		{ TSET_SPLIT, "SPLIT" },
 		{ 0, NULL }
 	};
 	int i, acmd = 0;
@@ -3354,6 +3355,39 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				sendto_flag(SCH_NOTICE, "%s changed value of "
 					"CACCEPT to %s", sptr->name, parv[2]);
 				break;
+			case TSET_SPLIT:
+			{
+				int tmp;
+
+				tmp = atoi(parv[2]);
+				if (tmp < SPLIT_SERVERS)
+					tmp = SPLIT_SERVERS;
+				if (tmp != iconf.split_minservers)
+				{
+					sendto_flag(SCH_NOTICE, "%s changed"
+						" value of SPLIT_SERVERS"
+						" from %d to %d", sptr->name,
+						iconf.split_minservers, tmp);
+					iconf.split_minservers = tmp;
+				}
+				if (parc > 3)
+				{
+					tmp = atoi(parv[3]);
+					if (tmp < SPLIT_USERS)
+						tmp = SPLIT_USERS;
+				}
+				else
+					tmp = iconf.split_minusers;
+				if (tmp != iconf.split_minusers)
+				{
+					sendto_flag(SCH_NOTICE, "%s changed"
+						" value of SPLIT_USERS"
+						" from %d to %d", sptr->name,
+						iconf.split_minusers, tmp);
+					iconf.split_minusers = tmp;
+				}
+				break;
+			}
 		} /* switch(acmd) */
 	} /* parc > 2 */
 
@@ -3374,6 +3408,12 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			sendto_one(sptr, ":%s NOTICE %s :CACCEPT = %s", ME,
 				parv[0], iconf.caccept == 2 ? "SPLIT" :
 				iconf.caccept == 1 ? "ON" : "OFF");
+		}
+		if (acmd & TSET_SPLIT)
+		{
+			sendto_one(sptr, ":%s NOTICE %s :SPLIT = SS %d SU %d",
+				ME, parv[0], iconf.split_minservers,
+				iconf.split_minusers);
 		}
 	}
 	return 1;

@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.122 2004/10/04 20:23:37 chopin Exp $
+ *   $Id: struct_def.h,v 1.123 2004/10/13 16:28:23 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -975,6 +975,7 @@ typedef enum ServerChannels {
 #define TSET_ACONNECT 0x001
 #define TSET_POOLSIZE 0x002
 #define TSET_CACCEPT 0x004
+#define TSET_SPLIT 0x008
 #define TSET_SHOWALL (int) ~0
 
 /* Runtime configuration structure */
