@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.154 2003/08/07 23:07:28 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.155 2003/08/08 19:13:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -256,12 +256,18 @@ int	server;
 		return 0;
 
 	for (ch = nick; *ch && (ch - nick) < NICKLEN; ch++)
+	{
 		/* Transition period. Until all 2.10 are gone, disable
-		** these chars in nicks for users. Then reenable and
-		** drop scandinavian origin from match --B. */
-		if ((!server && (*ch == '{' || *ch == '}' || *ch == '\\')) ||
-		!isvalidnick(*ch))
+		** these chars in nicks for users. --B. */
+		if (!server && isscandinavian(*ch))
+		{
 			break;
+		}
+		if (!isvalidnick(*ch))
+		{
+			break;
+		}
+	}
 
 	*ch = '\0';
 
