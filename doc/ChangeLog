@@ -1,3 +1,11 @@
+1999-03-13  Christophe Kalt
+
+	* struct_def.h, ircd.c, s_auth.c, s_bsd.c, s_user_ext.h, s_user.c,
+	a_struct_def.h, iauth.c, a_conf.c, a_io.c: added XOPT_EARLYPARSE,
+	`P' message for iauth, `extinfo' option for iauth.
+
+	* a_io.c/next_io(): if xxx_start() returns 1, count module as left.
+
 1999-03-11  Christophe Kalt
 
 	* chkconf.c:
