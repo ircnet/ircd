@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.151 2003/08/06 18:47:46 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.152 2003/08/08 19:22:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1892,6 +1892,38 @@ Reg	char *cn;
 			*cn = '\0';
 			return 0;
 		    }
+}
+
+/*
+** This will convert channel name from {}\~ to []|^ set.
+** It should be done on all channel names coming from 2.10 servers,
+** as 2.11+ do not treat them case equivalent. Hence we stick to
+** on set of chars (which are treated equivalent on old servers)
+** and drop it in the next version.
+** Local clients are treated likewise.
+**
+** XXX: Do NOT allow 2.10 and next version on the same net!
+**
+*/
+void   convert_scandinavian(Reg char *cn, aClient *cptr)
+{
+	if (ST_NOTUID(cptr) || MyPerson(cptr))
+	{
+		for (; *cn; cn++)
+		{
+			switch (*cn)
+			{
+			case    '{':
+				*cn = '['; break;
+			case    '}':
+				*cn = ']'; break;
+			case    '~':
+				*cn = '^'; break;
+			case    '\\':
+				*cn = '|'; break;
+			}
+		}
+	}
 }
 
 /*
