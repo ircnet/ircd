@@ -1,3 +1,25 @@
+1999-01-12  Christophe Kalt  <kalt@azurite>
+
+	* a_log_def.h, mod_pipe_ext.h, a_externs.h, mod_pipe.c, a_conf.c:
+	finally wrote the pipe module.
+
+	* struct_def.h, a_conf_def.h, a_io_ext.h, iauth.c, mod_rfc931.c,
+	mod_socks.c, s_auth.c, s_auth_ext.h, s_misc.c: iauth now sends
+	statistics to ircd, shown by /stats t.
+
+	* a_conf_def.h, a_conf.c, a_log_def.h, mod_socks.c: SOCKS module
+	overhaul: added caching, rewrote code to use v4 instead of v5, and
+	to be smarter (Based on work from Piotr Kucharski).
+	
+	* s_user.c: do_nick_name() now rejects "anonymous".
+
+	* packet.c/dopacket(): don't call unzip_packet() without data.
+
+	* channel.c: extension to del_modeid() from Kaspar Landsberg.
+
+	* s_bsd.c: don't call dopacket() again for compressed links just
+	because the output buffer was filled up.
+
 1998-12-24  Christophe Kalt
 
 	* s_service.c: using FLAGS_CBURST for services has too many
