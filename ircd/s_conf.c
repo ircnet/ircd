@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.157 2005/02/17 14:09:20 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.158 2005/02/22 18:09:47 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2400,6 +2400,9 @@ int	m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 		user++;
 	}
 	*host++ = '\0';
+#ifdef INET6
+	host = ipv6_convert(host);
+#endif
 	reason = parv[3];
 	if (strlen(reason) > TOPICLEN)
 	{
