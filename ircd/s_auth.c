@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.5 1998/07/19 19:37:30 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.6 1998/07/19 19:38:27 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -31,7 +31,7 @@ static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.5 1998/07/19 19:37:30 kalt Exp $";
 /*
  * sendto_iauth
  *
- *	Send the buffer to the authentication daemon.
+ *	Send the buffer to the authentication slave process.
  *	Return 0 if everything went well, -1 otherwise.
  */
 int
@@ -56,7 +56,7 @@ char *buf;
 /*
  * read_iauth
  *
- *	read and process data from the authentication daemon.
+ *	read and process data from the authentication slave process.
  */
 void
 read_iauth()
@@ -99,7 +99,7 @@ read_iauth()
 			}
 		    if ((cptr = local[i = atoi(buf+2)]) == NULL)
 			{
-			    sendto_flag(SCH_AUTH, "client gone"); /* debug */
+			    sendto_flag(SCH_DEBUG, "client gone");
 			    start = end;
 			    continue;
 			}
@@ -107,7 +107,7 @@ read_iauth()
 			    inetntoa((char *)&cptr->ip), cptr->port);
 		    if (strncmp(tbuf, buf, strlen(tbuf)))
 			{
-			    sendto_flag(SCH_AUTH, "mismatch"); /* debug again*/
+			    sendto_flag(SCH_DEBUG, "mismatch");
 			    start = end;
 			    continue;
 			}
