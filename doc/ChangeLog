@@ -1,3 +1,20 @@
+2004-06-18  Piotr Kucharski
+
+	* s_conf.c: move config_read() to new file.
+	* config_read.c: new file with config_read() and config_free().
+	* chkconf.c: work (almost) properly with ircd #include directive.
+	* Makefile.in: s_conf.o and chkconf.o dependency on config_read.c.
+	* s_serv.c/m_rehash(): use first char of first param to REHASH.
+	* s_conf.c/rehash(): change sig==2 (was sign of 'q') to sig=='d'.
+
+2004-06-17  Piotr Kucharski
+
+	* s_err.c, s_serv.c: slightly changed LUSERS format (numbers in front,
+	  but to ease transition, keep text with numbers too).
+	* os.h: removed some client includes of nameser.h.
+	* s_misc.c/exit_client(): exit_server() frees sptr, so we have to move
+	  usage of sptr->name up.
+
 2004-06-15  Piotr Kucharski
 
 	* parse.c: incorrect minparams for SMASK.
@@ -6,6 +23,9 @@
 	* s_serv.c: new function count_servers_users().
 	* s_serv.c/trace_one(), report_myservers(): use count_servers_users().
 	* s_serv.c/m_lusers(), config.h.dist: removed SHOW_INVISIBLE_LUSERS.
+	* numeric_def.h, s_err.c, s_serv.c/m_lusers: RPL_LOCALUSERS and
+	  RPL_GLOBALUSERS combined into one RPL_LUSERMAX.
+	* s_serv.c/m_wallops(): client wallops are ignored during parse.
 
 2004-06-13  Piotr Kucharski
 
