@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.251 2004/10/26 20:16:47 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.252 2004/10/26 23:23:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3902,9 +3902,45 @@ static void report_listeners(aClient *sptr, char *to)
 	}
 }
 
-/* allows ENCAPsulation of commands */
+/*
+** allows ENCAPsulation of commands
+** parv[0] is ignored (though it's source)
+** parv[1] is target mask
+** parv[2] is command
+** the rest is optional and is used by command as its own params
+*/
+
 int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
+	char buf[BUFSIZE];
+	int i, len;
+
+	/* Prepare ENCAP buffer... */
+	len = sprintf(buf, ":%s ENCAP", sptr->serv->sid);
+	for (i = 1; i < parc; i++)
+	{
+		if (len + strlen(parv[i]) >= BUFSIZE-2)
+		{
+			/* This can get cut. */
+			sendto_flag(SCH_ERROR, "ENCAP too long (%s)", buf);
+			/* Sending incomplete ENCAP means data corruption.
+			** Should we squit the link that fed us this? --B. */
+			return 1;
+		}
+		if (i >= 3 && i == parc - 1)
+			len += sprintf(buf+len, " :%s", parv[i]);
+		else
+			len += sprintf(buf+len, " %s", parv[i]);
+	}
+	/* ...and broadcast it. */
+	sendto_serv_v(cptr, SV_UID, "%s", buf);
+
+	/* FIXME: in 2.11.1 */
+	/* Do we match parv[1]? */
+	/* Copying things from parse() */
+	/* STAT_ENCAP handler for parv[2] */
+	/* Call handler function with parc-2, parv+2 */
+
 	return 0;
 }
 
