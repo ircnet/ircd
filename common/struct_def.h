@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.66 2002/12/28 21:18:31 jv Exp $
+ *   $Id: struct_def.h,v 1.67 2003/02/11 18:44:20 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -326,11 +326,13 @@ struct	ConfItem	{
 #define CFLAG_RNODNS		0x00002
 #define CFLAG_RNOIDENT		0x00004
 #define CFLAG_KEXEMPT		0x00008
+#define CFLAG_NORESOLVE		0x00010
 
 #define IsConfRestricted(x)	((x)->flags & CFLAG_RESTRICTED)
 #define IsConfRNoDNS(x)		((x)->flags & CFLAG_RNODNS)
 #define IsConfRNoIdent(x)	((x)->flags & CFLAG_RNOIDENT)
 #define IsConfKlineExempt(x)	((x)->flags & CFLAG_KEXEMPT)
+#define IsConfNoResolve(x)	((x)->flags & CFLAG_NORESOLVE)
 
 #define	IsIllegal(x)	((x)->status & CONF_ILLEGAL)
 

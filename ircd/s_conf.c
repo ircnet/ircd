@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.60 2003/02/10 19:25:46 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.61 2003/02/11 18:44:20 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -65,10 +65,11 @@ aConfItem	*kconf = NULL;
 char		*networkname = NULL;
 
 /* Parse I-lines flags from string.
- * D - Restricted, if no DNS
- * I - Restricted, if no ident
+ * D - Restricted, if no DNS.
+ * I - Restricted, if no ident.
  * R - Restricted.
- * E - Kline exempt
+ * E - Kline exempt.
+ * N - Do not resolve hostnames (show as IP).
  */
 long iline_flags_parse(char *string)
 {
@@ -91,10 +92,13 @@ long iline_flags_parse(char *string)
 	{
 		tmp |= CFLAG_RESTRICTED;
 	}
-	
 	if (index(string,'E'))
 	{
 		tmp |= CFLAG_KEXEMPT;
+	}
+	if (index(string,'N'))
+	{
+		tmp |= CFLAG_NORESOLVE;
 	}
 
 	return tmp;
@@ -110,20 +114,21 @@ char *iline_flags_to_string(long flags)
 	{
 		*s++ = 'D';
 	}
-
 	if (flags & CFLAG_RNOIDENT)
 	{
 		*s++ = 'I';
 	}
-	
 	if (flags & CFLAG_RESTRICTED)
 	{
 		*s++ = 'R';
 	}
-
 	if (flags & CFLAG_KEXEMPT)
 	{
 		*s++ = 'E';
+	}
+	if (flags & CFLAG_NORESOLVE)
+	{
+		*s++ = 'N';
 	}
 	*s++ = '\0';
 	
