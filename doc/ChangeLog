@@ -1,3 +1,13 @@
+1999-07-04  Christophe Kalt
+
+	* a_conf_def.h, a_conf.c, a_io.c: added the "timeout" option.
+
+	* mod_socks.c: added PROXY_BADPROTO & OPT_PROTOCOL to
+	differentiate between unexpected and bad protocol.
+
+	* s_id.c: fixed alphabet_id[] (noted by Michal Svoboda), and
+	rewrote some code.
+
 1999-07-04  Piotr Kucharski
 
 	* s_user.c/m_nick(): fix performance bug introduced in code
