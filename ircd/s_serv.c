@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.2 1997/04/14 15:04:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.3 1997/04/18 21:36:13 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -370,12 +370,30 @@ char	*parv[];
 		** youngest of the two links. -avalon
 		*/
 		acptr = acptr->from;
-		acptr = (cptr->firsttime > acptr->firsttime) ? cptr : acptr;
-		sendto_one(acptr,"ERROR :Server %s already exists", host);
-		sendto_flag(SCH_ERROR,
+		bcptr = (cptr->firsttime > acptr->from->firsttime) ? cptr :
+			acptr->from;
+		sendto_one(bcptr, "ERROR :Server %s already exists", host);
+		/* in both cases the bcptr (the youngest is killed) */
+		if (bcptr == cptr)
+		    {
+			sendto_flag(SCH_ERROR,
 			    "Link %s cancelled, server %s already exists",
-			    get_client_name(acptr, TRUE), host);
-		return exit_client(acptr, acptr, &me, "Server Exists");
+				    get_client_name(bcptr, TRUE), host);
+			return exit_client(bcptr, bcptr, &me, "Server Exists");
+		    }
+		else
+		    {
+			/*
+			** in this case, we are not dropping the link from
+			** which we got the SERVER message.  Thus we canNOT
+			** `return' yet! -krys
+			*/
+			sendto_flag(SCH_ERROR,
+			    "Link %s cancelled, server %s reintroduced by %s",
+				    get_client_name(bcptr, TRUE), host,
+				    get_client_name(cptr, TRUE));
+			(void) exit_client(bcptr, bcptr, &me, "Server Exists")
+		    }
 	    }
 	if ((acptr = find_person(host, NULL)) && (acptr != cptr))
 	    {
@@ -878,14 +896,10 @@ Reg	aClient	*cptr;
 		else if (IsService(acptr) &&
 			 (match(acptr->service->dist, acptr->name) == 0
 			  && cptr->serv->version != SV_OLD))
-		    {
-			stok = i ? acptr->service->servp->tok :
-				   acptr->service->server;
 			sendto_one(cptr, "SERVICE %s %s %s %d %d :%s",
-				   acptr->name, stok, acptr->service->dist,
-				   acptr->service->type, acptr->hopcount + 1,
-				   acptr->info);
-		    }
+				   acptr->name, acptr->service->servp->tok,
+				   acptr->service->dist, acptr->service->type,
+				   acptr->hopcount + 1, acptr->info);
 	    }
 	/*
 	** Last, pass all channels modes
