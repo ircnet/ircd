@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.35 2004/07/16 21:51:43 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.36 2004/07/16 22:54:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -283,8 +283,8 @@ static	aConfItem 	*initconf()
 	    }
 
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
-	files = ConfigTop = config_read(fd, 0, new_config_file(configfile, NULL, 0));
-	ftop = files->file;
+	ftop = new_config_file(configfile, NULL, 0);
+	files = ConfigTop = config_read(fd, 0, ftop);
 	for(filelist = ConfigTop; filelist; filelist = filelist->next)
 #else
 	ftop = configfile;
