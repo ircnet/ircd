@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.12 1999/01/17 01:13:54 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.13 1999/01/22 21:04:00 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -642,12 +642,13 @@ aChannel	*hash_find_channels(name, chptr)
 char	*name;
 aChannel *chptr;
 {
-	Reg	aChannel	*tmp, *prv = NULL;
-	Reg	aHashEntry	*tmp3;
+	aChannel	*tmp;
 	u_int	hashv, hv;
 
 	if (chptr == NULL)
 	    {
+		aHashEntry	*tmp3;
+
 		hashv = hash_channel_name(name, &hv);
 		tmp3 = &channelTable[hashv];
 		chptr = (aChannel *) tmp3->list;
@@ -660,20 +661,11 @@ aChannel *chptr;
 
 	if (chptr == NULL)
 		return NULL;
-	for (tmp = chptr; tmp; prv = tmp, tmp = tmp->hnextch)
+	for (tmp = chptr; tmp; tmp, tmp = tmp->hnextch)
 		if (hv == tmp->hashv && *tmp->chname == '!' &&
 		    mycmp(name, tmp->chname + CHIDLEN + 1) == 0)
 		    {
 			chhits++;
-			if (prv)
-			    {
-				register aChannel *tmp2;
-
-				tmp2 = (aChannel *)tmp3->list;
-				tmp3->list = (void *)tmp;
-				prv->hnextch = tmp->hnextch;
-				tmp->hnextch = tmp2;
-			    }
 			return (tmp);
 		    }
 	chmiss++;
