@@ -1,4 +1,11 @@
 2004-08-10  Jakub Vlasek
+	
+	* s_bsd.c, s_bsd_ext.h: Moved actual cptr->fd closing code
+	  to newly created close_client_fd().
+	* s_bsd.c/close_connection(): Do not send stop to iauth for
+	  outgoing server connections.
+
+2004-08-10  Jakub Vlasek
 
 	* s_bsd.c/close_connection(): Do not recurse listeners, remove only
 	  unused listeners from ListenerLL.
