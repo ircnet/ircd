@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.35 1998/02/07 15:37:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.36 1998/02/09 14:21:39 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1051,9 +1051,7 @@ int	parc, notice;
 					   parv[0]), nick);
 				continue;
 			    }
-			if (match(nick + 1, sptr->user->server) &&
-			    (*nick == '$' ||
-			     match(nick + 1, sptr->user->host)))
+			if (strcasecmp(rindex(nick, '.'), s))
 			    {
 				sendto_one(sptr, err_str(ERR_BADMASK,
 					   parv[0]), nick);
