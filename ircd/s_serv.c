@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.214 2004/06/26 00:44:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.215 2004/06/27 20:06:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1546,7 +1546,7 @@ int	m_info(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char **text = infotext;
 
-	if (IsServer(cptr) && check_link(cptr))
+	if (IsServer(cptr) && check_link(sptr))
 	    {
 		sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]),
 			   "INFO");
@@ -1588,7 +1588,7 @@ int	m_links(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (parc > 2)
 	    {
-		if (IsServer(cptr) && check_link(cptr) && !IsOper(sptr))
+		if (IsServer(cptr) && check_link(sptr) && !IsOper(sptr))
 		    {
 			sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]),
 				   "LINKS");
@@ -2030,7 +2030,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			}
 			/* else fallthrough */
 		default:
-			if (check_link(cptr))
+			if (check_link(sptr))
 			{
 				sendto_one(sptr, replies[RPL_TRYAGAIN], ME,
 					BadTo(parv[0]), "STATS");
@@ -2102,7 +2102,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		 */
 		if (doall || wilds)
 		    {
-			if (IsServer(cptr) && check_link(cptr))
+			if (IsServer(cptr) && check_link(sptr))
 		    	{
 				sendto_one(sptr, replies[RPL_TRYAGAIN], ME,
 					BadTo(parv[0]), "STATS");
@@ -2926,7 +2926,7 @@ int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	register aMotd *temp;
 	struct tm *tm;
 
-	if (check_link(cptr))
+	if (check_link(sptr))
 	    {
 		sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]), "MOTD");
 		return 5;
@@ -3375,11 +3375,13 @@ int	find_server_num(char *sname)
 */
 static	int	check_link(aClient *cptr)
 {
-    if (!IsServer(cptr))
+    if (MyClient(cptr))
 	    return 0;
     if (!(bootopt & BOOT_PROT))
 	    return 0;
 
+    /* changing cptr to get link where it came from */
+    cptr = cptr->from;
     ircstp->is_ckl++;
     if ((int)DBufLength(&cptr->sendQ) > 65536) /* SendQ is already (too) high*/
 	{
