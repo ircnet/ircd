@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.40 2004/03/07 03:02:14 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.41 2004/03/10 15:28:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -312,19 +312,24 @@ void	send_defines(aClient *cptr, char *nick)
 	sendto_one(cptr, ":%s %d %s :BS:%d MXR:%d MXB:%d MXBL:%d PY:%d",
 		   ME, RPL_STATSDEFINE, nick, BUFSIZE, MAXRECIPIENTS, MAXBANS,
 		   MAXBANLENGTH, MAXPENALTY);
-	sendto_one(cptr, ":%s %d %s :ZL:%d CM:%d CP:%d",
-		   ME, RPL_STATSDEFINE, nick,
+	sendto_one(cptr, ":%s %d %s :ZL:%d CM:%d CP:%d DC:%d",
+		ME, RPL_STATSDEFINE, nick,
 #ifdef	ZIP_LINKS
-		   ZIP_LEVEL,
+		ZIP_LEVEL,
 #else
-		   -1,
+		-1,
 #endif
 #ifdef	CLONE_CHECK
-		   CLONE_MAX, CLONE_PERIOD
+		CLONE_MAX, CLONE_PERIOD,
 #else
-		   -1, -1
+		-1, -1,
 #endif
-		   );
+#ifdef	DELAY_CLOSE
+		DELAY_CLOSE
+#else
+		-1
+#endif
+		);
 	sendto_one(cptr, ":%s %d %s :AC:%s SS:%d SU:%d", ME, RPL_STATSDEFINE,
 		   nick, (iconf.aconnect == 1) ? "ON" : "OFF",
 		   iconf.split_minservers, iconf.split_minusers);

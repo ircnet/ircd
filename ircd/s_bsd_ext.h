@@ -74,4 +74,15 @@ EXTERN void summon (aClient *who, char *namebuf, char *linebuf,
 #ifdef	UNIXPORT
 EXTERN int unixport (aClient *cptr, char *path, int port);
 #endif
+#ifdef DELAY_CLOSE
+EXTERN time_t delay_close (int);
+#endif
 #undef EXTERN
+
+#ifdef DELAY_CLOSE
+#ifndef SHUT_RD
+# error SHUT_RD not defined! Report buggy OS to ircd-bugs@irc.org
+/* Check shutdown(3) manpage for proper definition. */
+# define SHUT_RD 0
+#endif
+#endif

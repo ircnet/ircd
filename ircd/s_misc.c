@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.74 2004/03/01 01:22:43 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.75 2004/03/10 15:28:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1062,6 +1062,11 @@ void	tstats(aClient *cptr, char *name)
 	sendto_one(cptr, ":%s %d %s :abuse protections %u strict %u", ME,
 		   RPL_STATSDEBUG, name, (bootopt & BOOT_PROT) ? 1 : 0,
 		   (bootopt & BOOT_STRICTPROT) ? 1 : 0);
+#ifdef DELAY_CLOSE
+	sendto_one(cptr, ":%s %d %s :delay close %lu total %lu",
+		ME, RPL_STATSDEBUG, name, istat.is_delayclosewait,
+		istat.is_delayclose);
+#endif
 	sendto_one(cptr, ":%s %d %s :Client - Server",
 		   ME, RPL_STATSDEBUG, name);
 	sendto_one(cptr, ":%s %d %s :connected %lu %lu",

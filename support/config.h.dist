@@ -396,6 +396,17 @@
 */
 #define HELLO_MSG "Please wait while we process your connection."
 
+/*
+ * Connections rejected by check_clones() will be delayed for this many seconds
+ * before final error is sent to them and their socket is closed.
+ * This effectively reduces bouncing (fast reconnecting clients).
+ * CLONE_CHECK must be defined for this to work.
+ *
+ * Note: it may lead to file descriptors exhaustion. ("All connections in use"
+ * error message.)
+ */
+#define DELAY_CLOSE     15       /* Recommended value: 15 */
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
@@ -582,6 +593,18 @@
 #error CLIENT_FLOOD needs redefining.
 # endif
 #else
+
+/* sanity check */
+#if defined(DELAY_CLOSE)
+#  if defined(SLOW_ACCEPT) || !defined(CLONE_CHECK)
+#    error redefine CLONE_CHECK and undefine SLOW_ACCEPT to use DELAY_CLOSE.
+#  endif
+#  if (DELAY_CLOSE < 1)
+#    error DELAY_CLOSE needs redefining.
+#  endif
+#endif
+
+
 #error CLIENT_FLOOD undefined
 #endif
 

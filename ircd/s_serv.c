@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.168 2004/03/08 21:45:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.169 2004/03/10 15:28:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3041,6 +3041,10 @@ int	m_close(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    }
 	sendto_one(sptr, replies[RPL_CLOSEEND], ME, BadTo(parv[0]), closed);
 	sendto_flag(SCH_NOTICE, "%s closed %d unknown connections", sptr->name,
+		    closed);
+	closed = istat.is_delayclosewait;
+	delay_close(-2);
+	sendto_flag(SCH_NOTICE, "%s closed %d delayed connections", sptr->name,
 		    closed);
 	return 1;
 }

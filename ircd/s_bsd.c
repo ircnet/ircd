@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.123 2004/03/09 17:48:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.124 2004/03/10 15:28:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1492,10 +1492,11 @@ aClient	*add_connection(aClient *cptr, int fd)
 				report_error("Failed in connecting to %s :%s",
 					     cptr);
 add_con_refuse:
+			(void)close(fd);
+add_con_refuse_delay:
 			ircstp->is_ref++;
 			acptr->fd = -2;
 			free_client(acptr);
-			(void)close(fd);
 			return NULL;
 		    }
 		/* don't want to add "Failed in connecting to" here.. */
@@ -1521,9 +1522,14 @@ add_con_refuse:
 			sendto_flag(SCH_LOCAL, "Rejecting connection from %s.",
 				acptr->sockhost);
 			sendto_flog(acptr, EXITC_CLONE, "", acptr->sockhost);
+#ifdef DELAY_CLOSE
+			nextdelayclose = delay_close(fd);
+			goto add_con_refuse_delay;
+#else
 			(void)send(fd, "ERROR :Too rapid connections from your "
 				"host\r\n", 46, 0);
 			goto add_con_refuse;
+#endif
 		}
 #endif
 		lin.flags = ASYNC_CLIENT;
@@ -3216,3 +3222,98 @@ static	void	do_dns_async(void)
 	} while ((bytes > 0) && (pkts < 10));
 }
 
+#ifdef DELAY_CLOSE
+/*
+ * Delaying close(2) on too rapid connections reduces cpu
+ * and bandwidth usage. Not mentioning disk space, if you
+ * log such crap.
+ *
+ * Based on Ari `DLR' Heikkinen <aheikin@dlr.pspt.fi> irce0.9.1
+ * by Piotr `Beeth' Kucharski <chopin@sgh.waw.pl>
+ *
+ * Note: calling with fd == -2 closes all delayed fds.
+ */
+
+time_t	delay_close(int fd)
+{
+	struct	fdlog
+	{
+		struct	fdlog	*next;
+		int	fd;
+		time_t	time;
+	};
+	static	struct	fdlog	*first = NULL, *last = NULL;
+	struct	fdlog	*next = first, *tmp;
+	int	tmpdel = 0;
+
+	if (fd == -2)
+	{
+		/* special case used in m_close() -- close all! */
+		tmpdel = istat.is_delayclosewait;
+	}
+	else 
+	/* Make sure we don't delay close() on too many fds. If we have
+	 * kept more than half (possibly) available fds for clients
+	 * waiting to be closed, release quarter oldest of them.
+	 * >>1, >>2 are faster equivalents of /2, /4 --B. */
+	if (istat.is_delayclosewait > (MAXCLIENTS-istat.is_localc) >> 1)
+	{
+		tmpdel = istat.is_delayclosewait >> 2;
+	}
+
+	while ((tmp = next))
+	{
+		if (tmp->time < timeofday || tmpdel-- > 0)
+		{
+			next = tmp->next;
+			(void)send(fd, "ERROR :Too rapid connections "
+				"from your host\r\n", 46, 0);
+			close(tmp->fd);
+			MyFree(tmp);
+			istat.is_delayclosewait--;
+			if (!next)
+			{
+				last = NULL;
+			}
+			first = next;
+		}
+		else
+		{
+			/* This linked list has entries chronologically
+			 * sorted, so if tmp is not old enough, all next
+			 * would also be not old enough to close. */
+			break;
+		}
+	}
+
+	if (fd >= 0)
+	{
+		/* set socket in nonblocking state (just in case) */
+		set_non_blocking(fd, NULL);
+
+		/* disallow further receives */
+		shutdown(fd, SHUT_RD);
+
+		/* create a new entry with fd and time of close */
+		tmp = (struct fdlog *)MyMalloc(sizeof(*tmp));
+		tmp->next = NULL;
+		tmp->fd = fd;
+		tmp->time = timeofday + DELAY_CLOSE;
+		istat.is_delayclosewait++;
+		istat.is_delayclose++;
+
+		/* then add it to the list */
+		if (last)
+		{
+			last->next = tmp;
+			last = tmp;
+		}
+		else
+		{
+			first = last = tmp;
+		}
+	}
+
+	return first ? first->time : 0;
+}
+#endif

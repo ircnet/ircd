@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.89 2004/03/07 03:09:34 chopin Exp $
+ *   $Id: struct_def.h,v 1.90 2004/03/10 15:28:26 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -801,6 +801,10 @@ typedef	struct	{
 	u_long	is_m_myservice;	/* maximum local services */
 	u_long	is_l_myclnt;	/* last local user count */
 	time_t	is_l_myclnt_t;	/* timestamp for last count */
+#ifdef DELAY_CLOSE
+	u_long	is_delayclose;	/* number of fds that got delayed close() */
+	u_int	is_delayclosewait;	/* number of fds that wait for delayed close() */
+#endif
 } istat_t;
 
 /* String manipulation macros */

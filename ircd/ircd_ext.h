@@ -38,6 +38,9 @@ extern int bootopt;
 extern char *debugmode;
 extern char *sbrk0;
 extern char *tunefile;
+#ifdef DELAY_CLOSE
+extern time_t nextdelayclose;
+#endif
 extern time_t nextconnect;
 extern time_t nextgarbage;
 extern time_t nextping;

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.119 2004/03/08 21:45:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.120 2004/03/10 15:28:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -53,6 +53,9 @@ volatile static	int	dorehash = 0,
 			dorestart = 0,
 			restart_iauth = 0;
 
+#ifdef DELAY_CLOSE
+time_t	nextdelayclose = 0;	/* time for next delayed close */
+#endif
 time_t	nextconnect = 1;	/* time for next try_connections call */
 time_t	nextgarbage = 1;        /* time for next collect_channel_garbage call*/
 time_t	nextping = 1;		/* same as above for check_pings() */
@@ -1061,6 +1064,11 @@ static	void	io_loop(void)
 	*/
 	if (nextconnect && timeofday >= nextconnect)
 		nextconnect = try_connections(timeofday);
+#ifdef DELAY_CLOSE
+	/* close all overdue delayed fds */
+	if (nextdelayclose && timeofday >= nextdelayclose)
+		nextdelayclose = delay_close(-1);
+#endif
 	/*
 	** Every once in a while, hunt channel structures that
 	** can be freed. Reop channels while at it, too.
@@ -1083,6 +1091,10 @@ static	void	io_loop(void)
 		delay = MIN(nextping, nextconnect);
 	else
 		delay = nextping;
+#ifdef DELAY_CLOSE
+	if (nextdelayclose)
+		delay = MIN(nextdelayclose, delay);
+#endif
 	delay = MIN(nextdnscheck, delay);
 	delay = MIN(nextexpire, delay);
 	delay -= timeofday;
