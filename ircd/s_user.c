@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.240 2004/12/12 17:25:16 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.241 2005/01/30 13:45:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -763,50 +763,12 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		 * we are fully 2.11 */
 		if (ST_UID(acptr))
 		{
-			/* remote server is 2.11 */
-			if (user->uid[0])
-			{
-				/* user has uid */
 				sendto_one(acptr,
 					":%s UNICK %s %s %s %s %s %s :%s",
 					user->servp->sid, nick, user->uid,
 					user->username, user->host, user->sip,
 					(*buf) ? buf : "+", sptr->info);
 			}
-			else
-			{
-				sendto_one(acptr,
-					"NICK %s %d %s %s %s %s :%s",
-					nick, sptr->hopcount+1,
-					user->username, user->host,
-					user->servp->tok,
-					(*buf) ? buf : "+", sptr->info);
-			}
-		}
-		else
-		{
-			/* remote server is 2.10 */
-			if ((aconf = acptr->serv->nline) &&
-				!match(my_name_for_link(ME, aconf->port),
-				user->server))
-			{
-				/* not masked */
-				sendto_one(acptr, "NICK %s %d %s %s %s %s :%s",
-					nick, sptr->hopcount+1,
-					user->username, user->host,
-					me.serv->tok,
-					(*buf) ? buf : "+", sptr->info);
-			}
-			else
-			{
-				/* masked */
-				sendto_one(acptr, "NICK %s %d %s %s %s %s :%s",
-					nick, sptr->hopcount+1,
-					user->username, user->host,
-					user->servp->maskedby->serv->tok,
-					(*buf) ? buf : "+", sptr->info);
-			}
-		}
 	}	/* for(my-leaf-servers) */
 #ifdef	USE_SERVICES
 #if 0
@@ -2428,8 +2390,6 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		aClient	*acptr = NULL;
 		aServer	*sp = NULL;
 
-		if (!(sp = find_tokserver(atoi(server), cptr, NULL)))
-		    {
 			/*
 			** Why? Why do we keep doing this?
 			** s_service.c had the same kind of kludge.
@@ -2441,7 +2401,6 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			    "ERROR: SERVER:%s uses wrong syntax for NICK (%s)",
 					    get_client_name(cptr, FALSE),
 					    parv[0]);
-		    }
 		if (acptr)
 			sp = acptr->serv;
 		else if (!sp)
