@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.77 2001/12/29 20:54:07 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.78 2001/12/30 04:42:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -791,7 +791,8 @@ Reg	aClient	*cptr;
 		/*
 		** Pass my info to the new server
 		*/
-		sendto_one(cptr, "SERVER %s 1 :%s", mlname, me.info);
+		sendto_one(cptr, "SERVER %s 1 %s :%s",
+			mlname, me.serv->sid, me.info);
 
 		/*
 		** If we get a connection which has been authorized to be
