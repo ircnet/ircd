@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.44 2002/06/03 04:10:38 jv Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.45 2002/06/04 09:29:51 jv Exp $";
 #endif
 
 #include "os.h"
@@ -275,7 +275,7 @@ aClient *cptr;
 	return cptr;
     }
 #endif /* CLIENT_COMPILE */
-
+#ifndef CLIENT_COMPILE
 /*
 **  Find a user@host (server or user).
 **
@@ -351,7 +351,7 @@ int	*count;
 **	the old. 'name' is now assumed to be a null terminated
 **	string.
 */
-#ifndef CLIENT_COMPILE
+
 /*
 ** Find a server from hash table, given its name
 */
