@@ -792,10 +792,6 @@
 #error CONFIG_DIRECTIVE_INCLUDE and M4_PREPROC are mutually exclusive
 #endif
 
-#if defined(CONFIG_DIRECTIVE_INCLUDE) && !defined(HAVE_MMAP)
-#error CONFIG_DIRECTIVE_INCLUDE requires mmap()
-#endif
-
 #ifndef TKLINE
 #undef OPER_TKLINE
 #endif

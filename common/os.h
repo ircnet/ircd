@@ -696,10 +696,6 @@ char mydummy2[MYDUMMY_SIZE];
 # define WHOSTENTP(x) (x)
 #endif
 
-#if defined(HAVE_MMAP)
-#include <sys/mman.h>
-#endif
-
 /* Courtesy of AC_CHECK_TYPES autoconf macro in configure */
 #if !HAVE_INT16_T
 typedef short int16_t;
