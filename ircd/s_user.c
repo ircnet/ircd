@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.140 2002/09/11 19:53:26 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.141 2002/09/28 21:04:26 jv Exp $";
 #endif
 
 #include "os.h"
@@ -496,7 +496,8 @@ char	*nick, *username;
 				sendto_flag(SCH_LOCAL,
 					    "Denied connection from %s.",
 					    get_client_host(sptr));
-			return exit_client(cptr, cptr, &me, "Denied access");
+			return exit_client(cptr, cptr, &me,
+			         sptr->reason ? sptr->reason : "Denied access");
 		    }
 		if ((i = check_client(sptr)))
 		    {
