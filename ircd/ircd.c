@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.39 1998/12/28 15:47:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.40 1998/12/29 15:09:23 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -171,21 +171,6 @@ void	server_reboot()
 	*/
 #ifdef USE_SYSLOG
 	(void)closelog();
-#endif
-#if defined(USE_IAUTH)
-#if 0
-	if (adfd >= 0)
-	    {
-		/* if iauth is running, it'll become a zombie unless we wait
-		 * for it. (Of course, if the alarm rings, we haven't waited
-		 * long enough). -kalt
-		 */
-		close(adfd);
-		alarm(1);
-		wait(NULL);
-		alarm(0);
-	    }
-#endif
 #endif
 	for (i = 3; i < MAXCONNECTIONS; i++)
 		(void)close(i);
