@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.52 2004/06/11 17:07:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.53 2004/06/23 17:25:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -583,7 +583,7 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (strcmp(sptr->service->dist, "*"))
 		sptr->service->wants &= ~SERVICE_MASK_GLOBAL;
 	/* allow options */
-	sptr->service->wants |= (atoi(parv[1]) & ~SERVICE_MASK_ALL);
+	sptr->service->wants |= (strtol(parv[1], NULL, 0) & ~SERVICE_MASK_ALL);
 	/* send accepted SERVSET */
 	sendto_one(sptr, ":%s SERVSET %s :%d", sptr->name, sptr->name,
 		   sptr->service->wants);
