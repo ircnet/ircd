@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.163 2004/03/05 16:24:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.164 2004/03/06 11:32:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1747,7 +1747,7 @@ static	void	report_myservers(aClient *sptr, char *to)
 #ifdef	HUB
 	aServer *asptr;
 #endif
-	int users = 0, servers = 0;
+	int users, servers;
 
 	for (i = fdas.highest; i >= 0; i--)
 	{
@@ -1762,6 +1762,8 @@ static	void	report_myservers(aClient *sptr, char *to)
 		}
 		timeconnected = timeofday - acptr->firsttime;
 #ifdef HUB
+		servers = 0;
+		users = 0;
 		for (asptr = svrtop; asptr; asptr = asptr->nexts)
 		{
 			if (IsMasked(asptr->bcptr))
