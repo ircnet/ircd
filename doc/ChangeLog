@@ -1,4 +1,6 @@
-Thu Jul 17 23:04:48 1997  Christophe Kalt  <kalt@millennium.stealth.net>
+Thu Jul 17 23:04:48 1997  Christophe Kalt
+
+	* c_numeric.c, irc.c: fixes from Vesa.
 
 	* send.c: buffer overflow fix.
 
