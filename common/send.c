@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.77 2004/06/29 23:25:58 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.78 2004/09/08 17:39:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1298,16 +1298,37 @@ void	sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 	*/
 	(void)sprintf(linebuf,
 		"%c %d %d %s %s %s %s %d %s %lu %llu %lu %llu",
-		cptr->exitc, (u_int) cptr->firsttime, (u_int) timeofday,
-		username, hostname, cptr->auth ? cptr->auth : "",
+		/* exit code as defined in common/struct_def.h; some common:
+		 * '0' normal exit, '-' unregistered client quit, 'k' k-lined,
+		 * 'K' killed, 'X' x-lined, 'Y' max clients limit of Y-line,
+		 * 'L' local @host limit, 'l' local user@host limit, 'P' ping
+		 * timeout, 'Q' send queue exceeded, 'E' socket error */
+		cptr->exitc,
+		/* signon unix time */
+		(u_int) cptr->firsttime,
+		/* signoff unix time */
+		(u_int) timeofday,
+		/* username (if ident is not working, it's from USER cmd) */
+		username,
+		/* hmm, let me take an educated guess... a hostname? */
+		hostname,
+		/* ident, if available */
+		cptr->auth ? cptr->auth : "",
+		/* client IP */
 		cptr->user ? cptr->user->sip :
 #ifdef INET6
 		inetntop(AF_INET6, (char *)&cptr->ip, mydummy, MYDUMMY_SIZE),
 #else
 		inetntoa((char *)&cptr->ip),
 #endif
-		cptr->port, cptr->acpt ? cptr->acpt->sockhost : "?",
-		cptr->sendM, cptr->sendB, cptr->receiveM, cptr->receiveB);
+		/* client (remote) port */
+		cptr->port,
+		/* server sockhost (IP plus port or unix socket path) */
+		cptr->acpt ? cptr->acpt->sockhost : "?",
+		/* messages and bytes sent to client */
+		cptr->sendM, cptr->sendB,
+		/* messages and bytes received from client */
+		cptr->receiveM, cptr->receiveB);
 #endif /* LOG_OLDFORMAT */
 #if defined(USE_SYSLOG) && (defined(SYSLOG_USERS) || defined(SYSLOG_CONN))
 	if (msg == EXITC_REG)
