@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.75 1998/10/28 16:23:01 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.76 1998/10/28 16:31:06 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1945,13 +1945,15 @@ char	*parv[];
 			chptr = NULL;
 			/*
 			** !channels are special:
-			**	!#channel is supposed to be a new channel,
+			**	!!channel is supposed to be a new channel,
 			**		and requires a unique name to be built.
+			**		( !#channel is obsolete )
 			**	!channel cannot be created, and must already
 			**		exist.
 			*/
 			if (*(name+1) == '\0' ||
-			    (*(name+1) == '#' && *(name+2) == '\0'))
+			    (*(name+1) == '#' && *(name+2) == '\0') ||
+			    (*(name+1) == '!' && *(name+2) == '\0'))
 			    {
 				if (MyClient(sptr))
 					sendto_one(sptr,
@@ -1959,12 +1961,14 @@ char	*parv[];
 							   parv[0]), name);
 				continue;
 			    }
-			if (*name == '!' && *(name+1) == '#')
+			if (*name == '!' && (*(name+1) == '#' ||
+					     *(name+1) == '!'))
 			    {
 				if (!MyClient(sptr))
 				    {
 					sendto_flag(SCH_NOTICE,
-					   "Invalid !# channel from %s for %s",
+				   "Invalid !%c channel from %s for %s",
+						    *(name+1),
 						    get_client_name(cptr,TRUE),
 						    sptr->name);
 					continue;
