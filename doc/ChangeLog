@@ -1,3 +1,12 @@
+2005-02-22  Piotr Kucharski
+
+	* struct_def.h, send.c/setup_svchans(), sendto_flag(), logfiles_open(),
+	  logfiles_close(), Makefile.in: possibility to log server channels.
+
+2005-02-21  Piotr Kucharski
+
+	* s_bsd.c/add_connection(): clone rejects were not properly logged.
+
 2005-02-20  Piotr Kucharski
 
 	* s_user.c/m_nick(): drop 2.10 related code (introducing new clients
