@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.19 2001/12/30 07:24:08 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.20 2002/01/08 03:36:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -26,11 +26,6 @@ static  char rcsid[] = "@(#)$Id: s_id.c,v 1.19 2001/12/30 07:24:08 chopin Exp $"
 #define S_ID_C
 #include "s_externs.h"
 #undef S_ID_C
-
-/*
- * channel IDs
- */
-#define CHIDNB 36
 
 static unsigned char id_alphabet[CHIDNB+1] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
