@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: match.c,v 1.3 1997/09/03 17:45:14 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: match.c,v 1.4 1999/01/23 22:55:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -194,7 +194,7 @@ char	*mask, *name;
 				return 0;
 	  		for (m--; (m > (u_char *)mask) && (*m == '?'); m--)
 				;
-			if ((*m == '*') && (m > (u_char *)mask) &&
+			if ((m > (u_char *)mask) && (*m == '*') &&
 			    (m[-1] != '\\'))
 				return 0;
 			if (!wild) 
