@@ -1,5 +1,5 @@
 .\" @(#)$Id ircd.8 2.0 (beta version) 29 Mar 1989 $
-.TH IRCD 8 "$Date: 2004/03/07 03:09:34 $"
+.TH IRCD 8 "$Date: 2004/11/16 16:59:19 $"
 .SH NAME
 ircd \- The Internet Relay Chat Program Server 
 .SH SYNOPSIS
@@ -109,7 +109,7 @@ them.
 .BI \-T " tunefile"
 Specifies the ircd.tune file to be used for this ircdaemon. The option
 is used to override the default ircd.tune given at compile
-time.
+time. If no tune file is given, reading and writing of tune file is disabled.
 .TP
 .B \-v
 This option prevents the server from starting, and dumps
@@ -174,7 +174,6 @@ For full COPYRIGHT see LICENSE file with IRC package.
 .LP
 .RE
 .SH FILES
- /etc/utmp
  "ircd.conf"
 .SH "SEE ALSO"
 iauth(8) irc(1) ircdwatch(8)

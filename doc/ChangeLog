@@ -1,3 +1,18 @@
+2004-11-16  Piotr Kucharski
+
+	* send.c/dead_link(): make it va-aware, don't hardcode get_client_name,
+	  let caller give all arguments it needs.
+	* send.c: adjust to new dead_link().
+	* bsd.c/deliver_it(): return errno from send.
+	* send./send_queued(): put errno returned from deliver_it() in notices.
+	* ircd.c/main(): allow -T without filename.
+	* ircd.c/ircd_writetune(): return without error if empty filename.
+	* ircd.c/bad_command(): make it void and update for -T change.
+
+2004-11-15  Piotr Kucharski
+
+	* os.h: typedefs incorrectly written.
+
 2.11.0b17
 
 2004-11-14  Piotr Kucharski
