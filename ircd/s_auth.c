@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.39 1999/06/17 12:14:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.40 1999/06/17 12:34:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -364,7 +364,7 @@ read_iauth()
 				    istat.is_auth -= 1;
 				    MyFree(cptr->auth);
 				}
-			    cptr->auth = mystrdup(tbuf);
+			    cptr->auth = mystrdup(start+strlen(tbuf));
 			    set_clean_username(cptr);
 			    cptr->flags |= FLAGS_GOTID;
 			}
