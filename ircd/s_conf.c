@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.25 1998/01/07 20:29:56 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.26 1998/01/27 13:03:18 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1221,7 +1221,7 @@ char	**comment;
 	host = cptr->sockhost;
 	ip = (char *) inetntoa((char *)&cptr->ip);
 	if (!strcmp(host, ip))
-	  ip = NULL;
+		ip = NULL; /* we don't have a name for the ip# */
 	name = cptr->user->username;
 	ident = cptr->auth;
 
@@ -1237,22 +1237,42 @@ char	**comment;
 			continue;
 		if (!(tmp->status & (CONF_KILL | CONF_OTHERKILL)))
 			continue;
+		if (!tmp->host || !tmp->name)
+			continue;
 		if (tmp->status == CONF_KILL)
 			check = name;
 		else
 			check = ident;
- 		if (tmp->host && tmp->name &&
-		    /* host & IP matching.. */
-		    ((*tmp->host == '=' &&
-		      (match(tmp->host+1, host) == 0 ||
-		       (!ip && (match_ipmask(tmp->host+1, cptr) == 0)))) ||
-		     (*tmp->host != '=' &&
-		      (match(tmp->host, host) == 0 ||
-		       (ip && (match(tmp->host, ip) == 0)) ||
-		       (match_ipmask(tmp->host+1, cptr) == 0))))
-		    /* username matching */
-		    && (!check || match(tmp->name, check) == 0) &&
-		    (!tmp->port || (tmp->port == cptr->acpt->port)))
+		/* host & IP matching.. */
+		if (!ip) /* unresolved */
+		    {
+			if (strchr(tmp->host, '/'))
+			    {
+				if (match_ipmask((*tmp->host == '=') ?
+						 tmp->host+1: tmp->host, cptr))
+					continue;
+			    }
+			else          
+				if (match((*tmp->host == '=') ? tmp->host+1 :
+					  tmp->host, host))
+					continue;
+		    }
+		else if (*tmp->host == '=') /* numeric only */
+			continue;
+		else /* resolved */
+			if (strchr(tmp->host, '/'))
+			    {
+				if (match_ipmask(tmp->host, cptr))
+					continue;
+			    }
+			else
+				if (match(tmp->host, ip) &&
+				    match(tmp->host, host))
+					continue;
+		
+		/* user & port matching */
+		if ((!check || match(tmp->name, check) == 0) &&
+		    (!tmp->port || (tmp->port == cptr->acpt->port)))   
 		    {
 			now = 0;
 			if (!BadPtr(tmp->passwd) && isdigit(*tmp->passwd) &&
@@ -1534,7 +1554,8 @@ int	class, fd;
 		** check if B line is for a class #,
 		** and if it is for a hostname.
 		*/
-		if (fd != -2 && isdigit(*aconf->host))
+		if (fd != -2 &&
+		    !strchr(aconf->host, '.') && isdigit(*aconf->host))
 		    {
 			if (class != atoi(aconf->host))
 				continue;
@@ -1545,7 +1566,7 @@ int	class, fd;
 				if (match_ipmask(aconf->host, cptr))
 					continue;
 			    }
-			else if (match(aconf->host, cptr))
+			else if (match(aconf->host, cptr->sockhost))
 				continue;
 
 		sendto_one(cptr, rpl_str(RPL_BOUNCE, cptr->name), aconf->name,
