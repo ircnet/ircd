@@ -3,6 +3,10 @@
 	* s_conf.c/initconf(), s_serv.c: swap 'o' and 'O' to match umode.
 	* ircd.c/setup_me(): SetEOB(me).
 	* s_misc.c/check_split(): remove "+1", as &me is SetEOB now.
+	* s_serv.c/m_version(), s_err.c: add SID to version output.
+	* struct_def.h: TOPICLEN increased.
+	* config.h.dist: MCPU increased.
+	* RELEASE_NOTES: docs.
 
 2004-02-08  Piotr Kucharski
 
