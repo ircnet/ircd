@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.99 2004/03/19 00:32:40 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.100 2004/03/20 21:14:33 jv Exp $";
 #endif
 
 #include "os.h"
@@ -157,7 +157,48 @@ char	*iline_flags_to_string(long flags)
 	
 	return ifsbuf;
 }
+/* Convert P-line flags from string
+ * D - delayed port
+ * S - server only port
+ */
+long pline_flags_parse(char *string)
+{
+	long tmp = 0;
+	if (index(string, 'D'))
+	{
+		tmp |= PFLAG_DELAYED;
+	}
+	if (index(string, 'S'))
+	{
+		tmp |= PFLAG_SERVERONLY;
+	}
+	return tmp;
+}
+/* Convert P-line flags from integer to string
+ */
+char *pline_flags_to_string(long flags)
+{
+	static char pfsbuf[BUFSIZE];
+	char *s = pfsbuf;
+	
+	if (flags & PFLAG_DELAYED)
+	{
+		*s++ = 'D';
+	}
+			
+	if (flags & PFLAG_SERVERONLY)
+	{
+		*s++ = 'S';
+	}
+	
+	if (s == pfsbuf)
+	{
+		*s++ = '-';
+	}
 
+	*s++ = '\0';
+	return pfsbuf;
+}
 /*
  * remove all conf entries from the client except those which match
  * the status field mask.
@@ -1444,6 +1485,12 @@ int 	initconf(int opt)
 			{
 				aconf->flags |= iline_flags_parse(tmp3);
 			}
+		}
+		
+		if ((aconf->status & CONF_LISTEN_PORT) && tmp3)
+		{
+			/* Parse P-line flags */
+			aconf->flags |= pline_flags_parse(tmp3);
 		}
 		
 		if (aconf->status & CONF_SERVICE)

@@ -71,6 +71,8 @@ EXTERN void find_bounce (aClient *cptr, int class, int fd);
 EXTERN aConfItem *find_denied (char *name, int class);
 EXTERN char *iline_flags_to_string(long flags);
 EXTERN long iline_flags_parse(char *string);
+EXTERN char *pline_flags_to_string(long flags);
+EXTERN long pline_flags_parse(char *string);
 # ifdef	INET6
 EXTERN char *ipv6_convert (char *orig);
 # endif
