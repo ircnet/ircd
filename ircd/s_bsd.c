@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.96 2003/07/18 17:35:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.97 2003/07/28 17:17:06 jv Exp $";
 #endif
 
 #include "os.h"
@@ -145,6 +145,9 @@ aClient *cptr;
 	Reg	char	*host;
 	int	err;
 	SOCK_LEN_TYPE len = sizeof(err);
+	char	fmbuf[BUFSIZE+1];
+	aClient *bysptr = NULL;
+	
 	extern	char	*strerror();
 
 	host = (cptr) ? get_client_name(cptr, FALSE) : "";
@@ -163,6 +166,19 @@ aClient *cptr;
 				errtmp = err;
 #endif
 	sendto_flag(SCH_ERROR, text, host, strerror(errtmp));
+	if (cptr && (IsConnecting(cptr) || IsHandshake(cptr)) &&
+		cptr->serv && cptr->serv->byuid[0])
+	{
+		bysptr = find_uid(cptr->serv->byuid, NULL);
+		if (!MyConnect(bysptr))
+		{
+			fmbuf[0] = '\0';
+			strcpy(fmbuf, ":%s NOTICE %s :");
+			strncat(fmbuf, text, BUFSIZE-strlen(fmbuf));
+			sendto_one(bysptr, fmbuf, ME, bysptr->name,
+				host, strerror(errtmp));
+		}
+	}
 #ifdef USE_SYSLOG
 	syslog(LOG_WARNING, text, host, strerror(errtmp));
 #endif
@@ -2406,6 +2422,10 @@ struct	hostent	*hp;
 	if (by && IsPerson(by))
 	    {
 		(void)strcpy(cptr->serv->by, by->name);
+		if (HasUID(by))
+		{
+			strcpy(cptr->serv->byuid, by->user->uid);
+		}
 		cptr->serv->user = by->user;
 		by->user->refcnt++;
 	    }
