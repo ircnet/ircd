@@ -20,25 +20,31 @@ then
 else
   echo "retrieving the system name, type and OS release..."
   rev=`support/config.guess`
-  echo "  your system seems to be ${rev}."
-  if test ! -d "${rev}"
+  if test "${rev}" 		# test for no output
   then
-    echo "creating directory ${rev}..."
-    mkdir "${rev}"
-  fi
-  cd "${rev}"
-  echo "now working in directory ${rev}..."
-  cp -p ../support/configure .
-  if test ! -f config.h
-  then
-    echo "copying config.h from config.h.dist..."
-    cp -p ../support/config.h.dist config.h
-  fi
-  ./configure $*
-  if test $? = 0
-  then
-    echo "Have you read doc/README? (I hope so)"
-    echo "Next cd ${rev}, edit \"config.h\" and \"Makefile\","
-    echo "run \"make all\" to build and \"make install\" to install."
+    echo "  your system seems to be ${rev}."
+    if test ! -d "${rev}"
+    then
+      echo "creating directory ${rev}..."
+      mkdir "${rev}"
+    fi
+    cd "${rev}"
+    echo "now working in directory ${rev}..."
+    cp -p ../support/configure .
+   if test ! -f config.h
+   then
+     echo "copying config.h from config.h.dist..."
+     cp -p ../support/config.h.dist config.h
+   fi
+    ./configure $*
+    if test $? = 0
+    then
+      echo "Have you read doc/README? (I hope so)"
+      echo "Next cd ${rev}, edit \"config.h\" and \"Makefile\","
+      echo "run \"make all\" to build and \"make install\" to install."
+    fi
+  else
+    echo Failed to determine your host type, giving up.
+    echo Perhaps you should specify it manually.
   fi
 fi
