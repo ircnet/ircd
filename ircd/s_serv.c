@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.135 2004/02/09 01:14:05 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.136 2004/02/09 03:19:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1799,9 +1799,9 @@ static int report_array[17][3] = {
 		{ CONF_KILL,		  RPL_STATSKLINE, 'K'},
 		{ CONF_QUARANTINED_SERVER,RPL_STATSQLINE, 'Q'},
 		{ CONF_LEAF,		  RPL_STATSLLINE, 'L'},
-		{ CONF_OPERATOR,	  RPL_STATSOLINE, 'O'},
+		{ CONF_OPERATOR,	  RPL_STATSOLINE, 'o'},
 		{ CONF_HUB,		  RPL_STATSHLINE, 'H'},
-		{ CONF_LOCOP,		  RPL_STATSOLINE, 'o'},
+		{ CONF_LOCOP,		  RPL_STATSOLINE, 'O'},
 		{ CONF_SERVICE,		  RPL_STATSSLINE, 'S'},
 		{ CONF_VER,		  RPL_STATSVLINE, 'V'},
 		{ CONF_BOUNCE,		  RPL_STATSBLINE, 'B'},
