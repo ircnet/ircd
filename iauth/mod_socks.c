@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.17 1999/06/27 19:10:58 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.18 1999/06/27 21:20:36 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -337,10 +337,10 @@ char *strver;
     if (state == PROXY_UNEXPECTED)
 	{
 	    sendto_log(ALOG_FLOG, LOG_WARNING,
-		       "socks%d: unexpected reply: %u,%u %s[%s]", strver,
+		       "socks%s: unexpected reply: %u,%u %s[%s]", strver,
 		       cldata[cl].inbuffer[0], cldata[cl].inbuffer[1],
 		       cldata[cl].host, cldata[cl].itsip);
-	    sendto_log(ALOG_IRCD, 0, "socks%d: unexpected reply: %u,%u",
+	    sendto_log(ALOG_IRCD, 0, "socks%s: unexpected reply: %u,%u",
 		       strver, cldata[cl].inbuffer[0],
 		       cldata[cl].inbuffer[1]);
 	    state = PROXY_CLOSE;
