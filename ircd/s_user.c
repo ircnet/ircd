@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.169 2004/02/12 19:32:48 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.170 2004/02/13 18:01:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1369,11 +1369,7 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	... just remember to change it one day --Beeth */
 	acptr->user->servp = sptr->serv;
 	sptr->serv->refcnt++;
-	/*
-	** shouldn't it be here strdup? let's hope refcnt will
-	** prevent freeing it
-	*/
-	acptr->user->server = sptr->name;
+	acptr->user->server = find_server_string(sptr->serv->snum);
 	if (strlen(realname) > REALLEN)
 	{
 		realname[REALLEN] = '\0';
