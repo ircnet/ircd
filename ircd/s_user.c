@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.203 2004/05/18 22:53:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.204 2004/06/06 14:48:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2458,13 +2458,17 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	SetInvisible(sptr);
 #endif
 	/* parse desired user modes sent in USER */
-	/* old behaviour - bits */
-	if ((i = atoi(host)))
+	/* rfc behaviour - bits */
+	if (isdigit(*host))
 	{
-		/* allows only umodes specified in UFLAGS - see above */
-		sptr->user->flags |= (UFLAGS & atoi(host));
+		for (s = host+1; *s; s++)
+			if (!isdigit(*s))
+				break;
+		if (*s == '\0')
+			/* allows only umodes specified in UFLAGS - see above */
+			sptr->user->flags |= (UFLAGS & atoi(host));
 	}
-	else
+	else	/* new behaviour */
 	{
 		/* 0 here is intentional. User MUST specify + or -,
 		 * as we don't want to restrict clients which send
