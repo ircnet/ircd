@@ -56,4 +56,5 @@ EXTERN void tstats __P((aClient *cptr, char *name));
 #ifdef  CACHED_MOTD
 EXTERN void read_motd __P((char *filename));
 #endif /* CACHED_MOTD */
+EXTERN void check_split();
 #undef EXTERN
