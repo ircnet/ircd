@@ -175,12 +175,12 @@
 # include <sys/param.h>
 #endif
 
+#if HAVE_SYSLOG_H
+# include <syslog.h>
+#endif
+
 #if HAVE_SYS_SYSLOG_H
 # include <sys/syslog.h>
-#else
-# if HAVE_SYSLOG_H
-#  include <syslog.h>
-# endif
 #endif
 
 #if HAVE_STRING_H
