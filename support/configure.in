@@ -484,101 +484,6 @@ fi
 ])
 
 
-AC_DEFUN(IRC_STDARG,
-[AC_MSG_CHECKING([for working stdarg])
-AC_CACHE_VAL(irc_cv_stdarg,
-AC_RUN_IFELSE([AC_LANG_SOURCE([[
-changequote(<<, >>)dnl
-#if HAVE_STDIO_H
-#include <stdio.h>
-#endif
-#if HAVE_STDARG_H
-#include <stdarg.h>
-#endif
-#if HAVE_STRING_H
-#include <string.h>
-#endif
-
-char buf1[256];
-
-int level1(char *data, char *format, va_list ap)
-{
-  return vsprintf(data, format, ap);
-}
-
-int level2(char *data, int rounds, char *format, va_list ap)
-{
-  if(!--rounds)
-    return level1(data, format, ap);
-  else {
-    if(rounds == 2) {
-      va_list ap2 = ap;
-      char *arg = va_arg(ap2, char *);
-      strcpy(buf1, arg);
-    }
-    return level2(data, rounds, format, ap);
-  }
-}
-
-int level3(char *data, char *format, va_list ap)
-{
-  return level2(data, 5, format, ap);
-}
-
-int dotest(int size, char *val, char *data)
-{
-  if(size != strlen(val))
-    return 0;
-  if(strcmp(data, val))
-    return 0;
-  if(strcmp(buf1, "was"))
-    return 0;
-  return 1;
-}
-
-int base(char *val, char *format, ...)
-{
-  int res = 1;
-  char data[256];
-
-  {
-    va_list ap;
-    data[0]=0;
-    va_start(ap, format);
-    res = dotest(level3(data, format, ap), val, data);
-    va_end(ap);
-  }
-
-  {
-    va_list ap;
-    data[0]=0;
-    va_start(ap, format);
-    res = res && dotest(level3(data, format, ap), val, data);
-    va_end(ap);
-  }
-
-  return res;
-}
-
-int main(void)
-{
-  int res = base("toto was here ! 42", "toto %s here ! %d", "was", 42);
-
-  exit(res ? 0 : 1);
-}
-changequote([, ])dnl
-]])],[irc_cv_stdarg=yes],[irc_cv_stdarg=no],[])
-)
-if test $irc_cv_stdarg = yes; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE([USE_STDARG], [1], [Define is the system can use variable arguments.])
-else
-  AC_MSG_RESULT(no)
-  AC_MSG_ERROR([Compatibility code for systems without stdarg has not been written, please notify ircd-bugs@irc.org with description of your system type and version.])
-fi
-])
-
-
 AC_DEFUN(IRC_PATH_RESCONF,
 [AC_MSG_CHECKING([for resolver configuration file])
 AC_ARG_WITH(resconf, [  --with-resconf=FILE     use FILE as resolver config file [[/etc/resolv.conf]]], irc_cv_path_resconf="$withval", irc_cv_path_resconf="/etc/resolv.conf")
@@ -794,7 +699,7 @@ dnl main
 dnl ----
 
 AC_INIT([irc],[2.11],[ircd-bugs@irc.org])
-AC_REVISION([$Id: configure.in,v 1.62 2004/09/28 22:42:08 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.63 2004/10/21 21:47:46 chopin Exp $])
 AC_PREREQ(2.59)
 
 AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [[localstatedir/log]]], [
@@ -896,7 +801,6 @@ IRC_SELECT_POLL
 
 IRC_SIGNAL_IMPLEMENTATION
 IRC_NON_BLOCKING_SYSTEM
-IRC_STDARG
 IRC_PATH_RESCONF
 IRC_IP6
 IRC_SHAREDMODULES
