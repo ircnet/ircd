@@ -30,7 +30,7 @@
 /* masks */
 #define	SERVICE_MASK_GLOBAL	0x00007000 /*for these,service must be global*/
 #define	SERVICE_MASK_PREFIX	0x00000FFF /* these actions have a prefix */
-#define	SERVICE_MASK_ALL	0x3F007FFF /* all possible actions */
+#define	SERVICE_MASK_ALL	0x3F00FFFF /* all possible actions */
 #define	SERVICE_MASK_NUM	(SERVICE_WANT_NICK|SERVICE_WANT_USER|\
 				 SERVICE_WANT_UMODE)
 
