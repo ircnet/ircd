@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.30 2001/12/20 22:42:26 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.31 2002/01/05 03:05:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -243,8 +243,8 @@ char *	replies[] = {
 /* 212 RPL_STATSCOMMANDS */	":%s 212 %s %s %u %u %u",
 /* 213 RPL_STATSCLINE */	":%s 213 %s %c %s %s %s %d %d",
 /* 214 RPL_STATSNLINE */	":%s 214 %s %c %s %s %s %d %d",
-/* 215 RPL_STATSILINE */	":%s 215 %s %c %s %s %s %d %d",
-/* 216 RPL_STATSKLINE */	":%s 216 %s %c %s %s %s %d %d",
+/* 215 RPL_STATSILINE */	":%s 215 %s %c %s %s %s %d %d (%u)",
+/* 216 RPL_STATSKLINE */	":%s 216 %s %c %s %s %s %d %d (%u)",
 /* 217 RPL_STATSQLINE */	":%s 217 %s %c %s %s %s %d %d",
 /* 218 RPL_STATSYLINE */	":%s 218 %s %c %d %d %d %d %ld %d.%d %d.%d",
 /* 219 RPL_ENDOFSTATS */	":%s 219 %s %c :End of STATS report",
@@ -508,7 +508,7 @@ char *	replies[] = {
 /* 462 ERR_ALREADYREGISTRED */ ":%s 462 %s :Unauthorized command (already registered)",
 /* 463 ERR_NOPERMFORHOST */	":%s 463 %s :Your host isn't among the privileged",
 /* 464 ERR_PASSWDMISMATCH */	":%s 464 %s :Password Incorrect",
-/* 465 ERR_YOUREBANNEDCREEP */	":%s 465 %s :You are banned from this server",
+/* 465 ERR_YOUREBANNEDCREEP */	":%s 465 %s :You (%s@%s) are banned from this server%s%s",
 /* 466 ERR_YOUWILLBEBANNED */	(char *)NULL,
 /* 467 ERR_KEYSET */	":%s 467 %s %s :Channel key already set",
 /* 468 */ (char *)NULL,

@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.47 2001/12/28 22:27:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.48 2002/01/05 03:05:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1521,22 +1521,30 @@ char	**comment;
 		    }
 	    }
 
-	if (*reply)
-		sendto_one(cptr, reply, ME, now, cptr->name);
-	else if (tmp)
-		sendto_one(cptr, ":%s %d %s :%s%s", ME,
-			   ERR_YOUREBANNEDCREEP, cptr->name,
-			   BadPtr(tmp->passwd) ?
-			   "You are not welcome to this server" :
-			   "You are not welcome to this server: ",
-			   BadPtr(tmp->passwd) ? "" : tmp->passwd);
-
 	if (tmp && !BadPtr(tmp->passwd))
+	{
 		*comment = tmp->passwd;
+	}
 	else
+	{
 		*comment = NULL;
+	}
+	if (*reply)
+	{
+		/* R_LINE and TIMED_KLINE */
+		sendto_one(cptr, reply, ME, now, cptr->name);
+	}
+	else if (tmp)
+	{
+		sendto_one(cptr, replies[ERR_YOUREBANNEDCREEP], 
+			ME, cptr->name,
+			BadPtr(tmp->name) ? "*" : tmp->name,
+			BadPtr(tmp->host) ? "*" : tmp->host,
+			*comment ? ":" : "",
+			*comment ? *comment : "");
+	}
 
- 	return (tmp ? -1 : 0);
+	return (tmp ? -1 : 0);
 }
 
 /*
