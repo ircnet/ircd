@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.83 2004/10/09 12:39:03 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.84 2004/10/26 19:20:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1187,6 +1187,11 @@ void	logfiles_open(void)
 			|O_CREAT, S_IRUSR|S_IWUSR
 # endif
 			);
+	/* Better safe than sorry. */
+	if (userlog >= 0)
+	{
+		local[userlog] = NULL;
+	}
 #else
 	userlog = -1;
 #endif
@@ -1196,6 +1201,10 @@ void	logfiles_open(void)
 		|O_CREAT, S_IRUSR|S_IWUSR
 # endif
 			);
+	if (connlog >= 0)
+	{
+		local[connlog] = NULL;
+	}
 #else
 	connlog = -1;
 #endif
