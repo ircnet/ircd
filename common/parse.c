@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.54 2004/02/11 10:27:27 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.55 2004/02/23 22:53:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -242,7 +242,8 @@ aClient	*find_matching_client(char *mask)
 	(void) collapse(mask);
 	
 	/* try to match some servername against mask */
-	for (asptr = svrtop; asptr; asptr = asptr->nexts)
+	/* start from bottom, from ME, to return ourselves first */
+	for (asptr = me.serv; asptr; asptr = asptr->prevs)
 	{
 		if (!match(asptr->bcptr->name, mask) ||
 		    !match(mask, asptr->bcptr->name))
