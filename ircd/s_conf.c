@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.19 1997/09/26 15:02:58 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.20 1997/10/01 17:43:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1176,7 +1176,7 @@ int	doall;
 char	**comment;
 {
 	static char	reply[256];
-	char *host, *name, *ident, *check;
+	char *host, *ip, *name, *ident, *check;
 	aConfItem *tmp;
 	int	now;
 
@@ -1184,6 +1184,9 @@ char	**comment;
 		return 0;
 
 	host = cptr->sockhost;
+	ip = (char *) inetntoa((char *)&cptr->ip);
+	if (!strcmp(host, ip))
+	  ip = NULL;
 	name = cptr->user->username;
 	ident = cptr->auth;
 
@@ -1204,8 +1207,12 @@ char	**comment;
 		else
 			check = ident;
  		if (tmp->host && tmp->name &&
-		    (match(tmp->host, host) == 0) &&
- 		    (!check || match(tmp->name, check) == 0) &&
+		    /* host & IP matching.. */
+		    ((*tmp->host == '=' && match(tmp->host+1, host) == 0) ||
+		     (*tmp->host != '=' && (match(tmp->host, host) == 0 ||
+					    (ip && match(tmp->host, ip) ==0))))
+		    /* username matching */
+		    && (!check || match(tmp->name, check) == 0) &&
 		    (!tmp->port || (tmp->port == cptr->acpt->port)))
 		    {
 			now = 0;
