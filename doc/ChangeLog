@@ -1,3 +1,9 @@
+2004-03-20  Piotr Kucharsk
+
+	* s_conf.c/find_bounce(): allow negative classes in B:lines.
+	* s_user.c/m_nick(), m_user(): reject user when it connects to
+	  server-only P-line; use B:-1 for redirecting, if available.
+
 2004-03-20  Jakub Vlasek
 
 	* struct_def.h: Added PFLAG_DELAYED, PFLAG_SERVERONLY,
