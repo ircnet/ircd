@@ -337,14 +337,12 @@ Currently iauth suffers from several limitations. It is hoped that in
 the future these will be fixed. Patches are welcome. :) These
 limitations (in rough order of importance) are:
 
-1) After ircd has registered a client, iauth cannot reject or kill a
-connection. It is strongly desired that this be fixed.
-
-2) The current module design assumes a separate TCP/IP connection is
+1) The current module design assumes a separate TCP/IP connection is
 required for each client check (or at least separate file-descriptors
 for each client can be watched for activity). While it's possible
 tricks could be used to work around this assumption, it has not been
-successfully done yet.
+successfully done yet. (Except when it is OK to do blocking query,
+which can be done in _start.)
 
 Document Availability and Maintainence
 --------------------------------------
