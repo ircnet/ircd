@@ -1,0 +1,350 @@
+		       Internal IAUTH Workings
+		       =======================
+
+			     Andrew Snare
+
+Introduction
+------------
+
+The iauth daemon was written to offload some aspects of authenticating
+incoming ircd connections. Using a modular design, the original
+modules provides for identd lookup of incoming connections as well as
+checking for open socks proxies.
+
+When the ircd starts up, the iauth process is started as a slave
+process. The ircd communicates with the iauth daemon about new
+connections, and the iauth slave communicates information back as it
+becomes available.
+
+Communication Protocol
+----------------------
+
+IRCD Messages:-
+
+The communication protocol used to communicate from ircd to iauth is
+line-based and has the following form:
+
+	<id> <category> <information>
+
+	* <id> is used to identify the connection the information
+          concerns, and consists of the ircd's file-descriptor for the
+	  connection.
+
+	* <category> is a single letter used to denote the type of
+          information being sent.
+
+	* <information> is the rest of the line ("\n"-terminated),
+	  whose format depends on the category of information.
+
+Categories:
+
+     -	"C"
+
+	Denotes a new connection to start on. The information has the
+        form of <remote-ip> <remote-port> <local-ip> <local-port>. Eg:
+
+	2 C 192.168.2.10 13578 192.168.1.1 6667
+
+	This indicates a connection has been received on port 6667
+	with local IP-address of 192.167.1.1. The remote IP-address
+	was 192.168.2.10 (port 13578).
+
+     -	"O"
+
+	Denotes an update to information about an existing
+	connection. The format of this is identical to a C-message (as
+	described above).
+
+     -	"D"
+
+	Denotes a client has disconnected. No extra information is
+	provided. Eg:
+
+	2 D
+
+     -	"R"
+
+	This denotes a change of identifier for a client. The reason
+	for this currently is that sometimes ircd can re-map
+	file-descriptors (used as the identifier). The format of the
+	information is <new identifier>. Eg:
+
+	2 R 1
+
+	This indicates the client that was on file-descriptor 2 is now
+	on file-descriptor 1 (unlikely, I'm sure!:).
+
+     -  "N"
+
+	This denotes information has been received about the hostname
+	of a client. Format of the information is <hostname>. Eg:
+
+	2 N host.example.com
+
+	This indicates the hostname of that client is
+	host.example.com.
+
+     -  "d"
+
+	This denotes a DNS lookup for the client has timed out or
+	failed. This message has no other information. Eg:
+
+	2 d
+
+     -  "A" *
+
+	This denotes a host alias for the connection. Currently this
+	message is ignored by iauth and any information discarded.
+
+     -  "U"
+
+        This denotes the username information provided by a
+	client. This information cannot be trusted, and is only used
+	by ircd when an identd lookup has failed. Format of the
+	information is <username>. Eg:
+
+	2 U earthpig
+
+	This indicates the client supplied "earthpig" as the username
+	in the USER line during client handshaking with ircd.
+
+     -  "P"
+
+	This denotes password information supplied by the client. Eg:
+
+	2 P uhuh
+
+	This indicates the user supplied a password of "uhuh" during
+	client handshaking with ircd. A "U" message will always
+	immediately follow this message.
+
+     -  "T"
+
+	This denotes the ircd is registering a client, which will
+	usually only occur if iauth has taken too long to get back
+	to ircd with a response. This message has no other
+	information. Eg:
+
+	2 T
+
+     -	"E" *
+
+	This denotes an error message from ircd. The information
+	provided has the form of <error message>. Eg:
+
+	2 E I am a teapot.
+
+IAUTH Messages:
+
+The communication protocol used to communicate from iauth to ircd is
+line-based and has the following form:
+
+	<category> <information>
+
+	* <category> is a single letter used to denote the type of
+          information being sent.
+
+	* <information> is the rest of the line ("\n"-terminated),
+	  whose format depends on the category of information.
+
+     -	">"
+
+        This is used to by iauth to send messages to &AUTH.
+
+     -	"G"
+
+        This is used by iauth to set up debugging feedback from
+	ircd. Eg:
+
+	G 1
+
+     -  "O"
+
+	This is used by iauth to tell ircd of some global iauth
+	policy decisions. Valid <information> includes the letters
+        "R", "T", "A" and "W" only. Eg:
+
+	O RTA
+
+	Valid policy types are:
+		R -- All clients _must_ be authenticated by iauth
+		     to be allowed through;
+		T -- The IRC server should not accept new user
+		     connections if iauth hasn't finished its work;
+		A -- The IRC server should send additional information
+		     to iauth, such as a client-supplied password;
+		W -- Extra time should be allowed for requests
+		     (usually to allow for hostname information to
+		     become available).
+
+     -	"a"
+
+        This indicates that iauth is reading a new configuration
+	file. Eg:
+
+	a
+
+     -  "A" *
+
+	This is used to describe the iauth configuration as it is
+	read. The information consists of <hosts?> <module name>
+	<options>. Eg:
+
+	A * rfc931
+
+	This means that the rfc931 (identd) module is invoked for
+	every connection, and no options were given.
+
+     -  "s" *
+
+	This is used to denote that any recorded statistics on iauth
+	should be reset. Eg:
+
+	s
+
+     -  "S"
+
+	This is used to send iauth statistics. The information has the
+	form of <module name> <module-specific information>. Eg:
+
+	S rfc931 connected 0 unix 0 other 0 bad 0 out of 0
+
+	This indicates some statistics from the rfc931 module.
+
+     -  "U" *
+
+        This is used to send username information (returned by identd)
+        to the ircd. This corresponds to information that has been
+        deemed usable to ircd by iauth. The information has the form
+        of <identifier> <remote IP> <remote port> <username>. Eg:
+
+	U 2 192.168.2.10 13578 earthpig
+
+     -  "u" *
+
+	This is used to send username information (returned by identd)
+	to the ircd. This corresponds to information that has been not
+	deemed usable to ircd by iauth, usually due to the type of
+	reply received from identd. The information has the form of
+	<identifier> <remote IP> <remote port> <username>. Eg:
+
+	u 2 192.168.2.10 13578 earthpig
+
+     -  "K"
+
+        This is used to indicate a client should be killed. The
+	information provided is of the form <identifier> <remote IP>
+	<remote port>. Eg:
+
+	K 2 203.36.167.162 13578
+
+     -  "k"
+
+	This is used to indicate a client should be killed. The
+	information provided is the same as for the above "K" message
+	with the exception that this version is "quieter". ie, The
+	ircd won't be as verbose about the client being rejected.
+
+     -  "D"
+
+        This is used to indicate that iauth's processing of a client
+	has finished. The information provided is of the form <id>
+	<remote IP> <remote port>. Eg:
+
+	D 2 203.36.167.162 13578
+
+     -  "r" *
+
+        This is used by iauth to indicate it is shutting down. No
+	extra information is provided. Eg:
+
+	r
+
+Items marked with a * may be incorrect or contain uncertain
+information.
+
+Module Processing
+-----------------
+
+Module processing is done in a linear manner, one module at a
+time. When one module indicates it is finished with the client, iauth
+starts the next module on it. However, the matter is complicated
+slightly in that multiple passes can be made through the list of
+modules. By default each module is given 15 seconds to complete its
+work on a given client, before it gets timed-out.
+
+The first pass commences immediately when ircd notifies iauth of a
+client to check. A new pass commences:
+
+1) When DNS information about the client's hostname is finalised.
+
+2) When the USER information supplied by the client becomes available.
+
+Earlier versions of iauth did not commence a subsequent pass if DNS
+information was not available, but the current version starts one
+regardless.
+
+All modules are by default included in the first pass, with unused
+modules being included in the second pass if it commences prior to
+them being invoked. Modules are deferred to the second pass if they
+were configured using the "host = " directive (unless a "ip = " option
+was also specified and matched). There is a special case of "host = *"
+which forces a module to be delayed until hostname information is
+known, where it will always be invoked.
+
+Module Interface
+----------------
+
+The default modules are statically linked into the iauth
+daemon. However, there are now provisions for dynamically-loadable
+modules, as described by the iauth.conf man-page. Regardless of how
+they are linked/loaded, modules are currently expected to export the
+following functions (and array):
+
+char *name_init(AnInstance *self);
+void name_release(AnInstance *self);
+void name_stats(AnInstance *self);
+int name_start(u_int client);
+int name_work(u_int client);
+int name_timeout(u_int client);
+
+aModule Module_name =
+        { "name", name_init, name_release, name_stats,
+          name_start, name_work, name_timeout, name_clean };
+
+By convention the exported symbols use the form "name_symbol" where
+"name" is replaced by the module's name. For modules that are linked
+statically, a reference to Module_name must be added to the MList
+array near the start of conf_read() in a_conf.c
+
+For examples of what the exported functions are expected to do, please 
+refer to the (internally documented) modules included in iauth.
+
+Limitations
+-----------
+
+Currently iauth suffers from several limitations. It is hoped that in
+the future these will be fixed. Patches are welcome. :) These
+limitations (in rough order of importance) are:
+
+1) After ircd has registered a client, iauth cannot reject or kill a
+connection. It is strongly desired that this be fixed.
+
+2) There is no way for a module to specify the "reason" a client
+connection was rejected (for display or other purposes).
+
+3) The current module design assumes a separate TCP/IP connection is
+required for each client check (or at least separate file-descriptors
+for each client can be watched for activity). While it's possible
+tricks could be used to work around this assumption, it has not been
+successfully done yet.
+
+Document Availability and Maintainence
+--------------------------------------
+
+This document was originally written by Andrew Snare and may contain
+errors and/or omissions. Please send any corrections to
+ajs@pigpond.com for inclusion in future versions. An up-to-date
+version of this document is available on the web at:
+
+	http://www.pigpond.com/~earthpig/iauth-internals.txt
