@@ -50,6 +50,7 @@ extern time_t nextexpire;
 #ifdef TKLINE
 extern time_t nexttkexpire;
 #endif
+extern aClient *ListenerLL;
 #endif /* IRCD_C */
 
 /*  External definitions for global functions.
