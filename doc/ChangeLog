@@ -1,3 +1,10 @@
+2003-10-13  Kurt Roeckx
+
+	* match_ext.h, send_ext.h, c_conf.c, channel.c, hash.c, ircd.c, res.c,
+	  s_auth.c, s_bsd.ci, s_bsd_ext.h, s_conf.c, s_conf_ext.h, s_debug.c,
+	  s_err.c, s_misc.c, s_send.c, s_serv.c, s_user.c: Fix compiler
+	  warnings and other general cleanup (From Robbert Muller)
+
 2003-10-12  Piotr Kucharski
 
 	* channel.c/m_join(): join overflow bug.
