@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.207 2004/06/11 23:36:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.208 2004/06/12 14:56:47 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3350,7 +3350,7 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    !IsServer(cptr))
 			ClearOper(sptr);
 		if (!(setflags & FLAGS_LOCOP) && IsLocOp(sptr))
-			sptr->user->flags &= ~FLAGS_LOCOP;
+			ClearLocOp(sptr);
 		if ((setflags & FLAGS_RESTRICT) &&
 		    !IsRestricted(sptr))
 		    {
