@@ -1,3 +1,11 @@
+2004-08-18  Piotr Kucharski
+
+	* s_conf.c/initconf(): o:line (local oper) did not revoke remote rights
+	  like it should (noticed by Hans Engren).
+	* channel.c/setup_server_channels(): make &CLIENTS invite-only.
+	* channel.c/can_join(): reverse &CLIENTS join logic: if allowed, let
+	  oper in regardless invite-only status, for all others behave normal.
+
 2004-08-17  Piotr Kucharski
 
 	* channel.c/set_mode(): also allow +R from servers. :)
