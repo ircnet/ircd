@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.18 2005/01/30 16:15:03 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.19 2005/01/30 16:23:18 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -224,7 +224,7 @@ void	report_classes(aClient *sptr, char *to)
 	{
 		sendto_one(sptr, replies[RPL_STATSYLINE], ME, BadTo(to), 'Y',
 			Class(cltmp), PingFreq(cltmp), ConFreq(cltmp),
-			MaxLinks(cltmp), MaxSendq(cltmp),
+			MaxLinks(cltmp), MaxSendq(cltmp), MaxBSendq(cltmp),
 			MaxHLocal(cltmp), MaxUHLocal(cltmp),
 			MaxHGlobal(cltmp), MaxUHGlobal(cltmp), Links(cltmp));
 	}
