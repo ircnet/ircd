@@ -1,8 +1,8 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.37 1999/07/09 20:38:48 kalt Exp $
+  $Id: INSTALL.txt,v 1.38 1999/08/13 17:22:12 kalt Exp $
 
-  This document describes how to install, and configure IRC 2.10.2.
+  This document describes how to install, and configure IRC 2.10.3.
 
   11..  IInnssttaalllliinngg IIRRCC..
 
@@ -73,11 +73,10 @@
 
   11..22..  NNootteess ffoorr CCyyggwwiinn3322 uusseerrss
 
-  The 2.9.5 release compiles properly on W32 systems which have the GNU-
-  Win32 environment ( <http://www.cygnus.com/misc/gnu-win32/>) setup.
-  At the time of the release, tests were made using the version b18 of
-  the Cygwin32 library with the ``coolview'' patch from Sergey Okhapkin.
-  (This patch should be rolled in the next beta)
+  The daemon of 2.10.3 release compiles properly on W32 systems which
+  have the GNU-Win32 environment ( <http://www.cygnus.com/misc/gnu-
+  win32/>) setup.  At the time of the release, tests were made using the
+  version b20.1 of the Cygwin32 library.
 
   When compiling on such system, you want to make sure that you have
   carefully followed the Cygwin32 installation notes.  In particular,
@@ -87,6 +86,10 @@
   Also, the IRC server needs a rreessoollvv..ccoonnff file in order to initialize
   the resolver.  This file can be anywhere (see configure options), and
   is typically in //eettcc on UNIX systems.
+
+  Finally, iauth is automatically disabled.  Even though the iauth
+  program compiles properly, extra work is required to have a working
+  communication channel between the IRC server and the iauth program.
 
 
   11..33..  NNootteess ccoonncceerrnniinngg IIPPvv66 ssuuppppoorrtt
@@ -127,9 +130,6 @@
 
   TThhiiss sshhoouulldd oonnllyy bbee ddeeffiinneedd ffoorr tteesstt ppuurrppoosseess,, aanndd nneevveerr uusseedd oonn aa
   pprroodduuccttiioonn sseerrvveerr..
-
-
-
   22..33..  CCPPAATTHH,, MMPPAATTHH,, LLPPAATTHH,, PPPPAATTHH,, TTPPAATTHH,, QQPPAATTHH,, OOPPAATTHH
 
   Define CPATH to be the directory path to the ``ircd.conf'' file. This
