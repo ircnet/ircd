@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.66 2004/11/01 16:32:38 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.67 2004/11/02 22:38:34 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -57,6 +57,7 @@ New features in 2.11.0:
 	  and global usercounts and maximums (new 265/266 numerics).
 	* New command "MAP [*.mask] [s]" showing ascii tree version of LINKS
 	  and including (with "s" param) user counts and server versions.
+	* Oper-only &OPER channel reporting tklines now, more to come.
 
 Important changes in 2.11.0 (since 2.10.3):
 	* Nicknames of local clients cannot have [\]{|} chars. (Will be removed

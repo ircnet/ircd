@@ -558,7 +558,11 @@
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 
-/* Don't change unless you know, what it does. */
+/* 
+** We have some weird and rare-occuring bug in hash tables. Please define
+** this, so ircd will abort() when adding loop hash. If abort() happens,
+** contact ircd-bugs@irc.org for assistance. Thank you!
+*/
 /* #define HELP_IRCD_GET_RID_OF_HASHTABLE_BUG */
 
 /*
