@@ -1,5 +1,16 @@
 2002-01-06  Piotr Kucharski
 
+	* s_serv.c/m_server_estab(),s_service.c/m_service(),
+	  s_user.c/register_user(): if link we send NICK/UNICK/SERVICE to is
+	  UID capable, send client->servp->tok, not me.serv->tok.
+	* s_misc.c/exit_one_client(): don't decrease istat.is_serv when
+	  server is masked.
+	* s_misc.c/exit_server(): regenerate SQUITs to send them to &SERVERS.
+	* s_serv.c/m_server(): squit link if no SID was given on a 2.11 link.
+	* hash.c/bigger_hash_table(): add only ST_UID sptrs to sid_hash_table.
+
+2002-01-05  Piotr Kucharski
+
 	* parse.c/find_sender(): sid and fake sid aware now.
 	* parse.c, msg_def.h: aware of m_smask().
 	* struct_def.h: ismasked, left, right, down, servers to Server struct.
