@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.22 2002/10/09 21:23:20 q Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.23 2002/11/24 15:28:57 jv Exp $";
 #endif
 
 #include "os.h"
@@ -617,6 +617,7 @@ aConfItem	*make_conf()
 	aconf->status = CONF_ILLEGAL;
 	aconf->pref = -1;
 	aconf->hold = time(NULL);
+	aconf->source_ip = NULL;
 	Class(aconf) = NULL;
 	return (aconf);
 }
@@ -654,6 +655,8 @@ aConfItem *aconf;
 		bzero(aconf->passwd, strlen(aconf->passwd));
 	if (aconf->ping)
 		MyFree(aconf->ping);
+	if (aconf->source_ip)
+		MyFree(aconf->source_ip);
 	MyFree(aconf->passwd);
 	MyFree(aconf->name);
 	MyFree(aconf);
