@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.100 2004/06/11 23:22:34 chopin Exp $
+ *   $Id: struct_def.h,v 1.101 2004/06/12 12:36:18 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -109,18 +109,24 @@ typedef struct        LineItem aExtData;
 #define	BOOT_STRICTPROT	0x200
 #define	BOOT_NOIAUTH	0x400
 
-#define	STAT_CONNECTING	-4
-#define	STAT_HANDSHAKE	-3
-#define	STAT_UNKNOWN	-2
-#define	STAT_ME		-1
-#define	STAT_SERVER	0
-#define	STAT_CLIENT	1
-#define	STAT_SERVICE	2
+typedef enum Status {
+	STAT_CONNECTING = -4,
+	STAT_HANDSHAKE, /* -3 */
+	STAT_UNKNOWN,	/* -2 */
+	STAT_ME,	/* -1 */
+	STAT_SERVER,	/* 0 */
+	STAT_CLIENT,	/* 1 */
+	STAT_OPER,	/* 2 */
+	STAT_SERVICE,	/* 3 */
+	STAT_UNREG,	/* 4 */
+	STAT_MAX	/* 5 -- size of handler[] table we need */
+} Status;
 
 /*
  * status macros.
  */
-#define	IsRegisteredUser(x)	((x)->status == STAT_CLIENT && (x)->user)
+#define	IsRegisteredUser(x)	(((x)->status == STAT_CLIENT || \
+				 (x)->status == STAT_OPER) && (x)->user)
 #define	IsRegistered(x)		((x)->status >= STAT_SERVER || \
 				 (x)->status == STAT_ME)
 #define	IsConnecting(x)		((x)->status == STAT_CONNECTING)
@@ -128,7 +134,8 @@ typedef struct        LineItem aExtData;
 #define	IsMe(x)			((x)->status == STAT_ME)
 #define	IsUnknown(x)		((x)->status == STAT_UNKNOWN)
 #define	IsServer(x)		((x)->status == STAT_SERVER)
-#define	IsClient(x)		((x)->status == STAT_CLIENT)
+#define	IsClient(x)		((x)->status == STAT_CLIENT || \
+				 (x)->status == STAT_OPER)
 #define	IsService(x)		((x)->status == STAT_SERVICE && (x)->service)
 
 #define	SetConnecting(x)	((x)->status = STAT_CONNECTING)
@@ -209,8 +216,10 @@ typedef struct        LineItem aExtData;
 
 #define	SetDead(x)		((x)->flags |= FLAGS_DEADSOCK)
 #define	CBurst(x)		((x)->flags & FLAGS_CBURST)
-#define	SetOper(x)		((x)->user->flags |= FLAGS_OPER)
-#define	SetLocOp(x)		((x)->user->flags |= FLAGS_LOCOP)
+#define	SetOper(x)		((x)->user->flags |= FLAGS_OPER, \
+				 (x)->status = STAT_OPER)
+#define	SetLocOp(x)		((x)->user->flags |= FLAGS_LOCOP, \
+				 (x)->status = STAT_OPER)
 #define	SetInvisible(x)		((x)->user->flags |= FLAGS_INVISIBLE)
 #define SetRestricted(x)	((x)->user->flags |= FLAGS_RESTRICT)
 #define	SetWallops(x)		((x)->user->flags |= FLAGS_WALLOP)
@@ -230,7 +239,10 @@ typedef struct        LineItem aExtData;
 #define	DoneXAuth(x)		((x)->flags & FLAGS_XAUTHDONE)
 #define	NoNewLine(x)		((x)->flags & FLAGS_NONL)
 
-#define	ClearOper(x)		((x)->user->flags &= ~FLAGS_OPER)
+#define	ClearOper(x)		((x)->user->flags &= ~FLAGS_OPER, \
+				 (x)->status = STAT_CLIENT)
+#define	ClearLocOp(x)		((x)->user->flags &= ~FLAGS_LOCOP, \
+				 (x)->status = STAT_CLIENT)
 #define	ClearInvisible(x)	((x)->user->flags &= ~FLAGS_INVISIBLE)
 #define ClearRestricted(x)      ((x)->user->flags &= ~FLAGS_RESTRICT)
 #define	ClearWallops(x)		((x)->user->flags &= ~FLAGS_WALLOP)
@@ -587,29 +599,17 @@ struct	SMode	{
 
 /* Message table structure */
 
+typedef	int	(*CmdHandler)(aClient *, aClient *, int, char **);
+
 struct	Message	{
 	char	*cmd;
-	int	(*func)(aClient *cptr, aClient *sptr, int parc, char *parv[]);
 	int	minparams;
-	int	parameters;
-	u_int	flags;
-		/* bit 0 set means that this command is allowed to be used
-		 * only on the average of once per 2 seconds -SRB */
+	int	maxparams;
 	u_int	count;	/* total count */
 	u_int	rcount;	/* remote count */
 	u_long	bytes;
+	CmdHandler	handler[STAT_MAX];
 };
-
-#define	MSG_LAG		0x0001
-#define	MSG_NOU		0x0002	/* Not available to users */
-#define	MSG_SVC		0x0004	/* Services only */
-#define	MSG_NOUK	0x0008	/* Not available to unknowns */
-#define	MSG_REG		0x0010	/* Must be registered */
-#define	MSG_REGU	0x0020	/* Must be a registered user */
-/*#define	MSG_PP		0x0040*/
-/*#define	MSG_FRZ		0x0080*/
-#define	MSG_OP		0x0100	/* opers only */
-#define	MSG_LOP		0x0200	/* locops only */
 
 /* fd array structure */
 
