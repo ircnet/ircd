@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.28 1998/01/27 12:59:35 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.29 1998/01/27 13:22:54 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1539,9 +1539,9 @@ char	*parv[];
 	static	char	jbuf[BUFSIZE], cbuf[BUFSIZE];
 	Reg	Link	*lp;
 	Reg	aChannel *chptr;
-	Reg	char	*name, *chop, *key = NULL;
+	Reg	char	*name, *key = NULL;
 	int	i, flags = 0;
-	char	*p = NULL, *p2 = NULL, *s;
+	char	*p = NULL, *p2 = NULL, *s, chop[5];
 
 	if (parc < 2 || *parv[1] == '\0')
 	    {
@@ -1644,11 +1644,11 @@ char	*parv[];
 		** Operator.
 		*/
 		flags = 0;
-		chop = "";
+		chop[0] = '\0';
 		if (MyConnect(sptr) && UseModes(name) &&
 		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users)
 		    {
-			chop = "\007o";
+			strcpy(chop, "\007o");
 			s = chop+1; /* tricky */
 		    }
 		/*
