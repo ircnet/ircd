@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.27 1999/06/07 21:01:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.28 1999/06/27 19:27:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -853,7 +853,7 @@ char	*comment;
 			add_history(sptr, (sptr->flags & FLAGS_QUIT) ? 
 				    &me : NULL);
 #else
-			add_history(sptr, NULL);
+			add_history(sptr, (sptr == cptr) ? &me : NULL);
 #endif
 			off_history(sptr);
 		    }
