@@ -1,3 +1,8 @@
+2004-02-24  Piotr Kucharski
+
+	* parse.c, msg_def.h: add "POST" command being alias for "QUIT"
+	  to cut w3cache abuse (idea from ircu).
+
 2004-02-23  Piotr Kucharski
 
 	* s_serv.c/m_squit(): do not send compatibility sids in SQUIT.

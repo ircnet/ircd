@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.177 2004/02/22 19:27:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.178 2004/02/26 17:58:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2433,6 +2433,14 @@ user_finish:
 	else
 		strncpyzt(sptr->user->username, username, USERLEN+1);
 	return 2;
+}
+
+/* Fear www proxy abusers... aliased to QUIT, muhaha --B. */
+int	m_post(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+	sendto_flag(SCH_LOCAL, "Denied http-post connection from %s.",
+		cptr->sockhost);
+	m_quit(cptr, sptr, parc, parv);
 }
 
 /*
