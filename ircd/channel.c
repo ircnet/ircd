@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.205 2004/06/06 09:47:01 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.206 2004/06/06 10:25:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -177,39 +177,23 @@ static	void	free_bei(aListItem *bei)
 	MyFree(bei);
 }
 
+/* Prepare and fill ListItem struct. Note: check_string takes care of
+** cleaning parts, including possible use of static asterix. */
 static	aListItem	*make_bei(char *nick, char *user, char *host)
 {
 	aListItem	*tmp;
 
 	tmp = (struct ListItem *)MyMalloc(sizeof(aListItem));
 
-	if (!nick || !*nick || (nick[0]=='*' && nick[1]=='\0'))
-	{
-		tmp->nick=asterix;
-	}
-	else
-	{
-		tmp->nick=(char *) MyMalloc( strlen(nick)+1 );
-		strcpy(tmp->nick, nick);
-	}
-	if (!user || !*user || (user[0]=='*' && user[1]=='\0'))
-	{
-		tmp->user=asterix;
-	}
-	else
-	{
-		tmp->user=(char *) MyMalloc( strlen(user)+1 );
-		strcpy(tmp->user, user);
-	}
-	if (!host || !*host || (host[0]=='*' && host[1]=='\0'))
-	{
-		tmp->host=asterix;
-	}
-	else
-	{
-		tmp->host=(char *) MyMalloc( strlen(host)+1 );
-		strcpy(tmp->host, host);
-	}
+	nick = check_string(nick);
+	tmp->nick=(char *) MyMalloc( strlen(nick)+1 );
+	strncpyzt(tmp->nick, nick, NICKLEN + 1);
+	user = check_string(user);
+	tmp->user=(char *) MyMalloc( strlen(user)+1 );
+	strncpyzt(tmp->user, user, USERLEN + 1);
+	host = check_string(host);
+	tmp->host=(char *) MyMalloc( strlen(host)+1 );
+	strncpyzt(tmp->host, host, HOSTLEN + 1);
 
 	return tmp;
 }
