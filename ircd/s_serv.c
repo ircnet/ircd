@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.155 2004/02/17 16:27:24 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.156 2004/02/22 18:24:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -310,12 +310,6 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			    (timeconnected % 3600)/60, 
 			    timeconnected % 60);
 	    }
-	if (!IsMasked(acptr))
-	{
-		sendto_flag(SCH_SERVER, "Received SQUIT %s from %s (%s)",
-			acptr->name, parv[0], comment);
-	}
-
 	return exit_client(cptr, acptr, sptr, comment);
 }
 
