@@ -1,3 +1,20 @@
+Sun Apr 20 20:30:21 1997  Christophe Kalt
+
+	* s_conf.c: find_bounce() had an inversed test. (how could it work
+	when I tested it??)
+
+	* s_serv.c: SERVER message would occasionnally (and incorrectly)
+	be dropped.
+
+	* s_misc.c: simple optimization in exit_client().
+
+	* s_service.c, s_serv.c: things looked wrong, SERVICE syntax
+	inchorent. Minor memory leak.
+
+	* s_bsd.c, s_misc.c: various "typos" fixed. (UDP & non POLL)
+
+	* send.c, h.h: removed sendto_all_butone(). (unused)
+
 Tue Apr 15 19:41:32 1997  Christophe Kalt
 
 	* sock.h: added a check to make sure FD_SETSIZE is big enough.
