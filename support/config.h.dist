@@ -17,32 +17,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/*  Type of host. Keep them undefined, unless you're using one of these OS.
- */
-
-#undef	MIPS			/* MIPS Unix */
-#undef 	SVR3			/* SVR3 stuff - being worked on where poss. */
-#undef	ESIX			/* ESIX */
-
-/* Do these work? I dunno... */
-
-#undef	VMS			/* Should work for IRC client, not server */
-#undef	MAIL50			/* If you're running VMS 5.0 */
-#undef	PCS			/* PCS Cadmus MUNIX, use with BSD flag! */
-
-/*
- * NOTE: On some systems, valloc() causes many problems.
- */
-#undef	VALLOC			/* Define this if you have valloc(3) */
-
-#ifdef APOLLO
-#define	RESTARTING_SYSTEMCALLS
-#endif 				  /* read/write are restarted after signals
-				     defining this 1, gets siginterrupt call
-				     compiled, which attempts to remove this
-				     behaviour (apollo sr10.1/bsd4.3 needs
-				     this) */
-
 /*
  *  ircdwatch configuration options.
  *
@@ -61,7 +35,7 @@
 /* 
  * should we check for config file changes and HUP the server
  * if a change is detected?
-*/
+ */
 #undef IRCDWATCH_HUP_ON_CONFIG_CHANGE
 
 /* 
@@ -76,6 +50,14 @@
 # define IRCDWATCH_SYSLOG_FACILITY  LOG_DAEMON
 #endif
 
+
+/*
+ *  irc[d] configuration options.
+ *
+ *  Most of the following defines are related to the server,
+ *  some apply to the client.
+ *
+ */
 
 /*
  * Pathnames and defaults of irc system's support files. Please note that
