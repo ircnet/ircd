@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.65 1999/01/14 01:19:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.66 1999/01/23 23:05:52 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -695,7 +695,7 @@ char	*parv[];
 	aClient *acptr;
 	int	delayed = 0;
 	char	nick[NICKLEN+2], *s, *user, *host;
-	Link	*lp;
+	Link	*lp = NULL;
 
 	if (IsService(sptr))
    	    {
