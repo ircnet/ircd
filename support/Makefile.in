@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.14 1997/09/15 13:48:11 kalt Exp $
+#*   $Id: Makefile.in,v 1.15 1997/09/24 18:38:08 kalt Exp $
 #*
 #*/
 
@@ -216,7 +216,7 @@ match.o: ../common/match.c setup.h config.h
 parse.o: ../common/parse.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../common/parse.c
 
-support.o: ../common/support.c setup.h config.h
+support.o: ../common/support.c setup.h config.h ../common/patchlevel.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../common/support.c
 
 channel.o: ../ircd/channel.c setup.h config.h
