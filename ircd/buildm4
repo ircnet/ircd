@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# $Id: buildm4,v 1.8 1997/10/06 14:59:37 kalt Exp $
+# $Id: buildm4,v 1.9 1997/10/17 17:44:37 kalt Exp $
 #
 
 #
@@ -26,7 +26,7 @@ INCLUDE=`../support/config.guess`
 IRCDDIR=$1
 M4=$IRCDDIR/ircd.m4
 /bin/rm -f $M4
-egrep "^#def[^P]*PATCHLEVEL" ../include/patchlevel.h | \
+egrep "^#def[^P]*PATCHLEVEL" ../common/patchlevel.h | \
 sed -e 's/[^\"]*\"\([^\"]*\)\"/define(VERSION,\1)/' >>$M4
 DEBUG=`egrep "^#define[		]*DEBUGMODE" config.h`
 if [ -n "$DEBUG" ] ; then
@@ -51,8 +51,8 @@ CONT=`egrep '^#define[ 	]*CONNECTFREQUENCY[ 	]*[0-9]*' ../$INCLUDE/config.h\
 	| sed -e 's/[^0-9]*\([0-9]*\).*/\1/'`
 echo "define(CFREQ,$CONT)" >> $M4
 
-MAXL=`egrep '^#define[ 	]*MAXIMUM_LINKS[ 	]*[0-9]* | head -1'
-../$INCLUDE/config.h | sed -e 's/[^0-9]*\([0-9]*\).*/\1/'`
+MAXL=`egrep '^#define[ 	]*MAXIMUM_LINKS[ 	]*[0-9]* | head -1' \
+	../$INCLUDE/config.h | sed -e 's/[^0-9]*\([0-9]*\).*/\1/'`
 echo "define(MAXLINKS,$MAXL)" >> $M4
 
 DOM=`egrep '^domain' /etc/resolv.conf | \
