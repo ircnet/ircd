@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.10 1998/08/05 22:15:24 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.11 1998/08/06 02:05:00 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -92,7 +92,7 @@ void
 read_iauth()
 {
     static char obuf[READBUF_SIZE+1];
-    static int olen = 0;
+    static int olen = 0, ia_dbg = 0;
     char buf[READBUF_SIZE+1], *start, *end, tbuf[BUFSIZ];
     aClient *cptr;
     int i;
@@ -128,6 +128,13 @@ read_iauth()
 			    start = end;
 			    continue;
 			}
+		    if (*start == 'G')
+			{
+			    ia_dbg = atoi(start+2);
+			    sendto_flag(SCH_AUTH, "ia_dbg == %d", ia_dbg);
+			    start = end;
+			    continue;
+			}
 		    if (*start != 'U' && *start != 'u' &&
 			*start != 'K' && *start != 'D')
 			{
@@ -138,8 +145,13 @@ read_iauth()
 			}
 		    if ((cptr = local[i = atoi(start+2)]) == NULL)
 			{
-			    sendto_flag(SCH_AUTH, "Client %d is gone.", i);
-			    sendto_iauth("%d E Gone [%s]", i, start);
+			    /* this is fairly common and can be ignored */
+			    if (ia_dbg)
+				{
+				    sendto_flag(SCH_AUTH, "Client %d is gone.",
+						i);
+				    sendto_iauth("%d E Gone [%s]", i, start);
+				}
 			    start = end;
 			    continue;
 			}
