@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.12 1997/07/16 19:28:14 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.13 1997/07/25 20:14:35 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1763,7 +1763,7 @@ FdAry	*fdp;
 
 #ifdef	_DO_POLL_
 		if ( auth == 0 )
-			bzero((char *) &authclnts, sizeof( authclnts ));
+			bzero((char *) authclnts, sizeof( authclnts ));
 #endif
 		for (i = fdp->highest; i >= 0; i--)
 		    {
