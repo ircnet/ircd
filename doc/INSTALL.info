@@ -1,5 +1,5 @@
-This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-2806/sgmltmp.INSTALL.info.2.
+This is INSTALL.info, produced by makeinfo version 4.7 from
+/tmp/linuxdoc-dir-886/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.68 2004/07/13 23:15:15 chopin Exp $
+     $Id: INSTALL.info,v 1.69 2004/08/31 13:31:11 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -26,8 +26,8 @@ Installing IRC - The Internet Relay Chat Program
 
 File: INSTALL.info,  Node: Installing IRC-,  Next: The config-h file,  Prev: Top,  Up: Top
 
-Installing IRC-
-***************
+1 Installing IRC-
+*****************
 
 * Menu:
 
@@ -38,8 +38,8 @@ Installing IRC-
 
 File: INSTALL.info,  Node: The configure script,  Next: Notes for Cygwin32 users,  Up: Installing IRC-
 
-The configure script
-====================
+1.1 The configure script
+========================
 
 This package uses a GNU configure script for its configuration.  You
 simply need to untar the distribution and run the "configure" script.
@@ -58,7 +58,7 @@ default behaviour:
      files will go. It is important to set this properly. (default is
      prefix/sbin)
 
-`--logdir=DIR'
+`--with-logdir=DIR'
      changes the default directory where the irc log files will go.
      (default is prefix/var/log/ircd)
 
@@ -68,9 +68,9 @@ default behaviour:
 
 `--localstatedir=DIR'
      changes the default directory where the irc server state files
-     will go. (default is prefix/var/run)
+     will go. (default is prefix/var)
 
-`--resconf=FILE'
+`--with-resconf=FILE'
      defines the file to be used by ircd to initialize its resolver.
      (default is /etc/resolv.conf)
 
@@ -106,8 +106,8 @@ default behaviour:
 
 File: INSTALL.info,  Node: Notes for Cygwin32 users,  Next: Notes concerning IPv6 support,  Prev: The configure script,  Up: Installing IRC-
 
-Notes for Cygwin32 users
-========================
+1.2 Notes for Cygwin32 users
+============================
 
 The daemon of 2.11.0 release compiles properly on W32 systems which
 have the GNU-Win32 environment (  (http://www.cygwin.com/)) setup.  At
@@ -124,8 +124,8 @@ options), and is typically in `/etc' on UNIX systems.
 
 File: INSTALL.info,  Node: Notes concerning IPv6 support,  Prev: Notes for Cygwin32 users,  Up: Installing IRC-
 
-Notes concerning IPv6 support
-=============================
+1.3 Notes concerning IPv6 support
+=================================
 
 This version was tested on the following IPv6 systems: BSD/OS+KAME,
 Digital Unix, FreeBSD+KAME, Linux, NetBSD+INRIA.
@@ -136,8 +136,8 @@ separator for the server configuration file was changed to "%"'.
 
 File: INSTALL.info,  Node: The config-h file,  Next: Editing the Makefile and compiling,  Prev: Installing IRC-,  Up: Top
 
-The config-h file
-*****************
+2 The config-h file
+*******************
 
 The second step consists of defining options before the compilation.
 This is done by editing the "config.h" file and changing the various
@@ -158,8 +158,8 @@ This is done by editing the "config.h" file and changing the various
 
 File: INSTALL.info,  Node: DEBUGMODE,  Next: CHROOTDIR,  Up: The config-h file
 
-DEBUGMODE
-=========
+2.1 DEBUGMODE
+=============
 
 `This should only be defined for test purposes, and never used on a
 production server.'
@@ -174,8 +174,8 @@ of self diagnostics whilst running.
 
 File: INSTALL.info,  Node: CHROOTDIR,  Next: ENABLE_SUMMON ENABLE_USERS,  Prev: DEBUGMODE,  Up: The config-h file
 
-CHROOTDIR
-=========
+2.2 CHROOTDIR
+=============
 
 To use the CHROOTDIR feature, make sure it is #define'd and that the
 server is being run as root. Better use some other (external) way of
@@ -185,8 +185,8 @@ requiring to run as root.
 
 File: INSTALL.info,  Node: ENABLE_SUMMON ENABLE_USERS,  Next: NO_DEFAULT_INVISIBLE,  Prev: CHROOTDIR,  Up: The config-h file
 
-ENABLE_SUMMON ENABLE_USERS
-==========================
+2.3 ENABLE_SUMMON ENABLE_USERS
+==============================
 
 For security conscious server admins, they may wish to leave
 ENABLE_USERS undefined, disabling the USERS command which can be used
@@ -197,8 +197,8 @@ a message similar to that from talk(1) to a user's tty.
 
 File: INSTALL.info,  Node: NO_DEFAULT_INVISIBLE,  Next: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY,  Prev: ENABLE_SUMMON ENABLE_USERS,  Up: The config-h file
 
-NO_DEFAULT_INVISIBLE
-====================
+2.4 NO_DEFAULT_INVISIBLE
+========================
 
 The NO_DEFAULT_INVISIBLE define is used to toggle whether clients are
 automatically made invisible when they register.
@@ -206,8 +206,8 @@ automatically made invisible when they register.
 
 File: INSTALL.info,  Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY,  Next: ZIP_LINKS ZIP_LEVEL,  Prev: NO_DEFAULT_INVISIBLE,  Up: The config-h file
 
-OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY
-===========================================================
+2.5 OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY
+===============================================================
 
 The three operator only commands, KILL, REHASH, RESTART and SET, may
 all be disabled to ensure that an operator who does not have the
@@ -218,8 +218,8 @@ can be defined to only allow locally connected clients to be KILLed.
 
 File: INSTALL.info,  Node: ZIP_LINKS ZIP_LEVEL,  Next: SLOW_ACCEPT,  Prev: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY,  Up: The config-h file
 
-ZIP_LINKS ZIP_LEVEL
-===================
+2.6 ZIP_LINKS ZIP_LEVEL
+=======================
 
 As of the 2.9.3 version of the server, server-server connections may be
 compressed using the zlib.  In order to compile the server with this
@@ -239,8 +239,8 @@ Comments) 1950 to 1952 in the files
 
 File: INSTALL.info,  Node: SLOW_ACCEPT,  Next: CLONE_CHECK,  Prev: ZIP_LINKS ZIP_LEVEL,  Up: The config-h file
 
-SLOW_ACCEPT
-===========
+2.7 SLOW_ACCEPT
+===============
 
 This option is undefined by default, however is needed on some OSes.
 It creates an artificial delay in processing incoming connections.  On
@@ -254,8 +254,8 @@ decide to keep SLOW_ACCEPT undefined you MUST define CLONE_CHECK.
 
 File: INSTALL.info,  Node: CLONE_CHECK,  Next: Other #define's,  Prev: SLOW_ACCEPT,  Up: The config-h file
 
-CLONE_CHECK
-===========
+2.8 CLONE_CHECK
+===============
 
 This option is defined by default and acts as a wrapper, by checking
 incoming connections early before starting ident query.  By default,
@@ -265,8 +265,8 @@ within 2 seconds.
 
 File: INSTALL.info,  Node: Other #define's,  Prev: CLONE_CHECK,  Up: The config-h file
 
-Other #define's
-===============
+2.9 Other #define's
+===================
 
 The rest of the user changable #define's should be pretty much self
 explanatory in the config.h file.  It is *NOT* recommended that any of
@@ -275,8 +275,8 @@ the file under the line with "STOP STOP" in it be changed.
 
 File: INSTALL.info,  Node: Editing the Makefile and compiling,  Next: The ircd-conf file,  Prev: The config-h file,  Up: Top
 
-Editing the Makefile and compiling
-**********************************
+3 Editing the Makefile and compiling
+************************************
 
 This package now uses GNU autoconf to probe your system and generate
 the correct Makefile.  However you may need to read it to check for
@@ -297,8 +297,8 @@ edit Makefile as appropriate.
 
 File: INSTALL.info,  Node: The ircd-conf file,  Next: Related resources,  Prev: Editing the Makefile and compiling,  Up: Top
 
-The ircd-conf file
-******************
+4 The ircd-conf file
+********************
 
 After installing the ircd and irc programs, edit the ircd.conf file as
 per the instructions in this section and install it in the location you
@@ -382,8 +382,8 @@ connections).
 
 File: INSTALL.info,  Node: Machine information,  Next: Administrative info,  Up: The ircd-conf file
 
-Machine information
-===================
+4.1 Machine information
+=======================
 
 `Introduction'
      IRC needs to know a few things about your UNIX site, and the "M"
@@ -452,8 +452,8 @@ Machine information
 
 File: INSTALL.info,  Node: Administrative info,  Next: Port connections,  Prev: Machine information,  Up: The ircd-conf file
 
-Administrative info
-===================
+4.2 Administrative info
+=======================
 
 `Introduction'
      The "A" line is used for administrative information about a site.
@@ -511,8 +511,8 @@ Administrative info
 
 File: INSTALL.info,  Node: Port connections,  Next: Connection Classes,  Prev: Administrative info,  Up: The ircd-conf file
 
-Port connections
-================
+4.3 Port connections
+====================
 
 `Introduction'
      The port line adds flexibility to the server's ability to accept
@@ -578,8 +578,8 @@ Port connections
 
 File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev: Port connections,  Up: The ircd-conf file
 
-Connection Classes
-==================
+4.4 Connection Classes
+======================
 
 `Introduction'
      To enable more efficient use of MAXIMUM_LINKS, connection classes
@@ -705,8 +705,8 @@ Connection Classes
 
 File: INSTALL.info,  Node: Client connections,  Next: Operator priviliges,  Prev: Connection Classes,  Up: The ircd-conf file
 
-Client connections
-==================
+4.5 Client connections
+======================
 
 How to let clients connect to your IRCD.
 `Introduction'
@@ -869,8 +869,8 @@ How to let clients connect to your IRCD.
 
 File: INSTALL.info,  Node: Operator priviliges,  Next: Excluded accounts,  Prev: Client connections,  Up: The ircd-conf file
 
-Operator priviliges
-===================
+4.6 Operator priviliges
+=======================
 
 How to become the IRC administrator on your site
 `Introduction'
@@ -983,8 +983,8 @@ How to become the IRC administrator on your site
 
 File: INSTALL.info,  Node: Excluded accounts,  Next: X Excluded accounts,  Prev: Operator priviliges,  Up: The ircd-conf file
 
-Excluded accounts
-=================
+4.7 Excluded accounts
+=====================
 
 Remove an errant user from IRC on your site.
 `Introduction'
@@ -1088,8 +1088,8 @@ Remove an errant user from IRC on your site.
 
 File: INSTALL.info,  Node: X Excluded accounts,  Next: Server connections,  Prev: Excluded accounts,  Up: The ircd-conf file
 
-X Excluded accounts
-===================
+4.8 X Excluded accounts
+=======================
 
 Remove an errant user from IRC on your site.
 `Introduction'
@@ -1125,8 +1125,8 @@ Remove an errant user from IRC on your site.
 
 File: INSTALL.info,  Node: Server connections,  Next: Deny auto-connections,  Prev: X Excluded accounts,  Up: The ircd-conf file
 
-Server connections
-==================
+4.9 Server connections
+======================
 
 How to connect to other servers, How other servers can connect to you
 
@@ -1342,8 +1342,8 @@ format as the "C" entries.
 
 File: INSTALL.info,  Node: Deny auto-connections,  Next: Hub connections,  Prev: Server connections,  Up: The ircd-conf file
 
-Deny auto-connections
-=====================
+4.10 Deny auto-connections
+==========================
 
 `Introduction'
      D lines were implemented to give server administrators more
@@ -1391,8 +1391,8 @@ Deny auto-connections
 
 File: INSTALL.info,  Node: Hub connections,  Next: Leaf connections,  Prev: Deny auto-connections,  Up: The ircd-conf file
 
-Hub connections
-===============
+4.11 Hub connections
+====================
 
 `Introduction'
      In direct contrast to L-lines, the server also implements H-lines
@@ -1442,8 +1442,8 @@ Hub connections
 
 File: INSTALL.info,  Node: Leaf connections,  Next: Version limitations,  Prev: Hub connections,  Up: The ircd-conf file
 
-Leaf connections
-================
+4.12 Leaf connections
+=====================
 
 `Introduction'
      To stop servers which should only act as leaves from hubs becoming
@@ -1488,8 +1488,8 @@ Leaf connections
 
 File: INSTALL.info,  Node: Version limitations,  Next: Excluded machines,  Prev: Leaf connections,  Up: The ircd-conf file
 
-Version limitations
-===================
+4.13 Version limitations
+========================
 
 `Introduction'
      V-lines are used to restrict server connecting to you based on
@@ -1552,8 +1552,8 @@ Version limitations
 
 File: INSTALL.info,  Node: Excluded machines,  Next: Service connections,  Prev: Version limitations,  Up: The ircd-conf file
 
-Excluded machines
-=================
+4.14 Excluded machines
+======================
 
 Disallowing SERVERS in your irc net.
 `Introduction'
@@ -1581,8 +1581,8 @@ Disallowing SERVERS in your irc net.
 
 File: INSTALL.info,  Node: Service connections,  Next: Bounce server,  Prev: Excluded machines,  Up: The ircd-conf file
 
-Service connections
-===================
+4.15 Service connections
+========================
 
 `Introduction'
      The Service is a special kind of IRC client. It does not have the
@@ -1628,8 +1628,8 @@ Service connections
 
 File: INSTALL.info,  Node: Bounce server,  Prev: Service connections,  Up: The ircd-conf file
 
-Bounce server
-=============
+4.16 Bounce server
+==================
 
 `Introduction'
      This provides you a way to bounce clients to another server.  This
@@ -1691,8 +1691,8 @@ Bounce server
 
 File: INSTALL.info,  Node: Related resources,  Next: Reporting a bug,  Prev: The ircd-conf file,  Up: Top
 
-Related resources
-*****************
+5 Related resources
+*******************
 
 `Mailing list'
      A list is dedicated to the people using ircd. If you have trouble
@@ -1723,8 +1723,8 @@ Related resources
 
 File: INSTALL.info,  Node: Reporting a bug,  Prev: Related resources,  Up: Top
 
-Reporting a bug
-***************
+6 Reporting a bug
+*****************
 
 If you encounter a bug in the software, here is how and where to report
 it.
@@ -1737,8 +1737,8 @@ it.
 
 File: INSTALL.info,  Node: How to report a bug,  Next: Where to send a bug report,  Up: Reporting a bug
 
-How to report a bug
-===================
+6.1 How to report a bug
+=======================
 
 To save everyone time, make sure that your e-mail contains all the
 information related to your problem.  In particular, we need to know:
@@ -1769,8 +1769,8 @@ information related to your problem.  In particular, we need to know:
 
 File: INSTALL.info,  Node: Where to send a bug report,  Prev: How to report a bug,  Up: Reporting a bug
 
-Where to send a bug report
-==========================
+6.2 Where to send a bug report
+==============================
 
 Reports should be sent to ircd-bugs@irc.org.  Your report will be
 reviewed and forwarded to the appropriate mailing list.
@@ -1778,42 +1778,42 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top127
-Node: Installing IRC-650
-Node: The configure script875
-Node: Notes for Cygwin32 users3161
-Node: Notes concerning IPv6 support3894
-Node: The config-h file4325
-Node: DEBUGMODE4871
-Node: CHROOTDIR5448
-Node: ENABLE_SUMMON ENABLE_USERS5817
-Node: NO_DEFAULT_INVISIBLE6328
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY6669
-Node: ZIP_LINKS ZIP_LEVEL7308
-Node: SLOW_ACCEPT8336
-Node: CLONE_CHECK8966
-Node: Other #define's9329
-Node: Editing the Makefile and compiling9651
-Node: The ircd-conf file10636
-Node: Machine information13061
-Node: Administrative info15676
-Node: Port connections17827
-Node: Connection Classes19976
-Node: Client connections25103
-Node: Operator priviliges30885
-Node: Excluded accounts34187
-Node: X Excluded accounts38100
-Node: Server connections39390
-Node: Deny auto-connections48020
-Node: Hub connections49589
-Node: Leaf connections51077
-Node: Version limitations53161
-Node: Excluded machines54919
-Node: Service connections56224
-Node: Bounce server57818
-Node: Related resources59679
-Node: Reporting a bug60718
-Node: How to report a bug60975
-Node: Where to send a bug report61986
+Node: Top126
+Node: Installing IRC-649
+Node: The configure script878
+Node: Notes for Cygwin32 users3178
+Node: Notes concerning IPv6 support3919
+Node: The config-h file4358
+Node: DEBUGMODE4908
+Node: CHROOTDIR5493
+Node: ENABLE_SUMMON ENABLE_USERS5870
+Node: NO_DEFAULT_INVISIBLE6389
+Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY6738
+Node: ZIP_LINKS ZIP_LEVEL7385
+Node: SLOW_ACCEPT8421
+Node: CLONE_CHECK9059
+Node: Other #define's9430
+Node: Editing the Makefile and compiling9760
+Node: The ircd-conf file10749
+Node: Machine information13178
+Node: Administrative info15801
+Node: Port connections17960
+Node: Connection Classes20117
+Node: Client connections25252
+Node: Operator priviliges31042
+Node: Excluded accounts34352
+Node: X Excluded accounts38273
+Node: Server connections39571
+Node: Deny auto-connections48209
+Node: Hub connections49788
+Node: Leaf connections51286
+Node: Version limitations53380
+Node: Excluded machines55148
+Node: Service connections56463
+Node: Bounce server58067
+Node: Related resources59938
+Node: Reporting a bug60981
+Node: How to report a bug61242
+Node: Where to send a bug report62261
 
 End Tag Table

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.68 2004/07/13 23:15:15 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.69 2004/08/31 13:31:11 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -27,13 +27,13 @@ to /usr/local
 <tag/--sbindir=DIR/ changes the default directory where the
 system admin executable files will go. It is important to
 set this properly. (default is prefix/sbin)
-<tag/--logdir=DIR/ changes the default directory where the
+<tag/--with-logdir=DIR/ changes the default directory where the
 irc log files will go. (default is prefix/var/log/ircd)
 <tag/--sysconfdir=DIR/ changes the default directory where
 the irc server configuration files will go. (default is prefix/etc)
 <tag/--localstatedir=DIR/ changes the default directory
-where the irc server state files will go. (default is prefix/var/run)
-<tag/--resconf=FILE/ defines the file to be used by ircd to
+where the irc server state files will go. (default is prefix/var)
+<tag/--with-resconf=FILE/ defines the file to be used by ircd to
 initialize its resolver.  (default is /etc/resolv.conf)
 <tag/--zlib-include=DIR/ specifies in which directory the
 include file from the zlib is located.

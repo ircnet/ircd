@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.68 2004/07/13 23:15:15 chopin Exp $
+  $Id: INSTALL.txt,v 1.69 2004/08/31 13:31:12 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -26,7 +26,7 @@
         files will go. It is important to set this properly. (default is
         prefix/sbin)
 
-     ----llooggddiirr==DDIIRR
+     ----wwiitthh--llooggddiirr==DDIIRR
         changes the default directory where the irc log files will go.
         (default is prefix/var/log/ircd)
 
@@ -36,9 +36,9 @@
 
      ----llooccaallssttaatteeddiirr==DDIIRR
         changes the default directory where the irc server state files
-        will go. (default is prefix/var/run)
+        will go. (default is prefix/var)
 
-     ----rreessccoonnff==FFIILLEE
+     ----wwiitthh--rreessccoonnff==FFIILLEE
         defines the file to be used by ircd to initialize its resolver.
         (default is /etc/resolv.conf)
 
