@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.91 2004/03/05 12:34:41 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.92 2004/03/05 16:10:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -273,8 +273,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 
 	for (aconf = conf; aconf; aconf = aconf->next)
 	{
-		if ((aconf->status != CONF_CLIENT) &&
-		    (aconf->status != CONF_RCLIENT))
+		if ((aconf->status != CONF_CLIENT))
 		{
 			continue;
 		}
@@ -360,8 +359,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		}
 
 		/* Various cases of +r. */
-		if (aconf->status & CONF_RCLIENT ||
-			IsConfRestricted(aconf) ||
+		if (IsConfRestricted(aconf) ||
 			(!hp && IsConfRNoDNS(aconf)) ||
 			(!(cptr->flags & FLAGS_GOTID) && IsConfRNoIdent(aconf)))
 		{
@@ -497,15 +495,14 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		return 1;
 	if (IsIllegal(aconf))
 		return -1; /* EXITC_FAILURE, hmm */
-	if ((aconf->status & (CONF_LOCOP | CONF_OPERATOR | CONF_CLIENT |
-			      CONF_RCLIENT)))
+	if ((aconf->status & (CONF_LOCOP | CONF_OPERATOR | CONF_CLIENT )))
 	    {
 		if (aconf->clients >= ConfMaxLinks(aconf) &&
 		    ConfMaxLinks(aconf) > 0)
 			return -3;    /* EXITC_YLINEMAX */
 	    }
 
-	if ((aconf->status & (CONF_CLIENT | CONF_RCLIENT)))
+	if ((aconf->status & CONF_CLIENT))
 	{
 		int hcnt = 0, ucnt = 0;
 		int ghcnt = 0, gucnt = 0;
@@ -944,7 +941,7 @@ int	rehash(aClient *cptr, aClient *sptr, int sig)
 			** that it will be deleted when the last client
 			** exits...
 			*/
-			if (!(tmp2->status & (CONF_LISTEN_PORT|CONF_CLIENT|CONF_RCLIENT)))
+			if (!(tmp2->status & (CONF_LISTEN_PORT|CONF_CLIENT)))
 			    {
 				*tmp = tmp2->next;
 				tmp2->next = NULL;
@@ -1255,12 +1252,10 @@ int 	initconf(int opt)
 			case 'h':
 				aconf->status = CONF_HUB;
 				break;
-			case 'I': /* Just plain normal irc client trying  */
-			          /* to connect me */
-				aconf->status = CONF_CLIENT;
-				break;
 			case 'i' : /* Restricted client */
-				aconf->status = CONF_RCLIENT;
+				aconf->flags |= CFLAG_RESTRICTED;
+			case 'I':
+				aconf->status = CONF_CLIENT;
 				break;
 			case 'K': /* Kill user line on irc.conf           */
 				aconf->status = CONF_KILL;
@@ -1326,7 +1321,7 @@ int 	initconf(int opt)
 #ifdef	INET6
 			if (aconf->status & 
 				(CONF_CONNECT_SERVER|CONF_ZCONNECT_SERVER
-				|CONF_CLIENT|CONF_RCLIENT|CONF_KILL
+				|CONF_CLIENT|CONF_KILL
 				|CONF_OTHERKILL|CONF_NOCONNECT_SERVER
 				|CONF_OPERATOR|CONF_LOCOP|CONF_LISTEN_PORT
 				|CONF_SERVICE))
@@ -1400,7 +1395,7 @@ int 	initconf(int opt)
 			if (MaxLinks(Class(aconf)) < 0)
 				Class(aconf) = find_class(0);
 		    }
-		if (aconf->status & (CONF_LISTEN_PORT|CONF_CLIENT|CONF_RCLIENT))
+		if (aconf->status & (CONF_LISTEN_PORT|CONF_CLIENT))
 		    {
 			aConfItem *bconf;
 			if ((bconf = find_conf_entry(aconf, aconf->status)))
@@ -1420,16 +1415,12 @@ int 	initconf(int opt)
 				 aconf->status == CONF_LISTEN_PORT)
 				(void)add_listener(aconf);
 		    }
-		if ((aconf->status & (CONF_CLIENT|CONF_RCLIENT)))
+		if ((aconf->status & CONF_CLIENT))
 		{
 			/* Parse I-line flags */
 			if (tmp3)
 			{
-				aconf->flags = iline_flags_parse(tmp3);
-			}
-			else
-			{
-				aconf->flags = 0L;
+				aconf->flags |= iline_flags_parse(tmp3);
 			}
 		}
 		

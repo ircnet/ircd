@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.161 2004/03/01 16:55:32 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.162 2004/03/05 16:10:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1818,12 +1818,11 @@ static	void	report_myservers(aClient *sptr, char *to)
 **	      it--not reversed as in ircd.conf!
 */
 
-static int report_array[17][3] = {
+static int report_array[16][3] = {
 		{ CONF_ZCONNECT_SERVER,	  RPL_STATSCLINE, 'c'},
 		{ CONF_CONNECT_SERVER,	  RPL_STATSCLINE, 'C'},
 		{ CONF_NOCONNECT_SERVER,  RPL_STATSNLINE, 'N'},
 		{ CONF_CLIENT,		  RPL_STATSILINE, 'I'},
-		{ CONF_RCLIENT,		  RPL_STATSILINE, 'i'},
 		{ CONF_OTHERKILL,	  RPL_STATSKLINE, 'k'},
 		{ CONF_KILL,		  RPL_STATSKLINE, 'K'},
 		{ CONF_QUARANTINED_SERVER,RPL_STATSQLINE, 'Q'},
@@ -1873,7 +1872,7 @@ static	void	report_configured_links(aClient *sptr, char *to, int mask)
 					   c, host, (pass) ? pass : null,
 					   name, port, get_conf_class(tmp));
 			}
-			else if (tmp->status & (CONF_CLIENT | CONF_RCLIENT))
+			else if ((tmp->status & CONF_CLIENT))
 			{
 				char *iflags;
 				iflags = iline_flags_to_string(tmp->flags);
@@ -2121,8 +2120,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					CONF_HUB|CONF_LEAF|CONF_DENY);
 		break;
 	case 'I' : case 'i' : /* I (and i) conf lines */
-		report_configured_links(cptr, parv[0],
-					CONF_CLIENT|CONF_RCLIENT);
+		report_configured_links(cptr, parv[0], CONF_CLIENT);
 		break;
 	case 'K' : case 'k' : /* K lines */
 		report_configured_links(cptr, parv[0],

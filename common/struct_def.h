@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.84 2004/03/01 01:22:42 chopin Exp $
+ *   $Id: struct_def.h,v 1.85 2004/03/05 16:10:28 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -303,7 +303,7 @@ struct	ListItem	{
 #define	CONF_MATCH		0x40000000
 #define	CONF_QUARANTINED_SERVER	0x000001
 #define	CONF_CLIENT		0x000002
-#define CONF_RCLIENT            0x000004
+
 #define	CONF_CONNECT_SERVER	0x000008
 #define	CONF_NOCONNECT_SERVER	0x000010
 #define	CONF_ZCONNECT_SERVER	0x000020
@@ -325,7 +325,7 @@ struct	ListItem	{
 #define	CONF_OPS		(CONF_OPERATOR | CONF_LOCOP)
 #define	CONF_SERVER_MASK	(CONF_CONNECT_SERVER | CONF_NOCONNECT_SERVER |\
 				 CONF_ZCONNECT_SERVER)
-#define	CONF_CLIENT_MASK	(CONF_CLIENT | CONF_RCLIENT | CONF_SERVICE | CONF_OPS | \
+#define	CONF_CLIENT_MASK	(CONF_CLIENT | CONF_SERVICE | CONF_OPS | \
 				 CONF_SERVER_MASK)
 
 #define CFLAG_RESTRICTED	0x00001

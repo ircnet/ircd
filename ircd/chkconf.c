@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.22 2004/02/13 01:30:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.23 2004/03/05 16:10:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -296,15 +296,11 @@ static	aConfItem 	*initconf()
 			case 'h':
 				aconf->status = CONF_HUB;
 				break;
-			case 'I': /* Just plain normal irc client trying  */
-			          /* to connect me */
+			case 'i' : /* Restricted client */
+				aconf->flags |= CFLAG_RESTRICTED;
+			case 'I':
 				aconf->status = CONF_CLIENT;
 				mandatory_found |= CONF_CLIENT;
-				break;
-			case 'i' : /* Restricted client */
-				aconf->status = CONF_RCLIENT;
-				mandatory_found |= CONF_CLIENT;
-				break;
 				break;
 			case 'K': /* Kill user line on irc.conf           */
 				aconf->status = CONF_KILL;
@@ -394,7 +390,7 @@ static	aConfItem 	*initconf()
 			break;
 		    }
 
-		if ((aconf->status & (CONF_CLIENT|CONF_RCLIENT)))
+		if ((aconf->status & CONF_CLIENT))
 		{
 			/* Parse I-line flags */
 			if (tmp3)
