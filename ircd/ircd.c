@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.27 1998/08/24 02:26:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.28 1998/09/09 12:23:21 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -826,9 +826,28 @@ char	*argv[];
 	    {
 		Debug((DEBUG_FATAL, "Failed in reading configuration file %s",
 			configfile));
+		/* no can do.
 		(void)printf("Couldn't open configuration file %s\n",
 			configfile);
+		*/
 		exit(-1);
+	    }
+	else
+	    {
+		aClient *acptr;
+		int i;
+
+                for (i = 0; i <= highest_fd; i++)
+                    {   
+                        if (!(acptr = local[i]))
+                                continue;
+			if (IsListening(acptr))
+				break;
+			acptr = NULL;
+		    }
+		/* exit if there is nothing to listen to */
+		if (acptr == NULL)
+			exit(-1);
 	    }
 
 	dbuf_init();
