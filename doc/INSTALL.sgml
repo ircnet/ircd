@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.64 2004/06/30 18:43:00 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.65 2004/06/30 19:20:32 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -551,13 +551,14 @@ allowed on the server.
 <tag/Flags/This field contains flags of an I:line; flags are
 one character in size, can be combined and their order does not matter.
 <itemize>
-<item>E - client is exempted from K: lines
-<item>F - fall-through to next I:line if password did not match
-<item>R - restricted
-<item>I - restricted, when client has no ident.
 <item>D - restricted, when client has no reverse DNS
+<item>E - client is exempted from K: lines
+<item>e - client is exempted from X: lines
+<item>F - fall-through to next I:line if password did not match
+<item>I - restricted, when client has no ident.
 <item>M - disable resolved host name to be shown
 <item>N - disable resolved host name to be used
+<item>R - restricted
 </itemize>
 <tag/Note/Restricted I: line means that
 clients matching such I line will not be able to use their operator

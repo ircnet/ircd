@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-20751/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-23321/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.64 2004/06/30 18:43:00 chopin Exp $
+     $Id: INSTALL.info,v 1.65 2004/06/30 19:20:31 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -770,19 +770,21 @@ How to let clients connect to your IRCD.
 `Flags'
      This field contains flags of an I:line; flags are one character in
      size, can be combined and their order does not matter.
+        * D - restricted, when client has no reverse DNS
+
         * E - client is exempted from K: lines
+
+        * e - client is exempted from X: lines
 
         * F - fall-through to next I:line if password did not match
 
-        * R - restricted
-
         * I - restricted, when client has no ident.
-
-        * D - restricted, when client has no reverse DNS
 
         * M - disable resolved host name to be shown
 
         * N - disable resolved host name to be used
+
+        * R - restricted
 
 `Note'
      Restricted I: line means that clients matching such I line will
@@ -1783,20 +1785,20 @@ Node: Administrative info15677
 Node: Port connections17828
 Node: Connection Classes19977
 Node: Client connections25104
-Node: Operator priviliges30838
-Node: Excluded accounts33984
-Node: X Excluded accounts37897
-Node: Server connections39187
-Node: Deny auto-connections47817
-Node: Hub connections49191
-Node: Leaf connections50679
-Node: Version limitations52763
-Node: Excluded machines54521
-Node: Service connections55826
-Node: Bounce server57420
-Node: Related resources59281
-Node: Reporting a bug60320
-Node: How to report a bug60577
-Node: Where to send a bug report61588
+Node: Operator priviliges30886
+Node: Excluded accounts34032
+Node: X Excluded accounts37945
+Node: Server connections39235
+Node: Deny auto-connections47865
+Node: Hub connections49239
+Node: Leaf connections50727
+Node: Version limitations52811
+Node: Excluded machines54569
+Node: Service connections55874
+Node: Bounce server57468
+Node: Related resources59329
+Node: Reporting a bug60368
+Node: How to report a bug60625
+Node: Where to send a bug report61636
 
 End Tag Table

@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.64 2004/06/30 18:43:00 chopin Exp $
+  $Id: INSTALL.txt,v 1.65 2004/06/30 19:20:32 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -685,19 +685,21 @@
         This field contains flags of an I:line; flags are one character
         in size, can be combined and their order does not matter.
 
+        +o  D - restricted, when client has no reverse DNS
+
         +o  E - client is exempted from K: lines
+
+        +o  e - client is exempted from X: lines
 
         +o  F - fall-through to next I:line if password did not match
 
-        +o  R - restricted
-
         +o  I - restricted, when client has no ident.
-
-        +o  D - restricted, when client has no reverse DNS
 
         +o  M - disable resolved host name to be shown
 
         +o  N - disable resolved host name to be used
+
+        +o  R - restricted
 
      NNoottee
         Restricted I: line means that clients matching such I line will
@@ -723,6 +725,7 @@
         For example, if you were installing IRC on tolsun.oulu.fi and
         you wanted to let your own clients to connect to your server,
         you would add this entry to the file:
+
         I:::tolsun.oulu.fi::1
 
         If you wanted to let remote clients connect, you could add the
@@ -788,7 +791,6 @@
         to become an operator and what their ``Nickname'' and
         ``Password'' is.
 
-
      FFoorrmmaatt
 
         O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>:<Flags>
@@ -852,8 +854,8 @@
 
         +o  C - allows CONNECT (local and remote)
 
-        +o  c - allows only local CONNECT
 
+        +o  c - allows only local CONNECT
 
         +o  l - allows CLOSE
 
@@ -985,7 +987,6 @@
         requires ircd to be compiled with proper #define!
 
         K:192.11.35.0/24::*:0:
-
         This line disallows all hosts whose IP address is from network
         ``192.11.35.0/24'' to login to the ircd.
 
@@ -1051,7 +1052,6 @@
   other machines:
 
   +o  ``garfield.mit.edu''        - Tertiary Connection
-
 
   +o  ``irc.nada.kth.se''         - Secondary Connection
 
