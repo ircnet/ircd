@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.140 2003/02/10 23:32:24 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.141 2003/02/11 13:13:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -293,7 +293,7 @@ aChannel *chptr;
 			}
 			if (match(mode_user, cptr->username) != 0 &&
 				(match(mode_nick, cptr->name) != 0 ||
-				match(mode_user, cptr->uid) != 0))
+				match(mode_user, cptr->user->uid) != 0))
 			{
 				/* client doesn't match them, no point
 				   checking hostname */
