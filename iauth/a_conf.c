@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.31 2004/09/21 13:44:52 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.32 2004/09/21 13:59:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -398,7 +398,8 @@ char	*conf_read(char *cfile)
 				(*ttmp)->nextt = NULL;
 			    }
 			if ((*last)->port == 0 &&
-				Mlist[i] == &Module_socks)
+				(Mlist[i] == &Module_webproxy ||
+				Mlist[i] == &Module_socks))
 			{
 				conf_err(lnnb, "port here is mandatory.", cfile);
 			}
