@@ -51,7 +51,7 @@ cat >version.c <<!SUB!THIS!
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.6 1997/09/03 17:46:08 kalt Exp $";
+static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.7 1998/08/08 00:21:12 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -79,16 +79,16 @@ char *infotext[] =
 	"The following persons have made many changes and enhancements to the",
 	"code and still know how IRC really works if you have questions about it:",
 	"",
-	"Avalon       Darren Reed              avalon@coombs.anu.edu.au",
+	"syrk         Christophe Kalt          kalt@stealth.net",
 	"",
-	"Thanks to the following people for help with preparing 2.9",
+	"Thanks to the following people for help with preparing 2.10",
 	"",
-	"Krys         Christophe Kalt          kalt@stealth.net",
-	"Vesa         Vesa Ruokonen            ruokonen@lut.fi",
+	"Core         Magnus Tjernstrom        d92-mtm@ludd.luth.se",
 	"",
 	"Those who helped in prior versions and continue to be helpful:",
 	"",
 	"Jarkko Oikarinen",
+	"Darren Reed         Vesa Ruokonen",
 	"Matthew Green       Chuck Kane          Matt Lyle",
         "Markku Savela       Greg Lindahl        Armin Gruner",
  	"Stellan Klebom      Dan Goodwin         Mike Bolotski",

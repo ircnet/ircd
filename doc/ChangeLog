@@ -1,3 +1,27 @@
+Fri Aug  7 00:03:45 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* mod_rfc931.c: read RFC 1413 and fixed the reply parser.
+
+	* numeric_def.h, s_err.c, s_auth_ext.h, s_auth.c, s_serv.c: added
+	/stats a to show iauth's configuation.
+
+	* s_auth.c, a_*.[ch], mod_*.c:
+		* SIGUSR2 will cause iauth to close and reopen log file(s).
+		* worked around delayed messages from the iauth caused by
+		ircd's fd remapping habit.
+		* reduced memory usage by dynamically allocating `inbuffer'.
+		* added G message (a->i).
+		* added E message (i->a) and cleaned up errors messages in
+		parse_ircd().
+		* added a/A messages (a->i) to transmist configuration.
+		* revisited next_io() and hopefully fixed the logic.
+
+	* ircd.c, res.c, s_auth.c, s_auth_ext.h, s_bsd.c, s_user.c:
+		* stdarg'ized sendto_iauth().	
+		* iauth is now automatically restarted.
+		* fixed bcopy() length in read_iauth().
+		* added notices to track the "" username bug.
+
 Tue Aug  4 21:43:53 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* a_io.c: numerous bug fixes..
@@ -15,7 +39,7 @@ Tue Aug  4 21:43:53 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 	* parse.c: penalty bugfix.
 
 	* ircd.c, s_auth.c, s_bsd.c, s_bsd_ext.h:
- 		* cleaned up slave startup procedure, added start_iauth()
+ 		* cleaned up iauth startup procedure, added start_iauth()
 		which is called upon SIGUSR1.
 		* various fixes in read_iauth().
 
@@ -24,7 +48,7 @@ Sun Aug  2 18:34:20 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 	* s_mist_ext.h, s_misc.c, support_ext.h, support.c: moved
 	myctime() from s_misc.c to support.c.
 	
-	* s_bsd.c, a_io.c: added `R' message from ircd to slave.
+	* s_bsd.c, a_io.c: added `R' message from ircd to iauth.
 
 	* s_serv.c: updated check_version() not to use NJOIN with 2.9.5 links.
 
