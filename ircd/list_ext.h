@@ -45,7 +45,7 @@ EXTERN void send_listinfo __P((aClient *cptr, char *name));
 #endif /* DEBUGMOE */
 EXTERN aClient *make_client __P((aClient *from));
 EXTERN void free_client __P((aClient *cptr));
-EXTERN anUser *make_user __P((aClient *cptr));
+EXTERN anUser *make_user __P((aClient *cptr, int iplen));
 EXTERN aServer *make_server __P((aClient *cptr));
 EXTERN void free_user __P((Reg anUser *user, aClient *cptr));
 EXTERN void free_server __P((aServer *serv, aClient *cptr));
