@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.27 2004/06/24 17:26:19 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.28 2004/06/30 14:36:10 jv Exp $";
 #endif
 
 #include "os.h"
@@ -371,6 +371,11 @@ static	aConfItem 	*initconf()
 			case 'y':
 			        aconf->status = CONF_CLASS;
 		        	break;
+#ifdef XLINE
+			case 'X':
+				aconf->status = CONF_XLINE;
+				break;
+#endif
 		    default:
                         (void)fprintf(stderr, "%s:%d\tWARNING: unknown conf line letter (%c)\n",
 				filelist->filename, nr - filelist->min, *tmp);
