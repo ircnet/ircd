@@ -1,3 +1,15 @@
+2004-12-12  Piotr Kucharski
+
+	* s_user.c/m_nick(), m_user(): call exit_client with cptr, not NULL,
+	  so it returns FLUSH_BUFFER to parse().
+
+2004-12-10  Piotr Kucharski
+
+	* send.c/send_message(): tame notices about maxsendq exceeded, allow
+	  for complete disabling via define.
+	* config.h.dist: MAXSENDQ_NOTICES define.
+	* config_read.c/config_error(): add "\n" when printing to stdout.
+
 2.11.0b20
 
 2004-12-06  Piotr Kucharski
