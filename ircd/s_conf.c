@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.48 2002/01/05 03:05:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.49 2002/03/14 02:10:23 jv Exp $";
 #endif
 
 #include "os.h"
@@ -866,6 +866,7 @@ int	sig;
  */
 int	openconf()
 {
+	int ret;
 #ifdef	M4_PREPROC
 	int	pi[2], i;
 
@@ -874,6 +875,12 @@ int	openconf()
 	switch(vfork())
 	{
 	case -1 :
+		if (serverbooting)
+		{
+			fprintf(stderr,
+			"Fatal Error: Unable to fork() m4 (%s)",
+			strerror(errno));
+		}
 		return -1;
 	case 0 :
 		(void)close(pi[0]);
@@ -882,7 +889,12 @@ int	openconf()
 			(void)dup2(pi[1], 1);
 			(void)close(pi[1]);
 		    }
-		(void)dup2(1,2);
+		/* If the server is booting, stderr is still open and
+		 * user should receive error message */
+		if (!serverbooting)
+		{
+			(void)dup2(1,2);
+		}
 		for (i = 3; i < MAXCONNECTIONS; i++)
 			if (local[i])
 				(void) close(i);
@@ -892,6 +904,11 @@ int	openconf()
 		 * two servers running with the same fd's >:-) -avalon
 		 */
 		(void)execlp("m4", "m4", IRCDM4_PATH, configfile, 0);
+		if (serverbooting)
+		{
+			fprintf(stderr,"Fatal Error: Error executing m4 (%s)",
+				strerror(errno));
+		}
 		report_error("Error executing m4 %s:%s", &me);
 		_exit(-1);
 	default :
@@ -899,7 +916,16 @@ int	openconf()
 		return pi[0];
 	}
 #else
-	return open(configfile, O_RDONLY);
+	if ((ret = open(configfile, O_RDONLY)) == - 1)
+	{
+		if (serverbooting)
+		{
+			fprintf(stderr,
+			"Fatal Error: Can not open configuration file %s (%s)",
+			configfile,strerror(errno));
+		}
+	}
+	return ret;
 #endif
 }
 
@@ -1325,6 +1351,10 @@ int	opt;
 			if (ME[0] == '\0' && aconf->host[0])
 				strncpyzt(ME, aconf->host,
 					  sizeof(ME));
+			if (me.serv->sid[0] == '\0' && tmp)
+				strncpyzt(me.serv->sid, tmp,
+					sizeof(me.serv->sid));
+						
 			if (aconf->port)
 				setup_ping(aconf);
 		    }
