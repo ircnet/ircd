@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.6 1999/07/04 20:40:19 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.7 1999/07/04 21:10:27 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -119,7 +119,7 @@ char *id;
     if (id_alphabet[1 + alphabet_id[current]] == id[1])
 	    return 1;
     if (id[0] == current &&
-	idtol(id) >= (timeofday % pow(CHIDNB, CHIDLEN)))
+	idtol(id) >= (timeofday % (u_int) pow(CHIDNB, CHIDLEN)))
 	    return 1;
     return 0;
 }
