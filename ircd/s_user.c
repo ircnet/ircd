@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.137 2002/08/23 18:47:03 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.138 2002/09/06 23:41:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -730,6 +730,7 @@ char	*parv[];
 			char buf[BUFSIZE];
 			int k;
 
+badparamcountkills:
 			sendto_flag(SCH_NOTICE,
 				"Bad NICK param count (%d) for %s from %s via %s",
 				parc, parv[1], sptr->name,
@@ -908,6 +909,11 @@ char	*parv[];
 		** A new NICK being introduced by a neighbouring
 		** server (e.g. message type "NICK new" received)
 		*/
+		if (parc == 2)
+		{
+			/* New NICK *must* have proper param count */
+			goto badparamcountkills;
+		}
 		/*
 		** A new client never has an UID in this function, so
 		** we have to kill both clients.
