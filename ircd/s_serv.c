@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.209 2004/06/24 17:26:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.210 2004/06/24 17:37:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -227,11 +227,6 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), server);
 		return 1;
 	    }
-	if (MyConnect(sptr) && !MyConnect(acptr) && parc < 3)
-	    {
-                sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "SQUIT");
-		return 0;
-            }
 	if (IsLocOp(sptr) && !MyConnect(acptr))
 	    {
 		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
