@@ -47,6 +47,7 @@ EXTERN aClient *find_mask __P((char *name, aClient *cptr));
 EXTERN aServer *find_tokserver __P((int token, aClient *cptr, aClient *c2ptr));
 EXTERN aClient *find_name __P((char *name, aClient *cptr));
 #ifndef CLIENT_COMPILE
+EXTERN aClient *find_matching_client __P((char *mask));
 EXTERN aClient *find_target __P((char *name, aClient *cptr));
 #endif
 #else /* CLIENT_COMPILE */
