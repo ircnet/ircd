@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.246 2005/02/06 20:50:06 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.247 2005/02/06 23:28:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1414,7 +1414,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 						   replies[ERR_UNKNOWNMODE],
 						   ME, BadTo(sptr->name), *curr,
 						   chptr->chname);
-				else if (*ip == MODE_ANONYMOUS &&
+				else if (*ip == MODE_ANONYMOUS && whatt == MODE_ADD &&
 					 !IsServer(sptr) &&
 					 !(is_chan_op(sptr,chptr) &CHFL_UNIQOP)
 					 && *chptr->chname == '!')
