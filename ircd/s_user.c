@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.134 2002/07/30 00:15:00 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.135 2002/08/05 14:56:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -723,21 +723,50 @@ char	*parv[];
 		*s = '\0';
 	strncpyzt(nick, parv[1], NICKLEN+1);
 
-	if (parc == 8 && cptr->serv)
-	    {
-		user = parv[3];
-		host = parv[4];
-	    }
-	else
-	    {
-		if (sptr->user)
-		    {
-			user = sptr->user->username;
-			host = sptr->user->host;
-		    }
+	if (cptr->serv)	/* we later use 'IsServer(sptr), why not here? --B. */
+	{
+		if (parc != 8 && parc != 2)
+		{
+			char buf[BUFSIZE];
+			int k;
+
+			sendto_flag(SCH_NOTICE,
+				"Bad NICK param count (%d) for %s from %s via %s",
+				parc, parv[1], sptr->name,
+				get_client_name(cptr, FALSE));
+			sendto_one(cptr, ":%s KILL %s :%s (Bad NICK %d)",
+				ME, nick, ME, parc);
+			buf[0] = '\0';
+			for (k = 1; k < parc; k++)
+			{
+				strcat(buf, " ");
+				strcat(buf, parv[k]);
+			}
+			sendto_flag(SCH_ERROR,
+				"Bad NICK param count (%d) from %s via %s: %s NICK%s",
+				parc, sptr->name, 
+				get_client_name(cptr, FALSE),
+				parv[0], buf[0] ? buf : "");
+			return 0;
+		}
+		else if (parc == 8)
+		{
+			user = parv[3];
+			host = parv[4];
+		}
 		else
 			user = host = "";
-	    }
+	}
+	else
+	{
+		if (sptr->user)
+		{
+			user = sptr->user->username;
+			host = sptr->user->host;
+		}
+		else
+			user = host = "";
+	}
 	/*
 	 * if do_nick_name() returns a null name OR if the server sent a nick
 	 * name and do_nick_name() changed it in some way (due to rules of nick
@@ -974,16 +1003,6 @@ nickkilldone:
 	    {
 		char	*pv[7];
 
-		if (parc != 8)
-		    {
-			sendto_flag(SCH_NOTICE,
-			    "Bad NICK param count (%d) for %s from %s via %s",
-				    parc, parv[1], sptr->name,
-				    get_client_name(cptr, FALSE));
-			sendto_one(cptr, ":%s KILL %s :%s (Bad NICK %d)",
-				   ME, nick, ME, parc);
-			return 0;
-		    }
 		/* A server introducing a new client, change source */
 		sptr = make_client(cptr);
 		add_client_to_list(sptr);
