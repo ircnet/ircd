@@ -38,6 +38,6 @@ extern struct stats ircst, *ircstp;
 #ifdef DEBUGMODE
 EXTERN void debug (int level, char *form, ...);
 #else
-EXTERN void debug();
+EXTERN void debug(void);
 #endif
 #undef EXTERN
