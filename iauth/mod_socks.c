@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.29 2002/08/24 21:19:15 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.30 2002/08/25 01:11:38 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -339,7 +339,7 @@ static int socks_write(u_int cl, char *strver)
 		DebugLog((ALOG_DSOCKS, 0,
 			"socks%s_write(%d): write() failed: %s",
 			strver, cl, strerror(errno)));
-		socks_add_cache(cl, PROXY_NONE, 0);
+		socks_add_cache(cl, PROXY_NONE);
 		close(cldata[cl].wfd);
 		cldata[cl].rfd = cldata[cl].wfd = 0;
 		return 1;
@@ -536,7 +536,7 @@ again:
  *	Returns NULL if everything went fine,
  *	an error message otherwise.
  */
-char *socks_init(AnInstance *self);
+char *socks_init(AnInstance *self)
 {
 	struct socks_private *mydata;
 	char tmpbuf[80], cbuf[32];
@@ -632,7 +632,7 @@ char *socks_init(AnInstance *self);
  *
  *	This procedure is called when a particular module is unloaded.
  */
-void socks_release(AnInstance *self);
+void socks_release(AnInstance *self)
 {
 	struct sock_private *mydata = self->data;
 
@@ -645,7 +645,7 @@ void socks_release(AnInstance *self);
  *
  *	This procedure is called regularly to update statistics sent to ircd.
  */
-void socks_stats(AnInstance *self);
+void socks_stats(AnInstance *self)
 {
 	struct socks_private *mydata = self->data;
 
@@ -669,7 +669,7 @@ void socks_stats(AnInstance *self);
  *	In case of failure, it's responsible for cleaning up (e.g. socks_clean
  *	will NOT be called)
  */
-int socks_start(u_int cl);
+int socks_start(u_int cl)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
 	char *error;
@@ -697,7 +697,7 @@ int socks_start(u_int cl);
 		DebugLog((ALOG_DSOCKS, 0,
 			"socks_start(%d): tcp_connect() reported %s",
 			cl, error));
-		socks_add_cache(cl, PROXY_NONE, 0);
+		socks_add_cache(cl, PROXY_NONE);
 		return -1;
 	}
 
@@ -716,7 +716,7 @@ int socks_start(u_int cl);
  *
  *	It is responsible for sending error messages where appropriate.
  */
-int socks_work(u_int cl);
+int socks_work(u_int cl)
 {
 	char *strver = "4";
 	struct socks_private *mydata = cldata[cl].instance->data;
@@ -767,7 +767,7 @@ int socks_work(u_int cl);
  *	It is responsible for cleaning up any allocated data, and in particular
  *	closing file descriptors.
  */
-void socks_clean(u_int cl);
+void socks_clean(u_int cl)
 {
 	DebugLog((ALOG_DSOCKS, 0, "socks_clean(%d): cleaning up", cl));
 	/*
