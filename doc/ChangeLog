@@ -1,3 +1,11 @@
+Thu Dec 18 21:48:18 1997  Christophe Kalt
+
+	* channel.c: abusive usage of /names now forbidden.
+
+	* class.c: imposed a minimum of 60 seconds for connect frequencies.
+
+	* struct_def.h, s_misc.c, s_serv.c: check_link() tuning and statistics.
+
 Tue Dec 16 17:12:16 1997  Christophe Kalt
 
 	* s_conf.c: finished D lines.

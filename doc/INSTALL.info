@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info28240tmp2.
+input file /tmp/sgml2info22408tmp2.
 
    \input texinfo
 
@@ -10,9 +10,9 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.20 1997/12/17 14:32:07 kalt Exp $
+     $Id: INSTALL.info,v 1.21 1997/12/19 13:53:53 kalt Exp $
 
-   This document describes how to install, and configure IRC 2.9.4.
+   This document describes how to install, and configure IRC 2.9.5.
 
 * Menu:
 

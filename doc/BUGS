@@ -1,4 +1,4 @@
-# @(#)$Id: BUGS,v 1.8 1997/10/01 19:58:59 kalt Exp $
+# @(#)$Id: BUGS,v 1.9 1997/12/19 13:53:53 kalt Exp $
 
 The list is probably not as scary as it once was.
 Anyone with some free time is welcome to fix those =)
@@ -11,6 +11,3 @@ Anyone with some free time is welcome to fix those =)
 
 * RECONNECT is still in some unknown state. (and deactivated
   for various reasons)
-
-* The connection limit specified by Y lines can be exceeded
-  in some undetermined circumstances.
