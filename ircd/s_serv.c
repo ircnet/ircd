@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.267 2005/02/08 13:03:21 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.268 2005/02/09 17:28:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -319,20 +319,16 @@ static int	get_version(char *version, char *id)
 		int vers;
 
 		vers = atoi(version+4);
- 		if (vers < 20000)
+		if (vers >= 991200)
 		{
-			/* earlier than 2.10.2 would kill saved users */
-			result = SV_OLD;
-		}
-		else if (vers >= 990000)
-		{
-			/* alpha/beta of 2.11 */
+			/* good beta of 2.11 */
 			result = SV_2_11;
 		}
 		else
 		{
-			/* plain 2.10 */
-			result = SV_2_10;
+			/* earlier than 2.11.0b12 kills users with nicks longer
+			** than 9 and does not pass +R modes --B. */
+			result = SV_OLD;
 		}
 	}
 	else if (!strncmp(version, "021", 3))
@@ -346,14 +342,6 @@ static int	get_version(char *version, char *id)
 		/* if it doesn't match above, it is too old
 		   to coexist with us, sorry! */
 		result = SV_OLD;
-	}
-
-	if ((!id || !strcmp("IRC", id))
-		&& !strncmp(version, "02100", 5)
-		&& atoi(version+5) < 20600)
-	{
-		/* before 2.10.3a6 ( 2.10.3a5 is just broken ) */
-		result |= SV_OLDSQUIT;
 	}
 
 	return result;
