@@ -13,6 +13,7 @@
 	* s_user.c, s_user_ext.h: new function send_away() (idea from fiction).
 	* channel.c/m_invite(), s_user.c/m_message(): use send_away().
 	* config.h.dist: AWAY_MOREINFO define.
+	* hash.c: add guardians for possible loops in hashes.
 
 2004-11-01  Piotr Kucharski
 
