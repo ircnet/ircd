@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.234 2004/10/01 16:16:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.235 2004/10/01 17:14:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3799,10 +3799,27 @@ static void report_listeners(aClient *sptr, char *to)
 {
 	aConfItem *tmp;
 	aClient	*acptr;
+	char *what;
 
 	for (acptr = ListenerLL; acptr; acptr = acptr->next)
 	{
 		tmp = acptr->confs->value.aconf;
+		if (IsIllegal(tmp))
+			what = "dead";
+		else if (IsListenerInactive(acptr))
+			what = "inactive";
+		else if (IsConfDelayed(tmp))
+		{
+			if (iconf.caccept == 0)
+				what = "noaccept";
+			else if (iconf.caccept == 2 && iconf.split == 1)
+				what = "splitnoaccept";
+			else
+				what = "active";
+		}
+		else
+			what = "active";
+
 		sendto_one(sptr, ":%s %d %s %d %s %s %u %lu %llu %lu %llu %u"
 				 " %u %s",
 			ME, RPL_STATSLINKINFO, to,
@@ -3812,9 +3829,7 @@ static void report_listeners(aClient *sptr, char *to)
 			acptr->sendM, acptr->sendB,
 			acptr->receiveM, acptr->receiveB,
 			timeofday - acptr->firsttime,
-			acptr->confs->value.aconf->clients,
-			IsIllegal(acptr->confs->value.aconf) ? "dead" :
-			IsListenerInactive(acptr) ? "inactive" : "active" );
+			tmp->clients, what);
 	}
 }
 
