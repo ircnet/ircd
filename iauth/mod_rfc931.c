@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.10 1999/01/14 20:22:27 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.11 1999/01/18 16:57:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -27,15 +27,18 @@ static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.10 1999/01/14 20:22:27 kalt Ex
 #include "a_externs.h"
 #undef MOD_RFC931_C
 
-static u_char notify_protocol = 0;
+#define OPT_PROTOCOL	0x1
+#define OPT_LAZY	0x2
 
-struct _stats
+struct _data
 {
+	u_char	options;
 	u_int	tried;
 	u_int	connected;
 	u_int	unx;
 	u_int	other;
 	u_int	bad;
+	u_int	skipped;
 	u_int	clean, timeout;
 };
 
@@ -50,17 +53,27 @@ char *
 rfc931_init(self)
 AnInstance *self;
 {
-	self->data = (void *) malloc(sizeof(struct _stats));
-	bzero((char *) self->data, sizeof(struct _stats));
+	struct _data *dt;
+
+	dt = (struct _data *) malloc(sizeof(struct _data));
+	bzero((char *) self->data, sizeof(struct _data));
+	self->data = (void *) dt;
 
 	/* undocumented option */
 	if (self->opt && strstr(self->opt, "protocol"))
-	    {
-		notify_protocol = 1;
+		dt->options |= OPT_PROTOCOL;
+	if (self->opt && strstr(self->opt, "lazy"))
+		dt->options |= OPT_LAZY;
+
+	if (dt->options & (OPT_LAZY|OPT_PROTOCOL))
+		self->popt = "protocol,lazy";
+	else if (dt->options & OPT_LAZY)
+		self->popt = "lazy";
+	else if (dt->options & OPT_PROTOCOL)
 		self->popt = "protocol";
-		return "Will notify upon protocol errors.";
-	    }
-	return NULL;
+	else
+		return NULL;
+	return self->popt;
 }
 
 /*
@@ -72,7 +85,7 @@ void
 rfc931_release(self)
 AnInstance *self;
 {
-	struct _stats *st = self->data;
+	struct _data *st = self->data;
 	free(st);
 }
 
@@ -85,10 +98,12 @@ void
 rfc931_stats(self)
 AnInstance *self;
 {
-	struct _stats *st = self->data;
+	struct _data *st = self->data;
 
 	sendto_ircd("S rfc931 connected %u unix %u other %u bad %u out of %u",
 		    st->connected, st->unx, st->other, st->bad, st->tried);
+	sendto_ircd("S rfc931 skipped %u aborted %u / %u",
+		    st->skipped, st->clean, st->timeout);
 }
 
 /*
@@ -108,8 +123,13 @@ u_int cl;
 {
 	char *error;
 	int fd;
-	struct _stats *st = cldata[cl].instance->data;
-	
+	struct _data *st = cldata[cl].instance->data;
+
+	if (st->options & OPT_LAZY && cldata[cl].state & A_DENY)
+	    {
+		DebugLog((ALOG_D931, 0, "rfc931_start(%d): Lazy.", cl));
+		return -1;
+	    }
 	DebugLog((ALOG_D931, 0, "rfc931_start(%d): Connecting to %s %u", cl,
 		  cldata[cl].itsip, 113));
 	st->tried += 1;
@@ -139,7 +159,7 @@ int
 rfc931_work(cl)
 u_int cl;
 {
-	struct _stats *st = cldata[cl].instance->data;
+	struct _data *st = cldata[cl].instance->data;
 
     	DebugLog((ALOG_D931, 0, "rfc931_work(%d): %d %d buflen=%d", cl,
 		  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
@@ -258,7 +278,7 @@ u_int cl;
 			    {
 				st->bad += 1;
 
-				if (notify_protocol)
+				if (st->options & OPT_PROTOCOL)
 				    {
 					ch = cldata[cl].inbuffer;
 					while (*ch)
@@ -305,7 +325,7 @@ void
 rfc931_clean(cl)
 u_int cl;
 {
-	struct _stats *st = cldata[cl].instance->data;
+	struct _data *st = cldata[cl].instance->data;
 
 	st->clean += 1;
 	DebugLog((ALOG_D931, 0, "rfc931_clean(%d): cleaning up", cl));
@@ -332,7 +352,7 @@ int
 rfc931_timeout(cl)
 u_int cl;
 {
-	struct _stats *st = cldata[cl].instance->data;
+	struct _data *st = cldata[cl].instance->data;
 
 	st->timeout += 1;
 	DebugLog((ALOG_D931, 0, "rfc931_timeout(%d): calling rfc931_clean ",
