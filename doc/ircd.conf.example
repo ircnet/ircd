@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.21 2004/07/03 16:12:26 chopin Exp $
+# $Id: ircd.conf.example,v 1.22 2004/08/23 12:49:50 chopin Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -233,13 +233,13 @@ I:::*@indial*.irc.org::12
 #
 #
 ############################
-# o: [OPTIONAL]. These lines define operator access. You do not need to
+# O: [OPTIONAL]. These lines define operator access. You do not need to
 # have an operator to run a server. A well configured leaf site should not
 # need an operator online, if its connections are well defined, the irc
 # administrator can use 'kill -HUP' on the ircd to reload the configuration
 # file. 
 #
-# o:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>:<Flags>
+# O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>:<Flags>
 #
 # If the person in "Nickname" is not coming from the hostname defined in
 # the first field then the person will get the error message "No O: lines
@@ -248,21 +248,13 @@ I:::*@indial*.irc.org::12
 # Note that you don't need to use 'Nickname' to become operator, if you're
 # using some other nick at that moment '/oper Nickname' will do also.
 #
-o:*.bu.edu:Zaphod:Trillian::10
+O:*.bu.edu:Zaphod:Trillian::10
 #
 # and this line forces ident match:
-o:hrose@csa.bu.edu:Zaphod:Trillian::10
+O:hrose@csa.bu.edu:Zaphod:Trillian::10
 # 
 # and this line allows oper to come from ip block:
-o:192.168.0.0/16:Zaphod:Trillian::10
-#
-# This line is a "local operator", it is specified with a upper-case "O"
-#
-# this line permits the nickname "jhs" with the password of "ITBites" to
-# be a local operator only (restrictions are defined in config.h during
-# ircd compilation time).
-#
-O:*.bu.edu:ITBites:jhs::10
+O:192.168.0.0/16:Zaphod:Trillian::10
 #
 # a crypted password line (NOTE that if you have crypted passwords, *all*
 # of you passwords must be crypted! In fact, if you are getting an error
@@ -271,17 +263,27 @@ O:*.bu.edu:ITBites:jhs::10
 # crypted strings in the same IRC server configuration file is an
 # impossibility (but it is just theoretical, which is why I explained both).
 #
-o:rocker@csa.bu.edu:T0eiVgHrqeKTQ:Rocker::10
+O:rocker@csa.bu.edu:T0eiVgHrqeKTQ:Rocker::10
 #
 # New for 2.11 are flags for O:line. They specify permissions for various
 # activities (kill, connect, squit etc.) of an operator.
-# The simplest form is flag 'A' -- all possible permissions. 
-# Note that lower case o:line (which will be removed in next vesion) and
-# O:line with 'L' flag have exactly the same meaning.
+# The easiest is flag 'A' -- most possible permissions; read INSTALL file
+# for details.
+#
+# Warning: if you add no flags, no privileges will be granted. 
 #
 O:192.168.0.0/16:icmptz:Beeth::10:A
 #
-# Be warned: if you add no flags, no privileges will be granted. 
+# This line is a "local operator", it is specified with an O:line flag 'L'.
+#
+# this line permits the nickname "jhs" with the password of "ITBites" to
+# be a local operator only (restrictions are defined in config.h during
+# ircd compilation time).
+#
+O:*.bu.edu:ITBites:jhs::10:L
+#
+# Lower case o:line (which is deprecated and will be removed in next version)
+# and O:line with 'L' flag have exactly the same meaning.
 #
 ############################
 # c/C: [NETWORKED]. These lines define what servers your server tries to
