@@ -24,7 +24,7 @@
 /*  External definitions for global variables.
  */
 #ifndef S_CONF_C
-extern aConfItem *conf;
+extern aConfItem *conf, *kconf;
 #endif /* S_CONF_C */
 
 /*  External definitions for global functions.

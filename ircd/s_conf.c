@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.41 1999/04/10 16:35:19 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.42 1999/05/01 21:29:13 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -61,6 +61,7 @@ static	int	check_time_interval __P((char *, char *));
 static	int	lookup_confhost __P((aConfItem *));
 
 aConfItem	*conf = NULL;
+aConfItem	*kconf = NULL;
 
 /*
  * remove all conf entries from the client except those which match
@@ -711,6 +712,13 @@ int	sig;
 			free_conf(tmp2);
 	    	    }
 
+	tmp = &kconf;
+	while ((tmp2 = *tmp))
+	    {
+		*tmp = tmp2->next;
+		free_conf(tmp2);
+	    }
+
 	/*
 	 * We don't delete the class table, rather mark all entries
 	 * for deletion. The table is cleaned up by check_class. - avalon
@@ -1152,8 +1160,16 @@ int	opt;
 		      aconf->name, aconf->port,
 		      aconf->class ? ConfClass(aconf) : 0));
 
-		aconf->next = conf;
-		conf = aconf;
+		if (aconf->status & (CONF_KILL|CONF_OTHERKILL))
+		    {
+			aconf->next = kconf;
+			kconf = aconf;
+		    }
+		else
+		    {
+			aconf->next = conf;
+			conf = aconf;
+		    }
 		aconf = NULL;
 	    }
 	if (aconf)
@@ -1261,12 +1277,12 @@ char	**comment;
 
 	*reply = '\0';
 
-	for (tmp = conf; tmp; tmp = tmp->next)
+	for (tmp = kconf; tmp; tmp = tmp->next)
 	    {
 		if (!doall && (BadPtr(tmp->passwd) || !isdigit(*tmp->passwd)))
 			continue;
 		if (!(tmp->status & (CONF_KILL | CONF_OTHERKILL)))
-			continue;
+			continue; /* should never happen with kconf */
 		if (!tmp->host || !tmp->name)
 			continue;
 		if (tmp->status == CONF_KILL)
