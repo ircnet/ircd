@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.38 2002/11/22 21:19:26 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.39 2002/11/25 21:11:15 jv Exp $";
 #endif
 
 #include "os.h"
@@ -70,7 +70,7 @@ char *	replies[] = {
 /* 039 */ (char *)NULL,
 /* 040 */ (char *)NULL,
 /* 041 */ (char *)NULL,
-/* 042 RPL_YOURID */	":%s 042 %s :Your unique ID is %s.",
+/* 042 RPL_YOURID */	":%s 042 %s %s :your unique ID",
 /* 043 RPL_SAVENICK */	":%s 043 %s :Nickname collision, forcing nick change to your unique ID.",
 /* 044 */ (char *)NULL,
 /* 045 */ (char *)NULL,
