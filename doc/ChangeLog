@@ -1,3 +1,19 @@
+2004-05-16  Piotr Kucharski
+
+	* ircd.c/try_connections(): yet another condition, which could lead to
+	  temporarily disabled AC.
+	* ircd.c: new function calculate_preference().
+	* ircd.c/try_connections(): tidied up, moved calculating preference
+	  to new function.
+	* ircd.c/try_connections(): move send_ping() to calculate_preference.
+	* ircd.c/calculcate_preference(): skip non AC C-lines.
+
+2004-05-14  Piotr Kucharski
+
+	* msg_def.h, parse.c, s_serv.c, s_serv_ext.h: new command EOBACK
+	  (so far only placeholder).
+	* s_serv.c/m_eob(): send EOBACK.
+
 2004-05-13  Piotr Kucharski
 
 	* channel.c/m_njoin(): bug causing small desynch of big channels
