@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.112 2004/02/13 03:53:58 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.113 2004/02/13 03:58:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -93,6 +93,7 @@ static	char	readbuf[READBUF_SIZE];
 ** add_local_domain()
 ** Add the domain to hostname, if it is missing
 ** (as suggested by eps@TOASTER.SFSU.EDU)
+** Note: size is the max we can append to hname!
 */
 
 void	add_local_domain(char *hname, size_t size)
@@ -100,19 +101,22 @@ void	add_local_domain(char *hname, size_t size)
 #ifdef RES_INIT
 	/* try to fix up unqualified names */
 	if (!index(hname, '.'))
-	    {
+	{
 		if (!(ircd_res.options & RES_INIT))
-		    {
+		{
 			Debug((DEBUG_DNS,"ircd_res_init()"));
 			ircd_res_init();
-		    }
+		}
+		/* Enough space in hname to append defdname? */
+		/* "2" is dot and ending \0 */ 
 		if (ircd_res.defdname[0] &&
 			strlen(ircd_res.defdname) + 2 <= size)
-		    {
-			(void)strncat(hname, ".", size-1);
-			(void)strncat(hname, ircd_res.defdname, size-2);
-		    }
-	    }
+		{
+			/* no need for strncat with above check */
+			(void)strcat(hname, ".");
+			(void)strcat(hname, ircd_res.defdname);
+		}
+	}
 #endif
 	return;
 }
