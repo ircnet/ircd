@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.199 2004/05/13 14:35:58 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.200 2004/05/14 14:22:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2576,6 +2576,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	int chop, cnt = 0;
 	aChannel *chptr = NULL;
 	aClient *acptr;
+	int maxlen;
 
 	if (parc < 3 || *parv[2] == '\0')
 	    {
