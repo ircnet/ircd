@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.203 2004/06/19 18:01:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.204 2004/06/19 18:02:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2167,7 +2167,13 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	case 'I' : case 'i' : /* I (and i) conf lines */
 		report_configured_links(cptr, parv[0], CONF_CLIENT);
 		break;
-	case 'K' : case 'k' : /* K lines */
+#ifdef TKLINE
+	case 'k' : /* temporary K lines */
+		report_configured_links(cptr, parv[0],
+				(CONF_TKILL|CONF_TOTHERKILL));
+		break;
+#endif
+	case 'K' : /* K lines */
 		report_configured_links(cptr, parv[0],
 					(CONF_KILL|CONF_OTHERKILL));
 		break;
