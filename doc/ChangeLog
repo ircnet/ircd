@@ -1,7 +1,27 @@
+2.11.1a1
+
+2005-03-30  Piotr Kucharski
+
+	* s_user.c/m_nick(): prevent (however unlikely) possibility to change
+	  user nick to uid of another server.
+	* channel.c/set_mode(): allow mixing +R and other modes.
+	* ircd.c/setup_signals(), s_slave(): ignore (and not die) USR1 if
+	  USE_IAUTH is not defined.
+	* s_serv.c/m_links(), s_err.c: show SID after hopcount in LINKS.
+
+2005-03-29  Piotr Kucharski
+
+	* channel.c/m_join, m_part(), m_topic(), s_misc.c/exit_one_client(),
+	  s_user.c/m_nick, m_unick(), m_away(), send_umode_out(), save_user():
+	  use sid or uid as source of message, not nick.
+
 2005-02-22  Piotr Kucharski
 
 	* struct_def.h, send.c/setup_svchans(), sendto_flag(), logfiles_open(),
 	  logfiles_close(), Makefile.in: possibility to log server channels.
+	* res.c, config.h.dist: drop SIXBONE_HACK.
+	* s_conf.c/m_tkline(): expand ipv6 short form addresses, so they work.
+	* chkconf.c/validate(): use IRCDCONF_DELIMITER, not ':'.
 
 2005-02-21  Piotr Kucharski
 
