@@ -1,3 +1,18 @@
+1999-02-03  Christophe Kalt
+
+	* mod_rfc931.c/rfc931_work(): get rid of any \n in replies.
+	
+	* a_io.c/parse_ircd(): when receiving a "DNS timeout" message,
+	inform ircd if we're already done (otherwise, it keeps waiting
+	until timeout).
+
+	* s_bsd.c/completed_connection(): tell iauth not to wait for DNS
+	information for servers we connect to.
+
+	* s_auth.c/read_iauth():
+		* fixed "Garbage" notices to &AUTH.
+		* send E message to iauth when parsing garbage.
+
 1999-01-28  Christophe Kalt
 
 	* s_serv.c/m_server_estab(): added notices to &DEBUG.
