@@ -57,7 +57,7 @@ EXTERN u_long inetaddr __P((register const char *cp));
 EXTERN int inetaton __P((register const char *cp, struct in_addr *addr));
 #endif /* HAVE_INET_ATON */
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE)
-EXTERN void dumpcore ();
+EXTERN void dumpcore (void);
 #endif /* DEBUGMODE && !CLIENT_COMPILE */
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE) && defined(DO_DEBUG_MALLOC)
 EXTERN char *MyMalloc __P((size_t x));
@@ -68,8 +68,8 @@ EXTERN char *MyMalloc __P((size_t x));
 EXTERN char *MyRealloc __P((char *x, size_t y));
 #endif /* DEBUGMODE && !CLIENT_COMPILE && !DO_DEBUG_MALLOC */
 EXTERN int dgets __P((int fd, char *buf, int num));
-EXTERN char *make_version();
-EXTERN char **make_isupport();
+EXTERN char *make_version(void);
+EXTERN char **make_isupport(void);
 #if SOLARIS_2_3
 EXTERN struct hostent *solaris_gethostbyname __P((const char *name));
 #endif /* SOLARIS_2_3 */

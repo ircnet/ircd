@@ -9,7 +9,7 @@
 ** /dev/random for salt generation added by 
 ** Aaron Sethman <androsyn@ratbox.org>
 **
-** $Id: mkpasswd.c,v 1.3 2002/11/29 00:28:57 jv Exp $
+** $Id: mkpasswd.c,v 1.4 2003/10/17 20:09:22 q Exp $
 */
 #include <stdio.h>
 #include <string.h>
@@ -27,10 +27,10 @@
 #define FLAG_ROUNDS  0x00000040
 #define FLAG_EXT     0x00000080
 
-extern char *getpass();
-extern char *crypt();
+extern char *getpass(void);
+extern char *crypt(void);
 
-char *make_des_salt();
+char *make_des_salt(void);
 char *make_ext_salt(int);
 char *make_ext_salt_para(int, char *);
 char *make_md5_salt(int);
@@ -41,8 +41,8 @@ char *int_to_base64(int);
 char *generate_random_salt(char *, int);
 char *generate_poor_salt(char *, int);
 
-void full_usage();
-void brief_usage();
+void full_usage(void);
+void brief_usage(void);
 
 static char saltChars[] =
        "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

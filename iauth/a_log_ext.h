@@ -34,8 +34,8 @@
 # define EXTERN
 #endif /* A_LOG_C */
 
-EXTERN void init_filelogs();
-EXTERN void init_syslog();
+EXTERN void init_filelogs(void);
+EXTERN void init_syslog(void);
 EXTERN void vsendto_log (int, int, char *, va_list);
 EXTERN void sendto_log (int, int, char *, ...);
 
