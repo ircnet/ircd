@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.26 2002/10/09 21:23:20 q Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.27 2003/08/12 16:56:49 chopin Exp $";
 #endif
 
 /* #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -430,6 +430,12 @@ int	type;
 
 	if (rptr && !index(hname, '.') && ircd_res.options & RES_DEFNAMES)
 	    {
+		if (sizeof(hname) - 1 /* ending \0 */ <
+			strlen(hname) + 1 /* dot */ + strlen(ircd_res.defdname))
+		{
+			/* or some other retval? */
+			return -1;
+		}
 		(void)strncat(hname, dot, sizeof(hname) - len - 1);
 		len++;
 		(void)strncat(hname, ircd_res.defdname, sizeof(hname) - len -1);
