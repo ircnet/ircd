@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info22408tmp2.
+input file /tmp/sgml2info15483tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.21 1997/12/19 13:53:53 kalt Exp $
+     $Id: INSTALL.info,v 1.22 1998/01/23 14:48:37 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.5.
 
@@ -697,7 +697,7 @@ Client connections
      connect.  If "user@" prefixes the actual IP address the server
      will require that the remote username returned by the ident server
      be the same as the one given before the "@".  Wildcards are
-     permitted.
+     permitted unless using a bitmask (e.g. 1.2.3.0/24).
 
 `Password'
      The password that must be given by the client to be allowed on the
@@ -924,8 +924,9 @@ Excluded accounts
      "K" tells the IRCD that you are making a KILL USER command entry.
 
 `Host Name'
-     In this field you specify the Hostname that the user is connecting
-     from.  If you wanted to REMOVE connects to IRC from
+     In this field you specify the Hostname or the IP address (Single
+     IP, Wildcard notation or bitmask notation) that the user is
+     connecting from.  If you wanted to REMOVE connects to IRC from
      "orion.cair.du.edu" then you would want to enter
      "orion.cair.du.edu".  If you want to REMOVE ALL HOSTS access you
      can use "*" (Wild Card notation) and no matter what host the
@@ -934,12 +935,12 @@ Excluded accounts
      why would you run an ircd if you allow nobody to connect to it
      anyways ?
 
-     If you specify an IP address, or IP mask, it will match clients
-     connecting from the matching addresses, no matter if they resolve
-     or not.
+     If you specify an IP address, IP mask, or an IP bitmask, it will
+     match clients connecting from the matching addresses, no matter if
+     they resolve or not.
 
-     You can prefix an IP address or IP mask by "=" in which case only
-     non resolving matching hosts will be banned.
+     You can prefix an IP address, an IP mask, or IP bitmask by "=" in
+     which case only non resolving matching hosts will be banned.
 
 `time interval(s)|comment'
      Either leave this field empty or put a comment, then the line
@@ -1485,10 +1486,11 @@ Bounce server
 `B'
      This specifies a Bounce record.
 
-`Class|Host Name'
+`Class|Host Mask'
      This field specifies to which client this configuration line
-     applies to.  It can be either a connection class number, or a host
-     mask to be matched against the client's hostname.
+     applies to.  It can be either a connection class number, a host
+     mask to be matched against the client's hostname, or an IP
+     address/mask/bitmask to be matched against the client's IP address.
 
      When the server is completely full, it rejects clients with the
      "All connections in use" message.  In this case, the server
@@ -1590,18 +1592,18 @@ Node: Administrative info14932
 Node: Port connections16967
 Node: Connection Classes19177
 Node: Client connections24628
-Node: Operator priviliges30100
-Node: Restrict connections32220
-Node: Excluded accounts33535
-Node: Server connections37393
-Node: Deny auto-connections45832
-Node: Hub connections47205
-Node: Leaf connections48421
-Node: Version limitations50504
-Node: Excluded machines51743
-Node: Service connections53050
-Node: Bounce server54643
-Node: Default local server (for local clients) `*OBSOLETED*'56266
-Node: Related resources57149
+Node: Operator priviliges30141
+Node: Restrict connections32261
+Node: Excluded accounts33576
+Node: Server connections37539
+Node: Deny auto-connections45978
+Node: Hub connections47351
+Node: Leaf connections48567
+Node: Version limitations50650
+Node: Excluded machines51889
+Node: Service connections53196
+Node: Bounce server54789
+Node: Default local server (for local clients) `*OBSOLETED*'56491
+Node: Related resources57374
 
 End Tag Table

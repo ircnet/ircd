@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.21 1997/12/19 13:53:54 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.22 1998/01/23 14:48:39 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.5.
 </abstract>
@@ -525,7 +525,8 @@ i:&lt;TARGET Host Addr&gt;:&lt;Password&gt;:&lt;TARGET Hosts NAME&gt;:&lt;Port&g
 machine(s) that are allowed to connect.  If ``user@''
 prefixes the actual IP address the server will require that
 the remote username returned by the ident server be the same
-as the one given before the ``@''.  Wildcards are permitted.
+as the one given before the ``@''.  Wildcards are permitted
+unless using a bitmask (e.g. 1.2.3.0/24).
 <tag/Password/The password that must be given by the client
 to be allowed on the server.
 <tag/TARGET Host NAME/Specifies the host name(s) of the
@@ -713,22 +714,24 @@ well.
 <tag/Format/<verb>k:&lt;Host Name&gt;:&lt;time interval(s)|comment&gt;:&lt;Auth&gt;:&lt;port&gt;:</verb>
 <tag/K/``K'' tells the IRCD that you are making a KILL USER
 command entry.
-<tag/Host Name/ In this field you specify the Hostname that
-the user is connecting from.  If you wanted to REMOVE
-connects to IRC from ``orion.cair.du.edu'' then you would
-want to enter ``orion.cair.du.edu''.  If you want to REMOVE
-ALL HOSTS access you can use ``*'' (Wild Card notation) and
-no matter what host the USERNAME (specified in Field 4)
-connects from s/he will be denied access. Removing all hosts
-isn't very smart thing to do though, why would you run an
-ircd if you allow nobody to connect to it anyways ?
+<tag/Host Name/ In this field you specify the Hostname or
+the IP address (Single IP, Wildcard notation or bitmask
+notation) that the user is connecting from.  If you wanted
+to REMOVE connects to IRC from ``orion.cair.du.edu'' then
+you would want to enter ``orion.cair.du.edu''.  If you want
+to REMOVE ALL HOSTS access you can use ``*'' (Wild Card
+notation) and no matter what host the USERNAME (specified in
+Field 4) connects from s/he will be denied access. Removing
+all hosts isn't very smart thing to do though, why would you
+run an ircd if you allow nobody to connect to it anyways ?
 <p>
-If you specify an IP address, or IP mask, it will match
-clients connecting from the matching addresses, no matter if
-they resolve or not.
+If you specify an IP address, IP mask, or an IP bitmask,
+it will match clients connecting from the matching
+addresses, no matter if they resolve or not.
 <p>
-You can prefix an IP address or IP mask by ``='' in which
-case only non resolving matching hosts will be banned.
+You can prefix an IP address, an IP mask, or IP bitmask by
+``='' in which case only non resolving matching hosts will
+be banned.
 <tag/time interval(s)|comment/ Either leave this field empty
 or put a comment, then the line active continuously for the
 specified user/host machine.  You may also specify intervals
@@ -1211,10 +1214,11 @@ class is full, or the server is full, or they are not
 authorized to connect.
 <tag/Format/<verb>B:&lt;Class|Host Mask&gt;::&lt;Server Name&gt;:&lt;Port&gt;:</verb>
 <tag/B/ This specifies a Bounce record.
-<tag/Class|Host Name/ This field specifies to which client
+<tag/Class|Host Mask/ This field specifies to which client
 this configuration line applies to.  It can be either a
-connection class number, or a host mask to be matched
-against the client's hostname.
+connection class number, a host mask to be matched against
+the client's hostname, or an IP address/mask/bitmask to be
+matched against the client's IP address.
 <p>
 When the server is completely full, it rejects clients with
 the ``All connections in use'' message.  In this case, the

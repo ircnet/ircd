@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.21 1997/12/19 13:53:55 kalt Exp $
+  $Id: INSTALL.txt,v 1.22 1998/01/23 14:48:39 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.5.
 
@@ -626,7 +626,8 @@
         to connect.  If ``user@'' prefixes the actual IP address the
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
-        Wildcards are permitted.
+        Wildcards are permitted unless using a bitmask (e.g.
+        1.2.3.0/24).
 
      PPaasssswwoorrdd
         The password that must be given by the client to be allowed on
@@ -789,7 +790,6 @@
 
      EExxaammppllee
         O:orion.cair.du.edu:pyunxc:Jeff::1
-
         There is an OPERATOR at ``orion.cair.du.edu'' that can get
         Operator priviliges if he specifies a password of ``pyunxc'' and
         uses a NICKNAME of ``Jeff''.
@@ -864,7 +864,8 @@
         entry.
 
      HHoosstt NNaammee
-        In this field you specify the Hostname that the user is
+        In this field you specify the Hostname or the IP address (Single
+        IP, Wildcard notation or bitmask notation) that the user is
         connecting from.  If you wanted to REMOVE connects to IRC from
         ``orion.cair.du.edu'' then you would want to enter
         ``orion.cair.du.edu''.  If you want to REMOVE ALL HOSTS access
@@ -874,12 +875,12 @@
         though, why would you run an ircd if you allow nobody to connect
         to it anyways ?
 
-        If you specify an IP address, or IP mask, it will match clients
-        connecting from the matching addresses, no matter if they
-        resolve or not.
+        If you specify an IP address, IP mask, or an IP bitmask, it will
+        match clients connecting from the matching addresses, no matter
+        if they resolve or not.
 
-        You can prefix an IP address or IP mask by ``='' in which case
-        only non resolving matching hosts will be banned.
+        You can prefix an IP address, an IP mask, or IP bitmask by ``=''
+        in which case only non resolving matching hosts will be banned.
 
      ttiimmee iinntteerrvvaall((ss))||ccoommmmeenntt
         Either leave this field empty or put a comment, then the line
@@ -986,7 +987,10 @@
 
      FFoorrmmaatt
 
+
         C:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<TARGET PORT>:<Class>
+
+
 
      for example:
 
@@ -1050,7 +1054,6 @@
      This reads: Connect to host ``nic.funet.fi'', with no password and
      expect this server to identify itself to you as ``nic.funet.fi''.
      Your machine will connect to this host to port 6667.
-
   +o  C:18.72.0.252:Jeff:garfield.mit.edu:6667:1
 
      This reads: Connect to a host at address ``18.72.0.252'', using a
@@ -1116,10 +1119,12 @@
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
 
+
      PPaasssswwoorrdd
         The password of the other host.  A password must always be
         present for the line to be recognized. If CRYPT_LINK_PASSWORD is
         defined in config.h, this password must be crypted.
+
      TTAARRGGEETT HHoosstt NNAAMMEE
         The full hostname of the target machine. This is the name that
         the TARGET server will identify itself with when you connect to
@@ -1185,7 +1190,6 @@
 
 
 
-
      DDeenniieedd SSeerrvveerr MMaasskk
         This field is matched against all servers currently present on
         the network.
@@ -1248,7 +1252,6 @@
         that match the ``*.edu'' name mask.
 
         H:*::eff.org::
-
         Allows ``eff.org'' to introduce (and act as a hub for) any
         server.
 
@@ -1450,6 +1453,7 @@
         This information is provided to clients which are denied
         connection, either because their connection class is full, or
         the server is full, or they are not authorized to connect.
+
      FFoorrmmaatt
 
         B:<Class|Host Mask>::<Server Name>:<Port>:
@@ -1458,10 +1462,12 @@
 
      BB  This specifies a Bounce record.
 
-     CCllaassss||HHoosstt NNaammee
+     CCllaassss||HHoosstt MMaasskk
         This field specifies to which client this configuration line
-        applies to.  It can be either a connection class number, or a
-        host mask to be matched against the client's hostname.
+        applies to.  It can be either a connection class number, a host
+        mask to be matched against the client's hostname, or an IP
+        address/mask/bitmask to be matched against the client's IP
+        address.
 
         When the server is completely full, it rejects clients with the
         ``All connections in use'' message.  In this case, the server
@@ -1516,6 +1522,7 @@
         U:128.214.5.6::tolsun.oulu.fi:6667
 
         U:tolsun.oulu.fi::tolsun.oulu.fi
+
         If the port number is omitted, irc will default to using 6667.
 
 
@@ -1538,13 +1545,6 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
-
-
-
 
 
 
