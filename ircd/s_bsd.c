@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.66 1999/04/05 21:33:14 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.67 1999/04/05 21:37:30 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1391,7 +1391,7 @@ aClient	*cptr;
 # endif
 #endif
 #if defined(IP_OPTIONS) && defined(IPPROTO_IP) && !defined(AIX) && \
-    !defined(SUN_GSO_BUG)
+    !defined(SUN_GSO_BUG) && !defined(INET6)
 	/*
 	 * Mainly to turn off and alert us to source routing, here.
 	 * Method borrowed from Wietse Venema's TCP wrapper.
