@@ -219,7 +219,7 @@
  * The higher value (in seconds), the less often users will be polled (giving
  * a greater precedence to traffic to and from servers).
  */
-#define	HUB	1
+/* #define	HUB	1 */
 
 #ifdef HUB
 /*
