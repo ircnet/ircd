@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.119 2002/01/05 02:45:46 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.120 2002/03/28 22:52:37 jv Exp $";
 #endif
 
 #include "os.h"
@@ -55,6 +55,7 @@ static	void	free_channel __P((aChannel *));
 static	int	add_modeid __P((int, aClient *, aChannel *, char *));
 static	int	del_modeid __P((int, aChannel *, char *));
 static	Link	*match_modeid __P((int, aClient *, aChannel *));
+static  void    names_channel __P((aClient *,aClient *,char *,aChannel *,int));
 
 static	char	*PartFmt = ":%s PART %s :%s";
 
@@ -2198,7 +2199,6 @@ char	*parv[];
 	p = NULL;
 	if (parv[2])
 		key = strtoken(&p2, parv[2], ",");
-	parv[2] = NULL;	/* for m_names call later, parv[parc] must == NULL */
 	for (name = strtoken(&p, jbuf, ","); name;
 	     key = (key) ? strtoken(&p2, NULL, ",") : NULL,
 	     name = strtoken(&p, NULL, ","))
@@ -2328,8 +2328,8 @@ char	*parv[];
 			if (chptr->topic[0] != '\0')
 				sendto_one(sptr, replies[RPL_TOPIC], ME, BadTo(parv[0]),
 					   name, chptr->topic);
-			parv[1] = name;
-			(void)m_names(cptr, sptr, 2, parv);
+
+			names_channel(cptr, sptr, parv[0], chptr, 1);
 			if (IsAnonymous(chptr) && !IsQuiet(chptr))
 			    {
 				sendto_one(sptr, ":%s NOTICE %s :Channel %s has the anonymous flag set.", ME, chptr->chname, chptr->chname);
@@ -2531,7 +2531,7 @@ char	*parv[];
 			case 2:
 				sendto_channel_butserv(chptr, &me,
 					       ":%s MODE %s +%s%c %s %s",
-						       sptr->name, parv[1], 
+						       sptr->name, parv[1],
 						       modebuf, mbuf[1],
 						       parabuf, acptr->name);
 				if (mbuf[2])
@@ -3034,10 +3034,154 @@ char	*parv[];
 	sendto_one(sptr, replies[RPL_LISTEND], ME, BadTo(parv[0]));
 	return 2;
     }
+/*
+ * names_channel - send NAMES for one specific channel
+ * sends RPL_ENDOFNAMES when sendeon > 0
+ */
+static void names_channel(aClient *cptr, aClient *sptr, char *to,
+			  aChannel *chptr, int sendeon)
+{
+	Reg 	Link	*lp;
+	Reg	aClient	*acptr;
+	int 	pxlen, ismember, nlen, maxlen;
+	char 	*pbuf = buf;
+	int	showusers = 1, sent = 0;
+	
+	if (!chptr->users)     /* channel in ND */
+	{
+		showusers = 0;
+	}
+	else
+	{
+		ismember = (lp = find_channel_link(sptr->user->channel, chptr))
+			   ? 1 : 0;
+	}
+	
+	if (SecretChannel(chptr))
+	{
+		if (!ismember)
+		{
+			showusers = 0;
+		}
+		else
+		{
+			*pbuf++ = '@';
+		}
+	}
+	else if (HiddenChannel(chptr))
+	{
+		*pbuf++ = '*';
+	}
+	else
+	{
+		*pbuf++ = '=';
+	}
+	
+	if (showusers)
+	{
+		*pbuf++ = ' ';
+		pxlen = strlen(chptr->chname);
+		memcpy(pbuf, chptr->chname, pxlen);
+		pbuf += pxlen;
+		*pbuf++ = ' ';
+		*pbuf++ = ':';
+		*pbuf = '\0';
+		pxlen += 4;  /* ' ' + ' ' + ':' + '\0' */
+		
+		if (IsAnonymous(chptr))
+		{
+			if (ismember)
+			{
+				if (lp->flags & CHFL_CHANOP)
+				{
+					*pbuf++ = '@';
+				}
+				else if (lp->flags & CHFL_VOICE)
+				{
+					*pbuf++ = '+';
+				}
+				strcpy(pbuf,to);
+			}
+			sendto_one(sptr, replies[RPL_NAMREPLY], ME, BadTo(to),
+					buf);
+		}
+		else
+		{
+			/* server names + : : + spaces + "353" + nick length
+			 * +\r\n */
+			maxlen = BUFSIZE
+				 - 1  		/* : */
+				 - strlen(ME)
+				 - 5 		/* " 353 " */
+				 - strlen(to)
+				 - 1		/* " " */
+				 - pxlen	/* "= #chan :" */
+				 - 2;		/* \r\n  */
+			
+			for (lp = chptr->members; lp; lp = lp->next)
+			{
+				acptr = lp->value.cptr;
+				
+				nlen = strlen(acptr->name);
+				/* This check is needed for server channels
+				 * when someone removes +a mode from them.
+				 * (server is member of such channel).
+				 */
+				if (nlen > NICKLEN)
+				{
+					continue;
+				}
+				
+				/* Exceeded allowed length.  */
+				if (((size_t) pbuf - (size_t) buf) + nlen
+				   >= maxlen)
+				{
+					*pbuf = '\0';
+					sendto_one(sptr,
+						replies[RPL_NAMREPLY],ME ,
+						BadTo(to) , buf);
+					pbuf = buf + pxlen; /* save prefix
+							       for another
+							       iteration */
+					pbuf[0] = '\0';
+				}
+
+				if (!ismember && IsInvisible(acptr))
+				{
+					continue;
+				}
+				if (lp->flags & CHFL_CHANOP)
+				{
+					*pbuf++ = '@';
+				}
+				else if (lp->flags & CHFL_VOICE)
+				{
+					*pbuf++ = '+';
+				}
+	
+				memcpy(pbuf, acptr->name, nlen);
+				pbuf += nlen;
+				*pbuf++ = ' ';
+			}
+
+			*pbuf = '\0';
+			sendto_one(sptr, replies[RPL_NAMREPLY], ME,
+				BadTo(to), buf);
+		}
+	}
+	if (sendeon)
+	{
+		sendto_one(sptr, replies[RPL_ENDOFNAMES],ME ,BadTo(to),
+			   chptr->chname);
+	}
+	return;
+	
+}
 
 
 /************************************************************************
  * m_names() - Added by Jto 27 Apr 1989
+ * 	       Rewritten by jv 27 Apr 2001
  ************************************************************************/
 
 /*
@@ -3049,184 +3193,136 @@ int	m_names(cptr, sptr, parc, parv)
 aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
-{ 
+{
 	Reg	aChannel *chptr;
-	Reg	aClient *c2ptr;
+	Reg	aClient *acptr;
 	Reg	Link	*lp;
-	aChannel *ch2ptr = NULL;
-	int	idx, flag, len, mlen, rlen = 0;
-	char	*s, *para = parc > 1 ? parv[1] : NULL;
-
+	int	maxlen ,pxlen,nlen,cansend = 0, sent = 1;
+	char	*para = parc > 1 ? parv[1] : NULL,*name, *p = NULL, *pbuf = buf;
+	
 	if (parc > 2 &&
 	    hunt_server(cptr, sptr, ":%s NAMES %s %s", 2, parc, parv))
-		return 10;
-
-	mlen = strlen(ME) + 10; /* server names + : : + spaces + "353" */
-	mlen += strlen(parv[0]);
+	{
+		return MAXPENALTY;
+	}
+	
 	if (!BadPtr(para))
-	    {
-		s = index(para, ',');
-		if (s && MyConnect(sptr) && s != para)
-		    {
-			parv[1] = ++s;
-			(void)m_names(cptr, sptr, parc, parv);
-		    }
-		clean_channelname(para);
-		ch2ptr = find_channel(para, (aChannel *)NULL);
-	    }
-
-	*buf = '\0';
-
-	/*
-	 * First, do all visible channels (public and the one user self is)
-	 */
-
-	for (chptr = channel; chptr; chptr = chptr->nextch)
-	    {
-		if (!chptr->users ||	/* locked empty channel */
-		    ((chptr != ch2ptr) && !BadPtr(para))) /* 'wrong' channel */
-			continue;
-		if (!MyConnect(sptr) && (BadPtr(para) || (rlen > CHREPLLEN)))
-			break;
-		if ((BadPtr(para) || !HiddenChannel(chptr)) &&
-		    !ShowChannel(sptr, chptr))
-			continue; /* -- users on this are not listed */
-
-		/* Find users on same channel (defined by chptr) */
-
-		(void)strcpy(buf, "* ");
-		len = strlen(chptr->chname);
-		(void)strcpy(buf + 2, chptr->chname);
-		(void)strcpy(buf + 2 + len, " :");
-
-		if (PubChannel(chptr))
-			*buf = '=';
-		else if (SecretChannel(chptr))
-			*buf = '@';
-
-		if (IsAnonymous(chptr))
-		    {
-			if ((lp = find_user_link(chptr->members, sptr)))
-			    {
-				if (lp->flags & CHFL_CHANOP)
-					(void)strcat(buf, "@");
-				else if (lp->flags & CHFL_VOICE)
-					(void)strcat(buf, "+");
-				(void)strcat(buf, parv[0]);
-			    }
-			rlen += strlen(buf);
-			sendto_one(sptr, replies[RPL_NAMREPLY], ME, BadTo(parv[0]), buf);
-			continue;
-		    }
-		idx = len + 4; /* channel name + [@=] + 2?? */
-		flag = 1;
-		for (lp = chptr->members; lp; lp = lp->next)
-		    {
-			c2ptr = lp->value.cptr;
-			if (IsInvisible(c2ptr) && !IsMember(sptr,chptr))
+	{
+		for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
+		{
+			clean_channelname(name);
+			if BadPtr(name)
+			{
 				continue;
-			if (lp->flags & CHFL_CHANOP)
-			    {
-				(void)strcat(buf, "@");
-				idx++;
-			    }
-			else if (lp->flags & CHFL_VOICE)
-			    {
-				(void)strcat(buf, "+");
-				idx++;
-			    }
-			(void)strncat(buf, c2ptr->name, NICKLEN);
-			idx += strlen(c2ptr->name) + 1;
-			flag = 1;
-			(void)strcat(buf," ");
-			if (mlen + idx + NICKLEN + 1 > BUFSIZE - 2)
-			    {
-				sendto_one(sptr, replies[RPL_NAMREPLY],
-					   ME, BadTo(parv[0]), buf);
-				(void)strncpy(buf, "* ", 3);
-				(void)strncpy(buf+2, chptr->chname,
-						len + 1);
-				(void)strcat(buf, " :");
-				if (PubChannel(chptr))
-					*buf = '=';
-				else if (SecretChannel(chptr))
-					*buf = '@';
-				idx = len + 4;
-				flag = 0;
-			    }
-		    }
-		if (flag)
-		    {
-			rlen += strlen(buf);
-			sendto_one(sptr, replies[RPL_NAMREPLY], ME, BadTo(parv[0]), buf);
-		    }
-	    } /* for(channels) */
-	if (!BadPtr(para))
-	    {
-		if (!MyConnect(sptr) && (rlen > CHREPLLEN))
-			sendto_one(sptr, replies[ERR_TOOMANYMATCHES], ME, BadTo(parv[0]),
-				   para);
-		sendto_one(sptr, replies[RPL_ENDOFNAMES], ME, BadTo(parv[0]), para);
-		return(1);
-	    }
-
-	/* Second, do all non-public, non-secret channels in one big sweep */
-
-	(void)strncpy(buf, "* * :", 6);
-	idx = 5;
-	flag = 0;
-	for (c2ptr = client; c2ptr; c2ptr = c2ptr->next)
-	    {
-  		aChannel *ch3ptr;
-		int	showflag = 0, secret = 0;
-
-		if (!IsPerson(c2ptr) || IsInvisible(c2ptr))
+			}
+			chptr = find_channel(name, NULL);
+			if (chptr)
+			{
+				names_channel(cptr, sptr, parv[0], chptr, 1);
+			}
+			else
+			{
+				sendto_one(sptr, replies[RPL_ENDOFNAMES],ME ,
+				parv[0], name);
+			}
+			sent++;
+			if (!MyConnect(sptr) || sent > MAXCHANNELSPERUSER)
+			{
+				break;
+			}
+		}
+		return sent ?
+		   (int) ((float) MAXCHANNELSPERUSER / (float) MAXPENALTY) : 2;
+	}
+	/* Client wants all nicks/channels which is seriously cpu intensive
+	 * Allowed for local clients only.
+	 * First, list all secret channels user is on
+	 */
+	for (lp = sptr->user->channel; lp; lp = lp->next)
+	{
+		chptr = lp->value.chptr;
+		if (SecretChannel(chptr))
+		{
+			names_channel(cptr, sptr, parv[0], chptr, 0);
+		}
+	}
+	
+	/* Second, list all non-secret channels */
+	for (chptr = channel; chptr; chptr = chptr->nextch)
+	{
+		if (!chptr->users || /* channel in CD */
+			SecretChannel(chptr))
+		{
 			continue;
-		if (!MyConnect(sptr) && (BadPtr(para) || (rlen > CHREPLLEN)))
-			break;
-		lp = c2ptr->user->channel;
-		/*
-		 * don't show a client if they are on a secret channel or
-		 * they are on a channel sptr is on since they have already
-		 * been show earlier. -avalon
-		 */
+		}
+		names_channel(cptr, sptr, parv[0], chptr, 0);
+	}
+	/* Third, list all remaining users
+	 * ie, those which aren't on any channel, or are at Anonymous one
+	 */
+	strcpy(pbuf, "* * :");
+	pxlen = 5;
+	pbuf += pxlen;
+	maxlen = BUFSIZE
+		 - 1  		/* : */
+		 - strlen(ME)
+		 - 5 		/* " 353 " */
+		 - strlen(parv[0])
+		 - 1		/* " " */
+		 - pxlen	/* "* * :" */
+		 - 2;		/* \r\n  */
+
+
+	for (acptr = client; acptr ;acptr = acptr->next)
+	{
+		if (!IsPerson(acptr) || IsInvisible(acptr))
+		{
+			continue;
+		}
+		
+		lp = acptr->user->channel;
+		cansend = 1;
 		while (lp)
-		    {
-			ch3ptr = lp->value.chptr;
-			if (PubChannel(ch3ptr) || IsMember(sptr, ch3ptr))
-				showflag = 1;
-			if (SecretChannel(ch3ptr))
-				secret = 1;
+		{
+			chptr = lp->value.chptr;
+			if (PubChannel(chptr) || SecretChannel(chptr)
+			    || IsMember(sptr, chptr))
+			{   /* already shown */
+				cansend = 0;
+				break;
+			}
 			lp = lp->next;
-		    }
-		if (showflag) /* have we already shown them ? */
+		}
+		if (!cansend)
+		{
 			continue;
-		if (secret) /* on any secret channels ? */
+		}
+		nlen = strlen(acptr->name);
+		if (nlen > NICKLEN)
+		{
 			continue;
-		(void)strncat(buf, c2ptr->name, NICKLEN);
-		idx += strlen(c2ptr->name) + 1;
-		(void)strcat(buf," ");
-		flag = 1;
-		if (mlen + idx + NICKLEN > BUFSIZE - 2)
-		    {
-			rlen += strlen(buf);
-			sendto_one(sptr, replies[RPL_NAMREPLY], ME, BadTo(parv[0]), buf);
-			(void)strncpy(buf, "* * :", 6);
-			idx = 5;
-			flag = 0;
-		    }
-	    }
-	if (flag)
-	    {
-		rlen += strlen(buf);
-		sendto_one(sptr, replies[RPL_NAMREPLY], ME, BadTo(parv[0]), buf);
-	    }
-	if (!MyConnect(sptr) && rlen > CHREPLLEN)
-		sendto_one(sptr, replies[ERR_TOOMANYMATCHES], ME, BadTo(parv[0]),
-			   para ? para : "*");
-	/* This is broken.. remove the recursion? */
-	sendto_one(sptr, replies[RPL_ENDOFNAMES], ME, BadTo(parv[0]), "*");
-	return 2;
+		}
+		
+		if (((size_t) pbuf - (size_t) buf) + nlen >= maxlen)
+		{
+			*pbuf = '\0';
+			sendto_one(sptr, replies[RPL_NAMREPLY], ME, parv[0],
+				   buf);
+			sent = 1;
+			pbuf = buf + pxlen;
+			pbuf[0] = '\0';
+		}
+	
+		memcpy(pbuf, acptr->name, nlen);
+		pbuf += nlen;
+		*pbuf++ = ' ';
+		sent = 0;
+	}
+	
+	*pbuf = '\0';
+	sendto_one(sptr, replies[RPL_NAMREPLY], ME, parv[0], buf);
+	sendto_one(sptr, replies[RPL_ENDOFNAMES], ME, parv[0], "*");
+	return MAXPENALTY;
 }
 
 #define CHECKFREQ	300
