@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.136 2003/02/10 15:48:07 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.137 2003/02/10 16:23:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -295,40 +295,42 @@ aChannel *chptr;
 
 		if (strcmp(ip, cptr->user->host))
 		    {
-			int mask;
 
 			s = make_nick_user_host(cptr->name,
 						cptr->user->username, ip);
 	    
 			for (tmp = chptr->mlist; tmp; tmp = tmp->next)
-				if (tmp->flags == type)
-				{
-					if (match(tmp->value.cp, s) == 0)
+				if (tmp->flags == type &&
+					match(tmp->value.cp, s) == 0)
 						break;
-#ifndef INET6
-/* match_ipmask() seems so expensive :( */
-					/* depending on popularity of CIDR bans,
-					   we could move the whole block before
-					   checking @IP ban */
-					buf[0]='\0';
-					/* perhaps if (strrchr(tmp->value.cp, '/')
-					   before sscanf would give us some speed */
-					if (sscanf(tmp->value.cp, "%*[^@]@%[0-9.]/%d",
-						buf, &mask) == 2)
-					{
-						mask=32-mask;
-						if (htonl(cptr->ip.s_addr)
-							>> mask ==
-							htonl(inet_addr(buf))
-							>> mask)
-							/* CIDR match */
-							break;
-					}
-#endif
-				}
 		    }
 	  }
 
+#ifndef INET6
+	if (!tmp && MyConnect(cptr))
+	{
+		int mask;
+
+		buf[0]='\0';
+		/* perhaps if (strrchr(tmp->value.cp, '/')
+		   before sscanf would give us some speed */
+		for (tmp = chptr->mlist; tmp; tmp = tmp->next)
+			if (tmp->flags == type)
+		{
+			/* match_ipmask() seems so expensive :( */
+			if (sscanf(tmp->value.cp, "%*[^@]@%[0-9.]/%d",
+				buf, &mask) == 2)
+			{
+				mask=32-mask;
+				/* BUG: where is nick!user@ part checking? */
+				if (htonl(cptr->ip.s_addr) >> mask ==
+					htonl(inetaddr(buf)) >> mask)
+					/* CIDR match */
+					break;
+			}
+		}
+	}
+#endif
 	return (tmp);
 }
 
