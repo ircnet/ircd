@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.193 2004/03/05 17:05:09 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.194 2004/03/05 22:10:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -370,6 +370,20 @@ static	Link	*match_modeid(int type, aClient *cptr, aChannel *chptr)
 			/* perhaps we could relax it and check remotes too? */
 			if (MyConnect(cptr))
 			{
+				if (IsConfNoResolveMatch(cptr->confs->value.aconf))
+				{
+					/* user->host contains IP and was just
+					 * checked; try sockhost, it may have
+					 * hostname.
+					 */
+					if (match(tmp->value.alist->host,
+						cptr->sockhost) == 0)
+					{
+						/* match */
+						break;
+					}
+				}
+				else
 				/* Yay, it's 2.11, we have string ip! */
 				if (match(tmp->value.alist->host, cptr->user->sip) == 0)
 				{
