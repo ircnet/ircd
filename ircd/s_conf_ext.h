@@ -61,5 +61,5 @@ EXTERN int find_kill __P((aClient *cptr, int doall, char **comment));
 EXTERN int find_two_masks __P((char *name, char *host, int stat));
 EXTERN int find_conf_flags __P((char *name, char *key, int stat));
 EXTERN int find_restrict __P((aClient *cptr));
-EXTERN void find_bounce __P((aClient *cptr, int class));
+EXTERN void find_bounce __P((aClient *cptr, int class, int fd));
 #undef EXTERN

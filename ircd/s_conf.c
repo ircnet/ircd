@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.13 1997/09/08 22:30:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.14 1997/09/09 20:42:36 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -143,10 +143,10 @@ attach_iline:
 			SetRestricted(cptr);
 		get_sockhost(cptr, uhost);
 		if ((i = attach_conf(cptr, aconf)) < -1)
-			find_bounce(cptr, ConfClass(aconf));
+			find_bounce(cptr, ConfClass(aconf), -1);
 		return i;
 	    }
-	find_bounce(cptr, -1); /* -1 isn't a good way to do this */
+	find_bounce(cptr, 0, -2);
 	return -1;
 }
 
@@ -1392,11 +1392,13 @@ char	*interval, *reply;
 /*
 ** find_bounce
 **	send a bounce numeric to a client.
-**	if cptr is NULL, class is considered to be a fd (ugly, isn't it?)
+**	fd is optional, and only makes sense if positive and when cptr is NULL
+**	fd == -1 : not fd, class is a class number.
+**	fd == -2 : not fd, class isn't a class number.
 */
-void	find_bounce(cptr, class)
+void	find_bounce(cptr, class, fd)
 aClient *cptr;
-int	class;
+int	class, fd;
     {
 	Reg	aConfItem	*aconf;
 
@@ -1405,12 +1407,12 @@ int	class;
 		if (aconf->status != CONF_BOUNCE)
 			continue;
 
-		if (cptr == NULL)
+		if (fd >= 0)
 			/*
 			** early rejection,
 			** connection class and hostname are unknown
 			*/
-			if (atoi(aconf->host) == -1)
+			if (*aconf->host == '\0')
 			    {
 				char rpl[BUFSIZE];
 				
@@ -1423,13 +1425,13 @@ int	class;
 			else
 				continue;
 
-		/* cptr != NULL */
+		/* fd < 0 */
 		/*
 		** "too many" type rejection, class is known.
 		** check if B line is for a class #,
 		** and if it is for a hostname.
 		*/
-		if (isdigit(*aconf->host))
+		if (fd != -2 && isdigit(*aconf->host))
 		    {
 			if (class != atoi(aconf->host))
 				continue;

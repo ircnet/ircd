@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.16 1997/09/03 17:45:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.17 1997/09/09 20:42:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1926,7 +1926,7 @@ FdAry	*fdp;
 				sendto_flag(SCH_ERROR,
 					    "All connections in use. (%s)",
 					    get_client_name(cptr, TRUE));
-				find_bounce(NULL, fdnew);
+				find_bounce(NULL, 0, fdnew);
 				(void)send(fdnew,
 					   "ERROR :All connections in use\r\n",
 					   32, 0);
