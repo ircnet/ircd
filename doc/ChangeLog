@@ -8,10 +8,13 @@
 
 2004-02-13  Piotr Kucharski
 
-	* INSTALL.sgml: update.
+	* INSTALL.sgml, INSTALL.txt, INSTALL.info: update.
 	* channel.c/m_join(): do not return "Too many channels" when client
 	  tries to join channel he is already on.
 	* s_bsd.c/add_local_domain(): fix localhost bug introduced in 2.10.3p5.
+	* s_user.c/m_unick(): bug appearing in whowas (after squit users had
+	  improper info in server field).
+	* version.c.SH.in: INFO update.
 
 2004-02-12  Piotr Kucharski
 
