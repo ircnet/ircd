@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.22 1997/09/03 20:33:26 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.23 1997/09/08 00:20:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1161,7 +1161,11 @@ char	*parv[];
 	return m_message(cptr, sptr, parc, parv, 1);
 }
 
-static	void	do_who(sptr, acptr, repchan, lp)
+/*
+** who_one
+**	sends one RPL_WHOREPLY to sptr concerning acptr & repchan
+*/
+static	void	who_one(sptr, acptr, repchan, lp)
 aClient *sptr, *acptr;
 aChannel *repchan;
 Link *lp;
@@ -1193,7 +1197,109 @@ Link *lp;
 
 
 /*
-** r_who
+** who_channel
+**	lists all users on a given channel
+*/
+static	void	who_channel(sptr, chptr, oper)
+aClient *sptr;
+aChannel *chptr;
+int oper;
+{
+	Reg	Link	*lp;
+	aChannel *channame;
+	int	member;
+
+	if (!IsAnonymous(chptr))
+	    {
+		member = IsMember(sptr, chptr);
+		if (member || !SecretChannel(chptr))
+			for (lp = chptr->members; lp; lp = lp->next)
+			    {
+				if (oper && !IsAnOper(lp->value.cptr))
+					continue;
+				if (IsInvisible(lp->value.cptr) && !member)
+					continue;
+				who_one(sptr, lp->value.cptr, chptr, lp);
+			    }
+	    }
+	else if (lp = find_user_link(chptr->members, sptr))
+		who_one(sptr, lp->value.cptr, chptr, lp);
+}
+
+/*
+** who_find
+**	lists all (matching) users.
+**	CPU intensive, but what can be done?
+*/
+static	void	who_find(sptr, mask, oper)
+aClient *sptr;
+char *mask;
+int oper;
+{
+	aChannel *chptr, *ch2ptr;
+	Link	*lp;
+	int	member;
+	int	showperson, isinvis;
+	aClient	*acptr;
+
+	for (acptr = client; acptr; acptr = acptr->next)
+	    {
+		ch2ptr = NULL;
+			
+		if (!IsPerson(acptr))
+			continue;
+		if (oper && !IsAnOper(acptr))
+			continue;
+		showperson = 0;
+		/*
+		 * Show user if they are on the same channel, or not
+		 * invisible and on a non secret channel (if any).
+		 * Do this before brute force match on all relevant
+		 * fields since these are less cpu intensive (I
+		 * hope :-) and should provide better/more shortcuts
+		 * -avalon
+		 */
+		isinvis = IsInvisible(acptr);
+		for (lp = acptr->user->channel; lp; lp = lp->next)
+		    {
+			chptr = lp->value.chptr;
+			member = IsMember(sptr, chptr);
+			if (isinvis && !member)
+				continue;
+			if (member || (!isinvis && PubChannel(chptr)))
+			    {
+				showperson = 1;
+				if (!IsAnonymous(chptr) ||
+				    acptr != sptr)
+				    {
+					ch2ptr = chptr;
+					break;
+				    }
+			    }
+			if (HiddenChannel(chptr) &&
+			    !SecretChannel(chptr) && !isinvis)
+				showperson = 1;
+		    }
+		if (!acptr->user->channel && !isinvis)
+			showperson = 1;
+		/*
+		** This is brute force solution, not efficient...? ;( 
+		** Show entry, if no mask or any of the fields match
+		** the mask. --msa
+		*/
+		if (showperson &&
+		    (!mask ||
+		     match(mask, acptr->name) == 0 ||
+		     match(mask, acptr->user->username) == 0 ||
+		     match(mask, acptr->user->host) == 0 ||
+		     match(mask, acptr->user->server) == 0 ||
+		     match(mask, acptr->info) == 0))
+			who_one(sptr, acptr, ch2ptr, NULL);
+	    }
+}
+
+/*
+** m_who
 **	parv[0] = sender prefix
 **	parv[1] = nickname mask list
 **	parv[2] = additional selection flag, only 'o' for now.
@@ -1203,142 +1309,67 @@ aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	Reg	aClient *acptr;
-	Reg	char	*mask = parc > 1 ? parv[1] : NULL;
-	Reg	Link	*lp;
-	aChannel *chptr;
-	aChannel *mychannel;
-	char	*channame = NULL, *s = NULL;
+	Link	*lp;
+	aChannel *chptr, *mychannel;
+	char	*channame = NULL;
 	int	oper = parc > 2 ? (*parv[2] == 'o' ): 0; /* Show OPERS only */
 	int	member, penalty = 0;
+	char	*p, *mask;
 
-	if (!BadPtr(mask))
+	if (parc < 2)
 	    {
-		if ((s = (char *)index(mask, ',')))
-			*s = '\0';
+		who_find(sptr, NULL, oper);
+		sendto_one(sptr, rpl_str(RPL_ENDOFWHO, parv[0]), "*");
+		return 5;
+	    }
+
+        for (p = NULL, mask = strtoken(&p, parv[1], ",");
+	     mask && penalty < MAXPENALTY;
+             mask = strtoken(&p, NULL, ","))
+	    { 
 		clean_channelname(mask);
-	    }
-
-	mychannel = NullChn;
-	if (sptr->user)
-		if ((lp = sptr->user->channel))
-			mychannel = lp->value.chptr;
-
-	/*
-	**  Following code is some ugly hacking to preserve the
-	**  functions of the old implementation. (Also, people
-	**  will complain when they try to use masks like "12tes*"
-	**  and get people on channel 12 ;) --msa
-	*/
-	if (!mask || *mask == '\0')
-		mask = NULL;
-	else if (mask[1] == '\0' && mask[0] == '*')
-	    {
-		mask = NULL;
-		if (mychannel)
-			channame = mychannel->chname;
-	    }
-	else if (mask[1] == '\0' && mask[0] == '0') /* "WHO 0" for irc.el */
-		mask = NULL;
-	else
-		channame = mask;
-	(void)collapse(mask);
-
-	if (IsChannelName(channame))
-	    {
+		mychannel = NullChn;
+		if (sptr->user && (lp = sptr->user->channel))
+				mychannel = lp->value.chptr;
 		/*
-		 * List all users on a given channel
-		 */
-		chptr = find_channel(channame, NULL);
-		if (chptr && !IsAnonymous(chptr))
+		**  Following code is some ugly hacking to preserve the
+		**  functions of the old implementation. (Also, people
+		**  will complain when they try to use masks like "12tes*"
+		**  and get people on channel 12 ;) --msa
+		*/
+		if (!mask || *mask == '\0') /* !mask always false? */
+			mask = NULL;
+		else if (mask[1] == '\0' && mask[0] == '*')
 		    {
-			member = IsMember(sptr, chptr);
-			if (member || !SecretChannel(chptr))
-				for (lp = chptr->members; lp; lp = lp->next)
-				    {
-					if (oper && !IsAnOper(lp->value.cptr))
-						continue;
-					if (IsInvisible(lp->value.cptr) &&
-					    !member)
-						continue;
-					do_who(sptr, lp->value.cptr, chptr,lp);
-				    }
+			mask = NULL;
+			if (mychannel)
+				channame = mychannel->chname;
+		    }
+		else if (mask[1] == '\0' && mask[0] == '0')
+			/* "WHO 0" for irc.el */
+			mask = NULL;
+		else
+			channame = mask;
+		(void)collapse(mask);
+		
+		if (IsChannelName(channame))
+		    {
+			chptr = find_channel(channame, NULL);
+			if (chptr)
+				who_channel(sptr, chptr, oper);
 			penalty += 1;
 		    }
-		else if (chptr && IsAnonymous(chptr) &&
-			 (lp = find_user_link(chptr->members, sptr)))
+		else 
 		    {
-			do_who(sptr, lp->value.cptr, chptr, lp);
-			penalty += 1;
+			who_find(sptr, mask, oper);
+			if (strlen(mask) > 4)
+				penalty += 3;
+			else
+				penalty += 5;
 		    }
-	    }
-	else 
-	    {
-		for (acptr = client; acptr; acptr = acptr->next)
-		    {
-			aChannel *ch2ptr = NULL;
-			int	showperson, isinvis;
-			
-			if (!IsPerson(acptr))
-				continue;
-			if (oper && !IsAnOper(acptr))
-				continue;
-			showperson = 0;
-			/*
-			 * Show user if they are on the same channel, or not
-			 * invisible and on a non secret channel (if any).
-			 * Do this before brute force match on all relevant
-			 * fields since these are less cpu intensive (I
-			 * hope :-) and should provide better/more shortcuts
-			 * -avalon
-			 */
-			isinvis = IsInvisible(acptr);
-			for (lp = acptr->user->channel; lp; lp = lp->next)
-			    {
-				chptr = lp->value.chptr;
-				member = IsMember(sptr, chptr);
-				if (isinvis && !member)
-					continue;
-				if (member || (!isinvis && PubChannel(chptr)))
-				    {
-					showperson = 1;
-					if (!IsAnonymous(chptr) ||
-					    acptr != sptr)
-					    {
-						ch2ptr = chptr;
-						break;
-					    }
-				    }
-				if (HiddenChannel(chptr) &&
-				    !SecretChannel(chptr) && !isinvis)
-					showperson = 1;
-			    }
-			if (!acptr->user->channel && !isinvis)
-				showperson = 1;
-			/*
-			 ** This is brute force solution, not efficient...? ;( 
-			 ** Show entry, if no mask or any of the fields match
-			 ** the mask. --msa
-			 */
-			if (showperson &&
-			    (!mask ||
-			     match(mask, acptr->name) == 0 ||
-			     match(mask, acptr->user->username) == 0 ||
-			     match(mask, acptr->user->host) == 0 ||
-			     match(mask, acptr->user->server) == 0 ||
-			     match(mask, acptr->info) == 0))
-				do_who(sptr, acptr, ch2ptr, NULL);
-		    }
-		penalty += 3;
 	    }
 	sendto_one(sptr, rpl_str(RPL_ENDOFWHO, parv[0]),
 		   BadPtr(mask) ?  "*" : mask);
-	if (s)
-	    {
-		parv[1] = ++s;
-		if (penalty < MAXPENALTY)
-			penalty += m_who(cptr, sptr, parc, parv);
-	    }
 	return penalty;
 }
 
