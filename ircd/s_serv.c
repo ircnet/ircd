@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.104 2002/07/06 02:58:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.105 2002/07/06 03:15:10 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1661,12 +1661,22 @@ int	mask;
 			if (tmp->status == CONF_KILL
 			    || tmp->status == CONF_OTHERKILL
 			    || tmp->status == CONF_VER)
-				sendto_one(sptr, replies[p[1]], ME, BadTo(to), c, host,
-					   (pass) ? pass : null,
+			{
+				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
+					   c, host, (pass) ? pass : null,
 					   name, port, get_conf_class(tmp));
+			}
+			else if (tmp->status & (CONF_CLIENT | CONF_RCLIENT))
+			{
+				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
+					   c, host, (pass) ? "*" : null,
+					   name, port, get_conf_class(tmp),
+					   iline_flags_to_string(tmp->flags));
+
+			}
 			else
-				sendto_one(sptr, replies[p[1]], ME, BadTo(to), c, host,
-					   (pass) ? "*" : null,
+				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
+					   c, host, (pass) ? "*" : null,
 					   name, port, get_conf_class(tmp));
 		    }
 	return;
