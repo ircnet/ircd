@@ -494,8 +494,11 @@
  * Max time for the channel history and nick delay to be effective.
  * It should be the same value on all servers of a same net, and
  * be greater than the split durations usually seen.
+ * DELAYCHASETIMELIMIT is the default,
+ * LDELAYCHASETIMELIMIT applies to -channels and should be really long.
  */
-#define DELAYCHASETIMELIMIT 900   /* Recommended value: 900 */
+#define DELAYCHASETIMELIMIT	900	/* Recommended value: 900 /*
+#define LDELAYCHASETIMELIMIT	3600	/* Recommended value: 3600 */
 
 /*
  * Max number of channels a user is allowed to join.

@@ -1,3 +1,12 @@
+Tue May  5 19:26:25 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* config.h.dist, Makefile.in, struct_def.h, s_externs.h, send.c,
+	channel.c, hash.c, s_debug.c, s_err.c, s_misc.c, s_serv.c,
+	s_user.c: implemented new channels.
+
+	* struct_def.h, parse.c, channel.c, ircd.c, s_debug.c, s_misc.c,
+	s_serv.c, s_user.c, whowas.c, config.h.dist: replaced BIG_NET #define.
+
 Fri Apr 24 20:30:21 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* irc.c: missing refresh() (from Dave Hill <ddhill@zk3.dec.com>).

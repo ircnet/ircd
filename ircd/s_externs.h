@@ -46,6 +46,7 @@
 #include "s_service_ext.h"
 #include "s_user_ext.h"
 #include "s_zip_ext.h"
+#include "s_id_ext.h"
 #include "send_ext.h"
 #include "support_ext.h"
 #include "version_ext.h"

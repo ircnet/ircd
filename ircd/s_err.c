@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.14 1998/03/31 21:54:24 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.15 1998/05/05 23:30:19 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -53,7 +53,7 @@ static	Numeric	numeric_errors[] = {
 /* 405 */	{ ERR_TOOMANYCHANNELS, "%s :You have joined too many channels" },
 /* 406 */	{ ERR_WASNOSUCHNICK, "%s :There was no such nickname" },
 /* 407 */	{ ERR_TOOMANYTARGETS,
-		"%s :%s recipients. No message delivered" },
+		"%s :%s recipients. %s" },
 /* 408 */	{ ERR_NOSUCHSERVICE, "%s :No such service" },
 /* 409 */	{ ERR_NOORIGIN, ":No origin specified" },
 		{ 0, (char *)NULL },

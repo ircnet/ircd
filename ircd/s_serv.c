@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.39 1998/05/05 21:26:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.40 1998/05/05 23:30:24 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -265,7 +265,7 @@ aClient	*cptr;
 	    }
 	else if (!strncmp(cptr->info, "021", 3) ||
 		 !strncmp(cptr->info, "020999", 6))
-		cptr->hopcount = SV_29|SV_NJOIN|SV_NMODE;
+		cptr->hopcount = SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN;
 	else
 		cptr->hopcount = SV_OLD;
 

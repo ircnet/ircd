@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.19 1998/05/05 21:26:56 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.20 1998/05/05 23:30:18 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -575,8 +575,9 @@ int	debug;
 			   d_cl*sizeof(aClass));
 
 	sendto_one(cptr,
-		   ":%s %d %s :Channels %d(%d) Modes %d(%d) History %d(%d)",
-		   me.name, RPL_STATSDEBUG, nick, ch, chm, chb, chbm,chh,chhm);
+   ":%s %d %s :Channels %d(%d) Modes %d(%d) History %d(%d) Cache %d(%d)",
+		   me.name, RPL_STATSDEBUG, nick, ch, chm, chb, chbm, chh,
+		   chhm, istat.is_cchan, istat.is_cchanmem);
 	if (debug && (ch != d_ch || chm != d_chm || chb != d_chb
 		      || chbm != d_chbm || chh != d_chh || chhm != d_chhm))
 		sendto_one(cptr,

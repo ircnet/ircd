@@ -53,6 +53,7 @@ typedef struct        MotdItem aMotd;
 #define	MAXBANLENGTH	1024
 #define	BANLEN		(USERLEN + NICKLEN + HOSTLEN + 3)
 #define MAXPENALTY	10
+#define	CHIDLEN		5		/* WARNING: *DONT* CHANGE THIS!!!! */
 
 #define	READBUF_SIZE	16384	/* used in s_bsd.c *AND* s_zip.c ! */
  
@@ -572,7 +573,8 @@ struct Channel	{
 	Link	*invites;	/* outstanding invitations */
 	Link	*mlist;		/* list of extended modes: +b/+e/+I */
 	Link	*clist;		/* list of connections which are members */
-	time_t	history;
+	time_t	history;	/* channel history (aka channel delay) */
+/*	time_t	massop;		/* massreop stamp for -channels */
 	char	chname[1];
 };
 
@@ -582,35 +584,37 @@ struct Channel	{
 
 /* Channel related flags */
 
-#define	CHFL_CHANOP     0x0001 /* Channel operator */
-#define	CHFL_VOICE      0x0002 /* the power to speak */
-#define	CHFL_BAN	0x0004 /* ban channel flag */
-#define	CHFL_EXCEPTION	0x0008 /* exception channel flag */
-#define	CHFL_INVITE	0x0010 /* invite channel flag */
+#define	CHFL_UNIQOP     0x0001 /* Channel creator */
+#define	CHFL_CHANOP     0x0002 /* Channel operator */
+#define	CHFL_VOICE      0x0004 /* the power to speak */
+#define	CHFL_BAN	0x0008 /* ban channel flag */
+#define	CHFL_EXCEPTION	0x0010 /* exception channel flag */
+#define	CHFL_INVITE	0x0020 /* invite channel flag */
 
 /* Channel Visibility macros */
 
+#define	MODE_UNIQOP	CHFL_UNIQOP
 #define	MODE_CHANOP	CHFL_CHANOP
 #define	MODE_VOICE	CHFL_VOICE
-#define	MODE_PRIVATE	0x0004
-#define	MODE_SECRET	0x0008
-#define	MODE_MODERATED  0x0010
-#define	MODE_TOPICLIMIT 0x0020
-#define	MODE_INVITEONLY 0x0040
-#define	MODE_NOPRIVMSGS 0x0080
-#define	MODE_KEY	0x0100
-#define	MODE_BAN	0x0200
-#define	MODE_LIMIT	0x0400
-#define	MODE_ANONYMOUS	0x0800
-#define	MODE_QUIET	0x1000
-#define	MODE_EXCEPTION	0x2000
-#define	MODE_INVITE	0x4000
-#define MODE_FLAGS	0x1fff
+#define	MODE_PRIVATE	0x0008
+#define	MODE_SECRET	0x0010
+#define	MODE_MODERATED  0x0020
+#define	MODE_TOPICLIMIT 0x0040
+#define	MODE_INVITEONLY 0x0080
+#define	MODE_NOPRIVMSGS 0x0100
+#define	MODE_KEY	0x0200
+#define	MODE_BAN	0x0400
+#define	MODE_LIMIT	0x0800
+#define	MODE_ANONYMOUS	0x1000
+#define	MODE_QUIET	0x2000
+#define	MODE_EXCEPTION	0x4000
+#define	MODE_INVITE	0x8000
+#define MODE_FLAGS	0xffff
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */
-#define	MODE_WPARAS	(MODE_CHANOP|MODE_VOICE|MODE_BAN|MODE_KEY|MODE_LIMIT\
-			 |MODE_INVITE|MODE_EXCEPTION)
+#define	MODE_WPARAS	(MODE_UNIQOP|MODE_CHANOP|MODE_VOICE|MODE_BAN|MODE_KEY\
+			 |MODE_LIMIT|MODE_INVITE|MODE_EXCEPTION)
 /*
  * Undefined here, these are used in conjunction with the above modes in
  * the source.
@@ -636,9 +640,10 @@ struct Channel	{
 #define       IsMember(u, c)          (u && (u)->user && \
 		       find_channel_link((u)->user->channel, c) ? 1 : 0)
 #define	IsChannelName(n)	((n) && (*(n) == '#' || *(n) == '&' || \
-					*(n) == '+'))
+					*(n) == '+' || *(n) == '-'))
 #define	IsQuiet(x)		((x)->mode.mode & MODE_QUIET)
-#define	UseModes(n)		((n) && (*(n) == '#' || *(n) == '&'))
+#define	UseModes(n)		((n) && (*(n) == '#' || *(n) == '&' || \
+					 *(n) == '-'))
 
 /* Misc macros */
 
@@ -662,6 +667,8 @@ typedef	struct	{
 	u_long	is_chanusers;	/* channels users */
 	u_long	is_hchan;	/* channels in history */
 	u_long	is_hchanmem;
+	u_long	is_cchan;	/* channels in cache */
+	u_long	is_cchanmem;
 	u_long	is_away;	/* away sets */
 	u_long	is_awaymem;
 	u_long	is_oper;	/* opers */
@@ -721,11 +728,12 @@ typedef	struct	{
 
 /* used for sendto_serv */
 
-/* semi-obsolete, bitmasks should now be used!!! */
 #define	SV_OLD		0x0000
 #define	SV_29		0x0001	/* useless, but preserved for coherence */
 #define	SV_NJOIN	0x0002	/* server understands the NJOIN command */
 #define	SV_NMODE	0x0004	/* server knows new MODEs (+e/+I) */
+#define	SV_NCHAN	0x0008	/* server knows new channels -????name */
+				/* ! SV_NJOIN implies ! SV_NCHAN */
 
 /* used for sendto_flag */
 

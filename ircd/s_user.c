@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.44 1998/05/05 21:26:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.45 1998/05/05 23:30:26 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1005,7 +1005,7 @@ int	parc, notice;
 		    if (!notice)
 			    sendto_one(sptr, err_str(ERR_TOOMANYTARGETS,
 						     parv[0]),
-				       "Too many", nick); 
+				       "Too many",nick,"No Message Delivered");
 		    continue;      
 		}   
 		/*
@@ -1139,7 +1139,8 @@ int	parc, notice;
 				else if (!notice)
 					sendto_one(sptr, err_str(
 						   ERR_TOOMANYTARGETS,
-						   parv[0]), "Duplicate",nick);
+						   parv[0]), "Duplicate", nick,
+						   "No Message Delivered");
 				continue;
 			    }
 		    }
@@ -1161,7 +1162,8 @@ int	parc, notice;
 				else if (!notice)
 					sendto_one(sptr, err_str(
 						   ERR_TOOMANYTARGETS,
-						   parv[0]), "Duplicate",nick);
+						   parv[0]), "Duplicate", nick,
+						   "No Message Delivered");
 				continue;
 			    }
 		    }
@@ -1222,7 +1224,7 @@ Link *lp;
 		lp = find_user_link(repchan->members, acptr);
 	if (lp != NULL)
 	    {
-		if (lp->flags & CHFL_CHANOP)
+		if (lp->flags & (CHFL_UNIQOP|CHFL_CHANOP))
 			status[i++] = '@';
 		else if (lp->flags & CHFL_VOICE)
 			status[i++] = '+';
@@ -1554,7 +1556,7 @@ char	*parv[];
 						len = 0;
 					    }
 					if (is_chan_op(acptr, chptr))
-						*(buf + len++) = '@';
+					    *(buf + len++) = '@';
 					else if (has_voice(acptr, chptr))
 						*(buf + len++) = '+';
 					if (len)

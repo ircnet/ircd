@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.36 1998/05/05 21:26:55 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.37 1998/05/05 23:30:16 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -57,6 +57,7 @@ static	int	del_modeid __P((int, aChannel *, char *));
 static	Link	*match_modeid __P((int, aClient *, aChannel *));
 
 static	char	*PartFmt = ":%s PART %s :%s";
+
 /*
  * some buffers for rebuilding channel/nick lists with ,'s
  */
@@ -445,7 +446,7 @@ aChannel *chptr;
 		return 0;
 	if (chptr)
 		if ((lp = find_user_link(chptr->members, cptr)))
-			return (lp->flags & CHFL_CHANOP);
+			return (lp->flags & (CHFL_CHANOP | CHFL_UNIQOP));
 
 	return 0;
 }
@@ -458,7 +459,7 @@ aChannel *chptr;
 
 	if (chptr)
 		if ((lp = find_user_link(chptr->members, cptr)))
-			return (lp->flags & CHFL_VOICE);
+			return (lp->flags & (CHFL_UNIQOP | CHFL_VOICE));
 
 	return 0;
 }
@@ -473,13 +474,13 @@ aChannel *chptr;
 	member = IsMember(cptr, chptr);
 	lp = find_user_link(chptr->members, cptr);
 
-	if ((!lp || !(lp->flags & (CHFL_CHANOP | CHFL_VOICE))) &&
+	if ((!lp || !(lp->flags & (CHFL_UNIQOP | CHFL_CHANOP | CHFL_VOICE))) &&
 	    !match_modeid(CHFL_EXCEPTION, cptr, chptr) &&
 	    match_modeid(CHFL_BAN, cptr, chptr))
 		return (MODE_BAN);
 
 	if (chptr->mode.mode & MODE_MODERATED &&
-	    (!lp || !(lp->flags & (CHFL_CHANOP|CHFL_VOICE))))
+	    (!lp || !(lp->flags & (CHFL_CHANOP|CHFL_VOICE|CHFL_UNIQOP))))
 			return (MODE_MODERATED);
 
 	if (chptr->mode.mode & MODE_NOPRIVMSGS && !member)
@@ -654,7 +655,7 @@ void	send_channel_modes(cptr, chptr)
 aClient *cptr;
 aChannel *chptr;
 {
-	if (*chptr->chname != '#'
+	if ((*chptr->chname != '#' && *chptr->chname != '-')
 	    || chptr->users == 0) /* channel is empty (locked), thus no mode */
 		return;
 
@@ -702,6 +703,8 @@ aChannel *chptr;
 
 	if (check_channelmask(&me, cptr, chptr->chname))
 		return;
+	if (*chptr->chname == '-' && !(cptr->serv->version & SV_NCHAN))
+		return;
 
 	sprintf(buf, ":%s NJOIN %s :", ME, chptr->chname);
 	len = strlen(buf);
@@ -722,12 +725,20 @@ aChannel *chptr;
 			buf[len++] = ',';
 			buf[len] = '\0';
 		    }
-		if (lp->flags & (CHFL_CHANOP|CHFL_VOICE))
+		if (lp->flags & (CHFL_UNIQOP|CHFL_CHANOP|CHFL_VOICE))
 		    {
-			if (lp->flags & CHFL_CHANOP)
+			if (lp->flags & CHFL_UNIQOP)
+			    {
 				buf[len++] = '@';
-			if (lp->flags & CHFL_VOICE)
-				buf[len++] = '+';
+				buf[len++] = '@';
+			    }
+			else
+			    {
+				if (lp->flags & CHFL_CHANOP)
+					buf[len++] = '@';
+				else if (lp->flags & CHFL_VOICE)
+					buf[len++] = '+';
+			    }
 			buf[len] = '\0';
 		    }
 		(void)strcpy(buf + len, c2ptr->name);
@@ -853,7 +864,7 @@ char	*parv[];
 
 /*
  * Check and try to apply the channel modes passed in the parv array for
- * the client ccptr to channel chptr.  The resultant changes are printed
+ * the client cptr to channel chptr.  The resultant changes are printed
  * into mbuf and pbuf (if any) and applied to the channel.
  */
 static	int	set_mode(cptr, sptr, chptr, penalty, parc, parv, mbuf, pbuf)
@@ -875,7 +886,6 @@ char	*parv[], *mbuf, *pbuf;
 	u_int	whatt = MODE_ADD;
 	int	limitset = 0, count = 0, chasing = 0;
 	int	nusers = 0, ischop, new, len, keychange = 0, opcnt = 0;
-	char	fm = '\0';
 	aClient *who;
 	Mode	*mode, oldm;
 	Link	*plp = NULL;
@@ -905,6 +915,40 @@ char	*parv[], *mbuf, *pbuf;
 		case '-':
 			whatt = MODE_DEL;
 			break;
+		case 'O':
+			if (*chptr->chname == '-' && parc > 0 &&
+			    IsMember(sptr, chptr))
+			    {
+				*penalty += 1;
+				parc--;
+				/* Feature: no other modes after this query */
+                                *(curr+1) = '\0';
+				for (lp = chptr->members; lp; lp = lp->next)
+					if (lp->flags & CHFL_UNIQOP)
+					    {
+						sendto_one(sptr,
+							   ":%s MODE %s +O %s",
+							   ME, chptr->chname,
+						   lp->value.cptr->name);
+						break;
+					    }
+				if (!lp)
+					sendto_one(sptr, ":%s MODE %s -O", ME,
+						   chptr->chname);
+				break;
+			    }
+			/*
+			 * is this really ever used ?
+			 * or do ^G & NJOIN do the trick?
+			 */
+			if (*chptr->chname != '-' || whatt == MODE_DEL ||
+			    !IsServer(sptr))
+			    {
+				*penalty += 1;
+				--parc;
+				parv++;
+				break;
+			    }
 		case 'o' :
 		case 'v' :
 			*penalty += 1;
@@ -934,19 +978,12 @@ char	*parv[], *mbuf, *pbuf;
 			if (who == cptr && whatt == MODE_ADD && *curr == 'o')
 				break;
 
-			/*
-			 * to stop problems, don't allow +v and +o to mix
-			 * into the one message if from a client.
-			 */
-			if (!fm)
-				fm = *curr;
-			else if (MyClient(sptr) && (*curr != fm))
-				break;
 			if (whatt == MODE_ADD)
 			    {
 				lp = &chops[opcnt++];
 				lp->value.cptr = who;
-				lp->flags = (*curr == 'o') ? MODE_CHANOP:
+				lp->flags = (*curr == 'O') ? MODE_UNIQOP:
+			    			(*curr == 'o') ? MODE_CHANOP:
 								  MODE_VOICE;
 				lp->flags |= MODE_ADD;
 			    }
@@ -1008,10 +1045,6 @@ char	*parv[], *mbuf, *pbuf;
 #ifndef V29PlusOnly
 			    if (MyClient(sptr) || opcnt >= MAXMODEPARAMS + 1)
 #endif
-				break;
-			if (!fm)
-				fm = *curr;
-			else if (MyClient(sptr) && (*curr != fm))
 				break;
 			if (whatt == MODE_ADD)
 			    {
@@ -1214,23 +1247,36 @@ char	*parv[], *mbuf, *pbuf;
 			for (ip = flags; *ip; ip += 2)
 				if (*(ip+1) == *curr)
 					break;
-			
-			if (*ip && !(*ip == MODE_ANONYMOUS && whatt == MODE_ADD
-				     && !IsServer(sptr)
-				     && *chptr->chname == '#'))
+
+			if (*ip)
 			    {
-				if (whatt == MODE_ADD)
+				if (*ip == MODE_ANONYMOUS &&
+				    whatt == MODE_DEL && *chptr->chname == '-')
+					sendto_one(sptr,
+					   err_str(ERR_CHANOPRIVSNEEDED,
+						   parv[0]), chptr->chname);
+				else if (!(*ip == MODE_ANONYMOUS &&
+					   whatt == MODE_ADD &&
+					   !IsServer(sptr) &&
+					   *chptr->chname == '#'))
 				    {
-					if (*ip == MODE_PRIVATE)
-						new &= ~MODE_SECRET;
-					else if (*ip == MODE_SECRET)
-						new &= ~MODE_PRIVATE;
-					new |= *ip;
+					if (whatt == MODE_ADD)
+					    {
+						if (*ip == MODE_PRIVATE)
+							new &= ~MODE_SECRET;
+						else if (*ip == MODE_SECRET)
+							new &= ~MODE_PRIVATE;
+						new |= *ip;
+					    }
+					else
+						new &= ~*ip;
+					count++;
+					*penalty += 2;
 				    }
 				else
-					new &= ~*ip;
-				count++;
-				*penalty += 2;
+					sendto_one(sptr,
+					   err_str(ERR_CHANOPRIVSNEEDED,
+						   parv[0]), chptr->chname);
 			    }
 			else if (!IsServer(cptr))
 				sendto_one(cptr, err_str(ERR_UNKNOWNMODE,
@@ -1251,7 +1297,7 @@ char	*parv[], *mbuf, *pbuf;
 		 * Make sure old and new (+e/+I) modes won't get mixed
 		 * together on the same line
 		 */
-		if (curr && *curr != '-' && *curr != '+')
+		if (MyClient(sptr) && curr && *curr != '-' && *curr != '+')
 			if (*curr == 'e' || *curr == 'I')
 			    {
 				if (compat == 0)
@@ -1302,7 +1348,7 @@ char	*parv[], *mbuf, *pbuf;
 	    }
 
 	/*
-	 * Reconstruct "+bkov" chain.
+	 * Reconstruct "+beIkOov" chain.
 	 */
 	if (opcnt)
 	    {
@@ -1339,6 +1385,10 @@ char	*parv[], *mbuf, *pbuf;
 			{
 			case MODE_CHANOP :
 				c = 'o';
+				cp = lp->value.cptr->name;
+				break;
+			case MODE_UNIQOP :
+				c = 'O';
 				cp = lp->value.cptr->name;
 				break;
 			case MODE_VOICE :
@@ -1420,6 +1470,7 @@ char	*parv[], *mbuf, *pbuf;
 					break;
 				mode->limit = nusers;
 				break;
+			case MODE_UNIQOP :
 			case MODE_CHANOP :
 			case MODE_VOICE :
 				*mbuf++ = c;
@@ -1489,7 +1540,8 @@ char	*key;
 	Link	*lp, *banned;
 	int	ckinvite = 0;
 
-	if (chptr->users == 0 && (bootopt & BOOT_PROT) && chptr->history != 0)
+	if (chptr->users == 0 && (bootopt & BOOT_PROT) && 
+	    chptr->history != 0 && *chptr->chname != '-')
 		return (timeofday > chptr->history) ? 0 : ERR_UNAVAILRESOURCE;
 	if (banned = match_modeid(CHFL_BAN, sptr, chptr))
 		if (match_modeid(CHFL_EXCEPTION, sptr, chptr))
@@ -1788,7 +1840,69 @@ char	*parv[];
 			(void)strcpy(jbuf, "0");
 			continue;
 		    }
-		else if (!IsChannelName(name))
+		if (*name == '-')
+		    {
+			chptr = NULL;
+			/*
+			** -channels are special:
+			**	-#channel is supposed to be a new channel,
+			**		and requires a unique name to be built.
+			**	-channel cannot be created, and must already
+			**		exist.
+			*/
+			if (*(name+1) == '\0' ||
+			    (*(name+1) == '#' && *(name+2) == '\0'))
+			    {
+				if (MyClient(sptr))
+					sendto_one(sptr,
+						   err_str(ERR_NOSUCHCHANNEL,
+							   parv[0]), name);
+				continue;
+			    }
+			if (*name == '-' && *(name+1) == '#')
+			    {
+				if (get_channel(sptr, name+2, 0))
+				    {
+					sendto_one(sptr,
+						   err_str(ERR_TOOMANYTARGETS,
+							   parv[0]),
+						   "Duplicate", name,
+						   "Join aborted.");
+					continue;
+				    }
+				if (check_chid(name+2))
+				    {
+					/*
+					 * This is a bit wrong: if a channel
+					 * rightfully ceases to exist, it
+					 * can still be *locked* for up to
+					 * 2*CHIDNB^3 seconds (~24h)
+					 * Is it a reasonnable price to pay to
+					 * ensure shortname uniqueness? -kalt
+					 */
+					sendto_one(sptr,
+                                                   err_str(ERR_UNAVAILRESOURCE,
+							   parv[0]), name);
+					continue;
+				    }
+				sprintf(buf, "-%.*s%s", CHIDLEN, get_chid(),
+					name+2);
+				name = buf;
+			    }
+			else if (!get_channel(sptr, name, 0) &&
+				 !(chptr = get_channel(sptr, name+1, 0)))
+			    {
+				if (MyClient(sptr))
+					sendto_one(sptr,
+						   err_str(ERR_NOSUCHCHANNEL,
+							   parv[0]), name);
+				continue;
+			    }
+			else if (chptr)
+				name = chptr->chname;
+		    }
+		if (!IsChannelName(name) ||
+		    (*name == '-' && IsChannelName(name+1)))
 		    {
 			if (MyClient(sptr))
 				sendto_one(sptr, err_str(ERR_NOSUCHCHANNEL,
@@ -1865,9 +1979,13 @@ char	*parv[];
 		flags = 0;
 		chop[0] = '\0';
 		if (MyConnect(sptr) && UseModes(name) &&
-		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users)
+		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users &&
+		    !(chptr->history && *chptr->chname == '-'))
 		    {
-			strcpy(chop, "\007o");
+			if (*name == '-')
+				strcpy(chop, "\007O");
+			else
+				strcpy(chop, "\007o");
 			s = chop+1; /* tricky */
 		    }
 		/*
@@ -1875,7 +1993,14 @@ char	*parv[];
 		*/
 		if (s)
 		    {
-			if (*s == 'o')
+			if (*s == 'O')
+				/*
+				 * there can never be another mode here,
+				 * because we use NJOIN for netjoins.
+				 * here, it *must* be a channel creation. -kalt
+				 */
+				flags |= CHFL_UNIQOP;
+			else if (*s == 'o')
 			    {
 				flags |= CHFL_CHANOP;
 				if (*(s+1) == 'v')
@@ -1889,14 +2014,15 @@ char	*parv[];
 		** notify all users on the channel
 		*/
 #ifndef MIRC_KLUDGE
+		/* This part of the code should be removed in a near future */
 		if (s)
 			*--s = '\007';
-		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s%s",
-						parv[0], name, chop);
+		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
+				       parv[0], name /*, chop*/);
 #else
 		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
 						parv[0], name);
-		if (s && chptr->users == 1)
+		if (s && chptr->users != 1)
 		    {
 			/* no need if user is creating the channel */
 			sendto_channel_butserv(chptr, sptr,
@@ -1925,7 +2051,7 @@ char	*parv[];
 		/*
 	        ** notify other servers
 		*/
-		if (index(name, ':'))
+		if (index(name, ':') || *chptr->chname == '-') /* compat */
 			sendto_match_servs(chptr, cptr, ":%s JOIN :%s%s",
 					   parv[0], name, chop);
 		else if (*chptr->chname != '&')
@@ -1972,8 +2098,18 @@ char	*parv[];
 		mbuf[0] = '\0';
 		if (*target == '@')
 		    {
-			strcpy(mbuf, "\007o");
-			chop = CHFL_CHANOP;
+			if (*(target+1) == '@')
+			    {
+				/* actually never sends in a JOIN ^G */
+				strcpy(mbuf, "\007O");
+				chop = CHFL_UNIQOP;
+				target++;
+			    }
+			else
+			    {
+				strcpy(mbuf, "\007o");
+				chop = CHFL_CHANOP;
+			    }
 			if (*(target+1) == '+')
 			    {
 				strcat(mbuf, "v");
@@ -2015,8 +2151,9 @@ char	*parv[];
 			*(--target) = ',';
 		strcat(nbuf, target);
 		/* send 2.9 style join to other servers */
-		sendto_serv_notv(cptr, SV_NJOIN, ":%s JOIN %s%s", name,
-				 parv[1], mbuf);
+		if (*chptr->chname != '-')
+			sendto_serv_notv(cptr, SV_NJOIN, ":%s JOIN %s%s", name,
+					 parv[1], mbuf);
 		/* send join to local users on channel */
 		sendto_channel_butserv(chptr, &me, ":%s JOIN %s", name,
 				       parv[1]);
@@ -2128,14 +2265,16 @@ char	*parv[];
 		/*
 		**  Remove user from the old channel (if any)
 		*/
-		if (!index(name, ':')) {	/* channel:*.mask */
+		if (!index(name, ':') && (*chptr->chname != '-'))
+		    {	/* channel:*.mask */
 			if (*name != '&')
 			    {
 				if (*buf)
 					(void)strcat(buf, ",");
 				(void)strcat(buf, name);
 			    }
-		} else
+		    }
+		else
 			sendto_match_servs(chptr, cptr, PartFmt,
 				   	   parv[0], name, comment);
 		sendto_channel_butserv(chptr, sptr, PartFmt,
@@ -2227,6 +2366,7 @@ char	*parv[];
 						name, who->name, comment);
 				/* Don't send &local &kicks out */
 				if (*chptr->chname != '&' &&
+				    *chptr->chname != '-' &&
 				    index(chptr->chname, ':') == NULL) {
 					if (*nickbuf)
 						(void)strcat(nickbuf, ",");
@@ -2571,7 +2711,7 @@ char	*parv[];
 		    {
 			if ((lp = find_user_link(chptr->members, sptr)))
 			    {
-				if (lp->flags & CHFL_CHANOP)
+				if (lp->flags & (CHFL_UNIQOP|CHFL_CHANOP))
 					(void)strcat(buf, "@");
 				else if (lp->flags & CHFL_VOICE)
 					(void)strcat(buf, "+");
@@ -2588,7 +2728,7 @@ char	*parv[];
 			c2ptr = lp->value.cptr;
 			if (IsInvisible(c2ptr) && !IsMember(sptr,chptr))
 				continue;
-			if (lp->flags & CHFL_CHANOP)
+			if (lp->flags & (CHFL_UNIQOP|CHFL_CHANOP))
 			    {
 				(void)strcat(buf, "@");
 				idx++;
@@ -2710,6 +2850,9 @@ aClient	*cptr, *user;
 		chptr = lp->value.chptr;
 		if (*chptr->chname == '&')
 			continue;
+		if (*chptr->chname == '-' && !(cptr->serv->version & SV_NCHAN))
+			/* in reality, testing SV_NCHAN here is pointless */
+			continue;
 		if ((mask = index(chptr->chname, ':')))
 			if (match(++mask, cptr->name))
 				continue;
@@ -2731,9 +2874,11 @@ aClient	*cptr, *user;
 		    }
 		(void)strcpy(buf + len, chptr->chname);
 		len += clen;
-		if (lp->flags & (CHFL_CHANOP|CHFL_VOICE))
+		if (lp->flags & (CHFL_UNIQOP|CHFL_CHANOP|CHFL_VOICE))
 		    {
 			buf[len++] = '\007';
+			if (lp->flags & CHFL_UNIQOP) /*this should be useless*/
+				buf[len++] = 'O';
 			if (lp->flags & CHFL_CHANOP)
 				buf[len++] = 'o';
 			if (lp->flags & CHFL_VOICE)
@@ -2772,6 +2917,8 @@ time_t	now;
 #endif
 #define CHECKFREQ	300
 #define SPLITBONUS	(CHECKFREQ - 50)
+
+	collect_chid();
 
 	while (chptr)
 	    {
@@ -2836,7 +2983,11 @@ time_t	now;
 			istat.is_hchan--;
 			istat.is_hchanmem -= sizeof(aChannel) 
 				+ strlen(del_ch->chname);
-			MyFree((char *)del_ch);
+			if (*del_ch->chname == '-' &&
+			    close_chid(del_ch->chname+1))
+				cache_chid(del_ch);
+			else
+				MyFree((char *)del_ch);
 		    }
 		else
 			chptr = chptr->nextch;

@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.6 1998/02/07 14:39:59 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.7 1998/05/05 23:30:18 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -111,6 +111,8 @@ int	*store;
 	Reg	int	i = 30;
 	Reg	u_int	hash = 5;
 
+	if (*name == '-')
+		name += 1 + CHIDLEN;
 	for (; (ch = *name) && --i; name++)
 	{
 		hash <<= 1;
@@ -597,6 +599,9 @@ aClient *cptr;
 
 /*
  * hash_find_channel
+ *
+ * If the name doesn't begin with #, or & or -, then we're looking for
+ * -????name instead of a real match.
  */
 aChannel	*hash_find_channel(name, chptr)
 char	*name;
@@ -604,13 +609,20 @@ aChannel *chptr;
 {
 	Reg	aChannel	*tmp, *prv = NULL;
 	Reg	aHashEntry	*tmp3;
-	u_int	hashv, hv;
+	u_int	hashv, hv, exact;
 
 	hashv = hash_channel_name(name, &hv);
 	tmp3 = &channelTable[hashv];
 
+	if (IsChannelName(name))
+		exact = 1;
+	else
+		exact = 0;
 	for (tmp = (aChannel *)tmp3->list; tmp; prv = tmp, tmp = tmp->hnextch)
-		if (hv == tmp->hashv && mycmp(name, tmp->chname) == 0)
+		if (hv == tmp->hashv &&
+		    ((exact == 1 && mycmp(name, tmp->chname) == 0) ||
+		     (exact == 0 && *tmp->chname == '-' &&
+		      mycmp(name, tmp->chname + CHIDLEN + 1) == 0)))
 		    {
 			chhits++;
 			if (prv)
@@ -892,3 +904,5 @@ char	*parv[];
 	return 2;
 #endif
 }
+
+

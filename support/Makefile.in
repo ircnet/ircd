@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.19 1998/04/30 12:40:48 kalt Exp $
+#*   $Id: Makefile.in,v 1.20 1998/05/05 23:30:28 kalt Exp $
 #*
 #*/
 
@@ -79,7 +79,7 @@ CLIENT = irc
 SERVER_COMMON_OBJS = bsd.o dbuf.o packet.o send.o match.o parse.o \
                      support.o
 SERVER_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
-              s_bsd.o s_conf.o s_debug.o s_err.o s_misc.o s_numeric.o \
+              s_bsd.o s_conf.o s_debug.o s_err.o s_id.o s_misc.o s_numeric.o \
               s_serv.o s_service.o s_user.o s_zip.o whowas.o \
               res_init.o res_comp.o res_mkquery.o
 SERVER = ircd
@@ -266,6 +266,9 @@ s_debug.o: ../ircd/s_debug.c setup.h config.h
 
 s_err.o: ../ircd/s_err.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_err.c
+
+s_id.o: ../ircd/s_id.c setup.h config.h
+	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_id.c
 
 s_misc.o: ../ircd/s_misc.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_misc.c
