@@ -1,14 +1,23 @@
-# @(#)$Id: RELEASE_NOTES,v 1.32 1999/03/12 00:10:05 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.33 1999/06/21 02:56:53 kalt Exp $
 
 This is a development version of the IRC software.
 
 ===============================================================================
 
 New features in 2.10.3:
+	* new options for iauth.conf to better control iauth behaviour
 	* iauth now supports dynamically shared modules.
+	* socks module now checks for both v4 and v5 of the SOCKS protocol.
+	* iauth has a new module: LHEx, see ftp://ftp.irc.org/irc/server/LHEx
 
 Important changes in 2.10.3 (since 2.10.2):
 	* default PATHs have changed, see INSTALL file and Makefile.
+	* V line code was fixed, and format slightly changed again.
+
+------
+
+Because of the many changes concerning iauth, it is recommended that this new
+version of the iauth program not be used with older version of the IRC daemon.
 
 ===============================================================================
 

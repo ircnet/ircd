@@ -51,7 +51,7 @@ cat >version.c <<!SUB!THIS!
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.7 1998/08/08 00:21:12 kalt Exp $";
+static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.8 1999/06/21 02:56:54 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -83,6 +83,7 @@ char *infotext[] =
 	"",
 	"Thanks to the following people for help with preparing 2.10",
 	"",
+	"Q            Kurt Roeckx              Q@ping.be",
 	"Core         Magnus Tjernstrom        d92-mtm@ludd.luth.se",
 	"",
 	"Those who helped in prior versions and continue to be helpful:",

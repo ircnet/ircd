@@ -1,3 +1,35 @@
+1999-06-20  Christophe Kalt
+
+	* mod_socks: added code to allow checks for v5 as well as v4,
+	depending on configuration (from Piotr Kucharski).
+
+	* configure.in, ircd.c/ircd_writetune(), s_serv.c/m_rehash(): use
+	basename, and check if it needs libgen.
+
+	* channel.c/m_njoin(): simple optimization resulting from change
+	to sendto_match_servs_notv() below.
+
+	* send_ext.h, send.c: sendto_serv_{not,}v and
+	sendto_match_servs_{not,}v now return an integer.
+
+1999-06-16  Christophe Kalt
+
+	* iauth.c/main(): send version to ircd upon startup.
+
+	* mod_rfc931.c/rfc931_work(): removed checks on weird chars, let
+	ircd deal with this.
+
+	* s_auth.c:
+		* start_auth(): abort if getpeername() fails (problem
+		reported by Wolfgang Scherer).
+		* added set_clean_username(), used in read_iauth() and
+		read_authports().
+		* read_iauth(): added o message (a->i).
+		* read_iauth(): added V message (a->i).
+
+	* struct_def.h, s_serv.c: added SV_OLDSQUIT, and made m_squit()
+	smarter (ugh, it's a kludge).
+
 1999-06-07  Christophe Kalt
 
 	* s_user.c:
