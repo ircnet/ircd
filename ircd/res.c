@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.11 1997/09/03 18:20:18 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.12 1997/10/13 17:37:11 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -516,7 +516,7 @@ HEADER	*hptr;
 	alias = hp->h_aliases;
 	while (*alias)
 		alias++;
-#ifdef	SVR4		/* brain damaged compiler (Solaris2) it seems */
+#if SOLARIS_2 && !defined(__GNUC__) /* brain damaged compiler it seems */
 	for (; hptr->qdcount > 0; hptr->qdcount--)
 #else
 	while (hptr->qdcount-- > 0)

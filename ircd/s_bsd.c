@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.18 1997/09/12 02:09:32 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.19 1997/10/13 17:37:12 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1180,12 +1180,12 @@ aClient	*cptr;
 		report_error("setsockopt(SO_REUSEADDR) %s:%s", cptr);
 #endif
 #if  defined(SO_DEBUG) && defined(DEBUGMODE) && 0
-/* Solaris with SO_DEBUG writes to syslog by default */
-#if !defined(SVR4) || defined(USE_SYSLOG)
+/* Solaris 2.x with SO_DEBUG writes to syslog by default */
+#if ! SOLARIS_2 || defined(USE_SYSLOG)
 	opt = 1;
 	if (SETSOCKOPT(fd, SOL_SOCKET, SO_DEBUG, &opt, opt) < 0)
 		report_error("setsockopt(SO_DEBUG) %s:%s", cptr);
-#endif /* SVR4 */
+#endif /* SOLARIS_2 */
 #endif
 #ifdef	SO_USELOOPBACK
 	opt = 1;
