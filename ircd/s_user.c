@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.142 2002/11/22 21:19:26 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.143 2002/11/25 21:40:49 jv Exp $";
 #endif
 
 #include "os.h"
@@ -800,6 +800,15 @@ badparamcountkills:
 		else
 			user = host = "";
 	}
+	
+	/* Special case - user changing his nick to UID */
+	if (MyPerson(sptr) && ((nick[0] == '0' && nick[1] == '\0') ||
+		!mycmp(nick, sptr->user->uid)))
+	{
+		strncpyzt(nick, sptr->user->uid, UIDLEN + 1);
+		goto nickkilldone;
+	}
+	
 	/*
 	 * if do_nick_name() returns a null name OR if the server sent a nick
 	 * name and do_nick_name() changed it in some way (due to rules of nick
