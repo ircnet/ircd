@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.43 2004/06/24 17:34:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.44 2004/08/31 13:33:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -321,6 +321,10 @@ void	send_defines(aClient *cptr, char *nick)
 	sendto_one(cptr, ":%s %d %s :AC:%s SS:%d SU:%d", ME, RPL_STATSDEFINE,
 		   nick, (iconf.aconnect == 1) ? "ON" : "OFF",
 		   iconf.split_minservers, iconf.split_minusers);
+#ifdef CLIENTS_CHANNEL
+	sendto_one(cptr, ":%s %d %s :CCL:0x%X", ME, RPL_STATSDEFINE, nick,
+		CLIENTS_CHANNEL_LEVEL);
+#endif
 }
 
 void	count_memory(aClient *cptr, char *nick, int debug)
