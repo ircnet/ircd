@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.23 1997/11/13 02:02:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.24 1997/12/17 14:31:38 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1532,23 +1532,50 @@ find_denied(name, class)
     char *name;
     int class;
 {
-    aServer	*asptr;
     aConfItem	*aconf;
 
+    sendto_flag(SCH_DEBUG, "find_denied(%s, %d)", name, class);
     for (aconf = conf; aconf; aconf = aconf->next)
 	{
 	    if (aconf->status != CONF_DENY)
 		    continue;
 	    if (!aconf->name)
 		    continue;
-	    if (match(aconf->name, name))
+	    if (match(aconf->name, name) && aconf->port != class)
 		    continue;
-	    for (asptr = svrtop; asptr; asptr = asptr->nexts)
+	    if (isdigit(*aconf->passwd))
 		{
-		    if (aconf->port == class)
-			    return aconf;
-		    if (aconf->host && !match(aconf->host, asptr->bcptr->name))
+		    aConfItem	*aconf2;
+		    int		ck = atoi(aconf->passwd);
+
+		    for (aconf2 = conf; aconf2; aconf2 = aconf2->next)
+			{
+			    if (aconf2->status != CONF_NOCONNECT_SERVER)
+				    continue;
+			    if (!aconf2->class || ConfClass(aconf2) != ck)
+				    continue;
+			    if (find_client(aconf2->host, NULL))
+				{
+				    sendto_flag(SCH_DEBUG,"class match: %d %s",
+						ck, aconf2->host);
+				    return aconf2;
+				}
+			}
+		}
+	    if (aconf->host)
+		{
+		    aServer	*asptr;
+
+		    for (asptr = svrtop; asptr; asptr = asptr->nexts)
+			    if (aconf->host &&
+				!match(aconf->host, asptr->bcptr->name))
+				{
+				    sendto_flag(SCH_DEBUG,
+						"server match(%s,%s)",
+                                                aconf->host,
+						asptr->bcptr->name);
 				    return aconf;
+				}
 		}
 	}
     return NULL;
