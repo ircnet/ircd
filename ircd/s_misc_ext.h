@@ -57,4 +57,6 @@ EXTERN void tstats (aClient *cptr, char *name);
 EXTERN void read_motd (char *filename);
 #endif /* CACHED_MOTD */
 EXTERN void check_split(void);
+EXTERN int myrand(void);
+EXTERN void mysrand(unsigned int seed);
 #undef EXTERN
