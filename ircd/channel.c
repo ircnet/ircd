@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.133 2002/11/11 18:41:45 jv Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.134 2002/11/22 21:19:25 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2390,8 +2390,21 @@ char	*parv[];
 		    {
 			del_invite(sptr, chptr);
 			if (chptr->topic[0] != '\0')
+			{
+#ifdef TOPIC_WHO_TIME
+				if (chptr->topic_t > 0)
+				{
+					sendto_one(sptr, replies[RPL_TOPIC_WHO_TIME],
+						ME, BadTo(parv[0]),
+						name, IsAnonymous(chptr) ?
+						"anonymous!anonymous@anomyous" :
+						chptr->topic_nuh,
+						chptr->topic_t);
+				}
+#endif
 				sendto_one(sptr, replies[RPL_TOPIC], ME, BadTo(parv[0]),
 					   name, chptr->topic);
+			}
 
 			names_channel(cptr, sptr, parv[0], chptr, 1);
 			if (IsAnonymous(chptr) && !IsQuiet(chptr))
@@ -2887,13 +2900,28 @@ char	*parv[];
 				sendto_one(sptr, replies[RPL_NOTOPIC], ME, BadTo(parv[0]),
 					   chptr->chname);
 			else
+			{
 				sendto_one(sptr, replies[RPL_TOPIC], ME, BadTo(parv[0]),
 					   chptr->chname, chptr->topic);
+#ifdef TOPIC_WHO_TIME
+				if (chptr->topic_t > 0)
+				sendto_one(sptr, replies[RPL_TOPIC_WHO_TIME],
+					ME, BadTo(parv[0]), chptr->chname,
+					IsAnonymous(chptr) ?
+					"anonymous!anonymous@anonymous" :
+					chptr->topic_nuh, chptr->topic_t);
+#endif
+			}
 		    } 
 		else if ((chptr->mode.mode & MODE_TOPICLIMIT) == 0 ||
 			 is_chan_op(sptr, chptr))
 		    {	/* setting a topic */
 			strncpyzt(chptr->topic, topic, sizeof(chptr->topic));
+#ifdef TOPIC_WHO_TIME
+			sprintf(chptr->topic_nuh, "%s!%s@%s", sptr->name,
+				sptr->user->username, sptr->user->host);
+			chptr->topic_t = timeofday;
+#endif
 			sendto_match_servs(chptr, cptr,":%s TOPIC %s :%s",
 					   parv[0], chptr->chname,
 					   chptr->topic);

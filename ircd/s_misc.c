@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.51 2002/10/09 21:23:20 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.52 2002/11/22 21:19:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -500,6 +500,17 @@ char	*comment;	/* Reason for the exit */
 			else
 				istat.is_unknown--;
 
+			if (istat.is_myclnt % CLCHNO == 0 &&
+				istat.is_myclnt != istat.is_l_myclnt) {
+				sendto_flag(SCH_NOTICE,
+					"Local %screase from %d to %d clients "
+					"in %d seconds",
+					istat.is_myclnt>istat.is_l_myclnt?"in":"de",
+					istat.is_l_myclnt, istat.is_myclnt,
+					timeofday - istat.is_l_myclnt_t);
+				istat.is_l_myclnt_t = timeofday;
+				istat.is_l_myclnt = istat.is_myclnt;
+			}
 		      if (cptr != NULL && sptr != cptr)
 			sendto_one(sptr, "ERROR :Closing Link: %s %s (%s)",
 				   get_client_name(sptr,FALSE),
@@ -906,6 +917,9 @@ void	initstats()
 	bzero((char *)&istat, sizeof(istat));
 	istat.is_serv = 1;
 	istat.is_remc = 1;	/* don't ask me why, I forgot. */
+	istat.is_m_users_t = timeofday;
+	istat.is_m_myclnt_t = timeofday;
+	istat.is_l_myclnt_t = timeofday;
 	bzero((char *)&ircst, sizeof(ircst));
 }
 

@@ -512,6 +512,15 @@
 #define LIST_ALIS_NOTE "Usage of /list for listing all channels is " \
 		       "deprecated. Please use \"/squery alis help\" instead."
 
+/* Define this to see when a channel topic was set and who it was set by.
+** Warning: eats memory (around 5MB)
+*/
+#define TOPIC_WHO_TIME 1
+
+/* Define this to see local clients signon time
+*/
+#define WHOIS_SIGNON_TIME 1
+
 /* ------------------------- END CONFIGURATION SECTION -------------------- */
 #ifndef ENABLE_SUMMON
 #  undef LEAST_IDLE
@@ -590,3 +599,23 @@
 #define	RESTRICT_HOSTNAMES
 
 #define	RESTRICT_USERNAMES
+
+/*
+** CLCHNO defines changes in local clients count, which are shown
+** as "Local in/de-crease"
+*/
+# if (MAXCONNECTIONS <= 200)
+  #define CLCHNO 10
+# else
+  # if (MAXCONNECTIONS <= 1000)
+     #define CLCHNO 50
+  # else
+     #define CLCHNO 100
+  # endif
+# endif
+
+/*
+** CLCHSEC defines minimum time in seconds between two consecutive
+** "New highest local/global clients count" messages
+*/
+#define CLCHSEC 30

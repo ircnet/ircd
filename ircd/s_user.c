@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.141 2002/09/28 21:04:26 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.142 2002/11/22 21:19:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -602,6 +602,16 @@ char	*nick, *username;
 		user->servp->usercnt[0]++;
 		istat.is_user[0]++;
 	}
+	if ((istat.is_user[1] + istat.is_user[0]) > istat.is_m_users) {
+
+		istat.is_m_users = istat.is_user[1] + istat.is_user[0];
+		if (timeofday - istat.is_m_users_t >= CLCHSEC) {
+			sendto_flag(SCH_NOTICE, 
+				"New highest global client connection: %d",
+				istat.is_m_users);
+			istat.is_m_users_t = timeofday;
+		}
+	}
 
 	if (MyConnect(sptr))
 	    {
@@ -609,6 +619,27 @@ char	*nick, *username;
 		
 		istat.is_unknown--;
 		istat.is_myclnt++;
+		if (istat.is_myclnt > istat.is_m_myclnt) {
+
+			istat.is_m_myclnt = istat.is_myclnt;
+			if (timeofday - istat.is_m_myclnt_t >= CLCHSEC) {
+				sendto_flag(SCH_NOTICE,
+					"New highest local client "
+					"connection: %d", istat.is_m_myclnt);
+				istat.is_m_myclnt_t = timeofday;
+			}
+		}
+		if (istat.is_myclnt % CLCHNO == 0 &&
+			istat.is_myclnt != istat.is_l_myclnt) {
+			sendto_flag(SCH_NOTICE,
+				"Local %screase from %d to %d clients "
+				"in %d seconds",
+				istat.is_myclnt>istat.is_l_myclnt?"in":"de",
+				istat.is_l_myclnt, istat.is_myclnt,
+				timeofday - istat.is_l_myclnt_t);
+			istat.is_l_myclnt_t = timeofday;
+			istat.is_l_myclnt = istat.is_myclnt;
+		}
 		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
 		strcpy(sptr->user->uid, next_uid());
 		add_to_uid_hash_table(sptr->user->uid, sptr);
@@ -1938,7 +1969,11 @@ aClient	*sptr, *acptr;
 
 	if (acptr->user && MyConnect(acptr))
 		sendto_one(sptr, replies[RPL_WHOISIDLE], ME, BadTo(sptr->name),
-			   name, timeofday - user->last);
+			   name, timeofday - user->last
+#ifdef WHOIS_SIGNON_TIME
+			, acptr->firsttime
+#endif
+			);
 }
 
 /*

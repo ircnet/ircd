@@ -1,3 +1,15 @@
+2002-11-22  Piotr Kucharski
+
+	* numeric_def.h, channel.c/m_join(),m_topic(), s_err.c, config.h.dist,
+	  struct_def.h: who and when set the topic.
+	* s_err.c, s_user.c/send_whois(), config.h.dist: signon time in whois.
+	* numeric_def.h, s_serv.c/m_server_estab(),m_lusers(), struct_def.h,
+	  s_err.c: info (numerics 265 and 266) and notices about max local/global
+	  client count.
+	* s_service.c, s_serv.c, s_user.c: keep stats about max client values.
+	* struct_def.h, s_misc.c/initstats(),exit_client(), config.h.dist,
+	  s_user.c/register_user(): notice on in/de-creasing local clients count.
+
 2002-11-11  Jakub Vlasek
 	
 	* s_err.c: Changed text of ERR_TOOMANYMATCHES.

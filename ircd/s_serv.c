@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.113 2002/09/13 00:35:18 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.114 2002/11/22 21:19:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -589,6 +589,8 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	acptr->serv->maskedby = sptr->serv->maskedby;
 	SetServer(acptr);
 	istat.is_masked++;
+	if (istat.is_serv > istat.is_m_serv)
+		istat.is_m_serv = istat.is_serv;
 
 	/* We add this server to client list, but *only* to SID hash. */
 	add_client_to_list(acptr);
@@ -1169,7 +1171,11 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	SetServer(cptr);
 	istat.is_unknown--;
 	istat.is_serv++;
+	if (istat.is_serv > istat.is_m_serv)
+		istat.is_m_serv = istat.is_serv;
 	istat.is_myserv++;
+	if (istat.is_myserv > istat.is_m_myserv)
+		istat.is_m_myserv = istat.is_myserv;
 	nextping = timeofday;
 	sendto_flag(SCH_NOTICE, "Link with %s established. (%X%s)", inpath,
 		    cptr->hopcount, (cptr->flags & FLAGS_ZIP) ? "z" : "");
@@ -2182,6 +2188,10 @@ char	*parv[];
 	
 	sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]), m_clients,
 		   m_services, m_servers);
+        sendto_one(sptr, replies[RPL_LOCALUSERS], ME, BadTo(parv[0]),
+			istat.is_myclnt, istat.is_m_myclnt);
+	sendto_one(sptr, replies[RPL_GLOBALUSERS], ME, BadTo(parv[0]),
+			c_count + i_count, istat.is_m_users);
 	return 2;
     }
 

@@ -235,6 +235,7 @@
 
 #define RPL_NOTOPIC          331
 #define RPL_TOPIC            332
+#define RPL_TOPIC_WHO_TIME   333
 
 #define RPL_INVITING         341
 #define	RPL_SUMMONING        342
@@ -320,11 +321,11 @@
 #define	RPL_STATSPING        246
 #define	RPL_STATSBLINE       247
 #define	RPL_STATSDEFINE      248
-#define	RPL_STATSDEBUG	     249
+#define	RPL_STATSDEBUG       249
 #define	RPL_STATSDLINE       250
 
 #define	RPL_LUSERCLIENT      251
-#define RPL_LUSEROP          252
+#define	RPL_LUSEROP          252
 #define	RPL_LUSERUNKNOWN     253
 #define	RPL_LUSERCHANNELS    254
 #define	RPL_LUSERME          255
@@ -337,3 +338,5 @@
 #define	RPL_TRACEEND         262
 #define	RPL_TRYAGAIN         263
 
+#define	RPL_LOCALUSERS       265
+#define	RPL_GLOBALUSERS      266
