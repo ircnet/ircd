@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.42 1999/07/02 23:40:22 q Exp $
+#*   $Id: Makefile.in,v 1.43 1999/07/11 22:18:48 kalt Exp $
 #*
 #*/
 
@@ -207,9 +207,9 @@ $(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 
 # stuff in contrib/
 
-$(IRCDWATCH): ircdwatch.o
+$(IRCDWATCH): ircdwatch.o clsupport.o
 	$(RM) $(IRCDWATCH)
-	$(CC) -o $(IRCDWATCH) ircdwatch.o
+	$(CC) -o $(IRCDWATCH) clsupport.o ircdwatch.o
 
 ircd-mkpasswd: mkpasswd.o
 	$(RM) ircd-mkpasswd
