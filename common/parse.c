@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.43 2002/04/16 20:44:51 jv Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.44 2002/06/03 04:10:38 jv Exp $";
 #endif
 
 #include "os.h"
@@ -294,20 +294,50 @@ int	*count;
 
 	*count = 0;
 	if (user)
-		for (c2ptr = client; c2ptr; c2ptr = c2ptr->next) 
-		    {
-			if (!MyClient(c2ptr)) /* implies mine and a user */
-				continue;
-			if ((!host || !match(host, c2ptr->user->host)) &&
-			     mycmp(user, c2ptr->user->username) == 0)
-			    {
-				(*count)++;
-				res = c2ptr;
-			    }
-		    }
+	{
+		if (host)
+		{
+			anUser *auptr;
+			for (auptr = hash_find_hostname(host, NULL); auptr;
+					auptr = auptr->hhnext)
+			{
+				if (MyConnect(auptr->bcptr)
+				    && !mycmp(user, auptr->username))
+				{
+					if (++(*count) > 1)
+					{
+						/* We already failed
+						 * - just return */
+						return res;
+					}
+					res = auptr->bcptr;
+				}
+			}
+		}
+		else
+		{
+			int i;
+			for (i = 0; i <= highest_fd; i++)
+			{
+				if (!(c2ptr = local[i])
+				      || !IsRegisteredUser(c2ptr))
+				{
+					continue;
+				}
+				if (!mycmp(user, c2ptr->user->username))
+				{
+					if (++(*count) > 1)
+					{
+					/* Already failed, just return */
+						return res;
+					}
+					res = c2ptr;
+				}
+			}
+	    }
+	}
 	return res;
     }
-
 /*
 **  Find server by name.
 **
