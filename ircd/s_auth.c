@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.38 1999/06/17 01:22:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.39 1999/06/17 12:14:09 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -45,7 +45,7 @@ static void
 set_clean_username(cptr)
 aClient *cptr;
 {
-	int i, dirty = 0;
+	int i = 0, dirty = 0;
 	char *s;
 
 	if (cptr->auth == NULL)
