@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.61 1998/09/09 12:25:45 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.62 1998/09/10 21:05:49 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2206,23 +2206,34 @@ char	*parv[];
 			if (*(target+1) == '@')
 			    {
 				/* actually never sends in a JOIN ^G */
-				strcpy(mbuf, "\007O");
-				chop = CHFL_UNIQOP;
-				target++;
+				if (*(target+2) == '+')
+				    {
+					strcpy(mbuf, "\007O");
+					chop = CHFL_UNIQOP|CHFL_VOICE;
+					name = target + 3;
+				    }
+				else
+				    {
+					strcpy(mbuf, "\007Ov");
+					chop = CHFL_UNIQOP;
+					name = target + 2;
+				    }
 			    }
 			else
 			    {
-				strcpy(mbuf, "\007o");
-				chop = CHFL_CHANOP;
+				if (*(target+1) == '+')
+				    {
+					strcpy(mbuf, "\007ov");
+					chop = CHFL_CHANOP|CHFL_VOICE;
+					name = target+2;
+				    }
+				else
+				    {
+					strcpy(mbuf, "\007o");
+					chop = CHFL_CHANOP;
+					name = target+1;
+				    }
 			    }
-			if (*(target+1) == '+')
-			    {
-				strcat(mbuf, "v");
-				chop |= CHFL_VOICE;
-				name = target+2;
-			    }
-			else
-				name = target+1;
 		    }
 		else if (*target == '+')
 		    {
