@@ -65,6 +65,8 @@ EXTERN int find_conf_flags __P((char *name, char *key, int stat));
 EXTERN int find_restrict __P((aClient *cptr));
 EXTERN void find_bounce __P((aClient *cptr, int class, int fd));
 EXTERN aConfItem *find_denied __P((char *name, int class));
+EXTERN char *iline_flags_to_string(long flags);
+EXTERN long iline_flags_parse(char *string);
 # ifdef	INET6
 EXTERN char *ipv6_convert __P((char *orig));
 # endif
