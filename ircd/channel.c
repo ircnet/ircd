@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.167 2004/01/02 15:33:40 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.168 2004/01/02 15:36:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2319,7 +2319,8 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		else
 			clean_channelname(name), s = NULL;
 
-		if (MyConnect(sptr) &&
+		chptr = get_channel(sptr, name, !CREATE);
+		if (MyConnect(sptr) && !(chptr && IsQuiet(chptr)) &&
 			sptr->user->joined >= MAXCHANNELSPERUSER)
 		{
 			sendto_one(sptr, replies[ERR_TOOMANYCHANNELS],
@@ -2336,7 +2337,8 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			return exit_client(sptr, sptr, &me, "Virus Carrier");
 		    }
 
-		chptr = get_channel(sptr, name, CREATE);
+		if (!chptr)
+			chptr = get_channel(sptr, name, CREATE);
 
 		if (IsMember(sptr, chptr))
 			continue;
