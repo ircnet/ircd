@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.25 1998/04/05 00:14:38 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.26 1998/05/25 19:35:03 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1021,6 +1021,11 @@ aClient *cptr;
 {
 	Reg	aConfItem *aconf;
 	Reg	int	i,j;
+#ifdef SO_LINGER
+	struct 	linger	sockling;
+
+	sockling.l_onoff = 0;
+#endif
 
 	if (IsServer(cptr))
 	    {
@@ -1088,7 +1093,16 @@ aClient *cptr;
 	    }
 
 	if (cptr->authfd >= 0)
+	    {
+#ifdef	SO_LINGER
+		if (cptr->exitc == EXITC_PING)
+			if (SETSOCKOPT(cptr->authfd, SOL_SOCKET, SO_LINGER,
+				       &sockling, sockling))
+				report_error("setsockopt(SO_LINGER) %s:%s",
+					     cptr);
+#endif
 		(void)close(cptr->authfd);
+	    }
 
 	if ((i = cptr->fd) >= 0)
 	    {
@@ -1105,7 +1119,16 @@ aClient *cptr;
 #endif
 		    }
 		else if (IsClient(cptr))
+		    {
+#ifdef	SO_LINGER
+			if (cptr->exitc == EXITC_PING)
+				if (SETSOCKOPT(i, SOL_SOCKET, SO_LINGER,
+					       &sockling, sockling))
+					report_error("setsockopt(SO_LINGER) %s:%s",
+						     cptr);
+#endif
 			del_fd(i, &fdaa);
+		    }
 		del_fd(i, &fdall);
 		local[i] = NULL;
 		(void)close(i);
