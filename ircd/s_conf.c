@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.50 2002/03/14 23:12:39 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.51 2002/04/23 20:37:02 jv Exp $";
 #endif
 
 #include "os.h"
@@ -838,18 +838,18 @@ int	sig;
 	close_listeners();
 
 	/*
-	 * flush out deleted I and P lines although still in use.
+	 * Flush *unused* config entries.
 	 */
 	for (tmp = &conf; (tmp2 = *tmp); )
-		if (!(tmp2->status & CONF_ILLEGAL))
+		if (!(tmp2->status & CONF_ILLEGAL) || tmp2->clients)
 			tmp = &tmp2->next;
 		else
-		    {
+		{
 			*tmp = tmp2->next;
 			tmp2->next = NULL;
-			if (!tmp2->clients)
-				free_conf(tmp2);
-		    }
+			free_conf(tmp2);
+		}
+	
 #ifdef CACHED_MOTD
 	read_motd(IRCDMOTD_PATH);
 #endif
