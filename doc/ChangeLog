@@ -1,3 +1,15 @@
+2002-07-06  Jakub Vlasek
+
+	* struct_def.h: added defines for I: line flags. Added ->flags to
+	  struct ConfItem (from Beeth).
+	* ircd.c/check_pings(),s_user.c/register_user(): added support for
+	  kline exemptions.
+	* s_conf.c,s_conf_ext.h  iline_flags_parse(), iline_flags_to_string()
+	  added.
+	* s_conf.c/initconf(),attach_Iline: added support for kline exemptions.
+	* s_err.c: Added string field to RPL_STATSILINE for iline flags.
+	* s_serv.c/show_configured_links(): Show iline flags.
+	
 2002-07-05  Piotr Kucharski
 
 	* s_serv.c/trace_one(): removed duplicated argument causing core.
