@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.72 2004/06/15 11:02:03 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.73 2004/06/19 10:08:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -743,9 +743,12 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	    mptr->handler[status] != m_ping && mptr->handler[status] != m_pong)
 #endif
 		from->user->last = timeofday;
-	Debug((DEBUG_DEBUG, "Function: %#x = %s parc %d parv %#x",
-		mptr->func, mptr->cmd, i, para));
-	if (mptr->minparams > 0 && (i <= mptr->minparams || para[i-1][0] == '\0'))
+	Debug((DEBUG_DEBUG, "Function(%d): %#x = %s parc %d parv %#x",
+		status, mptr->handler[status], mptr->cmd, i, para));
+	if (mptr->handler[status] != m_nop && mptr->handler[status] != m_nopriv
+		&& mptr->handler[status] != m_unreg &&
+		mptr->minparams > 0 && 
+		(i <= mptr->minparams || para[i-1][0] == '\0'))
 	{
 		if (status == STAT_SERVER)
 		{
