@@ -494,12 +494,16 @@
  * Split detection
  * This defines thresholds for turning on and off the split-mode,
  * where joins to new channels do not give chanop status.
- * Note that this should always be bigger than the max counts of
- * users/servers in your TLD (or some other close group).
+ * This should always be bigger than the max counts of
+ * users/servers in your TLD (or some other close group), so you
+ * get in split when you split. It is also a good practice to set
+ * it above half of what your whole network counts minimally, so
+ * that split in the half would be noticed on each side.
+ *
  * Defining to 0 disables entering split-mode.
  */
-#define SPLIT_USERS	40000
-#define SPLIT_SERVERS	20
+#define SPLIT_USERS	70000
+#define SPLIT_SERVERS	30
 
 /*
 ** Notice sent to connecting users if the server is in the split-mode.
@@ -540,7 +544,7 @@
 /*
 ** Allow only "proper" chars in username.
 ** Disallow '^', '~', '+', '=', '-' as a first char.
-** Require at least one alphanum and no more than one nonalphanum.
+** Require at least one alphanum and no more than two nonalphanum.
 */
 #define	RESTRICT_USERNAMES
 
