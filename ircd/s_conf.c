@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.85 2004/03/04 14:57:15 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.86 2004/03/04 21:05:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -245,103 +245,132 @@ badmask:
  * find the first (best) I line to attach.
  */
 
-/* make sure no functions called in here return this. */
-#define NORETURN	42
+#define UHConfMatch(x, y, z)	(match((x), (index((x), '@') ? (y) : (y)+(z))))
+
 int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 {
 	Reg	aConfItem	*aconf;
-	Reg	char	*hname;
-	Reg	int	i;
-	static	char	uhost[HOSTLEN+USERLEN+3];
-	static	char	fullname[HOSTLEN+1];
-	int	namematched;
-	int	retval = NORETURN;
+	char	*uhosts[MAXALIASES];
+	char	ipname[HOSTLEN+USERLEN+2];
+	int	ulen = strlen(cptr->username) + 1; /* for '@' */
+	int	i, hostnum;
+	int	retval = -2;
+
+	if (hp)
+	{
+		char	*hname;
+
+		/* start with h_name */
+		hname = hp->h_name;
+		/* and repeat with all h_aliases */
+		for (i = 0; hname; hname = hp->h_aliases[i++])
+		{
+			char	fullname[HOSTLEN+1];
+
+			/* If not for add_local_domain, I wouldn't need this
+			** fullname. Can't we add_local_domain somewhere in
+			** dns code? --B. */
+			strncpyzt(fullname, hname, sizeof(fullname));
+			add_local_domain(fullname, HOSTLEN - strlen(fullname));
+			Debug((DEBUG_DNS, "a_il: %s->%s", sockhost, fullname));
+
+			/* What if no memory available? Let it core. :-> */
+			uhosts[i] = (char *)MyMalloc(ulen+strlen(fullname)+1);
+
+			/* filling uhosts[] with user@hostname/hostalias; we
+			** later check either whole, or from after '@',
+			** depending on aconf. I could fill two arrays, one
+			** with username@, another without, but that'd be pure
+			** waste, wouldn't it? --B. */
+			sprintf(uhosts[i], "%s@%s", cptr->username, fullname);
+		}
+		uhosts[i] = NULL;
+	}
+	/* Fill in the ipname (like uhosts[] table), not to do it
+	** (over and over again) inside aconf loop. */
+	sprintf(ipname, "%s@%s", cptr->username, sockhost);
 
 	for (aconf = conf; aconf; aconf = aconf->next)
 	{
 		if ((aconf->status != CONF_CLIENT) &&
 		    (aconf->status != CONF_RCLIENT))
+		{
 			continue;
+		}
 		if (aconf->port && aconf->port != cptr->acpt->port)
+		{
 			continue;
+		}
 		/* That's weird. I managed to get aconf->name NULL by putting
 		** wrong I:line in the config (without all required fields).
 		** Don't know how to make aconf->host NULL. Anyway, this is an
-		** error! It should've been caught earlier. */
+		** error! It should've been caught earlier. --B. */
 		if (!aconf->host || !aconf->name)
-			continue;	/* Try another I:line. */
-
-		namematched = 0;
-		/* If anything in aconf->name, one of hp hnames must match. */
-		if (*aconf->name && hp)
 		{
-			for (i = 0, hname = hp->h_name; hname;
-			     hname = hp->h_aliases[i++])
+			/* Try another I:line. */
+			continue;
+		}
+
+		hostnum = 0;
+		/* If anything in aconf->name... */
+		if (*aconf->name)
+		{
+			int	namematched = 0;
+
+			if (hp)
 			{
-				strncpyzt(fullname, hname,
-					sizeof(fullname));
-				add_local_domain(fullname,
-						 HOSTLEN - strlen(fullname));
-				Debug((DEBUG_DNS, "a_il: %s->%s",
-				      sockhost, fullname));
-				if (index(aconf->name, '@'))
-				    {
-					(void)strcpy(uhost, cptr->username);
-					(void)strcat(uhost, "@");
-				    }
-				else
-					*uhost = '\0';
-				(void)strncat(uhost, fullname,
-					sizeof(uhost) - strlen(uhost));
-				if (!match(aconf->name, uhost))
+				/* We have some DNS of client, match
+				** each of aliases. */
+				for (; uhosts[hostnum]; hostnum++)
 				{
-					namematched = 1;
-					break;
+					if (!UHConfMatch(aconf->name,
+						uhosts[hostnum], ulen))
+					{
+						namematched = 1;
+						break;
+					}
 				}
 			}
-		}
-		/* Non empty aconf->name, but no dns to match. */
-		if (*aconf->name && !hp)
-		{
-			/* Give it the last chance. */
-			if (strcmp(aconf->name, "*") == 0 ||
-				strcmp(aconf->name, "*@*") == 0)
+			/* Note: here we could do else (!hp) and try to
+			** check if aconf->name is '*' or '*@*' and
+			** if so, allow the client. But not doing so
+			** gives us nice opportunity to distinguish
+			** between '*' in aconf->name (requires DNS)
+			** and empty aconf->name (matches any). --B. */
+
+			/* Require name to match before checking addr fields. */
+			if (namematched == 0)
 			{
-				namematched = 1;
+				/* Try another I:line. */
+				continue;
 			}
-			else
-			{
-				continue;	/* Try another I:line. */
-			}
-		}
-		/* Empty aconf->name, treat like '*', don't care about DNS. */
-		if (!*aconf->name)
-		{
-			namematched = 1;
-		}
-		/* Require name to match before checking addr fields. */
-		if (!namematched)
-			continue;	/* Try another I:line. */
+		} /* else empty aconf->name, match any hostname. */
 
 		if (*aconf->host)
 		{
-			if (index(aconf->host, '@'))
-			    {
-				strncpyzt(uhost, cptr->username, sizeof(uhost));
-				(void)strcat(uhost, "@");
-			    }
-			else
-				*uhost = '\0';
-			(void)strncat(uhost, sockhost, sizeof(uhost)
-				- strlen(uhost));
 			if (strchr(aconf->host, '/'))	/* 1.2.3.0/24 */
 			{
+				
+				/* match_ipmask takes care of checking
+				** possible username if aconf->host has '@' */
 				if (match_ipmask(aconf->host, cptr, 1))
+				{
+					/* Try another I:line. */
 					continue;
-			} else if (match(aconf->host, uhost))	/* 1.2.3.* */
-				continue;
-		} /* else empty host name, match any ipaddr */
+				}
+			}
+			else	/* 1.2.3.* */
+			{
+				if (UHConfMatch(aconf->host, ipname, ulen))
+				{
+					/* Try another I:line. */
+					continue;
+				}
+			}
+		} /* else empty aconf->host, match any ipaddr */
 
+		/* Password check, if I:line has it. If 'F' flag, try another
+		** I:line, otherwise bail out and reject client. */
 		if (!BadPtr(aconf->passwd) &&
 			!StrEq(cptr->passwd, aconf->passwd))
 		{
@@ -370,29 +399,29 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		{
 			SetKlineExempt(cptr);
 		}
+
 		/* Copy uhost (hostname) over sockhost, if conf flag permits. */
 		if (hp && !IsConfNoResolve(aconf))
 		{
-			/* If aconf->name was not NULL, it did break on
-			** matching hp->h_name; if it was NULL, just take
-			** the first name. */
-			strncpyzt(uhost, hp->h_name, sizeof(uhost));
-			add_local_domain(uhost, sizeof(uhost) - strlen(uhost));
-			get_sockhost(cptr, uhost);
+			get_sockhost(cptr, uhosts[hostnum]+ulen);
 		}
-		if ((i = attach_conf(cptr, aconf)) < -1)
+		if ((retval = attach_conf(cptr, aconf)) < -1)
 			find_bounce(cptr, ConfClass(aconf), -1);
-		retval = i;
 		break;
 	}
-	if (retval == NORETURN)
+	if (hp)
+	{
+		for (i=0; uhosts[i]; i++)
+		{
+			MyFree(uhosts[i]);
+		}
+	}
+	if (retval == -2)
 	{
 		find_bounce(cptr, 0, -2);
-		retval = -2; /* used in register_user() */
 	}
 	return retval;
 }
-#undef NORETURN
 
 /*
  * Find the single N line and return pointer to it (from list).
