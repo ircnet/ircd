@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.14 2002/07/29 22:38:50 chopin Exp $
+# $Id: ircd.conf.example,v 1.15 2003/07/18 20:10:48 chopin Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -63,14 +63,17 @@
 # not to be the same as the hostname of the machine it's running on.
 # Note that <SID> must be globally unique, so if you are part of bigger
 # network, ask other admins, what to set it to. If you are on IRCnet, ask
-# your local coord.
+# your local coord. If you are (BIC) Coord on IRCnet, you have a pool of
+# 36 SIDs to choose from. Check doc/ISO-3166-1 file to find your country
+# numeric code (example: 000) and assign one SID for every of your servers
+# starting from 000A, through 000Z, 0000 and ending at 0009.
 #
 # This let's ircd use the primary ip of your host to establish connections
-M:example.irc.org::Example Geographic Location, Planet Earth:6667:00A
+M:example.irc.org::Example Geographic Location, Planet Earth:6667:000A
 #
 # This let's ircd use the ip 127.0.0.2 to establish connections, useful
 # if you're running virtual interfaces
-#M:example.irc.org:127.0.0.2:Example Geographic Location, Planet Earth:6667:00A
+#M:example.irc.org:127.0.0.2:Example Geographic Location, Planet Earth:6667:000A
 #
 #
 ############################
