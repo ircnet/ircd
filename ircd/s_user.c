@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.200 2004/03/29 18:46:42 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.201 2004/03/29 18:49:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -949,8 +949,7 @@ badparamcountkills:
 	 * creation) then reject it. If from a server and we reject it,
 	 * we have to KILL it. -avalon 4/4/92
 	 */
-	if (donickname == 0 ||
-	    (IsServer(cptr) && strcmp(nick, parv[1])))
+	if (donickname == 0 || strcmp(nick, parv[1]))
 	    {
 		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, BadTo(parv[0]),
 			   parv[1]);
