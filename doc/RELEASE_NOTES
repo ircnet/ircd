@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.61 2004/10/03 17:12:23 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.62 2004/10/04 20:29:13 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -83,6 +83,8 @@ Important changes in 2.11.0 (since 2.10.3):
 	  (hopcount) parameters), please update your services.
 
 Important configuration changes between 2.10.x and 2.11.0:
+	* log files are kept open all the time; kill -HUP closes/opens them;
+	  it is not sufficient to add/remove log file to start/stop logging.
 	* ircd.tune must be removed when upgrading from 2.10.x to 2.11.x
 	* M: has a new mandatory field: SID. Please read INSTALL.
 	* A: has a new field: "network name". 

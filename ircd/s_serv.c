@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.238 2004/10/03 17:13:43 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.239 2004/10/04 20:29:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -651,7 +651,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	int		hop = 0;
 	int		tmperr;
 
-	if (sptr->user) /* in case NICK hasn't been received yet */
+	if (sptr->user) /* in case NICK has been received already */
             {
                 sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, BadTo(parv[0]));
                 return 1;
