@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.32 2004/03/11 02:06:07 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.33 2004/04/13 16:34:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -387,7 +387,11 @@ void	free_server(aServer *serv, aClient *cptr)
 void	remove_client_from_list(aClient *cptr)
 {
 	checklist();
-	if (cptr->hopcount == 0) /* is there another way, at this point? */
+	/* is there another way, at this point? */
+	/* servers directly connected have hopcount=1, but so do their
+	 * users, hence the check for IsServer --B. */
+	if (cptr->hopcount == 0 ||
+		(cptr->hopcount == 1 && IsServer(cptr)))
 		istat.is_localc--;
 	else
 		istat.is_remc--;
