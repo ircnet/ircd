@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.111 2004/06/19 17:26:44 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.112 2004/06/19 17:40:52 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1725,6 +1725,9 @@ int	find_kill(aClient *cptr, int timedklines, char **comment)
 	char		*host, *ip, *name, *ident, *check;
 	aConfItem	*tmp;
 	int		now = 0;
+#ifdef TKLINE
+	int		tklines = 1;
+#endif
 
 	if (!cptr->user)
 		return 0;
@@ -1763,17 +1766,36 @@ int	find_kill(aClient *cptr, int timedklines, char **comment)
 	*reply = '\0';
 #endif
 
-	for (tmp = kconf; tmp; tmp = tmp->next)
+findkline:
+	tmp = 
+#ifdef TKLINE
+		tklines ? tkconf :
+#endif
+		kconf;
+	for (; tmp; tmp = tmp->next)
 	{
 #ifdef TIMEDKLINES
 		if (timedklines && (BadPtr(tmp->passwd) || !isdigit(*tmp->passwd)))
 			continue;
 #endif
-		if (!(tmp->status & (CONF_KILL | CONF_OTHERKILL)))
+		if (!(tmp->status & (
+#ifdef TKLINE
+			tklines ? (CONF_TKILL | CONF_TOTHERKILL) :
+#endif
+			(CONF_KILL | CONF_OTHERKILL))))
 			continue; /* should never happen with kconf */
 		if (!tmp->host || !tmp->name)
 			continue;
-		if (tmp->status == CONF_KILL)
+#ifdef TKLINE
+		/* this TK already expired */
+		if (tklines && tmp->hold < timeofday)
+			continue;
+#endif
+		if (tmp->status == (
+#ifdef TKLINE
+			tklines ? CONF_TKILL : 
+#endif
+			CONF_KILL))
 			check = name;
 		else
 			check = ident;
@@ -1819,7 +1841,13 @@ int	find_kill(aClient *cptr, int timedklines, char **comment)
 			break;
 		    }
 	}
-
+#ifdef TKLINE
+	if (!tmp && tklines)
+	{
+		tklines = 0;
+		goto findkline;
+	}
+#endif
 	if (tmp && !BadPtr(tmp->passwd))
 	{
 		*comment = tmp->passwd;
@@ -2186,11 +2214,6 @@ aConfItem *do_tkline(int status, int time, char *user, char *host, char *reason,
 		return NULL;
 	}
 
-	/* mark for delayed_kills to work */
-	if (rehashed == 0 || rehashed == 1)
-	{
-		rehashed++;
-	}
 	sendto_flag(SCH_NOTICE, "TKLINE %s@%s (%d) by %s",
 		aconf->name, aconf->host, time, who);
 
