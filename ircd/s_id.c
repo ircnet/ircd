@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.21 2002/10/09 21:23:20 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.22 2003/07/24 19:17:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -264,28 +264,33 @@ char * next_uid()
 {
 static	char	uid[UIDLEN+1+5];	/* why +5? --Beeth */
 static	long	curr_cid = 0;
+static	int	needfinduid = 0;
 
 	do
 	{
 		sprintf(uid, "%s%s", me.serv->sid, ltoid(curr_cid, UIDLEN-SIDLEN));
 		curr_cid++;
 
-		/* 
-		** We used all uid's, restart from 0.  It isn't really needed
-		** to restart from 0, since bigger numbers get truncated
-		** anyway.
-		** This should almost never happen, you need 
-		** 25K days * clients / sec.  So at 25 clients/sec (huge)
-		** You need an uptime of 1000 days.
-		** This pow() should probably be removed, and use some contant
-		** instead.
-		*/
-		if (curr_cid > pow(CHIDNB, (UIDLEN-SIDLEN)))
+#if CHIDNB == 36 && UIDLEN == 9 && SIDLEN == 4
+/* MAXCID = CHIDNB ^ (UIDLEN - SIDLEN) */
+# define MAXCID 60466176
+#else
+# error Fix MAXCID!
+#endif
+		if (curr_cid > MAXCID)
 		{
+			/* 
+			** We used all CIDs, restart from 0.
+			** At a rate of 1 client per second we have 700 days before
+			** reusing CID.
+			** Note: after we increase UIDLEN to 12 this uptime would
+			** have to be almost 90 thousands years!
+			*/
 			curr_cid = 0;
+			needfinduid = 1;
 		}
 	}
-	while (find_uid(uid, NULL) != NULL);
+	while (needfinduid && find_uid(uid, NULL) != NULL);
 	return uid;
 }
 
