@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.103 2001/12/30 06:15:41 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.104 2001/12/30 16:09:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -771,52 +771,6 @@ char	*parv[];
 		return 2;
 	    }
 
-	/*
-	** Check against nick name collisions.
-	**
-	** Put this 'if' here so that the nesting goes nicely on the screen :)
-	** We check against server name list before determining if the nickname
-	** is present in the nicklist (due to the way the below for loop is
-	** constructed). -avalon
-	*/
-	if ((acptr = find_server(nick, NULL)))
-		if (MyConnect(sptr))
-		    {
-			sendto_one(sptr, replies[ERR_NICKNAMEINUSE], ME, BadTo(parv[0]),
-				   nick);
-			return 2; /* NICK message ignored */
-		    }
-	/*
-	** acptr already has result from previous find_server()
-	*/
-	if (acptr)
-	    {
-		/*
-		** We have a nickname trying to use the same name as
-		** a server. Send out a nick collision KILL to remove
-		** the nickname. As long as only a KILL is sent out,
-		** there is no danger of the server being disconnected.
-		** Ultimate way to jupiter a nick ? >;-). -avalon
-		*/
-		sendto_flag(SCH_KILL,
-			    "Nick collision on %s (%s@%s)%s <- (%s@%s)%s",
-			    sptr->name,
-			    (acptr->user) ? acptr->user->username : "???",
-			    (acptr->user) ? acptr->user->host : "???",
-			    acptr->from->name, user, host,
-			    get_client_name(cptr, FALSE));
-		ircstp->is_kill++;
-		sendto_one(cptr, ":%s KILL %s :%s (%s <- %s)",
-			   ME, sptr->name, ME, acptr->from->name,
-			   /* NOTE: Cannot use get_client_name
-			   ** twice here, it returns static
-			   ** string pointer--the other info
-			   ** would be lost
-			   */
-			   get_client_name(cptr, FALSE));
-		sptr->flags |= FLAGS_KILLED;
-		return exit_client(cptr, sptr, &me, "Nick/Server collision");
-	    }
 	if (!(acptr = find_client(nick, NULL)))
 	    {
 		aClient	*acptr2;
@@ -1051,12 +1005,18 @@ nickkilldone:
 		{
 			if (!IsPerson(sptr))    /* Unregistered client */
 				return 2;       /* Ignore new NICKs */
-			if (IsRestricted(sptr))
-			    {
+			/*
+			** Restricted clients cannot change nicks
+			** with exception of changing nick from SAVEd UID.
+			** We could check for this earlier, so we would not
+			** do all those checks, just return error. --Beeth
+			*/
+			if (IsRestricted(sptr) && !isdigit(*parv[0]))
+			{
 				sendto_one(sptr,
-					   replies[ERR_RESTRICTED], ME, BadTo(nick));
+					replies[ERR_RESTRICTED], ME, BadTo(nick));
 				return 2;
-			    }
+			}
 			/* Can the user speak on all channels? */
 			for (lp = sptr->user->channel; lp; lp = lp->next)
 				if (can_send(sptr, lp->value.chptr) &&
