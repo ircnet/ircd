@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.183 2004/02/18 23:13:27 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.184 2004/02/19 00:16:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2754,6 +2754,7 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	*buf = '\0';
 
+	parv[1] = canonize(parv[1]);
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	    {
 		convert_scandinavian(name, cptr);
