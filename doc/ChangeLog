@@ -1,3 +1,10 @@
+Fri Sep 26 10:50:54 1997  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* buildm4: update for Y and K line macros, and added macros for
+	B,V,i and k lines (Mario Holbe).
+
+	* s_conf.c: Y global limit per host didn't work.
+
 Wed Sep 24 18:25:45 1997  Christophe Kalt
 
 	* acconfig.h, configure.in, setup.h.in, resolv_def.h, res_init.c:

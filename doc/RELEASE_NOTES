@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.12 1997/09/12 17:47:24 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.13 1997/09/26 17:56:47 kalt Exp $
 
 This is a development version of the package,
 
@@ -16,6 +16,12 @@ Configuration changes between 2.9.3 and 2.9.4:
 
 	* The format for B lines has slightly changed.
 	* The format for Y lines has changed ([user@]host limits)
+
+------
+
+As announced with the 2.9.3 release, the NOTE feature has been removed.
+A replacement has been written as an independant package, and can be found
+at the following location: ftp://ftp.cs.tu-berlin.de/pub/net/irc/noteserv/
 
 ===============================================================================
 
