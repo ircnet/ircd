@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.29 2003/10/13 23:43:43 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.30 2003/10/13 23:48:56 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -1009,36 +1009,31 @@ getres_err:
 	if (rptr)
 	    {
 		if (h_errno != TRY_AGAIN)
-		    {
+		{
 			/*
 			 * If we havent tried with the default domain and its
 			 * set, then give it a try next.
 			 */
 			if (ircd_res.options & RES_DEFNAMES && ++rptr->srch == 0)
-			    {
+			{
 				rptr->retries = ircd_res.retry;
 				rptr->sends = 0;
 				rptr->resend = 1;
+			}
 #ifdef INET6
 /* Comment out this ifdef to get names like ::ffff:a.b.c.d */
 /* We always want to query for both IN A and IN AAAA */
-				if(rptr->type == T_AAAA)
-					query_name(rptr->name, C_IN, T_A, rptr);
-					Debug((DEBUG_DNS,"getres_err: didn't work with T_AAAA, now also trying with T_A for %s",rptr->name));
+			if(rptr->type == T_AAAA)
+			{
+				rptr->type = T_A;
+				query_name(rptr->name, C_IN, T_A, rptr);
+				Debug((DEBUG_DNS,"getres_err: didn't work "
+					"with T_AAAA, now also trying with "
+					"T_A for %s", rptr->name));
+			}
 #endif
-				resend_query(rptr);
-			    }
-			else
-			    {
-#ifdef INET6
-/* Comment out this ifdef to get names like ::ffff:a.b.c.d */
-				if(rptr->type == T_AAAA)
-					query_name(rptr->name, C_IN, T_A, rptr);
-					Debug((DEBUG_DNS,"getres_err: didn't work with T_AAAA, now also trying with T_A for %s",rptr->name));
-#endif
-				resend_query(rptr);
-			    }
-		    }
+			resend_query(rptr);
+		}
 		else if (lp)
 			bcopy((char *)&rptr->cinfo, lp, sizeof(Link));
 	    }
