@@ -37,7 +37,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.9 1999/07/02 16:49:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.10 1999/08/15 21:01:22 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -185,6 +185,9 @@ aClient *cptr;
 		user->invited = NULL;
 		user->uwas = NULL;
 		cptr->user = user;
+		user->hashv = 0;
+		user->uhnext = NULL;
+		user->uid[0] = '\0';
 		user->servp = NULL;
 		user->bcptr = cptr;
 		if (cptr->next)	/* the only cptr->next == NULL is me */
