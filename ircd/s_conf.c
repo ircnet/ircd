@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.49 2002/03/14 02:10:23 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.50 2002/03/14 23:12:39 jv Exp $";
 #endif
 
 #include "os.h"
@@ -62,7 +62,7 @@ static	int	lookup_confhost __P((aConfItem *));
 
 aConfItem	*conf = NULL;
 aConfItem	*kconf = NULL;
-
+char		*networkname = NULL;
 /*
  * remove all conf entries from the client except those which match
  * the status field mask.
@@ -1351,13 +1351,25 @@ int	opt;
 			if (ME[0] == '\0' && aconf->host[0])
 				strncpyzt(ME, aconf->host,
 					  sizeof(ME));
-			if (me.serv->sid[0] == '\0' && tmp)
+			if (me.serv->sid[0] == '\0' && tmp && *tmp)
 				strncpyzt(me.serv->sid, tmp,
 					sizeof(me.serv->sid));
 						
 			if (aconf->port)
 				setup_ping(aconf);
 		    }
+		
+		if (aconf->status == CONF_ADMIN)
+		{
+			if (!networkname && tmp && *tmp)
+			{
+				if (strlen(tmp) < HOSTLEN)
+				{
+					DupString(networkname,tmp);
+				}
+			}
+		}
+		
 		(void)collapse(aconf->host);
 		(void)collapse(aconf->name);
 		Debug((DEBUG_NOTICE,
