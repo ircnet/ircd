@@ -4,9 +4,9 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.32 1998/12/13 00:02:34 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.33 1999/01/28 23:53:02 kalt Exp $
 <abstract>
-This document describes how to install, and configure IRC 2.10.
+This document describes how to install, and configure IRC 2.10.2.
 </abstract>
 
 <sect>Installing IRC.
@@ -73,12 +73,6 @@ order to initialize the resolver.  This file can be anywhere
 on UNIX systems.
 
 <sect1>Notes concerning IPv6 support
-<p>
-This version of the IRC software has support for IPv6
-systems.  However this is considered to be beta quality.
-For this reason, it is recommended that if you wish to run
-the server on an IPv6 system, you have prior experience with
-this software.
 <p>
 The only part of the software that doesn't use IPv6 is the
 server internal resolver.  It relies on the name servers
