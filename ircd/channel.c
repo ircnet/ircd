@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.98 1999/06/07 00:49:35 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.99 1999/06/20 21:24:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2232,7 +2232,7 @@ int	parc;
 char	*parv[];
 {
 	char nbuf[BUFSIZE], *q, *name, *target, *p, mbuf[4];
-	int chop, cnt = 0;
+	int chop, cnt = 0, nj = 0;
 	aChannel *chptr = NULL;
 	aClient *acptr;
 
@@ -2333,9 +2333,9 @@ char	*parv[];
 			*q++ = *target++;
 		/* send 2.9 style join to other servers */
 		if (*chptr->chname != '!')
-			sendto_match_servs_notv(chptr, cptr, SV_NJOIN,
-						":%s JOIN %s%s", name,
-						parv[1], mbuf);
+			nj = sendto_match_servs_notv(chptr, cptr, SV_NJOIN,
+						     ":%s JOIN %s%s", name,
+						     parv[1], mbuf);
 		/* send join to local users on channel */
 		sendto_channel_butserv(chptr, acptr, ":%s JOIN %s", name,
 				       parv[1]);
