@@ -1,0 +1,18 @@
+$Id: README,v 1.1 1998/04/30 12:47:59 kalt Exp $
+
+This directory contains ircd related contributions.  Most of them fall
+ in one of the following categories:
+	* small side utility
+	* code sample
+	* service
+
+Each contribution lives in its own directory under contrib/ and has a
+README file.  For those who need to be compiled, this can be done in
+the same directory as you compiled irc and/or ircd.
+
+If you want to submit a package for this directory, see the RULES file.
+
+---
+
+mkpasswd	utility to crypt a password.
+ircdwatch	utility to keep ircd running (eventually restarting it).
