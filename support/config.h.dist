@@ -171,7 +171,7 @@
 #undef	OPER_KILL
 #define	OPER_REHASH
 #undef	OPER_RESTART
-#undef	OPER_DIE
+#define	OPER_DIE
 #undef	OPER_REMOTE
 #undef	LOCOP_REHASH
 #undef	LOCOP_RESTART
@@ -435,12 +435,6 @@
  * IMPORTANT: This **MUST** defined if SLOW_ACCEPT is NOT defined
  */
 #undef	CLONE_CHECK
-
-/* For broken mirc (win/pc) client. Enables old features:
- * 1) Send start-of-list numeric before LIST reply
- * 2) Revert combined "n JOIN #^Go" -> "n JOIN #" "MODE # o n"
- */
-#define MIRC_KLUDGE
 
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */

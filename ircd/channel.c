@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.64 1998/09/18 22:37:18 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.65 1998/09/23 13:22:14 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2120,13 +2120,6 @@ char	*parv[];
 		/*
 		** notify all users on the channel
 		*/
-#ifndef MIRC_KLUDGE
-		/* This part of the code should be removed in a near future */
-		if (s)
-			*--s = '\007';
-		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
-				       parv[0], name /*, chop*/);
-#else
 		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
 						parv[0], name);
 		if (s)
@@ -2140,7 +2133,6 @@ char	*parv[];
 						       *(s+1)=='v'?parv[0]:"");
 			*--s = '\007';
 		    }
-#endif
 		/*
 		** If s wasn't set to chop+1 above, name is now #chname^Gov
 		** again (if coming from a server, and user is +o and/or +v
@@ -2721,9 +2713,6 @@ char	*parv[];
 	if (parc > 1 &&
 	    hunt_server(cptr, sptr, ":%s LIST %s %s", 2, parc, parv))
 		return 10;
-#ifdef MIRC_KLUDGE
-        sendto_one(sptr, rpl_str(RPL_LISTSTART, parv[0]));
-#endif
 	if (BadPtr(parv[1]))
 		for (chptr = channel; chptr; chptr = chptr->nextch)
 		    {

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.22 1998/09/21 13:59:51 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.23 1998/09/23 13:22:15 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -147,9 +147,6 @@ char	serveropts[] = {
 #endif
 #ifdef	ZIP_LINKS
 'Z',
-#endif
-#ifdef MIRC_KLUDGE
-'$',
 #endif
 '\0'};
 
