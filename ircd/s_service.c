@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.41 2003/02/15 19:25:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.42 2003/07/29 23:34:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -301,7 +301,7 @@ char	*parv[];
 #endif
 	aServer	*sp = NULL;
 	char	*dist, *server = NULL, *info, *stok;
-	int	type, metric = 0, i;
+	int	type, i;
 	char	*mlname;
 
 	if (sptr->user)
@@ -329,7 +329,7 @@ char	*parv[];
 		add_client_to_list(sptr);
 		strncpyzt(sptr->name, parv[1], sizeof(sptr->name));
 		server = parv[2];
-		metric = atoi(parv[5]);
+		sptr->hopcount = atoi(parv[5]);
 		sp = find_tokserver(atoi(server), cptr, NULL);
 		if (!sp)
 		    {
@@ -363,7 +363,7 @@ char	*parv[];
 #ifdef	USE_SERVICES
 	if (!IsServer(cptr))
 	    {
-		metric = 0;
+		sptr->hopcount = 0;
 		server = ME;
 		sp = me.serv;
 		if (!do_nick_name(parv[1], 0))
@@ -439,17 +439,16 @@ char	*parv[];
 	sptr->info = mystrdup(info);
 	svc->wants = 0;
 	svc->type = type;
-	sptr->hopcount = metric;
 	reorder_client_in_list(sptr);
 	(void)add_to_client_hash_table(sptr->name, sptr);
 
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_SERVICE, NULL, sptr,
 			      "SERVICE %s %s %s %d %d :%s", sptr->name,
-			      server, dist, type, metric, info);
+			      server, dist, type, sptr->hopcount, info);
 #endif
 	sendto_flag(SCH_SERVICE, "Received SERVICE %s from %s (%s %d %s)",
-		    sptr->name, get_client_name(cptr, TRUE), dist, metric,
+		    sptr->name, get_client_name(cptr, TRUE), dist, sptr->hopcount,
 		    info);
 
 	for (i = fdas.highest; i >= 0; i--)
@@ -466,7 +465,7 @@ char	*parv[];
 		else
 			stok = sp->tok;
 		sendto_one(acptr, "SERVICE %s %s %s %d %d :%s", sptr->name,
-			   stok, dist, type, metric+1, info);
+			   stok, dist, type, sptr->hopcount+1, info);
 	    }
 	return 0;
 }

@@ -1,3 +1,9 @@
+2003-07-29  Piotr Kucharski
+
+	* s_service.c/m_service(): removed metric variable; moved filling
+	  hopcount earlier, so it does not break later in free_client(),
+	  where it is used for local client check (noted by jv).
+
 2003-07-28  Jakub Vlasek
 
 	* struct_def.h: Added byuid to struct Server. Stores UID of remote
