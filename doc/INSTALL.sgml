@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.57 2004/04/02 21:26:57 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.58 2004/05/12 17:29:36 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0.
 </abstract>
@@ -633,8 +633,8 @@ know who is authorized to become an operator and what their
 <tag/O/ Specifies Operator record. 
 <tag/Note/If you use small letter (``o'') in it, it specifies
 a global operator. Capital letter (``O'') specifies a local operator. 
-Local operator has basically the same rights except global operator 
-with some restrictions.
+Local and global operator rights can be specified and fine-tuned in config.h
+file.
 <tag/TARGET Host NAME/ Tells IRC which host you have the
 privileges FROM.  This means that you should be logged into
 this host when you ask for the priviliges.  If you specify
