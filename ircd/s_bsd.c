@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.21 1997/12/16 17:25:04 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.22 1998/02/18 18:42:21 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -498,10 +498,10 @@ void	init_sys()
 	if (((bootopt & BOOT_CONSOLE) || isatty(0)) &&
 	    !(bootopt & (BOOT_INETD|BOOT_OPER)))
 	    {
-#ifndef _DO_MIKE_DEBUGGING__  /* Mike debugging XXX */
+#ifndef _WIN32
 		if (fork())
 			exit(0);
-#endif /* _DO_MIKE_DEBUGGING__  */
+#endif
 #ifdef TIOCNOTTY
 		if ((fd = open("/dev/tty", O_RDWR)) >= 0)
 		    {
