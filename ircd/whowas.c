@@ -24,7 +24,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: whowas.c,v 1.9 2003/10/18 15:31:27 q Exp $";
+static  char rcsid[] = "@(#)$Id: whowas.c,v 1.10 2004/08/02 15:51:40 jv Exp $";
 #endif
 
 #include "os.h"
@@ -101,7 +101,7 @@ void	add_history(aClient *cptr, aClient *nodelay)
 		uwas = *old_uwas;
 		*old_uwas = uwas->next;
 		free_link(uwas);
-		free_user(np->ww_user, np->ww_online);
+		free_user(np->ww_user);
 		istat.is_wwuwas--;
 	    }
 	else if (np->ww_user)
@@ -124,7 +124,7 @@ void	add_history(aClient *cptr, aClient *nodelay)
 							+ 1;
 			    }
 		    }
-		free_user(np->ww_user, NULL);
+		free_user(np->ww_user);
 	    }
 
 	if (np->ww_logout != 0)

@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.150 2004/08/01 06:34:06 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.151 2004/08/02 15:51:39 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2472,7 +2472,7 @@ free_server:
 		if (cptr->fd >= 0)
 			(void)close(cptr->fd);
 		cptr->fd = -2;
-		free_server(cptr->serv, cptr);
+		free_server(cptr->serv);
 		free_client(cptr);
 		return -1;
 	    }
