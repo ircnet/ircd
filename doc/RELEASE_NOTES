@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.44 2004/03/25 00:20:52 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.45 2004/04/14 18:08:37 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -11,7 +11,7 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* H: can have SID masks to accept. Read docs.
 	* O: and o: in the config has swapped in the meaning, to match
 	  the umode. Update your config.
-	* Nicknames of local clients cannot have [\]^{|}~ chars. Sorry.
+	* Nicknames of local clients cannot have [\]{|} chars. Sorry.
 	* Channelnames created on 2.11.0 will have chars {}~\ in their name
 	  automatically converted to []^|. Sorry.
 	* I: require now both name AND addr to match. Revise your config.
@@ -26,6 +26,7 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* resolv.conf can have IPv6 nameservers (this makes ircd fully IPv6).
 	* P: can have flags ('D' and 'S'), check INSTALL file for details.
 	* class summary was moved from trace to (separate) stats C.
+	* redundant bans are allowed to be set now.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================
