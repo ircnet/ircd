@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.89 2002/12/28 21:20:41 jv Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.90 2002/12/29 22:43:06 jv Exp $";
 #endif
 
 #include "os.h"
@@ -303,9 +303,9 @@ time_t	currenttime;
 		    }
 		if (!iconf.aconnect)
 		{
-			sendto_one(sptr, "Connection to %s deferred. Autoconnect
-					administratively disabled",
-					con_conf->name)
+			sendto_flag(SCH_NOTICE,
+				"Connection to %s deferred. Autoconnect "
+				"administratively disabled", con_conf->name);
 		}
 		else if (connect_server(con_conf, (aClient *)NULL,
 				   (struct hostent *)NULL) == 0)
