@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.225 2004/08/13 21:36:12 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.226 2004/08/17 17:07:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1752,7 +1752,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 							LDELAYCHASETIMELIMIT;
 					}
 					/* XXX: fix this in 2.11.1 */
-					if (MyConnect(sptr) && !IsAnOper(sptr))
+					if (MyClient(sptr) && !IsAnOper(sptr))
 					{
 						break;
 					}
