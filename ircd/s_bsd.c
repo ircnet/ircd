@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.126 2004/03/10 19:37:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.127 2004/03/11 02:08:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2354,7 +2354,6 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 		free_client(cptr);
 		return -1;
 	}
-	add_client_to_list(cptr);
 	cptr->hostp = hp;
 	/*
 	 * Copy these in so we have something for error detection.
@@ -2375,8 +2374,8 @@ free_server:
 		if (cptr->fd >= 0)
 			(void)close(cptr->fd);
 		cptr->fd = -2;
-		cptr->serv->bcptr = NULL;
-		remove_client_from_list(cptr);
+		free_server(cptr->serv, cptr);
+		free_client(cptr);
 		return -1;
 	    }
 
@@ -2448,6 +2447,7 @@ free_server:
 	SetConnecting(cptr);
 
 	get_sockhost(cptr, aconf->host);
+	add_client_to_list(cptr);
 	nextping = timeofday;
 	istat.is_unknown++;
 
