@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.42 2002/01/06 18:28:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.43 2002/04/05 03:05:19 jv Exp $";
 #endif
 
 #include "os.h"
@@ -628,6 +628,10 @@ char	*comment;
 		if (!IsMasked(sptr))
 		{
 			istat.is_serv--;
+		}
+		if (!IsBursting(sptr))
+		{
+			istat.is_eobservers--;
 		}
 	 	for (i = fdas.highest; i >= 0; i--)
 		    {
