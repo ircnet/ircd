@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.18 1998/08/02 18:32:59 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.19 1998/08/05 01:40:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -554,9 +554,9 @@ char	*buffer, *bufend;
 		    !(IsServer(cptr) || IsService(cptr)))
 		    {	/* Flood control partly migrated into penalty */
 			if (bootopt & BOOT_PROT)
-				cptr->since = timeofday;
-			else
 				cptr->since += (1 + i / 100);
+			else
+				cptr->since = timeofday;
 			/* Allow only 1 msg per 2 seconds
 			 * (on average) to prevent dumping.
 			 * to keep the response rate up,
