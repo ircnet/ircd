@@ -31,7 +31,7 @@
 #include "res.h"
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.2 1997/04/14 15:04:18 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.3 1997/04/24 21:16:51 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -64,6 +64,7 @@ static	ResRQ	*find_id __P((int));
 static	int	hash_number __P((unsigned char *));
 static	void	update_list __P((ResRQ *, aCache *));
 static	int	hash_name __P((char *));
+static	int	bad_hostname __P((char *, int));
 
 static	struct cacheinfo {
 	int	ca_adds;
@@ -597,6 +598,8 @@ HEADER	*hptr;
 			len = strlen(hostbuf);
 			Debug((DEBUG_INFO, "got host %s (%d vs %d)",
 				hostbuf, len, strlen(hostbuf)));
+			if (bad_hostname(hostbuf, len))
+				return -1;
 			/*
 			 * copy the returned hostname into the host name
 			 * or alias field if there is a known hostname
@@ -620,6 +623,8 @@ HEADER	*hptr;
 		case T_CNAME :
 			cp += dlen;
 			Debug((DEBUG_INFO,"got cname %s",hostbuf));
+			if (bad_hostname(hostbuf, len))
+				return -1;
 			if (alias >= &(hp->h_aliases[MAXALIASES-1]))
 				break;
 			*alias = (char *)MyMalloc(len + 1);
@@ -731,6 +736,12 @@ char	*lp;
 		goto getres_err;
 	    }
 	a = proc_answer(rptr, hptr, buf, buf+rc);
+	if (a == -1) {
+		sendto_flag(SCH_ERROR, "Bad hostname returned from %s",
+			inet_ntoa(sin.sin_addr));
+		Debug((DEBUG_DNS, "Bad hostname returned from %s",
+			inet_ntoa(sin.sin_addr)));
+	}
 #ifdef DEBUG
 	Debug((DEBUG_INFO,"get_res:Proc answer = %d",a));
 #endif
@@ -1421,4 +1432,17 @@ char	*nick;
 	sendto_one(sptr, ":%s %d %s :Structs %d IP storage %d Name storage %d",
 		   me.name, RPL_STATSDEBUG, nick, sm, im, nm);
 	return ts + sm + im + nm;
+}
+
+
+static	int	bad_hostname(name, len)
+char *name;
+int len;
+{
+	char	*s, c;
+
+	for (s = name; (c = *s) && len; s++, len--)
+		if (isspace(c) || (c == 0x7) || (c == ':'))
+			return -1;
+	return 0;
 }
