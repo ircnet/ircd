@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.147 2004/11/02 22:37:03 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.148 2004/11/03 01:58:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2295,7 +2295,7 @@ int	wdhms2sec(char *input, int *output)
 
 	*output = 0;
 
-	if (!s) return 0;
+	if (!input) return 0;
 
 	s = input;
 	while (*s)
