@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.60 2004/09/08 19:25:25 chopin Exp $
+#*   $Id: Makefile.in,v 1.61 2004/09/09 16:09:43 chopin Exp $
 #*
 #*/
 
@@ -56,9 +56,14 @@ MKDIRHIER = ../support/mkdirhier
 #
 # Binary names
 #
-SERVER = ircd
+# Note: $(IRCD) is basename for config, log and var files. Make sure to
+# make clean after changing this one.
+IRCD = ircd
+IRCD_BIN = $(IRCD)
 IAUTH = iauth
 IRCDWATCH = ircdwatch
+# TK line service binary
+TKSERV = tkserv
 
 #
 # Directories definitions
@@ -81,41 +86,41 @@ ircd_log_dir = @logdir@
 # They should all be absolute.
 #
 # Path to server binary
-IRCD_PATH = $(server_bin_dir)/$(SERVER)
+IRCD_PATH = $(server_bin_dir)/$(IRCD_BIN)
 # Path to authentication slave binary
 IAUTH_PATH = $(server_bin_dir)/$(IAUTH)
 # Path to the m4 configuration file
-IRCDM4_PATH = $(ircd_conf_dir)/ircd.m4
+IRCDM4_PATH = $(ircd_conf_dir)/$(IRCD).m4
 
 # Path to the m4 executable
 M4_PATH = @M4_PATH@
 
 # server configuration file
-IRCDCONF_PATH = $(ircd_conf_dir)/ircd.conf
+IRCDCONF_PATH = $(ircd_conf_dir)/$(IRCD).conf
 # server Message Of The Day
-IRCDMOTD_PATH = $(ircd_conf_dir)/ircd.motd
+IRCDMOTD_PATH = $(ircd_conf_dir)/$(IRCD).motd
 # authentication slave configuration file
-IAUTHCONF_PATH = $(ircd_conf_dir)/iauth.conf
+IAUTHCONF_PATH = $(ircd_conf_dir)/$(IAUTH).conf
 # server PID file
-IRCDPID_PATH = $(ircd_var_dir)/ircd.pid
+IRCDPID_PATH = $(ircd_var_dir)/$(IRCD).pid
 # authentication slave PID file
-IAUTHPID_PATH = $(ircd_var_dir)/iauth.pid
+IAUTHPID_PATH = $(ircd_var_dir)/$(IAUTH).pid
 # server state file
-IRCDTUNE_PATH = $(ircd_var_dir)/ircd.tune
+IRCDTUNE_PATH = $(ircd_var_dir)/$(IRCD).tune
 # ircdwatch PID file
-IRCDWATCHPID_PATH = $(ircd_var_dir)/ircdwatch.pid
+IRCDWATCHPID_PATH = $(ircd_var_dir)/$(IRCDWATCH).pid
 
 # Define these filenames to maintain a list of persons who log
 # into this server. Logging will stop when the file does not exist.
 # Logging will be disabled also if you do not define this.
-FNAME_USERLOG = $(ircd_log_dir)/users
-FNAME_OPERLOG = $(ircd_log_dir)/opers
-FNAME_CONNLOG = $(ircd_log_dir)/rejects
-FNAME_AUTHLOG = $(ircd_log_dir)/auth
+FNAME_USERLOG = $(ircd_log_dir)/$(IRCD).users
+FNAME_OPERLOG = $(ircd_log_dir)/$(IRCD).opers
+FNAME_CONNLOG = $(ircd_log_dir)/$(IRCD).rejects
+FNAME_AUTHLOG = $(ircd_log_dir)/$(IRCD).auth
 
 # files used for debugging purposes
-IRCDDBG_PATH = $(ircd_log_dir)/ircd.log
-IAUTHDBG_PATH = $(ircd_log_dir)/iauth.log
+IRCDDBG_PATH = $(ircd_log_dir)/$(IRCD).log
+IAUTHDBG_PATH = $(ircd_log_dir)/$(IAUTH).log
 
 # Access mode for irc.
 irc_mode = 755
@@ -126,14 +131,12 @@ ircd_mode = 711
 #
 # TK line service configuration
 #
-# TK line service binary
-TKSERV = tkserv
 # TK line service logfile
-TKSERV_LOGFILE = $(ircd_log_dir)/tkserv.log
+TKSERV_LOGFILE = $(ircd_log_dir)/$(TKSERV).log
 # TK line service access file 
-TKSERV_ACCESSFILE = $(ircd_conf_dir)/tkserv.access
+TKSERV_ACCESSFILE = $(ircd_conf_dir)/$(TKSERV).access
 # IRCD config file without path (from CPATH)
-TKSERV_IRCD_CONF = ircd.conf
+TKSERV_IRCD_CONF = $(IRCD).conf
 
 # End of system configuration section.
 # ------------------------------------------------------------------------
@@ -143,9 +146,9 @@ RM = rm -f
 
 CLIENT_COMMON_OBJS = clbsd.o cldbuf.o clpacket.o clsend.o clmatch.o \
                      clparse.o clsupport.o
-SERVER_COMMON_OBJS = bsd.o dbuf.o packet.o send.o match.o parse.o \
+IRCD_COMMON_OBJS = bsd.o dbuf.o packet.o send.o match.o parse.o \
                      support.o
-SERVER_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
+IRCD_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
               s_bsd.o s_conf.o s_debug.o s_err.o s_id.o s_misc.o s_numeric.o \
               s_send.o s_serv.o s_service.o s_user.o s_zip.o whowas.o \
               res_init.o res_comp.o res_mkquery.o
@@ -162,11 +165,11 @@ help:
 	@echo "Choose one of the following:"
 	@echo "        all            : build everything"
 	@echo "        server         : build server programs"
-	@echo "                ircd          : build the irc daemon"
-	@echo "                iauth         : build the authentication slave"
-	@echo "                chkconf       : build the configuration file checker"
-	@echo "                ircd-mkpasswd : build ircd-mkpasswd"
-	@echo "                ircdwatch     : build ircdwatch"
+	@echo "                $(IRCD_BIN)		: build the irc daemon"
+	@echo "                $(IAUTH)		: build the authentication slave"
+	@echo "                chkconf		: build the configuration file checker"
+	@echo "                ircd-mkpasswd	: build ircd-mkpasswd"
+	@echo "                $(IRCDWATCH)	: build ircdwatch"
 	@echo "        $(TKSERV)	: build tkserv"
 	@echo
 	@echo "        install        : build and install server programs"
@@ -175,13 +178,13 @@ help:
 
 all: server
 
-server: $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH)
+server: $(IRCD_BIN) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH)
 
-$(SERVER): $(SERVER_COMMON_OBJS) $(SERVER_OBJS)
+$(IRCD_BIN): $(IRCD_COMMON_OBJS) $(IRCD_OBJS)
 	$(RM) $@
 	./version.c.SH
 	$(CC) $(S_CFLAGS) -c -o version.o version.c
-	$(CC) $(LDFLAGS) -o $@ $(SERVER_COMMON_OBJS) version.o $(SERVER_OBJS) $(ZLIBS) $(MATHLIBS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ $(IRCD_COMMON_OBJS) version.o $(IRCD_OBJS) $(ZLIBS) $(MATHLIBS) $(LIBS)
 
 $(IAUTH): $(IAUTH_COMMON_OBJS) $(IAUTH_OBJS)
 	$(RM) $@
@@ -207,11 +210,11 @@ $(TKSERV): tkserv.o
 
 install: install-server
 
-install-ircd: $(SERVER)
+install-ircd: $(IRCD_BIN)
 	-@if [ ! -d $(server_bin_dir) ]; then \
 		$(MKDIRHIER) $(server_bin_dir); \
 	fi
-	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
+	$(INSTALL_PROGRAM) -m $(ircd_mode) $(IRCD_BIN) $(server_bin_dir)
 
 install-server: install-ircd server
 	-@if [ ! -d $(server_man_dir) ]; then \
@@ -420,7 +423,7 @@ tkserv.o: ../contrib/tkserv/tkserv.c tkconf.h
 	$(CC) $(O_CFLAGS) -DTKSERV_LOGFILE="\"$(TKSERV_LOGFILE)\"" -DTKSERV_ACCESSFILE="\"$(TKSERV_ACCESSFILE)\"" -DTKSERV_IRCD_CONF="\"$(TKSERV_IRCD_CONF)\"" -DCPATH="\"$(IRCDCONF_PATH)\"" -DPPATH="\"$(IRCDPID_PATH)\"" -c -o $@ ../contrib/tkserv/tkserv.c
 
 clean:
-	$(RM) $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH) $(TKSERV) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
+	$(RM) $(IRCD_BIN) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH) $(TKSERV) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
 
 distclean:
 	@echo "To make distclean, just delete the current directory."
