@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-24753/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-14478/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,9 +10,9 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.59 2004/05/18 09:34:45 chopin Exp $
+     $Id: INSTALL.info,v 1.60 2004/06/15 17:35:10 chopin Exp $
 
-   This document describes how to install, and configure IRC 2.11.0.
+   This document describes how to install, and configure IRC 2.11.0
 
 * Menu:
 
@@ -148,7 +148,7 @@ This is done by editing the "config.h" file and changing the various
 * DEBUGMODE::
 * CHROOTDIR::
 * ENABLE_SUMMON ENABLE_USERS::
-* SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE::
+* NO_DEFAULT_INVISIBLE::
 * OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY::
 * ZIP_LINKS ZIP_LEVEL::
 * SLOW_ACCEPT::
@@ -183,7 +183,7 @@ setting up chroot environment for ircd and run it from there, not
 requiring to run as root.
 
 
-File: INSTALL.info,  Node: ENABLE_SUMMON ENABLE_USERS,  Next: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE,  Prev: CHROOTDIR,  Up: The config-h file
+File: INSTALL.info,  Node: ENABLE_SUMMON ENABLE_USERS,  Next: NO_DEFAULT_INVISIBLE,  Prev: CHROOTDIR,  Up: The config-h file
 
 ENABLE_SUMMON ENABLE_USERS
 ==========================
@@ -195,20 +195,16 @@ whether the server will attempt to summon local users to irc by writing
 a message similar to that from talk(1) to a user's tty.
 
 
-File: INSTALL.info,  Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE,  Next: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY,  Prev: ENABLE_SUMMON ENABLE_USERS,  Up: The config-h file
+File: INSTALL.info,  Node: NO_DEFAULT_INVISIBLE,  Next: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY,  Prev: ENABLE_SUMMON ENABLE_USERS,  Up: The config-h file
 
-SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE
-==========================================
+NO_DEFAULT_INVISIBLE
+====================
 
-On large IRC networks, the number of invisible users is likely to be
-large and reporting that number cause no pain.  To aid and effect this,
-SHOW_INVISIBLE_LUSERS is provided to cause the LUSERS command to report
-the number of invisible users to all people and not just operators.  The
-NO_DEFAULT_INVISIBLE define is used to toggle whether clients are
+The NO_DEFAULT_INVISIBLE define is used to toggle whether clients are
 automatically made invisible when they register.
 
 
-File: INSTALL.info,  Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY,  Next: ZIP_LINKS ZIP_LEVEL,  Prev: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE,  Up: The config-h file
+File: INSTALL.info,  Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY,  Next: ZIP_LINKS ZIP_LEVEL,  Prev: NO_DEFAULT_INVISIBLE,  Up: The config-h file
 
 OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY
 ===========================================================
@@ -1674,40 +1670,40 @@ reviewed and forwarded to the appropriate mailing list.
 
 Tag Table:
 Node: Top128
-Node: Installing IRC-652
-Node: The configure script877
-Node: Notes for Cygwin32 users3163
-Node: Notes concerning IPv6 support3896
-Node: The config-h file4327
-Node: DEBUGMODE4895
-Node: CHROOTDIR5472
-Node: ENABLE_SUMMON ENABLE_USERS5841
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6374
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7063
-Node: ZIP_LINKS ZIP_LEVEL7724
-Node: SLOW_ACCEPT8752
-Node: CLONE_CHECK9382
-Node: Other #define's9745
-Node: Editing the Makefile and compiling10067
-Node: The ircd-conf file11052
-Node: Machine information12901
-Node: Administrative info15516
-Node: Port connections17667
-Node: Connection Classes19816
-Node: Client connections24943
-Node: Operator priviliges30677
-Node: Excluded accounts32841
-Node: Server connections36753
-Node: Deny auto-connections45381
-Node: Hub connections46755
-Node: Leaf connections48243
-Node: Version limitations50327
-Node: Excluded machines52085
-Node: Service connections53390
-Node: Bounce server54984
-Node: Related resources56845
-Node: Reporting a bug57884
-Node: How to report a bug58141
-Node: Where to send a bug report59152
+Node: Installing IRC-651
+Node: The configure script876
+Node: Notes for Cygwin32 users3162
+Node: Notes concerning IPv6 support3895
+Node: The config-h file4326
+Node: DEBUGMODE4872
+Node: CHROOTDIR5449
+Node: ENABLE_SUMMON ENABLE_USERS5818
+Node: NO_DEFAULT_INVISIBLE6329
+Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY6670
+Node: ZIP_LINKS ZIP_LEVEL7309
+Node: SLOW_ACCEPT8337
+Node: CLONE_CHECK8967
+Node: Other #define's9330
+Node: Editing the Makefile and compiling9652
+Node: The ircd-conf file10637
+Node: Machine information12486
+Node: Administrative info15101
+Node: Port connections17252
+Node: Connection Classes19401
+Node: Client connections24528
+Node: Operator priviliges30262
+Node: Excluded accounts32426
+Node: Server connections36338
+Node: Deny auto-connections44966
+Node: Hub connections46340
+Node: Leaf connections47828
+Node: Version limitations49912
+Node: Excluded machines51670
+Node: Service connections52975
+Node: Bounce server54569
+Node: Related resources56430
+Node: Reporting a bug57469
+Node: How to report a bug57726
+Node: Where to send a bug report58737
 
 End Tag Table

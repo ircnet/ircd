@@ -1,8 +1,8 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.59 2004/05/18 09:34:46 chopin Exp $
+  $Id: INSTALL.txt,v 1.60 2004/06/15 17:35:11 chopin Exp $
 
-  This document describes how to install, and configure IRC 2.11.0.
+  This document describes how to install, and configure IRC 2.11.0
 
   11..  IInnssttaalllliinngg IIRRCC..
 
@@ -130,14 +130,10 @@
   to glean information the same as finger can.  ENABLE_SUMMON toggles
   whether the server will attempt to summon local users to irc by
   writing a message similar to that from talk(1) to a user's tty.
-  22..44..  SSHHOOWW__IINNVVIISSIIBBLLEE__LLUUSSEERRSS,, NNOO__DDEEFFAAUULLTT__IINNVVIISSIIBBLLEE
+  22..44..  NNOO__DDEEFFAAUULLTT__IINNVVIISSIIBBLLEE
 
-  On large IRC networks, the number of invisible users is likely to be
-  large and reporting that number cause no pain.  To aid and effect
-  this, SHOW_INVISIBLE_LUSERS is provided to cause the LUSERS command to
-  report the number of invisible users to all people and not just
-  operators.  The NO_DEFAULT_INVISIBLE define is used to toggle whether
-  clients are automatically made invisible when they register.
+  The NO_DEFAULT_INVISIBLE define is used to toggle whether clients are
+  automatically made invisible when they register.
 
 
   22..55..  OOPPEERR__KKIILLLL,, OOPPEERR__RREEHHAASSHH,, OOPPEERR__RREESSTTAARRTT,, OOPPEERR__SSEETT,, LLOOCCAALL__KKIILLLL__OONNLLYY
@@ -264,6 +260,7 @@
 
   15.
      Bounce server         (B)
+
 
   Except for types ``M'' and ``A'', you are allowed to have multiple
   records of the same type.  In some cases, you can have concurrent
@@ -461,6 +458,7 @@
         Flags changing behaviour of a given P-line. It can be empty or
         one of:
 
+
         +o  D - delayed accept (not active until first netjoin)
 
         +o  S - server-only (user connections are rejected)
@@ -525,6 +523,8 @@
      SSeennddQQ
         This field defines the ``SendQ'' value for this class.  If this
         field is not present, the default (from config.h) is assigned.
+
+
      LLooccaall lliimmiitt
         This field is used to limit the number of local concurrent
         connections.  The format is <x>.<y>

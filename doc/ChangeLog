@@ -1,3 +1,12 @@
+2004-06-15  Piotr Kucharski
+
+	* parse.c: incorrect minparams for SMASK.
+	* parse.c/parse(): exit server when it sends us command with less than
+	  minparams parameters.
+	* s_serv.c: new function count_servers_users().
+	* s_serv.c/trace_one(), report_myservers(): use count_servers_users().
+	* s_serv.c/m_lusers(), config.h.dist: removed SHOW_INVISIBLE_LUSERS.
+
 2004-06-13  Piotr Kucharski
 
 	* channel.c/set_mode(): reset reop time when +r comes from server (or
