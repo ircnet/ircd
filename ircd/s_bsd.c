@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.133 2004/03/18 00:54:46 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.134 2004/03/21 18:24:38 jv Exp $";
 #endif
 
 #include "os.h"
@@ -206,7 +206,7 @@ void	report_error(char *text, aClient *cptr)
  * Connections are accepted to this socket depending on the IP# mask given
  * by 'ipmask'.  Returns the fd of the socket created or -1 on error.
  */
-int	inetport(aClient *cptr, char *ip, char *ipmask, int port)
+int	inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 {
 	static	struct SOCKADDR_IN server;
 	int	ad[4];
@@ -310,7 +310,11 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port)
 	cptr->ip.s_addr = server.sin_addr.s_addr; /* broken on linux at least*/
 #endif
 	cptr->port = port;
-	(void)listen(cptr->fd, LISTENQUEUE);
+
+	if (dolisten)
+	{
+		listen(cptr->fd, LISTENQUEUE);
+	}
 
 	return 0;
 }
@@ -324,6 +328,7 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port)
 int	add_listener(aConfItem *aconf)
 {
 	aClient	*cptr;
+	int dolisten = 1;
 
 	cptr = make_client(NULL);
 	cptr->flags = FLAGS_LISTEN;
@@ -340,8 +345,17 @@ int	add_listener(aConfItem *aconf)
 	    }
 	else
 #endif
-		if (inetport(cptr, aconf->host, aconf->name, aconf->port))
+	{
+		if (IsConfDelayed(aconf) && !firstrejoindone)
+		{
+			dolisten = 0;
+		}
+		if (inetport(cptr, aconf->host, aconf->name, aconf->port,
+				dolisten))
+		{
 			cptr->fd = -2;
+		}
+	}
 
 	if (cptr->fd >= 0)
 	    {

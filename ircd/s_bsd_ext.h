@@ -40,7 +40,8 @@ extern time_t timeofday;
 #endif /* S_BSD_C */
 EXTERN void add_local_domain (char *hname, size_t size);
 EXTERN void report_error (char *text, aClient *cptr);
-EXTERN int inetport (aClient *cptr, char *ip, char *ipmask, int port);
+EXTERN int inetport (aClient *cptr, char *ip, char *ipmask, int port,
+		int dolisten);
 EXTERN int add_listener (aConfItem *aconf);
 EXTERN void close_listeners(void);
 EXTERN void start_iauth (int);
