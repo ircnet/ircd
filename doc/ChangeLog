@@ -1,3 +1,16 @@
+2004-04-13  Piotr Kucharski
+
+	* s_misc.c/initstats(): set localc, not remc.
+	* list.c/remove_client_from_list(): negative remote client count bug,
+	  as directly connected servers have hopcount of 1, not 0.
+
+2004-04-10  Piotr Kucharski
+
+	* channel.c/del_modeid(): memleak, it should've freed modeid.
+	* channel.c/set_mode(): memleak, it should've freed tmp->value.alist
+	  where it was not used or freed by add_modeid().
+	* channel.c/add_modeid(): don't free modeid, let set_mode() do it.
+
 2004-04-07  Piotr Kucharski
 
 	* ircd.c, s_bsd.c, s_bsd_ext.h: reverting changes from 2004-03-07
