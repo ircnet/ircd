@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.19 1999/03/13 23:14:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.20 1999/06/27 18:26:19 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -65,7 +65,8 @@ vsendto_ircd(char *pattern, va_list va)
 	strcat(ibuf, "\n");
 	if (write(0, ibuf, strlen(ibuf)) != strlen(ibuf))
 	    {
-		sendto_log(ALOG_DMISC, LOG_NOTICE, "Daemon exiting. [w]");
+		sendto_log(ALOG_DMISC, LOG_NOTICE, "Daemon exiting. [w %s]",
+			   strerror(errno));
 		exit(0);
 	    }
 }
