@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.177 2004/03/22 14:03:51 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.178 2004/03/24 22:49:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -34,9 +34,10 @@ static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.177 2004/03/22 14:03:51 jv Exp $";
 static	char	buf[BUFSIZE];
 
 static	int	check_link (aClient *);
-static	int	get_version (char *version, char *id);
-static	void	trace_one (aClient *sptr, aClient *acptr);
-static	void	report_listeners(aClient *sptr, char *to);
+static	int	get_version (char *, char *);
+static	void	trace_one (aClient *, aClient *);
+static	void	report_listeners(aClient *, char *);
+static	void	report_class(aClient *, char *);
 const	char	*check_servername_errors[3][2] = {
 	{ "too long", "Bogus servername - too long" },
 	{ "invalid", "Bogus servername - invalid hostname" },
@@ -1993,7 +1994,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* These are available with no penalty for opers. */
 		/* Although I have no idea, why only for opers. --B. */
 		case 'o': case 'O':	/* O:lines */
-		case 'c': case 'C':	/* C:/N: lines */
+		case 'c': 		/* C:/N: lines */
 		case 'h': case 'H':	/* H:/D: lines */
 		case 'a': case 'A':	/* iauth conf */
 		case 'b': case 'B':	/* B:lines */
@@ -2121,7 +2122,10 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	case 'B' : case 'b' : /* B conf lines */
 		report_configured_links(cptr, parv[0], CONF_BOUNCE);
 		break;
-	case 'c' : case 'C' : /* C and N conf lines */
+	case 'C': /* class usage stats */
+		report_class(cptr, BadTo(parv[0]));
+		break;
+	case 'c': /* C and N conf lines */
 		report_configured_links(cptr, parv[0], CONF_CONNECT_SERVER|
 					CONF_ZCONNECT_SERVER|
 					CONF_NOCONNECT_SERVER);
@@ -2940,22 +2944,6 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				continue;
 			}
 			trace_one(sptr, a2cptr);	
-		}
-		
-		/* Report Class usage */
-		if (IsPerson(sptr) && SendWallops(sptr))
-		{
-			aClass  *tmp;
-		    	for (tmp = FirstClass(); tmp; tmp = NextClass(tmp))
-		    	{
-				if (Links(tmp) > 0)
-				{
-					sendto_one(sptr,
-						   replies[RPL_TRACECLASS],
-						   ME, BadTo(parv[0]),
-					   	   Class(tmp), Links(tmp));
-				}
-	   		}
 		}
 	}
 	sendto_one(sptr, replies[RPL_TRACEEND], ME, BadTo(parv[0]),
@@ -3785,5 +3773,23 @@ static void report_listeners(aClient *sptr, char *to)
 			timeofday - acptr->firsttime,
 			acptr->confs->value.aconf->clients,
 			IsListenerInactive(acptr) ? "inactive" : "active" );
+	}
+}
+
+static void report_class(aClient *sptr, char *to)
+{
+	/* Report Class usage */
+	if (IsPerson(sptr))
+	{
+		aClass  *tmp;
+
+	    	for (tmp = FirstClass(); tmp; tmp = NextClass(tmp))
+	    	{
+			if (Links(tmp) > 0)
+			{
+				sendto_one(sptr, replies[RPL_TRACECLASS],
+					ME, to, Class(tmp), Links(tmp));
+			}
+   		}
 	}
 }
