@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.48 2002/06/02 00:27:20 q Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.49 2002/06/04 21:39:01 jv Exp $";
 #endif
 
 #include "os.h"
@@ -380,7 +380,7 @@ aClient *to;
 static	anUser	ausr = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL,
 			 0, NULL, NULL,
 			 "anonymous", "0", "anonymous.", "anonymous.",
-			 "127.0.0.0"};
+			 0,NULL, "127.0.0.0"};
 
 static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 			 &anon, -2, 0, STAT_CLIENT, "anonymous", "anonymous",
@@ -1311,24 +1311,34 @@ void	sendto_ops_butone(aClient *one, aClient *from, char *pattern, ...)
 	Reg	int	i;
 	Reg	aClient *cptr;
 
-	bzero((char *)&sentalong[0], sizeof(int) * MAXCONNECTIONS);
-	for (cptr = client; cptr; cptr = cptr->next)
-	    {
-		if (IsService(cptr) || !IsRegistered(cptr))
+	for (i = highest_fd; i >= 0; i--)
+	{
+		if (!(cptr = local[i]))
+		{
 			continue;
-		if ((IsPerson(cptr) && !SendWallops(cptr)) || IsMe(cptr))
+		}
+
+		/* WALLOPS are sent to services via check_service() in
+		 * m_wallops */
+		if (IsService(cptr) || IsMe(cptr) || !IsRegistered(cptr))
+		{
 			continue;
-		if (MyClient(cptr) && !(IsServer(from) || IsMe(from)))
+		}
+	
+		/* user doesn't want WALLOPS */
+		if (IsPerson(cptr) && !SendWallops(cptr))
+		{
 			continue;
-		i = cptr->from->fd;	/* find connection oper is on */
-		if (sentalong[i])	/* sent message along it already ? */
-			continue;
+		}
+		
+		/* skip the one ... */
 		if (cptr->from == one)
-			continue;	/* ...was the one I should skip */
-		sentalong[i] = 1;
+		{
+			continue;
+		}
 #if ! USE_STDARG
       		sendto_prefix_one(cptr->from, from, pattern,
-				  p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,p11);
+			  p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,p11);
 #else
 		{
 			va_list	va;
@@ -1337,7 +1347,9 @@ void	sendto_ops_butone(aClient *one, aClient *from, char *pattern, ...)
 			va_end(va);
 		}
 #endif
-	    }
+	
+	}
+	
 	return;
 }
 
