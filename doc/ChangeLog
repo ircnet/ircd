@@ -1,3 +1,24 @@
+1999-01-28  Christophe Kalt
+
+	* s_serv.c/m_server_estab(): added notices to &DEBUG.
+
+	* struct_def.h, s_auth.c: renamed MotdItem to LineItem and moved
+	around some defines.
+
+	* s_bsd_ext.h: added missing ';' for utmp_open() definition.
+
+	* channel.c/m_list(): !shortname now reports +p/+s channels (but
+	still hides member count and topic for +s channels).
+
+	* match.c/match(): rearranged if test to suppress harmless read
+	overflow errors (reported by Insure++).
+
+	* s_user.c/m_nick(): lp needs to be initialized (reported by Insure++).
+
+	* hash.c/hash_find_channels(): bugfix (spottoed by Q).
+
+	* mod_rfc931.c/rfc931_init(): fix for a silly bug (from Piotr).
+
 1999-01-19  Christophe Kalt
 
 	* resolv_def.h, res_comp.c, res_init.c: updated (BIND 4.9.7-REL).
