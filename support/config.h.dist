@@ -87,6 +87,12 @@
  */
 #undef	NO_DEFAULT_INVISIBLE
 
+/*
+ * Define this if you want to have TKLINE and UNTKLINE commands
+ * for opers and services.
+ */
+#define TKLINE
+
 /* OPER_KILL
  *
  * If you dont believe operators should be allowed to use the /KILL command
@@ -98,9 +104,11 @@
  * operators and accidents.
  * OPER_SET enables SET command which can be used for fine-tuning of certain
  * aspects of ircd behaviour during runtime.
+ * OPER_TKLINE allows opers to use TKLINE and UNTKLINE commands if TKLINE
+ * has been enabled.
  * The 'LOCOP_' #defines are for making the respective commands available
  * to 'local' operators. Note that the 'OPER_' #defines affect both global
- * (big O) and local (little o) operators.  Defining 'LOCOP_x' has no effect
+ * (little o) and local (big O) operators.  Defining 'LOCOP_x' has no effect
  * if 'OPER_x' is undefined so you can't give local operators more rights
  * than global ones.
  */
@@ -108,11 +116,15 @@
 #define	OPER_REHASH
 #undef	OPER_RESTART
 #define	OPER_DIE
-#define OPER_SET
+#define	OPER_SET
 #undef	LOCOP_REHASH
 #undef	LOCOP_RESTART
 #undef	LOCOP_DIE
 #undef	LOCOP_SET
+#ifdef TKLINE
+#define	OPER_TKLINE
+#undef	LOCOP_TKLINE
+#endif
 
 /*
  * Maximum number of network connections your server will allow.  This must
