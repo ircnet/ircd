@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.1 1998/06/12 22:57:40 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.2 1998/08/05 01:47:07 kalt Exp $";
 #endif
 
 #include <stdio.h>
@@ -487,7 +487,8 @@ Usage:\n\
 %s\n", rcsid);
 }
 
-void main (int argc, char **argv) {
+int
+main (int argc, char **argv) {
   int i;
 
   chdir(DPATH);
