@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.23 1998/07/26 23:20:18 kalt Exp $
+#*   $Id: Makefile.in,v 1.24 1998/08/01 21:19:07 kalt Exp $
 #*
 #*/
 
@@ -99,7 +99,7 @@ CHKCONF = chkconf
 
 all: server client
 
-server: $(SERVER) $(IAUTH) $(CHKCONF) mkpasswd ircdwatch
+server: $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd ircdwatch
 
 client: $(CLIENT)
 
@@ -127,7 +127,7 @@ ircdwatch: ircdwatch.o
 	$(RM) ircdwatch
 	$(CC) -o $@ $<
 
-mkpasswd: mkpasswd.o
+ircd-mkpasswd: mkpasswd.o
 	$(RM) ircd-mkpasswd
 	$(CC) $(LDFLAGS) -o ircd-mkpasswd mkpasswd.o $(LIBS)
 
