@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.78 2004/03/04 11:43:06 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.79 2004/03/04 11:46:48 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -336,7 +336,11 @@ attach_iline:
 		{
 			SetKlineExempt(cptr);
 		}
-		get_sockhost(cptr, uhost);
+		/* Copy uhost (hostname) over sockhost, if conf flag permits. */
+		if (hp && !IsConfNoResolve(aconf))
+		{
+			get_sockhost(cptr, uhost);
+		}
 		if ((i = attach_conf(cptr, aconf)) < -1)
 			find_bounce(cptr, ConfClass(aconf), -1);
 		return i;
