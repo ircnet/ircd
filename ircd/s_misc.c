@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.15 1998/01/07 19:13:29 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.16 1998/04/02 18:45:53 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -76,9 +76,9 @@ time_t	clock;
 	if (minswest < 0)
 		minswest = -minswest;
 
-	(void)sprintf(buf, "%s %s %d 19%02d -- %02d:%02d %c%02d:%02d",
+	(void)sprintf(buf, "%s %s %d %d -- %02d:%02d %c%02d:%02d",
 		weekdays[lt->tm_wday], months[lt->tm_mon],lt->tm_mday,
-		lt->tm_year, lt->tm_hour, lt->tm_min,
+		lt->tm_year + 1900, lt->tm_hour, lt->tm_min,
 		plus, minswest/60, minswest%60);
 
 	return buf;
