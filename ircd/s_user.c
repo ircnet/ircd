@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.145 2003/02/15 19:10:29 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.146 2003/02/15 19:14:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1467,12 +1467,16 @@ int	parc, notice;
 					   ME, BadTo(parv[0]), nick);
 				continue;
 			    }
+			/* this function now sends it to local clients and
+			** new (2.11) servers */
 			sendto_match_butone(IsServer(cptr) ? cptr : NULL, 
 					    sptr, nick + 2,
 					    (*(nick+1) == '#') ? MATCH_HOST :
 							     MATCH_SERVER,
 					    ":%s %s %s :%s", parv[0],
 					    cmd, nick, parv[2]);
+			/* old servers don't know new syntax, so send them
+			** old syntax (observe ++nick) --Beeth */
 			sendto_match_butone_old(IsServer(cptr) ? cptr : NULL, 
 					    sptr, nick + 2,
 					    (*(nick+1) == '#') ? MATCH_HOST :
