@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.34 1999/06/07 21:01:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.35 1999/06/20 21:21:40 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -724,68 +724,80 @@ void	sendto_serv_butone(aClient *one, char *pattern, ...)
 }
 
 #if ! USE_STDARG
-void	sendto_serv_v(one, ver, pattern, p1, p2, p3, p4,p5,p6,p7,p8,p9,p10,p11)
+int
+sendto_serv_v(one, ver, pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
 aClient *one;
 int	ver;
 char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 #else
-void	sendto_serv_v(aClient *one, int ver, char *pattern, ...)
+int
+sendto_serv_v(aClient *one, int ver, char *pattern, ...)
 #endif
 {
-	Reg	int	i, len=0;
+	Reg	int	i, len=0, rc=0;
 	Reg	aClient *cptr;
 
 	for (i = fdas.highest; i >= 0; i--)
 		if ((cptr = local[fdas.fd[i]]) &&
-		    (!one || cptr != one->from) && !IsMe(cptr) &&
-		    (cptr->serv->version & ver)) {
-			if (!len)
+		    (!one || cptr != one->from) && !IsMe(cptr))
+			if (cptr->serv->version & ver)
 			    {
+				if (!len)
+				    {
 #if ! USE_STDARG
-				len = sendprep(pattern, p1, p2, p3, p4, p5,
-					       p6, p7, p8, p9, p10, p11);
+					len = sendprep(pattern, p1, p2, p3, p4,
+						       p5, p6, p7, p8, p9, p10,
+						       p11);
 #else
-				va_list	va;
-				va_start(va, pattern);
-				len = vsendprep(pattern, va);
-				va_end(va);
+					va_list	va;
+					va_start(va, pattern);
+					len = vsendprep(pattern, va);
+					va_end(va);
 #endif
+				    }
+				(void)send_message(cptr, sendbuf, len);
 			    }
-			(void)send_message(cptr, sendbuf, len);
-	}
-	return;
+			else
+				rc = 1;
+	return rc;
 }
 
 #if ! USE_STDARG
-void	sendto_serv_notv(one, ver, pattern, p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11)
+int
+sendto_serv_notv(one, ver, pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9,p10,p11)
 aClient *one;
 int	ver;
 char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 #else
-void	sendto_serv_notv(aClient *one, int ver, char *pattern, ...)
+int
+sendto_serv_notv(aClient *one, int ver, char *pattern, ...)
 #endif
 {
-	Reg	int	i, len=0;
+	Reg	int	i, len=0, rc=0;
 	Reg	aClient *cptr;
 
 	for (i = fdas.highest; i >= 0; i--)
 		if ((cptr = local[fdas.fd[i]]) &&
-		    (!one || cptr != one->from) && !IsMe(cptr) &&
-		    ((cptr->serv->version & ver) == 0)) {
-			if (!len)
+		    (!one || cptr != one->from) && !IsMe(cptr))
+			if ((cptr->serv->version & ver) == 0)
 			    {
+				if (!len)
+				    {
 #if ! USE_STDARG
-				len = sendprep(pattern, p1, p2, p3, p4, p5,
-					       p6, p7, p8, p9, p10, p11);
+					len = sendprep(pattern, p1, p2, p3, p4,
+						       p5, p6, p7, p8, p9, p10,
+						       p11);
 #else
-				va_list	va;
-				va_start(va, pattern);
-				len = vsendprep(pattern, va);
-				va_end(va);
+					va_list	va;
+					va_start(va, pattern);
+					len = vsendprep(pattern, va);
+					va_end(va);
 #endif
+				    }
+				(void)send_message(cptr, sendbuf, len);
 			    }
-			(void)send_message(cptr, sendbuf, len);
-	}
+			else
+				rc = 1;
 	return;
 }
 
@@ -1071,18 +1083,20 @@ void	sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 
 #if ! USE_STDARG
 /*VARARGS*/
-void	sendto_match_servs_v(chptr, from, ver, format, p1, p2, p3, p4, p5, p6,
-			     p7, p8, p9, p10, p11)
+int
+sendto_match_servs_v(chptr, from, ver, format, p1, p2, p3, p4, p5, p6,
+		     p7, p8, p9, p10, p11)
 aChannel *chptr;
 aClient	*from;
 char	*format, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 int	ver;
 #else
-void	sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
-			     char *format, ...)
+int
+sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
+		     char *format, ...)
 #endif
 {
-	Reg	int	i, len=0;
+	Reg	int	i, len=0, rc=0;
 	Reg	aClient	*cptr;
 	char	*mask;
 
@@ -1103,11 +1117,14 @@ void	sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
 			continue;
-		if ((ver & cptr->serv->version) == 0)
-			continue;
 		if (chptr &&
 		    *chptr->chname == '!' && !(cptr->serv->version & SV_NJOIN))
 			continue;
+		if ((ver & cptr->serv->version) == 0)
+		    {
+			rc = 1;
+			continue;
+		    }
 		if (!len)
 		    {
 #if ! USE_STDARG
@@ -1122,22 +1139,25 @@ void	sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
 		    }
 		(void)send_message(cptr, sendbuf, len);
 	    }
+	return rc;
 }
 
 #if ! USE_STDARG
 /*VARARGS*/
-void	sendto_match_servs_notv(chptr, from, ver, format, p1, p2, p3, p4, p5,
-				p6, p7, p8, p9, p10, p11)
+int
+sendto_match_servs_notv(chptr, from, ver, format, p1, p2, p3, p4, p5,
+			p6, p7, p8, p9, p10, p11)
 aChannel *chptr;
 aClient	*from;
 char	*format, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 int	ver;
 #else
-void	sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
-				char *format, ...)
+int
+sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
+			char *format, ...)
 #endif
 {
-	Reg	int	i, len=0;
+	Reg	int	i, len=0, rc=0;
 	Reg	aClient	*cptr;
 	char	*mask;
 
@@ -1158,11 +1178,14 @@ void	sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
 			continue;
-		if ((ver & cptr->serv->version) != 0)
-			continue;
 		if (chptr &&
 		    *chptr->chname == '!' && !(cptr->serv->version & SV_NJOIN))
 			continue;
+		if ((ver & cptr->serv->version) != 0)
+		    {
+			rc = 1;
+			continue;
+		    }
 		if (!len)
 		    {
 #if ! USE_STDARG
@@ -1177,6 +1200,7 @@ void	sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
 		    }
 		(void)send_message(cptr, sendbuf, len);
 	    }
+	return rc;
 }
 
 /*
