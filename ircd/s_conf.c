@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.153 2004/12/06 17:07:22 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.154 2005/01/30 17:22:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1625,6 +1625,8 @@ int 	initconf(int opt)
 					  atoi(aconf->passwd),
 					  atoi(aconf->name), aconf->port,
 					  tmp ? atoi(tmp) : 0,
+					  (tmp && index(tmp, '.')) ?
+					  atoi(index(tmp, '.') + 1) : 0,
 					  tmp3 ? atoi(tmp3) : 1,
 					  (tmp3 && index(tmp3, '.')) ?
 					  atoi(index(tmp3, '.') + 1) : 1,
