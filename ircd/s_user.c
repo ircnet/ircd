@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.42 1998/04/03 14:34:47 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.43 1998/04/15 18:29:25 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -617,6 +617,7 @@ char	*parv[];
 	aClient *acptr;
 	int	delayed = 0;
 	char	nick[NICKLEN+2], *s, *user, *host;
+	Link	*lp;
 
 	if (IsService(sptr))
    	    {
@@ -897,6 +898,10 @@ nickkilldone:
 					   err_str(ERR_RESTRICTED, nick));
 				return 2;
 			    }
+			/* is the user banned on any channel ? */
+			for (lp = sptr->user->channel; lp; lp = lp->next)
+				if (can_send(sptr, lp->value.chptr) ==MODE_BAN)
+					break;
 		}
 		/*
 		** Client just changing his/her nick. If he/she is
@@ -946,7 +951,10 @@ nickkilldone:
 	**  Finally set new nick name.
 	*/
 	(void)add_to_client_hash_table(nick, sptr);
-	return 3;
+	if (lp)
+		return 15;
+	else
+		return 3;
 }
 
 /*
