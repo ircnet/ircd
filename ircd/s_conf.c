@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.40 1999/04/10 15:57:47 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.41 1999/04/10 16:35:19 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1360,11 +1360,16 @@ char	*name, *key;
 int	stat;
 {
 	aConfItem *tmp;
+	int l;
 
+	if (index(key, '/') == NULL)
+		return 0;
+	l = ((char *)index(key, '/') - key) + 1;
 	for (tmp = conf; tmp; tmp = tmp->next)
  		if ((tmp->status == stat) && tmp->passwd && tmp->name &&
- 		    (match(tmp->name, name) == 0) &&
-		    (match(tmp->passwd, key) == 0))
+		    (strncasecmp(key, tmp->passwd, l) == 0) &&
+		    (match(tmp->name, name) == 0) &&
+		    (strpbrk(key + l, tmp->passwd + l)))
 			break;
  	return (tmp ? -1 : 0);
 }
