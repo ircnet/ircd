@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.119 2002/04/05 03:07:57 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.120 2002/04/05 03:58:07 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2613,7 +2613,7 @@ char	*parv[];
 	}
 	if (IsMe(acptr))
 	{
-		if (IsBursting(sptr))
+		if (IsServer(sptr) && IsBursting(sptr))
 		{
 			do_emulated_eob(sptr);
 		}
