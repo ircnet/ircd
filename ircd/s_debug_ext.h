@@ -37,7 +37,7 @@ extern char serveropts[];
 #if ! USE_STDARG
 EXTERN void debug();
 #else /* USE_STDARG */
-EXTERN void debug __P((int level, char *form, ...));
+EXTERN void debug (int level, char *form, ...);
 #endif /* USE_STDARG */
 EXTERN void send_usage __P((aClient *cptr, char *nick));
 EXTERN void send_defines __P((aClient *cptr, char *nick));
