@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.55 2004/03/21 17:31:35 chopin Exp $
+  $Id: INSTALL.txt,v 1.56 2004/03/24 18:59:55 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0.
 
@@ -413,8 +413,8 @@
 
      FFoorrmmaatt
 
-        P:<Internet IP#>:<*>::<Port>:
-        P:<Directory>:<*>:<*>:<Port>:
+        P:<Internet IP#>:<*>::<Port>:<Flags>:
+        P:<Directory>:<*>:<*>:<Port>:<Flags>:
 
 
 
@@ -428,11 +428,14 @@
         SSeerrvveerr CCoonnnneeccttiioonnss sections to properly configure outgoing
         connections.
 
-        P:192.168.1.194:::6664:
-
      PPoorrtt
         The port number field tells the server which port number it
         should listen on for incoming connections.
+
+     EExxaammppllee
+        P:192.168.1.194:::6664:
+
+        Listens for incoming connections on IP 192.168.1.194, port 6664.
 
   +o  Unix Socket Ports.
 
@@ -454,8 +457,16 @@
         ``6667''. The unix socket (file) must be a numerical.
 
 
+     FFllaaggss
+        Flags changing behaviour of a given P-line. It can be empty or
+        one of:
+
+        +o  D - delayed accept (not active until first netjoin)
+
+        +o  S - server-only (user connections are rejected)
+
      NNoottee
-        You need at least one P line or server won't start.  (Unless you
+        You need at least one P-line or server won't start.  (Unless you
         run it from inetd.)
 
 
@@ -514,7 +525,6 @@
      SSeennddQQ
         This field defines the ``SendQ'' value for this class.  If this
         field is not present, the default (from config.h) is assigned.
-
      LLooccaall lliimmiitt
         This field is used to limit the number of local concurrent
         connections.  The format is <x>.<y>
@@ -589,7 +599,6 @@
         same hostname.
 
 
-
   44..55..  CClliieenntt ccoonnnneeccttiioonnss
 
   How to let clients connect to your IRCD.
@@ -646,6 +655,7 @@
         Using this field to enforce that clients have no Host Name set
         is not working (they will rather be denied connection). Use
         ``N'' ffllaagg.
+
 
      PPoorrtt
         Specifies the port number for which this configuration line is
@@ -713,7 +723,6 @@
 
         Allow clients from a machine with that IP number aanndd that
         hostname to connect.
-
         I::secret:*.tut.fi::1
 
         Allow clients from machines matching ``*.tut.fi'' to connect
@@ -722,6 +731,7 @@
         I:::*::1
 
         Allow anyone from anywhere to connect to your server.
+
         I:::*.fi:6667:1
 
         Allow clients from machines matching ``*.fi'' to connect on the
@@ -854,6 +864,7 @@
         If you specify an IP address, IP mask, or an IP bitmask, it will
         match clients connecting from the matching addresses, no matter
         if they resolve or not.
+
         You can prefix an IP address, an IP mask, or IP bitmask by ``=''
         in which case only non resolving matching hosts will be banned.
 
@@ -1051,7 +1062,6 @@
      but if ``irc.nada.kth.se'' requests a connection, allow it to
      connect.
 
-
   Now back to our original problem, we wanted OUR server CONNECT to 3
   hosts,  ``nic.funet.fi'', ``irc.nada.kth.se'' and ``garfield.mit.edu''
   in that order.  So as we enter these entries into the file they must
@@ -1109,14 +1119,12 @@
         The password of the other host.  A password must always be
         present for the line to be recognized. If CRYPT_LINK_PASSWORD is
         defined in config.h, this password must be crypted.
-
      TTAARRGGEETT HHoosstt NNAAMMEE
         The full hostname of the target machine. This is the name that
         the TARGET server will identify itself with when you connect to
         it.  If you were connecting to nic.funet.fi you would receive
         ``nic.funet.fi'' and that is what you should place in this
         field.
-
 
      DDoommaaiinn MMaasskk
         Domain masking, see below.
@@ -1242,7 +1250,6 @@
         Allows a server named ``*.bu.edu'' to introduce only servers
         that match the ``*.edu'' name mask, no matter what SID they
         have.
-
         H:*:616*:eff.org::
 
         Allows ``eff.org'' to introduce (and act as a hub for) any
@@ -1313,7 +1320,6 @@
         this new server.
 
 
-
   44..1122..  VVeerrssiioonn lliimmiittaattiioonnss
 
 
@@ -1374,10 +1380,10 @@
         implementation dependant; matches on this part should be used
         with particular identification.
 
+
      FFllaaggss
         are not standard.  Therefore, this field sshhoouulldd aallwwaayyss contain a
         specific identification.
-
 
 
   44..1133..  EExxcclluuddeedd mmaacchhiinneess
@@ -1441,10 +1447,8 @@
         The type of service. It defines the priviledges given to the
         service. Be very careful in the types you allow.  The types can
         be found in include/service.h
-
      CCllaassss
         The class field should refer to an existing class.
-
 
      NNootteess
         A service is not a very useful sort of client, it cannot join
@@ -1509,9 +1513,9 @@
         anymore.
 
         B:::irc2.stealth.net:6667:
-
         When the server is completely full, clients should use the
         secondary server.
+
         B:-1::our.server.example:6667:
 
         Clients that connected to server-only port should really use
@@ -1576,7 +1580,6 @@
         If the bug results in a crash, please include the backtrace.
         (This can be done, for example, by running ``gdb'' on the core
         file, and typing ``where'').
-
 
      FFiixx
         If you have a fix, don't forget to include it.

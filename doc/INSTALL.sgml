@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.55 2004/03/21 17:31:35 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.56 2004/03/24 18:59:55 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0.
 </abstract>
@@ -348,8 +348,8 @@ server's ability to accept connections. By use of this line
 in the ircd.conf file, it is easy to setup both Unix Domain
 ports for the server to accept connections on as well as
 extra internet ports.
-<tag/Format/<verb>P:&lt;Internet IP&num;&gt;:&lt;*&gt;::&lt;Port&gt;:
-P:&lt;Directory&gt;:&lt;*&gt;:&lt;*&gt;:&lt;Port&gt;:</verb>
+<tag/Format/<verb>P:&lt;Internet IP&num;&gt;:&lt;*&gt;::&lt;Port&gt;:&lt;Flags&gt;:
+P:&lt;Directory&gt;:&lt;*&gt;:&lt;*&gt;:&lt;Port&gt;:&lt;Flags&gt;:</verb>
 </descrip>
 <itemize>
 <item>Internet Ports
@@ -360,10 +360,11 @@ connections will be accepted. If none is defined here, server
 will bind to all interfaces (INADDR_ANY).  See also <bf>Machine
 configuration</bf> and <bf>Server Connections</bf> sections
 to properly configure outgoing connections.
-<p>
-P:192.168.1.194:::6664:
 <tag/Port/ The port number field tells the server which port
 number it should listen on for incoming connections.
+<tag/Example/ P:192.168.1.194:::6664:
+<p>
+Listens for incoming connections on IP 192.168.1.194, port 6664.
 </descrip>
 <item> Unix Socket Ports.
 <descrip>
@@ -381,7 +382,13 @@ Creates a unix socket in the /tmp/.ircd directory called
 </descrip>
 </itemize>
 <descrip>
-<tag/Note/ You need at least one P line or server won't start.
+<tag/Flags/ Flags changing behaviour of a given P-line. It can be empty
+or one of:
+<itemize>
+<item>D - delayed accept (not active until first netjoin)
+<item>S - server-only (user connections are rejected)
+</itemize>
+<tag/Note/ You need at least one P-line or server won't start.
 (Unless you run it from inetd.)
 </descrip>
 

@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-3744/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-16816/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.55 2004/03/21 17:31:35 chopin Exp $
+     $Id: INSTALL.info,v 1.56 2004/03/24 18:59:54 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0.
 
@@ -511,7 +511,8 @@ Port connections
      connections on as well as extra internet ports.
 
 `Format'
-     P:<Internet IP#>:<*>::<Port>: P:<Directory>:<*>:<*>:<Port>:
+     P:<Internet IP#>:<*>::<Port>:<Flags>:
+     P:<Directory>:<*>:<*>:<Port>:<Flags>:
 
 
    * Internet Ports
@@ -523,11 +524,15 @@ Port connections
           configuration' and `Server Connections' sections to properly
           configure outgoing connections.
 
-          P:192.168.1.194:::6664:
-
     `Port'
           The port number field tells the server which port number it
           should listen on for incoming connections.
+
+    `Example'
+          P:192.168.1.194:::6664:
+
+          Listens for incoming connections on IP 192.168.1.194, port
+          6664.
 
 
    *  Unix Socket Ports.
@@ -549,8 +554,15 @@ Port connections
           "6667". The unix socket (file) must be a numerical.
 
 
+`Flags'
+     Flags changing behaviour of a given P-line. It can be empty or one
+     of:
+        * D - delayed accept (not active until first netjoin)
+
+        * S - server-only (user connections are rejected)
+
 `Note'
-     You need at least one P line or server won't start.  (Unless you
+     You need at least one P-line or server won't start.  (Unless you
      run it from inetd.)
 
 
@@ -1662,41 +1674,41 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top127
-Node: Installing IRC-651
-Node: The configure script876
-Node: Notes for Cygwin32 users3162
-Node: Notes concerning IPv6 support3895
-Node: The config-h file4326
-Node: DEBUGMODE4894
-Node: CHROOTDIR5471
-Node: ENABLE_SUMMON ENABLE_USERS5840
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6373
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7062
-Node: ZIP_LINKS ZIP_LEVEL7723
-Node: SLOW_ACCEPT8751
-Node: CLONE_CHECK9381
-Node: Other #define's9744
-Node: Editing the Makefile and compiling10066
-Node: The ircd-conf file11051
-Node: Machine information12900
-Node: Administrative info15515
-Node: Port connections17666
-Node: Connection Classes19497
-Node: Client connections24624
-Node: Operator priviliges30358
-Node: Excluded accounts32531
-Node: Server connections36443
-Node: Deny auto-connections45071
-Node: Hub connections46445
-Node: Leaf connections47933
-Node: Version limitations50017
-Node: Excluded machines51775
-Node: Service connections53080
-Node: Bounce server54674
-Node: Related resources56535
-Node: Reporting a bug57574
-Node: How to report a bug57831
-Node: Where to send a bug report58842
+Node: Top128
+Node: Installing IRC-652
+Node: The configure script877
+Node: Notes for Cygwin32 users3163
+Node: Notes concerning IPv6 support3896
+Node: The config-h file4327
+Node: DEBUGMODE4895
+Node: CHROOTDIR5472
+Node: ENABLE_SUMMON ENABLE_USERS5841
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6374
+Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7063
+Node: ZIP_LINKS ZIP_LEVEL7724
+Node: SLOW_ACCEPT8752
+Node: CLONE_CHECK9382
+Node: Other #define's9745
+Node: Editing the Makefile and compiling10067
+Node: The ircd-conf file11052
+Node: Machine information12901
+Node: Administrative info15516
+Node: Port connections17667
+Node: Connection Classes19830
+Node: Client connections24957
+Node: Operator priviliges30691
+Node: Excluded accounts32864
+Node: Server connections36776
+Node: Deny auto-connections45404
+Node: Hub connections46778
+Node: Leaf connections48266
+Node: Version limitations50350
+Node: Excluded machines52108
+Node: Service connections53413
+Node: Bounce server55007
+Node: Related resources56868
+Node: Reporting a bug57907
+Node: How to report a bug58164
+Node: Where to send a bug report59175
 
 End Tag Table
