@@ -151,7 +151,7 @@
  * A HUB Server has many servers connect to it at the same as opposed
  * to a leaf which just has 1 server (typically the uplink).
  */
-/* #define	HUB */
+#undef	HUB
 
 #ifdef HUB
 /*
