@@ -1,3 +1,35 @@
+2004-11-11  Piotr Kucharski
+
+	* send.c/send_message(): default define to allow increasing poolsize
+	  all the time, not only during bursts.
+
+2004-11-10  Piotr Kucharski
+
+	* config.h.dist, s_bsd.c/read_listener(), read_message(): speed up
+	  accepting new clients tenfold by default; make it configurable.
+	* s_bsd.c/read_message(): keep existing (primary) error on cptr.
+	* s_conf.c/initconf(): make sure sid is uppercase.
+	* send.c/send_message(): no need to increase sendq and poolsize
+	  for bursting clients when they exceed their maxsendq.
+	* send.c/send_message(): no need to increase sendq when poolsize
+	  is exceeded.
+
+2004-11-09  Piotr Kucharski
+
+	* a_conf.c/conf_err(): print errors to stderr.
+	* configure: fix --disable-ip6.
+	* struct_def.h: add ping to aClient.
+	* ircd.c/check_pings(): use cptr->ping.
+	* s_conf.c/attach_conf(): set cptr->ping.
+
+2004-11-04  Piotr Kucharski
+
+	* send.c/vsendpreprep(): do not use sockhost (breaks I-line 'M' flag).
+	* send.c/vsendpreprep(): overall simplification.
+	* s_misc.c/get_client_name(): use host for registered users, sockhost
+	  for others (so make I-line 'M' flag working better); also use sip for
+	  registered users.
+
 2.11.0b16
 
 2004-11-03  Piotr Kucharski
