@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.121 2002/03/29 01:21:35 jv Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.122 2002/04/16 20:48:22 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2759,28 +2759,6 @@ char	*parv[];
 	    } /* loop on parv[1] */
 
 	return penalty;
-}
-
-int	count_channels(sptr)
-aClient	*sptr;
-{
-Reg	aChannel	*chptr;
-	Reg	int	count = 0;
-
-	for (chptr = channel; chptr; chptr = chptr->nextch)
-	    {
-		if (chptr->users) /* don't count channels in history */
-#ifdef	SHOW_INVISIBLE_LUSERS
-			if (SecretChannel(chptr))
-			    {
-				if (IsAnOper(sptr))
-					count++;
-			    }
-			else
-#endif
-				count++;
-	    }
-	return (count);
 }
 
 /*
