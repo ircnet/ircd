@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.38 2002/01/06 04:57:40 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.39 2002/01/07 02:07:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -421,7 +421,7 @@ int	find_sender(aClient *cptr, aClient **sptr, char *sender, char *buffer)
 				from = find_uid(sender, NULL);
 			}
 		}
-		else if (*sender == '$' && sender[SIDLEN] == '\0')
+		else if (*sender == '$' && strlen(sender) == SIDLEN)
 		{
 			/* Compatibility SID. */
 			aServer *servptr;
