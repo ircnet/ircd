@@ -1,4 +1,11 @@
+2002-04-06  Piotr Kucharski
+
+	* s_serv.c/m_server_estab(),m_eob(): send empty EOB if we have no
+	  leaf-servers EOB-ed.
+	* parse.c,s_serv.c: add missing parameter to idtol().
+
 2002-04-07  Jakub Vlasek
+
 	* bsd.c/deliver_it(): Removed call to hold_server() (which has been
 	  removed).
 	* s_serv.c/m_eob(): Fix notices about received EOBs, warn about
@@ -6,12 +13,14 @@
 	* support.c/inetntop(): Use the_size for bcopy() properly.
 
 2002-04-06  Jakub Vlasek
+
 	* s_user.c/save_user(): Send ME as source of RPL_SAVENICK if collision
 	  is generated locally.
 	* s_serv.c/m_eob(): Pass sid+1 as a parameter to find_tokserver()
 	  for fake SIDs.
 
 2002-04-05  Jakub Vlasek
+
 	* s_service.c/m_service(),m_servset(),m_servlist(): Changed atoi()
 	  to strtol() to allow hexadecimal arguments.
 	* msg_dev.h: Added EOB, removed useless comments.
