@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.256 2004/11/21 00:41:16 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.257 2004/12/12 19:26:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1787,7 +1787,7 @@ static	void	report_myservers(aClient *sptr, char *to)
 		count_servers_users(acptr, &servers, &users);
 		sendto_one(sptr,
 			   ":%s %d %s :%s (%d, %02d:%02d:%02d) %dS %dC"
-			   " %lldkB sent %lldkB recv %ldkB sq%s",
+			   " %lldkB sent %lldkB recv %ldkB sq %sV%X%s",
 			   ME, RPL_STATSDEBUG, to, acptr->name,
 			   timeconnected / 86400,
 			   (timeconnected % 86400) / 3600,
@@ -1797,7 +1797,9 @@ static	void	report_myservers(aClient *sptr, char *to)
 			   (acptr->sendB / 1024) ,
 			   (acptr->receiveB / 1024),
 			   (int) ((int)DBufLength(&acptr->sendQ) / 1024),
-			   IsBursting(acptr) ? " BURST" : "");
+			   IsBursting(acptr) ? "BURST " : "",
+			   acptr->serv->version,
+			   (acptr->flags & FLAGS_ZIP) ?  "z" : "");
 	}
 }
 
