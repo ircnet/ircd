@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.138 2003/02/10 16:26:49 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.139 2003/02/10 19:18:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -271,70 +271,56 @@ aChannel *chptr;
 {
 	Reg	Link	*tmp;
 	char	*s;
+	char	mode_nick[NICKLEN+1];
+	char	mode_user[USERLEN+1];
+	char	mode_host[HOSTLEN+1];
 
 	if (!IsPerson(cptr))
 		return NULL;
 
-	s = make_nick_user_host(cptr->name, cptr->user->username,
-				  cptr->user->host);
-
 	for (tmp = chptr->mlist; tmp; tmp = tmp->next)
-		if (tmp->flags == type && match(tmp->value.cp, s) == 0)
-			break;
-
-	if (!tmp && MyConnect(cptr))
-	    {
-		char *ip = NULL;
-
-#ifdef 	INET6
-		ip = (char *) inetntop(AF_INET6, (char *)&cptr->ip,
-				       mydummy, MYDUMMY_SIZE);
-#else
-		ip = (char *) inetntoa((char *)&cptr->ip);
-#endif
-
-		if (strcmp(ip, cptr->user->host))
-		    {
-
-			s = make_nick_user_host(cptr->name,
-						cptr->user->username, ip);
-	    
-			for (tmp = chptr->mlist; tmp; tmp = tmp->next)
-				if (tmp->flags == type &&
-					match(tmp->value.cp, s) == 0)
-						break;
-		    }
-	  }
-
-#ifndef INET6
-	if (!tmp && MyConnect(cptr))
 	{
-		int mask;
-
-		buf[0]='\0';
-		/* perhaps if (strrchr(tmp->value.cp, '/')
-		   before sscanf would give us some speed */
-		for (tmp = chptr->mlist; tmp; tmp = tmp->next)
-			if (tmp->flags == type)
+		if (tmp->flags == type)
 		{
-			/* match_ipmask() seems so expensive :( */
-			if (sscanf(tmp->value.cp, "%*[^@]@%[0-9.]/%d",
-				buf, &mask) == 2)
+			/* voting for putting n!u@h in proper value.cp struct */
+			if (sscanf(tmp->value.cp, "%[^!]!%[^@]@%s", mode_nick,
+				mode_user, mode_host) != 3)
 			{
-				if (mask == 0)
+				/* perhaps SCH_ERROR should be notified?
+				   anyway, any beI line not matching above
+				   pattern will never match anyone */
+				continue;
+			}
+			if (match(mode_nick, cptr->name)
+				|| match(mode_user, cptr->username))
+			{
+				/* client doesn't match them, no point
+				   checking hostname */
+				continue;
+			}
+			if (match(mode_host, cptr->user->host) == 0)
+			{
+				/* match */
+				break;
+			}
+			/* if our client, let's check IP and CIDR */
+			if (MyConnect(cptr))
+			{
+				/* Yay, it's 2.11, we have string ip! */
+				if (match(mode_host, cptr->user->sip) == 0)
+				{
+					/* match */
 					break;
-				if (mask > 32 || mask < 0)
-					continue;
-				mask=32-mask;
-				/* BUG: where is nick!user@ part checking? */
-				if (htonl(cptr->ip.s_addr) >> mask ==
-					htonl(inetaddr(buf)) >> mask)
-					/* CIDR match */
+				}
+				/* so now we check CIDR */
+				if (strchr(mode_host, '/') &&
+					match_ipmask(mode_host, cptr, 0) == 0)
+				{
 					break;
+				}
 			}
 		}
 	}
-#endif
 	return (tmp);
 }
 
