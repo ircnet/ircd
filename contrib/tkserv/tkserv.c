@@ -52,6 +52,7 @@
 
 static char *nuh;
 int fd = -1, tklined = 0;
+static char delimiter[2] = { IRCDCONF_DELIMITER, '\0' };
 
 /*
 ** Returns the current time in a formated way.
@@ -632,23 +633,13 @@ int check_tklines(char *host, char *user, int lifetime)
 
                     strcpy(buf, buffer);
 
-#ifdef INET6
-                    token = (char *) strtok(buf, "%");
-                    token = (char *) strtok(NULL, "%");
-#else
-                    token = (char *) strtok(buf, ":");
-                    token = (char *) strtok(NULL, ":");
-#endif
+                    token = (char *) strtok(buf, delimiter);
+                    token = (char *) strtok(NULL, delimiter);
                     
                     if (!strcasecmp(token, host))
                     {
-#ifdef INET6
-                        token = (char *) strtok(NULL, "%");
-                        token = (char *) strtok(NULL, "%");
-#else
-                        token = (char *) strtok(NULL, ":");
-                        token = (char *) strtok(NULL, ":");
-#endif
+                        token = (char *) strtok(NULL, delimiter);
+                        token = (char *) strtok(NULL, delimiter);
                         
                         if (!strcasecmp(token, user))
                         {
@@ -875,17 +866,9 @@ void squery_tkline(char **args)
 
     while (args[i] && *args[i])
     {
-#ifdef INET6
-        if (strchr(args[i], '%'))
-#else
-        if (strchr(args[i], ':'))
-#endif
+        if (strchr(args[i], IRCDCONF_DELIMITER))
         {
-#ifdef INET6
-            sendto_user("Percent signs are only allowed in the password.");
-#else
-            sendto_user("Colons are only allowed in the password.");
-#endif
+            sendto_user("The '%c' chars are only allowed in the password.", IRCDCONF_DELIMITER);
             return;
         }
 
