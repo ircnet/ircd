@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.38 1998/05/12 16:57:54 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.39 1998/05/12 17:16:59 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -198,7 +198,7 @@ char	*modeid;
 				return -1;
 			    }
 		    }
-		else if (!mycmp(mode->value.cp, modeid))
+		else if (type == mode->flags && !mycmp(mode->value.cp, modeid))
 			return -1;
 		
 	    }
