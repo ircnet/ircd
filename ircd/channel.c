@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.182 2004/02/18 21:43:51 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.183 2004/02/18 23:13:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3560,16 +3560,21 @@ static int	reop_channel(time_t now, aChannel *chptr, int reopmode)
 	}
 
 	op.value.chptr = NULL;
+	/* Why do we wait until CD expires? --B. */
 	if (now - chptr->history > DELAYCHASETIMELIMIT)
 	{
 		int idlelimit1, idlelimit2;
 
-		/*
-		** This selects random idle limits in the range
-		** from CHECKFREQ to 4*CHECKFREQ
-		*/
-		idlelimit1 = CHECKFREQ + myrand() % (2*CHECKFREQ);
-		idlelimit2 = idlelimit1 + CHECKFREQ + myrand() % (2*CHECKFREQ);
+		if (reopmode != CHFL_REOPLIST)
+		{
+			/*
+			** This selects random idle limits in the range
+			** from CHECKFREQ to 4*CHECKFREQ
+			*/
+			idlelimit1 = CHECKFREQ + myrand() % (2*CHECKFREQ);
+			idlelimit2 = idlelimit1 + CHECKFREQ +
+				myrand() % (2*CHECKFREQ);
+		}
 
 		for (lp = chptr->members; lp; lp = lp->next)
 		{
@@ -3595,10 +3600,11 @@ static int	reop_channel(time_t now, aChannel *chptr, int reopmode)
 			{
 				continue;
 			}
-			/* If channel reop is heavily overdue, don't care about
-			** idle. Find the least idle client possible.
+			/* If +R list or channel reop is heavily overdue,
+			** don't care about idle. Find the least idle client.
 			*/
-			if (now - chptr->reop > 7*LDELAYCHASETIMELIMIT)
+			if (reopmode == CHFL_REOPLIST ||
+				now - chptr->reop > 7*LDELAYCHASETIMELIMIT)
 			{
 				if (op.value.cptr == NULL ||
 					lp->value.cptr->user->last >
