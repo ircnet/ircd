@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.143 2004/11/01 16:26:01 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.144 2004/11/02 12:25:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2363,6 +2363,10 @@ int	m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 	}
 
 	/* All seems fine. */
+#ifdef TKLINE_MAXTIME
+	if (time > TKLINE_MAXTIME)
+		time = TKLINE_MAXTIME;
+#endif
 	if (*user == '=')
 	{
 		status = CONF_TOTHERKILL;
