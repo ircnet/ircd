@@ -1,3 +1,26 @@
+1999-06-27  Christophe Kalt
+
+	* s_misc.c/exit_one_client(): made BETTER_NDELAY a little more
+	friendly (from Piotr Kucharski).
+
+	* a_io.c/sendto_ircd(): added error output in write error notice.
+
+	* hash.c/hash_channel_name(): added shortname parameter to disable
+	guess and fix bug (From Q).
+
+	* channel.c/m_join(): reject local user join for duplicates.
+
+	* mod_socks.c: more options, less bugs (from Piotr Kucharski).
+
+	* s_user.c:
+		* m_nick(): kill nicks introduced by server if parc != 8
+		instead of simply sending a notice.
+		* register_user(): static variable wasn't declared as such.
+
+	* ircd.c, s_serv.c: used mybasename();
+	
+	* support_ext.h, support.c: added mybasename();
+
 1999-06-20  Christophe Kalt
 
 	* mod_socks: added code to allow checks for v5 as well as v4,
