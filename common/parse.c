@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.29 2001/12/20 22:42:24 q Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.30 2001/12/21 19:22:51 q Exp $";
 #endif
 
 #include "os.h"
@@ -175,6 +175,16 @@ Reg	aClient *cptr;
 
 	return acptr;
     }
+
+aClient *find_sid(char *sid, aClient *cptr)
+{
+	if (sid && isdigit(*sid))
+	{
+		cptr = hash_find_sid(sid, cptr);
+	}
+
+	return cptr;
+}
 
 aClient *find_service(name, cptr)
 char	*name;
@@ -378,6 +388,116 @@ aClient *cptr;
 		return cptr;
     }
 
+
+/* find_serder(): 
+** Find the client structure for the sender of the message we got from cptr
+** and checks it to be valid.
+** Stores the result in *sptr.
+** Returns:
+**	 1 on success.
+**	 0 when we removed a remote client.
+**	-1 when coming from a wrong server (wrong direction).
+**	-2 (FLUSH_BUFFER) when we removed a local client (server).
+**	-3 when client not found.
+*/
+int	find_sender(aClient *cptr, aClient **sptr, char *sender, char *buffer)
+{
+	aClient *from = NULL;
+
+	if (ST_UID(cptr))
+	{
+		if (isdigit(*sender))
+		{
+			if (sender[SIDLEN] == '\0')
+			{
+				/* SID */
+				from = find_sid(sender, NULL);
+			}
+			else
+			{
+				/* UID */
+				from = find_uid(sender, NULL);
+			}
+		}
+		else if (*sender == '$' && sender[SIDLEN] == '\0')
+		{
+			/* Compatibility SID. */
+			aServer *servptr;
+
+			servptr = find_tokserver(idtol(sender + 1, SIDLEN - 1),
+				cptr, NULL);
+			if (servptr)
+			{
+				from = servptr->bcptr;
+			}
+		}
+	}
+
+	if (!from)
+	{
+		from = find_client(sender, (aClient *) NULL);
+		if (!from ||
+			/*
+			** I really believe that the followin line is 
+			** useless.  What a waste, especially with 2.9
+			** hostmasks.. at least the test on from->name
+			** will make it a bit better. -krys
+			*/
+			(*from->name == '*' && match(from->name, sender)))
+		{
+			from = find_server(sender, (aClient *)NULL);
+		}
+	}
+#ifndef	CLIENT_COMPILE
+	/* Is there svc@server prefix ever? -Vesa */
+	/* every time a service talks -krys */
+	if (!from && index(sender, '@'))
+	{
+		from = find_service(sender, (aClient *)NULL);
+	}
+	if (!from)
+	{
+		from = find_mask(sender, (aClient *) NULL);
+	}
+#endif
+
+	para[0] = sender;
+
+	/* Hmm! If the client corresponding to the
+	** prefix is not found--what is the correct
+	** action??? Now, I will ignore the message
+	** (old IRC just let it through as if the
+	** prefix just wasn't there...) --msa
+	** Since 2.9 we pick them up and .. --Vesa
+	*/
+	if (!from)
+	{
+		Debug((DEBUG_ERROR,
+			"Unknown prefix (%s)(%s) from (%s)",
+			sender, buffer, cptr->name));
+		ircstp->is_unpf++;
+#ifndef	CLIENT_COMPILE
+		remove_unknown(cptr, sender);
+#endif
+		return -3;	/* Grab it in read_message() */
+	}
+	if (from->from != cptr)
+	{
+		ircstp->is_wrdi++;
+		Debug((DEBUG_ERROR,
+			"Message (%s) coming from (%s)",
+			buffer, cptr->name));
+#ifndef	CLIENT_COMPILE
+		return cancel_clients(cptr, from, buffer);
+#else
+		return -1;
+#endif
+	}
+
+	*sptr = from;
+	return 0;
+}
+
 /*
  * parse a buffer.
  * Return values:
@@ -413,7 +533,7 @@ char	*buffer, *bufend;
 		** Copy the prefix to 'sender' assuming it terminates
 		** with SPACE (or NULL, which is an error, though).
 		*/
-		for (++ch, i = 0; *ch && *ch != ' '; ++ch )
+		for (++ch; *ch && *ch != ' '; ++ch )
 			if (s < (sender + sizeof(sender)-1))
 				*s++ = *ch; /* leave room for NULL */
 		*s = '\0';
@@ -441,59 +561,13 @@ char	*buffer, *bufend;
 		** as "no prefix" at all --msa  (": NOTICE nick ...")
 		*/
 		if (*sender && IsServer(cptr))
-		    {
- 			from = find_client(sender, (aClient *) NULL);
-			if (!from ||
-			    /*
-			    ** I really believe that the followin line is 
-			    ** useless.  What a waste, especially with 2.9
-			    ** hostmasks.. at least the test on from->name
-			    ** will make it a bit better. -krys
-			    */
-			    (*from->name == '*' && match(from->name, sender)))
-				from = find_server(sender, (aClient *)NULL);
-#ifndef	CLIENT_COMPILE
-			/* Is there svc@server prefix ever? -Vesa */
-			/* every time a service talks -krys */
-			if (!from && index(sender, '@'))
-				from = find_service(sender, (aClient *)NULL);
-			if (!from)
-				from = find_mask(sender, (aClient *) NULL);
-#endif
-
-			para[0] = sender;
-
-			/* Hmm! If the client corresponding to the
-			 * prefix is not found--what is the correct
-			 * action??? Now, I will ignore the message
-			 * (old IRC just let it through as if the
-			 * prefix just wasn't there...) --msa
-			 * Since 2.9 we pick them up and .. --Vesa
-			 */
-			if (!from)
-			    {
-				Debug((DEBUG_ERROR,
-					"Unknown prefix (%s)(%s) from (%s)",
-					sender, buffer, cptr->name));
-				ircstp->is_unpf++;
-#ifndef	CLIENT_COMPILE
-				remove_unknown(cptr, sender);
-#endif
-				return -3;	/* Grab it in read_message() */
-			    }
-			if (from->from != cptr)
-			    {
-				ircstp->is_wrdi++;
-				Debug((DEBUG_ERROR,
-					"Message (%s) coming from (%s)",
-					buffer, cptr->name));
-#ifndef	CLIENT_COMPILE
-				return cancel_clients(cptr, from, buffer);
-#else
-				return -1;
-#endif
-			    }
-		    }
+		{
+			i = find_sender(cptr, &from, sender, buffer);
+			if (i <= 0)
+			{
+				return i;
+			}
+		}
 		while (*ch == ' ')
 			ch++;
 	    }
