@@ -19,43 +19,29 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.64 2004/06/11 17:04:16 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.65 2004/06/11 23:22:34 chopin Exp $";
 #endif
 
 #include "os.h"
-#ifndef CLIENT_COMPILE
-# include "s_defines.h"
-#else
-# include "c_defines.h"
-#endif
+#include "s_defines.h"
 #define PARSE_C
-#ifndef CLIENT_COMPILE
-# include "s_externs.h"
-#else
-# include "c_externs.h"
-#endif
+#include "s_externs.h"
 #undef PARSE_C
 
 struct Message msgtab[] = {
   { MSG_PRIVATE, m_private,  2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-#ifndef CLIENT_COMPILE
   { MSG_NJOIN,   m_njoin,    2, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-#endif
   { MSG_JOIN,    m_join,     1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_MODE,    m_mode,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-#ifndef CLIENT_COMPILE
   { MSG_UNICK,   m_unick,    7, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-#endif
   { MSG_NICK,    m_nick,     1, MAXPARA, MSG_LAG, 0, 0, 0L},
   { MSG_PART,    m_part,     1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_QUIT,    m_quit,     0, MAXPARA, MSG_LAG, 0, 0, 0L},
   { MSG_NOTICE,  m_notice,   2, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_KICK,    m_kick,     2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_SERVER,  m_server,   2, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-#ifndef CLIENT_COMPILE
   { MSG_SMASK,   m_smask,    3, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
   { MSG_TRACE,   m_trace,    0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-#endif
   { MSG_TOPIC,   m_topic,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_INVITE,  m_invite,   2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_WALLOPS, m_wallops,  1, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
@@ -67,7 +53,6 @@ struct Message msgtab[] = {
 #else
   { MSG_KILL,    m_kill,     2, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
 #endif
-#ifndef CLIENT_COMPILE
   { MSG_SAVE,    m_save,     1, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_USER,    m_user,     4, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_AWAY,    m_away,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
@@ -138,7 +123,6 @@ struct Message msgtab[] = {
 #endif /* OPER_SET */
   { MSG_MAP,  m_map,   0, MAXPARA, MSG_LAG | MSG_REG, 0, 0, 0L},
   { MSG_POST,    m_post,     0, MAXPARA, MSG_NOU, 0, 0, 0L},
-#endif /* !CLIENT_COMPILE */
   { NULL, NULL, 0, 0, 0, 0, 0L}
 };
 
@@ -147,15 +131,9 @@ struct Message msgtab[] = {
  */
 static	char	*para[MAXPARA+1];
 
-#ifdef	CLIENT_COMPILE
-static	char	sender[NICKLEN+USERLEN+HOSTLEN+3];
-char	userhost[USERLEN+HOSTLEN+2];
-#define	timeofday	time(NULL)
-#else
 static	char	sender[HOSTLEN+1];
 static	int	cancel_clients (aClient *, aClient *, char *);
 static	void	remove_unknown (aClient *, char *);
-#endif
 
 static	int	find_sender (aClient *cptr, aClient **sptr, char *sender,
 			char *buffer);
@@ -168,7 +146,6 @@ static	int	find_sender (aClient *cptr, aClient **sptr, char *sender,
 **	the old. 'name' is now assumed to be a null terminated
 **	string and the search is the for server and user.
 */
-#ifndef CLIENT_COMPILE
 aClient	*find_client(char *name, aClient *cptr)
 {
 	aClient *acptr = cptr;
@@ -268,22 +245,7 @@ aClient	*find_matching_client(char *mask)
 	}
 	return NULL;
 }
-#else /* CLIENT_COMPILE */
 
-aClient	*find_client(char *name, aClient *cptr)
-{
-	Reg	aClient	*c2ptr = cptr;
-
-	if (!name || !*name)
-		return c2ptr;
-
-	for (c2ptr = client; c2ptr; c2ptr = c2ptr->next) 
-		if (mycmp(name, c2ptr->name) == 0)
-			return c2ptr;
-	return cptr;
-}
-#endif /* CLIENT_COMPILE */
-#ifndef CLIENT_COMPILE
 /*
 **  Find a user@host (server or user).
 **
@@ -439,25 +401,6 @@ aClient	*find_name(char *name, aClient *cptr)
 	    }
 	return (sp ? sp->bcptr : cptr);
 }
-#else
-aClient	*find_server(char *name, aClient *cptr)
-{
-	Reg	aClient *c2ptr = cptr;
-
-	if (!name || !*name)
-		return c2ptr;
-
-	for (c2ptr = client; c2ptr; c2ptr = c2ptr->next)
-	    {
-		if (!IsServer(c2ptr) && !IsMe(c2ptr))
-			continue;
-		if (match(c2ptr->name, name) == 0 ||
-		    match(name, c2ptr->name) == 0)
-			break;
-	    }
-	return (c2ptr ? c2ptr : cptr);
-}
-#endif /* CLIENT_COMPILE */
 
 /*
 **  Find person by (nick)name.
@@ -491,7 +434,6 @@ static	int	find_sender(aClient *cptr, aClient **sptr, char *sender,
 {
 	aClient *from = NULL;
 
-#ifndef	CLIENT_COMPILE
 	if (ST_UID(cptr))
 	{
 		if (isdigit(*sender))
@@ -520,7 +462,6 @@ static	int	find_sender(aClient *cptr, aClient **sptr, char *sender,
 			}
 		}
 	}
-#endif
 	if (!from)
 	{
 		from = find_client(sender, (aClient *) NULL);
@@ -536,7 +477,6 @@ static	int	find_sender(aClient *cptr, aClient **sptr, char *sender,
 			from = find_server(sender, (aClient *)NULL);
 		}
 	}
-#ifndef	CLIENT_COMPILE
 	/* Is there svc@server prefix ever? -Vesa */
 	/* every time a service talks -krys */
 	if (!from && index(sender, '@'))
@@ -552,7 +492,6 @@ static	int	find_sender(aClient *cptr, aClient **sptr, char *sender,
 		para[0] = from->name;
 	}
 	else
-#endif
 	{
 		para[0] = sender;
 	}
@@ -570,9 +509,7 @@ static	int	find_sender(aClient *cptr, aClient **sptr, char *sender,
 			"Unknown prefix (%s)(%s) from (%s)",
 			sender, buffer, cptr->name));
 		ircstp->is_unpf++;
-#ifndef	CLIENT_COMPILE
 		remove_unknown(cptr, sender);
-#endif
 		return -3;	/* Grab it in read_message() */
 	}
 	if (from->from != cptr)
@@ -581,17 +518,12 @@ static	int	find_sender(aClient *cptr, aClient **sptr, char *sender,
 		Debug((DEBUG_ERROR,
 			"Message (%s) coming from (%s)",
 			buffer, cptr->name));
-#ifndef	CLIENT_COMPILE
 		return cancel_clients(cptr, from, buffer);
-#else
-		return -1;
-#endif
 	}
-
 	*sptr = from;
 	return 1;
 }
-#ifndef CLIENT_COMPILE
+
 /* find target.
 **  name - name of the client to be searched
 **  cptr - originating socket
@@ -641,7 +573,6 @@ aClient	*find_target(char *name, aClient *cptr)
 	}
 	return acptr;
 }
-#endif
 
 /*
  * parse a buffer.
@@ -658,12 +589,10 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	Reg	struct	Message *mptr = NULL;
 	int	ret;
 
-#ifndef	CLIENT_COMPILE
 	Debug((DEBUG_DEBUG, "Parsing %s: %s",
 		get_client_name(cptr, FALSE), buffer));
 	if (IsDead(cptr))
 		return -1;
-#endif
 
 	s = sender;
 	*s = '\0';
@@ -680,18 +609,6 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 			if (s < (sender + sizeof(sender)-1))
 				*s++ = *ch; /* leave room for NULL */
 		*s = '\0';
-#ifdef CLIENT_COMPILE
-		if ((s = index(sender, '!')))
-		    {
-			*s++ = '\0';
-			strncpyzt(userhost, s, sizeof(userhost));
-		    }
-		else if ((s = index(sender, '@')))
-		    {
-			*s++ = '\0';
-			strncpyzt(userhost, s, sizeof(userhost));
-		    }
-#endif
 		/*
 		** Actually, only messages coming from servers can have
 		** the prefix--prefix silently ignored, if coming from
@@ -767,17 +684,12 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 					    ":%s %d %s %s :Unknown command",
 					    me.name, ERR_UNKNOWNCOMMAND,
 					    from->name, ch);
-#ifdef	CLIENT_COMPILE
-				Debug((DEBUG_ERROR,"Unknown (%s) from %s[%s]",
-					ch, cptr->name, cptr->sockhost));
-#else
 				else if (IsServer(cptr))
 					sendto_flag(SCH_ERROR,
 					    "Unknown command from %s:%s",
 					    get_client_name(cptr, TRUE), ch);
 				Debug((DEBUG_ERROR,"Unknown (%s) from %s",
 					ch, get_client_name(cptr, TRUE)));
-#endif
 			    }
 			ircstp->is_unco++;
 			return -1;
@@ -785,7 +697,6 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 		paramcount = mptr->parameters;
 		i = bufend - ((s) ? s : ch);
 		mptr->bytes += i;
-#ifndef	CLIENT_COMPILE
 		if ((mptr->flags & MSG_LAG) &&
 		    !(IsServer(cptr) || IsService(cptr)))
 		    {	/* Flood control partly migrated into penalty */
@@ -800,7 +711,6 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 			 * -SRB
 			 */
 		    }
-#endif
 	    }
 	/*
 	** Must the following loop really be so devious? On
@@ -812,10 +722,6 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 
 	/* Note initially true: s==NULL || *(s-1) == '\0' !! */
 
-#ifdef	CLIENT_COMPILE
-	if (me.user)
-		para[0] = sender;
-#endif
 	i = 0;
 	if (s)
 	    {
@@ -863,7 +769,6 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 		from->user->last = timeofday;
 	Debug((DEBUG_DEBUG, "Function: %#x = %s parc %d parv %#x",
 		mptr->func, mptr->cmd, i, para));
-#ifndef	CLIENT_COMPILE
 	if ((mptr->flags & MSG_REGU) && check_registered_user(from))
 		return -1;
 	if ((mptr->flags & MSG_SVC) && check_registered_service(from))
@@ -891,7 +796,6 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	}
 	else
 	{
-#endif
 	/*
 	** ALL m_functions return now UNIFORMLY:
 	**   -2  old FLUSH_BUFFER return value (unchanged).
@@ -902,7 +806,6 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	*/
 	ret = (*mptr->func)(cptr, from, i, para);
 
-#ifndef       CLIENT_COMPILE
 	}
 	/*
         ** Add penalty score for sucessfully parsed command if issued by
@@ -917,7 +820,6 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 			   me.name, cptr->name, ch, ret);
 */
 	    }
-#endif
 	return (ret != FLUSH_BUFFER) ? 2 : FLUSH_BUFFER;
 }
 
@@ -981,7 +883,6 @@ char	*getfield(char *irc_newline)
 	return(field);
 }
 
-#ifndef	CLIENT_COMPILE
 static	int	cancel_clients(aClient *cptr, aClient *sptr, char *cmd)
 {
 	/*
@@ -1055,5 +956,4 @@ static	void	remove_unknown(aClient *cptr, char *sender)
 		sendto_flag(SCH_NOTICE, "Dropping unknown %s brought by %s.",
 			    sender, get_client_name(cptr, FALSE));
 }
-#endif
 

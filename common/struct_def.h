@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.99 2004/06/11 17:04:16 chopin Exp $
+ *   $Id: struct_def.h,v 1.100 2004/06/11 23:22:34 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -727,14 +727,9 @@ struct Channel	{
 */
 #define       IsMember(u, c)          (u && (u)->user && \
 		       find_channel_link((u)->user->channel, c) ? 1 : 0)
-#ifdef CLIENT_COMPILE
-# define	IsChannelName(n)	((n) && (*(n) == '#' || *(n) == '&' ||\
-					*(n) == '+' || *(n) == '!'))
-#else
 # define	IsChannelName(n)	((n) && (*(n) == '#' || *(n) == '&' ||\
 					*(n) == '+' || \
 					(*(n) == '!' && cid_ok(n, CHIDLEN))))
-#endif
 #define	IsQuiet(x)		((x)->mode.mode & MODE_QUIET)
 #define	UseModes(n)		((n) && (*(n) == '#' || *(n) == '&' || \
 					 *(n) == '!'))
@@ -933,24 +928,6 @@ typedef	struct	{
 #define	COMMA		","
 
 #define	SAP	struct SOCKADDR *
-
-/* IRC client structures */
-
-#ifdef	CLIENT_COMPILE
-typedef	struct	Ignore {
-	char	user[NICKLEN+1];
-	char	from[USERLEN+HOSTLEN+2];
-	int	flags;
-	struct	Ignore	*next;
-} anIgnore;
-
-#define	IGNORE_PRIVATE	1
-#define	IGNORE_PUBLIC	2
-#define	IGNORE_TOTAL	3
-
-#define	HEADERLEN	200
-
-#endif /* CLIENT_COMPILE */
 
 /* safety checks */
 #if ! (UIDLEN <= NICKLEN)

@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.48 2004/05/18 23:16:49 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.49 2004/06/11 23:22:35 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -32,6 +32,7 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* localstatedir in configure changed from var/run to var, be careful.
 	* user mode +w is doing nothing: class usage is in stats Y and wallops
 	  are sent to a new server channel &WALLOPS.
+	* irc client is no longer included.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================

@@ -34,7 +34,6 @@ EXTERN int sendto_one (aClient *to, char *pattern, ...);
 EXTERN void logfiles_open(void);
 EXTERN void logfiles_close(void);
 EXTERN int send_message (aClient *, char *, int);
-#ifndef CLIENT_COMPILE
 EXTERN void flush_connections (int fd);
 EXTERN void flush_fdary (FdAry *);
 EXTERN void setup_svchans(void);
@@ -63,5 +62,4 @@ EXTERN void sendto_prefix_one (aClient *to, aClient *from, char *pattern,
 EXTERN void sendto_flag (u_int chan, char *pattern, ...);
 EXTERN void sendto_match_butone_old(aClient *one, aClient *from,
 		char *mask, int what, char *pattern, ...);
-#endif /* CLIENT_COMPILE */
 #undef EXTERN

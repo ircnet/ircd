@@ -19,32 +19,21 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.71 2004/05/18 22:42:23 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.72 2004/06/11 23:22:34 chopin Exp $";
 #endif
 
 #include "os.h"
-#ifndef CLIENT_COMPILE
-# include "s_defines.h"
-#else
-# include "c_defines.h"
-#endif
+#include "s_defines.h"
 #define SEND_C
-#ifndef CLIENT_COMPILE
-# include "s_externs.h"
-#else
-# include "c_externs.h"
-#endif
+#include "s_externs.h"
 #undef SEND_C
 
 static	char	sendbuf[2048];
 
 
-
-#ifndef CLIENT_COMPILE
 static	void	vsendto_prefix_one(aClient *, aClient *, char *, va_list);
 static	char	psendbuf[2048];
 static	int	sentalong[MAXCONNECTIONS];
-#endif
 
 /*
 ** dead_link
@@ -70,15 +59,12 @@ static	int	dead_link(aClient *to, char *notice)
 	 */
 	DBufClear(&to->recvQ);
 	DBufClear(&to->sendQ);
-#ifndef CLIENT_COMPILE
 	if (!IsPerson(to) && !IsUnknown(to) && !(to->flags & FLAGS_CLOSING))
 		sendto_flag(SCH_ERROR, notice, get_client_name(to, FALSE));
 	Debug((DEBUG_ERROR, notice, get_client_name(to, FALSE)));
-#endif
 	return -1;
 }
 
-#ifndef CLIENT_COMPILE
 /*
 ** flush_fdary
 **      Used to empty all output buffers for connections in fdary.
@@ -122,7 +108,6 @@ void	flush_connections(int fd)
 	else if (fd >= 0 && (cptr = local[fd]) && DBufLength(&cptr->sendQ) > 0)
 		(void)send_queued(cptr);
 }
-#endif
 
 /*
 ** send_message
@@ -135,7 +120,6 @@ void	flush_connections(int fd)
 **	If msg is a null pointer, we are flushing connection
 */
 int	send_message(aClient *to, char *msg, int len)
-#if !defined(CLIENT_COMPILE)
 {
 	int i;
 
@@ -247,37 +231,6 @@ tryagain:
 		send_queued(to);
 	return 0;
 }
-#else /* CLIENT_COMPILE */
-{
-	int	rlen = 0;
-
-	Debug((DEBUG_SEND,"Sending %s %d [%s] ", to->name, to->fd, msg));
-
-	if (to->from)
-		to = to->from;
-	if (to->fd < 0)
-	    {
-		Debug((DEBUG_ERROR,
-		      "Local socket %s with negative fd... AARGH!",
-		      to->name));
-	    }
-	if (IsDead(to))
-		return 0; /* This socket has already been marked as dead */
-
-	if ((rlen = deliver_it(to, msg, len)) < 0 && rlen < len)
-		return dead_link(to,"Write error to %s, closing link");
-	/*
-	** Update statistics. The following is slightly incorrect
-	** because it counts messages even if queued, but bytes
-	** only really sent. Queued bytes get updated in SendQueued.
-	*/
-	to->sendM += 1;
-	me.sendM += 1;
-	if (to->acpt != &me)
-		to->acpt->sendM += 1;
-	return 0;
-}
-#endif
 
 /*
 ** send_queued
@@ -289,9 +242,7 @@ int	send_queued(aClient *to)
 {
 	char	*msg;
 	int	len, rlen, more = 0;
-#ifndef CLIENT_COMPILE
 	aClient *bysptr = NULL;
-#endif
 
 	/*
 	** Once socket is marked dead, we cannot start writing to it,
@@ -338,7 +289,6 @@ int	send_queued(aClient *to)
 					/* Returns always len > 0 */
 		if ((rlen = deliver_it(to, msg, len)) < 0)
 		{
-#ifndef CLIENT_COMPILE
 			if ( (IsConnecting(to) || IsHandshake(to))
 			     && to->serv && to->serv->byuid[0])
 			{
@@ -350,7 +300,6 @@ int	send_queued(aClient *to)
 					ME, bysptr->name, to->name);
 				}
 			}
-#endif
 			return dead_link(to,"Write error to %s, closing link");
 		}
 		(void)dbuf_delete(&to->sendQ, rlen);
@@ -386,7 +335,6 @@ int	send_queued(aClient *to)
 }
 
 
-#ifndef CLIENT_COMPILE
 static	anUser	ausr = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL,
 			 0, NULL, NULL,
 			 "anonymous", "0", "anonymous.", "anonymous.",
@@ -403,7 +351,6 @@ static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 			/* hack around union{} initialization	-Vesa */
 			 , {0}, NULL, "", "", EXITC_UNDEF
 			};
-#endif
 
 /*
  * sendprep: takes care of building the string according to format & args
@@ -426,7 +373,6 @@ static	int	vsendprep(char *pattern, va_list va)
 	return len;
 }
 
-#ifndef CLIENT_COMPILE
 /*
  * sendpreprep: takes care of building the string according to format & args,
  *		and of adding a complete prefix if necessary
@@ -499,7 +445,6 @@ static	int	vsendpreprep(aClient *to, aClient *from, char *pattern, va_list va)
 	psendbuf[len] = '\0';
 	return len;
 }
-#endif /* CLIENT_COMPILE */
 
 /*
 ** send message to single client
@@ -530,7 +475,6 @@ int	sendto_one(aClient *to, char *pattern, ...)
  * Send a message to all members of a channel that are connected to this
  * server except client 'one'.
  */
-#ifndef CLIENT_COMPILE
 void	sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr,
 		char *pattern, ...)
 {
@@ -1376,5 +1320,3 @@ void	sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 		(void)write(logfile, linebuf, strlen(linebuf));
 	}
 }
-#endif /* CLIENT_COMPILE */
-

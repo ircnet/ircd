@@ -1,4 +1,4 @@
-# @(#)$Id: README,v 1.7 2003/10/13 23:06:48 chopin Exp $
+# @(#)$Id: README,v 1.8 2004/06/11 23:22:35 chopin Exp $
 
 This directory contains the documentation related to this package.
 
@@ -22,7 +22,6 @@ BUGS		- list of known bugs
 2.11-New	- transition documentation from 2.10 to 2.11 version
 2.10-New	- transition documentation from 2.9 to 2.10 version
 Etiquette	- IRC Etiquette
-irc.1		- man page for the client
 ircd.8		- man page for the server
 iauth.8		- man page for iauth
 iauth.conf.5	- man page for the iauth.conf file

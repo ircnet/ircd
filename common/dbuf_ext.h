@@ -24,9 +24,6 @@
 /*  External definitions for global variables.
  */
 #ifndef DBUF_C
-#ifdef	CLIENT_COMPILE
-extern u_int dbufalloc;
-#endif
 extern u_int poolsize;
 extern dbufbuf *freelist;
 #endif /* DBUF_C */

@@ -19,21 +19,13 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: bsd.c,v 1.8 2003/10/18 15:31:28 q Exp $";
+static  char rcsid[] = "@(#)$Id: bsd.c,v 1.9 2004/06/11 23:22:34 chopin Exp $";
 #endif
 
 #include "os.h"
-#ifndef CLIENT_COMPILE
-# include "s_defines.h"
-#else
-# include "c_defines.h"
-#endif
+#include "s_defines.h"
 #define BSD_C
-#ifndef CLIENT_COMPILE
-# include "s_externs.h"
-#else
-# include "c_externs.h"
-#endif
+#include "s_externs.h"
 #undef BSD_C
 
 #ifdef DEBUGMODE

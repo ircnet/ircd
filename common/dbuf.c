@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.10 2003/10/18 15:31:28 q Exp $";
+static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.11 2004/06/11 23:22:34 chopin Exp $";
 #endif
 
 /*
@@ -28,23 +28,10 @@ static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.10 2003/10/18 15:31:28 q Exp $";
 */
 
 #include "os.h"
-#ifndef CLIENT_COMPILE
-# include "s_defines.h"
-#else
-# include "c_defines.h"
-#endif
+#include "s_defines.h"
 #define DBUF_C
-#ifndef CLIENT_COMPILE
-# include "s_externs.h"
-#else
-# include "c_externs.h"
-#endif
+#include "s_externs.h"
 #undef DBUF_C
-
-#ifdef	CLIENT_COMPILE
-/* kind of ugly, eh? */
-u_int	dbufalloc = 0;
-#endif
 
 u_int	poolsize = (BUFFERPOOL > 1500000) ? BUFFERPOOL : 1500000;
 dbufbuf	*freelist = NULL;
@@ -66,17 +53,11 @@ void	dbuf_init(void)
 	if (!freelist)
 		return; /* screw this if it doesn't work */
 	dbp = freelist;
-#ifndef	CLIENT_COMPILE
 	for( ; i < (nb - 1); i++, dbp++, istat.is_dbufnow++)
-#else
-	for( ; i < (nb - 1); i++, dbp++)
-#endif
 		dbp->next = (dbp + 1);
 	dbp->next = NULL;
-#ifndef	CLIENT_COMPILE
 	istat.is_dbufnow++;
 	istat.is_dbuf = istat.is_dbufnow;
-#endif
 }
 
 /*
@@ -86,34 +67,20 @@ void	dbuf_init(void)
 */
 static	int	dbuf_alloc(dbufbuf **dbptr)
 {
-#ifndef	CLIENT_COMPILE
 	if (istat.is_dbufuse++ == istat.is_dbufmax)
 		istat.is_dbufmax = istat.is_dbufuse;
-#else
-	dbufalloc++;
-#endif
 	if ((*dbptr = freelist))
 	    {
 		freelist = freelist->next;
 		return 0;
 	    }
-#ifndef	CLIENT_COMPILE
 	if (istat.is_dbufuse * DBUFSIZ > poolsize)
-#else
-	if (dbufalloc * DBUFSIZ > poolsize)
-#endif
 	    {
-#ifndef	CLIENT_COMPILE
 		istat.is_dbufuse--;
-#else
-		dbufalloc--;
-#endif
 		return -2;	/* Not fatal, go back and increase poolsize */
 	    }
 
-#ifndef	CLIENT_COMPILE
 	istat.is_dbufnow++;
-#endif
 	if (!(*dbptr = (dbufbuf *)MyMalloc(sizeof(dbufbuf))))
 		return -1;
 	return 0;
@@ -123,11 +90,7 @@ static	int	dbuf_alloc(dbufbuf **dbptr)
 */
 static	void	dbuf_free(dbufbuf *ptr)
 {
-#ifndef	CLIENT_COMPILE
 	istat.is_dbufuse--;
-#else
-	dbufalloc--;
-#endif
 	ptr->next = freelist;
 	freelist = ptr;
 }

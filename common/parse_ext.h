@@ -24,9 +24,6 @@
 /*  External definitions for global variables.
  */
 #ifndef PARSE_C
-#ifdef	CLIENT_COMPILE
-extern char userhost[];
-#endif /* CLIENT_COMPILE */
 extern struct Message msgtab[];
 #endif /* PARSE_C */
 
@@ -37,7 +34,6 @@ extern struct Message msgtab[];
 #else /* PARSE_C */
 #define EXTERN
 #endif /* PARSE_C */
-#ifndef CLIENT_COMPILE
 EXTERN aClient *find_client (char *name, Reg aClient *cptr);
 EXTERN aClient *find_uid (char *uid, Reg aClient *cptr);
 EXTERN aClient *find_sid (char *sid, Reg aClient *cptr);
@@ -46,14 +42,8 @@ EXTERN aClient *find_server (char *name, Reg aClient *cptr);
 EXTERN aClient *find_mask (char *name, aClient *cptr);
 EXTERN aServer *find_tokserver (int token, aClient *cptr, aClient *c2ptr);
 EXTERN aClient *find_name (char *name, aClient *cptr);
-#ifndef CLIENT_COMPILE
 EXTERN aClient *find_matching_client (char *mask);
 EXTERN aClient *find_target (char *name, aClient *cptr);
-#endif
-#else /* CLIENT_COMPILE */
-EXTERN aClient *find_client (char *name, aClient *cptr);
-EXTERN aClient *find_server (char *name, aClient *cptr);
-#endif /* CLIENT_COMPILE */
 EXTERN aClient *find_userhost (char *user, char *host, aClient *cptr,
 				   int *count);
 EXTERN aClient *find_person (char *name, aClient *cptr);
