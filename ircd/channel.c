@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.71 1998/10/23 18:34:18 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.72 1998/10/23 18:39:29 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2175,7 +2175,7 @@ Reg	aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	char nbuf[BUFSIZE], *name, *target, *p, mbuf[4];
+	char nbuf[BUFSIZE], *q, *name, *target, *p, mbuf[4];
 	int chop, cnt = 0;
 	aChannel *chptr = NULL;
 	aClient *acptr;
@@ -2185,7 +2185,7 @@ char	*parv[];
 		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]),"NJOIN");
 		return 1;
 	    }
-	*nbuf = '\0';
+	*nbuf = '\0'; q = nbuf;
 	for (target = strtoken(&p, parv[2], ","); target;
 	     target = strtoken(&p, NULL, ","))
 	    {
@@ -2254,9 +2254,10 @@ char	*parv[];
 		/* add user to channel */
 		add_user_to_channel(chptr, acptr, chop);
 		/* build buffer for NJOIN capable servers */
-		if (*nbuf)
-			*(--target) = ',';
-		strcat(nbuf, target);
+		if (q != nbuf)
+			*q++ = ',';
+		while (*target)
+			*q++ = *target++;
 		/* send 2.9 style join to other servers */
 		if (*chptr->chname != '!')
 			sendto_serv_notv(cptr, SV_NJOIN, ":%s JOIN %s%s", name,
@@ -2318,6 +2319,7 @@ char	*parv[];
 				       sptr->name, parv[1], modebuf, parabuf);
 
 	/* send NJOIN to capable servers */
+	*q = '\0';
 	if (nbuf[0])
 		sendto_serv_v(cptr, SV_NJOIN, ":%s NJOIN %s :%s", parv[0],
 			      parv[1], nbuf);
