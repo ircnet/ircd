@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.47 2002/09/28 21:03:27 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.48 2003/10/12 14:29:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -108,22 +108,40 @@ static aExtData	*iauth_stats = NULL;
 int
 vsendto_iauth(char *pattern, va_list va)
 {
-    static char abuf[BUFSIZ];
+	static char abuf[BUFSIZ], *p;
+	int	i, len;
 
-    vsprintf(abuf, pattern, va);
-    strcat(abuf, "\n");
-
-    if (adfd < 0)
-	    return -1;
-    if (write(adfd, abuf, strlen(abuf)) != strlen(abuf))
+	if (adfd < 0)
 	{
-	    sendto_flag(SCH_AUTH, "Aiiie! lost slave authentication process");
-	    close(adfd);
-	    adfd = -1;
-	    start_iauth(0);
-	    return -1;
+		return -1;
 	}
-    return 0;
+
+	vsprintf(abuf, pattern, va);
+	strcat(abuf, "\n");
+	p = abuf;
+	len = strlen(p);
+
+	do
+	{
+		i = write(adfd, abuf, len);
+		if ( i == -1 )
+		{
+			if (errno != EAGAIN && errno != EWOULDBLOCK)
+			{
+				sendto_flag(SCH_AUTH, "Aiiie! lost slave "
+					"authentication process");
+				close(adfd);
+				adfd = -1;
+				start_iauth(0);
+				return -1;
+			}
+			i = 0;
+		}
+		p += i;
+		len -= i;
+	} while (len > 0);
+
+	return 0;
 }
 
 int
