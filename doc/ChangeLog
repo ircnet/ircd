@@ -1,3 +1,9 @@
+2004-08-10  Piotr Kucharski
+
+	* s_bsd.c/check_server(): as trace shows last attached class, attach
+	  H: before C/N.
+	* ircd.c/main(): check for tune filename length.
+
 2004-08-10  Jakub Vlasek
 	
 	* s_bsd.c, s_bsd_ext.h: Moved actual cptr->fd closing code
@@ -18,6 +24,15 @@
 	* s_bsd.c/close_connection(): Do not recurse listeners, remove only
 	  unused listeners from ListenerLL.
 	* s_conf.c/detach_conf(),rehash(): Check for negative client counts.
+
+2004-08-04  Piotr Kucharski
+
+	* s_user.c/m_quit(): if sptr is server, return at once; also use
+	  MyConnect to surround quit reason with double quotes.
+
+2004-08-03  Piotr Kucharski
+
+	* channel.c/m_join(): empty part comment in JOIN 0.
 
 2004-08-03  Jakub Vlasek
 
