@@ -1,4 +1,4 @@
-dnl configure.in for irc-2.9.4
+dnl configure.in for irc-2.9.5
 dnl Matthew Green (mrg@mame.mu.oz.au), Alain Nissen (Alain.Nissen@ulg.ac.be)
 dnl using portions of Avalon's Config and GNU Autoconf 1.12.
 
@@ -473,7 +473,6 @@ AC_DEFUN(IRC_NON_BLOCKING_SYSTEM,
 AC_CACHE_VAL(irc_cv_non_blocking_system,
 [
 changequote(<<, >>)dnl
-<<
 irc_precode='#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -518,7 +517,6 @@ irc_postcode=')))
     }
    exit(1);
 }'
->>
 changequote([, ])dnl
 irc_code_posix="${irc_precode}O_NONBLOCK${irc_postcode}"
 irc_code_bsd="${irc_precode}O_NDELAY${irc_postcode}"
@@ -553,7 +551,6 @@ AC_CACHE_VAL(irc_cv_stdarg,
 AC_TRY_RUN(
 [
 changequote(<<, >>)dnl
-<<
 #if HAVE_STDIO_H
 #include <stdio.h>
 #endif
@@ -631,7 +628,6 @@ int main(void)
 
   exit(res ? 0 : 1);
 }
->>
 changequote([, ])dnl
 ],
 irc_cv_stdarg=yes,
@@ -1317,7 +1313,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.16 1998/01/07 16:40:21 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.17 1998/02/07 14:21:19 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
