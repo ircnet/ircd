@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.94 2002/04/07 19:38:45 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.95 2002/04/07 22:39:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2737,7 +2737,8 @@ char	*parv[];
 		{
 			aServer *asptr;
 			/* Fake sid (comes from EOB emulation */
-			asptr = find_tokserver(idtol(sid + 1), cptr, NULL);
+			asptr = find_tokserver(idtol(sid + 1, SIDLEN - 1),
+				cptr, NULL);
 			if (asptr)
 			{
 				acptr = asptr->bcptr;

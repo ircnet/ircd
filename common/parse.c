@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.41 2002/04/05 04:04:37 jv Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.42 2002/04/07 22:39:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -531,7 +531,8 @@ aClient *find_target(char *name,aClient *cptr)
 		else if (name[0] == '$' && name[SIDLEN] == '\0')
 		{
 			aServer *asptr;
-			asptr = find_tokserver(idtol(name+1), cptr, NULL);
+			asptr = find_tokserver(idtol(name + 1, SIDLEN - 1),
+				cptr, NULL);
 			if (acptr)
 			{
 				acptr = asptr->bcptr;
