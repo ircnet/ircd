@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.87 2004/11/10 19:08:25 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.88 2004/11/10 19:13:48 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -189,16 +189,8 @@ tryagain:
 	{
 		if (i == -2 && CBurst(to))
 		    {	/* poolsize was exceeded while connect burst */
-			aConfItem	*aconf;
 
-			if (IsServer(to))
-				aconf = to->serv->nline;
-			else
-				aconf = to->confs->value.aconf;
-
-			poolsize -= MaxSendq(aconf->class) >> 1;
-			IncSendq(aconf->class);
-			poolsize += MaxSendq(aconf->class) >> 1;
+			poolsize *= 1.1;
 			sendto_flag(SCH_NOTICE,
 				    "New poolsize %d. (reached)",
 				    poolsize);
