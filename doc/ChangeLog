@@ -1,3 +1,13 @@
+2.11.0b12
+
+2004-08-31  Piotr Kucharski
+
+	* s_serv.c/m_stats(): is_allowed I forgot to negate (caught by Borys).
+	* struct_def.h: increased MAXBANS to 42.
+	* support.c/make_isupport(): add R to MAXLIST.
+	* config.h.dist: moved IRCDCONF_DELIMITER from os.h.
+	* struct_def.h: increased NICKLEN to 15.
+
 2004-08-27  Piotr Kucharski
 
 	* channel.c/reop_channel(): do not abort reop mechanism if restricted
