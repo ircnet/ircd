@@ -1,3 +1,15 @@
+2.10.3
+
+1999-08-13  Christophe Kalt
+
+	* channel.c/match_modeid(): logic fix (reported by Michal Svoboda).
+
+	* os.h: added YET ANOTHER KLUDGE for linux and poll().
+
+	* ircd.c: assume "-s" option in CYGWIN environment.
+
+	* configure.in: update for CYGWIN environment.
+
 1999-08-01  Piotr Kucharski
 
 	* ircd.c/bad_command(): -d command line option no longer exists,
