@@ -384,12 +384,15 @@
 #undef	CLONE_CHECK
 
 /*
- * Server ID used for the UID's. Setting one that already exists on the
- * net means death by chainsaw or anything your coordinator thinks of.
+ * Server ID used for the UIDs. 
+ *
+ * If you are part of IRCnet, ask your IRC coordinator for assignment,
+ * he should know better. Else you must pick it yourself wisely.
+ * Remember, the key is: unique network-wide.
  *
  * Note: This must be a string.  It should contain 3 chars.
- * The first char should be in the range of [0-9], the rest should be in
- * [0-9A-Z].
+ * The first char must be in the range of [0-9], the rest must be in
+ * [0-9A-Z] (case insensitive).
  */
 /* #define SERVER_ID "123" */
 
@@ -574,7 +577,7 @@ error FD_SETSIZE must be bigger than MAXCONNECTIONS
 #endif
 
 #ifndef SERVER_ID
-#error SERVER_ID not defined
+#error SERVER_ID not defined, edit config.h properly!
 #endif
 
 /*
