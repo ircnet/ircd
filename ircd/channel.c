@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.107 1999/07/25 19:52:59 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.108 1999/07/28 22:15:43 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2395,7 +2395,7 @@ char	*parv[];
 		/* build MODE for local users on channel, eventually send it */
 		if (*mbuf)
 		    {
-			if (UseModes(parv[1]))
+			if (!UseModes(parv[1]))
 			    {
 				sendto_one(cptr, err_str(ERR_NOCHANMODES,
 							 parv[0]), parv[1]);
