@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.29 2004/07/14 23:16:46 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.30 2004/07/14 23:37:18 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -41,6 +41,7 @@ static	void	validate(aConfItem *);
 static	int	dgets(int, char *, int);
 static	aClass	*get_class(int, int);
 static	aConfItem	*initconf(void);
+static	void	showconf(void);
 
 struct	wordcount {
 	char *filename;
@@ -70,11 +71,18 @@ int	main(int argc, char *argv[])
 	struct wordcount *filelist = files;
 #endif
 	aConfItem *result;
+	int	showflag = 0;
 
 	if (argc > 1 && !strncmp(argv[1], "-h", 2))
 	{
-		(void)fprintf(stderr, "Usage: %s [-h] [-d[#]] [%s]\n",
-			      argv[0], IRCDCONF_PATH);
+		(void)printf("Usage: %s [-h | -s | -d[#]] [ircd.conf]\n",
+			      argv[0]);
+		(void)printf("\t-h\tthis help\n");
+		(void)printf("\t-s\tshows preprocessed config file (after "
+			"includes and/or M4)\n");
+		(void)printf("\t-d[#]\tthe bigger number, the more verbose "
+			"chkconf is in its checks\n");
+		(void)printf("\tDefault ircd.conf = %s\n", IRCDCONF_PATH);
 		exit(0);
 	}
 	new_class(0);
@@ -87,8 +95,19 @@ int	main(int argc, char *argv[])
 		argc--;
 		argv++;
 	}
+	else if (argc > 1 && !strncmp(argv[1], "-s", 2))
+   	{
+		showflag = 1;
+		argc--;
+		argv++;
+	}
 	if (argc > 1)
 		configfile = argv[1];
+	if (showflag)
+	{
+		showconf();
+		return 0;
+	}
 	/* Initialize counters to be able to print line number even with m4 */
 	mywc();
 #ifdef DEBUGMODE
@@ -153,6 +172,53 @@ static	int	openconf()
 	return open(configfile, O_RDONLY);
 #endif
 }
+
+/* show config as ircd would see it before starting to parse it */
+static	void	showconf()
+{
+#if defined(CONFIG_DIRECTIVE_INCLUDE)
+	aConfig *p, *p2;
+#else
+	int dh;
+	char	line[512], c[80], *tmp;
+#endif
+	int fd;
+
+	fprintf(stderr, "showconf(): %s\n", configfile);
+	if ((fd = openconf()) == -1)
+	    {
+#ifdef	M4_PREPROC
+		(void)wait(0);
+#endif
+		return;
+	    }
+#if defined(CONFIG_DIRECTIVE_INCLUDE)
+	p2 = config_read(fd, 0);
+	for(p = p2; p; p = p->next)
+		printf("%s\n", p->line);
+	config_free(p2);
+#else
+	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
+	while ((dh = dgets(fd, line, sizeof(line) - 1)) > 0)
+	{
+		if ((tmp = (char *)index(line, '\n')))
+			*tmp = 0;
+		else while(dgets(fd, c, sizeof(c) - 1))
+			if ((tmp = (char *)index(c, '\n')))
+			{   
+				*tmp = 0;
+				break;
+			}
+		printf("%s\n", line);
+	}
+#endif
+	(void)close(fd);
+#ifdef	M4_PREPROC
+	(void)wait(0);
+#endif
+	return;
+}
+
 
 /*
 ** initconf()
