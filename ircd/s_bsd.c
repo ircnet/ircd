@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.155 2004/08/10 18:55:01 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.156 2004/08/10 19:29:11 jv Exp $";
 #endif
 
 #include "os.h"
@@ -315,6 +315,10 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 #endif
 	cptr->port = port;
 	local[cptr->fd] = cptr;
+	if (dolisten)
+	{
+		listen(cptr->fd, LISTENQUEUE);
+	}
 
 	return 0;
 }
@@ -501,11 +505,6 @@ void	open_listener(aClient *cptr)
 		add_fd(cptr->fd, &fdas);
 		add_fd(cptr->fd, &fdall);
 		set_non_blocking(cptr->fd, cptr);
-
-		if (dolisten)
-		{
-			listen(cptr->fd, LISTENQUEUE);
-		}
 	}
 }
 
