@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.9 1997/09/15 01:00:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.10 1997/09/19 20:47:12 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -423,7 +423,14 @@ char	*buffer, *bufend;
 		if (*sender && IsServer(cptr))
 		    {
  			from = find_client(sender, (aClient *) NULL);
-			if (!from || match(from->name, sender))
+			if (!from ||
+			    /*
+			    ** I really believe that the followin line is 
+			    ** useless.  What a waste, especially with 2.9
+			    ** hostmasks.. at least the test on from->name
+			    ** will make it a bit better. -krys
+			    */
+			    (*from->name == '*' && match(from->name, sender)))
 				from = find_server(sender, (aClient *)NULL);
 #ifndef	CLIENT_COMPILE
 			/* Is there svc@server prefix ever? -Vesa */
