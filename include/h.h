@@ -157,8 +157,6 @@ extern	void	sendto_channel_butserv();
 extern	void	sendto_match_servs();
 /*VARARGS5*/
 extern	void	sendto_match_butone();
-/*VARARGS3*/
-extern	void	sendto_all_butone();
 /*VARARGS1*/
 extern	void	sendto_ops();
 /*VARARGS3*/

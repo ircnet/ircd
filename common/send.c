@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.4 1997/04/18 12:23:59 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.5 1997/04/18 14:31:00 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -836,45 +836,6 @@ char	*mask, *pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9,*p10,*p11;
 		sendto_prefix_one(cptr, from, pattern,
 				  p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,p11);
 	    }
-	return;
-}
-
-/*
- * sendto_all_butone.
- *
- * Send a message to all connections except 'one'. The basic wall type
- * message generator.
- */
-/*VARARGS*/
-void	sendto_all_butone(one, from, pattern, p1, p2, p3, p4, p5, p6, p7, p8,
-			  p9, p10, p11)
-aClient *one, *from;
-char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
-{
-	Reg	int	i;
-	Reg	aClient *cptr;
-	int	len1 = 0, len2 = 0;
-
-	for (i = 0; i <= highest_fd; i++)
-		if ((cptr = local[i]) && !IsMe(cptr) && one != cptr)
-			if (MyClient(cptr))
-			    {
-				if (!len1)
-					len1 = sendpreprep(cptr, from, pattern,
-							   p1, p2, p3, p4, p5,
-							   p6, p7, p8, p9, p10,
-							   p11);
-				(void)send_message(cptr, psendbuf, len1);
-			    }
-			else
-			    {
-				if (!len2)
-					len2 = sendprep(pattern, p1, p2, p3,
-							p4, p5, p6, p7, p8,
-							p9, p10, p11);
-				(void)send_message(cptr, sendbuf, len2);
-			    }
-
 	return;
 }
 
