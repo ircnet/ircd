@@ -44,8 +44,6 @@ Server:
 	  changes (may be undefined during compilation).
 
 Admin:
-	* Newest autoconf changed localstatedir (where ircd.pid is kept)
-	  from var/run/ to var/ -- make sure you update all scripts.
 	* Ability to specify outgoing IP in C: line.
 	* I:line now requires both addr and name fields to match.
 	* I:line flags
