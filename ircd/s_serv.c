@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.250 2004/10/26 19:33:04 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.251 2004/10/26 20:16:47 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3004,7 +3004,7 @@ int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	for(temp=motd;temp != NULL;temp = temp->next)
 		sendto_one(sptr, replies[RPL_MOTD], ME, BadTo(parv[0]), temp->line);
 	sendto_one(sptr, replies[RPL_ENDOFMOTD], ME, BadTo(parv[0]));
-	return 2;
+	return IsUnknown(sptr) ? 5 : 2;
 }
 
 /*
