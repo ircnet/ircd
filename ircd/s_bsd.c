@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.164 2004/10/26 19:13:57 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.165 2004/10/26 19:20:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -781,6 +781,7 @@ void	daemonize(void)
 #else
 		(void)setpgrp(0, (int)getpid());
 #endif
+		(void)fclose(stdin);
 		(void)close(0);
 		local[0] = NULL;
 	    }
