@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.141 2004/02/11 11:08:34 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.142 2004/02/13 01:38:16 jv Exp $";
 #endif
 
 #include "os.h"
@@ -123,10 +123,11 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	aConfItem *aconf;
 	char	*server;
 	Reg	aClient	*acptr = NULL;
+	int	rsquit = 0;
 	char	*comment = (parc > 2 && parv[2]) ? parv[2] : cptr->name;
 
 	if (parc > 1)
-	    {
+	{
 		server = parv[1];
 		/*
 		** To accomodate host masking, a squit for a masked server
@@ -134,7 +135,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		** the server name for that link to the name of link.
 		*/
 		while ((*server == '*') && IsServer(cptr))
-		    {
+		{
 			aconf = cptr->serv->nline;
 			if (!aconf)
 				break;
@@ -142,7 +143,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				   my_name_for_link(ME, aconf->port)))
 				server = cptr->name;
 			break; /* WARNING is normal here */
-		    }
+		}
 		/*
 		** Find server matching (compatibility) SID
 		*/
@@ -178,20 +179,25 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			}
 		}
 		if (acptr && IsMe(acptr))
-		    {
+		{
+			if (MyConnect(sptr) && ST_UID(sptr))
+			{
+				/* remote server is closing it's link */
+				rsquit = 1;
+			}
 			acptr = cptr;
 			server = cptr->sockhost;
-		    }
-	    }
+		}
+	}
 	else
-	    {
+	{
 		/*
 		** This is actually protocol error. But, well, closing
 		** the link is very proper answer to that...
 		*/
 		server = cptr->name;
 		acptr = cptr;
-	    }
+	}
 
 	/*
 	** SQUIT semantics is tricky, be careful...
@@ -246,14 +252,17 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if ((acptr->from->serv->version & SV_OLDSQUIT) == 0)
 		    {
 			/* better server: just propagate upstream */
-			sendto_one(acptr->from, ":%s SQUIT %s :%s", parv[0],
-				   acptr->name, comment);
+			sendto_one(acptr->from, ":%s SQUIT %s :%s",
+				    parv[0], ST_UID(acptr->from) ?
+				    acptr->serv->sid : acptr->name, comment);
+			
 			sendto_flag(SCH_SERVER,
-				    "Forwarding SQUIT %s from %s (%s)",
-				    acptr->name, parv[0], comment);
+				    "Forwarding SQUIT %s (%s) from %s (%s)",
+				    acptr->name, acptr->serv->sid, parv[0],
+				    comment);
 			sendto_flag(SCH_DEBUG,
 				    "Forwarding SQUIT %s to %s from %s (%s)",
-				    acptr->name, acptr->from->name, 
+				    acptr->name, acptr->from->name,
 				    parv[0], comment);
 			return 1;
 		    }
@@ -263,7 +272,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		** do the right thing, and fake the yet to come SQUIT which
 		** will never be received from the bad servers.
 		*/
-		if (IsServer(cptr) && 
+		if (IsServer(cptr) &&
 		    (cptr->serv->version & SV_OLDSQUIT) == 0)
 		    {
 			sendto_one(cptr, ":%s SQUIT %s :%s (Bounced for %s)",
@@ -275,7 +284,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	/*
 	**  Notify all opers, if my local link is remotely squitted
 	*/
-	if (MyConnect(acptr) && !IsAnOper(cptr))
+	if (MyConnect(acptr) && !IsAnOper(cptr) && !rsquit)
 	    {
 		sendto_ops_butone(NULL, &me,
 			":%s WALLOPS :Received SQUIT %s from %s (%s)",
@@ -3721,6 +3730,7 @@ static	void	dump_map(aClient *sptr, aClient *root, aClient **prevserver,
 			*(pbuf + 2) = '-';
 			*(pbuf + 3) = ' ';
 			dump_map(sptr, *prevserver, &prev, pbuf + 4);
+			*prevserver = NULL;
 		}
 	}
 }
