@@ -4,7 +4,7 @@
 
 <title>STATS unleashed
 <author>Piotr Kucharski
-<date>$Id: stats.sgml,v 1.5 2004/10/06 15:00:39 chopin Exp $
+<date>$Id: stats.sgml,v 1.6 2004/10/27 00:30:39 chopin Exp $
 <abstract>
 This document describes all STATS for ircd server 2.11.
 </abstract>
@@ -167,10 +167,12 @@ This command accepts second parameter: if present, it shows the above
 info only for the specified client.
 
 <tag/m, M - commands usage stats/
-<tscreen><verb>COMMANDNAME 1 6 0</verb></tscreen>
-1st field is command name, 2nd number of times this command was used,
-3rd is number of bytes this command parameters had in total, 4th is number
-of times that command was used from remote clients.
+<tscreen><verb>COMMANDNAME 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 8 0 0</verb></tscreen>
+1st field is command name, the rest is in groups of 4 digits: total count, 
+total argument bytes, remote count, remote bytes; each of 5 groups shows usage 
+within given handler (function responsible for dealing with command coming from
+a given type of client), in the following sequence: server, client, oper, 
+service, unregistered.
 
 <tag/o, O - operator lines/
 <tscreen><verb>o *@*.example.org * Beeth 0 10</verb></tscreen>

@@ -1,6 +1,6 @@
   STATS unleashed
   Piotr Kucharski
-  $Id: stats.txt,v 1.5 2004/10/06 15:00:39 chopin Exp $
+  $Id: stats.txt,v 1.6 2004/10/27 00:30:39 chopin Exp $
 
   This document describes all STATS for ircd server 2.11.
 
@@ -302,19 +302,22 @@
      mm,, MM -- ccoommmmaannddss uussaaggee ssttaattss
 
 
-          COMMANDNAME 1 6 0
+          COMMANDNAME 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 8 0 0
 
 
 
-     1st field is command name, 2nd number of times this command was
-     used, 3rd is number of bytes this command parameters had in total,
-     4th is number of times that command was used from remote clients.
+     1st field is command name, the rest is in groups of 4 digits: total
+     count, total argument bytes, remote count, remote bytes; each of 5
+     groups shows usage within given handler (function responsible for
+     dealing with command coming from a given type of client), in the
+     following sequence: server, client, oper, service, unregistered.
+
 
 
      oo,, OO -- ooppeerraattoorr lliinneess
 
 
-     o *@*.example.org * Beeth 0 10
+          o *@*.example.org * Beeth 0 10
 
 
 
@@ -366,13 +369,14 @@
      rr,, RR -- ssyysstteemm uussaaggee
 
 
-          CPU Secs 1269:55 User 975:10 System 294:45
-          RSS 180656 ShMem 4294962080 Data 1446 Stack 4294963143
-          Swaps 0 Reclaims 882162 Faults 14516
-          Block in 13 out 0
-          Msg Rcv 21277744 Send 56443634
-          Signals 16 Context Vol. 14305344 Invol 6442565
-          DBUF alloc 60 blocks 40867
+
+     CPU Secs 1269:55 User 975:10 System 294:45
+     RSS 180656 ShMem 4294962080 Data 1446 Stack 4294963143
+     Swaps 0 Reclaims 882162 Faults 14516
+     Block in 13 out 0
+     Msg Rcv 21277744 Send 56443634
+     Signals 16 Context Vol. 14305344 Invol 6442565
+     DBUF alloc 60 blocks 40867
 
 
 
@@ -423,15 +427,17 @@
      Messages coming from wrong direction and empty messages.
 
 
-          users without servers 0 ghosts N/A
-          numerics seen 261332 mode fakes 2894
-          auth: successes 0 fails 0
-          local connections 12 udp packets 0
-          udp errors 0 udp dropped 0
+
+     users without servers 0 ghosts N/A
+     numerics seen 261332 mode fakes 2894
+     auth: successes 0 fails 0
+     local connections 12 udp packets 0
+     udp errors 0 udp dropped 0
 
 
 
           link checks 38 passed 1 15s/35 30s dropped 0Sq/0Yg/2Fl
+
 
 
      Calls to check_link(), accepted early (last one made more than 15s
@@ -481,8 +487,7 @@
 
      uu,, UU -- uuppttiimmee
 
-
-          Server Up 0 days, 0:31:55
+     Server Up 0 days, 0:31:55
 
 
 
@@ -558,8 +563,8 @@
      increased.
 
 
-     RES table 8072
-     Structs 20440 IP storage 12344 Name storage 12685
+          RES table 8072
+          Structs 20440 IP storage 12344 Name storage 12685
 
 
 
