@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.18 1997/09/24 18:26:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.19 1997/09/26 15:02:58 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -304,8 +304,8 @@ aClient *cptr;
 					continue;
 				if (!strcmp(cptr->sockhost, acptr->user->host))
 				    {
-					if (ConfMaxUHGlobal(aconf) > 0 &&
-					    ++ghcnt >= ConfMaxUHGlobal(aconf))
+					if (ConfMaxHGlobal(aconf) > 0 &&
+					    ++ghcnt >= ConfMaxHGlobal(aconf))
 						return -6;
 					if (ConfMaxUHGlobal(aconf) > 0 &&
 					    !strcmp(cptr->user->username,
