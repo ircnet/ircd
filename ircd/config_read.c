@@ -274,7 +274,7 @@ void config_error(int level, char *filename, int line, char *pattern, ...)
 #ifdef CHKCONF_COMPILE
 	if (level == CF_NONE)
 	{
-		fprintf(stdout, "%s", vbuf);
+		fprintf(stdout, "%s\n", vbuf);
 	}
 	else
 	{
