@@ -532,6 +532,12 @@
 */
 #define CLCHSEC 300
 
+/*
+** Define this to allow MOTD for unregistered clients. Note that this is
+** required by some European countries laws.
+*/
+#undef MOTD_UNREG
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 

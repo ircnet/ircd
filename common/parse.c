@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.83 2004/10/23 13:54:28 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.84 2004/10/26 20:12:22 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -80,7 +80,13 @@ struct Message msgtab[] = {
 { "SUMMON",   0, MPAR, { _m(m_nop), _m(m_summon), _m(m_summon), _m(m_nop), _m(m_unreg) } },
 { "HELP",     0, MPAR, { _m(m_nop), _m(m_help), _m(m_help), _m(m_nop), _m(m_unreg) } },
 { "INFO",     0, MPAR, { _m(m_nop), _m(m_info), _m(m_info), _m(m_nop), _m(m_unreg) } },
-{ "MOTD",     0, MPAR, { _m(m_nop), _m(m_motd), _m(m_motd), _m(m_nop), _m(m_unreg) } },
+{ "MOTD",     0, MPAR, { _m(m_nop), _m(m_motd), _m(m_motd), _m(m_nop),
+#ifdef MOTD_UNREG
+									_m(m_motd)
+#else
+									_m(m_unreg)
+#endif
+									} },
 { "CLOSE",    0, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_close), _m(m_nop), _m(m_unreg) } },
 { "SERVICE",  4, MPAR, { _m(m_service), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_service) } },
 { "EOB",      0, MPAR, { _m(m_eob), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
