@@ -1,3 +1,13 @@
+2003-06-22  Kurt Roeckx
+
+	* channel.c/m_join: Send RPL_TOPIC before RPL_TOPIC_WHO_TIME.
+	* channel.c, s_send.c: Fix spelling of the anonymous user.
+	* channel.c/m_join: Now always use NJOIN between servers.
+
+2003-06-18  Kurt Roeckx
+
+	* Update RPL_ISUPPORT to the latest draft.
+
 2003-06-03  Piotr Kucharski
 
 	* s_user.c/m_nick(): bad param count NICK coming from server must
