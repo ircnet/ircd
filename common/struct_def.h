@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.52 2002/01/08 03:38:42 chopin Exp $
+ *   $Id: struct_def.h,v 1.53 2002/03/03 21:56:48 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -62,6 +62,7 @@ typedef struct        LineItem aExtData;
 #define MAXPENALTY	10
 #define	CHIDLEN		5		/* WARNING: *DONT* CHANGE THIS!!!! */
 #define	SIDLEN		3		/* WARNING: *DONT* CHANGE THIS!!!! */
+#define	MAXMODEPARAMS	3		/* WARNING: *DONT* CHANGE THIS!!!! */
 
 #define	READBUF_SIZE	16384	/* used in s_bsd.c *AND* s_zip.c ! */
  
