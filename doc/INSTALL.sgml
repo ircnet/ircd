@@ -4,21 +4,38 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.7 1997/06/09 15:24:09 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.8 1997/07/15 04:33:39 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.3.
 </abstract>
 
 <sect>Installing IRC.
 <p>
-So that ircd/irc will compile and work correctly with your
-version of Unix, it is necessary that you run ``make''
-first. This will run configure which will probe your system
-for any peculiarities it has and setup the Makefile and a
-file of default &num;define's (&dollar;arch/setup.h). To
-change the default directory into which ircd will install
-using ``make install'', invoke ``make'' using the
-``CONFIGARGS=--prefix=/dir'' command line option.
+This package uses a GNU configure script for its configuration.
+You simply need to untar the distribution and run the
+``configure'' script.  This will run configure which will probe
+your system for any peculiarities it has and setup the Makefile
+and a file of default &num;define's (&dollar;arch/setup.h).
+<p>
+There are a few options to ``configure'' to help it out, or
+change the default behaviour:
+<descrip>
+<tag/--prefix=DIR/ changes the default directory into which
+ircd will install using ``make install''.  This defaults
+to /usr/local
+<tag/--libdir=DIR/ changes the default directory where most
+irc files will go. (default is prefix/lib/ircd)
+<tag/--zlib-include=DIR/ specifies in which directory the
+include file from the zlib is located.
+<tag/--zlib-library=DIR/ specifies in which directory the
+zlib library is locate.
+<tag/--with-zlib/ is the default.  ``configure'' looks on your
+system to find the zlib.  If found, ircd will be linked using
+it.  This does NOT mean you can use server link compression,
+for this you also need to define ZIP_LINKS (see section below).
+<tag/--without-zlib/ tells ``configure'' not to look for the zlib.
+Defining this will keep you from using server link compression.
+</descrip>
 
 <sect>The config.h file
 <p>
@@ -49,11 +66,11 @@ used on a production server.</bf>
 <sect1>SPATH, CPATH, MPATH, LPATH, PPATH, TPATH
 <p>
 Define SPATH to be the directory path to ircd.  This is
-usually /usr/local/bin/ircd, unless you don't have
+usually /usr/local/sbin/ircd, unless you don't have
 installation permission there.
 <p>
 Define CPATH to be the directory path to the ``ircd.conf''
-file. This path is usually /usr/local/lib/ircd.conf. The
+file. This path is usually /usr/local/lib/ircd/ircd.conf. The
 format of this file will be discussed later.
 <p>
 The LPATH &num;define should be set to ``/dev/null'' unless
@@ -71,7 +88,7 @@ previously used PPATH file.  It is used for storing the
 server's PID so a ps(1) isn't necessary.
 <p>
 Define TPATH to be the directory path to the ``ircd.tune''
-file. This path is usually /usr/local/lib/ircd.tune.  This
+file. This path is usually /usr/local/lib/ircd/ircd.tune.  This
 file is used by the server to optimize memory use.
 
 <sect1>CACHED_MOTD
@@ -171,14 +188,10 @@ pretty much self explanatory in the config.h file.  It is
 This package now uses GNU autoconf to probe your system and
 generate the correct Makefile.  However you need to edit it
 to specify specific information, such as ``prefix'',
-``IRCDMODE'' and ``IRCDDIR''.
+``irc_mode'', ``ircd_mode'' and ``irc_dir''.
 <p>
-If GNU autoconf didn't generate a correct Makefile for your
-machine, you might need to uncomment the correct
-``IRCDLIBS'', ``IRCLIBS'' and ``IRCDDIR'' lines.
-<p>
-To now build and install the server, type ``make && make
-install''.
+Now to build the package, type ``make''.  If everything
+goes will, you can then install it by typing ``make install''.
 <p>
 If you have trouble compiling ircd, copy Makefile.in to
 Makefile and edit Makefile as appropriate.
@@ -206,7 +219,7 @@ configuration options.  The record types are as follows:
 <item>Client connections      (I,i)
 <item>Operator privileges     (O)
 <item>Restrict lines          (R)
-<item>Excluded accounts       (K)
+<item>Excluded accounts       (K,k)
 <item>Server connections      (C,c,N)
 <item>Hub connections         (H)
 <item>Leaf connections        (L)
