@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.1 1998/07/19 19:37:24 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.2 1998/08/03 11:47:25 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -217,7 +217,7 @@ static void
 parse_ircd()
 {
 	char *ch, *chp, *buf = iobuf;
-	int cl = -1;
+	int cl = -1, ncl;
 
 	iobuf[iob_len] = '\0';
 	while (ch = index(buf, '\n'))
@@ -230,6 +230,12 @@ parse_ircd()
 		switch (chp[0])
 		    {
 		case 'C': /* new connection */
+			if (!(cldata[cl].state & A_ACTIVE))
+			    {
+                                sendto_log(ALOG_IRCD, LOG_CRIT,
+			   "Entry %d [R] is already active (fatal)!", cl);
+				exit(1);
+			    }
 			if (cldata[cl].instance || cldata[cl].rfd > 0 ||
 			    cldata[cl].wfd > 0)
 			    {
@@ -282,6 +288,49 @@ parse_ircd()
 			/* log here? hmmpf */
 			if (cldata[cl].authuser)
 				free(cldata[cl].authuser);
+			cldata[cl].authuser = NULL;
+			break;
+		case 'R': /* fd remap */
+			if (!(cldata[cl].state & A_ACTIVE))
+			    {
+                                sendto_log(ALOG_IRCD, LOG_CRIT,
+					   "Entry %d [R] is not active!", cl);
+				break;
+			    }
+			ncl = atoi(buf+1);
+			if (!(cldata[ncl].state & A_ACTIVE))
+			    {
+                                sendto_log(ALOG_IRCD, LOG_CRIT,
+			   "Entry %d [R] is already active (fatal)!", ncl);
+				exit(1);
+			    }
+			if (cldata[ncl].instance || cldata[ncl].rfd > 0 ||
+			    cldata[ncl].wfd > 0)
+			    {
+				sendto_log(ALOG_IRCD, LOG_CRIT,
+				   "Entry %d is already active! (fatal)",
+					   ncl);
+				/*
+				** Ok, I don't think this is actually fatal,
+				** cleaning up already active entry and going
+				** on should work; but this should really never
+				** happen, so let's forbid it. -kalt
+				*/
+				exit(1);
+			    }
+			if (cldata[ncl].authuser)
+			    {
+				/* shouldn't be here - hmmpf */
+				sendto_log(ALOG_IRCD|ALOG_DIO, LOG_WARNING,
+					   "Unreleased data [%d]!", ncl);
+				free(cldata[ncl].authuser);
+				cldata[ncl].authuser = NULL;
+			    }
+			bcopy(cldata+cl, cldata+ncl, sizeof(anAuthData));
+
+			cldata[cl].state = 0;
+			cldata[cl].rfd = cldata[cl].wfd = 0;
+			cldata[cl].instance = NULL;
 			cldata[cl].authuser = NULL;
 			break;
 		case 'N': /* hostname */
