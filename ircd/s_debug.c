@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.31 2002/07/29 21:36:07 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.32 2002/09/11 20:24:31 jv Exp $";
 #endif
 
 #include "os.h"
@@ -87,6 +87,9 @@ char	serveropts[] = {
 # else
 'K',
 # endif
+#endif
+#ifdef FAILED_OPERLOG
+'l',
 #endif
 #ifdef	LEAST_IDLE
 'L',
