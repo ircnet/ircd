@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.32 2003/10/18 16:28:54 q Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.33 2003/10/18 17:30:22 q Exp $";
 #endif
 
 #include "os.h"
@@ -154,7 +154,7 @@ static	u_int	hash_sid(char *sid, u_int *store)
  * is little or no point hashing on a full channel name which maybe 255 chars
  * long.
  */
-static	u_int	hash_channel_name(char *hname, int *store, int shortname)
+static	u_int	hash_channel_name(char *hname, u_int *store, int shortname)
 {
 	Reg	u_char	*name = (u_char *)hname;
 	Reg	u_char	ch;
