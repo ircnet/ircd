@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.44 1998/06/12 23:14:53 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.45 1998/07/19 19:37:28 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -544,6 +544,13 @@ aClient	*mp;
 	strcpy(chptr->topic, "SERVER MESSAGES: services joining and leaving");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
+#if defined(USE_IAUTH)
+	chptr = get_channel(mp, "&AUTH", CREATE);
+	strcpy(chptr->topic,
+	       "SERVER MESSAGES: messages from the authentication slave");
+	add_user_to_channel(chptr, mp, CHFL_CHANOP);
+	chptr->mode.mode = smode;
+#endif
 	chptr = get_channel(mp, "&DEBUG", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: debug messages [you shouldn't be here! ;)]");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);

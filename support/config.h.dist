@@ -82,14 +82,17 @@
  * these are only the recommened names and paths. Change as needed.
  * You must define these to something, even if you don't really want them.
  */
-/* This is either full path or file within "server_bin_dir" (see Makefile) */
+/* These are either full path or file within "server_bin_dir" (see Makefile) */
 #define	SPATH	"ircd"		/* daemon path */
+#define	APATH	"iauth"		/* authentication process path */
 /* These are either full paths or files within "ircd_dir" (see Makefile) */
 #define	CPATH	"ircd.conf"	/* configuration file */
 #define	MPATH	"ircd.motd"	/* motd file */
 #define	LPATH	"ircd.log"	/* debugging log */
 #define	PPATH	"ircd.pid"	/* PID file */
 #define	TPATH	"ircd.tune"	/* tuning file */
+#define	QPATH	"iauth.conf"	/* authentication slave configuration file */
+#define	OPATH	"iauth.log"	/* authentication slave debugging log */
 
 /*
  * If you don't want the server to keep reading the MOTD file from the disk,
@@ -101,15 +104,18 @@
 /*
  * Define these filenames to maintain a list of persons who log
  * into this server. Logging will stop when the file does not exist.
- * Logging will be disable also if you do not define this.
+ * Logging will be disabled also if you do not define this.
  *	FNAME_USERLOG just logs user connections,
  *	FNAME_OPERLOG logs every successful use of /oper.
  *	FNAME_CONNLOG logs every user rejected or uncomplete connection
+ *	FNAME_AUTHLOG logs authentication information retrieved by iauth
+ *		      (file must exist on startup, see man page)
  * These are either full paths or files within "ircd_dir" (see Makefile).
  */
 #define FNAME_USERLOG "@logdir@users" /* */
 #define FNAME_OPERLOG "@logdir@opers" /* */
 #define FNAME_CONNLOG "@logdir@rejects" /* */
+#define FNAME_AUTHLOG "@logdir@auth" /* */
 
 /* CHROOTDIR
  *

@@ -149,7 +149,7 @@ typedef struct        MotdItem aMotd;
 #define	FLAGS_WRAUTH	 0x0400	/* set if we havent writen to ident server */
 #define	FLAGS_LOCAL	 0x0800 /* set for local clients */
 #define	FLAGS_GOTID	 0x1000	/* successful ident lookup achieved */
-#define	FLAGS_DOID	 0x2000	/* I-lines say must use ident return [unused]*/
+#define	FLAGS_XAUTH	 0x2000	/* waiting on external authentication */
 #define	FLAGS_NONL	 0x4000 /* No \n in buffer */
 #define	FLAGS_HELD	 0x8000	/* connection held and reconnect try */
 #define	FLAGS_CBURST	0x10000	/* set to mark connection burst being sent */
@@ -170,7 +170,6 @@ typedef struct        MotdItem aMotd;
 
 #define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP)
 #define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP|FLAGS_RESTRICTED)
-#define	FLAGS_ID	(FLAGS_DOID|FLAGS_GOTID)
 
 /*
  * flags macros.
@@ -203,6 +202,7 @@ typedef struct        MotdItem aMotd;
 #define	DoingDNS(x)		((x)->flags & FLAGS_DOINGDNS)
 #define	SetAccess(x)		((x)->flags |= FLAGS_CHKACCESS)
 #define	DoingAuth(x)		((x)->flags & FLAGS_AUTH)
+#define	DoingXAuth(x)		((x)->flags & FLAGS_XAUTH)
 #define	NoNewLine(x)		((x)->flags & FLAGS_NONL)
 
 #define	ClearOper(x)		((x)->user->flags &= ~FLAGS_OPER)
@@ -211,6 +211,7 @@ typedef struct        MotdItem aMotd;
 #define	ClearWallops(x)		((x)->user->flags &= ~FLAGS_WALLOP)
 #define	ClearDNS(x)		((x)->flags &= ~FLAGS_DOINGDNS)
 #define	ClearAuth(x)		((x)->flags &= ~FLAGS_AUTH)
+#define	ClearXAuth(x)		((x)->flags &= ~FLAGS_XAUTH)
 #define	ClearAccess(x)		((x)->flags &= ~FLAGS_CHKACCESS)
 
 /*
@@ -753,7 +754,8 @@ typedef	struct	{
 #define	SCH_LOCAL	8
 #define	SCH_SERVICE	9
 #define	SCH_DEBUG	10
-#define	SCH_MAX		10
+#define	SCH_AUTH	11
+#define	SCH_MAX		11
 
 /* used for async dns values */
 
@@ -777,6 +779,7 @@ typedef	struct	{
 #define EXITC_SENDQ	'Q'	/* send queue exceeded */
 #define EXITC_RLINE	'r'	/* R-lined */
 #define EXITC_REF	'R'	/* Refused */
+#define EXITC_AREF	'U'	/* Unauthorized by iauth */
 
 /* misc defines */
 

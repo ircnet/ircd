@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.21 1998/06/12 23:35:19 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.22 1998/07/19 19:37:29 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -381,7 +381,8 @@ time_t	currenttime;
 						  "Ping timeout");
 			    }
 			if (!IsRegistered(cptr) && 
-			    (DoingDNS(cptr) || DoingAuth(cptr)))
+			    (DoingDNS(cptr) || DoingAuth(cptr) ||
+			     DoingXAuth(cptr)))
 			    {
 				if (cptr->authfd >= 0)
 				    {
@@ -394,7 +395,16 @@ time_t	currenttime;
 					get_client_name(cptr,TRUE)));
 				del_queries((char *)cptr);
 				ClearAuth(cptr);
+#if defined(USE_IAUTHD)
+				if (DoingDNS(cptr) || DoingXAuth(cptr))
+				    {
+					char buf[80];
+					sprintf(buf, "%d T\n", cptr->fd);
+					sendto_iauth(buf);
+				    }
+#endif
 				ClearDNS(cptr);
+				ClearXAuth(cptr);
 				SetAccess(cptr);
 				cptr->firsttime = currenttime;
 				continue;
@@ -705,6 +715,31 @@ char	*argv[];
 		(void)fprintf(stderr, "%s: Error in daemon path: %s.\n",
                               SPATH, dpath);
 		exit(-1);
+	    }
+#endif
+#if defined(USE_IAUTH)
+	switch (vfork())
+	    {
+	case -1:
+		fprintf(stderr, "%s: Unable to fork!", myargv[0]);
+		exit(-1);
+	case 0:
+		close(0); close(1); close(3);
+		if (execl(APATH, APATH, "-X", NULL) < 0)
+			_exit(-1);
+	default:
+		    {
+			int rc;
+
+			(void)wait(&rc);
+			if (rc != 0)
+			    {
+				fprintf(stderr,
+					"%s: error: unable to find \"%s\".\n",
+					myargv[0], APATH);
+				exit(-1);
+			    }
+		    }
 	    }
 #endif
 

@@ -1,6 +1,6 @@
 /************************************************************************
- *   IRC - Internet Relay Chat, ircd/s_auth_ext.h
- *   Copyright (C) 1997 Alain Nissen
+ *   IRC - Internet Relay Chat, iauth/a_log_def.h
+ *   Copyright (C) 1998 Christophe Kalt
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,22 +17,20 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/*  This file contains external definitions for global variables and functions
-    defined in ircd/s_auth.c.
- */
+#if defined(IAUTH_DEBUG)
+# define DebugLog(x)	sendto_log x
+#else
+# define DebugLog(x)	;
+#endif
 
-/*  External definitions for global functions.
- */
-#ifndef S_AUTH_C
-#define EXTERN extern
-#else /* S_AUTH_C */
-#define EXTERN
-#endif /* S_AUTH_C */
-# if defined(USE_IAUTH)
-EXTERN int sendto_iauth __P((char *));
-EXTERN void read_iauth();
-# endif
-EXTERN void start_auth __P((Reg aClient *cptr));
-EXTERN void send_authports __P((aClient *cptr));
-EXTERN void read_authports __P((Reg aClient *cptr));
-#undef EXTERN
+#define	ALOG_FLOG	0x01	/* file log */
+#define	ALOG_IRCD	0x02	/* notice sent to ircd (then sent to &AUTH) */
+
+#define	ALOG_DMISC	0x0100	/* debug: misc stuff */
+#define	ALOG_DIO	0x0200	/* debug: IO stuff */
+#define	ALOG_DSPY	0x0400	/* debug: show ircd stream */
+#define	ALOG_DCONF	0x0800	/* debug: configuration file */
+
+#define	ALOG_D931	0x1000	/* debug: module rfc931 */
+
+#define	ALOG_DALL	0x1F00	/* any debug flag */

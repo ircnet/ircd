@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.4 1997/09/03 17:45:56 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.5 1998/07/19 19:37:30 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -26,6 +26,148 @@ static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.4 1997/09/03 17:45:56 kalt Exp $";
 #define S_AUTH_C
 #include "s_externs.h"
 #undef S_AUTH_C
+
+#if defined(USE_IAUTH)
+/*
+ * sendto_iauth
+ *
+ *	Send the buffer to the authentication daemon.
+ *	Return 0 if everything went well, -1 otherwise.
+ */
+int
+sendto_iauth(buf)
+char *buf;
+{
+    if (adfd < 0)
+	    return -1;
+    if (write(adfd, buf, strlen(buf)) != strlen(buf))
+	{
+	    close(adfd);
+	    adfd = -1;
+	    /*
+	    ** this should not happen.. but if it does.. shall we try to
+	    ** restart the thing ? (afterall, iauth is almost stateless)
+	    */
+	    return -1;
+	}
+    return 0;
+}
+
+/*
+ * read_iauth
+ *
+ *	read and process data from the authentication daemon.
+ */
+void
+read_iauth()
+{
+    static char obuf[READBUF_SIZE];
+    static int olen = 0;
+    char buf[READBUF_SIZE], *start, *end, tbuf[BUFSIZ];
+    aClient *cptr;
+    int i;
+
+    while (1)
+	{
+	    if (olen)
+		    bcopy(obuf, buf, olen);
+	    if ((i = recv(adfd, buf+olen, READBUF_SIZE-olen, 0)) <= 0)
+		{
+		    if (errno != EAGAIN && errno != EWOULDBLOCK)
+			{
+			    sendto_flag(SCH_AUTH, "Aiiie! lost slave authentication process (errno = %d)", errno);
+			    close(adfd);
+			    adfd = -1;
+			}
+		    break;
+		}
+	    olen += i;
+	    buf[olen] = '\0';
+	    start = buf;
+	    while (end = index(start, '\n'))
+		{
+		    *end++ = '\0';
+		    if (*buf == '>')
+			    sendto_flag(SCH_AUTH, "%s", start+1);
+		    else if (*buf != 'U' && *buf != 'u' &&
+			     *buf != 'K' && *buf != 'D')
+			{
+			    sendto_flag(SCH_AUTH, "Garbage from iauth [%.*]",
+					start);
+			    start = end;
+			    continue;
+			}
+		    if ((cptr = local[i = atoi(buf+2)]) == NULL)
+			{
+			    sendto_flag(SCH_AUTH, "client gone"); /* debug */
+			    start = end;
+			    continue;
+			}
+		    sprintf(tbuf, "%c %d %s %u ", buf[0], i,
+			    inetntoa((char *)&cptr->ip), cptr->port);
+		    if (strncmp(tbuf, buf, strlen(tbuf)))
+			{
+			    sendto_flag(SCH_AUTH, "mismatch"); /* debug again*/
+			    start = end;
+			    continue;
+			}
+		    if (buf[0] == 'U')
+			{
+			    if (cptr->auth != cptr->username)
+				{   
+				    istat.is_authmem -= sizeof(cptr->auth);
+				    istat.is_auth -= 1;
+				    MyFree(cptr->auth);
+				}
+			    cptr->auth =cptr->username;
+			    strncpy(cptr->username, start+strlen(tbuf),
+				    USERLEN+1);
+			    cptr->username[USERLEN] = '\0';
+			    cptr->flags |= FLAGS_GOTID;
+			}
+		    else if (buf[0] == 'u')
+			{
+			    if (cptr->auth != cptr->username)
+				{
+				    istat.is_authmem -= sizeof(cptr->auth);
+				    istat.is_auth -= 1;
+				    MyFree(cptr->auth);
+				}
+			    cptr->username[0] = '-';
+			    strncpy(cptr->username+1, start+strlen(tbuf),
+				    USERLEN);
+			    cptr->username[USERLEN] = '\0';
+			    cptr->auth = MyMalloc(strlen(start+strlen(tbuf))
+						  + 2);
+			    *cptr->auth = '-';
+			    strcpy(cptr->auth+1, start+strlen(tbuf));
+			    istat.is_authmem += sizeof(cptr->auth);
+			    istat.is_auth += 1;
+			    cptr->flags |= FLAGS_GOTID;
+			}
+		    else if (buf[0] == 'D')
+			    /*authentication finished*/
+			    ClearXAuth(cptr);
+		    else
+			{
+			    /*
+			    ** mark for kill, because it cannot be killed
+			    ** yet: we don't even know if this is a server
+			    ** or a user connection!
+			    */
+			    cptr->exitc = EXITC_AREF;
+			}
+		    start = end;
+		}
+	    if (start != buf+olen)
+		    bcopy(start, obuf, olen = (buf+olen)-start);
+	    else
+		    olen = 0;
+	}
+    if (olen)
+	    bcopy(buf, obuf, olen); /* for next time */		    
+}
+#endif
 
 /*
  * start_auth
@@ -72,8 +214,6 @@ Reg	aClient	*cptr;
 	/* get remote host peer - so that we get right interface -- jrg */
 	tlen = ulen = sizeof(us);
 	(void)getpeername(cptr->fd, (struct sockaddr *)&them, &tlen);
-
-	them.sin_port = htons(113);
 	them.sin_family = AF_INET;
 
 	/* We must bind the local end to the interface that they connected
@@ -81,8 +221,27 @@ Reg	aClient	*cptr;
 	   and RFC931 check only sends port numbers: server takes IP addresses
 	   from query socket -- jrg */
 	(void)getsockname(cptr->fd, (struct sockaddr *)&us, &ulen);
-	us.sin_port = htons(0);  /* bind assigns us a port */
 	us.sin_family = AF_INET;
+#if defined(USE_IAUTH)
+	if (adfd >= 0)
+	    {
+		char abuf[BUFSIZ];
+
+		sprintf(abuf, "%d C %s %u ", cptr->fd,
+			inetntoa((char *)&them.sin_addr),ntohs(them.sin_port));
+		sprintf(abuf+strlen(abuf), "%s %u\n",
+			inetntoa((char *)&us.sin_addr), ntohs(us.sin_port));
+		if (sendto_iauth(abuf) == 0)
+		    {
+			close(cptr->authfd);
+			cptr->authfd = -1;
+			cptr->flags |= FLAGS_XAUTH;
+			return;
+		    }
+	    }
+#endif
+	them.sin_port = htons(113);
+	us.sin_port = htons(0);  /* bind assigns us a port */
 	Debug((DEBUG_NOTICE,"auth(%x) from %s",
 	       cptr, inetntoa((char *)&us.sin_addr)));
 	if (bind(cptr->authfd, (struct sockaddr *)&us, ulen) >= 0)

@@ -1,0 +1,51 @@
+.\" @(#)$Id: iauth.8,v 1.1 1998/07/19 19:37:17 kalt Exp $
+.TH IRCD 8 "$Date: 1998/07/19 19:37:17 $"
+.SH NAME
+iauth \- The Internet Relay Chat Authentication Program
+.SH SYNOPSIS
+.hy 0
+.IP \fBiauth\fP
+[
+.B -v 
+|
+.BI \-c " configfile"
+]
+.SH DESCRIPTION
+.LP
+\fIiauth\fP is a slave process used by the \fIircd\fP program to perform
+the authentication of incoming connections.  The \fIircd\fP program starts
+\fIiauth\fP upon startup.
+.SH OPTIONS
+.TP
+.BI \-c " filename"
+When this flag is given, the program will read the configuration file
+specify and validate it.  This is useful to check for errors in the setup.
+.TP
+.B \-v
+This option dumps information about the version.
+.SH EXAMPLE
+.RS
+.nf
+millennium% \fBiauth -c iauth.conf\fP
+iauth 2.10
+
+Reading "iauth.conf"
+
+Module(s) loaded:
+        rfc931
+.fi
+.RE
+.SH COPYRIGHT
+(c) 1998 Christophe Kalt
+.LP
+For full COPYRIGHT see LICENSE file with IRC package.
+.LP
+.RE
+.SH FILES
+ "iauth.conf"
+.SH "SEE ALSO"
+ircd(8)
+.SH BUGS
+None... ;-) if somebody finds one, please send mail to ircd-bugs@stealth.net
+.SH AUTHOR
+Christophe Kalt.

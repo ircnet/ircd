@@ -1,6 +1,6 @@
 /************************************************************************
- *   IRC - Internet Relay Chat, ircd/s_auth_ext.h
- *   Copyright (C) 1997 Alain Nissen
+ *   IRC - Internet Relay Chat, iauth/a_conf_ext.h
+ *   Copyright (C) 1998 Christophe Kalt
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -18,21 +18,25 @@
  */
 
 /*  This file contains external definitions for global variables and functions
-    defined in ircd/s_auth.c.
+    defined in iauth/a_conf.c.
  */
+
+/*  External definitions for global variables.
+ */
+#ifndef A_CONF_C
+extern u_int	debuglevel;
+extern AnInstance *instances;
+#endif /* A_CONF_C */
 
 /*  External definitions for global functions.
  */
-#ifndef S_AUTH_C
-#define EXTERN extern
-#else /* S_AUTH_C */
-#define EXTERN
-#endif /* S_AUTH_C */
-# if defined(USE_IAUTH)
-EXTERN int sendto_iauth __P((char *));
-EXTERN void read_iauth();
-# endif
-EXTERN void start_auth __P((Reg aClient *cptr));
-EXTERN void send_authports __P((aClient *cptr));
-EXTERN void read_authports __P((Reg aClient *cptr));
+#ifndef A_CONF_C
+# define EXTERN extern
+#else /* A_CONF_C */
+# define EXTERN
+#endif /* A_CONF_C */
+
+EXTERN void conf_read __P((char *));
+EXTERN int conf_match __P((u_int, AnInstance *, int));
+
 #undef EXTERN

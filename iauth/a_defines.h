@@ -1,6 +1,6 @@
 /************************************************************************
- *   IRC - Internet Relay Chat, ircd/s_auth_ext.h
- *   Copyright (C) 1997 Alain Nissen
+ *   IRC - Internet Relay Chat, iauth/a_defines.h
+ *   Copyright (C) 1998 Christophe Kalt
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,22 +17,19 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/*  This file contains external definitions for global variables and functions
-    defined in ircd/s_auth.c.
+/*  This file includes all files defining constants, macros and types
+    definitions used by the authentication process.
  */
 
-/*  External definitions for global functions.
- */
-#ifndef S_AUTH_C
-#define EXTERN extern
-#else /* S_AUTH_C */
-#define EXTERN
-#endif /* S_AUTH_C */
-# if defined(USE_IAUTH)
-EXTERN int sendto_iauth __P((char *));
-EXTERN void read_iauth();
-# endif
-EXTERN void start_auth __P((Reg aClient *cptr));
-EXTERN void send_authports __P((aClient *cptr));
-EXTERN void read_authports __P((Reg aClient *cptr));
-#undef EXTERN
+#define IAUTH_DEBUG	1
+
+#include "config.h"
+#include "patchlevel.h"
+
+#include "dbuf_def.h"	/* needed for struct_def.h, sigh */
+#include "class_def.h"	/* needed for struct_def.h, sigh */
+#include "struct_def.h"
+
+#include "a_conf_def.h"
+#include "a_struct_def.h"
+#include "a_log_def.h"

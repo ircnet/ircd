@@ -1,6 +1,6 @@
 /************************************************************************
- *   IRC - Internet Relay Chat, ircd/s_auth_ext.h
- *   Copyright (C) 1997 Alain Nissen
+ *   IRC - Internet Relay Chat, iauth/a_externs.h
+ *   Copyright (C) 1998 Christophe Kalt
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,22 +17,15 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/*  This file contains external definitions for global variables and functions
-    defined in ircd/s_auth.c.
+/*  This file includes all *_ext.h files containing external declarations
+ *  for the authentication process.
  */
 
-/*  External definitions for global functions.
- */
-#ifndef S_AUTH_C
-#define EXTERN extern
-#else /* S_AUTH_C */
-#define EXTERN
-#endif /* S_AUTH_C */
-# if defined(USE_IAUTH)
-EXTERN int sendto_iauth __P((char *));
-EXTERN void read_iauth();
-# endif
-EXTERN void start_auth __P((Reg aClient *cptr));
-EXTERN void send_authports __P((aClient *cptr));
-EXTERN void read_authports __P((Reg aClient *cptr));
-#undef EXTERN
+#include "match_ext.h"
+#include "support_ext.h"
+
+#include "a_conf_ext.h"
+#include "a_io_ext.h"
+#include "a_log_ext.h"
+
+#include "mod_rfc931_ext.h"

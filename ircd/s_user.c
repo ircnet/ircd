@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.46 1998/06/12 23:06:06 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.47 1998/07/19 19:37:32 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -392,6 +392,25 @@ char	*nick, *username;
 		user->username[USERLEN] = '\0';
 		/* eos */
 
+		if (sptr->exitc == EXITC_AREF)
+		    {
+			sendto_flag(SCH_LOCAL, "Denied connection from %s.",
+				    get_client_host(sptr));
+#if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
+			syslog(LOG_NOTICE, "%s ( %s ): <none>@%s [%s] %c\n",
+			       myctime(sptr->firsttime), " Denied  ",
+			       (IsUnixSocket(sptr)) ? me.sockhost :
+			       ((sptr->hostp) ? sptr->hostp->h_name :
+				sptr->sockhost), sptr->auth, sptr->exitc);
+#endif		    
+#if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
+			sendto_flog(sptr, " Denied  ", 0, "<none>",
+				    (IsUnixSocket(sptr)) ? me.sockhost :
+				    ((sptr->hostp) ? sptr->hostp->h_name :
+				    sptr->sockhost));
+#endif
+			return exit_client(cptr, sptr, &me, "Denied Access");
+		    }
 		if ((i = check_client(sptr)))
 		    {
 			struct msg_set { char *shortm; char *longm; };
@@ -1742,6 +1761,15 @@ user_finish:
 	user->servp->userlist = user;
 	
 	strncpyzt(sptr->info, realname, sizeof(sptr->info));
+#if defined(USE_IAUTH)
+	if (MyConnect(sptr))
+	    {
+		char buf[USERLEN+20];
+
+		sprintf(buf, "%d U %.*s\n", sptr->fd, USERLEN+1, username);
+		sendto_iauth(buf);
+	    }
+#endif
 	if (sptr->name[0]) /* NICK already received, now we have USER... */
 	    {
 		if ((parc == 6) && IsServer(cptr)) /* internal m_user() */

@@ -1,6 +1,6 @@
 /************************************************************************
- *   IRC - Internet Relay Chat, ircd/s_auth_ext.h
- *   Copyright (C) 1997 Alain Nissen
+ *   IRC - Internet Relay Chat, iauth/mod_pipe.c
+ *   Copyright (C) 1998 Christophe Kalt
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -17,22 +17,13 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/*  This file contains external definitions for global variables and functions
-    defined in ircd/s_auth.c.
- */
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.1 1998/07/19 19:37:26 kalt Exp $";
+#endif
 
-/*  External definitions for global functions.
- */
-#ifndef S_AUTH_C
-#define EXTERN extern
-#else /* S_AUTH_C */
-#define EXTERN
-#endif /* S_AUTH_C */
-# if defined(USE_IAUTH)
-EXTERN int sendto_iauth __P((char *));
-EXTERN void read_iauth();
-# endif
-EXTERN void start_auth __P((Reg aClient *cptr));
-EXTERN void send_authports __P((aClient *cptr));
-EXTERN void read_authports __P((Reg aClient *cptr));
-#undef EXTERN
+#include "os.h"
+#include "a_defines.h"
+#define MOD_PIPE_C
+#include "a_externs.h"
+#undef MOD_PIPE_C
+

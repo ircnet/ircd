@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.12 1997/10/13 17:37:11 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.13 1998/07/19 19:37:29 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -224,6 +224,9 @@ time_t	now;
 		if (now >= tout)
 			if (--rptr->retries <= 0)
 			    {
+#if defined(USE_IAUTHD)
+				char buf[80];
+#endif
 #ifdef DEBUG
 				Debug((DEBUG_ERROR,"timeout %x now %d cptr %x",
 				       rptr, now, rptr->cinfo.value.cptr));
@@ -233,9 +236,13 @@ time_t	now;
 				switch (rptr->cinfo.flags)
 				    {
 				case ASYNC_CLIENT :
+#if defined(USE_IAUTHD)
+					sprintf(buf, "%d d\n", cptr->fd);
+					sendto_iauth(buf);
+#endif
 					ClearDNS(cptr);
-					if (!DoingAuth(cptr))
-						SetAccess(cptr);
+					if (!DoingAuth(cptr))	/* XAuth? */
+						SetAccess(cptr); /* unused */
 					break;
 				case ASYNC_CONNECT :
 					sendto_flag(SCH_ERROR,

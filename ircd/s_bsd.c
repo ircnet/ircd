@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.27 1998/06/12 23:23:03 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.28 1998/07/19 19:37:31 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -50,7 +50,7 @@ static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.27 1998/06/12 23:23:03 kalt Exp $";
 
 aClient	*local[MAXCONNECTIONS];
 FdAry	fdas, fdaa, fdall;
-int	highest_fd = 0, readcalls = 0, udpfd = -1, resfd = -1;
+int	highest_fd = 0, readcalls = 0, udpfd = -1, resfd = -1, adfd = -1;
 time_t	timeofday;
 static	struct	sockaddr_in	mysk;
 static	void	polludp();
@@ -420,6 +420,9 @@ void	close_listeners()
 void	init_sys()
 {
 	Reg	int	fd;
+#if defined(USE_IAUTH)
+	int sp[2];
+#endif
 
 #ifdef RLIMIT_FD_MAX
 	struct rlimit limit;
@@ -520,6 +523,34 @@ void	init_sys()
 	    }
 init_dgram:
 	resfd = init_resolver(0x1f);
+
+#if defined(USE_IAUTH)
+	/* finally, start up the authentication slave process */
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sp) < 0)
+		abort(); /* hmmpf! */
+	adfd = sp[0];
+	set_non_blocking(sp[0], NULL);
+	set_non_blocking(sp[1], NULL); /* less to worry about in iauth */
+	switch (vfork())
+	    {
+	case -1:
+		/* hmmpf */
+		exit(-1);
+	case 0:
+		for (fd = 0; fd < MAXCONNECTIONS; fd++)
+			if (fd != sp[1])
+				(void)close(fd);
+		if (sp[1] != 0)
+		    {
+			(void)dup2(sp[1], 0);
+			close(sp[1]);
+		    }
+		if (execl(APATH, APATH, NULL) < 0)
+			_exit(-1); /* should really not happen.. */
+	default:
+		close(sp[1]);
+	    }
+#endif
 
 	return;
 }
@@ -1106,6 +1137,12 @@ aClient *cptr;
 
 	if ((i = cptr->fd) >= 0)
 	    {
+#if defined(USE_IAUTH)
+		char buf[10];
+
+		sprintf(buf, "%d D\n", cptr->fd);
+		sendto_iauth(buf);
+#endif
 		flush_connections(i);
 		if (IsServer(cptr) || IsListening(cptr))
 		    {
@@ -1453,6 +1490,27 @@ add_con_refuse:
 	acptr->acpt = cptr;
 	add_client_to_list(acptr);
 	start_auth(acptr);
+#if defined(USE_IAUTH)
+	if (!isatty(fd) && !DoingDNS(acptr))
+	    {
+		char buf[BUFSIZ];
+		int i = 0;
+		
+		while (acptr->hostp->h_aliases[i])
+		    {   
+			sprintf(buf, "%d A %s\n",
+				acptr->fd,
+				acptr->hostp->h_aliases[i++]);
+			sendto_iauth(buf);
+		    }
+		if (acptr->hostp->h_name)
+		    {   
+			sprintf(buf, "%d N %s\n",
+				acptr->fd, acptr->hostp->h_name);
+			sendto_iauth(buf);
+		    }
+	    }
+#endif
 	return acptr;
 }
 
@@ -1698,6 +1756,7 @@ FdAry	*fdp;
 	struct pollfd * pfd     = poll_fdarray;
 	struct pollfd * res_pfd = NULL;
 	struct pollfd * udp_pfd = NULL;
+	struct pollfd * ad_pfd = NULL;
 	aClient	 * authclnts[MAXCONNECTIONS];	/* mapping of auth fds to client ptrs */
 	int	   nbr_pfds = 0;
 #endif
@@ -1722,6 +1781,7 @@ FdAry	*fdp;
 		pfd->fd  = -1;
 		res_pfd  = NULL;
 		udp_pfd  = NULL;
+		ad_pfd = NULL;
 #endif	/* USE_POLL */
 		auth = 0;
 
@@ -1752,7 +1812,8 @@ FdAry	*fdp;
 					highfd = cptr->authfd;
 #endif
 			    }
-			if (DoingDNS(cptr) || DoingAuth(cptr))
+			if (DoingDNS(cptr) || DoingAuth(cptr) ||
+			    DoingXAuth(cptr))
 				continue;
 #if ! USE_POLL
 			if (fd > highfd)
@@ -1815,7 +1876,20 @@ FdAry	*fdp;
 			res_pfd = pfd;
 #endif			
 		    }
-		Debug((DEBUG_L11, "udpfd %d resfd %d", udpfd, resfd));
+#if defined(USE_IAUTH)
+		if (adfd >= 0)
+		    {
+			SET_READ_EVENT(adfd);
+# if ! USE_POLL
+			if (adfd > highfd)
+				highfd = adfd;
+# else
+			ad_pfd = pfd;
+# endif			
+		    }
+#endif
+		Debug((DEBUG_L11, "udpfd %d resfd %d adfd %s", udpfd, resfd,
+		       adfd));
 #if ! USE_POLL
 		Debug((DEBUG_L11, "highfd %d", highfd));
 #endif
@@ -1866,6 +1940,18 @@ FdAry	*fdp;
 	    TST_READ_EVENT(udpfd))
 	    {
 		polludp();
+		nfds--;
+		CLR_READ_EVENT(udpfd);
+	    }
+	if (nfds > 0 &&
+#if ! USE_POLL
+	    adfd >= 0 &&
+#else
+	    (pfd = ad_pfd) &&
+#endif
+	    TST_READ_EVENT(adfd))
+	    {
+		read_iauth();
 		nfds--;
 		CLR_READ_EVENT(udpfd);
 	    }
@@ -2839,6 +2925,27 @@ static	void	do_dns_async()
 				if (!DoingAuth(cptr))
 					SetAccess(cptr);
 				cptr->hostp = hp;
+#if defined(USE_IAUTH)
+				if (hp)
+				    {
+					char buf[BUFSIZ];
+					int i = 0;
+
+					while (hp->h_aliases[i])
+					    {
+						sprintf(buf, "%d A %s\n",
+							cptr->fd,
+							hp->h_aliases[i++]);
+						sendto_iauth(buf);
+					    }
+					if (hp->h_name)
+					    {
+						sprintf(buf, "%d N %s\n",
+							cptr->fd, hp->h_name);
+						sendto_iauth(buf);
+					    }
+				    }
+#endif
 			    }
 			break;
 		case ASYNC_CONNECT :

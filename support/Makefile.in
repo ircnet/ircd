@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.21 1998/06/12 22:57:41 kalt Exp $
+#*   $Id: Makefile.in,v 1.22 1998/07/19 19:37:35 kalt Exp $
 #*
 #*/
 
@@ -27,8 +27,13 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 
 CC = @CC@
+# for the server
 S_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common @IRC_ZLIB_INCLUDE@
+# for the authentication daemon
+A_CFLAGS = @CFLAGS@ -I. -I../iauth -I../common
+# for chkconfig
 CC_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common
+# for the client
 C_CFLAGS = @CFLAGS@ -I. -I../irc -I../common
 U_CFLAGS = @CFLAGS@ -I.
 LDFLAGS = @LDFLAGS@
@@ -84,13 +89,17 @@ SERVER_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
               res_init.o res_comp.o res_mkquery.o
 SERVER = ircd
 
+IAUTH_COMMON_OBJS = clsupport.o clmatch.o # This is a little evil
+IAUTH_OBJS = iauth.o a_conf.o a_io.o a_log.o mod_pipe.o mod_rfc931.o
+IAUTH = iauth
+
 CHKCONF_COMMON_OBJS = match.o
 CHKCONF_OBJS = chkconf.o
 CHKCONF = chkconf
 
 all: server client
 
-server: $(SERVER) $(CHKCONF) mkpasswd ircdwatch
+server: $(SERVER) $(IAUTH) $(CHKCONF) mkpasswd ircdwatch
 
 client: $(CLIENT)
 
@@ -99,6 +108,10 @@ $(SERVER): $(SERVER_COMMON_OBJS) $(SERVER_OBJS)
 	./version.c.SH
 	$(CC) $(S_CFLAGS) -c -o version.o version.c
 	$(CC) $(LDFLAGS) -o $@ $(SERVER_COMMON_OBJS) version.o $(SERVER_OBJS) $(ZLIBS) $(MATHLIBS) $(LIBS)
+
+$(IAUTH): $(IAUTH_COMMON_OBJS) $(IAUTH_OBJS)
+	$(RM) $@
+	$(CC) $(LDFLAGS) -o $@ $(IAUTH_COMMON_OBJS) $(IAUTH_OBJS) $(LIBS)
 
 $(CLIENT): $(CLIENT_COMMON_OBJS) $(CLIENT_OBJS)
 	$(RM) $@
@@ -148,6 +161,7 @@ install-server: server
 	$(RM) $(ircd_dir)/ircd.m4
 	../ircd/buildm4 $(ircd_dir)
 	(cd ../doc; $(INSTALL_DATA) ircd.8 $(server_man_dir))
+	(cd ../doc; $(INSTALL_DATA) iauth.8 $(server_man_dir))
 	(cd ../contrib/ircdwatch; $(INSTALL_DATA) ircdwatch.8 $(server_man_dir)) 
 	(cd ../../doc; $(INSTALL_DATA) example.conf $(ircd_dir))
 	@echo "installation of server done."
@@ -306,6 +320,24 @@ res_comp.o: ../ircd/res_comp.c setup.h config.h
 res_mkquery.o: ../ircd/res_mkquery.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/res_mkquery.c
 
+iauth.o: ../iauth/iauth.c config.h setup.h
+	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/iauth.c
+
+a_conf.o: ../iauth/a_conf.c config.h setup.h
+	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/a_conf.c
+
+a_io.o: ../iauth/a_io.c config.h setup.h
+	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/a_io.c
+
+a_log.o: ../iauth/a_log.c config.h setup.h
+	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/a_log.c
+
+mod_pipe.o: ../iauth/mod_pipe.c config.h setup.h
+	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_pipe.c
+
+mod_rfc931.o: ../iauth/mod_rfc931.c config.h setup.h
+	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_rfc931.c
+
 chkconf.o: ../ircd/chkconf.c setup.h config.h
 	$(CC) $(CC_CFLAGS) -DCHKCONF_COMPILE -DDPATH="\"$(ircd_dir)\"" -c -o $@ ../ircd/chkconf.c
 
@@ -318,7 +350,7 @@ mkpasswd.o: ../contrib/mkpasswd/mkpasswd.c
 	$(CC) $(CC_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c
 
 clean:
-	$(RM) $(CLIENT) $(SERVER) $(CHKCONF) ircd-mkpasswd ircdwatch *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
+	$(RM) $(CLIENT) $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd ircdwatch *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
 
 distclean:
 	@echo "To make distclean, just delete the current directory."

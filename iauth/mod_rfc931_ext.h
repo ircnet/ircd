@@ -1,6 +1,6 @@
 /************************************************************************
- *   IRC - Internet Relay Chat, ircd/s_auth_ext.h
- *   Copyright (C) 1997 Alain Nissen
+ *   IRC - Internet Relay Chat, iauth/mod_rfc931_ext.h
+ *   Copyright (C) 1998 Christophe Kalt
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -18,21 +18,28 @@
  */
 
 /*  This file contains external definitions for global variables and functions
-    defined in ircd/s_auth.c.
+    defined in iauth/mod_rfc931.c.
  */
+
+/*  External definitions for global variables.
+ */
+#ifndef MOD_RFC931_C
+extern aModule Module_rfc931;
+#endif /* MOD_RFC931_C */
 
 /*  External definitions for global functions.
  */
-#ifndef S_AUTH_C
-#define EXTERN extern
-#else /* S_AUTH_C */
-#define EXTERN
-#endif /* S_AUTH_C */
-# if defined(USE_IAUTH)
-EXTERN int sendto_iauth __P((char *));
-EXTERN void read_iauth();
-# endif
-EXTERN void start_auth __P((Reg aClient *cptr));
-EXTERN void send_authports __P((aClient *cptr));
-EXTERN void read_authports __P((Reg aClient *cptr));
+#ifndef MOD_RFC931_C
+# define EXTERN extern
+#else /* MOD_RFC931_C */
+# define EXTERN
+#endif /* MOD_RFC931_C */
+
+/*
+EXTERN int rfc931_start __P((u_int));
+EXTERN int rfc931_work __P((u_int));
+EXTERN int rfc931_timeout __P((u_int));
+EXTERN void rfc931_clean __P((u_int));
+*/
+
 #undef EXTERN
