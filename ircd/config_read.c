@@ -16,11 +16,12 @@ static aConfig	*config_read(int, int);
 static void	config_free(aConfig *);
 
 /* 
-** syntax of include is simple:
+** Syntax of include is simple (but very strict):
 ** #include "filename"
-** #include <filename>
-** # must be first char on the line and " or > the last
-** if filename in <>, it's loaded from dir where IRCDCONF_PATH is.
+** # must be first char on the line, word include, one space, then ",
+** filename and another " must be the last char on the line.
+** If filename does not start with slash, it's loaded from dir 
+** where IRCDCONF_PATH is.
 */
 
 /* read from supplied fd, putting line by line onto aConfig struct.
@@ -74,8 +75,7 @@ aConfig *config_read(int fd, int depth)
 			if (*end == '\r')
 				end--;		/* ... and \r, if is */
 
-			if (((*start == '<' && *end == '>') ||
-				(*start == '"' && *end == '"'))
+			if (*start == '"' && *end == '"'
 				&& strncasecmp(i, "#include ", 9) == 0)
 			{
 				char	file[FILEMAX + 1];
@@ -96,7 +96,7 @@ aConfig *config_read(int fd, int depth)
 #endif
 					dont = 1;
 				}
-				if (*start == '<' && *(start+1) != '/')
+				if (*(start+1) != '/')
 				{
 					strcat(file, IRCDCONF_PATH);
 					filep = strrchr(file, '/') + 1;
