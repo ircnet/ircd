@@ -36,7 +36,7 @@
 */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.4 1997/06/02 14:49:53 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.5 1997/06/19 15:07:09 kalt Exp $";
 #endif
 
 #include <stdio.h>
@@ -52,7 +52,6 @@ static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.4 1997/06/02 14:49:53 kalt Exp $";
 #define	valloc malloc
 #endif
 
-u_int	dbufalloc = 0, dbufblocks = 0;
 u_int	poolsize = (BUFFERPOOL > 1500000) ? BUFFERPOOL : 1500000;
 dbufbuf	*freelist = NULL;
 
@@ -84,10 +83,11 @@ void dbuf_init()
 	if (!freelist)
 		return; /* screw this if it doesn't work */
 	dbp = freelist;
-	for( ; i < (nb - 1); i++, dbp++, dbufblocks++)
+	for( ; i < (nb - 1); i++, dbp++, istat.is_dbufnow++)
 		dbp->next = (dbp + 1);
 	dbp->next = NULL;
-	dbufblocks++;
+	istat.is_dbufnow++;
+	istat.is_dbuf = istat.is_dbufnow;
 }
 
 #endif /* DBUF_INIT */
@@ -105,15 +105,16 @@ dbufbuf **dbptr;
 	Reg	int	num;
 #endif
 
-	dbufalloc++;
+	if (istat.is_dbufuse++ == istat.is_dbufmax)
+		istat.is_dbufmax = istat.is_dbufuse;
 	if ((*dbptr = freelist))
 	    {
 		freelist = freelist->next;
 		return 0;
 	    }
-	if (dbufalloc * DBUFSIZ > poolsize)
+	if (istat.is_dbufuse * DBUFSIZ > poolsize)
 	    {
-		dbufalloc--;
+		istat.is_dbufuse--;
 		return -2;	/* Not fatal, go back and increase poolsize */
 	    }
 
@@ -129,7 +130,7 @@ dbufbuf **dbptr;
 	if (num < 0)
 		num = 1;
 
-	dbufblocks += num;
+	istat.is_dbufnow += num;
 
 	*dbptr = (dbufbuf *)valloc(num*sizeof(dbufbuf));
 	if (!*dbptr)
@@ -144,7 +145,7 @@ dbufbuf **dbptr;
 	    }
 	return 0;
 #else
-	dbufblocks++;
+	istat.is_dbufnow++;
 	if (!(*dbptr = (dbufbuf *)MyMalloc(sizeof(dbufbuf))))
 		return -1;
 	return 0;
@@ -156,7 +157,7 @@ dbufbuf **dbptr;
 static	void	dbuf_free(ptr)
 Reg	dbufbuf	*ptr;
 {
-	dbufalloc--;
+	istat.is_dbufuse--;
 	ptr->next = freelist;
 	freelist = ptr;
 }

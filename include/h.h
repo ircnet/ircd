@@ -102,7 +102,7 @@ extern	char	*strerror __P((int));
 extern	int	dgets __P((int, char *, int));
 extern	char	*inetntoa __P((char *)), *mystrdup __P((char *));
 
-extern	u_int	dbufalloc, dbufblocks, poolsize;
+extern	u_int	poolsize;
 extern	int	debuglevel, errno, h_errno;
 extern	int	highest_fd, debuglevel, portnum, debugtty, maxusersperchannel;
 extern	int	readcalls, udpfd, resfd;

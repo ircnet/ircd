@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.12 1997/06/18 17:15:39 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.13 1997/06/19 15:07:09 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -162,8 +162,10 @@ int	len;
 			poolsize -= MaxSendq(aconf->class) >> 1;
 			IncSendq(aconf->class);
 			poolsize += MaxSendq(aconf->class) >> 1;
-			sendto_flag(SCH_NOTICE, "New poolsize %d.",
+			sendto_flag(SCH_NOTICE,
+				    "New poolsize %d. (sendq adjusted)",
 				    poolsize);
+			istat.is_dbufmore++;
 		    }
 		else if (IsServer(to))
 			sendto_flag(SCH_ERROR,
@@ -210,8 +212,10 @@ tryagain:
 				poolsize -= MaxSendq(aconf->class) >> 1;
 				IncSendq(aconf->class);
 				poolsize += MaxSendq(aconf->class) >> 1;
-				sendto_flag(SCH_NOTICE, "New poolsize %d. (r)",
+				sendto_flag(SCH_NOTICE,
+					    "New poolsize %d. (reached)",
 					    poolsize);
+				istat.is_dbufmore++;
 				goto tryagain;
 			    }
 			else
@@ -244,7 +248,7 @@ tryagain:
 }
 #else /* SENDQ_ALWAYS */
 {
-	int	rlen = 0;
+	int	rlen = 0, i;
 
 	Debug((DEBUG_SEND,"Sending %s %d [%s] ", to->name, to->fd, msg));
 
@@ -289,6 +293,10 @@ tryagain:
 				poolsize -= MaxSendq(cl) >> 1;
 				IncSendq(cl);
 				poolsize += MaxSendq(cl) >> 1;
+				sendto_flag(SCH_NOTICE,
+				    "New poolsize %d. (sendq adjusted)",
+                                            poolsize);
+				istat.is_dbufmore++;
 			    }
 			else if (IsServer(to))
 #  else
@@ -302,12 +310,44 @@ tryagain:
 		    }
 		else
 # endif
-			if (dbuf_put(&to->sendQ,msg+rlen,len-rlen) < 0)
-			    {
-				to->exitc = EXITC_MBUF;
-				return dead_link(to,
-					"Buffer allocation error for %s");
-			    }
+		    {
+tryagain:
+# ifdef	ZIP_LINKS
+	        /*
+		** data is first stored in to->zip->outbuf until
+		** it's big enough to be compressed and stored in the sendq.
+		** send_queued is then responsible to never let the sendQ
+		** be empty and to->zip->outbuf not empty.
+		*/
+			if (to->flags & FLAGS_ZIP)
+				msg = zip_buffer(to, msg, &len, 0);
+
+			if (len && (i = dbuf_put(&to->sendQ, msg+rlen,
+						 len-rlen)) < 0)
+# else 	/* ZIP_LINKS */
+			if ((i = dbuf_put(&to->sendQ, msg+rlen, len-rlen)) < 0)
+# endif	/* ZIP_LINKS */
+				if (i == -2 && CBurst(to))
+				    {
+				/* poolsize was exceeded while connect burst */
+					aConfItem *aconf = to->serv->nline;
+
+					poolsize -= MaxSendq(aconf->class) >>1;
+					IncSendq(aconf->class);
+					poolsize += MaxSendq(aconf->class) >>1;
+					sendto_flag(SCH_NOTICE,
+					    "New poolsize %d. (reached)",
+						    poolsize);
+					istat.is_dbufmore++;
+					goto tryagain;
+				    }
+				else
+				    {
+					to->exitc = EXITC_MBUF;
+					return dead_link(to,
+					 "Buffer allocation error for %s");
+				    }
+		    }
 	    }
 	/*
 	** Update statistics. The following is slightly incorrect

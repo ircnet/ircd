@@ -711,6 +711,12 @@ typedef	struct	{
 	u_long	is_userc;	/* user links to channels */
 	u_long	is_auth;	/* OTHER ident reply block */
 	u_long	is_authmem;
+	u_int	is_dbuf;	/* number of dbuf allocated (originally) */
+	u_int	is_dbufnow;	/* number of dbuf allocated */
+	u_int	is_dbufuse;	/* number of dbuf in use */
+	u_int	is_dbufmin;	/* min number of dbuf in use */
+	u_int	is_dbufmax;	/* max number of dbuf in use */
+	u_int	is_dbufmore;	/* how many times we increased the bufferpool*/
 } istat_t;
 
 /* String manipulation macros */

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.5 1997/06/18 17:15:38 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.6 1997/06/19 15:07:09 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -336,7 +336,8 @@ char	*nick;
 	sendto_one(cptr, ":%s %d %s :Reads %d Writes %d",
 		   me.name, RPL_STATSDEBUG, nick, readcalls, writecalls);
 	sendto_one(cptr, ":%s %d %s :DBUF alloc %d blocks %d",
-		   me.name, RPL_STATSDEBUG, nick, dbufalloc, dbufblocks);
+		   me.name, RPL_STATSDEBUG, nick, istat.is_dbufuse,
+		   istat.is_dbufnow);
 	sendto_one(cptr,
 		   ":%s %d %s :Writes:  <0 %d 0 %d <16 %d <32 %d <64 %d",
 		   me.name, RPL_STATSDEBUG, nick,
@@ -659,10 +660,12 @@ int	debug;
 		   me.name, RPL_STATSDEBUG, nick, _HASHSIZE,
 		   sizeof(aHashEntry) * _HASHSIZE,
 		   _CHANNELHASHSIZE, sizeof(aHashEntry) * _CHANNELHASHSIZE);
-	d_db = db = dbufblocks * sizeof(dbufbuf);
-	db = dbufblocks * sizeof(dbufbuf);
-	sendto_one(cptr, ":%s %d %s :Dbuf blocks %d(%d)",
-		   me.name, RPL_STATSDEBUG, nick, dbufblocks, db);
+	d_db = db = istat.is_dbufnow * sizeof(dbufbuf);
+	db = istat.is_dbufnow * sizeof(dbufbuf);
+	sendto_one(cptr, ":%s %d %s :Dbuf blocks %u(%d) (%u < %u < %u) [%u]",
+		   me.name, RPL_STATSDEBUG, nick, istat.is_dbufnow, db,
+		   istat.is_dbuf, istat.is_dbufuse, istat.is_dbufmax,
+		   istat.is_dbufmore);
 
 	d_rm = rm = cres_mem(cptr, nick);
 
