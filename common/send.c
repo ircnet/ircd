@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.85 2004/11/02 16:20:00 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.86 2004/11/04 15:57:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -395,58 +395,27 @@ static	int	vsendprep(char *pattern, va_list va)
  */
 static	int	vsendpreprep(aClient *to, aClient *from, char *pattern, va_list va)
 {
-	Reg	anUser	*user;
 	int	flag = 0, len;
 
 	Debug((DEBUG_L10, "sendpreprep(%#x(%s),%#x(%s),%s)",
 		to, to->name, from, from->name, pattern));
 	if (to && from && MyClient(to) && IsPerson(from) &&
 	    !strncmp(pattern, ":%s", 3))
-	    {
+	{
 		char	*par = va_arg(va, char *);
-		if (from == &anon || !mycmp(par, from->name))
-		    {
-			user = from->user;
-			(void)strcpy(psendbuf, ":");
-			(void)strcat(psendbuf, from->name);
-			if (user)
-			    {
-				if (*user->username)
-				    {
-					(void)strcat(psendbuf, "!");
-					(void)strcat(psendbuf, user->username);
-				    }
-				if (*user->host && !MyConnect(from))
-				    {
-					(void)strcat(psendbuf, "@");
-					(void)strcat(psendbuf, user->host);
-					flag = 1;
-				    }
-			    }
-			/*
-			** flag is used instead of index(newpat, '@') for speed and
-			** also since username/nick may have had a '@' in them. -avalon
-			*/
-			if (!flag && MyConnect(from) && *user->host)
-			    {
-				(void)strcat(psendbuf, "@");
-#ifdef UNIXPORT
-				if (IsUnixSocket(from))
-				    (void)strcat(psendbuf, user->host);
-				else
-#endif
-				    (void)strcat(psendbuf, from->sockhost);
-			    }
-		    }
-		else
-		    {
-			(void)strcpy(psendbuf, ":");
-			(void)strcat(psendbuf, par);
-		    }
 
-		len = strlen(psendbuf);
+		if (from == &anon || !mycmp(par, from->name))
+		{
+			len = sprintf(psendbuf, ":%s!%s@%s", from->name,
+				from->user->username, from->user->host);
+		}
+		else
+		{
+			len = sprintf(psendbuf, ":%s", par);
+		}
+
 		len += vsprintf(psendbuf+len, pattern+3, va);
-	    }
+	}
 	else
 		len = vsprintf(psendbuf, pattern, va);
 
