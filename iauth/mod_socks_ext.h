@@ -1,5 +1,5 @@
 /************************************************************************
- *   IRC - Internet Relay Chat, iauth/a_conf_def.h
+ *   IRC - Internet Relay Chat, iauth/mod_socks_ext.h
  *   Copyright (C) 1998 Christophe Kalt
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -17,33 +17,12 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-typedef struct Module aModule;
-typedef struct Instance AnInstance;
-typedef struct Target aTarget;
+/*  This file contains external definitions for global variables and functions
+    defined in iauth/mod_socks.c.
+ */
 
-struct Module
-{
-    char	*name;			/* module name */
-    char	*(*init)(AnInstance *);	/* instance initialization */
-    void	(*release)();		/* instance releasing */
-    int		(*start)(u_int);	/* start authentication */
-    int		(*work)(u_int);		/* called whenever something has to be
-					 * done (incoming data, timeout..) */
-    int		(*timeout)(u_int);	/* called when timeout is reached */
-    void	(*clean)(u_int);	/* finish/abort: cleanup*/
-};
-
-struct Instance
-{
-    AnInstance	*nexti;
-    aModule	*mod;
-    void	*opt;
-    aTarget	*address;
-    aTarget	*hostname;
-};
-
-struct Target
-{
-    char	*value;
-    aTarget	*nextt;
-};
+/*  External definitions for global variables.
+ */
+#ifndef MOD_SOCKS_C
+extern aModule Module_socks;
+#endif /* MOD_SOCKS_C */

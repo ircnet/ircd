@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.2 1998/07/19 20:06:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.3 1998/08/05 02:44:17 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -28,7 +28,7 @@ static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.2 1998/07/19 20:06:09 kalt Exp $";
 #undef A_CONF_C
 
 static aModule *Mlist[] =
-	{ &Module_rfc931, (aModule *)NULL };
+	{ &Module_rfc931, &Module_socks, (aModule *)NULL };
 
 u_int	debuglevel = 0;
 
@@ -211,31 +211,37 @@ char *cfile;
 		(*last)->address = NULL;
 	    }
 
+	itmp = instances;
 	if (cfile)
 	    {
 		aTarget *ttmp;
+		char *err;
 
 		printf("Module(s) loaded:\n");
-		itmp = instances;
 		while (itmp)
 		    {
-			printf("\t%s\t%s", itmp->mod->name,
+			printf("\t%s\t%s\n", itmp->mod->name,
 			       (itmp->opt) ? itmp->opt : "");
 			if (ttmp = itmp->hostname)
 			    {
-				printf("\tHost = %s", ttmp->value);
+				printf("\t\tHost = %s", ttmp->value);
 				while (ttmp = ttmp->nextt)
 					printf(",%s", ttmp->value);
 				printf("\n");
 			    }
 			if (ttmp = itmp->address)
 			    {
-				printf("\tIP   = %s", ttmp->value);
+				printf("\t\tIP   = %s", ttmp->value);
 				while (ttmp = ttmp->nextt)
 					printf(",%s", ttmp->value);
 				printf("\n");
 			    }
-			printf("\n");
+			if (itmp->mod->init)
+			    {
+				err = itmp->mod->init(itmp);
+				printf("\t\tInitialization: %s\n",
+				       (err) ? err : "Successful");
+			    }
 			itmp = itmp->nexti;
 		    }
 	    }

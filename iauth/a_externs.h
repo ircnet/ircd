@@ -29,3 +29,4 @@
 #include "a_log_ext.h"
 
 #include "mod_rfc931_ext.h"
+#include "mod_socks_ext.h"

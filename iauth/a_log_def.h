@@ -32,5 +32,6 @@
 #define	ALOG_DCONF	0x0800	/* debug: configuration file */
 
 #define	ALOG_D931	0x1000	/* debug: module rfc931 */
+#define	ALOG_DSOCKS	0x2000	/* debug: module socks */
 
-#define	ALOG_DALL	0x1F00	/* any debug flag */
+#define	ALOG_DALL	0x3F00	/* any debug flag */
