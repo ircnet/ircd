@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.40 2002/06/01 17:46:58 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.41 2002/06/01 18:03:43 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.10.3.
 </abstract>
@@ -459,7 +459,7 @@ same host (IP) will be allowed.
 <item> y: defines the maximum number of clients from the
 same user@host (IP) will be allowed.  Read note below.
 </itemize>
-Only x or y may be set, any unset value defaults to zero.
+Any unset value defaults to 1 (one).
 <tag/Global limit/  This field has the same use as the
 ``Local limit'' field.  But, the connection counts are done
 for all clients present on the net instead of only counting
