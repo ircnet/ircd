@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.76 2004/06/21 15:54:53 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.77 2004/06/24 15:44:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -53,13 +53,13 @@ struct Message msgtab[] = {
 { "PING",     1, MPAR, 0, 0, 0L, { m_ping, m_ping, m_ping, m_ping, m_unreg } },
 { "PONG",     1, MPAR, 0, 0, 0L, { m_pong, m_pong, m_pong, m_pong, m_unreg } },
 { "ERROR",    1, MPAR, 0, 0, 0L, { m_error, m_nop, m_nop, m_nop, m_unreg } },
-{ "KILL",     1, MPAR, 0, 0, 0L, { m_kill, m_nopriv, m_kill, m_nop, m_unreg } },
+{ "KILL",     2, MPAR, 0, 0, 0L, { m_kill, m_nopriv, m_kill, m_nop, m_unreg } },
 { "SAVE",     1, MPAR, 0, 0, 0L, { m_save, m_nop, m_nop, m_nop, m_unreg } },
 { "USER",     4, MPAR, 0, 0, 0L, { m_nop, m_reg, m_reg, m_nop, m_user } },
 { "AWAY",     0, MPAR, 0, 0, 0L, { m_nop, m_away, m_away, m_nop, m_unreg } },
 { "UMODE",    1, MPAR, 0, 0, 0L, { m_nop, m_umode, m_umode, m_nop, m_unreg } },
 { "ISON",     1,    1, 0, 0, 0L, { m_ison, m_ison, m_ison, m_nop, m_unreg } },
-{ "SQUIT",    0, MPAR, 0, 0, 0L, { m_squit, m_nopriv, m_squit, m_nop, m_unreg } },
+{ "SQUIT",    2, MPAR, 0, 0, 0L, { m_squit, m_nopriv, m_squit, m_nop, m_unreg } },
 { "WHOIS",    1, MPAR, 0, 0, 0L, { m_whois, m_whois, m_whois, m_nop, m_unreg } },
 { "WHO",      1, MPAR, 0, 0, 0L, { m_who, m_who, m_who, m_nop, m_unreg } },
 { "WHOWAS",   1, MPAR, 0, 0, 0L, { m_whowas, m_whowas, m_whowas, m_nop, m_unreg } },
