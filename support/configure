@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Id: configure.in,v 1.32 1999/03/10 00:30:17 kalt Exp 
+# From configure.in Id: configure.in,v 1.33 1999/03/11 17:06:28 kalt Exp 
 
 # Guess values for system-dependent variables and create Makefiles.
 # Generated automatically using autoconf version 2.13 
@@ -3574,11 +3574,11 @@ if test $ac_cv_func_poll = yes; then
 #define USE_POLL 1
 EOF
 
-  if test $irc_cv_select_poll = select; then
-    echo "configure: warning: poll() was unexpectedly found on this system, it will be used; please report system type and version to ircd-dev@irc.org" 1>&2
-  fi
+#  if test $irc_cv_select_poll = select; then
+#    AC_MSG_WARN([poll() was unexpectedly found on this system, it will be used; please report system type and version to ircd-stats@irc.org])
+#  fi
   if test ! $irc_cv_linux = no; then
-    echo "configure: warning: Aiiie.. This is linux.  poll() is known to be broken for some releases (2.0.x with libc ?).  You may want to edit setup.h to undefine USE_POLL" 1>&2
+    echo "configure: warning: Aiiie.. This is linux.  poll() is known to be broken for some releases (2.0.x with libc6?).  You may want to edit setup.h to undefine USE_POLL" 1>&2
   fi
 else
   echo "$ac_t""select" 1>&6 
