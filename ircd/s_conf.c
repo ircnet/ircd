@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.144 2004/11/02 12:25:51 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.145 2004/11/02 12:49:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2432,8 +2432,8 @@ void do_tkline(char *who, int time, char *user, char *host, char *reason, int st
 		}
 		tkconf = aconf;
 	}
-	sendto_flag(SCH_NOTICE, "TKLINE %s@%s (%d) by %s",
-		aconf->name, aconf->host, time, who);
+	sendto_flag(SCH_NOTICE, "TKLINE %s@%s (%d) by %s :%s",
+		aconf->name, aconf->host, time, who, reason);
 
 	/* get rid of tklined clients */
 	for (i = highest_fd; i >= 0; i--)
