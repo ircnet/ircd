@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.154 2004/08/10 14:12:56 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.155 2004/08/10 18:55:01 jv Exp $";
 #endif
 
 #include "os.h"
@@ -316,11 +316,6 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 	cptr->port = port;
 	local[cptr->fd] = cptr;
 
-	if (dolisten)
-	{
-		listen(cptr->fd, LISTENQUEUE);
-	}
-
 	return 0;
 }
 
@@ -333,7 +328,6 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 int	add_listener(aConfItem *aconf)
 {
 	aClient	*cptr;
-	int dolisten = 1;
 
 	cptr = make_client(NULL);
 	cptr->flags = FLAGS_LISTEN;
@@ -342,48 +336,21 @@ int	add_listener(aConfItem *aconf)
 	cptr->firsttime = time(NULL);
 	cptr->name = ME;
 	SetMe(cptr);
-#ifdef	UNIXPORT
-	if (*aconf->host == '/')
-	    {
-		if (unixport(cptr, aconf->host, aconf->port))
-			cptr->fd = -2;
-	    }
-	else
-#endif
-	{
-		if (IsConfDelayed(aconf) && !firstrejoindone)
-		{
-			dolisten = 0;
-			SetListenerInactive(cptr);
-		}
-		if (inetport(cptr, aconf->host, aconf->name, aconf->port,
-				dolisten))
-		{
-			cptr->fd = -2;
-		}
-	}
+	
+	
+	cptr->confs = make_link();
+	cptr->confs->next = NULL;
+	cptr->confs->value.aconf = aconf;
 
-	if (cptr->fd >= 0)
-	    {
-		cptr->confs = make_link();
-		cptr->confs->next = NULL;
-		cptr->confs->value.aconf = aconf;
-		add_fd(cptr->fd, &fdas);
-		add_fd(cptr->fd, &fdall);
-		set_non_blocking(cptr->fd, cptr);
-		/* Add to linked list */
-		if (ListenerLL)
-		{
-			ListenerLL->prev = cptr;
-		}
-		cptr->next = ListenerLL;
-		cptr->prev = NULL;
-		ListenerLL = cptr;
-	    }
-	else
+	open_listener(cptr);
+	/* Add to linked list */
+	if (ListenerLL)
 	{
-		free_client(cptr);
+		ListenerLL->prev = cptr;
 	}
+	cptr->next = ListenerLL;
+	cptr->prev = NULL;
+	ListenerLL = cptr;
 	
 	return 0;
 }
@@ -467,9 +434,10 @@ void	close_listeners(void)
 	for (acptr = ListenerLL; acptr; acptr = bcptr)
 	{
 		aconf = acptr->confs->value.aconf;
-		bcptr = acptr->next; // might get deleted by close_connection
+		bcptr = acptr->next; /* might get deleted by close_connection
+				      */
 
-		if (IsIllegal(aconf) && aconf->clients == 0)
+		if (IsIllegal(aconf))
 		{
 #ifdef	UNIXPORT
 			if (IsUnixSocket(acptr))
@@ -479,10 +447,83 @@ void	close_listeners(void)
 				(void)unlink(unixpath);
 			}
 #endif
-			close_connection(acptr);
+			if (aconf->clients > 0)
+			{
+				close_client_fd(acptr);
+			}
+			else
+			{
+				close_connection(acptr);
+			}
 		}
 	}
 }
+
+/* Opens listening socket on given listener */
+void	open_listener(aClient *cptr)
+{
+	aConfItem *aconf;
+	int dolisten = 1;
+
+	aconf = cptr->confs->value.aconf;
+	
+	if (!IsListener(cptr) || cptr->fd > 0)
+	{
+		return;
+	}
+	
+#ifdef	UNIXPORT
+	if (*aconf->host == '/')
+	{
+		if (unixport(cptr, aconf->host, aconf->port))
+		{
+			cptr->fd = -1;
+		}
+	}
+	else
+#endif
+	{
+		if (IsConfDelayed(aconf) && !firstrejoindone)
+		{
+			dolisten = 0;
+			SetListenerInactive(cptr);
+		}
+		if (inetport(cptr, aconf->host, aconf->name, aconf->port,
+			dolisten))
+		{
+			/* to allow further inetport calls */
+			cptr->fd = -1;
+		}
+	}
+
+	if (cptr->fd >= 0)
+	{
+		add_fd(cptr->fd, &fdas);
+		add_fd(cptr->fd, &fdall);
+		set_non_blocking(cptr->fd, cptr);
+
+		if (dolisten)
+		{
+			listen(cptr->fd, LISTENQUEUE);
+		}
+	}
+}
+
+/* Reopens listening sockets on all listeners */
+void	reopen_listeners()
+{
+	aClient *acptr;
+	aConfItem *aconf;
+	for (acptr = ListenerLL; acptr; acptr = acptr->next)
+	{
+		aconf = acptr->confs->value.aconf;
+		if (!IsIllegal(aconf) && acptr->fd < 0)
+		{
+			open_listener(acptr);
+		}
+	}
+}
+
 void	activate_delayed_listeners(void)
 {
 	int cnt = 0;
@@ -1275,7 +1316,7 @@ void close_client_fd(aClient *cptr)
 		local[i] = NULL;
 		(void)close(i);
 
-		cptr->fd = -2;
+		cptr->fd = -1;
 		DBufClear(&cptr->sendQ);
 		DBufClear(&cptr->recvQ);
 		bzero(cptr->passwd, sizeof(cptr->passwd));
