@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.24 2002/01/06 18:27:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.25 2002/06/02 00:43:34 jv Exp $";
 #endif
 
 #include "os.h"
@@ -31,17 +31,20 @@ static	aHashEntry	*uidTable = NULL;
 static	aHashEntry	*channelTable = NULL;
 static	aHashEntry	*serverTable = NULL;
 static	aHashEntry	*sidTable = NULL;
+static  aHashEntry      *hostnameTable = NULL;
 static	unsigned int	*hashtab = NULL;
 static	int	clhits = 0, clmiss = 0, clsize = 0;
 static	int	uidhits = 0, uidmiss = 0, uidsize = 0;
 static	int	chhits = 0, chmiss = 0, chsize = 0;
 static	int	sidhits = 0, sidmiss = 0, sidsize = 0;
+static  int     cnhits = 0, cnmiss = 0 ,cnsize = 0;
 static	int	svsize = 0;
 int	_HASHSIZE = 0;
 int	_UIDSIZE = 0;
 int	_CHANNELHASHSIZE = 0;
 int	_SERVERSIZE = 0;
 int	_SIDSIZE = 0;
+int     _HOSTNAMEHASHSIZE = 0;
 
 /*
  * Hashing.
@@ -110,7 +113,6 @@ static	u_int	hash_uid(uid, store)
 char	*uid;
 int	*store;
 {
-	Reg	u_char	*id = (u_char *)uid;
 	Reg	u_char	ch;
 	Reg	u_int	hash = 1;
 
@@ -132,7 +134,6 @@ int	*store;
 */
 static	u_int	hash_sid(char *sid, u_int *store)
 {
-	Reg	u_char	*id = (u_char *)sid;
 	Reg	u_char	ch;
 	Reg	u_int	hash = 1;
 
@@ -176,6 +177,28 @@ int	*store;
 	if (store)
 		*store = hash;
 	hash %= _CHANNELHASHSIZE;
+	return (hash);
+}
+
+/*
+ * hash_host_name
+ */
+static	u_int	hash_host_name(hname, store)
+char	*hname;
+int	*store;
+{
+
+	Reg	u_char	*name = (u_char *)hname;
+	Reg	u_int	hash = 0;
+	
+	for (; *name; name++)
+	{
+		hash = 31 * hash + hashtab[*name];
+	}
+	
+	if (store)
+		*store = hash;
+	hash %= _HOSTNAMEHASHSIZE;
 	return (hash);
 }
 
@@ -293,6 +316,21 @@ static	void	clear_sid_hash_table(int size)
 	Debug((DEBUG_DEBUG, "Sid Hash Table Init: %d (%d)", _SIDSIZE, size));
 }
 
+static	void	clear_hostname_hash_table(size)
+int	size;
+{
+	_HOSTNAMEHASHSIZE = bigger_prime(size);
+	cnhits = 0;
+	cnmiss = 0;
+	cnsize = 0;
+	if (!hostnameTable)
+		hostnameTable = (aHashEntry *)MyMalloc(_HOSTNAMEHASHSIZE *
+						     sizeof(aHashEntry));
+	bzero((char *)hostnameTable, sizeof(aHashEntry) * _HOSTNAMEHASHSIZE);
+	Debug((DEBUG_DEBUG, "Hostname Hash Table Init: %d (%d)",
+		_HOSTNAMEHASHSIZE, size));
+}
+
 void	inithashtables()
 {
 	Reg int i;
@@ -305,7 +343,8 @@ void	inithashtables()
 	clear_server_hash_table((_SERVERSIZE) ? _SERVERSIZE : SERVERSIZE);
 	_SIDSIZE = _SERVERSIZE;
 	clear_sid_hash_table(_SIDSIZE);
-
+	clear_hostname_hash_table((_HOSTNAMEHASHSIZE) ? _HOSTNAMEHASHSIZE : 
+				   HOSTNAMEHASHSIZE);
 	/*
 	 * Moved multiplication out from the hashfunctions and into
 	 * a pre-generated lookup table. Should save some CPU usage
@@ -401,6 +440,31 @@ int	new;
 				add_to_uid_hash_table(cptr->user->uid, cptr);
 		MyFree(otab);
 	    }
+	else if (otab == hostnameTable)
+	    {
+		int	i;
+		anUser	*next,*user;
+		Debug((DEBUG_ERROR, "Hostname Hash Table from %d to %d (%d)",
+			    osize, new, clsize));
+		sendto_flag(SCH_HASH, "Hostname Hash Table from %d to %d (%d)",
+			    osize, new, clsize);
+		cnmiss = 0;
+		cnhits = 0;
+		cnsize = 0;
+		hostnameTable = table;
+
+		for (i = 0; i < osize; i++)
+		    {
+			for (user = (anUser *)otab[i].list; user;
+				user = next)
+			    {
+				next = user->hhnext;
+				(void)add_to_hostname_hash_table(user->host,
+					user);
+			    }
+		    }
+		MyFree(otab);
+	    }
 	else if (otab == serverTable)
 	    {
 		Debug((DEBUG_ERROR, "Server Hash Table from %d to %d (%d)",
@@ -433,7 +497,7 @@ int	new;
 		}
 		MyFree(otab);
 	}
-
+    
 	return;
 }
 
@@ -537,6 +601,26 @@ int	add_to_sid_hash_table(char *sid, aClient *cptr)
 	{
 		bigger_hash_table(&_SIDSIZE, sidTable, 0);
 	}
+	return 0;
+}
+
+/*
+ * add_to_client_hash_table
+ */
+int	add_to_hostname_hash_table(hostname, user)
+char	*hostname;
+anUser	*user;
+{
+	Reg	u_int	hashv;
+
+	hashv = hash_host_name(hostname, &user->hhashv);
+	user->hhnext = (anUser *)hostnameTable[hashv].list;
+	hostnameTable[hashv].list = (void *)user;
+	hostnameTable[hashv].links++;
+	hostnameTable[hashv].hits++;
+	cnsize++;
+	if (cnsize > _HOSTNAMEHASHSIZE)
+		bigger_hash_table(&_HOSTNAMEHASHSIZE, hostnameTable, 0);
 	return 0;
 }
 
@@ -745,6 +829,50 @@ int	del_from_sid_hash_table(aServer *sptr)
 		}
 		prev = tmp;
 	}
+	return 0;
+}
+
+/*
+ * del_from_hostname_hash_table
+ */
+int	del_from_hostname_hash_table(hostname, user)
+char	*hostname;
+anUser	*user;
+{
+	Reg	anUser	*tmp, *prev = NULL;
+	Reg	u_int	hashv;
+
+	hashv = user->hhashv;
+	hashv %= _HOSTNAMEHASHSIZE;
+	for (tmp = (anUser *)hostnameTable[hashv].list; tmp; tmp = tmp->hhnext)
+	    {
+		if (tmp == user)
+		    {
+			if (prev)
+				prev->hhnext = tmp->hhnext;
+			else
+				hostnameTable[hashv].list = (void *)tmp->hhnext;
+			tmp->hhnext = NULL;
+			if (hostnameTable[hashv].links > 0)
+			    {
+				hostnameTable[hashv].links--;
+				cnsize--;
+				return 1;
+			    }
+			else
+			    {
+				sendto_flag(SCH_ERROR, "hn-hash table failure");
+				Debug((DEBUG_ERROR, "hn-hash table failure")); 
+				/*
+				 * Should never actually return from here and
+				 * if we do it is an error/inconsistency in the
+				 * hash table.
+				 */
+				return -1;
+			    }
+		    }
+		prev = tmp;
+	    }
 	return 0;
 }
 
@@ -1047,6 +1175,29 @@ aClient	*hash_find_sid(char *sid, aClient *cptr)
 	return (cptr);
 }
 
+/*
+ * hash_find_hostname
+ */
+anUser		*hash_find_hostname(hostname, user)
+char	*hostname;
+anUser	*user;
+{
+	Reg	anUser	*tmp, *prv = NULL;
+	Reg	aHashEntry	*tmp3;
+	u_int	hashv, hv;
+
+	hashv = hash_host_name(hostname, &hv);
+	tmp3 = &hostnameTable[hashv];
+
+	for (tmp = (anUser *)tmp3->list; tmp; prv = tmp, tmp = tmp->hhnext)
+		if (hv == tmp->hhashv && !mycmp(hostname, tmp->host))
+		    {
+			cnhits++;
+			return (tmp);
+		    }
+	cnmiss++;
+	return user;
+}
 
 /*
  * NOTE: this command is not supposed to be an offical part of the ircd
