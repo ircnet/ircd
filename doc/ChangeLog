@@ -1,3 +1,26 @@
+2004-03-10  Piotr Kucharski
+
+	* s_bsd.c, s_bsd_ext.h: added delay_close() function.
+	* s_bsd.c/add_connection(): use delay_close for too rapid connections.
+	* struct_def.h: counters wrt delay_close()
+	* ircd.c/io_loop(), ircd_ext.h: calling delay_close() when needed.
+	* s_debug.c: send DELAY_CLOSE value in stats d.
+	* s_misc.c: send stats counters wrt delay_close in stats t.
+	* s_serv.c/m_close(): close also all delayed fds.
+	* config.h.dist: default DELAY_CLOSE, some sanity checks.
+	* s_bsd.c/connect_server(): reversed params to memcpy resulting in
+	  "Address family not supported..." errors when connecting.
+	* list.c/remove_client_from_list(), free_server(): moved some server
+	  related cleaning to free_server(), where it rather belongs.
+	* s_bsd.c/add_connection(): we did not deal with aServer structure to
+	  be released after make_server().
+	* s_serv.c/m_server_estab(): send maskedby->serv->tok in NICK during
+	  burst to 2.10 (from jv).
+	* s_user.c/register_user(): send real tok to 2.11 servers, even if 
+	  client is coming from 2.10, even behind the mask (noted by ZZyZZ,
+	  patch from jv).
+	* s_service/free_service(): unnecessary free_server() call.
+
 2004-03-09  Piotr Kucharski
 
 	* s_bsd.c/add_connection(): move check_clones() before DNS starts.
