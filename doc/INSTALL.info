@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info18110tmp2.
+input file /tmp/sgml2info26055tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.5 1997/05/21 20:27:10 kalt Exp $
+     $Id: INSTALL.info,v 1.6 1997/06/02 13:22:50 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.3.
 
@@ -1242,6 +1242,9 @@ Service connections
      full abilities of a normal user but can behave in a more active
      manner than a normal client.
 
+     Services are not intended for interactive usage, and are better
+     suited for automated clients.
+
 `Format'
      S:<TARGET Host Mask>:<Password>:<Service Name>:<Service
      Type>:<Class>
@@ -1282,15 +1285,15 @@ Service connections
      reply as a result of sending service indicates an error has
      occured.
 
+     Services can be listed using the SERVLIST command, and can be sent
+     messages using the SQUERY command.
+
      A service is not a very useful sort of client, it cannot join
      channels or issue certain commands although most are available to
      it. Services are rejected upon sending an unknown or unallowed
      command. Services however, are not affected by flood control and
-     can be granted special priviledges. It is therefore `wise to
+     can be granted special privileges. It is therefore `wise to
      oversee the use of S-lines with much care.'
-
-     Services can be listed using the SERVLIST command, and can be sent
-     messages using the SQUERY command.
 
 
 File: INSTALL.info,  Node: Bounce server,  Next: Default local server (for local clients) `*OBSOLETED*',  Prev: Service connections,  Up: The ircd-conf file
@@ -1326,7 +1329,7 @@ Bounce server
 
 `Port'
      This specifies the IRC server port that the client should connect
-     to.  This defaults to 6667 if not specified.
+     to.
 
 `Example'
      B:2::irc.stealth.net:6660:
@@ -1424,8 +1427,8 @@ Node: Leaf connections41369
 Node: Version limitations43452
 Node: Excluded machines44685
 Node: Service connections45992
-Node: Bounce server48261
-Node: Default local server (for local clients) `*OBSOLETED*'49926
-Node: Related resources50809
+Node: Bounce server48365
+Node: Default local server (for local clients) `*OBSOLETED*'49989
+Node: Related resources50872
 
 End Tag Table

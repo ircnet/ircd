@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.5 1997/05/21 20:27:10 kalt Exp $
+  $Id: INSTALL.txt,v 1.6 1997/06/02 13:22:52 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.3.
 
@@ -1194,6 +1194,9 @@
         the full abilities of a normal user but can behave in a more
         active manner than a normal client.
 
+        Services are not intended for interactive usage, and are better
+        suited for automated clients.
+
      FFoorrmmaatt
 
         S:<TARGET Host Mask>:<Password>:<Service Name>:<Service Type>:<Class>
@@ -1237,19 +1240,19 @@
         reply as a result of sending service indicates an error has
         occured.
 
+        Services can be listed using the SERVLIST command, and can be
+        sent messages using the SQUERY command.
+
         A service is not a very useful sort of client, it cannot join
         channels or issue certain commands although most are available
         to it. Services are rejected upon sending an unknown or
         unallowed command. Services however, are not affected by flood
-        control and can be granted special priviledges. It is therefore
+        control and can be granted special privileges. It is therefore
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
 
-        Services can be listed using the SERVLIST command, and can be
-        sent messages using the SQUERY command.
 
 
   44..1155..  BBoouunnccee sseerrvveerr
-
 
 
      IInnttrroodduuccttiioonn
@@ -1283,7 +1286,7 @@
 
      PPoorrtt
         This specifies the IRC server port that the client should
-        connect to.  This defaults to 6667 if not specified.
+        connect to.
 
      EExxaammppllee
         B:2::irc.stealth.net:6660:
@@ -1313,6 +1316,7 @@
         TARGET host's connection information and password (if any).
 
      FFoorrmmaatt
+
 
         U:<TARGET Host addr>:<Password>:<TARGET Host NAME>:<Internet Port>
 
@@ -1347,10 +1351,6 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
 
 
 

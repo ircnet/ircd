@@ -1,8 +1,11 @@
-Wed May 28 19:24:45 1997  Christophe Kalt
+Sun Jun  1 16:57:39 1997  Christophe Kalt
+
+	* s_conf.c: fixed B lines behaviour.
 
 	* send.c: missing arg to dead_link(). (Olivier Galibert)
 
-	* s_serv.c: added /stats B to see B lines.
+	* s_serv.c, numeric.h, s_err.c: added /stats B to see B lines (and
+	fixed /stats V reply).
 
 	* service.h, channel.c, s_misc.c, s_service.c, s_serv.c, s_user.c:
 		* numerous bugfixes related to local services (if
