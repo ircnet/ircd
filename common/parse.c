@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.2 1997/04/14 15:04:06 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.3 1997/04/14 15:10:26 kalt Exp $";
 #endif
 #include "struct.h"
 #include "common.h"
@@ -552,11 +552,6 @@ char	*buffer, *bufend;
 	Debug((DEBUG_DEBUG, "Function: %#x = %s parc %d parv %#x",
 		mptr->func, mptr->cmd, i, para));
 #ifndef	CLIENT_COMPILE
-/* replaced by penalty
-	if ((mptr->flags & MSG_PP) && !(IsServer(cptr) || IsService(cptr)) &&
-	    i > 2)
-		cptr->since += (i - 2);
-*/
 	if ((mptr->flags & MSG_REGU) && check_registered_user(from))
 		return -1;
 	if ((mptr->flags & MSG_SVC) && check_registered_service(from))
