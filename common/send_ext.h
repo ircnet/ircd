@@ -44,6 +44,7 @@ EXTERN void sendto_flog __P((aClient *cptr, char *msg, time_t duration,
 EXTERN void sendto_channel_butone();
 EXTERN void sendto_serv_butone();
 EXTERN void sendto_serv_v();
+EXTERN void sendto_serv_notv();
 EXTERN void sendto_common_channels();
 EXTERN void sendto_channel_butserv();
 EXTERN void sendto_match_servs();
@@ -56,6 +57,7 @@ EXTERN void sendto_channel_butone __P((aClient *one, aClient *from,
 				       aChannel *chptr, char *pattern, ...));
 EXTERN void sendto_serv_butone __P((aClient *one, char *pattern, ...));
 EXTERN void sendto_serv_v __P((aClient *one, int ver, char *pattern, ...));
+EXTERN void sendto_serv_notv __P((aClient *one, int ver, char *pattern, ...));
 EXTERN void sendto_common_channels __P((aClient *user, char *pattern, ...));
 EXTERN void sendto_channel_butserv __P((aChannel *chptr, aClient *from,
 					char *pattern, ...));
