@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.180 2004/02/16 02:13:28 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.181 2004/02/16 02:15:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1704,13 +1704,14 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 					** chanops leaving, so no other way to
 					** set ->reop. As we prefer not to op
 					** remote clients, set this here, upon
-					** each +R, so reop_channel has a chance
-					** to work. It's mostly harmless, as it
-					** will be reset to 0 with every MODE +o
-					** and even if not, reop_channel will
+					** each +R from remote server, so that
+					** reop_channel has a chance to work.
+					** It's mostly harmless, as chptr->reop
+					** will be reset to 0 in is_chan_op()
+					** and even if not, reop_channel() will
 					** NOT give ops if ops are already on
 					** the channel. --B. */
-					if (ischop)
+					if (IsServer(sptr))
 					{
 						chptr->reop = timeofday +
 							LDELAYCHASETIMELIMIT;
