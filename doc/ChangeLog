@@ -1,3 +1,18 @@
+2005-01-30  Piotr Kucharski
+
+	* configure.in, configure: suncc adds space in front thus breaking grep.
+	* s_bsd.c/free_server(): there should be cptr->name, not cptr.
+	* s_serv.c/m_server_estab(): move clearing of burst state to m_eoback().
+	* class_def.h: add bsendq (burst sendq).
+	* s_err.c, class.c/report_classes(): show bsendq in STATSYLINE.
+	* class_ext.h, class.c/get_sendq(): return bsendq or sendq depending on
+	  new param "bursting".
+	* send.c/send_message(), channel.c/m_list(): update get_sendq() call.
+	* class.c/add_class(): new param bsendq (empty equal sendq)
+	* send.c/initconf(): parse sendq.bsendq in conf.
+	* send.c/send_message(): remove ignoring sendq exceeding during burst
+	  as we now have burst sendq.
+
 2005-01-30  Piotr Kucharski, Kurt Roeckx
 
 	* struct_def.h: removed stok, tok, ltok.
