@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.86 2002/01/06 05:55:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.87 2002/01/06 09:04:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1103,21 +1103,22 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	{
 		if (!sid)
 		{
-			abort();
+			sendto_flag(SCH_ERROR, "Invalid SID from %s",
+				get_client_name(cptr, TRUE));
+			return exit_client(cptr, cptr, &me, "Invalid SID");
 		}
-
 		if (!sid_valid(sid))
 		{
 			sendto_flag(SCH_ERROR, "Invalid SID %s from %s",
-				get_client_name(cptr, TRUE));
-			return exit_client(cptr,cptr,&me, "Invalid SID");
+				sid, get_client_name(cptr, TRUE));
+			return exit_client(cptr, cptr, &me, "Invalid SID");
 		}
 		if (find_sid(sid, NULL))
 		{
 			sendto_flag(SCH_NOTICE,	"Link %s tried to introduce"
 				" already existing SID (%s), dropping link",
 				get_client_name(cptr,TRUE),sid);
-			return exit_client(cptr,cptr,&me,"SID collision");
+			return exit_client(cptr, cptr, &me,"SID collision");
 		}
 	}
 
