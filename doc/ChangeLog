@@ -1,3 +1,12 @@
+2002-03-14  Jakub Vlasek
+	* s_bsd.c,s_bsd_ext.h: Moved daemonization from init_sys() into
+	  daemonize().
+	* ircd.c,ircd_ext.h,s_conf.c: Read SID from M-line instead of #define.
+	* ircd.c,list.c,s_conf.c: Send error messages during server boot
+	  to stderr. Show message that server successfuly started.
+	* list.c/outofmemory(): Die instead of restart if the server
+	  is booting.
+
 2002-03-13  Jakub Vlasek
 	* numeric_def.h, s_err.c, s_user.c/save_user(): Added RPL_SAVENICK
 	  to inform user that his nick is being changed to UID after
