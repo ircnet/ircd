@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.83 2004/02/08 22:48:01 chopin Exp $
+ *   $Id: struct_def.h,v 1.84 2004/03/01 01:22:42 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -537,6 +537,7 @@ struct	stats {
 	u_int	is_empt; /* empty message */
 	u_int	is_num;	/* numeric message */
 	u_int	is_kill; /* number of kills generated on collisions */
+	u_int	is_save; /* number of saved clients */
 	u_int	is_fake; /* MODE 'fakes' */
 	u_int	is_asuc; /* successful auth requests */
 	u_int	is_abad; /* bad auth requests */

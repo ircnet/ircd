@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.73 2004/02/23 22:28:15 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.74 2004/03/01 01:22:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1031,8 +1031,8 @@ void	tstats(aClient *cptr, char *name)
 		   ME, RPL_STATSDEBUG, name, sp->is_ac, sp->is_ref);
 	sendto_one(cptr, ":%s %d %s :unknown: commands %lu prefixes %lu",
 		   ME, RPL_STATSDEBUG, name, sp->is_unco, sp->is_unpf);
-	sendto_one(cptr, ":%s %d %s :nick collisions %lu unknown closes %lu",
-		   ME, RPL_STATSDEBUG, name, sp->is_kill, sp->is_ni);
+	sendto_one(cptr, ":%s %d %s :nick collisions %lu saves %lu, unknown closes %lu",
+		   ME, RPL_STATSDEBUG, name, sp->is_kill, sp->is_save, sp->is_ni);
 	sendto_one(cptr, ":%s %d %s :wrong direction %lu empty %lu",
 		   ME, RPL_STATSDEBUG, name, sp->is_wrdi, sp->is_empt);
 	sendto_one(cptr, ":%s %d %s :users without servers %lu ghosts N/A",
