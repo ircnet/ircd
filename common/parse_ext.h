@@ -40,6 +40,7 @@ extern struct Message msgtab[];
 #ifndef CLIENT_COMPILE
 EXTERN aClient *find_client __P((char *name, Reg aClient *cptr));
 EXTERN aClient *find_uid __P((char *uid, Reg aClient *cptr));
+EXTERN aClient *find_sid __P((char *sid, Reg aClient *cptr));
 EXTERN aClient *find_service __P((char *name, Reg aClient *cptr));
 EXTERN aClient *find_server __P((char *name, Reg aClient *cptr));
 EXTERN aClient *find_mask __P((char *name, aClient *cptr));
