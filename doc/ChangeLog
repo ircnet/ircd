@@ -1,3 +1,17 @@
+2003-08-08  Piotr Kucharski
+
+	* common_def.h: added isscandinavian() macro checking ~^{}[]|\ chars.
+	* s_user.c/do_nick_name(): move check to isscandinavian() macro.
+	* s_user.c/m_nick(): do do_nick_name() earlier, not to broadcast
+	  ":old NICK old" message.
+	* channel.c: added convert_scandinavian() function to change
+	  chars {}\~ to []|^ in channel names in commands from local clients
+	  or 2.10 servers; this will allow dropping scandinavian origin
+	  in next version.
+	* channel.c: m_mode(), m_join(), m_njoin(), m_part(), m_kick(),
+	  m_topic(), m_invite(), m_names(): added convert_scandinavian() in
+	  proper places (I hope no important function is missing).
+
 2003-08-07  Piotr Kucharski
 
 	* s_user.c/m_nick(): move around some code and add checking for
