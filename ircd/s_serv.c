@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.61 1999/06/07 21:01:58 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.62 1999/06/16 22:20:00 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -211,9 +211,39 @@ char	*parv[];
 	    }
 	if (!MyConnect(acptr) && (cptr != acptr->from))
 	    {
-		sendto_one(acptr->from, ":%s SQUIT %s :%s", parv[0],
-			   acptr->name, comment);
-		return 1;
+		/*
+		** The following is an awful kludge, but I don't see any other
+		** way to change the pre 2.10.3 behaviour.  I'm probably going
+		** to regret it.. -kalt
+		*/
+		if ((acptr->from->serv->version & SV_OLDSQUIT) == 0)
+		    {
+			/* better server: just propagate upstream */
+			sendto_one(acptr->from, ":%s SQUIT %s :%s", parv[0],
+				   acptr->name, comment);
+			sendto_flag(SCH_SERVER,
+				    "Forwarding SQUIT %s from %s (%s)",
+				    acptr->name, parv[0], comment);
+			sendto_flag(SCH_DEBUG,
+				    "Forwarding SQUIT %s to %s from %s (%s)",
+				    acptr->name, acptr->from->name, 
+				    parv[0], comment);
+			return 1;
+		    }
+		/*
+		** ack, bad server encountered!
+		** must send back to other good servers which were trying to
+		** do the right thing, and fake the yet to come SQUIT which
+		** will never be received from the bad servers.
+		*/
+		if (IsServer(cptr) && 
+		    (cptr->serv->version & SV_OLDSQUIT) == 0)
+		    {
+			sendto_one(cptr, ":%s SQUIT %s :%s (Bounced for %s)",
+				   ME, acptr->name, comment, parv[0]);
+			sendto_flag(SCH_DEBUG, "Bouncing SQUIT %s back to %s",
+				    acptr->name, acptr->from->name);
+		    }
 	    }
 	/*
 	**  Notify all opers, if my local link is remotely squitted
@@ -242,6 +272,13 @@ char	*parv[];
 	sendto_flag(SCH_SERVER, "Received SQUIT %s from %s (%s)",
 		    acptr->name, parv[0], comment);
 
+	if (MyConnect(acptr) && 
+	    IsServer(cptr) && (cptr->serv->version & SV_OLDSQUIT) == 0)
+	    {
+		sendto_one(cptr, ":%s SQUIT %s :%s", ME, acptr->name, comment);
+		sendto_flag(SCH_DEBUG, "Issuing additionnal SQUIT %s for %s",
+			    acptr->name, acptr->from->name);
+	    }
 	return exit_client(cptr, acptr, sptr, comment);
     }
 
@@ -283,9 +320,14 @@ aClient	*cptr;
 	if (!strncmp(cptr->info, "021", 3))
 		cptr->hopcount = SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN; /* SV_2_10*/
 	else if (!strncmp(cptr->info, "0209", 4))
-		cptr->hopcount = SV_29;	/* 2.9+ protocol */
+		cptr->hopcount = SV_29|SV_OLDSQUIT;	/* 2.9+ protocol */
 	else
 		cptr->hopcount = SV_OLD; /* uhuh */
+
+	if (!strcmp("IRC", id) && !strncmp(cptr->info, "02100", 5) &&
+	    atoi(cptr->info+5) < 20600)
+		/* before 2.10.3a6 ( 2.10.3a5 is just broken ) */
+		cptr->hopcount |= SV_OLDSQUIT;
 
 	/* Check version number/mask from conf */
 	sprintf(buf, "%s/%s", id, cptr->info);

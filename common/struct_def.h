@@ -748,6 +748,7 @@ typedef	struct	{
 #define	SV_NCHAN	0x0008	/* server knows new channels -????name */
 				/* ! SV_NJOIN implies ! SV_NCHAN */
 #define	SV_2_10		(SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN)
+#define	SV_OLDSQUIT	0x1000	/* server uses OLD SQUIT logic */
 
 /* used for sendto_flag */
 
