@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.23 1998/01/23 13:40:26 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.24 1998/01/23 14:39:28 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1700,7 +1700,7 @@ char	*parv[];
 		if (index(name, ':'))
 			sendto_match_servs(chptr, cptr, ":%s JOIN :%s%s",
 					   parv[0], name, chop);
-		else
+		else if (*chptr->chname != '&')
 		    {
 			if (*cbuf)
 				strcat(cbuf, ",");
@@ -1998,7 +1998,8 @@ char	*parv[];
 						":%s KICK %s %s :%s", parv[0],
 						name, who->name, comment);
 				/* Don't send &local &kicks out */
-				if (*chptr->chname != '&') {
+				if (*chptr->chname != '&' &&
+				    index(chptr->chname, ':') == NULL) {
 					if (*nickbuf)
 						(void)strcat(nickbuf, ",");
 					(void)strcat(nickbuf, who->name);
@@ -2154,7 +2155,9 @@ char	*parv[];
 		return 1;
 	    }
 	clean_channelname(parv[2]);
-	if (check_channelmask(sptr, cptr, parv[2]))
+	if (check_channelmask(sptr, acptr->from, parv[2]))
+		return 1;
+	if (*parv[2] == '&')
 		return 1;
 	if (!(chptr = find_channel(parv[2], NullChn)))
 	    {
