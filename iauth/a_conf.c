@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.14 1999/03/11 21:03:02 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.15 1999/03/11 21:04:47 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -41,7 +41,7 @@ char *msg, *chk;
 	if (chk)
 		printf("line %d: %s\n", nb, msg);
 	else
-		sendto_log(ALOG_DCONF, LOG_ERR,
+		sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
 			   "Configuration error line %d: %s", nb, msg);
 }
 
