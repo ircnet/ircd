@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.99 2003/10/18 17:26:35 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.100 2003/10/18 19:48:21 q Exp $";
 #endif
 
 #include "os.h"
@@ -622,7 +622,7 @@ static	void	setup_me(aClient *mp)
 #endif
 	mp->hostp->h_addr_list = (char **)MyMalloc(2*sizeof(char *));
 #ifdef	INET6
-	mp->hostp->h_addr_list[0] = (char *)&in6addr_loopback;
+	mp->hostp->h_addr_list[0] = (const char *)&in6addr_loopback;
 #else
 	mp->hostp->h_addr_list[0] = (void *)MyMalloc(mp->hostp->h_length);
 	*(long *)(mp->hostp->h_addr_list[0]) = IN_LOOPBACKNET;
