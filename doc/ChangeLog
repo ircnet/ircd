@@ -1,4 +1,12 @@
 2003-10-18  Jakub Vlasek
+	
+	* bsd.c, config.h.dist: Removed NOWRITEALARM.
+	* dbuf.c: Removed VALLOC.
+	* s_bsd.c: Removed SUN_GSO_BUG.
+	* s_debug.c: Removed SUN_GSO_BUG, VALLOC, NPATH and NOWRITELALARM
+	  from serveropts[]. (Not used anymore)
+
+2003-10-18  Jakub Vlasek
 
 	* msg_def.h: Added MSG_MAP.
 	* numeric_def.h, s_err.c: Added MSG_MAPSTART, MSG_MAP and MSG_MAPEND.
