@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.40 2002/01/06 03:43:26 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.41 2002/01/06 08:58:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -351,7 +351,7 @@ int	mark_blind_servers (aClient *cptr, aClient *server)
 ** Argument:
 **	cptr: The real server to SQUIT.
 **	acptr: One of the depended servers to SQUIT.
-**	comment: The original comment for the SQUIT. (Onle for cptr itself.)
+**	comment: The original comment for the SQUIT. (Only for cptr itself.)
 **	comment2: The comment for (S)QUIT reasons for the rest.
 */
 void	exit_server(aClient *cptr, aClient *acptr, char *comment, char
@@ -363,8 +363,16 @@ void	exit_server(aClient *cptr, aClient *acptr, char *comment, char
 	/* Remove all the servers recursively. */
 	while (acptr->serv->down)
 	{
+		if (!IsMasked(acptr->serv->down))
+		{
+			sendto_flag(SCH_SERVER,
+				"Received SQUIT %s from %s (%s)",
+				acptr->serv->down->name, cptr->name, comment);
+		}
 		exit_server(cptr, acptr->serv->down, comment, comment2);
 	}
+	/* Here we should send "Received SQUIT" for last server,
+	** but exit_client() is doing (well, almost) this --Beeth */
 
 	/* This server doesn't have any depedent servers anymore, only
 	** users/services left. */
@@ -617,7 +625,10 @@ char	*comment;
 	 ** need to send different names to different servers
 	 ** (domain name matching)
 	 */
-		istat.is_serv--;
+		if (!IsMasked(sptr)
+		{
+			istat.is_serv--;
+		}
 	 	for (i = fdas.highest; i >= 0; i--)
 		    {
 			Reg	aConfItem *aconf;
