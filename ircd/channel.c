@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.100 1999/06/25 21:41:55 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.101 1999/07/05 16:25:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2728,7 +2728,7 @@ char	*parv[];
 		return 1;
 	    }
 	clean_channelname(parv[2]);
-	if (check_channelmask(sptr, acptr->from, parv[2]))
+	if (check_channelmask(sptr, acptr->user->servp->bcptr, parv[2]))
 		return 1;
 	if (*parv[2] == '&' && !MyClient(acptr))
 		return 1;
