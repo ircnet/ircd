@@ -7,6 +7,10 @@
 
 	* s_err.c, numeric_def.h: Change RPL_BOUNCE to numeric 010.
 
+2001-01-15	Piotr Kucharski
+
+	* s_user.c/m_unick(): fixed irritating typo (parv[7] vs. parv[8])
+
 1999-09-21  Piotr Kucharski
 
 	* channel.c, class.c, parse.c, s_bsd.c, s_conf.c, s_err.c,
