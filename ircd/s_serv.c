@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.6 1997/04/24 21:16:47 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.7 1997/04/24 21:19:16 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -902,7 +902,7 @@ Reg	aClient	*cptr;
 			else
 				stok = acptr->user->servp->tok;
 			sendto_one(cptr, "SERVICE %s %s %s %d %d :%s",
-				   acptr->name, tok, acptr->service->dist,
+				   acptr->name, stok, acptr->service->dist,
 				   acptr->service->type, acptr->hopcount + 1,
 				   acptr->info);
 		    }
