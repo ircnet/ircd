@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.4 1998/08/07 02:04:22 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.5 1998/09/07 21:53:42 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -77,6 +77,8 @@ char *cfile;
 			if (buffer[0] == '#' || buffer[0] == '\n')
 				continue;
 			*ch = '\0';
+			if (ch = index(buffer, '#'))
+				*ch = '\0';
 			/* debugmode setting */
 			if (!strncmp("debuglvl = 0x", buffer, 13))
 			    {
