@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.65 1999/07/02 16:49:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.66 1999/08/15 21:07:43 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -317,8 +317,12 @@ aClient	*cptr;
 	else
 		id = "";
 
-	if (!strncmp(cptr->info, "021", 3))
+	if (!strncmp(cptr->info, "021099", 6))
+		cptr->hopcount = SV_2_10|SV_UID;
+	else if (!strncmp(cptr->info, "0210", 4))
 		cptr->hopcount = SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN; /* SV_2_10*/
+	else if (!strncmp(cptr->info, "021", 3))
+		cptr->hopcount = SV_2_10|SV_UID;
 	else if (!strncmp(cptr->info, "0209", 4))
 		cptr->hopcount = SV_29|SV_OLDSQUIT;	/* 2.9+ protocol */
 	else
@@ -952,11 +956,20 @@ Reg	aClient	*cptr;
 			else
 				stok = acptr->user->servp->tok;
 			send_umode(NULL, acptr, 0, SEND_UMODES, buf);
-			sendto_one(cptr,"NICK %s %d %s %s %s %s :%s",
-				   acptr->name, acptr->hopcount + 1,
-				   acptr->user->username,
-				   acptr->user->host, stok,
-				   (*buf) ? buf : "+", acptr->info);
+			if (cptr->serv->version & SV_UID && *acptr->user->uid)
+				sendto_one(cptr,
+					   "UNICK %s %s %d %s %s %s %s :%s",
+					   acptr->user->uid, acptr->name,
+					   acptr->hopcount + 1,
+					   acptr->user->username,
+					   acptr->user->host, stok,
+					   (*buf) ? buf : "+", acptr->info);
+			else
+				sendto_one(cptr,"NICK %s %d %s %s %s %s :%s",
+					   acptr->name, acptr->hopcount + 1,
+					   acptr->user->username,
+					   acptr->user->host, stok,
+					   (*buf) ? buf : "+", acptr->info);
 			if ((cptr->serv->version & SV_NJOIN) == 0)
 				send_user_joins(cptr, acptr);
 		    }
