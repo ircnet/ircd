@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.30 2004/07/14 23:37:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.31 2004/07/15 01:03:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -30,6 +30,7 @@ static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.30 2004/07/14 23:37:18 chopin Exp
 #define MyMalloc(x)     malloc(x)
 /*#define MyFree(x)       free(x)*/
 
+static	char	*configfile = IRCDCONF_PATH;
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 #include "config_read.c"
 #endif
@@ -58,7 +59,6 @@ static	int	simulateM4Include(struct wordcount *, int, char *, int);
 #endif
 
 static	int	numclasses = 0, *classarr = (int *)NULL, debugflag = 0;
-static	char	*configfile = IRCDCONF_PATH;
 static	char	nullfield[] = "";
 static	char	maxsendq[12];
 static	struct	wordcount *files;
@@ -193,7 +193,7 @@ static	void	showconf()
 		return;
 	    }
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
-	p2 = config_read(fd, 0);
+	p2 = config_read(fd, 0, new_config_file(configfile, NULL, 0));
 	for(p = p2; p; p = p->next)
 		printf("%s\n", p->line);
 	config_free(p2);
@@ -253,7 +253,7 @@ static	aConfItem 	*initconf()
 	    }
 
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
-	ConfigTop = config_read(fd, 0);
+	ConfigTop = config_read(fd, 0, new_config_file(configfile, NULL, 0));
 	for(p = ConfigTop; p; p = p->next)
 #else
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */

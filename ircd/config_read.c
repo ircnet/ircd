@@ -27,7 +27,7 @@ struct Config
 	aConfig *next;
 };
 
-static aConfig	*config_read(int, int);
+static aConfig	*config_read(int, int, aFile *);
 static void	config_free(aConfig *);
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 #define STACKTYPE char
@@ -50,7 +50,7 @@ aFile	*new_config_file(char *, aFile *, int);
 
 /* read from supplied fd, putting line by line onto aConfig struct.
 ** calls itself recursively for each #include directive */
-aConfig *config_read(int fd, int depth)
+aConfig *config_read(int fd, int depth, aFile *curfile)
 {
 	int len, linenum;
 	struct stat fst;
@@ -58,6 +58,10 @@ aConfig *config_read(int fd, int depth)
 	aConfig *ConfigTop = NULL;
 	aConfig *ConfigCur = NULL;
 
+	if (curfile == NULL)
+	{
+		curfile = new_config_file(configfile, NULL, 0);
+	}
 	fstat(fd, &fst);
 	len = fst.st_size;
 	if ((address = mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0))
@@ -157,7 +161,8 @@ aConfig *config_read(int fd, int depth)
 #endif
 					goto eatline;
 				}
-				ret = config_read(fd, depth + 1);
+				ret = config_read(fd, depth + 1,
+					new_config_file(file, curfile, linenum));
 				close(fd);
 				if (ConfigCur)
 				{

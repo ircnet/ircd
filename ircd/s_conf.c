@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.129 2004/07/13 22:57:47 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.130 2004/07/15 01:03:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1387,7 +1387,7 @@ int 	initconf(int opt)
 		return -1;
 	    }
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
-	ConfigTop = config_read(fd, 0);
+	ConfigTop = config_read(fd, 0, new_config_file(configfile, NULL, 0));
 	for(p = ConfigTop; p; p = p->next)
 #else
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
