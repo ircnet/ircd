@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.47 1998/09/18 22:04:01 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.48 1998/10/29 07:56:03 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2227,6 +2227,11 @@ char	*parv[];
 	struct	tm	*tm;
 #endif
 
+	if (check_link(cptr))
+	    {
+		sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]), "MOTD");
+		return 5;
+	    }
 	if (hunt_server(cptr, sptr, ":%s MOTD :%s", 1,parc,parv)!=HUNTED_ISME)
 		return 5;
 #ifdef CACHED_MOTD
