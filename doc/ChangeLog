@@ -1,3 +1,8 @@
+2002-03-14  Jakub Vlasek
+	* ircd.c/setup_signals(): Ignore SIGTRAP on FreeBSD to prevent crash
+	  after detaching ircd in gdb.
+	* support.c: Added #ifndef CLIENT_COMPILE around make_isupport.
+
 2002-03-15  Jakub Vlasek
 	* support.c,s_conf.c: Read network name from ircd.conf.
 	* s_conf.c/s_conf_ext.h: Added networkname global variable.
