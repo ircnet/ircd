@@ -1,3 +1,16 @@
+2002-08-23  Piotr Kucharski
+
+	* irc_sprintf.c,irc_sprintf_body.c,irc_sprint_ext.h: added irc_vsprintf;
+	  irc_sprintf() now supports most of basic formats and modifiers (no
+	  uid support yet).
+	* s_user.c/m_message(): changed syntax for oper mass notices from
+	  $/#-mask to $$/$#-mask (since it may go confused with channels).
+	* channel.c/send_channel_modes(): allow mixing beI (compatibility
+	  with 2.9, no longer needed).
+	* s_serv.c/m_stats(): allow 'stats L nick' without penalizing with
+	  RPL_TRYAGAIN.
+	* res.c/proc_answer(): check if answer is matching the request (from Q).
+
 2002-08-05  Piotr Kucharski
 
 	* s_user.c/m_nick(): check for correct number of params in NICK when
