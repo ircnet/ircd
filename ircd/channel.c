@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.194 2004/03/05 22:10:19 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.195 2004/03/17 15:06:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2366,6 +2366,13 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 		if (chptr && IsMember(sptr, chptr))
 		{
+			if (IsServer(cptr))
+			{
+				/* Valid only for 2.10 servers, as we use
+				** NJOIN for 2.11 */
+				sendto_flag(SCH_CHAN, "Fake: %s JOIN %s",
+					sptr->name, chptr->chname);
+			}
 			continue;
 		}
 
@@ -2645,22 +2652,25 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    }
 		/* make sure user isn't already on channel */
 		if (IsMember(acptr, chptr))
-		    {
-			/* I know, it's hiding the bug under the carpet. But
-			** all 2.10 servers have this bug (and ignore it!),
-			** so we don't show it for them. --B. */
-			if (ST_UID(sptr))
+		{
+			if (IsBursting(sptr))
 			{
-			sendto_flag(SCH_ERROR, "NJOIN protocol error from %s"
-				" (%s already on %s)",
-				    get_client_name(cptr, TRUE), acptr->name,
-				chptr->chname);
-			sendto_one(cptr, "ERROR :NJOIN protocol error"
-				" (%s already on %s)",
-				acptr->name, chptr->chname);
+				sendto_flag(SCH_ERROR, "NJOIN protocol error"
+					" from %s (%s already on %s)",
+					get_client_name(cptr, TRUE),
+					acptr->name, chptr->chname);
+				sendto_one(cptr, "ERROR :NJOIN protocol error"
+					" (%s already on %s)",
+					acptr->name, chptr->chname);
 			}
+			else
+			{
+				sendto_flag(SCH_CHAN, "Fake: %s JOIN %s",
+					acptr->name, chptr->chname);
+			}
+			/* ignore such join anyway */
 			continue;
-		    }
+		}
 		/* add user to channel */
 		add_user_to_channel(chptr, acptr, UseModes(parv[1]) ? chop :0);
 
