@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.98 2003/10/18 16:48:16 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.99 2003/10/18 17:26:35 q Exp $";
 #endif
 
 #include "os.h"
@@ -667,7 +667,7 @@ static	void	setup_me(aClient *mp)
 **	This is called when the commandline is not acceptable.
 **	Give error message and exit without starting anything.
 */
-static	int	bad_command()
+static	int	bad_command(void)
 {
   (void)printf(
 	 "Usage: ircd [-a] [-b] [-c]%s [-h servername] [-q] [-o] [-i]"

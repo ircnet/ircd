@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.163 2003/10/18 16:48:15 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.164 2003/10/18 17:26:34 q Exp $";
 #endif
 
 #include "os.h"
@@ -78,8 +78,7 @@ static	char	modebuf[MODEBUFLEN], parabuf[MODEBUFLEN], uparabuf[MODEBUFLEN];
 /*
  * return the length (>=0) of a chain of links.
  */
-static	int	list_length(lp)
-Reg	Link	*lp;
+static	int	list_length(invLink *lp)
 {
 	Reg	int	count = 0;
 

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: irc.c,v 1.8 2003/10/18 15:31:27 q Exp $";
+static  char rcsid[] = "@(#)$Id: irc.c,v 1.9 2003/10/18 17:26:34 q Exp $";
 #endif
  
 #include "os.h"
@@ -42,71 +42,71 @@ static  char rcsid[] = "@(#)$Id: irc.c,v 1.8 2003/10/18 15:31:27 q Exp $";
 #endif /* AUTOMATON */
 
 struct Command commands[] = {
-  { (void (*)()) 0, "SIGNOFF", SERVER_CMD, "\0\0", MSG_QUIT },
-  { do_bye,         "QUIT",    LOCAL_FUNC, "\0\0", MSG_QUIT },
-  { do_bye,         "EXIT",    LOCAL_FUNC, "\0\0", MSG_QUIT },
-  { do_bye,         "BYE",     LOCAL_FUNC, "\0\0", MSG_QUIT },
-  { do_kill,        "KILL",    LOCAL_FUNC, "\0\0", MSG_KILL },
-  { (void (*)()) 0, "SUMMON",  SERVER_CMD, "\0\0", MSG_SUMMON },
-  { (void (*)()) 0, "STATS",   SERVER_CMD, "\0\0", MSG_STATS },
-  { (void (*)()) 0, "USERS",   SERVER_CMD, "\0\0", MSG_USERS },
-  { (void (*)()) 0, "TIME",    SERVER_CMD, "\0\0", MSG_TIME },
-  { (void (*)()) 0, "DATE",    SERVER_CMD, "\0\0", MSG_TIME },
-  { (void (*)()) 0, "NAMES",   SERVER_CMD, "\0\0", MSG_NAMES },
-  { (void (*)()) 0, "NICK",    SERVER_CMD, "\0\0", MSG_NICK },
-  { (void (*)()) 0, "WHO",     SERVER_CMD, "\0\0", MSG_WHO },
-  { (void (*)()) 0, "WHOIS",   SERVER_CMD, "\0\0", MSG_WHOIS },
-  { (void (*)()) 0, "WHOWAS",  SERVER_CMD, "\0\0", MSG_WHOWAS },
-  { do_kill,	    "LEAVE",   LOCAL_FUNC, "\0\0", MSG_PART },
-  { do_kill,	    "PART",    LOCAL_FUNC, "\0\0", MSG_PART },
-  { (void (*)()) 0, "WOPS",    SERVER_CMD, "\0\0", MSG_WALLOPS },
-  { do_channel,     "JOIN",    LOCAL_FUNC, "\0\0", MSG_JOIN },
-  { do_channel,     "CHANNEL", LOCAL_FUNC, "\0\0", MSG_JOIN },
+  { NULL,	"SIGNOFF", SERVER_CMD, "\0\0", MSG_QUIT },
+  { do_bye,	"QUIT",    LOCAL_FUNC, "\0\0", MSG_QUIT },
+  { do_bye,	"EXIT",    LOCAL_FUNC, "\0\0", MSG_QUIT },
+  { do_bye,	"BYE",     LOCAL_FUNC, "\0\0", MSG_QUIT },
+  { do_kill,	"KILL",    LOCAL_FUNC, "\0\0", MSG_KILL },
+  { NULL,	"SUMMON",  SERVER_CMD, "\0\0", MSG_SUMMON },
+  { NULL,	"STATS",   SERVER_CMD, "\0\0", MSG_STATS },
+  { NULL,	"USERS",   SERVER_CMD, "\0\0", MSG_USERS },
+  { NULL,	"TIME",    SERVER_CMD, "\0\0", MSG_TIME },
+  { NULL,	"DATE",    SERVER_CMD, "\0\0", MSG_TIME },
+  { NULL,	"NAMES",   SERVER_CMD, "\0\0", MSG_NAMES },
+  { NULL,	"NICK",    SERVER_CMD, "\0\0", MSG_NICK },
+  { NULL,	"WHO",     SERVER_CMD, "\0\0", MSG_WHO },
+  { NULL,	"WHOIS",   SERVER_CMD, "\0\0", MSG_WHOIS },
+  { NULL,	"WHOWAS",  SERVER_CMD, "\0\0", MSG_WHOWAS },
+  { do_kill,    "LEAVE",   LOCAL_FUNC, "\0\0", MSG_PART },
+  { do_kill,    "PART",    LOCAL_FUNC, "\0\0", MSG_PART },
+  { NULL,	"WOPS",    SERVER_CMD, "\0\0", MSG_WALLOPS },
+  { do_channel,	"JOIN",    LOCAL_FUNC, "\0\0", MSG_JOIN },
+  { do_channel,	"CHANNEL", LOCAL_FUNC, "\0\0", MSG_JOIN },
 #ifdef VMSP
-  { do_exec,        "EXEC",    LOCAL_FUNC, "\0\0", "EXEC" },
-  { do_oper,        "OPER",    LOCAL_FUNC, "\0\0", "OPER" },
+  { do_exec,	"EXEC",    LOCAL_FUNC, "\0\0", "EXEC" },
+  { do_oper,	"OPER",    LOCAL_FUNC, "\0\0", "OPER" },
 #endif
 #ifdef GETPASS
-  { do_oper,        "OPER",    LOCAL_FUNC, "\0\0", "OPER" },
+  { do_oper,	"OPER",    LOCAL_FUNC, "\0\0", "OPER" },
 #else
-  { (void (*)()) 0, "OPER",    SERVER_CMD, "\0\0", MSG_OPER },
+  { NULL,	"OPER",    SERVER_CMD, "\0\0", MSG_OPER },
 #endif
-  { do_away,	    "AWAY",    LOCAL_FUNC, "\0\0", MSG_AWAY },
-  { do_mypriv,      "MSG",     LOCAL_FUNC, "\0\0", MSG_PRIVATE },
-  { do_kill,        "TOPIC",   LOCAL_FUNC, "\0\0", MSG_TOPIC },
-  { do_cmdch,       "CMDCH",   LOCAL_FUNC, "\0\0", "CMDCH" },
-  { (void (*)()) 0, "INVITE",  SERVER_CMD, "\0\0", MSG_INVITE },
-  { (void (*)()) 0, "INFO",    SERVER_CMD, "\0\0", MSG_INFO },
-  { (void (*)()) 0, "LIST",    SERVER_CMD, "\0\0", MSG_LIST },
-  { (void (*)()) 0, "KILL",    SERVER_CMD, "\0\0", MSG_KILL },
-  { do_quote,       "QUOTE",   LOCAL_FUNC, "\0\0", "QUOTE" },
-  { (void (*)()) 0, "LINKS",   SERVER_CMD, "\0\0", MSG_LINKS },
-  { (void (*)()) 0, "ADMIN",   SERVER_CMD, "\0\0", MSG_ADMIN },
-  { do_ignore,      "IGNORE",  LOCAL_FUNC, "\0\0", "IGNORE" },
-  { (void (*)()) 0, "TRACE",   SERVER_CMD, "\0\0", MSG_TRACE },
-  { do_help,        "HELP",    LOCAL_FUNC, "\0\0", "HELP" },
-  { do_log,         "LOG",     LOCAL_FUNC, "\0\0", "LOG" },
-  { (void (*)()) 0, "VERSION", SERVER_CMD, "\0\0", MSG_VERSION },
-  { do_clear,       "CLEAR",   LOCAL_FUNC, "\0\0", "CLEAR" },
-  { (void (*)()) 0, "REHASH",  SERVER_CMD, "\0\0", MSG_REHASH },
-  { do_query,       "QUERY",   LOCAL_FUNC, "\0\0", "QUERY" },
-  { (void (*)()) 0, "LUSERS",  SERVER_CMD, "\0\0", MSG_LUSERS },
-  { (void (*)()) 0, "MOTD",    SERVER_CMD, "\0\0", MSG_MOTD },
-  { do_unkill,      "UNKILL",  LOCAL_FUNC, "\0\0", "UNKILL" },
-  { do_server,      "SERVER",  LOCAL_FUNC, "\0\0", "SERVER" },
-  { (void (*)()) 0, "MODE",    SERVER_CMD, "\0\0", MSG_MODE },
+  { do_away,	"AWAY",    LOCAL_FUNC, "\0\0", MSG_AWAY },
+  { do_mypriv,  "MSG",     LOCAL_FUNC, "\0\0", MSG_PRIVATE },
+  { do_kill,    "TOPIC",   LOCAL_FUNC, "\0\0", MSG_TOPIC },
+  { do_cmdch,   "CMDCH",   LOCAL_FUNC, "\0\0", "CMDCH" },
+  { NULL,	"INVITE",  SERVER_CMD, "\0\0", MSG_INVITE },
+  { NULL,	"INFO",    SERVER_CMD, "\0\0", MSG_INFO },
+  { NULL,	"LIST",    SERVER_CMD, "\0\0", MSG_LIST },
+  { NULL,	"KILL",    SERVER_CMD, "\0\0", MSG_KILL },
+  { do_quote,	"QUOTE",   LOCAL_FUNC, "\0\0", "QUOTE" },
+  { NULL,	"LINKS",   SERVER_CMD, "\0\0", MSG_LINKS },
+  { NULL,	"ADMIN",   SERVER_CMD, "\0\0", MSG_ADMIN },
+  { do_ignore,	"IGNORE",  LOCAL_FUNC, "\0\0", "IGNORE" },
+  { NULL,	"TRACE",   SERVER_CMD, "\0\0", MSG_TRACE },
+  { do_help,	"HELP",    LOCAL_FUNC, "\0\0", "HELP" },
+  { do_log,	"LOG",     LOCAL_FUNC, "\0\0", "LOG" },
+  { NULL,	"VERSION", SERVER_CMD, "\0\0", MSG_VERSION },
+  { do_clear,	"CLEAR",   LOCAL_FUNC, "\0\0", "CLEAR" },
+  { NULL,	"REHASH",  SERVER_CMD, "\0\0", MSG_REHASH },
+  { do_query,	"QUERY",   LOCAL_FUNC, "\0\0", "QUERY" },
+  { NULL,	"LUSERS",  SERVER_CMD, "\0\0", MSG_LUSERS },
+  { NULL,	"MOTD",    SERVER_CMD, "\0\0", MSG_MOTD },
+  { do_unkill,	"UNKILL",  LOCAL_FUNC, "\0\0", "UNKILL" },
+  { do_server,	"SERVER",  LOCAL_FUNC, "\0\0", "SERVER" },
+  { NULL,	"MODE",    SERVER_CMD, "\0\0", MSG_MODE },
 #ifdef MSG_MAIL
-  { (void (*)()) 0, "MAIL",    SERVER_CMD, "\0\0", MSG_MAIL },
+  { NULL,	"MAIL",    SERVER_CMD, "\0\0", MSG_MAIL },
 #endif
-  { do_kick,        "KICK",    LOCAL_FUNC, "\0\0", MSG_KICK },
-  { (void (*)()) 0, "USERHOST",SERVER_CMD, "\0\0", MSG_USERHOST },
-  { (void (*)()) 0, "ISON",    SERVER_CMD, "\0\0", MSG_ISON },
-  { (void (*)()) 0, "CONNECT", SERVER_CMD, "\0\0", MSG_CONNECT },
-  { do_kill,        "SQUIT",   LOCAL_FUNC, "\0\0", MSG_SQUIT },
-  { (void (*)()) 0, "SERVLIST",SERVER_CMD, "\0\0", MSG_SERVLIST },
-  { do_kill,        "SQUERY",  LOCAL_FUNC, "\0\0", MSG_SQUERY },
-  { do_kill,        "NOTICE",  LOCAL_FUNC, "\0\0", MSG_NOTICE },
-  { (void (*)()) 0, (char *) 0, 0,         "\0\0", (char *) 0 }
+  { do_kick,	"KICK",    LOCAL_FUNC, "\0\0", MSG_KICK },
+  { NULL,	"USERHOST",SERVER_CMD, "\0\0", MSG_USERHOST },
+  { NULL,	"ISON",    SERVER_CMD, "\0\0", MSG_ISON },
+  { NULL,	"CONNECT", SERVER_CMD, "\0\0", MSG_CONNECT },
+  { do_kill,	"SQUIT",   LOCAL_FUNC, "\0\0", MSG_SQUIT },
+  { NULL,	"SERVLIST",SERVER_CMD, "\0\0", MSG_SERVLIST },
+  { do_kill, 	"SQUERY",  LOCAL_FUNC, "\0\0", MSG_SQUERY },
+  { do_kill,	"NOTICE",  LOCAL_FUNC, "\0\0", MSG_NOTICE },
+  { NULL, 	NULL,      0,          "\0\0", NULL }
 };
 
 aChannel *channel = NULL;
@@ -146,7 +146,8 @@ int	main(int argc, char *argv[])
 	char	channel[BUFSIZE+1];
 	int	length, mode = 0;
 	struct	passwd	*userdata;
-	char	*cp, *argv0=argv[0], *nickptr, *servptr, *getenv(), ch;
+	char	*cp, *argv0=argv[0], *nickptr, *servptr, ch;
+extern	char	*getenv(const char *name);
 
 	if ((cp = rindex(argv0, '/')) != NULL)
 		argv0 = ++cp;

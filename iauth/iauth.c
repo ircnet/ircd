@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: iauth.c,v 1.14 2003/10/18 15:31:29 q Exp $";
+static  char rcsid[] = "@(#)$Id: iauth.c,v 1.15 2003/10/18 17:26:35 q Exp $";
 #endif
 
 #include "os.h"
@@ -77,7 +77,7 @@ static	RETSIGTYPE	s_log(int s)
         do_log = 1;
 }
 
-static	void	init_signals()
+static	void	init_signals(void)
 {
 	/* from ircd/ircd.c setup_signals() */
 #if POSIX_SIGNALS

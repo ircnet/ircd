@@ -18,7 +18,7 @@
  */
 
 struct Command {
-  void (*func)();
+  void (*func)(char *, char *);
   char *name;
   int type;
   char keybinding[3];

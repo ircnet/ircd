@@ -17,7 +17,7 @@
  *
  */
 
-static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.7 2003/10/15 19:55:48 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.8 2003/10/18 17:26:36 q Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>     /* atol() */
@@ -274,7 +274,8 @@ static int verify_pid(int pid)
   return(res == 0);
 }
 
-static int ircdwatch_running () {
+static int ircdwatch_running (void)
+{
   int pid;
 
   if (file_exists(IRCDWATCH_PID_FILENAME)) {
@@ -288,7 +289,8 @@ static int ircdwatch_running () {
   return(0);
 }
 
-static int ircd_running () {
+static int ircd_running (void)
+{
   int pid;
 
   if (file_exists(IRCDPID_PATH)) {
@@ -302,7 +304,7 @@ static int ircd_running () {
   return(0);
 }
 
-static void hup_ircd ()
+static void hup_ircd (void)
 {
   int pid;
   int res;
@@ -322,7 +324,7 @@ static void hup_ircd ()
 }
 
 
-static void daemon_run () 
+static void daemon_run (void) 
 {
   int i;
 #ifdef IRCDWATCH_HUP_ON_CONFIG_CHANGE
@@ -412,7 +414,7 @@ static void daemon_run ()
   return;
 }
 
-static void kill_ircd ()
+static void kill_ircd (void)
 {
   int pid;
   int res;
@@ -433,7 +435,7 @@ static void kill_ircd ()
   }
 }
 
-static void kill_ircdwatch ()
+static void kill_ircdwatch (void)
 {
   int pid;
   int res;

@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.107 2003/10/18 15:31:25 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.108 2003/10/18 17:26:35 q Exp $";
 #endif
 
 #include "os.h"
@@ -146,7 +146,7 @@ void	report_error(char *text, aClient *cptr)
 	char	fmbuf[BUFSIZE+1];
 	aClient *bysptr = NULL;
 	
-	extern	char	*strerror();
+	extern	char	*strerror(int);
 
 	host = (cptr) ? get_client_name(cptr, FALSE) : "";
 
