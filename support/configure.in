@@ -580,13 +580,7 @@ fi
 
 AC_DEFUN(IRC_PATH_RESCONF,
 [AC_MSG_CHECKING([for resolver configuration file])
-AC_CACHE_VAL(irc_cv_path_resconf,
-[if test -z "$irc_resconf"; then
-   irc_cv_path_resconf="/etc/resolv.conf";
- else
-   irc_cv_path_resconf="$irc_resconf";
- fi
-])
+AC_ARG_WITH(resconf, [  --with-resconf=FILE     use FILE as resolver config file [[/etc/resolv.conf]]], irc_cv_path_resconf="$withval", irc_cv_path_resconf="/etc/resolv.conf")
 AC_MSG_RESULT($irc_cv_path_resconf)
 AC_DEFINE_UNQUOTED([IRC_RESCONF], ["$irc_cv_path_resconf"], [Define as the resolver configuration file.])
 if test ! -r "$irc_cv_path_resconf"; then
@@ -799,7 +793,7 @@ dnl main
 dnl ----
 
 AC_INIT([irc],[2.11],[ircd-bugs@irc.org])
-AC_REVISION([$Id: configure.in,v 1.57 2004/06/11 23:22:36 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.58 2004/07/07 15:29:55 chopin Exp $])
 AC_PREREQ(2.59)
 
 AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [PREFIX/var/log/ircd]], [
