@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.121 2004/03/07 21:40:42 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.122 2004/03/09 10:15:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1511,6 +1511,17 @@ add_con_refuse:
 			sizeof(struct IN_ADDR));
 		acptr->port = ntohs(addr.SIN_PORT);
 
+#ifdef	CLONE_CHECK
+		if (check_clones(acptr) > CLONE_MAX)
+		{
+			sendto_flag(SCH_LOCAL, "Rejecting connection from %s.",
+				acptr->sockhost);
+			sendto_flog(acptr, EXITC_CLONE, "", acptr->sockhost);
+			(void)send(fd, "ERROR :Too rapid connections from your "
+				"host\r\n", 46, 0);
+			goto add_con_refuse;
+		}
+#endif
 		lin.flags = ASYNC_CLIENT;
 		lin.value.cptr = acptr;
 		lin.next = NULL;
@@ -1528,22 +1539,6 @@ add_con_refuse:
 		nextdnscheck = 1;
 	    }
 
-#ifdef	CLONE_CHECK
-	if (check_clones(acptr) > CLONE_MAX)
-	    {
-		sendto_flag(SCH_LOCAL, "Rejecting connection from %s[%s].",
-			    (acptr->hostp) ? acptr->hostp->h_name : "",
-			    acptr->sockhost);
-		sendto_flog(acptr, EXITC_CLONE, "",
-			    (acptr->hostp) ? acptr->hostp->h_name :
-			    acptr->sockhost);
-		del_queries((char *)acptr);
-		(void)send(fd,
-			   "ERROR :Too rapid connections from your host\r\n",
-			   46, 0);
-		goto add_con_refuse;
-	    }
-#endif
 	acptr->fd = fd;
 	set_non_blocking(acptr->fd, acptr);
 	if (set_sock_opts(acptr->fd, acptr) == -1)
