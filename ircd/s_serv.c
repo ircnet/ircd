@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.242 2004/10/06 12:20:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.243 2004/10/06 14:36:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -42,6 +42,7 @@ const	char	*check_servername_errors[3][2] = {
 	{ "too long", "Bogus servername - too long" },
 	{ "invalid", "Bogus servername - invalid hostname" },
 	{ "bogus", "Bogus servername - no dot"}};
+static	int	send_users(aClient *, aClient *, int, char **);
 
 /*
 ** m_functions execute protocol messages on this server:
@@ -2309,7 +2310,19 @@ int	m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #endif
 	    }
 #else /* USERS_RFC1459 */
+	(void) send_users(cptr, sptr, parc, parv);
 #endif /* USERS_RFC1459 */
+	return 2;
+}
+
+int	send_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+        sendto_one(sptr, replies[RPL_LOCALUSERS], ME, BadTo(parv[0]),
+		istat.is_myclnt, istat.is_m_myclnt,
+		istat.is_myclnt, istat.is_m_myclnt);
+        sendto_one(sptr, replies[RPL_GLOBALUSERS], ME, BadTo(parv[0]),
+		istat.is_user[0] + istat.is_user[1], istat.is_m_users,
+		istat.is_user[0] + istat.is_user[1], istat.is_m_users);
 	return 2;
 }
 
@@ -2480,12 +2493,7 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	
 	sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]), m_clients,
 		   m_services, m_servers);
-        sendto_one(sptr, replies[RPL_LOCALUSERS], ME, BadTo(parv[0]),
-			m_clients, istat.is_m_myclnt,
-			m_clients, istat.is_m_myclnt);
-        sendto_one(sptr, replies[RPL_GLOBALUSERS], ME, BadTo(parv[0]),
-			c_count + i_count, istat.is_m_users,
-			c_count + i_count, istat.is_m_users);
+	(void) send_users(cptr, sptr, parc, parv);
 	return 2;
 }
 
