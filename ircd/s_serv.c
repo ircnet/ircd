@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.268 2005/02/09 17:28:11 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.269 2005/02/09 17:52:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -237,47 +237,22 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		comment = comment2;
 	}
 	if (!MyConnect(acptr) && (cptr != acptr->from))
-	    {
-		/*
-		** The following is an awful kludge, but I don't see any other
-		** way to change the pre 2.10.3 behaviour.  I'm probably going
-		** to regret it.. -kalt
-		*/
-		if ((acptr->from->serv->version & SV_OLDSQUIT) == 0)
-		    {
-			/* better server: just propagate upstream */
-			sendto_one(acptr->from, ":%s SQUIT %s :%s",
-				    IsServer(sptr) ?
-				    sptr->serv->sid : sptr->name,
-				    acptr->serv->sid, comment);
-			
-			sendto_flag(SCH_SERVER,
-				    "Forwarding SQUIT %s (%s) from %s (%s)",
-				    acptr->name, acptr->serv->sid, parv[0],
-				    comment);
-			sendto_flag(SCH_DEBUG,
-				    "Forwarding SQUIT %s to %s from %s (%s)",
-				    acptr->name, acptr->from->name,
-				    parv[0], comment);
-			return 1;
-		    }
-		/*
-		** ack, bad server encountered!
-		** must send back to other good servers which were trying to
-		** do the right thing, and fake the yet to come SQUIT which
-		** will never be received from the bad servers.
-		*/
-		if (IsServer(cptr) &&
-		    (cptr->serv->version & SV_OLDSQUIT) == 0)
-		    {
-			sendto_one(cptr, ":%s SQUIT %s :%s (Bounced for %s)",
-				   me.serv->sid,
-				   IsServer(acptr) ? acptr->serv->sid:
-				   acptr->name, comment, parv[0]);
-			sendto_flag(SCH_DEBUG, "Bouncing SQUIT %s back to %s",
-				    acptr->name, acptr->from->name);
-		    }
-	    }
+	{
+		/* just propagate upstream */
+		sendto_one(acptr->from, ":%s SQUIT %s :%s",
+			    IsServer(sptr) ?
+			    sptr->serv->sid : sptr->name,
+			    acptr->serv->sid, comment);
+		sendto_flag(SCH_SERVER,
+			    "Forwarding SQUIT %s (%s) from %s (%s)",
+			    acptr->name, acptr->serv->sid, parv[0],
+			    comment);
+		sendto_flag(SCH_DEBUG,
+			    "Forwarding SQUIT %s to %s from %s (%s)",
+			    acptr->name, acptr->from->name,
+			    parv[0], comment);
+		return 1;
+	}
 	/*
 	**  Notify all opers, if my local link is remotely squitted
 	*/
