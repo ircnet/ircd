@@ -42,7 +42,7 @@ EXTERN void report_error __P((char *text, aClient *cptr));
 EXTERN int inetport __P((aClient *cptr, char *ip, char *ipmask, int port));
 EXTERN int add_listener __P((aConfItem *aconf));
 EXTERN void close_listeners();
-EXTERN void start_iauth();
+EXTERN void start_iauth __P((int));
 EXTERN void init_sys();
 EXTERN void write_pidfile();
 EXTERN int check_client __P((Reg aClient *cptr));

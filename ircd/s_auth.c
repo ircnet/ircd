@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.18 1998/09/21 14:00:31 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.19 1998/10/10 12:19:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -61,7 +61,7 @@ vsendto_iauth(char *pattern, va_list va)
 	    sendto_flag(SCH_AUTH, "Aiiie! lost slave authentication process");
 	    close(adfd);
 	    adfd = -1;
-	    start_iauth();
+	    start_iauth(0);
 	    return -1;
 	}
     return 0;
@@ -111,7 +111,7 @@ read_iauth()
 			    sendto_flag(SCH_AUTH, "Aiiie! lost slave authentication process (errno = %d)", errno);
 			    close(adfd);
 			    adfd = -1;
-			    start_iauth();
+			    start_iauth(0);
 			}
 		    break;
 		}
