@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.168 2004/01/02 15:36:43 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.169 2004/01/20 19:16:17 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1695,6 +1695,14 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 					tmp_chfl = CHFL_INVITE; break;
 				case MODE_REOPLIST :
 					tmp_chfl = CHFL_REOPLIST; break;
+				}
+				/* XXX: remove this in 2.11.1 */
+				if ((whatt & MODE_ADD) &&
+					tmp_chfl == CHFL_REOPLIST &&
+					MyClient(sptr))
+				{
+					/* ignore +R from a local client. */
+					break;
 				}
 				if (ischop &&
 					(((whatt & MODE_ADD) &&
