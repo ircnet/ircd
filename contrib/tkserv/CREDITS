@@ -33,6 +33,9 @@ to the development of TkServ:
 - Kristian 'Fusion' Bergmann & 'viha'
   + Sending out of a hint when an unknown command is received
 
+- 'Virginie'
+  + rename of the logf function because of conflict under *BSD?
+
 - 'jbn'
   + expiration of tklines / default expiration
 

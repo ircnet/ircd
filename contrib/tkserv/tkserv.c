@@ -3,7 +3,7 @@
 **
 ** Copyright (c) 1998 Kaspar 'Kasi' Landsberg, <kl@berlin.Snafu.DE> 
 **
-** File     : tkserv.c v1.0.8
+** File     : tkserv.c v1.0.9
 ** Author   : Kaspar 'Kasi' Landsberg, <kl@berlin.Snafu.DE>
 ** Desc.    : Temporary K-line Service.
 **            For further info see the README file.
@@ -44,10 +44,10 @@
 #define TKS_MAXARGS 250
 
 /* The version information */
-#define TKS_VERSION "Hello, i'm TkServ v1.0.8."
+#define TKS_VERSION "Hello, i'm TkServ v1.0.9."
 
 static char *nuh, *passwd;
-FILE *logf;
+FILE *tks_logf;
 int fd = -1, tklined = 0;
 
 /*
@@ -56,7 +56,7 @@ int fd = -1, tklined = 0;
 ** this hurts, but i couldn't find any better
 ** description. ;->
 */
-char *ts(void)
+char *tks_ts(void)
 {
     static char tempus[256];
     time_t now;
@@ -74,17 +74,17 @@ char *ts(void)
 }
 
 /* logging routine, with timestamps */
-void sendlog(char *text, ...)
+void tks_log(char *text, ...)
 {
     char txt[TKS_MAXBUFFER];
     va_list va;
 
-    logf = fopen(TKSERV_LOGFILE, "a");
+    tks_logf = fopen(TKSERV_LOGFILE, "a");
     va_start(va, text);
     vsprintf(txt, text, va);
 
-    if (logf != NULL)
-        fprintf(logf, "%s %s\n", txt, ts());
+    if (tks_logf != NULL)
+        fprintf(tks_logf, "%s %s\n", txt, tks_ts());
     else
     {
         perror(TKSERV_LOGFILE);
@@ -93,7 +93,7 @@ void sendlog(char *text, ...)
     }
 
     va_end(va);
-    fclose(logf);
+    fclose(tks_logf);
 }
 
 /* an optimized system() function */
@@ -170,7 +170,7 @@ void process_server_output(char *line)
         chmod(TKSERV_LOGFILE, S_IRUSR | S_IWRITE);
         exec_cmd("cp %s/ircd.conf %s/ircd.conf.tkserv", 
                  IRCDPATH, IRCDPATH);
-        sendlog("Registration successful.");
+        tks_log("Registration successful.");
     }
         
     /* We do only react upon PINGs, SQUERYs and &NOTICES */
@@ -309,7 +309,7 @@ int must_be_opered()
             /* check for access file corruption */
             if (!access_uh)
             {
-                sendlog("Corrupt access file. RTFM. :-)");
+                tks_log("Corrupt access file. RTFM. :-)");
 
                 return(0);
             }
@@ -323,7 +323,7 @@ int must_be_opered()
         }
     }
     else
-        sendlog("%s not found.", TKSERV_ACCESSFILE);
+        tks_log("%s not found.", TKSERV_ACCESSFILE);
 
     return(1);
 }
@@ -367,7 +367,7 @@ int is_authorized(char *pwd, char *host)
             /* check for access file corruption */
             if (!access_uh || !access_pwd)
             {
-                sendlog("Corrupt access file. RTFM. :-)");
+                tks_log("Corrupt access file. RTFM. :-)");
 
                 return(0);
             }
@@ -420,7 +420,7 @@ int is_authorized(char *pwd, char *host)
 
     }
     else
-        sendlog("%s not found.", TKSERV_ACCESSFILE);
+        tks_log("%s not found.", TKSERV_ACCESSFILE);
 
     return(0);
 }
@@ -445,13 +445,13 @@ int add_tkline(char *host, char *user, char *reason, int lifetime)
                 host, reason, user, lifetime, now);
         fclose(iconf);
         rehash(1);
-        sendlog("K:%s:%s:%s:0 added for %d hour(s) by %s.",
+        tks_log("K:%s:%s:%s:0 added for %d hour(s) by %s.",
             host, reason, user, lifetime, nuh);
 
         return(1);
     }
     else
-        sendlog("Couldn't write to %s", path);
+        tks_log("Couldn't write to %s", path);
 
     return(0);
 }
@@ -548,7 +548,7 @@ int check_tklines(char *host, char *user, int lifetime)
         return(count);
     }
     else
-        sendlog("Error while checking for expired tklines...");
+        tks_log("Error while checking for expired tklines...");
 }
 
 /* reloads the ircd.conf file  -- the easy way */
@@ -800,7 +800,7 @@ void squery_tkline(char **args)
     if (!strcmp(pattern, "*@*") || !strcmp(pattern, "*"))
     {
         sendto_user("The pattern \"%s\" is not allowed.", pattern);
-        sendlog("%s tried to tkline/untkline \"%s\".", nuh, pattern);
+        tks_log("%s tried to tkline/untkline \"%s\".", nuh, pattern);
         return;
     }
 
@@ -859,7 +859,7 @@ void squery_quit(char **args)
 
     if (!strcmp(args[4], passwd))
     {
-        sendlog("Got QUIT from %s. Terminating.", nuh);
+        tks_log("Got QUIT from %s. Terminating.", nuh);
         sendto_server("QUIT :Linux makes the world go round. :)\n");
     }
 }
@@ -913,7 +913,7 @@ int main(int argc, char *argv[])
         printf("you read the part about the service distribution in the README.\n");
     }
 
-    sendlog("Welcome to TkServ. Lean back and enjoy the show...");
+    tks_log("Welcome to TkServ. Lean back and enjoy the show...");
 
     if ((fd = socket(sock_type, proto_type, 0)) < 0)
     {
