@@ -1,3 +1,8 @@
+2004-03-23  Piotr Kucharski
+
+	* res.c/init_resolver(): a hack to allow resolving inside FreeBSD
+	  jail (patch from Gerhard Gonter).
+
 2004-03-22  Jakub Vlasek
 
 	* struct_def.h, s_bsd.c, s_serv.c: Rename IsListeningInactive and
