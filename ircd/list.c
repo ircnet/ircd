@@ -37,8 +37,7 @@
  */
 
 #ifndef lint
-static  char sccsid[] = "%W% %G% (C) 1988 University of Oulu, \
-Computing Center and Jarkko Oikarinen";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.2 1997/04/14 15:04:17 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -155,7 +154,11 @@ aClient	*from;
 		cptr->sockhost[0] = '\0';
 		cptr->buffer[0] = '\0';
 		cptr->authfd = -1;
+		cptr->auth = cptr->username;
 		cptr->exitc = EXITC_UNDEF;
+#ifdef	ZIP_LINKS
+		cptr->zip = NULL;
+#endif
 	    }
 	return (cptr);
 }
@@ -310,37 +313,15 @@ void	free_server(serv, cptr)
 aServer	*serv;
 aClient	*cptr;
 {
-	anUser *user;
-
-	if ((user = serv->user))
-	    {
-		if (user->refcnt == 1)
-		    {
-			/*
-			** This really doesn't belong to here, but...
-			** user has been stored in whowas[] sometime in the
-			** past, but it hasn't been counted as gone when all
-			** references were removed - krys
-			*/
-			istat.is_wwusers--;
-			if (user->away)
-			    {
-				istat.is_wwaways--;
-				istat.is_wwawaysmem -= strlen(user->away) + 1;
-			    }
-		    }
-		serv->user = NULL;	/* to avoid some impossible loop */
-		free_user(user, cptr);
-	    }
 	if (--serv->refcnt <= 0)
 	    {
 		if (serv->refcnt < 0 ||	serv->prevs || serv->nexts ||
-		    serv->bcptr || serv->userlist)
+		    serv->bcptr || serv->userlist || serv->user)
 		    {
 			char buf[512];
-			SPRINTF(buf, "%d %#x %#x %#x %#x (%s)",
+			SPRINTF(buf, "%d %#x %#x %#x %#x %#x (%s)",
 				serv->refcnt, serv->prevs, serv->nexts,
-				serv->userlist, serv->bcptr,
+				serv->userlist, serv->user, serv->bcptr,
 				(serv->bcptr) ? serv->bcptr->name : "none");
 #ifdef DEBUGMODE
 			dumpcore("%#x server %s %s",
@@ -412,6 +393,17 @@ Reg	aClient	*cptr;
 
 	if (cptr->serv)
 	    {
+		if (cptr->serv->userlist)
+#ifdef DEBUGMODE
+			dumpcore("%#x server %s %#x",
+				 cptr, cptr ? cptr->name : "<noname>",
+				 cptr->serv->userlist);
+#else
+			sendto_flag(SCH_ERROR, "* %#x server %s %#x *",
+				    cptr, cptr ? cptr->name : "<noname>",
+				    cptr->serv->userlist);
+#endif
+
 		/* has to be removed from the list of aServer structures */
 		if (cptr->serv->nexts)
 			cptr->serv->nexts->prevs = cptr->serv->prevs;
@@ -422,6 +414,12 @@ Reg	aClient	*cptr;
 		cptr->serv->prevs = NULL;
 		cptr->serv->nexts = NULL;
 		
+		if (cptr->serv->user)
+		    {
+			free_user(cptr->serv->user, cptr);
+			cptr->serv->user = NULL;
+		    }
+
 		/* decrement reference counter, and eventually free it */
 		cptr->serv->bcptr = NULL;
 		free_server(cptr->serv, cptr);
@@ -486,6 +484,17 @@ Reg	aClient *ptr;
 			if (lp->value.cptr == ptr)
 				return (lp);
 	return NULL;
+}
+
+Link  *find_channel_link(lp, ptr)
+Reg   Link    *lp;
+Reg   aChannel *ptr; 
+{ 
+	if (ptr)
+		for (; lp; lp = lp->next)
+			if (lp->value.chptr == ptr)
+				return (lp);
+	return NULL;    
 }
 
 Link	*make_link()
@@ -586,7 +595,7 @@ aConfItem *aconf;
 	if (aconf->passwd)
 		bzero(aconf->passwd, strlen(aconf->passwd));
 	if (aconf->ping)
-		MyFree(aconf->ping);
+		MyFree((char *)aconf->ping);
 	MyFree(aconf->passwd);
 	MyFree(aconf->name);
 	MyFree((char *)aconf);

@@ -64,6 +64,10 @@
 #endif
 #include "resolv.h"
 
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: inet_addr.c,v 1.2 1997/04/14 15:04:05 kalt Exp $";
+#endif
+
 #ifndef	INADDR_NONE
 #define	INADDR_NONE	((u_long)0xffffffff)
 #endif

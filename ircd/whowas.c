@@ -24,7 +24,7 @@
  */
 
 #ifndef lint
-static  char sccsid[] = "%W% %G% (C) 1988 Markku Savela";
+static  char rcsid[] = "@(#)$Id: whowas.c,v 1.2 1997/04/14 15:04:40 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -351,7 +351,7 @@ char	*parv[];
 		max = atoi(parv[2]);
 	if (parc > 3)
 		if (hunt_server(cptr,sptr,":%s WHOWAS %s %s :%s", 3,parc,parv))
-			return 2;
+			return 3;
 
 	parv[1] = canonize(parv[1]);
 	if (!MyConnect(sptr))
@@ -396,7 +396,7 @@ char	*parv[];
 			p[-1] = ',';
 	    }
 	sendto_one(sptr, rpl_str(RPL_ENDOFWHOWAS, parv[0]), parv[1]);
-	return 1;
+	return 2;
     }
 
 

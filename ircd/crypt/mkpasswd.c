@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: mkpasswd.c,v 1.2 1997/04/14 15:04:41 kalt Exp $";
+#endif
+
 extern char *getpass();
 
 int main(argc, argv)

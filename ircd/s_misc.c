@@ -22,8 +22,7 @@
  */
 
 #ifndef lint
-static  char sccsid[] = "%W% %G% (C) 1988 University of Oulu, \
-Computing Center and Jarkko Oikarinen";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.2 1997/04/14 15:04:29 kalt Exp $";
 #endif
 
 #include <sys/time.h>
@@ -223,21 +222,22 @@ int	showip;
 		else
 		    {
 			if (showip)
-				(void)sprintf(nbuf, "%s[%s@%s]",
-					sptr->name,
+				(void)sprintf(nbuf, "%s[%.*s@%s]",
+					sptr->name, USERLEN,
 					(!(sptr->flags & FLAGS_GOTID)) ? "" :
-					sptr->username,
-					inetntoa((char *)&sptr->ip));
+					sptr->auth,
+					      inetntoa((char *)&sptr->ip));
 			else
 			    {
 				if (mycmp(sptr->name, sptr->sockhost))
 					/* Show username for clients and
 					 * ident for others.
 					 */
-					SPRINTF(nbuf, "%s[%s@%s]", sptr->name,
+					SPRINTF(nbuf, "%s[%.*s@%s]",
+						sptr->name, USERLEN,
 						IsPerson(sptr) ?
 							sptr->user->username :
-							sptr->username,
+							sptr->auth,
 						sptr->sockhost);
 				else
 					return sptr->name;
@@ -262,7 +262,7 @@ aClient	*cptr;
 	else
 		(void)sprintf(nbuf, "%s[%-.*s@%-.*s]",
 			cptr->name, USERLEN,
-			(!(cptr->flags & FLAGS_GOTID)) ? "" : cptr->username,
+			(!(cptr->flags & FLAGS_GOTID)) ? "" : cptr->auth,
 			HOSTLEN, cptr->hostp->h_name);
 	return nbuf;
 }
@@ -337,7 +337,7 @@ char	*name;
 			continue;
 		}
 		if ((aconf = acptr->serv->nline) &&
-		    (matches(my_name_for_link(ME, aconf->port), name) == 0))
+		    (match(my_name_for_link(ME, aconf->port), name) == 0))
 		{
 			acptr->flags |= FLAGS_HIDDEN;
 			j++;
@@ -409,12 +409,11 @@ char	*comment;	/* Reason for the exit */
 			       on_for / 3600, (on_for % 3600)/60,
 			       on_for % 60,
 			       sptr->user->username, sptr->user->host,
-			       sptr->username, sptr->exitc);
+			       sptr->auth, sptr->exitc);
 # endif
 # ifdef FNAME_USERLOG
-			sendto_flog(myctime(sptr->firsttime), NULL, on_for,
-				    sptr->user->username, sptr->user->host,
-				    sptr->username, &sptr->exitc);
+			sendto_flog(sptr, NULL, on_for, sptr->user->username,
+				    sptr->user->host);
 # endif
 		    }
 		else if (sptr->exitc != EXITC_REF)
@@ -425,15 +424,13 @@ char	*comment;	/* Reason for the exit */
 			       myctime(sptr->firsttime),
 			       (IsUnixSocket(sptr)) ? me.sockhost :
 			       ((sptr->hostp) ? sptr->hostp->h_name :
-				sptr->sockhost), sptr->username, sptr->exitc);
+				sptr->sockhost), sptr->auth, sptr->exitc);
 # endif
 # ifdef FNAME_CONNLOG
-			sendto_flog(myctime(sptr->firsttime), " Unknown ", 0,
-				    "<none>", 
+			sendto_flog(sptr, " Unknown ", 0, "<none>", 
 				    (IsUnixSocket(sptr)) ? me.sockhost :
 				    ((sptr->hostp) ? sptr->hostp->h_name :
-				     sptr->sockhost),
-				    sptr->username, &sptr->exitc);
+				     sptr->sockhost));
 # endif
 		    }
 #endif
@@ -455,6 +452,14 @@ char	*comment;	/* Reason for the exit */
 		      else
 			sendto_one(sptr, "ERROR :Closing Link: %s (%s)",
 				   get_client_name(sptr,FALSE), comment);
+
+		      if (sptr->auth != sptr->username)
+			  {
+			    istat.is_authmem -= sizeof(sptr->auth);
+			    istat.is_auth -= 1;
+			    MyFree(sptr->auth);
+			    sptr->auth = sptr->username;
+			  }
 		    }
 		/*
 		** Currently only server connections can have
@@ -462,6 +467,7 @@ char	*comment;	/* Reason for the exit */
 		** harm to check for all local clients. In
 		** future some other clients than servers might
 		** have remotes too...
+		** now, I think it harms big client servers... - krys
 		**
 		** Close the Client connection first and mark it
 		** so that no messages are attempted to send to it.
@@ -678,40 +684,18 @@ char	*comment;
 			    acptr == cptr || IsMe(acptr))
 				continue;
 			if ((aconf = acptr->serv->nline) &&
-			    (matches(my_name_for_link(ME, aconf->port),
+			    (match(my_name_for_link(ME, aconf->port),
 				     sptr->name) == 0))
 				continue;
-			/*
-			** SQUIT going "upstream". This is the remote
-			** squit still hunting for the target. Use prefixed
-			** form. "from" will be either the oper that issued
-			** the squit or some server along the path that
-			** didn't have this fix installed. --msa
-			*/
-			if (sptr->from == acptr)
-			    {
-				sendto_one(acptr, ":%s SQUIT %s :%s",
-					   from->name, sptr->name, comment);
+			sendto_one(acptr, ":%s SQUIT %s :%s",
+				   from->name, sptr->name, comment);
 #ifdef	USE_SERVICES
-				check_services_butone(SERVICE_WANT_SQUIT, 
-						      sptr->name, sptr,
-						      ":%s SQUIT %s :%s",
-						      from->name,
-						      sptr->name, comment);
+			check_services_butone(SERVICE_WANT_SQUIT, 
+					      sptr->name, sptr,
+					      ":%s SQUIT %s :%s",
+					      from->name,
+					      sptr->name, comment);
 #endif
-			    }
-			else
-			    {
-				sendto_one(acptr, ":%s SQUIT %s :%s",
-					   from->name, sptr->name, comment);
-#ifdef	USE_SERVICES
-				check_services_butone(SERVICE_WANT_SQUIT, 
-						      sptr->name, sptr,
-						      ":%s SQUIT %s :%s",
-						      from->name, sptr->name,
-						      comment);
-#endif
-			    }
 		    }
 		(void) del_from_server_hash_table(sptr->serv, cptr ? cptr :
 						  sptr->from);
@@ -838,14 +822,14 @@ char	*comment;
 				    || !IsServer(acptr) || acptr == cptr
 				    || IsMe(acptr))
 					continue;
-				if (matches(sptr->service->dist, acptr->name))
+				if (match(sptr->service->dist, acptr->name))
 					continue;
 				sendto_one(acptr, ":%s QUIT :%s", sptr->name,
 					   comment);
 			    }
 		    }
 #ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_SERVICE, NULL,
+		check_services_butone(SERVICE_WANT_SERVICE, NULL, NULL,
 				      ":%s QUIT :%s", sptr->name, comment);
 #endif
 		/* MyConnect(sptr) is always FALSE here */
@@ -992,3 +976,54 @@ char	*name;
 	sendto_one(cptr, ":%s %d %s :time connected %u %u",
 		   ME, RPL_STATSDEBUG, name, sp->is_cti, sp->is_sti);
 }
+
+#ifdef CACHED_MOTD
+aMotd		*motd = NULL;
+struct tm	motd_tm;
+
+void read_motd(filename)
+char *filename;
+{
+	int fd;
+	register aMotd *temp, *last;
+	struct stat Sb;
+	char line[80];
+	register char *tmp;
+	
+	if ((fd = open(filename, O_RDONLY)) == -1)
+		return;
+	if (fstat(fd, &Sb) == -1)
+	    {
+		close(fd);
+		return;
+	    }
+	for(;motd != NULL;motd=last)
+	    {
+		last = motd->next;
+		MyFree(motd->line);
+		MyFree(motd);
+	    }
+	motd_tm = *localtime(&Sb.st_mtime);
+	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
+	last = NULL;
+	while (dgets(fd, line, sizeof(line)-1) > 0)
+	    {
+		if ((tmp = strchr(line, '\n')) != NULL)
+			*tmp = (char) 0;
+		if ((tmp = strchr(line, '\r')) != NULL)
+			*tmp = (char) 0;
+		temp = (aMotd *)MyMalloc(sizeof(aMotd));
+		if (!temp)
+			outofmemory();
+		temp->line = mystrdup(line);
+		temp->next = NULL;
+		       if (!motd)
+			motd = temp;
+		else
+			last->next = temp;
+		last = temp;
+	    }
+	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
+	close(fd);
+}     
+#endif

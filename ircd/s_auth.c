@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char sccsid[] = "%W% %G% (C) 1992-1995 Darren Reed";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.2 1997/04/14 15:04:20 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -49,6 +49,7 @@ static  char sccsid[] = "%W% %G% (C) 1992-1995 Darren Reed";
 void	start_auth(cptr)
 Reg	aClient	*cptr;
 {
+#ifndef	NO_IDENT
 	struct	sockaddr_in	us, them;
 	int     ulen, tlen;
 
@@ -120,14 +121,18 @@ Reg	aClient	*cptr;
 		(void)alarm((unsigned)0);
 	    }
 	else
+	    {
+		report_error("binding stream socket for auth request %s:%s",
+			     cptr);
 		Debug((DEBUG_ERROR,"auth(%x) bind failed on %s port %d - %d",
 		      cptr, inetntoa((char *)&us.sin_addr),
 		      ntohs(us.sin_port), errno));
-
+	    }
 
 	cptr->flags |= (FLAGS_WRAUTH|FLAGS_AUTH);
 	if (cptr->authfd > highest_fd)
 		highest_fd = cptr->authfd;
+#endif
 	return;
 }
 
@@ -196,7 +201,7 @@ Reg	aClient	*cptr;
 {
 	Reg	char	*s, *t;
 	Reg	int	len;
-	char	ruser[USERLEN+1], system[8];
+	char	ruser[513], system[8];
 	u_short	remp = 0, locp = 0;
 
 	*system = *ruser = '\0';
@@ -217,7 +222,7 @@ Reg	aClient	*cptr;
 	    }
 
 	if ((len > 0) && (cptr->count != (sizeof(cptr->buffer) - 1)) &&
-	    (sscanf(cptr->buffer, "%hd , %hd : USERID : %*[^:]: %10s",
+	    (sscanf(cptr->buffer, "%hd , %hd : USERID : %*[^:]: %512s",
 		    &remp, &locp, ruser) == 3))
 	    {
 		s = rindex(cptr->buffer, ':');
@@ -265,6 +270,22 @@ Reg	aClient	*cptr;
 	    { /* OTHER type of identifier */
  		*cptr->username = '-';	/* -> add '-' prefix into ident */
  		strncpy(&cptr->username[1], ruser, USERLEN);
+		if (strlen(ruser) > USERLEN)
+		    {
+			if (cptr->auth != cptr->username)/*impossible, but...*/
+			    {
+				istat.is_authmem -= sizeof(cptr->auth);
+				istat.is_auth -= 1;
+				MyFree(cptr->auth);
+			    }
+			cptr->auth = MyMalloc(strlen(ruser) + 2);
+			*cptr->auth = '-';
+			strcpy(cptr->auth+1, ruser);
+			istat.is_authmem += sizeof(cptr->auth);
+			istat.is_auth += 1;
+		    }
+		else
+			cptr->auth = cptr->username;
 	    }
  	cptr->username[USERLEN] = '\0';
  	cptr->flags |= FLAGS_GOTID;

@@ -19,17 +19,20 @@
  */
 
 #ifndef lint
-static  char sccsid[] = "%W% %G% (C) 1988 University of Oulu, \
-Computing Center and Jarkko Oikarinen";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.2 1997/04/14 15:04:25 kalt Exp $";
 #endif
 
 #include "struct.h"
 /*
  * Option string.  Must be before #ifdef DEBUGMODE.
+ * spaces are not allowed.
  */
 char	serveropts[] = {
 #ifdef	SENDQ_ALWAYS
 'A',
+#endif
+#ifndef	NO_IDENT
+'a',
 #endif
 #ifdef	CHROOTDIR
 'c',
@@ -41,13 +44,19 @@ char	serveropts[] = {
 'D',
 #endif
 #ifdef	RANDOM_NDELAY
-'D',
+'d',
 #endif
 #ifdef	LOCOP_REHASH
 'e',
 #endif
 #ifdef	OPER_REHASH
 'E',
+#endif
+#ifdef	SLOW_ACCEPT
+'f',
+#endif
+#ifdef	CLONE_CHECK
+'F',
 #endif
 #ifdef	SUN_GSO_BUG
 'g',
@@ -86,6 +95,9 @@ char	serveropts[] = {
 #ifdef	BETTER_NDELAY
 'n',
 #endif
+#ifdef	KRYS
+'o',
+#endif
 #ifdef	CRYPT_OPER_PASSWORD
 'p',
 #endif
@@ -107,6 +119,9 @@ char	serveropts[] = {
 #ifdef	OPER_REMOTE
 't',
 #endif
+#ifndef	NO_PREFIX
+'u',
+#endif
 #ifdef	ENABLE_USERS
 'U',
 #endif
@@ -122,13 +137,13 @@ char	serveropts[] = {
 #ifdef	USE_SYSLOG
 'Y',
 #endif
-#ifdef	V28PlusOnly
-'8',
+#ifdef	ZIP_LINKS
+'Z',
 #endif
 #ifdef MIRC_KLUDGE
 '$',
 #endif
-' ',
+'_',
 'V',
 #ifndef NoV28Links
 '0',
@@ -356,9 +371,22 @@ char	*nick;
 	sendto_one(cptr, ":%s %d %s :H:%d N:%d U:%d R:%d T:%d C:%d P:%d K:%d",
 		   ME, RPL_STATSDEFINE, nick, HOSTLEN, NICKLEN, USERLEN,
 		   REALLEN, TOPICLEN, CHANNELLEN, PASSWDLEN, KEYLEN);
-	sendto_one(cptr, ":%s %d %s :BS:%d MXR:%d MXB:%d MXBL:%d",
+	sendto_one(cptr, ":%s %d %s :BS:%d MXR:%d MXB:%d MXBL:%d PY:%d",
 		   ME, RPL_STATSDEFINE, nick, BUFSIZE, MAXRECIPIENTS, MAXBANS,
-		   MAXBANLENGTH);
+		   MAXBANLENGTH, MAXPENALTY);
+	sendto_one(cptr, ":%s %d %s :ZL:%d CM:%d CP:%d",
+		   ME, RPL_STATSDEFINE, nick,
+#ifdef	ZIP_LINKS
+		   ZIP_LEVEL,
+#else
+		   -1,
+#endif
+#ifdef	CLONE_CHECK
+		   CLONE_MAX, CLONE_PERIOD
+#else
+		   -1, -1
+#endif
+		   );
 }
 
 void	count_memory(cptr, nick, debug)
@@ -530,8 +558,10 @@ int	debug;
 		sendto_one(cptr, ":%s %d %s :Request processed in %u seconds",
 			   me.name, RPL_STATSDEBUG, nick, time(NULL) - start);
 
-	sendto_one(cptr, ":%s %d %s :Client Local %d(%d) Remote %d(%d)",
-		   me.name, RPL_STATSDEBUG, nick, lc, lcm, rc, rcm);
+	sendto_one(cptr,
+		   ":%s %d %s :Client Local %d(%d) Remote %d(%d) Auth %d(%d)",
+		   me.name, RPL_STATSDEBUG, nick, lc, lcm, rc, rcm,
+		   istat.is_auth, istat.is_authmem);
 	if (debug
 	    && (lc != d_lc || lcm != d_lcm || rc != d_rc || rcm != d_rcm))
 		sendto_one(cptr,

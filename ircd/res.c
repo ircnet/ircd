@@ -31,7 +31,7 @@
 #include "res.h"
 
 #ifndef lint
-static  char sccsid[] = "@(#)res.c	1.1 1/21/95 (C) 1992 Darren Reed";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.2 1997/04/14 15:04:18 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -103,7 +103,7 @@ int	op;
 	    }
 	if (op & RES_CALLINIT)
 	    {
-		ret = res_init();
+		ret = ircd_res_init();
 		if (!ircd_res.nscount)
 		    {
 			ircd_res.nscount = 1;
@@ -183,7 +183,7 @@ ResRQ	*old;
 			MyFree(s);
 	if (r2ptr->name)
 		MyFree(r2ptr->name);
-	MyFree(r2ptr);
+	MyFree((char *)r2ptr);
 
 	return;
 }
@@ -1369,7 +1369,7 @@ char	*parv[];
 					   parv[0], cp->he.h_name,
 					   inetntoa(cp->he.h_addr_list[i]));
 		    }
-		return 0;
+		return 2;
 	}
 	sendto_one(sptr,"NOTICE %s :Ca %d Cd %d Ce %d Cl %d Ch %d:%d Cu %d",
 		   sptr->name,
@@ -1383,7 +1383,7 @@ char	*parv[];
 	sendto_one(sptr,"NOTICE %s :Ru %d Rsh %d Rs %d(%d) Rt %d", sptr->name,
 		   reinfo.re_unkrep, reinfo.re_shortttl, reinfo.re_sent,
 		   reinfo.re_resends, reinfo.re_timeouts);
-	return 0;
+	return 2;
 }
 
 u_long	cres_mem(sptr, nick)

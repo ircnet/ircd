@@ -1,4 +1,4 @@
-dnl @(#) configure.in,v 1.2 1995/01/07 01:50:18 mrg Exp
+dnl @(#)$Id configure.in,v 1.2 1995/01/07 01:50:18 mrg Exp$
 dnl
 dnl configure.in for ircd 2.9.
 dnl written by matthew green (mrg@mame.mu.oz.au), with portions
@@ -11,9 +11,23 @@ AC_CONFIG_HEADER(setup.h:include/setup.h.in)
 
 AC_PROG_CC
 AC_PROG_CPP
-AC_ISC_POSIX
 AC_AIX
+AC_ISC_POSIX
 AC_PROG_GCC_TRADITIONAL
+
+dnl SGI's compiler needs -cckr
+AC_MSG_CHECKING(for SGI's cc(1))
+AC_EGREP_CPP(yes, [#ifdef sgi
+yes
+#endif
+],
+if test x$CC = xcc; then
+  CFLAGS="-cckr $CFLAGS"
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi,
+AC_MSG_RESULT(no))
 
 AC_PATH_PROGS(SUM, sum cksum, true)
 
@@ -154,5 +168,14 @@ main()
 }
 ],AC_DEFINE(SYS_ERRLIST_DECLARED) AC_MSG_RESULT(yes), AC_MSG_RESULT(no), :)
 
+dnl Shared linking of zlib can mess things, check it last.
+if test x$ZLIB_HOME != x; then
+	LDFLAGS="${LDFLAGS} -L${ZLIB_HOME}/lib"
+	AC_CHECK_LIB(z, inflate, LIBS="-lz $LIBS"
+			CPPFLAGS="${CPPFLAGS} -I${ZLIB_HOME}/include",
+			echo Failed to use ZLIB_HOME=${ZLIB_HOME})
+else
+       AC_CHECK_LIB(z, inflate)
+fi
 
 AC_OUTPUT(Makefile:support/Makefile.in version.c.SH:ircd/version.c.SH.in sums:ircd/crypt/sums.in)

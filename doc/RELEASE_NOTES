@@ -1,3 +1,4 @@
+# @(#)$Id: RELEASE_NOTES,v 1.2 1997/04/14 15:04:09 kalt Exp $
 
 This is a development version of the package,
 
@@ -16,4 +17,17 @@ and 2.7 servers on the same network.
 
 ---
 
-2.9.3 supports compression of server links, see INSTALL.
+2.9.3 supports compression of server links, see INSTALL.txt
+
+---
+
+2.9.3 reintroduce the port number in the M line, see INSTALL.txt
+
+---
+
+2.9.3b8 changes + to ! in whois replies
+
+---
+
+The format of M and P lines has changed since 2.9.2, your old config
+might need to be updated.

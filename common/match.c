@@ -18,8 +18,7 @@
  */
 
 #ifndef lint
-static  char sccsid[] = "@(#)match.c	1.1 1/22/95 (C) 1988 University of Oulu, \
-Computing Center and Jarkko Oikarinen";
+static  char rcsid[] = "@(#)$Id: match.c,v 1.2 1997/04/14 15:04:05 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -27,8 +26,7 @@ Computing Center and Jarkko Oikarinen";
 #include "sys.h"
 
 
-static	int	calls = 0;
-#define	MAX_CALLS	512
+#define	MAX_ITERATIONS	512
 /*
 **  Compare if a given string (name) matches the given
 **  mask (which can contain wild cards: '*' - match any
@@ -39,22 +37,25 @@ static	int	calls = 0;
 */
 
 /*
-** _match()
+** match()
 ** Iterative matching function, rather than recursive.
 ** Written by Douglas A Lewis (dalewis@acsu.buffalo.edu)
 */
 
-static	int	_match(mask, name)
+int	match(mask, name)
 char	*mask, *name;
 {
 	Reg	u_char	*m = (u_char *)mask, *n = (u_char *)name;
 	char	*ma = mask, *na = name;
-	int	wild = 0, q = 0;
+	int	wild = 0, q = 0, calls = 0;
 
 	while (1)
 	    {
-		if (calls++ > MAX_CALLS)
-			return 1;
+#ifdef	MAX_ITERATIONS
+	        if (calls++ > MAX_ITERATIONS)
+			break;               
+#endif                                     
+
 		if (*m == '*')
 		   {
 			while (*m == '*')
@@ -107,23 +108,8 @@ char	*mask, *name;
 				n++;
 		    }
 	    }
-}
 
-/*
- * External interfaces to the above matching routine.
- */
-int	match(ma, na)
-char	*ma, *na;
-{
-	calls = 0;
-	return _match(ma, na);
-}
-
-int	matches(ma, na)
-char	*ma,*na;
-{
-	calls = 0;
-	return _match(ma, na);
+	return 1;
 }
 
 

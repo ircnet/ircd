@@ -1,3 +1,4 @@
+# @(#)$Id: README,v 1.2 1997/04/14 15:04:08 kalt Exp $
 
 This directory contains the documentation related to this package.
 
@@ -7,7 +8,7 @@ The files relevant to the software compilation and configuration are:
 
 RELEASE_NOTES	- useful information for people upgrading from a previous
 		  version
-INSTALL		- detailed information about compilation and configuration
+INSTALL.txt	- detailed information about compilation and configuration
 example.conf	- server configuration example file (useful complement to
 		  INSTALL)
 
@@ -24,11 +25,12 @@ Nets/		- documentation about various IRC networks
 ircd.8		- man page for the server
 Authors		- irc contributors
 Juped/		- old/obsolete documentation files
-alt-irc-faq	- alt.irc faw
+alt-irc-faq	- alt.irc faq
 m4macros	- note on m4 macros for the server configuration file
 
 
 
 related documents on the World Wide Web:
 
+		http://www.stealth.net/~kalt/irc/faq.html
 		http://www.irc.org/~irc/server/

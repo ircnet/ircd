@@ -15,6 +15,9 @@
 #*   You should have received a copy of the GNU General Public License
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#*
+#*   $Id: Makefile,v 1.2 1997/04/14 15:03:58 kalt Exp $
+#*
 #*/
 
 SHELL=/bin/sh
@@ -26,6 +29,8 @@ all install config configure:
 		echo "Configuration for ${rev} already exists"; \
 		echo "Please \"cd ${rev}\" first"; \
 	else \
+		@echo "The CONFIGARGS environment variable will be used as"; \
+		@echo "argument to GNU configure script."; \
 		echo "Configuring ${rev}"; \
 		mkdir -p ${rev}; \
 		cd ${rev}; \

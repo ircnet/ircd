@@ -17,6 +17,10 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: s_zip.c,v 1.2 1997/04/14 15:04:39 kalt Exp $";
+#endif
+
 #include "struct.h"
 #include "common.h"
 #include "sys.h"

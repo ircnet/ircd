@@ -1,3 +1,30 @@
+/************************************************************************
+ *   IRC - Internet Relay Chat, ircd/s_service.c
+ *   Copyright (C) 1990 Jarkko Oikarinen and
+ *                      University of Oulu, Computing Center
+ *
+ *   See file AUTHORS in IRC package for additional names of
+ *   the programmers. 
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 1, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.2 1997/04/14 15:04:34 kalt Exp $";
+#endif
+
 #include "struct.h"
 #include "common.h"
 #include "sys.h"
@@ -49,7 +76,7 @@ aClient	*cptr;
 		if (serv->servp)
 			free_server(serv->servp, cptr);
 
-		MyFree(serv);
+		MyFree((char *)serv);
 		cptr->service = NULL;
 	    }
 }
@@ -91,6 +118,7 @@ aClient	*cptr;
 char	*fmt, *server;
 void	*p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8;
 {
+	char nbuf[NICKLEN + USERLEN + HOSTLEN + 3] = "";
 	Reg	aClient	*acptr;
 	Reg	int	i;
 
@@ -104,8 +132,18 @@ void	*p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8;
 		** wanted AND if it comes from a server matching the dist
 		*/
 		if ((acptr->service->wants & action)
-		    && (!server || !matches(acptr->service->dist, server)))
-			sendto_one(acptr, fmt, p1, p2, p3, p4, p5, p6, p7, p8);
+		    && (!server || !match(acptr->service->dist, server)))
+			if ((acptr->service->wants & SERVICE_WANT_PREFIX) && 
+			    IsRegisteredUser(cptr))
+			    {
+				sprintf(nbuf, "%s!%s@%s", cptr->name,
+					cptr->user->username,cptr->user->host);
+				sendto_one(acptr, fmt, nbuf, p2, p3, p4, p5,
+					   p6, p7, p8);
+			    }
+			else
+				sendto_one(acptr, fmt, p1, p2, p3, p4, p5,
+					   p6, p7, p8);
 	    }
 	return;
 }
@@ -143,11 +181,11 @@ int	type;
 			for (s = hp->h_name, i = 0; s; s = hp->h_aliases[i++])
 			    {
 				SPRINTF(uhost, "%s@%s", cptr->username, s);
-				if (matches(tmp->host, uhost) == 0)
+				if (match(tmp->host, uhost) == 0)
 					return tmp;
 			    }
 		SPRINTF(uhost, "%s@%s", cptr->username, cptr->sockhost);
-		if (matches(tmp->host, uhost) == 0)
+		if (match(tmp->host, uhost) == 0)
 			return tmp;
 	    }
 	return aconf;
@@ -216,6 +254,7 @@ char	*parv[];
 */
 	    }
 #ifndef	USE_SERVICES
+	else
 	    {
 		sendto_one(cptr, "ERROR :Server doesn't support services");
 		return 1;
@@ -247,7 +286,7 @@ char	*parv[];
 			return exit_client(cptr, sptr, &me, "Name too long");
 		    }
 
-		(void)strcpy(sptr->name, parv[1]);
+		strncpyzt(sptr->name, parv[1], sizeof(sptr->name));
 		if (!(aconf = find_conf_service(sptr, type, NULL)))
 		    {
 			sendto_one(sptr,
@@ -300,8 +339,8 @@ char	*parv[];
 
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_SERVICE, NULL, sptr,
-				"SERVICE %s %s %s %d %d :%s", sptr->name,
-				server, dist, type, metric, info);
+			      "SERVICE %s %s %s %d %d :%s", sptr->name,
+			      server, dist, type, metric, info);
 #endif
 
 	for (i = fdas.highest; i >= 0; i--)
@@ -309,7 +348,7 @@ char	*parv[];
 		if (!(acptr = local[fdas.fd[i]]) || !IsServer(acptr) ||
 		    acptr == cptr)
 			continue;
-		if (matches(dist, acptr->name))
+		if (match(dist, acptr->name))
 			continue;
 		if (acptr->serv->version == SV_OLD)
 			continue;
@@ -339,12 +378,12 @@ char	*parv[];
 		type = BadPtr(parv[2]) ? 0 : atoi(parv[2]);
 	for (sp = svctop; sp; sp = sp->nexts)
 		if  ((acptr = sp->bcptr) && (!type || type == sp->type) &&
-		     (matches(mask, acptr->name) == 0))
+		     (match(mask, acptr->name) == 0))
 			sendto_one(sptr, rpl_str(RPL_SERVLIST, parv[0]),
 				   acptr->name, sp->server, sp->dist,
 				   sp->type, acptr->hopcount, acptr->info);
 	sendto_one(sptr, rpl_str(RPL_SERVLISTEND, parv[0]), mask, type);
-	return 1;
+	return 2;
 }
 
 
@@ -399,5 +438,5 @@ char	*parv[];
 			   parv[0], acptr->name, parv[2]);
 	else
 		sendto_one(sptr, err_str(ERR_NOSUCHSERVICE, parv[0]), parv[1]);
-	return 1;
+	return 2;
 }

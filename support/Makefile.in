@@ -15,6 +15,9 @@
 #*   You should have received a copy of the GNU General Public License
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#*
+#*   $Id: Makefile.in,v 1.2 1997/04/14 15:04:42 kalt Exp $
+#*
 #*/
 
 prefix = @prefix@
@@ -25,7 +28,8 @@ DEFS = @DEFS@
 LIBS = @LIBS@
 
 INCLUDEDIR = -I. -I../include
-CFLAGS = @CFLAGS@ $(DEFS) $(INCLUDEDIR)
+CFLAGS = @CFLAGS@ $(DEFS) $(INCLUDEDIR) @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
 
 IRCDLIBS = $(LIBS)
 
@@ -42,8 +46,11 @@ IRCDMODE = 711
 #
 IRCDDIR = $(prefix)/lib/irc
 
-#L/home/ch1/avalon/lib -lefence
-IRCLIBS=-lcurses -ltermcap
+IRCLIBS=-lcurses -ltermcap $(LIBS)
+
+# The following are from the time when autoconf wasn't used.
+# They are pretty useless but can be a good source of inspiration if you
+# have trouble compiling.
 #
 # use the following on MIPS:
 #CFLAGS= -systype bsd43 -DSYSTYPE_BSD43 $(INCLUDEDIR)

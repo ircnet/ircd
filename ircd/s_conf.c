@@ -48,8 +48,7 @@
  */
 
 #ifndef lint
-static  char sccsid[] = "@(#)s_conf.c	1.1 1/21/95 (C) 1988 University of Oulu, \
-Computing Center and Jarkko Oikarinen";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.2 1997/04/14 15:04:23 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -179,7 +178,8 @@ Reg	Link	*lp;
 		aconf = lp->value.aconf;
 		if (!(aconf->status & CONF_SERVER_MASK))
 			continue;
-		if (aconf->status == CONF_CONNECT_SERVER && !cline)
+		if ((aconf->status == CONF_CONNECT_SERVER ||
+		     aconf->status == CONF_ZCONNECT_SERVER) && !cline)
 			cline = aconf;
 		else if (aconf->status == CONF_NOCONNECT_SERVER && !nline)
 			nline = aconf;
@@ -288,8 +288,8 @@ aClient *cptr;
 				if ((acptr = local[i]) && (cptr != acptr) &&
 				    !bcmp((char *)&cptr->ip,(char *)&acptr->ip,
 					  sizeof(cptr->ip))
-				    && !strncasecmp(acptr->username,
-						    cptr->username, USERLEN))
+				    && !strncasecmp(acptr->auth,
+						    cptr->auth, USERLEN))
 					cnt--;
 			if (cnt <= ConfConFreq(aconf))
 				return -5;      /* for error message */
@@ -597,7 +597,7 @@ int	sig;
 	if (sig == 1)
 	    {
 		sendto_flag(SCH_NOTICE,
-			    "Got signal SIGHUP, reloading ircd conf. file");
+			    "Got signal SIGHUP, reloading ircd.conf file");
 #ifdef	ULTRIX
 		if (fork() > 0)
 			exit(0);
@@ -678,6 +678,9 @@ int	sig;
 			if (!tmp2->clients)
 				free_conf(tmp2);
 		    }
+#ifdef CACHED_MOTD
+	read_motd(MPATH);
+#endif
 	rehashed = 1;
 	return ret;
 }
@@ -824,9 +827,13 @@ int	opt;
 				aconf->status = CONF_ADMIN;
 				break;
 			case 'C': /* Server where I should try to connect */
-			case 'c': /* in case of lp failures             */
+			  	  /* in case of lp failures             */
 				ccount++;
 				aconf->status = CONF_CONNECT_SERVER;
+				break;
+			case 'c':
+				ccount++;
+				aconf->status = CONF_ZCONNECT_SERVER;
 				break;
 			case 'H': /* Hub server line */
 			case 'h':
@@ -886,10 +893,15 @@ int	opt;
 			case 's': /* CONF_OPERATOR                */
 				aconf->status = CONF_SERVICE;
 				break;
+#if 0
 			case 'U': /* Uphost, ie. host where client reading */
 			case 'u': /* this should connect.                  */
 			/* This is for client only, I must ignore this */
 			/* ...U-line should be removed... --msa */
+				break;
+#endif
+			case 'V': /* Server link version requirements */
+				aconf->status = CONF_VER;
 				break;
 			case 'Y':
 			case 'y':
@@ -917,6 +929,8 @@ int	opt;
 				break;
 			aconf->port = atoi(tmp);
 			if (aconf->status == CONF_CONNECT_SERVER)
+				DupString(tmp2, tmp);
+			if (aconf->status == CONF_ZCONNECT_SERVER)
 				DupString(tmp2, tmp);
 			if ((tmp = getfield(NULL)) == NULL)
 				break;
@@ -997,7 +1011,7 @@ int	opt;
 			else if (!(opt & BOOT_QUICK))
 				(void)lookup_confhost(aconf);
 		    }
-		if (aconf->status & CONF_CONNECT_SERVER)
+		if (aconf->status & (CONF_CONNECT_SERVER | CONF_ZCONNECT_SERVER))
 		    {
 			aconf->ping = (aCPing *)MyMalloc(sizeof(aCPing));
 			bzero((char *)aconf->ping, sizeof(*aconf->ping));
@@ -1027,6 +1041,8 @@ int	opt;
 			if (ME[0] == '\0' && aconf->host[0])
 				strncpyzt(ME, aconf->host,
 					  sizeof(ME));
+			if (aconf->port)
+				setup_ping(aconf);
 		    }
 		(void)collapse(aconf->host);
 		(void)collapse(aconf->name);
@@ -1146,7 +1162,44 @@ int	doall;
 			   "You are not welcome to this server" : tmp->passwd);
 
  	return (tmp ? -1 : 0);
- }
+}
+
+/*
+ * For type stat, check if both name and host masks match.
+ * Return -1 for match, 0 for no-match.
+ */
+int	find_two_masks(name, host, stat)
+char	*name, *host;
+int	stat;
+{
+	aConfItem *tmp;
+
+	for (tmp = conf; tmp; tmp = tmp->next)
+ 		if ((tmp->status == stat) && tmp->host && tmp->name &&
+		    (match(tmp->host, host) == 0) &&
+ 		    (match(tmp->name, name) == 0))
+			break;
+ 	return (tmp ? -1 : 0);
+}
+
+/*
+ * For type stat, check if name matches and any char from key matches
+ * to chars in passwd field.
+ * Return -1 for match, 0 for no-match.
+ */
+int	find_conf_flags(name, key, stat)
+char	*name, *key;
+int	stat;
+{
+	aConfItem *tmp;
+
+	for (tmp = conf; tmp; tmp = tmp->next)
+ 		if ((tmp->status == stat) && tmp->passwd && tmp->name &&
+ 		    (match(tmp->name, name) == 0) &&
+		    strpbrk(key, tmp->passwd))
+			break;
+ 	return (tmp ? -1 : 0);
+}
 
 #ifdef R_LINES
 /* find_restrict works against host/name and calls an outside program 

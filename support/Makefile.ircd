@@ -15,6 +15,9 @@
 #*   You should have received a copy of the GNU General Public License
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#*
+#*   $Id: Makefile.ircd,v 1.2 1997/04/14 15:04:43 kalt Exp $
+#*
 #*/
 
 #CC=gcc -traditional
@@ -37,14 +40,12 @@ COMMONOBJS=bsd.o dbuf.o packet.o send.o match.o parse.o support.o inet_addr.o
 
 IOBJS=channel.o class.o hash.o ircd.o list.o res.o s_auth.o s_bsd.o s_conf.o \
 	s_debug.o s_err.o s_misc.o s_numeric.o s_serv.o s_service.o s_user.o \
-	whowas.o note.o $(RES)
+	s_zip.o whowas.o note.o $(RES)
 
 OBJS=$(IOBJS) $(COMMONOBJS)
 
-#SRC=$(OBJS:%.o=%.c)
 ISRC=$(IOBJS:%.o=../ircd/%.c)
 
-#COMMONSRC=$(COMMONOBJS:%.o=%.c)
 COMMONSRC=$(COMMONOBJS:%.o=../common/%.c)
 
 SRC=$(ISRC) $(COMMONSRC)
@@ -73,21 +74,21 @@ saber: $(SRC)
 lint:
 	lint $(LINTFLAGS) -I../include $(SRC) | egrep -v 'sendto_|debug'
 
-parse.o: ../common/parse.c
+parse.o: ../common/parse.c config.h
 	$(CC) $(CFLAGS) -c ../common/parse.c
-bsd.o: ../common/bsd.c
+bsd.o: ../common/bsd.c config.h
 	$(CC) $(CFLAGS) -c ../common/bsd.c
-dbuf.o: ../common/dbuf.c
+dbuf.o: ../common/dbuf.c config.h
 	$(CC) $(CFLAGS) -c ../common/dbuf.c
-packet.o: ../common/packet.c
+packet.o: ../common/packet.c config.h
 	$(CC) $(CFLAGS) -c ../common/packet.c
-send.o: ../common/send.c
+send.o: ../common/send.c config.h
 	$(CC) $(CFLAGS) -c ../common/send.c
-match.o: ../common/match.c
+match.o: ../common/match.c config.h
 	$(CC) $(CFLAGS) -c ../common/match.c
-support.o: ../common/support.c
+support.o: ../common/support.c config.h
 	$(CC) $(CFLAGS) -c ../common/support.c
-inet_addr.o: ../common/inet_addr.c
+inet_addr.o: ../common/inet_addr.c config.h
 	$(CC) $(CFLAGS) -c ../common/inet_addr.c
 
 install: all
@@ -107,66 +108,69 @@ clean:
 	$(RM) -f ${OBJS} ircd version.c chkconf
 
 depend:
-	makedepend -fMakefile.ircd -- ${INCLUDEDIR} -- ${SRC}
+	makedepend -fMakefile.ircd -- ${CFLAGS} -- ${SRC}
 
-channel.o: ../ircd/channel.c
+channel.o: ../ircd/channel.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/channel.c
 
-class.o: ../ircd/class.c
+class.o: ../ircd/class.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/class.c
 
-ircd.o: ../ircd/ircd.c Makefile
+ircd.o: ../ircd/ircd.c Makefile config.h
 	$(CC) $(CFLAGS) -DDPATH=\"$(IRCDDIR)\" -c ../ircd/ircd.c
 
-list.o: ../ircd/list.c
+list.o: ../ircd/list.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/list.c
 
-res.o: ../ircd/res.c
+res.o: ../ircd/res.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/res.c
 
-s_bsd.o: ../ircd/s_bsd.c
+s_bsd.o: ../ircd/s_bsd.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/s_bsd.c
 
-s_auth.o: ../ircd/s_auth.c
+s_auth.o: ../ircd/s_auth.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/s_auth.c
 
-s_conf.o: ../ircd/s_conf.c
+s_conf.o: ../ircd/s_conf.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/s_conf.c
 
-s_debug.o: ../ircd/s_debug.c
+s_debug.o: ../ircd/s_debug.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/s_debug.c
 
-s_err.o: ../ircd/s_err.c
+s_err.o: ../ircd/s_err.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/s_err.c
 
-s_misc.o: ../ircd/s_misc.c
+s_misc.o: ../ircd/s_misc.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/s_misc.c
 
-s_user.o: ../ircd/s_user.c
+s_user.o: ../ircd/s_user.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/s_user.c
 
-s_serv.o: ../ircd/s_serv.c
+s_serv.o: ../ircd/s_serv.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/s_serv.c
 
-s_service.o: ../ircd/s_service.c
+s_service.o: ../ircd/s_service.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/s_service.c
 
-s_numeric.o: ../ircd/s_numeric.c
+s_numeric.o: ../ircd/s_numeric.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/s_numeric.c
 
-whowas.o: ../ircd/whowas.c
+s_zip.o: ../ircd/s_zip.c config.h
+	$(CC) $(CFLAGS) -c ../ircd/s_zip.c
+
+whowas.o: ../ircd/whowas.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/whowas.c
 
-note.o: ../ircd/note.c
+note.o: ../ircd/note.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/note.c
 
-res_init.o: ../ircd/res_init.c
+res_init.o: ../ircd/res_init.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/res_init.c
 
-res_mkquery.o: ../ircd/res_mkquery.c
+res_mkquery.o: ../ircd/res_mkquery.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/res_mkquery.c
 
-res_comp.o: ../ircd/res_comp.c
+res_comp.o: ../ircd/res_comp.c config.h
 	$(CC) $(CFLAGS) -c ../ircd/res_comp.c
 
 hash.o: ../include/struct.h ../include/sys.h ../include/hash.h \

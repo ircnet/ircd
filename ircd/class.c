@@ -17,8 +17,8 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef	lint
-static char sccsid[] = "@(#)class.c	1.1 1/21/95 (C) 1990 Darren Reed";
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: class.c,v 1.2 1997/04/14 15:04:15 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -95,7 +95,8 @@ aClient	*acptr;
 		    {
 			aconf = link->value.aconf;
 			if (aconf->status & (CONF_CLIENT|CONF_CONNECT_SERVER|
-					     CONF_NOCONNECT_SERVER))
+					     CONF_NOCONNECT_SERVER|
+					     CONF_ZCONNECT_SERVER))
 			    {
 				ping2 = get_conf_ping(aconf);
 				if ((ping2 != BAD_PING) && ((ping > ping2) ||

@@ -22,6 +22,10 @@
  *        E-mail: jarlel@ii.uib.no
  */
 
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: note.c,v 1.2 1997/04/14 15:04:17 kalt Exp $";
+#endif
+
 #include "struct.h"
 #ifdef NPATH
 #include "numeric.h"
@@ -867,16 +871,16 @@ int id;
      && (!id || id == msgclient->id)
      && (chn && (msgclient->flags & FLAGS_SERVER_GENERATED
 		 || msgclient->flags & FLAGS_DENY
-		 || !matches(msgclient->toname, UserName(sptr))
-		    && !matches(msgclient->tohost, sptr->user->host))
+		 || !match(msgclient->toname, UserName(sptr))
+		    && !match(msgclient->tohost, sptr->user->host))
 	 || !Usermycmp(UserName(sptr),msgclient->fromname))
      && (chn || !mycmp(sptr->name, msgclient->fromnick)
          || wild_fromnick(sptr->name, msgclient))
      && (!time_l || msgclient->time >= time_l 
                     && msgclient->time < time_l+SECONDS_DAY)
-     && !matches(tonick,msgclient->tonick)
-     && !matches(toname,msgclient->toname)
-     && !matches(tohost,msgclient->tohost)
+     && !match(tonick,msgclient->tonick)
+     && !match(toname,msgclient->toname)
+     && !match(tohost,msgclient->tohost)
      && (*msgclient->passwd == '*' && !msgclient->passwd[1]
          || chn || StrEq(passwd,msgclient->passwd))
      &&  (chn || host_check(sptr->user->host,msgclient->fromhost)))
@@ -1022,9 +1026,9 @@ long32 flags;
 	    msgclient = index_p[t];
 	    if (msgclient->flags & FLAGS_KEY_TO_OPEN_OPER_LOCKS
 		&& msgclient->flags & flags
-		&& !matches(msgclient->tonick,sptr->name)
-		&& !matches(msgclient->toname,UserName(sptr))
-		&& !matches(msgclient->tohost,sptr->user->host)) return 1;
+		&& !match(msgclient->tonick,sptr->name)
+		&& !match(msgclient->toname,UserName(sptr))
+		&& !match(msgclient->tohost,sptr->user->host)) return 1;
             t++;
 	}
      if (index_p == ToNameList) {
@@ -1353,7 +1357,7 @@ aMsgClient *msgclient;
            }
          if (!*c++) return message;
          t1 += t;ebuf[t] = 0;
-         if (!matches(ebuf,nick)) exception = 1;
+         if (!match(ebuf,nick)) exception = 1;
          t=0;ebuf[0] = 0;            
          while (*c != '@') {
                 if (!*c || *c == ' ' || t > BUF_LEN) return message;
@@ -1361,7 +1365,7 @@ aMsgClient *msgclient;
            }
          if (!*c++) return message;
          t1 += t;ebuf[t] = 0;
-         if (matches(ebuf,UserName(sptr))) exception = 0;
+         if (match(ebuf,UserName(sptr))) exception = 0;
          t=0;ebuf[0] = 0;
          if (*c == ' ') return message;
          while (*c && *c != ' ') {
@@ -1370,7 +1374,7 @@ aMsgClient *msgclient;
            } 
          if (*c) c++; t1 += t;ebuf[t] = 0; message += t1+2;
          if (*c) message++;
-         if (exception && !matches(ebuf,sptr->user->host)) return NULLCHAR;
+         if (exception && !match(ebuf,sptr->user->host)) return NULLCHAR;
      }
    }
  return message;
@@ -1462,9 +1466,9 @@ aChannel *sptr_chn;
                                     fmsgclient))
                 && !Usermycmp(UserName(qptr), fmsgclient->fromname)
                 && host_check(qptr->user->host, fmsgclient->fromhost)
-                && !matches(fmsgclient->tonick, nick)
-                && !matches(fmsgclient->toname, UserName(sptr))
-                && !matches(fmsgclient->tohost, sptr->user->host)
+                && !match(fmsgclient->tonick, nick)
+                && !match(fmsgclient->toname, UserName(sptr))
+                && !match(fmsgclient->tohost, sptr->user->host)
                 && flag_send(aptr, sptr, qptr, nick, fmsgclient, 
                              mode, sptr_chn)) {
                 t1 = wildcards(fmsgclient->tonick) ? 1 : 0;
@@ -1596,7 +1600,7 @@ aChannel *sptr_chn;
                                        "NOTICE %s :### %s (%s) %s <%s> %s",
                                        qptr->name, nick, buf, 
                                        "changed name to", newnick, message);
-                            if (!matches(msgclient->tonick,newnick))
+                            if (!match(msgclient->tonick,newnick))
                                 msgclient->flags |= FLAGS_NEWNICK_DISPLAYED;
 	                 }
 
@@ -1616,7 +1620,7 @@ aChannel *sptr_chn;
      *repeat = 1; return NULLCHAR;
   }
  while (mode != 'g' && (msgclient->flags & FLAGS_RETURN_CORRECT_DESTINATION)){
-        if (*message && matches(message, sptr->info) || 
+        if (*message && match(message, sptr->info) || 
             secret && !right_tonick) {
            *repeat = 1; break;
 	 }
@@ -1809,9 +1813,9 @@ char mode;
                && (index_p != ToNameList || 
                   (!nick_list && msgclient->flags & FLAGS_SORT_BY_TONAME) ||
                   (nick_list && !(msgclient->flags & FLAGS_SORT_BY_TONAME)))
-               && !matches(msgclient->tonick, tonick)
-               && !matches(msgclient->toname, UserName(sptr))
-               && !matches(msgclient->tohost, sptr->user->host)
+               && !match(msgclient->tonick, tonick)
+               && !match(msgclient->toname, UserName(sptr))
+               && !match(msgclient->tohost, sptr->user->host)
                && (mode != 's' && mode != 'g'
                    || (wild_fromnick(qptr_nick, msgclient)
                        || !mycmp(qptr_nick, msgclient->fromnick))
@@ -2010,13 +2014,13 @@ char *param;
   /* Don't change or queue anything if this server called distribute */
   if (t <= last && timeofday < msgclient->timeout) {
       /* If new request isn't equal, but matches old, remove old */
-     if (!matches(toname, msgclient->toname) 
-         && !matches(tohost, msgclient->tohost)
+     if (!match(toname, msgclient->toname) 
+         && !match(tohost, msgclient->tohost)
          && (mycmp(toname, msgclient->toname)
 	     || mycmp(tohost, msgclient->tohost))) msgclient->timeout = 0;
       /* If old request matches new... */
-     else if (!matches(msgclient->toname, toname) 
-	      && !matches(msgclient->tohost, tohost)) {
+     else if (!match(msgclient->toname, toname) 
+	      && !match(msgclient->tohost, tohost)) {
               if (root_call &&
 		  (!strcmp(password, msgclient->passwd)
 		   || !mycmp(fromname, msgclient->fromname)
@@ -2063,7 +2067,7 @@ just_distribute:
   for (t = 0; t <= highest_fd; t++) {
       if (!(acptr = local[t])) continue;
       if (IsServer(acptr) && acptr != cptr
-	  && (deny || !matches(toserver, acptr->name)))
+	  && (deny || !match(toserver, acptr->name)))
           sendto_one(acptr, ":%s NOTE %s", sptr->name, param);
   }
 }
@@ -2496,9 +2500,9 @@ aClient *sptr;
 		 || !only_wildcards(msgclient->toname)
 		 || !only_wildcards(msgclient->tohost))
 	     && !(msgclient->flags & FLAGS_KEY_TO_OPEN_OPER_LOCKS)
-	     && !matches(msgclient->tonick,sptr->name) 
-	     && !matches(msgclient->toname,UserName(sptr))
-	     && !matches(msgclient->tohost,sptr->user->host)) {
+	     && !match(msgclient->tonick,sptr->name) 
+	     && !match(msgclient->toname,UserName(sptr))
+	     && !match(msgclient->tohost,sptr->user->host)) {
 	     sprintf(buf,"doesn't allow %s!%s@%s:", msgclient->tonick, 
 		     msgclient->toname, msgclient->tohost);
 	     sendto_one(sptr,"NOTICE %s :### %s (%s@%s) %s %s", sptr->name,
@@ -2545,12 +2549,12 @@ char mode, *name, *toname, *tohost;
          if (msgclient->flags & FLAGS_CHANNEL
 	    && note_headchannel(msgclient->tonick)
             && !(msgclient->flags & FLAGS_SORT_BY_TONAME)
-            && (!matches(name, msgclient->tonick)
+            && (!match(name, msgclient->tonick)
 	       || MyEq(name, msgclient->tonick))
-	    && (!*toname || !matches(msgclient->toname, toname))
-            && (!*tohost || !matches(msgclient->tohost, tohost))
-	    && !matches(msgclient->toname, UserName(sptr))
-            && !matches(msgclient->tohost, sptr->user->host)) {
+	    && (!*toname || !match(msgclient->toname, toname))
+            && (!*tohost || !match(msgclient->tohost, tohost))
+	    && !match(msgclient->toname, UserName(sptr))
+            && !match(msgclient->tohost, sptr->user->host)) {
 	    found++;
 	    if (mode == 'c') return t;
              sendto_one(sptr,"NOTICE %s :*** %-30.29s : %.40s", sptr->name, 
@@ -2580,7 +2584,7 @@ char mode, *name;
 	if (index(chptr->chname,'.')) {
 	  strncpyzt(buf, chptr->chname, BUF_LEN-5);
 	  if (c = index(buf, '-')) *c = 0;
-	  if ((!matches(name, chptr->chname)
+	  if ((!match(name, chptr->chname)
 	       || MyEq(name, chptr->chname)
 	       || only_users)
 	      && check_channel(sptr, 'c', buf, "", ""))
@@ -2708,7 +2712,7 @@ char *passwd, *flag_s, *timeout_s, *name, *message;
                      "NOTICE %s :#?# This matches more than one country.",
                      sptr->name);
         else if (!(flags & FLAGS_WASOPER) && !Key(sptr) &&
-                 matches(local_host(sptr->user->host), tohost))
+                 match(local_host(sptr->user->host), tohost))
                  sendto_one(sptr, "NOTICE %s :#?# %s must be a local host.",
                             sptr->name, local_host(sptr->user->host));
           else break; 
@@ -2787,16 +2791,16 @@ char *passwd, *flag_s, *timeout_s, *name, *message;
             && !(msgclient->flags & FLAGS_SERVER_GENERATED)
             && !(msgclient->flags & FLAGS_SERVER_GENERATED_DESTINATION)  
             && (msgclient->flags & FLAGS_NEWS
-                && !matches(msgclient->tonick, tonick)
-                && !matches(msgclient->toname, UserName(sptr))
-                && !matches(msgclient->tohost, sptr->user->host)
-                && (!matches(toname, msgclient->tonick)
-                    || matches(toname, tonick)
+                && !match(msgclient->tonick, tonick)
+                && !match(msgclient->toname, UserName(sptr))
+                && !match(msgclient->tohost, sptr->user->host)
+                && (!match(toname, msgclient->tonick)
+                    || match(toname, tonick)
                        && !mycmp(msgclient->tonick, tonick))      
                 && (!*Message(msgclient)
-                    || !matches(Message(msgclient), message))
+                    || !match(Message(msgclient), message))
                 || !mycmp(tonick, "admin.users"))
-            && !matches(tohost, msgclient->fromhost)
+            && !match(tohost, msgclient->fromhost)
             && !(msgclient->flags & FLAGS_KEY_TO_OPEN_OPER_LOCKS)) {
             c = wild_fromnick(msgclient->fromnick, msgclient);            
             sprintf(anyname, "%s!%s@%s", 
@@ -3021,9 +3025,9 @@ char *arg, *name, *time_s, *delete;
          if (msgclient->timeout > timeofday
              && (!time_l || msgclient->time >= time_l 
                  && msgclient->time < time_l+SECONDS_DAY)
-             && (!matches(fromnick,msgclient->fromnick))
-             && (!matches(fromname,msgclient->fromname))
-             && (!matches(fromhost,msgclient->fromhost))
+             && (!match(fromnick,msgclient->fromnick))
+             && (!match(fromname,msgclient->fromname))
+             && (!match(fromhost,msgclient->fromhost))
              && (!*delete || !mycmp(delete,"RM")
                  || !mycmp(delete,"RMBF") &&
                     (msgclient->flags & FLAGS_RETURN_CORRECT_DESTINATION ||
@@ -3147,9 +3151,9 @@ aClient *sptr;
  while (fromname_index && t <= fromname_index) {
         msgclient = FromNameList[t];
         if (msgclient->flags & FLAGS_FIND_CORRECT_DEST_SEND_ONCE 
-            && !matches(msgclient->tonick, sptr->name)
-            && !matches(msgclient->toname, UserName(sptr))
-            && !matches(msgclient->tohost, sptr->user->host)
+            && !match(msgclient->tonick, sptr->name)
+            && !match(msgclient->toname, UserName(sptr))
+            && !match(msgclient->tohost, sptr->user->host)
             && flag_send((aClient *)0, sptr, (aClient *)0, sptr->name, 
                          msgclient, '-', NULLCHAR)) {
             msgclient->flags &= ~FLAGS_FIND_CORRECT_DEST_SEND_ONCE;
@@ -3243,7 +3247,7 @@ char *pwd;
   
   name = ToNameList[chn]->tonick;
   if (!(ToNameList[chn]->flags & FLAGS_CHANNEL_PASSWORD) &&
-      matches("#pwd.*", name) && matches("*.pwd.*", name)) return 0;
+      match("#pwd.*", name) && match("*.pwd.*", name)) return 0;
 
   if (strlen(pwd) > BUF_LEN) {
      sendto_one(sptr, "NOTICE %s :#?# Too long argument", sptr->name);
@@ -3259,9 +3263,9 @@ char *pwd;
          msg = flag_send((aClient *)0, sptr, (aClient *)0 , sptr->name, 
                          msgclient, '-', NULLCHAR);
          if (msg && msgclient->flags & FLAGS_CHANNEL
-             && !matches(msgclient->tonick,sptr->name) 
-             && !matches(msgclient->toname,UserName(sptr))
-             && !matches(msgclient->tohost,sptr->user->host)) {
+             && !match(msgclient->tonick,sptr->name) 
+             && !match(msgclient->toname,UserName(sptr))
+             && !match(msgclient->tohost,sptr->user->host)) {
 	     found++;
  	     if (!strcmp(pwd, msgclient->passwd)) return 0;
 	  }
@@ -3280,7 +3284,7 @@ char *pwd;
     strcpy(hostname, c+1);
     *c = 0;
     if (strcmp(username, UserName(sptr))
-	|| matches(local_host(sptr->user->host), hostname)
+	|| match(local_host(sptr->user->host), hostname)
 	|| fake_email(hostname)
 	|| fake_email(UserName(sptr))
 	|| fake_email(sptr->user->host)) {
@@ -3441,7 +3445,7 @@ char *parv[];
                                         ":%s NOTE %s", sptr->name, param);
                               break;
 			   }
-               if (!matches(c, me.name)) {
+               if (!match(c, me.name)) {
                    if (wildcards(c)) remote = -1; else remote = 1;
                    while (*param && *param != ' ') param++; 
                          if (*param) param++;

@@ -53,10 +53,9 @@
  * --Copyright--
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static char rcsid[] = "$Id: res_init.c,v 1.1 1997/04/14 13:25:04 kalt Exp $";
-#endif /* LIBC_SCCS and not lint */
+#ifndef lint
+static  char rcsid[] = "@(#)$Id: res_init.c,v 1.2 1997/04/14 15:04:19 kalt Exp $";
+#endif
 
 #include "config.h"
 
@@ -151,7 +150,7 @@ struct __res_state ircd_res;
  * Return 0 if completes successfully, -1 on error
  */
 int
-res_init()
+ircd_res_init()
 {
 	register FILE *fp;
 	register char *cp, **pp;
@@ -173,16 +172,16 @@ res_init()
 	 * it hard to use this code in a shared library.  It is necessary,
 	 * now that we're doing dynamic initialization here, that we preserve
 	 * the old semantics: if an application modifies one of these three
-	 * fields of ircd_res before res_init() is called, res_init() will not
+	 * fields of ircd_res before ircd_res_init() is called, ircd_res_init() will not
 	 * alter them.  Of course, if an application is setting them to
-	 * _zero_ before calling res_init(), hoping to override what used
+	 * _zero_ before calling ircd_res_init(), hoping to override what used
 	 * to be the static default, we can't detect it and unexpected results
 	 * will follow.  Zero for any of these fields would make no sense,
 	 * so one can safely assume that the applications were already getting
 	 * unexpected results.
 	 *
 	 * ircd_res.options is tricky since some apps were known to diddle the 
-	 * bits before res_init() was first called. We can't replicate that 
+	 * bits before ircd_res_init() was first called. We can't replicate that 
 	 * semantic with dynamic initialization (they may have turned bits off 
 	 * that are set in RES_DEFAULT).  Our solution is to declare such 
 	 * applications "broken".  They could fool us by setting RES_INIT but 
@@ -413,7 +412,7 @@ res_init()
 		*pp = NULL;
 #ifdef DEBUG
 		if (ircd_res.options & RES_DEBUG) {
-			printf(";; res_init()... default dnsrch list:\n");
+			printf(";; ircd_res_init()... default dnsrch list:\n");
 			for (pp = ircd_res.dnsrch; *pp; pp++)
 				printf(";;\t%s\n", *pp);
 			printf(";;\t..END..\n");

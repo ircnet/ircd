@@ -1,5 +1,6 @@
 #!/bin/sh
 # trap "" 1 2 3 13 14 15 21 22
+# $Id: sums.in,v 1.2 1997/04/14 15:04:42 kalt Exp $
 trap "" 1 2 3 13 14 15 
 /bin/cp hash.c hash.c.old 2>/dev/null
 /bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
