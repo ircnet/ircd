@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.70 2004/05/18 22:04:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.71 2004/05/18 22:42:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1094,43 +1094,16 @@ void	sendto_match_butone_old(aClient *one, aClient *from, char *mask,
 ** one - client not to send message to
 ** from- client which message is from *NEVER* NULL!!
 */
-void	sendto_ops_butone(aClient *one, aClient *from, char *pattern, ...)
+void	sendto_ops_butone(aClient *one, char *from, char *pattern, ...)
 {
-	Reg	int	i;
-	Reg	aClient *cptr;
+	va_list	va;
+	char	buf[BUFSIZE];
 
-	for (i = highest_fd; i >= 0; i--)
-	{
-		if (!(cptr = local[i]))
-		{
-			continue;
-		}
-
-		/* WALLOPS are sent to services via check_service() in
-		 * m_wallops */
-		if (IsService(cptr) || IsMe(cptr) || !IsRegistered(cptr))
-		{
-			continue;
-		}
-	
-		/* user doesn't want WALLOPS */
-		if (IsPerson(cptr) && !SendWallops(cptr))
-		{
-			continue;
-		}
-		
-		/* skip the one ... */
-		if (cptr->from == one)
-		{
-			continue;
-		}
-		{
-			va_list	va;
-			va_start(va, pattern);
-			vsendto_prefix_one(cptr->from, from, pattern, va);
-			va_end(va);
-		}
-	}
+	va_start(va, pattern);
+	vsprintf(buf, pattern, va);
+	va_end(va);
+	sendto_serv_butone(one, ":%s WALLOPS :%s", from, buf);
+	sendto_flag(SCH_WALLOP, "!%s! %s", from, buf);
 	
 	return;
 }

@@ -56,7 +56,7 @@ EXTERN int sendto_match_servs_notv (aChannel *chptr, aClient *from, int ver,
 				    char *format, ...);
 EXTERN void sendto_match_butone (aClient *one, aClient *from, char *mask,
 				 int what, char *pattern, ...);
-EXTERN void sendto_ops_butone (aClient *one, aClient *from, char *pattern,
+EXTERN void sendto_ops_butone (aClient *one, char *from, char *pattern,
 			       ...);
 EXTERN void sendto_prefix_one (aClient *to, aClient *from, char *pattern,
 			       ...);
