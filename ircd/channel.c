@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.208 2004/06/06 10:31:18 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.209 2004/06/06 10:54:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1341,9 +1341,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 					/* this won't propagate right */
 					break;
 				lp = &chops[opcnt++];
-				/* this is horribly temporary,
-				** we deal with it later, find
-				** parseNUH to check */
+				/* we deal with it later at parseNUH */
 				lp->value.cp = *parv;
 				lp->flags = MODE_ADD|tmp_mode;
 			}
@@ -1549,6 +1547,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 		Reg	int	i = 0;
 		Reg	char	c = '\0';
 		char	*user, *host, numeric[16];
+		int	tmplen;
 
 /*		if (opcnt > MAXMODEPARAMS)
 			opcnt = MAXMODEPARAMS;
@@ -1614,18 +1613,12 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 					c = 'R'; break;
 				}
 				/* parseNUH: */
-				cp = lp->value.cp;	/* see? we get it back */
+				cp = lp->value.cp;
 				if ((user = index(cp, '!')))
 					*user++ = '\0';
 				if ((host = rindex(user ? user : cp, '@')))
 					*host++ = '\0';
 				lp->value.alist = make_bei(cp, user, host);
-				/* XXX: rewrite to get rid of this function --B. */
-				cp = make_nick_user_host(cp, user, host);
-				if (user)
-					*(--user) = '!';
-				if (host)
-					*(--host) = '@';
 				break;
 			case MODE_KEY :
 				c = 'k';
@@ -1639,8 +1632,20 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				cp = numeric;
 				break;
 			}
+			
+			switch(lp->flags & MODE_WPARAS)
+			{
+			case MODE_BAN :
+			case MODE_EXCEPTION :
+			case MODE_INVITE :
+			case MODE_REOPLIST :
+				tmplen = BanLen(lp->value.alist) + 2 /* !@ */;
+				break;
+			default:
+				tmplen = strlen(cp);
+			}
 
-			if (len + strlen(cp) + 2 > (size_t) MODEBUFLEN)
+			if (len + tmplen + 2 > (size_t) MODEBUFLEN)
 				break;
 			/*
 			 * pass on +/-o/v regardless of whether they are
@@ -1752,11 +1757,20 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 					!del_modeid(tmp_chfl, chptr,
 						lp->value.alist))))
 				{
+					char nuh[NICKLEN+USERLEN+HOSTLEN+3];
+
+					/* I could strcat on u/pbuf directly,
+					** but this looks nicer. Note that alist
+					** values were already cleaned. --B. */
+					tmplen = sprintf(nuh, "%s!%s@%s",
+						lp->value.alist->nick,
+						lp->value.alist->user,
+						lp->value.alist->host);
 					*mbuf++ = c;
-					(void)strcat(pbuf, cp);
-					(void)strcat(upbuf, cp);
-					len += strlen(cp);
-					ulen += strlen(cp);
+					(void)strcat(pbuf, nuh);
+					(void)strcat(upbuf, nuh);
+					len += tmplen;
+					ulen += tmplen;
 					(void)strcat(pbuf, " ");
 					(void)strcat(upbuf, " ");
 					len++;
