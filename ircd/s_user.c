@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.105 2001/12/31 01:21:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.106 2001/12/31 03:48:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -374,6 +374,7 @@ char	*nick, *username;
 	if (MyConnect(sptr))
 	    {
 		char *reason = NULL;
+		char *lbuf = NULL;
 
 #if defined(USE_IAUTH)
 		static time_t last = 0;
@@ -431,6 +432,35 @@ char	*nick, *username;
 			return exit_client(cptr, sptr, &me,
 					   "Fatal Bug - Try Again");
 		    }
+#endif
+#ifdef RESTRICT_USERNAMES
+		/*
+		** Do not allow special chars in the username.
+		*/
+		if (!(sptr->flags & FLAGS_GOTID))
+		{
+			/* no ident, use whatever client gave us */
+			lbuf = username;
+		}
+		else
+		{
+			/* got ident */
+			lbuf = sptr->username;
+
+			if (*sptr->username == '-' ||
+			    index(sptr->username, '@'))
+			{
+				/* OTHER type ident is prefixed, omit it */
+				lbuf++;
+			}
+		}
+		if (!isvalidusername(lbuf))
+		{
+			ircstp->is_ref++;
+			sendto_flag(SCH_LOCAL, "Invalid username:  %s@%s.",
+				lbuf, sptr->sockhost);
+			return exit_client(cptr, sptr, &me, "Invalid username");
+		}
 #endif
 		/*
 		** the following insanity used to be after check_client()
@@ -516,7 +546,6 @@ char	*nick, *username;
 			return ereject_user(cptr, exit_msg[i].shortm,
 					    exit_msg[i].longm);
 		    }
-
 #ifndef	NO_PREFIX
 		if (IsRestricted(sptr))
 		    {
@@ -548,18 +577,6 @@ char	*nick, *username;
 			return exit_client(cptr, sptr, &me, "Bad Password");
 		    }
 		bzero(sptr->passwd, sizeof(sptr->passwd));
-#ifdef RESTRICT_USERNAMES
-		/*
-		** Do not allow special chars in the username.
-		*/
-		if (!isvalidusername(user->username))
-		{
-			ircstp->is_ref++;
-			sendto_flag(SCH_LOCAL, "Invalid username:  %s@%s.",
-				sptr->user->username, sptr->sockhost);
-			return exit_client(cptr, sptr, &me, "Invalid username");
-		}
-#endif
 		/*
 		 * following block for the benefit of time-dependent K:-lines
 		 */
@@ -620,7 +637,12 @@ char	*nick, *username;
 		    }
 		send_umode(NULL, sptr, 0, SEND_UMODES, buf);
 	    }
+	/* below !MyConnect, as it can remove user */
+	if (IsInvisible(sptr))		/* Can be initialized in m_user() */
+		istat.is_user[1]++;	/* Local and server defaults +i */
 	else
+		istat.is_user[0]++;
+	if (MyConnect(sptr))
 	    {
 		istat.is_unknown--;
 		istat.is_myclnt++;
@@ -673,10 +695,6 @@ char	*nick, *username;
 					   user->servp->tok, 
 					   (*buf) ? buf : "+", sptr->info);
 	    }	/* for(my-leaf-servers) */
-	if (IsInvisible(sptr))		/* Can be initialized in m_user() */
-		istat.is_user[1]++;	/* Local and server defaults +i */
-	else
-		istat.is_user[0]++;
 #ifdef	USE_SERVICES
 #if 0
 	check_services_butone(SERVICE_WANT_NICK, user->server, NULL,
