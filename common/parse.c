@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.21 1998/11/02 17:47:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.22 1998/11/09 20:06:00 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -38,7 +38,9 @@ static  char rcsid[] = "@(#)$Id: parse.c,v 1.21 1998/11/02 17:47:55 kalt Exp $";
 
 struct Message msgtab[] = {
   { MSG_PRIVATE, m_private,  MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+#ifndef CLIENT_COMPILE
   { MSG_NJOIN,   m_njoin,    MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+#endif
   { MSG_JOIN,    m_join,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_MODE,    m_mode,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_NICK,    m_nick,     MAXPARA, MSG_LAG, 0, 0, 0L},
@@ -47,7 +49,9 @@ struct Message msgtab[] = {
   { MSG_NOTICE,  m_notice,   MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_KICK,    m_kick,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_SERVER,  m_server,   MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+#ifndef CLIENT_COMPILE
   { MSG_TRACE,   m_trace,    MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+#endif
   { MSG_TOPIC,   m_topic,    MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_INVITE,  m_invite,   MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_WALLOPS, m_wallops,  MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
