@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: class.c,v 1.14 2004/07/01 21:47:23 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: class.c,v 1.15 2004/07/01 21:49:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -232,7 +232,7 @@ void	report_classes(aClient *sptr, char *to)
 
 int	get_sendq(aClient *cptr)
 {
-	Reg	int	sendq = QUEUELEN, retc = BAD_CLIENT_CLASS;
+	Reg	int	sendq = QUEUELEN;
 	Reg	Link	*tmp;
 	Reg	aClass	*cl;
 
@@ -244,8 +244,8 @@ int	get_sendq(aClient *cptr)
 			if (!tmp->value.aconf ||
 			    !(cl = tmp->value.aconf->class))
 				continue;
-			if (Class(cl) > retc)
-				sendq = MaxSendq(cl);
+			sendq = MaxSendq(cl);
+			break;
 		    }
 	return sendq;
 }
