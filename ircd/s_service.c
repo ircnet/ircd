@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.11 1997/06/27 13:38:38 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.12 1997/06/27 13:46:36 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -324,7 +324,7 @@ char	*parv[];
 	aServer	*sp = NULL;
 	char	*dist, *server = NULL, *info, *stok;
 	int	type, metric = 0, i;
-	char	mlname[HOSTLEN+1];
+	char	*mlname;
 
 	if (sptr->user)
 	    {
