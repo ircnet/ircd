@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.2 1998/08/05 02:45:51 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.3 1998/08/07 04:03:31 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -111,40 +111,70 @@ u_int cl;
 			*ch = '\0';
 			DebugLog((ALOG_D931, 0, "rfc931_work(%d): Got [%s]",
 				  cl, cldata[cl].inbuffer));
-			if (cldata[cl].buflen > 512)
-			    cldata[cl].inbuffer[512] = '\0';
-			ch = index(cldata[cl].inbuffer, ':');
-			if (ch == NULL)
+			if (cldata[cl].buflen > 1024)
+			    cldata[cl].inbuffer[1024] = '\0';
+			ch = cldata[cl].inbuffer;
+			while (*ch && !isdigit(*ch)) ch++;
+			if (!*ch || atoi(ch) != cldata[cl].itsport)
 			    {
-				/* broken ident server */
+				DebugLog((ALOG_D931, 0,
+					  "remote port mismatch."));
+				ch = NULL;
 			    }
-			else if (!strncmp(": USERID : UNIX : ", ch, 18))
+			while (ch && *ch && *ch != ',') ch++;
+			while (ch && *ch && !isdigit(*ch)) ch++;
+			if (ch && (!*ch || atoi(ch) != cldata[cl].ourport))
 			    {
-				/* bingo! */
-				if (cldata[cl].authuser)
-					free(cldata[cl].authuser);
-				cldata[cl].authuser = mystrdup(ch+18);
-				cldata[cl].best = cldata[cl].instance;
-				cldata[cl].state |= A_UNIX;
-				sendto_ircd("U %d %s %u %s", cl,
-					    cldata[cl].itsip,
-					    cldata[cl].itsport,
-					    cldata[cl].authuser);
+				DebugLog((ALOG_D931, 0,
+					  "local port mismatch."));
+				ch = NULL;
 			    }
-			else if (!strncmp(": USERID : OTHER : ", ch, 19))
+			if (ch) ch = index(ch, ':');
+			if (ch) ch += 1;
+			while (ch && *ch && *ch == ' ') ch++;
+			if (ch && strncmp(ch, "USERID", 6))
 			    {
-				
-				/* bingo! */
-				if (cldata[cl].authuser)
-					free(cldata[cl].authuser);
-				cldata[cl].authuser = mystrdup(ch+19);
-				cldata[cl].best = cldata[cl].instance;
-				sendto_ircd("u %d %s %u %s", cl,
-					    cldata[cl].itsip,
-					    cldata[cl].itsport,
-					    cldata[cl].authuser);
+				DebugLog((ALOG_D931, 0, "No USERID."));
+				ch = NULL;
 			    }
-			/* else there's some error */
+			if (ch) ch = index(ch, ':');
+			if (ch) ch += 1;
+			while (ch && *ch && *ch == ' ') ch++;
+			if (ch && !strncmp(ch, "OTHER", 5))
+			    {
+				ch = rindex(ch, ':');
+				if (ch) ch += 1;
+				while (ch && *ch && *ch == ' ') ch++;
+				if (ch && *ch)
+				    {
+					if (cldata[cl].authuser)
+						free(cldata[cl].authuser);
+					cldata[cl].authuser = mystrdup(ch);
+					cldata[cl].best = cldata[cl].instance;
+					sendto_ircd("u %d %s %u %s", cl,
+						    cldata[cl].itsip,
+						    cldata[cl].itsport,
+						    cldata[cl].authuser);
+				    }
+			    }
+			else if (ch)
+			    {
+				ch = rindex(ch, ':');
+				if (ch) ch += 1;
+				while (ch && *ch && *ch == ' ') ch++;
+				if (ch && *ch)
+				    {
+					if (cldata[cl].authuser)
+						free(cldata[cl].authuser);
+					cldata[cl].authuser = mystrdup(ch);
+					cldata[cl].best = cldata[cl].instance;
+					cldata[cl].state |= A_UNIX;
+					sendto_ircd("U %d %s %u %s", cl,
+						    cldata[cl].itsip,
+						    cldata[cl].itsport,
+						    cldata[cl].authuser);
+				    }
+			    }
 			/*
 			** In any case, our job is done, let's cleanup.
 			*/
