@@ -1,0 +1,54 @@
+The nospoof patch was adapted from the nospoof5 patch in use on Undernet
+servers.  It should NOT be needed unless you're running ircd on a really
+old OS which doesn't have a patch against TCP spoofing.
+
+When a client connects to the server, they are sent a PING with a random
+number (please do not confuse this with a CTCP PING -- they're very
+different things). Until the client responds with a PONG and the correct
+random number, it is not registered with the server and cannot do
+anything.
+
+Please note that this does break the RFC. However, it has been tested
+with most popular clients and is in common use of large IRC networks
+currently. The only reported client to have problems is Homer (for
+the Macintosh).
+
+To cater for possibly broken clients, a message is also sent to clients
+on connect of the form:
+
+*** If your client freezes here, type /QUOTE PONG 12345678 or /PONG 12345678
+
+Because of this, it is a good idea to increase the allowed timeout on
+connections since the user might have to manually PONG the server with
+the ugly number (although hopefully they only need to cut'n'paste).
+
+If the client PONGs with the wrong number, another message is sent to
+the client directing the user what to type. In addition, if the
+connection does end up timing out due to no PONG, a message is sent to
+the user explaining the client may not be compatible, and lists where
+compatible clients for all the major platforms can be found.
+
+The random number sequence is based on an md5 series. I didn't write it.
+Someone else did. It's included because many have a dud random() in their
+libc (this applies to more people than you think). It is seeded on a
+#define value in config.h - YOU MUST CHANGE THIS FROM THE DEFAULT OR YOU
+CAN STILL BE SPOOFED. If you still find that you get spoofed, try
+changing this value again and recompiling.
+
+KNOWN BUGS:
+
+      - There is a known bug whereby the host provided by the client's
+        USER sequence is not checked for validity until after the PONG
+        reply (and registration takes place). This allows a form of
+        "spoofing" to take place, with the client showing under /whois
+        lookups with a fake hostname. At this stage the client can't
+        actually issue commands to the server though, and the hostmask
+        is corrected to what it should be upon the PONG being received
+        (and the client properly registered).
+
+      - The random number generator isn't 64-bit clean. On 64-bit
+        machines, a 64-bit random number is generated, but I'm not
+        convinced all 64-bits are random. At least 32 bits are
+        however, so this isn't a problem.
+
+ - Andrew (earthpig@yoyo.cc.monash.edu.au)

@@ -1,0 +1,456 @@
+diff -urN irc2.10/common/numeric_def.h irc2.10-nospoof/common/numeric_def.h
+--- irc2.10/common/numeric_def.h	Fri Aug  7 12:04:02 1998
++++ irc2.10-nospoof/common/numeric_def.h	Wed Sep 16 21:04:49 1998
+@@ -196,6 +196,10 @@
+ #define ERR_UMODEUNKNOWNFLAG 501
+ #define ERR_USERSDONTMATCH   502
+ 
++#if defined(NOSPOOF)
++#define ERR_BADPING          513
++#endif
++
+ /*
+  * Numberic replies from server commands.
+  * These are currently in the range 200-399.
+diff -urN irc2.10/common/parse.c irc2.10-nospoof/common/parse.c
+--- irc2.10/common/parse.c	Wed Aug  5 11:40:37 1998
++++ irc2.10-nospoof/common/parse.c	Wed Sep 16 21:05:53 1998
+@@ -49,7 +49,11 @@
+   { MSG_KICK,    m_kick,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+   { MSG_WALLOPS, m_wallops,  MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+   { MSG_PING,    m_ping,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
++#if defined(NOSPOOF)
++  { MSG_PONG,    m_pong,     MAXPARA, MSG_LAG, 0, 0, 0L},
++#else
+   { MSG_PONG,    m_pong,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
++#endif
+   { MSG_ERROR,   m_error,    MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+ #ifdef	OPER_KILL
+   { MSG_KILL,    m_kill,     MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
+diff -urN irc2.10/common/send.c irc2.10-nospoof/common/send.c
+--- irc2.10/common/send.c	Wed Sep  9 22:25:26 1998
++++ irc2.10-nospoof/common/send.c	Wed Sep 16 21:06:16 1998
+@@ -468,6 +468,9 @@
+ 			 NULL,
+ # endif
+ 			 0, {0, 0, NULL }, {0, 0, NULL },
++#if defined(NOSPOOF)
++			 -1,
++#endif
+ 			 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, NULL,
+ 			 0, 0, 0
+ # if defined(__STDC__)	/* hack around union{} initialization	-Vesa */
+diff -urN irc2.10/common/struct_def.h irc2.10-nospoof/common/struct_def.h
+--- irc2.10/common/struct_def.h	Mon Aug 24 12:26:40 1998
++++ irc2.10-nospoof/common/struct_def.h	Wed Sep 16 21:06:33 1998
+@@ -431,6 +431,9 @@
+ 	short	lastsq;		/* # of 2k blocks when sendqueued called last*/
+ 	dbuf	sendQ;		/* Outgoing message queue--if socket full */
+ 	dbuf	recvQ;		/* Hold for data incoming yet to be parsed */
++#if defined(NOSPOOF)
++	u_long	cookie;		/* Random cookie local clients must PONG */
++#endif
+ 	long	sendM;		/* Statistics: protocol messages send */
+ 	long	sendK;		/* Statistics: total k-bytes send */
+ 	long	receiveM;	/* Statistics: protocol messages received */
+diff -urN irc2.10/ircd/ircd.c irc2.10-nospoof/ircd/ircd.c
+--- irc2.10/ircd/ircd.c	Mon Sep 14 02:44:46 1998
++++ irc2.10-nospoof/ircd/ircd.c	Wed Sep 16 21:08:04 1998
+@@ -480,6 +480,22 @@
+ 			else
+ 			    {
+ 				cptr->exitc = EXITC_PING;
++#if defined(NOSPOOF)
++				if((!IsRegistered(cptr)) && (cptr->name) &&
++				   (cptr->username))
++				    {
++					sendto_one(cptr,
++	":%s %d %s :Your client may not be compatible with this server.",
++					me.name, ERR_BADPING, cptr->name);
++					/* Someone suggest a better
++					 * place? :) - Earthpig
++					 */
++					sendto_one(cptr,
++	":%s %d %s :Compatible clients are available at "
++	"ftp://yoyo.cc.monash.edu.au/pub/irc/clients/",
++					me.name, ERR_BADPING, cptr->name);
++				    }
++#endif
+ 				(void)exit_client(cptr, cptr, &me,
+ 						  "Ping timeout");
+ 			    }
+diff -urN irc2.10/ircd/list.c irc2.10-nospoof/ircd/list.c
+--- irc2.10/ircd/list.c	Mon Aug 24 12:26:33 1998
++++ irc2.10-nospoof/ircd/list.c	Wed Sep 16 21:08:54 1998
+@@ -146,6 +146,9 @@
+ 	if (size == CLIENT_LOCAL_SIZE)
+ 	    {
+ 		cptr->since = cptr->lasttime = cptr->firsttime = timeofday;
++#if defined(NOSPOOF)
++		cptr->cookie = 0;
++#endif
+ 		cptr->confs = NULL;
+ 		cptr->sockhost[0] = '\0';
+ 		cptr->buffer[0] = '\0';
+diff -urN irc2.10/ircd/random.c irc2.10-nospoof/ircd/random.c
+--- irc2.10/ircd/random.c	Thu Jan  1 10:00:00 1970
++++ irc2.10-nospoof/ircd/random.c	Wed Sep 16 21:04:02 1998
+@@ -0,0 +1,162 @@
++/************************************************************************
++ *   IRC - Internet Relay Chat, ircd/random.c
++ *
++ *   This program is free software; you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 1, or (at your option)
++ *   any later version.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ *
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program; if not, write to the Free Software
++ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
++ */
++
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/time.h>
++#include "os.h"
++#include "s_defines.h"
++
++#ifdef NOSPOOF
++
++char localkey[8] = RANDOM_SEED;
++
++/*
++ * MD5 transform algorithm, taken from code written by Colin Plumb,
++ * and put into the public domain
++ *
++ * Kev: Taken from Ted T'so's /dev/random random.c code and modified to
++ * be slightly simpler.  That code is released under a BSD-style copyright
++ * OR under the terms of the GNU Public License, which should be included
++ * at the top of this source file.
++ *
++ * record: Cleaned up to work with ircd.  RANDOM_TOKEN is defined in
++ * setup.h by the make script; if people start to "guess" your cookies,
++ * consider recompiling your server with a different random token.
++ */
++
++/* The four core functions - F1 is optimized somewhat */
++
++#define F1(x, y, z) (z ^ (x & (y ^ z)))
++#define F2(x, y, z) F1(z, x, y)
++#define F3(x, y, z) (x ^ y ^ z)
++#define F4(x, y, z) (y ^ (x | ~z))
++
++/* This is the central step in the MD5 algorithm. */
++#define MD5STEP(f, w, x, y, z, data, s) \
++      ( w += f(x, y, z) + data,  w = w<<s | w>>(32-s),  w += x )
++
++/*
++ * The core of the MD5 algorithm, this alters an existing MD5 hash to
++ * reflect the addition of 16 longwords of new data.  MD5Update blocks
++ * the data and converts bytes into longwords for this routine.
++ *
++ * original comment left in; this used to be called MD5Transform and took
++ * two arguments; I've internalized those arguments, creating the character
++ * array "localkey," which should contain 8 bytes of data.  The function also
++ * originally returned nothing; now it returns an unsigned long that is the
++ * random number.  It appears to be reallyrandom, so... -Kev
++ *
++ * I don't really know what this does.  I tried to figure it out and got
++ * a headache.  If you know what's good for you, you'll leave this stuff
++ * for the smart people and do something else.                -record
++ */
++unsigned long ircrandom(void)
++{
++  unsigned long a, b, c, d;
++  unsigned char in[16];
++  struct timeval tv;
++
++  (void)gettimeofday(&tv, NULL);
++
++  (void)memcpy((void *)in, (void *)localkey, 8);
++  (void)memcpy((void *)(in+8), (void *)&tv.tv_sec, 4);
++  (void)memcpy((void *)(in+12), (void *)&tv.tv_usec, 4);
++
++  a = 0x67452301;
++  b = 0xefcdab89;
++  c = 0x98badcfe;
++  d = 0x10325476;
++
++  MD5STEP(F1, a, b, c, d, (long)in[ 0]+0xd76aa478,  7);
++  MD5STEP(F1, d, a, b, c, (long)in[ 1]+0xe8c7b756, 12);
++  MD5STEP(F1, c, d, a, b, (long)in[ 2]+0x242070db, 17);
++  MD5STEP(F1, b, c, d, a, (long)in[ 3]+0xc1bdceee, 22);
++  MD5STEP(F1, a, b, c, d, (long)in[ 4]+0xf57c0faf,  7);
++  MD5STEP(F1, d, a, b, c, (long)in[ 5]+0x4787c62a, 12);
++  MD5STEP(F1, c, d, a, b, (long)in[ 6]+0xa8304613, 17);
++  MD5STEP(F1, b, c, d, a, (long)in[ 7]+0xfd469501, 22);
++  MD5STEP(F1, a, b, c, d, (long)in[ 8]+0x698098d8,  7);
++  MD5STEP(F1, d, a, b, c, (long)in[ 9]+0x8b44f7af, 12);
++  MD5STEP(F1, c, d, a, b, (long)in[10]+0xffff5bb1, 17);
++  MD5STEP(F1, b, c, d, a, (long)in[11]+0x895cd7be, 22);
++  MD5STEP(F1, a, b, c, d, (long)in[12]+0x6b901122,  7);
++  MD5STEP(F1, d, a, b, c, (long)in[13]+0xfd987193, 12);
++  MD5STEP(F1, c, d, a, b, (long)in[14]+0xa679438e, 17);
++  MD5STEP(F1, b, c, d, a, (long)in[15]+0x49b40821, 22);
++
++  MD5STEP(F2, a, b, c, d, (long)in[ 1]+0xf61e2562,  5);
++  MD5STEP(F2, d, a, b, c, (long)in[ 6]+0xc040b340,  9);
++  MD5STEP(F2, c, d, a, b, (long)in[11]+0x265e5a51, 14);
++  MD5STEP(F2, b, c, d, a, (long)in[ 0]+0xe9b6c7aa, 20);
++  MD5STEP(F2, a, b, c, d, (long)in[ 5]+0xd62f105d,  5);
++  MD5STEP(F2, d, a, b, c, (long)in[10]+0x02441453,  9);
++  MD5STEP(F2, c, d, a, b, (long)in[15]+0xd8a1e681, 14);
++  MD5STEP(F2, b, c, d, a, (long)in[ 4]+0xe7d3fbc8, 20);
++  MD5STEP(F2, a, b, c, d, (long)in[ 9]+0x21e1cde6,  5);
++  MD5STEP(F2, d, a, b, c, (long)in[14]+0xc33707d6,  9);
++  MD5STEP(F2, c, d, a, b, (long)in[ 3]+0xf4d50d87, 14);
++  MD5STEP(F2, b, c, d, a, (long)in[ 8]+0x455a14ed, 20);
++  MD5STEP(F2, a, b, c, d, (long)in[13]+0xa9e3e905,  5);
++  MD5STEP(F2, d, a, b, c, (long)in[ 2]+0xfcefa3f8,  9);
++  MD5STEP(F2, c, d, a, b, (long)in[ 7]+0x676f02d9, 14);
++  MD5STEP(F2, b, c, d, a, (long)in[12]+0x8d2a4c8a, 20);
++
++  MD5STEP(F3, a, b, c, d, (long)in[ 5]+0xfffa3942,  4);
++  MD5STEP(F3, d, a, b, c, (long)in[ 8]+0x8771f681, 11);
++  MD5STEP(F3, c, d, a, b, (long)in[11]+0x6d9d6122, 16);
++  MD5STEP(F3, b, c, d, a, (long)in[14]+0xfde5380c, 23);
++  MD5STEP(F3, a, b, c, d, (long)in[ 1]+0xa4beea44,  4);
++  MD5STEP(F3, d, a, b, c, (long)in[ 4]+0x4bdecfa9, 11);
++  MD5STEP(F3, c, d, a, b, (long)in[ 7]+0xf6bb4b60, 16);
++  MD5STEP(F3, b, c, d, a, (long)in[10]+0xbebfbc70, 23);
++  MD5STEP(F3, a, b, c, d, (long)in[13]+0x289b7ec6,  4);
++  MD5STEP(F3, d, a, b, c, (long)in[ 0]+0xeaa127fa, 11);
++  MD5STEP(F3, c, d, a, b, (long)in[ 3]+0xd4ef3085, 16);
++  MD5STEP(F3, b, c, d, a, (long)in[ 6]+0x04881d05, 23);
++  MD5STEP(F3, a, b, c, d, (long)in[ 9]+0xd9d4d039,  4);
++  MD5STEP(F3, d, a, b, c, (long)in[12]+0xe6db99e5, 11);
++  MD5STEP(F3, c, d, a, b, (long)in[15]+0x1fa27cf8, 16);
++  MD5STEP(F3, b, c, d, a, (long)in[ 2]+0xc4ac5665, 23);
++
++  MD5STEP(F4, a, b, c, d, (long)in[ 0]+0xf4292244,  6);
++  MD5STEP(F4, d, a, b, c, (long)in[ 7]+0x432aff97, 10);
++  MD5STEP(F4, c, d, a, b, (long)in[14]+0xab9423a7, 15);
++  MD5STEP(F4, b, c, d, a, (long)in[ 5]+0xfc93a039, 21);
++  MD5STEP(F4, a, b, c, d, (long)in[12]+0x655b59c3,  6);
++  MD5STEP(F4, d, a, b, c, (long)in[ 3]+0x8f0ccc92, 10);
++  MD5STEP(F4, c, d, a, b, (long)in[10]+0xffeff47d, 15);
++  MD5STEP(F4, b, c, d, a, (long)in[ 1]+0x85845dd1, 21);
++  MD5STEP(F4, a, b, c, d, (long)in[ 8]+0x6fa87e4f,  6);
++  MD5STEP(F4, d, a, b, c, (long)in[15]+0xfe2ce6e0, 10);
++  MD5STEP(F4, c, d, a, b, (long)in[ 6]+0xa3014314, 15);
++  MD5STEP(F4, b, c, d, a, (long)in[13]+0x4e0811a1, 21);
++  MD5STEP(F4, a, b, c, d, (long)in[ 4]+0xf7537e82,  6);
++  MD5STEP(F4, d, a, b, c, (long)in[11]+0xbd3af235, 10);
++  MD5STEP(F4, c, d, a, b, (long)in[ 2]+0x2ad7d2bb, 15);
++  MD5STEP(F4, b, c, d, a, (long)in[ 9]+0xeb86d391, 21);
++
++  /*
++   * we have 4 unsigned longs generated by the above sequence; this scrambles
++   * them together so that if there is any pattern, it will be obscured.
++   */
++  return (a ^ b ^ c ^ d);
++}
++
++#endif
+diff -urN irc2.10/ircd/s_err.c irc2.10-nospoof/ircd/s_err.c
+--- irc2.10/ircd/s_err.c	Sun Aug 23 05:22:28 1998
++++ irc2.10-nospoof/ircd/s_err.c	Wed Sep 16 21:10:03 1998
+@@ -161,6 +161,19 @@
+                 { 0, (char *)NULL },
+ /* 501 */	{ ERR_UMODEUNKNOWNFLAG, ":Unknown MODE flag" },
+ /* 502 */	{ ERR_USERSDONTMATCH, ":Cant change mode for other users" },
++#if defined(NOSPOOF)
++                { 0, (char *)NULL },
++                { 0, (char *)NULL },
++                { 0, (char *)NULL },
++                { 0, (char *)NULL },
++                { 0, (char *)NULL },
++                { 0, (char *)NULL },
++                { 0, (char *)NULL },
++                { 0, (char *)NULL },
++                { 0, (char *)NULL },
++                { 0, (char *)NULL },
++/* 513 */	{ ERR_BADPING, (char *)NULL },
++#endif
+ 		{ 0, (char *)NULL }
+ };
+ 
+diff -urN irc2.10/ircd/s_user.c irc2.10-nospoof/ircd/s_user.c
+--- irc2.10/ircd/s_user.c	Sat Sep 12 03:48:59 1998
++++ irc2.10-nospoof/ircd/s_user.c	Wed Sep 16 21:11:21 1998
+@@ -302,9 +302,9 @@
+ 
+ /*
+ ** register_user
+-**	This function is called when both NICK and USER messages
+-**	have been accepted for the client, in whatever order. Only
+-**	after this the USER message is propagated.
++**	This function is called when both NICK and USER [and maybe PONG]
++**	messages have been accepted for the client, in whatever order.
++**	Only after this the USER message is propagated.
+ **
+ **	NICK's must be propagated at once when received, although
+ **	it would be better to delay them too until full info is
+@@ -964,9 +964,30 @@
+ 
+ 		/* This had to be copied here to avoid problems.. */
+ 		(void)strcpy(sptr->name, nick);
++#if defined(NOSPOOF)
++		/* If the client hasn't gotten a cookie-ping yet,
++		   choose a cookie and send it. -record!jegelhof@cloud9.net */
++
++		if (!sptr->cookie)
++		    {
++			while((!sptr->cookie) || (sptr->cookie==-1))
++				sptr->cookie=(ircrandom());
++			sendto_one(cptr, "PING :%lu", sptr->cookie);
++			sendto_one(sptr,
++	":%s %d %s :If your client freezes here, type /QUOTE PONG %lu "
++	"or /PONG %lu ",
++			me.name, ERR_BADPING, sptr->name,
++			sptr->cookie, sptr->cookie);
++		    }
++
++		if ((sptr->user) && (sptr->cookie==-1))
++		{
++#else
+ 		if (sptr->user)
++#endif
+ 			/*
+-			** USER already received, now we have NICK.
++			** USER [and possibly PONG] already received,
++			** now we have NICK.
+ 			** *NOTE* For servers "NICK" *must* precede the
+ 			** user message (giving USER before NICK is possible
+ 			** only for local client connection!). register_user
+@@ -977,6 +998,9 @@
+ 					  sptr->user->username)
+ 			    == FLUSH_BUFFER)
+ 				return FLUSH_BUFFER;
++#if defined(NOSPOOF)
++		}
++#endif
+ 	    }
+ 	/*
+ 	**  Finally set new nick name.
+@@ -2115,7 +2139,32 @@
+ 	aClient *acptr;
+ 	char	*origin, *destination;
+ 
+-	if (parc < 2 || *parv[1] == '\0')
++#if defined(NOSPOOF)
++	/* Check to see if this is a PONG :cookie reply from an
++	   unregistered user.  If so, process it. -record       */
++
++	if((!IsRegistered(sptr)) && (sptr->cookie!=0) &&
++	   (sptr->cookie!=-1) && (parc>1))
++	    {
++		if(strtoul(parv[parc-1],NULL,10)==sptr->cookie)
++		    {
++			sptr->cookie=-1;
++			if((sptr->user) && (sptr->name[0]))
++				/* NICK and USER OK */
++				return register_user(cptr, sptr, sptr->name,
++						     sptr->user->username);
++		    }
++		else
++			sendto_one(sptr,
++	":%s %d %s :To connect, type /QUOTE PONG %lu or /PONG %lu",
++				   me.name, ERR_BADPING, sptr->name,
++				   sptr->cookie, sptr->cookie);
++
++		return 1;
++	    }
++#endif
++
++ 	if (parc < 2 || *parv[1] == '\0')
+ 	    {
+ 		sendto_one(sptr, err_str(ERR_NOORIGIN, parv[0]));
+ 		return 1;
+diff -urN irc2.10/support/Makefile.in irc2.10-nospoof/support/Makefile.in
+--- irc2.10/support/Makefile.in	Thu Sep 10 23:14:40 1998
++++ irc2.10-nospoof/support/Makefile.in	Wed Sep 16 21:04:02 1998
+@@ -95,7 +95,7 @@
+ SERVER_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
+               s_bsd.o s_conf.o s_debug.o s_err.o s_id.o s_misc.o s_numeric.o \
+               s_serv.o s_service.o s_user.o s_zip.o whowas.o \
+-              res_init.o res_comp.o res_mkquery.o
++              res_init.o res_comp.o res_mkquery.o random.o
+ SERVER = ircd
+ 
+ IAUTH_COMMON_OBJS = clsupport.o clmatch.o # This is a little evil
+@@ -365,6 +365,9 @@
+ 
+ res_mkquery.o: ../ircd/res_mkquery.c setup.h config.h
+ 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/res_mkquery.c
++
++random.o: ../ircd/random.c setup.h config.h
++	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/random.c
+ 
+ iauth.o: ../iauth/iauth.c config.h setup.h
+ 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/iauth.c
+diff -urN irc2.10/support/config.h.dist irc2.10-nospoof/support/config.h.dist
+--- irc2.10/support/config.h.dist	Thu Sep 10 23:14:40 1998
++++ irc2.10-nospoof/support/config.h.dist	Wed Sep 16 21:13:57 1998
+@@ -446,6 +446,30 @@
+  */
+ #define MIRC_KLUDGE
+ 
++/* Define this to turn on code that enables a PING/PONG cookies sequence
++ * whenever a client connects. The purpose of this is to prevent IP
++ * spoofing (normally based on predicting TCP/IP sequence numbers).
++ * This breaks the RFC slightly, but so far only one (old) client has
++ * been encountered that breaks. There's a small overhead if you define
++ * it, but it's essential for older BSD-based (or any other) TCP/IP
++ * stacks with predictable sequence numbers.
++ */
++
++#undef	NOSPOOF
++
++/* Random number generator seed -- used for cookies if NOSPOOF is
++ * defined.
++ *
++ * Set this to an 8 character random text string.
++ * Do _NOT_ use the default text.
++ * If people are able to defeat the IP-spoofing protection on your
++ * server, please consider changing this value and recompiling.
++ */
++
++#if defined(NOSPOOF)
++#define	RANDOM_SEED "ChangeMe"
++#endif
++
+ /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
+ /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
+ /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
+@@ -515,7 +539,11 @@
+  * CONNECTTIMEOUT - 10 seconds for its host to respond to an ident lookup
+  * query and for a DNS answer to be retrieved.
+  */
++#if defined(NOSPOOF)
++#define	CONNECTTIMEOUT	90	/* Recommended value: 30 */
++#else
+ #define	CONNECTTIMEOUT	30	/* Recommended value: 30 */
++#endif
+ 
+ /*
+  * Max time from the nickname change that still causes KILL
+diff -urN irc2.10/ircd/s_debug.c irc2.10-nospoof/ircd/s_debug.c
+--- irc2.10/ircd/s_debug.c	Sat Jun 13 09:28:36 1998
++++ irc2.10-nospoof/ircd/s_debug.c	Sun Sep 20 20:50:31 1998
+@@ -106,6 +106,9 @@
+ #ifdef	BETTER_NDELAY
+ 'n',
+ #endif
++#if defined(NOSPOOF)
++'O',
++#endif
+ #ifdef	CRYPT_OPER_PASSWORD
+ 'p',
+ #endif

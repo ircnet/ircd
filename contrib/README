@@ -1,4 +1,4 @@
-$Id: README,v 1.3 1998/08/08 20:40:25 kalt Exp $
+$Id: README,v 1.4 1998/09/20 19:19:13 kalt Exp $
 
 This directory contains ircd related contributions.  Most of them fall
  in one of the following categories:
@@ -17,3 +17,4 @@ If you want to submit a package for this directory, see the RULES file.
 mkpasswd	utility to crypt a password.
 ircdwatch	utility to keep ircd running (eventually restarting it).
 tkserv		stupid toy to manage "temporary" klines.
+antispoof.diff	diff file to add extra code to ircd to prevent TCP spoofing
