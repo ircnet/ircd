@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.46 2004/02/13 05:13:45 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.47 2004/02/22 20:23:13 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0.
 </abstract>
@@ -57,26 +57,18 @@ Defining this will keep you from using server link compression.
 <p>
 The daemon of 2.11.0 release compiles properly on W32
 systems which have the GNU-Win32 environment (<url
-url="http://www.cygnus.com/misc/gnu-win32/">) setup.  At the
+url="http://www.cygwin.com/">) setup.  At the
 time of the release, tests were made using the version b20.1
 of the Cygwin32 library.
 <p>
 When compiling on such system, you want to make sure that
 you have carefully followed the Cygwin32 installation
-notes.  In particular, you will need to make sure that the
-following files exist: <bf>/bin/cp.exe</bf>,
-<bf>/bin/mv.exe</bf>, <bf>/bin/rm.exe</bf> and
-<bf>/bin/sh.exe</bf>.
+notes. 
 <p>
 Also, the IRC server needs a <bf>resolv.conf</bf> file in
 order to initialize the resolver.  This file can be anywhere
 (see configure options), and is typically in <bf>/etc</bf>
 on UNIX systems.
-<p>
-Finally, iauth is automatically disabled.  Even though the
-iauth program compiles properly, extra work is required to
-have a working communication channel between the IRC server
-and the iauth program.
 
 <sect1>Notes concerning IPv6 support
 <p>
@@ -167,13 +159,12 @@ used.  Values above 5 will noticeably increase the CPU used
 by the server.
 <p>
 The zlib package may be found at <url
-url="http://www.cdrom.com/pub/infozip/zlib/">. The data format used
+url="http://www.gzip.org/zlib/">. The data format used
 by the zlib library is described by RFCs (Request for
 Comments) 1950 to 1952 in the files <url
 url="ftp://ds.internic.net/rfc/rfc1950.txt"> (zlib format),
 rfc1951.txt (deflate format) and rfc1952.txt (gzip
-format). These documents are also available in other formats
-from <url url="ftp://ftp.uu.net/graphics/png/documents/zlib/zdoc-index.html">
+format).
 
 <sect1>SLOW_ACCEPT
 <p>
@@ -199,7 +190,7 @@ same host within 2 seconds.
 <p>
 The rest of the user changable &num;define's should be
 pretty much self explanatory in the config.h file.  It is
-*NOT* recommended that any of the file undef the line with
+*NOT* recommended that any of the file under the line with
 "STOP STOP" in it be changed.
 
 <sect>Editing the Makefile, and compiling

@@ -1,4 +1,4 @@
-# @(#)$Id: BUGS,v 1.17 2004/02/17 20:06:46 chopin Exp $
+# @(#)$Id: BUGS,v 1.18 2004/02/22 20:23:12 chopin Exp $
 
 The list is probably not as scary as it once was.
 Anyone with some free time is welcome to fix those =)
@@ -8,7 +8,4 @@ Anyone with some free time is welcome to fix those =)
   times but it keeps crashing :^) [We haven't seen this for ages.]
 
 * localhost (127.0.0.1) resolving is wrong with INET6 enabled
-
-* occasionally we see NJOIN protocol errors (server sends the same NJOIN
-  cmd twice somehow)
 
