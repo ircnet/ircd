@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.30 1998/12/28 15:44:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.31 1999/02/04 23:26:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -87,6 +87,27 @@ char	*notice;
 
 #ifndef CLIENT_COMPILE
 /*
+** flush_fdary
+**      Used to empty all output buffers for connections in fdary.
+*/
+void    flush_fdary(fdp)
+FdAry   *fdp;
+{
+        int     i;
+        aClient *cptr;
+
+        for (i = 0; i <= fdp->highest; i++)
+            {
+                if (!(cptr = local[fdp->fd[i]]))
+                        continue;
+                if (!IsRegistered(cptr)) /* is this needed?? -kalt */
+                        continue;
+                if (DBufLength(&cptr->sendQ) > 0)
+                        (void)send_queued(cptr);
+            }
+}
+
+/*
 ** flush_connections
 **	Used to empty all output buffers for all connections. Should only
 **	be called once per scan of connections. There should be a select in
@@ -98,7 +119,6 @@ char	*notice;
 void	flush_connections(fd)
 int	fd;
 {
-#ifdef SENDQ_ALWAYS
 	Reg	int	i;
 	Reg	aClient *cptr;
 
@@ -110,7 +130,6 @@ int	fd;
 	    }
 	else if (fd >= 0 && (cptr = local[fd]) && DBufLength(&cptr->sendQ) > 0)
 		(void)send_queued(cptr);
-#endif
 }
 #endif
 
@@ -119,7 +138,6 @@ int	fd;
 **	Internal utility which delivers one message buffer to the
 **	socket. Takes care of the error handling and buffering, if
 **	needed.
-**	if SENDQ_ALWAYS is defined, the message will be queued.
 **	if ZIP_LINKS is defined, the message will eventually be compressed,
 **	anything stored in the sendQ is compressed.
 */
@@ -127,7 +145,7 @@ static	int	send_message(to, msg, len)
 aClient	*to;
 char	*msg;	/* if msg is a null pointer, we are flushing connection */
 int	len;
-#ifdef SENDQ_ALWAYS
+#if !defined(CLIENT_COMPILE)
 {
 	int i;
 
@@ -141,19 +159,16 @@ int	len;
 		      "Local socket %s with negative fd... AARGH!",
 		      to->name));
 	    }
-#ifndef	CLIENT_COMPILE
 	else if (IsMe(to))
 	    {
 		sendto_flag(SCH_ERROR, "Trying to send to myself! [%s]", msg);
 		return 0;
 	    }
-#endif
 	if (IsDead(to))
 		return 0; /* This socket has already been marked as dead */
-# ifndef	CLIENT_COMPILE
 	if (DBufLength(&to->sendQ) > get_sendq(to))
 	    {
-#  ifdef HUB
+# ifdef HUB
 		if (CBurst(to))
 		    {
 			aConfItem	*aconf = to->serv->nline;
@@ -176,7 +191,7 @@ int	len;
 			to->exitc = EXITC_SENDQ;
 			return dead_link(to, "Max Sendq exceeded");
 		    }
-#  else /* HUB */
+# else /* HUB */
 		if (IsService(to) || IsServer(to))
 			sendto_flag(SCH_ERROR,
 				"Max SendQ limit exceeded for %s: %d > %d",
@@ -184,10 +199,9 @@ int	len;
 				DBufLength(&to->sendQ), get_sendq(to));
 		to->exitc = EXITC_SENDQ;
 		return dead_link(to, "Max Sendq exceeded");
-#  endif /* HUB */
+# endif /* HUB */
 	    }
 	else
-# endif
 	    {
 tryagain:
 # ifdef	ZIP_LINKS
@@ -245,7 +259,7 @@ tryagain:
 		send_queued(to);
 	return 0;
 }
-#else /* SENDQ_ALWAYS */
+#else /* CLIENT_COMPILE */
 {
 	int	rlen = 0, i;
 
@@ -259,97 +273,11 @@ tryagain:
 		      "Local socket %s with negative fd... AARGH!",
 		      to->name));
 	    }
-#ifndef	CLIENT_COMPILE
-	else if (IsMe(to))
-	    {
-		sendto_flag(SCH_ERROR, "Trying to send to myself! [%s]", msg);
-		return 0;
-	    }
-#endif
 	if (IsDead(to))
 		return 0; /* This socket has already been marked as dead */
 
-	/*
-	** DeliverIt can be called only if SendQ is empty...
-	*/
-	if ((DBufLength(&to->sendQ) == 0) &&
-	    (rlen = deliver_it(to, msg, len)) < 0)
+	if ((rlen = deliver_it(to, msg, len)) < 0 && rlen < len)
 		return dead_link(to,"Write error to %s, closing link");
-	else if (rlen < len)
-	    {
-		/*
-		** Was unable to transfer all of the requested data. Queue
-		** up the remainder for some later time...
-		*/
-# ifndef	CLIENT_COMPILE
-		if (DBufLength(&to->sendQ) > get_sendq(to))
-		    {
-#  ifdef HUB
-			if ((IsService(to) || IsServer(to)) && CBurst(to))
-			    {
-				aClass	*cl = to->serv->nline->class;
-
-				poolsize -= MaxSendq(cl) >> 1;
-				IncSendq(cl);
-				poolsize += MaxSendq(cl) >> 1;
-				sendto_flag(SCH_NOTICE,
-				    "New poolsize %d. (sendq adjusted)",
-                                            poolsize);
-				istat.is_dbufmore++;
-			    }
-			else if (IsServer(to) || IsService(to))
-#  else
-			if (IsServer(to) || IsService(to))
-#  endif
-			sendto_flag(SCH_ERROR,
-				"Max SendQ limit exceeded for %s: %d > %d",
-				 get_client_name(to, FALSE),
-				 DBufLength(&to->sendQ), get_sendq(to));
-			return dead_link(to, "Max Sendq exceeded");
-		    }
-		else
-# endif
-		    {
-tryagain:
-# ifdef	ZIP_LINKS
-	        /*
-		** data is first stored in to->zip->outbuf until
-		** it's big enough to be compressed and stored in the sendq.
-		** send_queued is then responsible to never let the sendQ
-		** be empty and to->zip->outbuf not empty.
-		*/
-			if (to->flags & FLAGS_ZIP)
-				msg = zip_buffer(to, msg, &len, 0);
-
-			if (len && (i = dbuf_put(&to->sendQ, msg+rlen,
-						 len-rlen)) < 0)
-# else 	/* ZIP_LINKS */
-			if ((i = dbuf_put(&to->sendQ, msg+rlen, len-rlen)) < 0)
-# endif	/* ZIP_LINKS */
-				if (i == -2 && CBurst(to))
-				    {
-				/* poolsize was exceeded while connect burst */
-					aConfItem *aconf = to->serv->nline;
-
-					poolsize -= MaxSendq(aconf->class) >>1;
-					IncSendq(aconf->class);
-					poolsize += MaxSendq(aconf->class) >>1;
-#ifndef	CLIENT_COMPILE
-					sendto_flag(SCH_NOTICE,
-					    "New poolsize %d. (reached)",
-						    poolsize);
-					istat.is_dbufmore++;
-#endif
-					goto tryagain;
-				    }
-				else
-				    {
-					to->exitc = EXITC_MBUF;
-					return dead_link(to,
-					 "Buffer allocation error for %s");
-				    }
-		    }
-	    }
 	/*
 	** Update statistics. The following is slightly incorrect
 	** because it counts messages even if queued, but bytes
@@ -386,11 +314,7 @@ aClient *to;
 		** not working correct if send_queued is called for a
 		** dead socket... --msa
 		*/
-#ifndef SENDQ_ALWAYS
-		return dead_link(to, "send_queued called for a DEADSOCKET:%s");
-#else
 		return -1;
-#endif
 	    }
 #ifdef	ZIP_LINKS
 	/*
