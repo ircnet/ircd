@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.82 2004/03/04 12:59:44 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.83 2004/03/04 13:11:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -319,20 +319,24 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		if (!namematched)
 			continue;	/* Try another I:line. */
 
-		if (index(aconf->host, '@'))
-		    {
-			strncpyzt(uhost, cptr->username, sizeof(uhost));
-			(void)strcat(uhost, "@");
-		    }
-		else
-			*uhost = '\0';
-		(void)strncat(uhost, sockhost, sizeof(uhost) - strlen(uhost));
-		if (strchr(aconf->host, '/'))		/* 1.2.3.0/24 */
-		    {
-			if (match_ipmask(aconf->host, cptr, 1))
+		if (*aconf->host)
+		{
+			if (index(aconf->host, '@'))
+			    {
+				strncpyzt(uhost, cptr->username, sizeof(uhost));
+				(void)strcat(uhost, "@");
+			    }
+			else
+				*uhost = '\0';
+			(void)strncat(uhost, sockhost, sizeof(uhost)
+				- strlen(uhost));
+			if (strchr(aconf->host, '/'))	/* 1.2.3.0/24 */
+			{
+				if (match_ipmask(aconf->host, cptr, 1))
+					continue;
+			} else if (match(aconf->host, uhost))	/* 1.2.3.* */
 				continue;
-                } else if (match(aconf->host, uhost))	/* 1.2.3.* */
-			continue;
+		} /* else empty host name, match any ipaddr */
 		if (*aconf->name == '\0' && hp)
 		    {
 			strncpyzt(uhost, hp->h_name, sizeof(uhost));
