@@ -1,7 +1,12 @@
-2004-02-22  Piotr Kucharski
+2004-02-22  Jakub Vlasek
 
 	* s_misc.c/exit_server(): moved "Received SQUIT", so the sequence on
-	  &SERVERS is not reversed (patch from jv).
+	  &SERVERS is not reversed.
+	* s_misc.c/exit_server(): added "from" parameter.
+	* s_misc.c/exit_client(): use "from" in remote squit reason.
+
+2004-02-22  Piotr Kucharski
+
 	* s_misc.c/exit_client(): removed unnecessary "Sending SQUIT" notice.
 	* s_serv.c/m_squit(): removed unnecessary "Received SQUIT", it's now
 	  in exit_server().
