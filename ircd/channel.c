@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.97 1999/04/19 22:41:37 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.98 1999/06/07 00:49:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -3152,10 +3152,16 @@ aChannel *chptr;
 			{
 			    mbuf[cnt] = '\0';
 			    if (lp != chptr->members)
-				    sendto_channel_butone(&me, &me, chptr,
-							  ":%s MODE %s +%s %s",
-							  ME, chptr->chname,
-							  mbuf, nbuf);
+				{
+				    sendto_match_servs_v(chptr, NULL, SV_NCHAN,
+							 ":%s MODE %s +%s %s",
+							 ME, chptr->chname,
+							 mbuf, nbuf);
+				    sendto_channel_butserv(chptr, &me,
+						   ":%s MODE %s +%s %s",
+							   ME, chptr->chname,
+							   mbuf, nbuf);
+				}
 			    cnt = 0;
 			    mbuf[0] = nbuf[0] = '\0';
 			}
@@ -3169,8 +3175,11 @@ aChannel *chptr;
 	    if (cnt)
 		{
 		    mbuf[cnt] = '\0';
-		    sendto_channel_butone(&me, &me, chptr,":%s MODE %s +%s %s",
-					  ME, chptr->chname, mbuf, nbuf);
+		    sendto_match_servs_v(chptr, NULL, SV_NCHAN,
+					 ":%s MODE %s +%s %s",
+					 ME, chptr->chname, mbuf, nbuf);
+		    sendto_channel_butserv(chptr, &me, ":%s MODE %s +%s %s",
+					   ME, chptr->chname, mbuf, nbuf);
 		}
 	}
     else
@@ -3200,7 +3209,9 @@ aChannel *chptr;
 					   chptr->chname, now - chptr->reop);
 	    op.flags = MODE_ADD|MODE_CHANOP;
 	    change_chan_flag(&op, chptr);
-	    sendto_channel_butone(&me, &me, chptr, ":%s MODE %s +o %s",
+	    sendto_match_servs_v(chptr, NULL, SV_NCHAN, ":%s MODE %s +o %s",
+				 ME, chptr->chname, op.value.cptr->name);
+	    sendto_channel_butserv(chptr, &me, ":%s MODE %s +o %s",
 				   ME, chptr->chname, op.value.cptr->name);
 	}
     chptr->reop = 0;
