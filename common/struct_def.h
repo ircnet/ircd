@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.116 2004/06/30 18:59:12 chopin Exp $
+ *   $Id: struct_def.h,v 1.117 2004/07/03 15:58:01 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -1006,6 +1006,8 @@ typedef struct
 #define ACL_TKLINE		0x04000
 #define ACL_UNTKLINE		ACL_TKLINE
 #define ACL_CLIENTS		0x08000
+#define ACL_CANFLOOD		0x10000
+#define ACL_NOPENALTY		0x20000
 
 #define ACL_ALL_REMOTE		(ACL_KILLREMOTE|ACL_SQUITREMOTE|ACL_CONNECTREMOTE)
 #define ACL_ALL			0xFFFFF
