@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.257 2005/03/28 23:33:26 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.258 2005/03/29 22:36:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1014,7 +1014,9 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 	aClient *who;
 	Mode	*mode, oldm;
 	Link	*plp = NULL;
+#if 0
 	int	compat = -1; /* to prevent mixing old/new modes */
+#endif
 	char	*mbuf = modebuf, *pbuf = parabuf, *upbuf = uparabuf;
 	int	tmp_chfl = 0, tmp_rpl = 0, tmp_rpl2 = 0, tmp_mode = 0;
 
@@ -1029,6 +1031,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 
 	while (curr && *curr && count >= 0)
 	    {
+#if 0
 		if (compat == -1 && *curr != '-' && *curr != '+')
 		{
 			if (*curr == 'R')
@@ -1040,6 +1043,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				compat = 0;
 			}
 		}
+#endif
 		switch (*curr)
 		{
 		case '+':
@@ -1448,6 +1452,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 			curr = *++parv;
 			parc--;
 		    }
+#if 0
 		/*
 		 * Make sure new (+R) mode won't get mixed with old modes
 		 * together on the same line.
@@ -1466,6 +1471,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				*curr = '\0';
 			}
 		}
+#endif
 	    } /* end of while loop for MODE processing */
 
 	whatt = 0;
