@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.19 2004/06/29 17:51:34 chopin Exp $
+# $Id: ircd.conf.example,v 1.20 2004/07/02 15:22:59 chopin Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -433,12 +433,16 @@ H:*.mit.edu:000*:irc-2.mit.edu::
 #   1                    2              3             4
 #
 # If a server matching <Denied Server Mask> or a server in <Denied Class>
-# is present ircd won't auto connect to any server matching <Server Mask>
+# is present (or absent, if <Denied Server Mask> is prefixed with '!')
+# ircd won't auto connect to any server matching <Server Mask>
 # or being in <Server Class> although auto connect for those is active.
 #
 # Example, don't auto connect to *.fi if some server of *.edu is already
 # linked
 D:*.edu::*.fi::
+#
+# Example, don't auto connect to *.fi if no server of *.edu is yet linked
+D:!*.edu::*.fi::
 #
 # Example, don't auto connect to *.fi or any server in class '3'  if a
 # server from our class '2' is already present

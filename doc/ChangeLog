@@ -1,8 +1,13 @@
 2004-07-02  Piotr Kucharski
 
-	* s_user.c/find_denied(): added reverse D: (disable AC when server *not*
-	  found.
+	* s_user.c/find_denied(): added reverse D: (disable AC when given server
+	  is absent).
 	* s_user.c/save_user(): send saved nick change to &CLIENTS as well.
+	* s_service.c/m_servset(): send "EOB" after burst.
+	* services_def.h: new SERVICE_WANT_UID.
+	* s_service.c/check_services_butone(): if WANT_UID, send it, not nick.
+	* s_service.c/sendnum_toone(): if WANT_UID, send appropriate UNICK.
+	* s_service.c/m_service(): send 005 to services.
 
 2004-07-01  Piotr Kucharski
 

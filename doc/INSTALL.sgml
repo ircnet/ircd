@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.65 2004/06/30 19:20:32 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.66 2004/07/02 15:22:58 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -1043,12 +1043,13 @@ which have complex configurations.
 <tag/Format/<verb>D:&lt;Denied Server Mask&gt;:Denied Class:&lt;Server Name&gt;:Server Class:
 </verb>
 <tag/Denied Server Mask/ This field is matched against all
-servers currently present on the network.
+servers currently present on the network. If it starts with ``!'',
+it reverses the meaning of search.
 <tag/Denied Class/  If this field contains a class number,
 it will match if any server in that class is currently
 present on the network.  Note that this can be true for any
 server, even the ones not directly connected.
-<tag/Server Mask/ This field is matched against the server
+<tag/Server Name/ This field is matched against the server
 name that the server wants to auto connect to.
 <tag/Server Class/ This field is used to match against the
 class to which belong the servers for which an autoconnect
@@ -1056,6 +1057,11 @@ is set.
 <tag/Examples/D:*.edu::*.fi::
 <p>
 Don't auto-connect to any ``*.fi'' server if any server
+present on the network matches ``*.edu''.
+<p>
+D:!*.edu::*.fi::
+<p>
+Don't auto-connect to any ``*.fi'' server if none of the servers
 present on the network matches ``*.edu''.
 <p>
 D::2:eff.org:3:

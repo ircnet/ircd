@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-23321/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-30467/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.65 2004/06/30 19:20:31 chopin Exp $
+     $Id: INSTALL.info,v 1.66 2004/07/02 15:22:58 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -1345,14 +1345,14 @@ Deny auto-connections
 
 `Denied Server Mask'
      This field is matched against all servers currently present on the
-     network.
+     network. If it starts with "!", it reverses the meaning of search.
 
 `Denied Class'
      If this field contains a class number, it will match if any server
      in that class is currently present on the network.  Note that this
      can be true for any server, even the ones not directly connected.
 
-`Server Mask'
+`Server Name'
      This field is matched against the server name that the server
      wants to auto connect to.
 
@@ -1365,6 +1365,11 @@ Deny auto-connections
 
      Don't auto-connect to any "*.fi" server if any server present on
      the network matches "*.edu".
+
+     D:!*.edu::*.fi::
+
+     Don't auto-connect to any "*.fi" server if none of the servers
+     present on the network matches "*.edu".
 
      D::2:eff.org:3:
 
@@ -1790,15 +1795,15 @@ Node: Excluded accounts34032
 Node: X Excluded accounts37945
 Node: Server connections39235
 Node: Deny auto-connections47865
-Node: Hub connections49239
-Node: Leaf connections50727
-Node: Version limitations52811
-Node: Excluded machines54569
-Node: Service connections55874
-Node: Bounce server57468
-Node: Related resources59329
-Node: Reporting a bug60368
-Node: How to report a bug60625
-Node: Where to send a bug report61636
+Node: Hub connections49434
+Node: Leaf connections50922
+Node: Version limitations53006
+Node: Excluded machines54764
+Node: Service connections56069
+Node: Bounce server57663
+Node: Related resources59524
+Node: Reporting a bug60563
+Node: How to report a bug60820
+Node: Where to send a bug report61831
 
 End Tag Table

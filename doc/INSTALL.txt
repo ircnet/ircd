@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.65 2004/06/30 19:20:32 chopin Exp $
+  $Id: INSTALL.txt,v 1.66 2004/07/02 15:22:58 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -1288,7 +1288,8 @@
 
      DDeenniieedd SSeerrvveerr MMaasskk
         This field is matched against all servers currently present on
-        the network.
+        the network. If it starts with ``!'', it reverses the meaning of
+        search.
 
      DDeenniieedd CCllaassss
         If this field contains a class number, it will match if any
@@ -1296,7 +1297,7 @@
         that this can be true for any server, even the ones not directly
         connected.
 
-     SSeerrvveerr MMaasskk
+     SSeerrvveerr NNaammee
         This field is matched against the server name that the server
         wants to auto connect to.
 
@@ -1310,8 +1311,12 @@
         Don't auto-connect to any ``*.fi'' server if any server present
         on the network matches ``*.edu''.
 
-        D::2:eff.org:3:
+        D:!*.edu::*.fi::
 
+        Don't auto-connect to any ``*.fi'' server if none of the servers
+        present on the network matches ``*.edu''.
+
+        D::2:eff.org:3:
         Do not auto-connect to ``eff.org'', or any server in class ``3''
         if a server defined to be in class ``2'' is currently present on
         the network.
@@ -1442,11 +1447,9 @@
      FFllaaggss
         If any flag specified in this field is found in the peer's flags
         string, it will be rejected.
-
      SSeerrvveerr MMaasskk
         This field is used to match server names.  The V line will be
         used for servers matching the mask given in this field.
-
 
      SSeerrvveerr TTyyppee
         Both the VVeerrssiioonn MMaasskk and the FFllaaggss should be prefixed with the
@@ -1510,10 +1513,11 @@
 
      EExxaammppllee
         Q::of the security holes:foo.bar.baz::
-
         This command excludes a server named ``foo.bar.baz'', the reason
         is given to be security holes (you should give a reason, it is
         polite). The first field is unused, so leave it empty.
+
+
   44..1155..  SSeerrvviiccee ccoonnnneeccttiioonnss
 
 
@@ -1573,7 +1577,6 @@
      FFoorrmmaatt
 
         B:<Class|Host Mask>::<Server Name>:<Port>:
-
 
 
      BB  This specifies a Bounce record.
@@ -1644,7 +1647,6 @@
         working on the source code are welcome.  This is done by sending
         an email to majordomo@irc.org, with ``ssuubbssccrriibbee iirrccdd--ddeevv'' in
         the body.
-
 
      FFAAQQ
         It can be found on the WWW, at

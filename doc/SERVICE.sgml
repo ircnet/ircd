@@ -4,7 +4,7 @@
 
 <title>IRC Services
 <author>Christophe Kalt
-<date>$Id: SERVICE.sgml,v 1.7 2004/03/19 23:01:17 jv Exp $
+<date>$Id: SERVICE.sgml,v 1.8 2004/07/02 15:22:59 chopin Exp $
 <abstract>
 The IRC protocol described in RFC 1459 defines two types of
 connections (client, and server).  A third type was
@@ -223,6 +223,7 @@ of what the S line setting is:
 SERVICE_WANT_PREFIX     0x10000 /* to receive n!u@h instead of n */
 SERVICE_WANT_TOKEN      0x20000 /* use server token instead of name */
 SERVICE_WANT_EXTNICK    0x40000 /* user extended NICK syntax */
+SERVICE_WANT_UID        0x80000 /* user extended UID syntax */
 </verb>
 <tag/mask2/ It is optional.  It is a subset of mask1 that
 defines which information the service wants to receive in a

@@ -1,6 +1,6 @@
   IRC Services
   Christophe Kalt
-  $Id: SERVICE.txt,v 1.8 2004/03/19 23:01:17 jv Exp $
+  $Id: SERVICE.txt,v 1.9 2004/07/02 15:22:59 chopin Exp $
 
   The IRC protocol described in RFC 1459 defines two types of connec-
   tions (client, and server).  A third type was introduced with version
@@ -244,6 +244,7 @@
         SERVICE_WANT_PREFIX     0x10000 /* to receive n!u@h instead of n */
         SERVICE_WANT_TOKEN      0x20000 /* use server token instead of name */
         SERVICE_WANT_EXTNICK    0x40000 /* user extended NICK syntax */
+        SERVICE_WANT_UID        0x80000 /* user extended UID syntax */
 
 
 
