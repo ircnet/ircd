@@ -1,0 +1,91 @@
+.\" @(#)$Id: iauth.conf.5,v 1.1 1998/08/16 20:02:24 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1998/08/16 20:02:24 $"
+.SH NAME
+iauth.conf \- The Internet Relay Chat Authentication Configuration File
+.SH DESCRIPTION
+.LP
+The \fIiauth.conf\fP file is read by the \fIiauth\fP program upon startup,
+it contains the list of modules that should be used to authenticate a
+particular connection.  The list is ordered, which means that the first
+module to successfully authenticate a connection will be the last to be
+tried.
+
+The file is divided in sections, each section specifies a module with
+eventual options using the following format:
+
+.RS
+.nf
+module\ \fImodule-name\fP
+[TAB]option = \fIstring\fP
+[TAB]hostname = \fIhost-name\fP
+[TAB]address = \fIip-address\fP
+
+.fi
+.RE
+The section ends with an empty line.  The \fImodule-name\fP defines which
+module the section applies to.  A particular module may be used in several
+sections.  A \fIstring\fP of undefined format may be specified, it will
+then be passed to the module upon initialization, see the MODULES section
+to find out if a module accepts any option.
+
+If \fIhost-name\fP and \fIip-address\fP fields are specified, then the
+module will only be used for connections matching one of the fields given
+in the configuration.  If none are specified, then the module will always
+be used.
+
+When writing a configuration file, one should \fBalways\fP verify the
+syntax using the \fIiauth\fP program to avoid later problems.
+.SH MODULES
+.TP
+.B socks
+This module performs a basic check to verify that the host where the
+connection originated from doesn't run a proxy server on port 1080 that is
+open to the world.  It is useful to reject abusive clients using a relay to
+evade kill lines and bans.
+
+This module takes two options:
+.B reject
+to reject connections originating from a host where an open proxy
+was detected,
+.B log
+to log hostnames where an open proxy is detected.
+.TP
+.B rfc931
+This module is for authentication TCP connections using the protocol
+defined in RFC 1413 (which obsoletes RFC 931).
+.SH EXAMPLE
+The following file will cause the IRC daemon to reject and log all
+connections originating from a system where an open proxy is running.  For
+all connections, an ident lookup (RFC 1413) will be performed.
+
+.RS
+.nf
+module socks
+        option = log,reject
+
+module rfc931
+.fi
+.RE
+
+The following file will cause the IRC daemon to only attempt an ident
+lookup for connections originating from a host which has an internet
+address.
+
+.RS
+.nf
+module rfc931
+        hostname = *
+.fi
+.RE
+.SH COPYRIGHT
+(c) 1998 Christophe Kalt
+.LP
+For full COPYRIGHT see LICENSE file with IRC package.
+.LP
+.RE
+.SH FILES
+ "iauth.conf"
+.SH "SEE ALSO"
+iauth(8)
+.SH AUTHOR
+Christophe Kalt.

@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.29 1998/08/08 20:40:37 kalt Exp $
+#*   $Id: Makefile.in,v 1.30 1998/08/16 20:02:25 kalt Exp $
 #*
 #*/
 
@@ -54,6 +54,9 @@ server_bin_dir = @sbindir@
 
 # Directory in which to install the client manual page file.
 client_man_dir = @mandir@/man1
+
+# Directory in which to install the configration manual page file.
+conf_man_dir = @mandir@/man5
 
 # Directory in which to install the server manual page file.
 server_man_dir = @mandir@/man8
@@ -173,6 +176,9 @@ install-server: server
 	-@if [ ! -d $(server_man_dir) ]; then \
 	$(MKDIRHIER) $(server_man_dir); \
 	fi
+	-@if [ ! -d $(conf_man_dir) ]; then \
+	$(MKDIRHIER) $(conf_man_dir); \
+	fi
 	-@if [ ! -d $(ircd_dir) ]; then \
 	$(MKDIRHIER) $(ircd_dir); \
 	fi
@@ -184,6 +190,7 @@ install-server: server
 	../ircd/buildm4 $(ircd_dir)
 	$(INSTALL_DATA) ../doc/ircd.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/iauth.8 $(server_man_dir)
+	$(INSTALL_DATA) ../doc/iauth.conf.5 $(conf_man_dir)
 	$(INSTALL_DATA) ../contrib/ircdwatch/ircdwatch.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/example.conf $(ircd_dir)
 	@echo "installation of server done."
