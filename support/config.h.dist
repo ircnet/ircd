@@ -46,9 +46,6 @@
 /*
  *  irc[d] configuration options.
  *
- *  Most of the following defines are related to the server,
- *  some apply to the client.
- *
  */
 
 /* CHROOTDIR
@@ -307,9 +304,6 @@
 
 /* Remote query flood protection. */
 #define	CHREPLLEN	8192
-
-/* Default server for standard client */
-#define	UPHOST	"irc"
 
 /*
  * If you wish to run services, define USE_SERVICES.
