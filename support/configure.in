@@ -777,7 +777,6 @@ yes
 #ifdef _ZETA_MINAMI_INET6
 yes
 #endif], irc_cv_v6type=zeta)))))
-    fi
     fi])
   AC_MSG_RESULT($irc_cv_v6type)
 
@@ -1436,7 +1435,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.40 1999/07/09 20:37:22 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.41 1999/07/09 22:54:34 q Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
