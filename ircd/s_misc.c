@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.86 2004/04/14 18:59:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.87 2004/04/18 15:38:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -751,7 +751,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			else if (!IsMasked(sptr))
 			{
 				sendto_one(acptr, ":%s SQUIT %s :%s",
-					sptr->serv->up->name, sptr->name,
+					from->name, sptr->name,
 					comment);
 			}
 		}
