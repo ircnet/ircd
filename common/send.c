@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.27 1998/08/01 21:27:41 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.28 1998/09/09 12:25:26 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1123,6 +1123,61 @@ void	sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 		    IsMe(cptr))
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
+			continue;
+		if (chptr &&
+		    *chptr->chname == '!' && !(cptr->serv->version & SV_NJOIN))
+			continue;
+		if (!len)
+		    {
+#if ! USE_STDARG
+			len = sendprep(format, p1, p2, p3, p4, p5, p6, p7,
+				       p8, p9, p10, p11);
+#else
+			va_list	va;
+			va_start(va, format);
+			len = vsendprep(format, va);
+			va_end(va);
+#endif
+		    }
+		(void)send_message(cptr, sendbuf, len);
+	    }
+}
+
+#if ! USE_STDARG
+/*VARARGS*/
+void	sendto_match_servs_v(chptr, from, ver, format, p1, p2, p3, p4, p5, p6,
+			     p7, p8, p9, p10, p11)
+aChannel *chptr;
+aClient	*from;
+char	*format, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
+int	ver;
+#else
+void	sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
+			     char *format, ...)
+#endif
+{
+	Reg	int	i, len=0;
+	Reg	aClient	*cptr;
+	char	*mask;
+
+	if (chptr)
+	    {
+		if (*chptr->chname == '&')
+			return;
+		if ((mask = (char *)rindex(chptr->chname, ':')))
+			mask++;
+	    }
+	else
+		mask = (char *)NULL;
+
+	for (i = fdas.highest; i >= 0; i--)
+	    {
+		if (!(cptr = local[fdas.fd[i]]) || (cptr == from) ||
+		    IsMe(cptr))
+			continue;
+		if (!BadPtr(mask) && match(mask, cptr->name))
+			continue;
+		if ((ver & cptr->serv->version) == 0)
 			continue;
 		if (chptr &&
 		    *chptr->chname == '!' && !(cptr->serv->version & SV_NJOIN))
