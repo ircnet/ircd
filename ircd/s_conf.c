@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.24 1997/12/17 14:31:38 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.25 1998/01/07 20:29:56 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -78,6 +78,26 @@ int	mask;
 		if ((tmp->value.aconf->status & mask) == 0)
 			(void)detach_conf(cptr, tmp->value.aconf);
 	    }
+}
+
+/*
+ * Match address by #IP bitmask (10.11.12.128/27)
+ */
+int    match_ipmask(mask, cptr)
+char   *mask;
+aClient *cptr;
+{
+        int i1, i2, i3, i4, m;
+        u_long lmask, baseip;
+ 
+        if (sscanf(mask, "%d.%d.%d.%d/%d", &i1, &i2, &i3, &i4, &m) != 5 ||
+           m < 1 || m > 31) {
+               sendto_flag(SCH_LOCAL, "Ignoring bad mask: %s", mask);
+                return -1;
+        }
+        lmask = htonl(0xfffffffful << (32 - m)); /* /24 -> 0xffffff00ul */
+        baseip = htonl(i1 * 0x1000000 + i2 * 0x10000 + i3 * 0x100 + i4);
+        return ((cptr->ip.s_addr & lmask) == baseip) ? 0 : 1;
 }
 
 /*
@@ -134,7 +154,11 @@ char	*sockhost;
 		else
 			*uhost = '\0';
 		(void)strncat(uhost, sockhost, sizeof(uhost) - strlen(uhost));
-		if (match(aconf->host, uhost))
+		if (strchr(aconf->host, '/'))		/* 1.2.3.0/24 */
+		    {
+			if (match_ipmask(aconf->host, cptr))
+				continue;
+                } else if (match(aconf->host, uhost))	/* 1.2.3.* */
 			continue;
 		if (*aconf->name == '\0' && hp)
 		    {
@@ -1219,9 +1243,13 @@ char	**comment;
 			check = ident;
  		if (tmp->host && tmp->name &&
 		    /* host & IP matching.. */
-		    ((*tmp->host == '=' && match(tmp->host+1, host) == 0) ||
-		     (*tmp->host != '=' && (match(tmp->host, host) == 0 ||
-					    (ip && match(tmp->host, ip) ==0))))
+		    ((*tmp->host == '=' &&
+		      (match(tmp->host+1, host) == 0 ||
+		       (!ip && (match_ipmask(tmp->host+1, cptr) == 0)))) ||
+		     (*tmp->host != '=' &&
+		      (match(tmp->host, host) == 0 ||
+		       (ip && (match(tmp->host, ip) == 0)) ||
+		       (match_ipmask(tmp->host+1, cptr) == 0))))
 		    /* username matching */
 		    && (!check || match(tmp->name, check) == 0) &&
 		    (!tmp->port || (tmp->port == cptr->acpt->port)))
@@ -1512,7 +1540,12 @@ int	class, fd;
 				continue;
 		    }
 		else
-			if (match(aconf->host, cptr->sockhost))
+			if (strchr(aconf->host, '/'))
+			    {
+				if (match_ipmask(aconf->host, cptr))
+					continue;
+			    }
+			else if (match(aconf->host, cptr))
 				continue;
 
 		sendto_one(cptr, rpl_str(RPL_BOUNCE, cptr->name), aconf->name,
