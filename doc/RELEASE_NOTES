@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.57 2004/09/21 15:28:19 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.58 2004/09/28 22:42:42 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -45,9 +45,10 @@ New features in 2.11.0:
 	* New "SET" command, which makes possible to fine-tune certain ircd
 	  values during runtime (like dbuf poolsize and autoconnect).
 	* New iauth module: mod_webproxy.
-	* Modules socks and webproxy can work on different ports.
+	* Modules socks and webproxy can work on multiple different ports.
 	* New keyword "delayed" in iauth configuration (shortening time client
 	  waits for accepting).
+	* Services can request UIDs (or, rather, UNICKs).
 
 Important changes in 2.11.0 (since 2.10.3):
 	* Nicknames of local clients cannot have [\]{|} chars. (Will be removed
@@ -56,10 +57,11 @@ Important changes in 2.11.0 (since 2.10.3):
 	  automatically converted to []^|. (Will be removed in 2.11.1).
 	* An irc client is no longer included.
 	* Class usage was moved from end of "TRACE" to "STATS Y".
-	* "DNS" command is oper only from now.
+	* "DNS" command is now oper only.
 	* Redundant bans are allowed to be set.
-	* User mode +w is doing nothing: class usage is in stats Y and wallops
-	  are sent to a new server channel &WALLOPS.
+	* New server channel &WALLOPS.
+	* User mode +w is doing nothing: class usage is in "STATS Y" and
+	  wallops are sent to &WALLOPS.
 	* "REHASH d" (dns flush) instead of "REHASH q".
 	* Only "STATS K" (upper case K) returns list of klines.
 	* "LIST" (if allowed) does not disconnect if client's sendQ fills.
@@ -86,8 +88,8 @@ Important configuration changes between 2.10.x and 2.11.0:
 	* I: has a new field: flags (D, E, e, F, I, M, N, R); read INSTALL.
 	* P: has a new field: flags ('D' and 'S'); read INSTALL.
 	* C: has a new field: outgoing IP (useful for multihomed servers).
-	* O: have flags now, check INSTALL file for details; WARNING: no flags
-	  means no privileges at all!
+	* O: has a new field: flags; read INSTALL for details.
+	  WARNING: no flags means no privileges at all!
 	* o: is deprecated (but still works), please use O: with 'L' flag.
 	* File names and layout changed a bit, be careful:
 	  - localstatedir defaults to $(prefix)/var (autoconf did that!)

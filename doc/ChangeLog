@@ -1,3 +1,14 @@
+2004-09-28  Piotr Kucharski
+
+	* a_conf.c/conf_read(): allow rfc913 timeout be smaller (but warn).
+	* configure.in, configure: --with-zlib takes param now, replacing
+	  old --with-zlib-prefix (and removing --with-zlib-library and
+	  --with-zlib-include).
+
+2004-09-23  Piotr Kucharski
+
+	* channel.c/reop_channel(): clear ->reop only when we did reop.
+
 2004-09-21  Piotr Kucharski
 
 	* mod_webproxy.c, mod_webproxy_ext.h: new files.
