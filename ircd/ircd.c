@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.81 2002/06/02 00:31:24 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.82 2002/06/02 00:44:52 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1319,6 +1319,8 @@ char *filename;
 		ww_size = t_data[0];
 		lk_size = t_data[1];
 		_HASHSIZE = t_data[2];
+		_HOSTNAMEHASHSIZE = t_data[2]; /* hostname has always same size
+						  as the client hash */
 		_CHANNELHASHSIZE = t_data[3];
 		_SERVERSIZE = t_data[4];
 		poolsize = t_data[5];
