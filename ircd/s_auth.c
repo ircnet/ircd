@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.17 1998/09/18 22:49:39 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.18 1998/09/21 14:00:31 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -89,7 +89,7 @@ sendto_iauth(char *pattern, ...)
 void
 read_iauth()
 {
-    static char obuf[READBUF_SIZE+1];
+    static char obuf[READBUF_SIZE+1], last = '?';
     static int olen = 0, ia_dbg = 0;
     char buf[READBUF_SIZE+1], *start, *end, tbuf[BUFSIZ];
     aClient *cptr;
@@ -121,6 +121,7 @@ read_iauth()
 	    while (end = index(start, '\n'))
 		{
 		    *end++ = '\0';
+		    last = *start;
 		    if (*start == '>')
 			{
 			    sendto_flag(SCH_AUTH, "%s", start+1);
@@ -166,6 +167,14 @@ read_iauth()
 			{
 			    sendto_flag(SCH_AUTH, "Garbage from iauth [%s]",
 					start);
+			    /*
+			    ** The above should never happen, but i've seen it
+			    ** occasionnally, so let's try to get more info
+			    ** about it! -kalt
+			    */
+			    sendto_flag(SCH_AUTH,
+			"last='%c' start=%x end=%x buf=%x olen=%d i=%d",
+					last, start, end, buf, olen, i);
 			    start = end;
 			    continue;
 			}
