@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.99 2005/01/30 17:26:41 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.100 2005/02/08 01:49:03 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -910,7 +910,7 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what,
 		** another (sendto_match_butone_old()) function to
 		** send $#/$$-mask messages to old servers, which do
 		** not understand new syntax. --Beeth */
-		if (ST_UID(cptr))
+		if (/*ST_UID*/IsServer(cptr))
 		{
 			/*
 			** we can save some CPU here by not searching the
@@ -976,7 +976,7 @@ void	sendto_match_butone_old(aClient *one, aClient *from, char *mask,
 			continue;
 		/* we want to pick only old servers to perhaps send them
 		** $/#-mask message, if it's old, check if clients match */
-		if (ST_NOTUID(cptr))
+		if (/*ST_NOTUID*/0)
 		{
 			/* see comment in sendto_match_butone() */
 			for (srch = cptr->prev; srch; srch = srch->prev)

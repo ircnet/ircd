@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.263 2005/02/08 00:14:06 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.264 2005/02/08 01:49:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -165,7 +165,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 	if (acptr && IsMe(acptr))
 	{
-		if (MyConnect(sptr) && ST_UID(sptr))
+		if (MyConnect(sptr) && /*ST_UID*/IsServer(sptr))
 		{
 			/* remote server is closing it's link */
 			rsquit = 1;
@@ -247,9 +247,9 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    {
 			/* better server: just propagate upstream */
 			sendto_one(acptr->from, ":%s SQUIT %s :%s",
-				    ST_UID(sptr) && ST_UID(acptr->from) ?
+				    /*ST_UID*/IsServer(sptr) && /*ST_UID*/IsServer(acptr->from) ?
 				    sptr->serv->sid : sptr->name,
-				    ST_UID(acptr->from) && acptr->serv->sid[0] != '$' ?
+				    /*ST_UID*/IsServer(acptr->from) && acptr->serv->sid[0] != '$' ?
 				    acptr->serv->sid : acptr->name, comment);
 			
 			sendto_flag(SCH_SERVER,
@@ -272,8 +272,8 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    (cptr->serv->version & SV_OLDSQUIT) == 0)
 		    {
 			sendto_one(cptr, ":%s SQUIT %s :%s (Bounced for %s)",
-				   ST_UID(cptr) ? me.serv->sid : ME,
-				   ST_UID(cptr) && ST_UID(acptr) &&
+				   /*ST_UID*/IsServer(cptr) ? me.serv->sid : ME,
+				   /*ST_UID*/IsServer(cptr) && /*ST_UID*/IsServer(acptr) &&
 				   acptr->serv->sid[0]!='$' ? acptr->serv->sid:
 				   acptr->name, comment, parv[0]);
 			sendto_flag(SCH_DEBUG, "Bouncing SQUIT %s back to %s",
@@ -468,7 +468,7 @@ static	void	send_server(aClient *cptr, aClient *server)
 	{
 		/* I'm masking this server, or it was introduced to us with
 		** SMASK. */
-		if (ST_UID(cptr))
+		if (/*ST_UID*/IsServer(cptr))
 		{
 			/* Introduce it to 2.11 with SMASK. */
 			sendto_one(cptr, ":%s SMASK %s %s",
@@ -478,7 +478,7 @@ static	void	send_server(aClient *cptr, aClient *server)
 		/* We send nothing at all for a 2.10. */
 		return;
 	}
-	if (ST_UID(cptr))
+	if (/*ST_UID*/IsServer(cptr))
 	{
 		/* 2.11 */
 		sendto_one(cptr,":%s SERVER %s %d %s %s :%s",
@@ -632,7 +632,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return exit_client(cptr, cptr, &me, "Server version too old");
 	}
 
-	if (ST_UID(cptr))
+	if (/*ST_UID*/IsServer(cptr))
 	{ 
 		/* remote is 2.11+ */
 		if (parc < 6)
@@ -770,7 +770,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/*
 		**
 		*/
-		if (!(aconf = ST_UID(cptr) ?
+		if (!(aconf = /*ST_UID*/IsServer(cptr) ?
 			find_conf_host_sid(cptr->confs, host, parv[3], CONF_HUB)
 			: find_conf_host(cptr->confs, host, CONF_HUB)) ||
 		    (aconf->port && (hop > aconf->port)) )
@@ -825,7 +825,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		add_client_to_list(acptr);
 		register_server(acptr);
 
-		if (ST_UID(cptr))
+		if (/*ST_UID*/IsServer(cptr))
 		{
 			strncpyzt(acptr->serv->sid, parv[3], SIDLEN+1);
 			acptr->serv->version |= SV_UID;
@@ -1242,7 +1242,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	cptr->serv->snum = find_server_num(cptr->name);
 
 	strncpyzt(cptr->serv->verstr, versionbuf, sizeof(cptr->serv->verstr));
-	if (ST_UID(cptr))
+	if (/*ST_UID*/IsServer(cptr))
 	{
 		strcpy(cptr->serv->sid, sid);
 		add_to_sid_hash_table(sid, cptr);
@@ -1297,7 +1297,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			** been received. -avalon
 			*/
 			send_umode(NULL, acptr, 0, SEND_UMODES, buf);
-			if (ST_UID(cptr) && *acptr->user->uid)
+			if (/*ST_UID*/IsServer(cptr) && *acptr->user->uid)
 			{
 				sendto_one(cptr,
 					   ":%s UNICK %s %s %s %s %s %s :%s",
@@ -1312,7 +1312,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		else if (IsService(acptr) &&
 			 match(acptr->service->dist, cptr->name) == 0)
 		{
-			if (ST_UID(cptr))
+			if (/*ST_UID*/IsServer(cptr))
 			{
 				sendto_one(cptr, ":%s SERVICE %s %s %d :%s",
 						acptr->service->servp->sid,
@@ -1356,7 +1356,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			}
 		}
 	}
-	if (ST_UID(cptr))
+	if (/*ST_UID*/IsServer(cptr))
 	{
 		if (istat.is_myserv == 1)
 		{ /* remote server is the only we have connected */
@@ -2672,7 +2672,7 @@ static	void	trace_one(aClient *sptr, aClient *acptr)
 	int class;
 	char *to;
 
-	/* to = ST_UID(acptr) && sptr->user ? sptr->user->uid : sptr->name; */
+	/* to = #ST_UID#IsServer(acptr) && sptr->user ? sptr->user->uid : sptr->name; */
 	to = sptr->name;
 	name = get_client_name(acptr, FALSE);
 	class = get_client_class(acptr);
@@ -2964,7 +2964,7 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		return 0;
 	}
-	if (ST_NOTUID(sptr))
+	if (/*ST_NOTUID*/0)
 	{
 		sendto_flag(SCH_ERROR, "EOB protocol error from %s",
 			get_client_name(sptr, TRUE));

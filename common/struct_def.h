@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.131 2005/02/08 00:14:05 chopin Exp $
+ *   $Id: struct_def.h,v 1.132 2005/02/08 01:49:03 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -866,8 +866,6 @@ typedef	struct	{
 
 #define	SV_OLDSQUIT	0x1000	/* server uses OLD SQUIT logic */
 
-#define	ST_UID(x)	(IsServer(x) && (x->serv->version & SV_UID))
-#define	ST_NOTUID(x)	(IsServer(x) && !(x->serv->version & SV_UID))
 
 /* used for sendto_flag */
 

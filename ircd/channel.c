@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.248 2005/02/08 00:14:05 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.249 2005/02/08 01:49:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -807,7 +807,7 @@ static	void	send_mode_list(aClient *cptr, char *chname, Link *top,
 			** or long enough that they filled up parabuf
 			*/
 			sendto_one(cptr, ":%s MODE %s %s %s",
-				ST_UID(cptr) ? me.serv->sid : ME,
+				/*ST_UID*/IsServer(cptr) ? me.serv->sid : ME,
 				chname, modebuf, parabuf);
 			send = 0;
 			*parabuf = '\0';
@@ -839,7 +839,7 @@ static	void	send_mode_list(aClient *cptr, char *chname, Link *top,
  */
 void	send_channel_modes(aClient *cptr, aChannel *chptr)
 {
-	char	*me2 = ST_UID(cptr) ? me.serv->sid : ME;
+	char	*me2 = /*ST_UID*/IsServer(cptr) ? me.serv->sid : ME;
 
 	if (check_channelmask(&me, cptr, chptr->chname))
 		return;
@@ -861,7 +861,7 @@ void	send_channel_modes(aClient *cptr, aChannel *chptr)
 		CHFL_EXCEPTION, 'e');
 	send_mode_list(cptr, chptr->chname, chptr->mlist,
 		CHFL_INVITE, 'I');
-	if (ST_UID(cptr))	/* knows UID == new server */
+	if (/*ST_UID*/IsServer(cptr))	/* knows UID == new server */
 	{
 		if (modebuf[1] || *parabuf)
 		{
@@ -895,7 +895,7 @@ void	send_channel_members(aClient *cptr, aChannel *chptr)
 	Reg	aClient *c2ptr;
 	Reg	int	cnt = 0, len = 0, nlen;
 	char	*p;
-	char	*me2 = ST_UID(cptr) ? me.serv->sid : ME;
+	char	*me2 = /*ST_UID*/IsServer(cptr) ? me.serv->sid : ME;
 
 	if (check_channelmask(&me, cptr, chptr->chname) == -1)
 		return;
@@ -905,7 +905,7 @@ void	send_channel_members(aClient *cptr, aChannel *chptr)
 	for (lp = chptr->members; lp; lp = lp->next)
 	    {
 		c2ptr = lp->value.cptr;
-		p = (ST_UID(cptr) && c2ptr->user) ?
+		p = (/*ST_UID*/IsServer(cptr) && c2ptr->user) ?
 			c2ptr->user->uid : c2ptr->name;
 		nlen = strlen(p);
 		if ((len + nlen) > (size_t) (BUFSIZE - 9)) /* ,@+ \r\n\0 */
@@ -2760,7 +2760,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		** burst, but 2.11 always. Hence we check for EOB from 2.11
 		** to know what kind of NJOIN it is. --B. */
 		sendto_channel_butserv(chptr, acptr, ":%s JOIN %s%s", acptr->name,
-			(ST_NOTUID(sptr) || IsBursting(sptr)) ? "" : ":", parv[1]);
+			(/*ST_NOTUID*/0 || IsBursting(sptr)) ? "" : ":", parv[1]);
 		/* build MODE for local users on channel, eventually send it */
 		if (*mbuf)
 		    {

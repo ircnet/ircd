@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.247 2005/02/08 00:14:07 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.248 2005/02/08 01:49:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -742,7 +742,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		}
 		/* this will get nicely reduced to UNICK only, when
 		 * we are fully 2.11 */
-		if (ST_UID(acptr))
+		if (/*ST_UID*/IsServer(acptr))
 		{
 			sendto_one(acptr,
 				":%s UNICK %s %s %s %s %s %s :%s",

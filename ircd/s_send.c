@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_send.c,v 1.9 2004/10/09 12:40:29 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_send.c,v 1.10 2005/02/08 01:49:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -56,7 +56,7 @@ static	void	esend_message(aClient *to)
 		lastmax = maxplen;
 	}
 
-	if (ST_UID(to) && newplen > 0)
+	if (/*ST_UID*/IsServer(to) && newplen > 0)
 	{
 		send_message(to, newprefixbuf, newplen);
 		if (slen)
@@ -239,7 +239,7 @@ void	esendto_one(aClient *orig, aClient *dest, char *imsg, char *fmt, ...)
 	va_list va;
 
 	CLEAR_LENGTHS;
-	if (ST_UID(dest->from))
+	if (/*ST_UID*/IsServer(dest->from))
 	{
 		build_new_prefix(orig, imsg, dest, NULL);
 	}
@@ -269,9 +269,9 @@ void	esendto_serv_butone(aClient *orig, aClient *dest, char *dname,
 		if ((acptr = local[fdas.fd[i]]) &&
 			(!one || acptr != one->from) && !IsMe(acptr))
 		{
-			if (newplen == 0 && ST_UID(acptr))
+			if (newplen == 0 && /*ST_UID*/IsServer(acptr))
 				build_new_prefix(orig, imsg, dest, dname);
-			if (oldplen == 0 && (ST_NOTUID(acptr) || newplen <= 0))
+			if (oldplen == 0 && (/*ST_NOTUID*/0 || newplen <= 0))
 				build_old_prefix(orig, imsg, dest, dname);
 			if (slen == 0)
 			{
@@ -323,12 +323,12 @@ void	esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 		else
 		{
 			/* to servers */
-			if (newplen == 0 && ST_UID(acptr))
+			if (newplen == 0 && /*ST_UID*/IsServer(acptr))
 			{
 				build_new_prefix(orig, imsg, NULL,
 					chptr->chname);
 			}
-			if (oldplen == 0 && (ST_NOTUID(acptr) || newplen <= 0))
+			if (oldplen == 0 && (/*ST_NOTUID*/0 || newplen <= 0))
 			{
 				build_old_prefix(orig, imsg, NULL,
 					chptr->chname);
@@ -387,11 +387,11 @@ void	esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr,
 		{
 		    continue;
 		}
-		if (newplen == 0 && ST_UID(cptr))
+		if (newplen == 0 && /*ST_UID*/IsServer(cptr))
 		{
 		    build_new_prefix(orig, imsg, NULL, chptr->chname);
 		}
-		if (oldplen == 0 && (ST_NOTUID(cptr) || newplen <= 0))
+		if (oldplen == 0 && (/*ST_NOTUID*/0 || newplen <= 0))
 		{
 		    build_old_prefix(orig, imsg, NULL, chptr->chname);
 		}

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.100 2005/02/08 00:14:06 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.101 2005/02/08 01:49:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -325,7 +325,7 @@ int	mark_blind_servers (aClient *cptr, aClient *server)
 			||
 			(IsMasked(server) &&
 			server->serv->maskedby == cptr->serv->maskedby && 
-			ST_NOTUID(acptr)))
+			/*ST_NOTUID*/0))
 		{
 			acptr->flags |= FLAGS_HIDDEN;
 			j++;
@@ -538,7 +538,7 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 			 * the squit reason for rebroadcast on the other side
 			 * - jv
 			 */
-			if (ST_UID(sptr))
+			if (/*ST_UID*/IsServer(sptr))
 			{
 				if (sptr->serv->sid[0] != '$')
 				{
@@ -549,7 +549,7 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 				else
 				{
 					sendto_flag(SCH_DEBUG,
-						"ST_UID(sptr) && fake SID");
+						"/*ST_UID*/IsServer(sptr) && fake SID");
 					sendto_one(sptr, ":%s SQUIT %s :%s",
 						me.serv->sid, sptr->name,
 						comment);
@@ -730,20 +730,20 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			{
 				continue;
 			}
-			if (ST_UID(acptr) && !(sptr->flags & FLAGS_SQUIT))
+			if (/*ST_UID*/IsServer(acptr) && !(sptr->flags & FLAGS_SQUIT))
 			{
 				/* Make sure we only send the last SQUIT
 				** to a 2.11. */
 				continue;
 			}
-			if ((acptr->flags & FLAGS_HIDDEN) && ST_NOTUID(acptr))
+			if ((acptr->flags & FLAGS_HIDDEN) && /*ST_NOTUID*/0)
 			{
 				/* A 2.10 can't see this server, so don't send
 				** the SQUIT.
 				*/ 
 				continue;
 			}
-			if (ST_UID(acptr))
+			if (/*ST_UID*/IsServer(acptr))
 			{
 				if ((acptr->flags & FLAGS_HIDDEN) &&
 					!IsMasked(sptr))
@@ -822,7 +822,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 						if (!(acptr =local[fdas.fd[i]])
 						    || !IsServer(acptr)
 						    || acptr == cptr
-						    || ST_UID(acptr)
+						    || /*ST_UID*/IsServer(acptr)
 						    || IsMe(acptr))
 							continue;
 						if (acptr->flags & FLAGS_HIDDEN)
