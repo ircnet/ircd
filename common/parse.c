@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.40 2002/04/05 03:02:46 jv Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.41 2002/04/05 04:04:37 jv Exp $";
 #endif
 
 #include "os.h"
@@ -545,7 +545,7 @@ aClient *find_target(char *name,aClient *cptr)
 		{
 			acptr = find_server(name, NULL);
 		}
-		if (!acptr && match(name, ME))
+		if (!acptr && !match(name, ME))
 		{
 			acptr = &me;
 		}
