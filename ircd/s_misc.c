@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.93 2004/08/02 22:59:02 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.94 2004/08/04 14:04:32 jv Exp $";
 #endif
 
 #include "os.h"
@@ -911,16 +911,15 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			{
 				del_from_uid_hash_table(sptr->user->uid, sptr);
 			}
-#if 0
+
 			/* Add user to history */
 #ifndef BETTER_NDELAY
-			add_history(sptr, (sptr->flags & FLAGS_QUIT) ? 
+			add_history(sptr, (sptr->flags & FLAGS_QUIT) ?
 				    &me : NULL);
 #else
 			add_history(sptr, (sptr == cptr) ? &me : NULL);
 #endif
 			off_history(sptr);
-#endif
 			del_from_hostname_hash_table(sptr->user->host,
 						     sptr->user);
 		    }
