@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.199 2004/03/29 18:44:14 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.200 2004/03/29 18:46:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -825,7 +825,7 @@ int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	int	delayed = 0;
-	char	nick[NICKLEN+2], *s, *user, *host;
+	char	nick[NICKLEN+2], *user, *host;
 	Link	*lp = NULL;
 	int	donickname;
 
@@ -848,8 +848,6 @@ int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[ERR_NONICKNAMEGIVEN], ME, BadTo(parv[0]));
 		return 1;
 	    }
-	if (MyConnect(sptr) && (s = (char *)index(parv[1], '~')))
-		*s = '\0';
 	/* local clients' nick size can be ONICKLEN max */
 	strncpyzt(nick, parv[1], (MyConnect(sptr) ? ONICKLEN : NICKLEN)+1);
 
