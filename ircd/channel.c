@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.206 2004/06/06 10:25:46 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.207 2004/06/06 10:29:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -113,17 +113,16 @@ static	aClient	*find_chasing(aClient *sptr, char *user, int *chasing)
 }
 
 /*
- *  Fixes a string so that the first white space found becomes an end of
- * string marker (`\-`).  returns the 'fixed' string or "*" if the string
+ * Fixes a string so that the first white space found becomes an end of
+ * string marker (`\0`). Returns the 'fixed' string or static "*" if the string
  * was NULL length or a NULL pointer.
  */
 static	char	*check_string(char *s)
 {
-	static	char	star[2] = "*";
 	char	*str = s;
 
 	if (BadPtr(s))
-		return star;
+		return asterix;
 
 	for ( ;*s; s++)
 		if (isspace(*s))
@@ -132,7 +131,7 @@ static	char	*check_string(char *s)
 			break;
 		    }
 
-	return (BadPtr(str)) ? star : str;
+	return (BadPtr(str)) ? asterix : str;
 }
 
 /*
