@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.239 2004/11/13 23:09:54 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.240 2004/11/19 15:10:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -957,7 +957,6 @@ void	send_channel_members(aClient *cptr, aChannel *chptr)
 
 int	m_mode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	int	mcount = 0;
 	int	penalty = 0;
 	aChannel *chptr;
 	char	*name, *p = NULL;
@@ -999,8 +998,8 @@ int	m_mode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    }
 		else	/* Check parameters for the channel */
 		    {
-			if(!(mcount = set_mode(cptr, sptr, chptr,
-				&penalty, parc - 2, parv + 2)))
+			if(0==set_mode(cptr, sptr, chptr,
+				&penalty, parc - 2, parv + 2))
 				continue;	/* no valid mode change */
 		    } /* else(parc>2) */
 	    } /* for (parv1) */

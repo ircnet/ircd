@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.237 2004/11/02 16:41:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.238 2004/11/19 15:10:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -351,7 +351,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 {
 	Reg	aConfItem *aconf;
 	aClient	*acptr;
-	aServer	*sp = NULL;
 	anUser	*user = sptr->user;
 	char	*parv[3];
 #ifndef NO_PREFIX
@@ -612,7 +611,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 				XLINE_EXIT_REASON);
 		}
 #endif
-		sp = user->servp;
 	    }
 	else
 		strncpyzt(user->username, username, USERLEN+1);
@@ -828,7 +826,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #endif
 	add_to_hostname_hash_table(user->host, user);
 	return 1;
-    }
+}
 
 /*
 ** m_nick

@@ -267,7 +267,6 @@ void config_error(int level, aFile *curF, int line, char *pattern, ...)
 void config_error(int level, char *filename, int line, char *pattern, ...)
 #endif
 {
-	int len;
 	static int etclen = 0;
 	va_list va;
 	char vbuf[8192];
@@ -282,7 +281,7 @@ void config_error(int level, char *filename, int line, char *pattern, ...)
 	}
 
 	va_start(va, pattern);
-	len = vsprintf(vbuf, pattern, va);
+	vsprintf(vbuf, pattern, va);
 	va_end(va);
 
 	/* no need to show full path, if the same dir */

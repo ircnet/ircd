@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.93 2004/11/19 14:45:39 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.94 2004/11/19 15:10:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1108,7 +1108,7 @@ void	sendto_flag(u_int chan, char *pattern, ...)
 	SChan	*shptr;
 	char	nbuf[1024];
 
-	if (chan < 0 || chan >= SCH_MAX)
+	if (chan >= SCH_MAX)
 		chan = SCH_NOTICE;
 	shptr = svchans + chan;
 
