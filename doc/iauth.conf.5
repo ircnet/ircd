@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.14 1999/06/27 19:10:58 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1999/06/27 19:10:58 $"
+.\" @(#)$Id: iauth.conf.5,v 1.15 1999/07/01 21:50:48 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1999/07/01 21:50:48 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -42,16 +42,18 @@ syntax using the \fIiauth\fP program to avoid later problems.
 .TP
 .B required
 By specifying this keyword, the IRC server is told not to accept new user
-connections unless the authentication is handled by iauth.
+connections unless the authentication is handled by \fIiauth\fP.  This does
+NOT mean that the server will wait forever to get the data from iauth, see
+the \fInotimeout\fP option.
 .TP
 .B notimeout
 By specifying this keyword, the IRC server is told not to accept new user
-connections if iauth hasn't finished its work in time.
+connections if \fIiauth\fP hasn't finished its work in time.
 .TP
 .B extinfo
 This keyword allows extra information (user supplied username, and
-eventually password) to be received by iauth from the server.  This is only
-useful is a module using this information is loaded.
+eventually password) to be received by \fIiauth\fP from the server.  This
+is only useful is a module using this information is loaded.
 .TP
 .B shared <name> <mod_name.so>
 If iauth was compiled with Dynamically Shared Module support, it can be
@@ -102,7 +104,7 @@ to check only socks v5.
 .B rfc931
 This module is for authentication TCP connections using the protocol
 defined in RFC 1413 (which obsoletes RFC 931).  It is always loaded, and
-does not recognize the "host" nor "ip" fields.
+does not recognize the \fIhost\fP nor \fIip\fP fields.
 .TP
 .B lhex
 This module acts as a proxy, communicating with a LHEx server to perform
@@ -144,7 +146,7 @@ For full COPYRIGHT see LICENSE file with IRC package.
 .LP
 .RE
 .SH FILES
- "iauth.conf"
+"iauth.conf"
 .SH "SEE ALSO"
 iauth(8)
 .SH AUTHOR
