@@ -31,6 +31,7 @@ typedef	struct	CPing	aCPing;
 typedef	struct	Zdata	aZdata;
 #ifdef CACHED_MOTD
 typedef struct        MotdItem aMotd;
+typedef struct        MotdItem aExtCf;
 #endif
 
 #define	HOSTLEN		63	/* Length of hostname.  Updated to         */

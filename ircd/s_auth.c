@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.13 1998/08/06 02:58:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.14 1998/08/07 02:04:09 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -26,6 +26,8 @@ static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.13 1998/08/06 02:58:57 kalt Exp $"
 #define S_AUTH_C
 #include "s_externs.h"
 #undef S_AUTH_C
+
+aExtCf	*iauth_conf = NULL;
 
 #if defined(USE_IAUTH)
 /*
@@ -132,6 +134,33 @@ read_iauth()
 			    start = end;
 			    continue;
 			}
+		    if (*start == 'a')
+			{
+			    aExtCf *ectmp;
+
+			    while (ectmp = iauth_conf)
+				{
+				    iauth_conf = iauth_conf->next;
+				    MyFree(ectmp->line);
+				    MyFree(ectmp);
+				}
+			    /* little lie.. ;) */
+			    sendto_flag(SCH_AUTH, "New iauth configuration.");
+			    start = end;
+			    continue;
+			}
+		    if (*start == 'A')
+			{
+			    aExtCf **ectmp = &iauth_conf;
+
+			    while (*ectmp)
+				    ectmp = &((*ectmp)->next);
+			    *ectmp = (aExtCf *) MyMalloc(sizeof(aExtCf));
+			    (*ectmp)->line = mystrdup(start+2);
+			    (*ectmp)->next = NULL;
+			    start = end;
+			    continue;
+			}
 		    if (*start != 'U' && *start != 'u' &&
 			*start != 'K' && *start != 'D')
 			{
@@ -156,11 +185,15 @@ read_iauth()
 			    inetntoa((char *)&cptr->ip), cptr->port);
 		    if (strncmp(tbuf, start, strlen(tbuf)))
 			{
-			    sendto_flag(SCH_AUTH,
+			    /* this is fairly common and can be ignored */
+			    if (ia_dbg)
+				{
+				    sendto_flag(SCH_AUTH,
 					"Client mismatch: %d [%s] != [%s]",
-					i, start, tbuf);
-			    sendto_iauth("%d E Mismatch [%s] != [%s]", i,
-					 start, tbuf);
+						i, start, tbuf);
+				    sendto_iauth("%d E Mismatch [%s] != [%s]",
+						 i, start, tbuf);
+				}
 			    start = end;
 			    continue;
 			}
@@ -219,6 +252,26 @@ read_iauth()
 	}
 /*    if (olen)
 	    bcopy(buf, obuf, olen); /* for next time */		    
+}
+
+/*
+ * report_iauth_conf
+ *
+ * called from m_stats(), this is the reply to /stats a
+ */
+void
+report_iauth_conf(sptr, to)
+aClient *sptr;
+char *to;
+{
+	aExtCf *ectmp = iauth_conf;
+
+	while (ectmp)
+	    {
+		sendto_one(sptr, ":%s %d %s :%s",
+			   ME, RPL_STATSIAUTH, to, ectmp->line);
+		ectmp = ectmp->next;
+	    }
 }
 #endif
 

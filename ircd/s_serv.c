@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.41 1998/08/02 22:33:39 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.42 1998/08/07 02:04:10 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1399,6 +1399,11 @@ char	*parv[];
 				   timeofday - acptr->firsttime);
 		    }
 		break;
+#if defined(USE_IAUTH)
+	case 'a' : case 'A' : /* iauth configuration */
+		report_iauth_conf(sptr, parv[0]);
+		break;
+#endif
 	case 'B' : case 'b' : /* B conf lines */
 		report_configured_links(cptr, parv[0], CONF_BOUNCE);
 		break;

@@ -305,6 +305,7 @@
 #define RPL_SERVLIST         234
 #define RPL_SERVLISTEND      235
 
+#define	RPL_STATSIAUTH       239
 #define	RPL_STATSVLINE       240
 #define	RPL_STATSLLINE       241
 #define	RPL_STATSUPTIME      242
@@ -330,3 +331,4 @@
 #define	RPL_TRACELOG         261
 #define	RPL_TRACEEND         262
 #define	RPL_TRYAGAIN         263
+
