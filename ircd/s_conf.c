@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.59 2002/11/24 15:30:31 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.60 2003/02/10 19:25:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -153,9 +153,10 @@ int	mask;
  * Now should work for IPv6 too.
  * returns -1 on error, 0 on match, 1 when NO match.
  */
-int    match_ipmask(mask, cptr)
+int    match_ipmask(mask, cptr, maskwithusername)
 char   *mask;
 aClient *cptr;
+int	maskwithusername;
 {
 	int	m;
 	char	*p;
@@ -168,7 +169,7 @@ aClient *cptr;
  
 	strncpyzt(dummy, mask, sizeof(dummy));
 	mask = dummy;
-	if ((p = index(mask, '@')))
+	if (maskwithusername && (p = index(mask, '@')))
 	{
 		*p = '\0';
 		if (match(mask, cptr->username))
@@ -183,11 +184,11 @@ aClient *cptr;
 	{
 		goto badmask;
 	}
+	if (!m)
+		return 0;       /* x.x.x.x/0 always matches */
 #ifndef	INET6
 	if (m < 0 || m > 32)
 		goto badmask;
-	if (!m)
-		return 0;       /* x.x.x.x/0 always matches */
 	lmask = htonl((u_long)0xffffffffL << (32 - m));
 	addr.s_addr = inetaddr(mask);
 	return ((addr.s_addr ^ cptr->ip.s_addr) & lmask) ? 1 : 0;
@@ -224,6 +225,7 @@ aClient *cptr;
 	return 0;
 #endif
 badmask:
+	if (maskwithusername)
 	sendto_flag(SCH_ERROR, "Ignoring bad mask: %s", mask);
 	return -1;
 }
@@ -284,7 +286,7 @@ char	*sockhost;
 		(void)strncat(uhost, sockhost, sizeof(uhost) - strlen(uhost));
 		if (strchr(aconf->host, '/'))		/* 1.2.3.0/24 */
 		    {
-			if (match_ipmask(aconf->host, cptr))
+			if (match_ipmask(aconf->host, cptr, 1))
 				continue;
                 } else if (match(aconf->host, uhost))	/* 1.2.3.* */
 			continue;
@@ -690,7 +692,7 @@ aClient	*cptr;
 		*/
 		if (match(tmp->host, userhost) && match(tmp->host, userip) &&
 			(!strchr(tmp->host, '/') 
-			|| match_ipmask(tmp->host, cptr)))
+			|| match_ipmask(tmp->host, cptr, 1)))
 			continue;
 		if (tmp->clients < MaxLinks(Class(tmp)))
 			return tmp;
@@ -1634,7 +1636,7 @@ char	**comment;
 			if (strchr(tmp->host, '/'))
 			    {
 				if (match_ipmask((*tmp->host == '=') ?
-						 tmp->host+1: tmp->host, cptr))
+						 tmp->host+1: tmp->host, cptr, 1))
 					continue;
 			    }
 			else          
@@ -1647,7 +1649,7 @@ char	**comment;
 		else /* resolved */
 			if (strchr(tmp->host, '/'))
 			    {
-				if (match_ipmask(tmp->host, cptr))
+				if (match_ipmask(tmp->host, cptr, 1))
 					continue;
 			    }
 			else
@@ -1857,7 +1859,7 @@ int	class, fd;
 		else
 			if (strchr(aconf->host, '/'))
 			    {
-				if (match_ipmask(aconf->host, cptr))
+				if (match_ipmask(aconf->host, cptr, 1))
 					continue;
 			    }
 			else if (match(aconf->host, cptr->sockhost))
