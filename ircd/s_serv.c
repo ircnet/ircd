@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.58 1999/04/15 21:32:02 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.59 1999/04/19 22:29:23 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -209,7 +209,7 @@ char	*parv[];
 		sendto_one(sptr, err_str(ERR_NOPRIVILEGES, parv[0]));
 		return 1;
 	    }
-	if (!MyConnect(acptr))
+	if (!MyConnect(acptr) && (cptr != acptr->from))
 	    {
 		sendto_one(acptr->from, ":%s SQUIT %s :%s", parv[0],
 			   acptr->name, comment);
