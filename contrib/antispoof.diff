@@ -1,6 +1,6 @@
-diff -urN irc2.10/common/numeric_def.h irc2.10-nospoof/common/numeric_def.h
---- irc2.10/common/numeric_def.h	Fri Aug  7 12:04:02 1998
-+++ irc2.10-nospoof/common/numeric_def.h	Wed Sep 16 21:04:49 1998
+diff -urN irc2.10b13/common/numeric_def.h irc2.10b13-nospoof/common/numeric_def.h
+--- irc2.10b13/common/numeric_def.h	Fri Aug  7 12:04:02 1998
++++ irc2.10b13-nospoof/common/numeric_def.h	Mon Sep 21 12:50:46 1998
 @@ -196,6 +196,10 @@
  #define ERR_UMODEUNKNOWNFLAG 501
  #define ERR_USERSDONTMATCH   502
@@ -12,9 +12,9 @@ diff -urN irc2.10/common/numeric_def.h irc2.10-nospoof/common/numeric_def.h
  /*
   * Numberic replies from server commands.
   * These are currently in the range 200-399.
-diff -urN irc2.10/common/parse.c irc2.10-nospoof/common/parse.c
---- irc2.10/common/parse.c	Wed Aug  5 11:40:37 1998
-+++ irc2.10-nospoof/common/parse.c	Wed Sep 16 21:05:53 1998
+diff -urN irc2.10b13/common/parse.c irc2.10b13-nospoof/common/parse.c
+--- irc2.10b13/common/parse.c	Mon Sep 14 06:09:05 1998
++++ irc2.10b13-nospoof/common/parse.c	Mon Sep 21 12:50:46 1998
 @@ -49,7 +49,11 @@
    { MSG_KICK,    m_kick,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
    { MSG_WALLOPS, m_wallops,  MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
@@ -27,9 +27,9 @@ diff -urN irc2.10/common/parse.c irc2.10-nospoof/common/parse.c
    { MSG_ERROR,   m_error,    MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
  #ifdef	OPER_KILL
    { MSG_KILL,    m_kill,     MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
-diff -urN irc2.10/common/send.c irc2.10-nospoof/common/send.c
---- irc2.10/common/send.c	Wed Sep  9 22:25:26 1998
-+++ irc2.10-nospoof/common/send.c	Wed Sep 16 21:06:16 1998
+diff -urN irc2.10b13/common/send.c irc2.10b13-nospoof/common/send.c
+--- irc2.10b13/common/send.c	Wed Sep  9 22:25:26 1998
++++ irc2.10b13-nospoof/common/send.c	Mon Sep 21 12:50:46 1998
 @@ -468,6 +468,9 @@
  			 NULL,
  # endif
@@ -40,9 +40,9 @@ diff -urN irc2.10/common/send.c irc2.10-nospoof/common/send.c
  			 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, NULL,
  			 0, 0, 0
  # if defined(__STDC__)	/* hack around union{} initialization	-Vesa */
-diff -urN irc2.10/common/struct_def.h irc2.10-nospoof/common/struct_def.h
---- irc2.10/common/struct_def.h	Mon Aug 24 12:26:40 1998
-+++ irc2.10-nospoof/common/struct_def.h	Wed Sep 16 21:06:33 1998
+diff -urN irc2.10b13/common/struct_def.h irc2.10b13-nospoof/common/struct_def.h
+--- irc2.10b13/common/struct_def.h	Mon Aug 24 12:26:40 1998
++++ irc2.10b13-nospoof/common/struct_def.h	Mon Sep 21 12:50:46 1998
 @@ -431,6 +431,9 @@
  	short	lastsq;		/* # of 2k blocks when sendqueued called last*/
  	dbuf	sendQ;		/* Outgoing message queue--if socket full */
@@ -53,9 +53,9 @@ diff -urN irc2.10/common/struct_def.h irc2.10-nospoof/common/struct_def.h
  	long	sendM;		/* Statistics: protocol messages send */
  	long	sendK;		/* Statistics: total k-bytes send */
  	long	receiveM;	/* Statistics: protocol messages received */
-diff -urN irc2.10/ircd/ircd.c irc2.10-nospoof/ircd/ircd.c
---- irc2.10/ircd/ircd.c	Mon Sep 14 02:44:46 1998
-+++ irc2.10-nospoof/ircd/ircd.c	Wed Sep 16 21:08:04 1998
+diff -urN irc2.10b13/ircd/ircd.c irc2.10b13-nospoof/ircd/ircd.c
+--- irc2.10b13/ircd/ircd.c	Mon Sep 14 21:44:52 1998
++++ irc2.10b13-nospoof/ircd/ircd.c	Mon Sep 21 12:50:46 1998
 @@ -480,6 +480,22 @@
  			else
  			    {
@@ -79,9 +79,9 @@ diff -urN irc2.10/ircd/ircd.c irc2.10-nospoof/ircd/ircd.c
  				(void)exit_client(cptr, cptr, &me,
  						  "Ping timeout");
  			    }
-diff -urN irc2.10/ircd/list.c irc2.10-nospoof/ircd/list.c
---- irc2.10/ircd/list.c	Mon Aug 24 12:26:33 1998
-+++ irc2.10-nospoof/ircd/list.c	Wed Sep 16 21:08:54 1998
+diff -urN irc2.10b13/ircd/list.c irc2.10b13-nospoof/ircd/list.c
+--- irc2.10b13/ircd/list.c	Mon Aug 24 12:26:33 1998
++++ irc2.10b13-nospoof/ircd/list.c	Mon Sep 21 12:50:46 1998
 @@ -146,6 +146,9 @@
  	if (size == CLIENT_LOCAL_SIZE)
  	    {
@@ -92,9 +92,9 @@ diff -urN irc2.10/ircd/list.c irc2.10-nospoof/ircd/list.c
  		cptr->confs = NULL;
  		cptr->sockhost[0] = '\0';
  		cptr->buffer[0] = '\0';
-diff -urN irc2.10/ircd/random.c irc2.10-nospoof/ircd/random.c
---- irc2.10/ircd/random.c	Thu Jan  1 10:00:00 1970
-+++ irc2.10-nospoof/ircd/random.c	Wed Sep 16 21:04:02 1998
+diff -urN irc2.10b13/ircd/random.c irc2.10b13-nospoof/ircd/random.c
+--- irc2.10b13/ircd/random.c	Thu Jan  1 10:00:00 1970
++++ irc2.10b13-nospoof/ircd/random.c	Mon Sep 21 12:50:46 1998
 @@ -0,0 +1,162 @@
 +/************************************************************************
 + *   IRC - Internet Relay Chat, ircd/random.c
@@ -258,9 +258,48 @@ diff -urN irc2.10/ircd/random.c irc2.10-nospoof/ircd/random.c
 +}
 +
 +#endif
-diff -urN irc2.10/ircd/s_err.c irc2.10-nospoof/ircd/s_err.c
---- irc2.10/ircd/s_err.c	Sun Aug 23 05:22:28 1998
-+++ irc2.10-nospoof/ircd/s_err.c	Wed Sep 16 21:10:03 1998
+diff -urN irc2.10b13/ircd/s_debug.c irc2.10b13-nospoof/ircd/s_debug.c
+--- irc2.10b13/ircd/s_debug.c	Sat Jun 13 09:28:36 1998
++++ irc2.10b13-nospoof/ircd/s_debug.c	Mon Sep 21 13:39:02 1998
+@@ -151,6 +151,9 @@
+ #ifdef MIRC_KLUDGE
+ '$',
+ #endif
++#if defined(NOSPOOF)
++'*',
++#endif
+ '\0'};
+ 
+ #ifdef DEBUGMODE
+@@ -343,7 +346,7 @@
+ 	sendto_one(cptr, ":%s %d %s :BS:%d MXR:%d MXB:%d MXBL:%d PY:%d",
+ 		   ME, RPL_STATSDEFINE, nick, BUFSIZE, MAXRECIPIENTS, MAXBANS,
+ 		   MAXBANLENGTH, MAXPENALTY);
+-	sendto_one(cptr, ":%s %d %s :ZL:%d CM:%d CP:%d",
++	sendto_one(cptr, ":%s %d %s :ZL:%d CM:%d CP:%d NS:%s",
+ 		   ME, RPL_STATSDEFINE, nick,
+ #ifdef	ZIP_LINKS
+ 		   ZIP_LEVEL,
+@@ -351,9 +354,14 @@
+ 		   -1,
+ #endif
+ #ifdef	CLONE_CHECK
+-		   CLONE_MAX, CLONE_PERIOD
++		   CLONE_MAX, CLONE_PERIOD,
++#else
++		   -1, -1,
++#endif
++#if defined(NOSPOOF)
++		   "yes"
+ #else
+-		   -1, -1
++		   "no"
+ #endif
+ 		   );
+ }
+diff -urN irc2.10b13/ircd/s_err.c irc2.10b13-nospoof/ircd/s_err.c
+--- irc2.10b13/ircd/s_err.c	Sat Sep 19 08:02:51 1998
++++ irc2.10b13-nospoof/ircd/s_err.c	Mon Sep 21 12:50:47 1998
 @@ -161,6 +161,19 @@
                  { 0, (char *)NULL },
  /* 501 */	{ ERR_UMODEUNKNOWNFLAG, ":Unknown MODE flag" },
@@ -281,9 +320,9 @@ diff -urN irc2.10/ircd/s_err.c irc2.10-nospoof/ircd/s_err.c
  		{ 0, (char *)NULL }
  };
  
-diff -urN irc2.10/ircd/s_user.c irc2.10-nospoof/ircd/s_user.c
---- irc2.10/ircd/s_user.c	Sat Sep 12 03:48:59 1998
-+++ irc2.10-nospoof/ircd/s_user.c	Wed Sep 16 21:11:21 1998
+diff -urN irc2.10b13/ircd/s_user.c irc2.10b13-nospoof/ircd/s_user.c
+--- irc2.10b13/ircd/s_user.c	Sat Sep 19 07:46:57 1998
++++ irc2.10b13-nospoof/ircd/s_user.c	Mon Sep 21 13:25:55 1998
 @@ -302,9 +302,9 @@
  
  /*
@@ -339,7 +378,21 @@ diff -urN irc2.10/ircd/s_user.c irc2.10-nospoof/ircd/s_user.c
  	    }
  	/*
  	**  Finally set new nick name.
-@@ -2115,7 +2139,32 @@
+@@ -1787,7 +1811,12 @@
+ 	if (MyConnect(sptr))
+ 		sendto_iauth("%d U %.*s", sptr->fd, USERLEN+1, username);
+ #endif
+-	if (sptr->name[0]) /* NICK already received, now we have USER... */
++	if ((sptr->name[0])
++#if defined(NOSPOOF)
++	    && (!MyConnect(sptr) || (sptr->cookie==-1))
++#endif
++	    )
++	    /* NICK already received, now we have a USER... */
+ 	    {
+ 		if ((parc == 6) && IsServer(cptr)) /* internal m_user() */
+ 		    {
+@@ -2160,7 +2189,32 @@
  	aClient *acptr;
  	char	*origin, *destination;
  
@@ -373,9 +426,9 @@ diff -urN irc2.10/ircd/s_user.c irc2.10-nospoof/ircd/s_user.c
  	    {
  		sendto_one(sptr, err_str(ERR_NOORIGIN, parv[0]));
  		return 1;
-diff -urN irc2.10/support/Makefile.in irc2.10-nospoof/support/Makefile.in
---- irc2.10/support/Makefile.in	Thu Sep 10 23:14:40 1998
-+++ irc2.10-nospoof/support/Makefile.in	Wed Sep 16 21:04:02 1998
+diff -urN irc2.10b13/support/Makefile.in irc2.10b13-nospoof/support/Makefile.in
+--- irc2.10b13/support/Makefile.in	Mon Sep 14 21:44:53 1998
++++ irc2.10b13-nospoof/support/Makefile.in	Mon Sep 21 12:50:47 1998
 @@ -95,7 +95,7 @@
  SERVER_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
                s_bsd.o s_conf.o s_debug.o s_err.o s_id.o s_misc.o s_numeric.o \
@@ -395,10 +448,10 @@ diff -urN irc2.10/support/Makefile.in irc2.10-nospoof/support/Makefile.in
  
  iauth.o: ../iauth/iauth.c config.h setup.h
  	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/iauth.c
-diff -urN irc2.10/support/config.h.dist irc2.10-nospoof/support/config.h.dist
---- irc2.10/support/config.h.dist	Thu Sep 10 23:14:40 1998
-+++ irc2.10-nospoof/support/config.h.dist	Wed Sep 16 21:13:57 1998
-@@ -446,6 +446,30 @@
+diff -urN irc2.10b13/support/config.h.dist irc2.10b13-nospoof/support/config.h.dist
+--- irc2.10b13/support/config.h.dist	Sat Sep 19 07:59:54 1998
++++ irc2.10b13-nospoof/support/config.h.dist	Mon Sep 21 12:50:47 1998
+@@ -442,6 +442,30 @@
   */
  #define MIRC_KLUDGE
  
@@ -429,7 +482,7 @@ diff -urN irc2.10/support/config.h.dist irc2.10-nospoof/support/config.h.dist
  /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
  /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
  /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
-@@ -515,7 +539,11 @@
+@@ -511,7 +535,11 @@
   * CONNECTTIMEOUT - 10 seconds for its host to respond to an ident lookup
   * query and for a DNS answer to be retrieved.
   */
@@ -441,16 +494,3 @@ diff -urN irc2.10/support/config.h.dist irc2.10-nospoof/support/config.h.dist
  
  /*
   * Max time from the nickname change that still causes KILL
-diff -urN irc2.10/ircd/s_debug.c irc2.10-nospoof/ircd/s_debug.c
---- irc2.10/ircd/s_debug.c	Sat Jun 13 09:28:36 1998
-+++ irc2.10-nospoof/ircd/s_debug.c	Sun Sep 20 20:50:31 1998
-@@ -106,6 +106,9 @@
- #ifdef	BETTER_NDELAY
- 'n',
- #endif
-+#if defined(NOSPOOF)
-+'O',
-+#endif
- #ifdef	CRYPT_OPER_PASSWORD
- 'p',
- #endif
