@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.45 2003/10/18 15:31:26 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.46 2003/10/18 18:42:52 q Exp $";
 #endif
 
 #include "os.h"
@@ -131,7 +131,7 @@ void	check_services_butone(long action, char *server, aClient *cptr,
 				char	buf[2048];
 				va_list	va;
 				va_start(va, fmt);
-				va_arg(va, char *);
+				(void)va_arg(va, char *);
 				vsprintf(buf, fmt+3, va);
 				va_end(va);
 				sprintf(nbuf, "%s!%s@%s", cptr->name,
