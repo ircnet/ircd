@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.26 2002/10/09 21:23:19 q Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.27 2003/06/18 19:44:48 q Exp $";
 #endif
 
 #include "os.h"
@@ -795,11 +795,11 @@ char **make_isupport()
 	/* Warning: There must be up to 13 tokens in each string */
 	tis[0] = (char *) MyMalloc(BUFSIZE);
 	sprintf(tis[0],
-	"RFC2812 PREFIX=(ov)@+ CHANTYPES=#&!+ MODES=%d MAXCHANNELS=%d "
-	"NICKLEN=%d TOPICLEN=%d KICKLEN=%d MAXBANS=%d CHANNELLEN=%d CHIDLEN=%d "
-	"CHANMODES=beI,k,l,imnpstaqr",
-	MAXMODEPARAMS,MAXCHANNELSPERUSER,
-	NICKLEN,TOPICLEN,TOPICLEN,MAXBANS,CHANNELLEN,CHIDLEN);
+		"RFC2812 PREFIX=(ov)@+ CHANTYPES=#&!+ MODES=%d MAXCHANNELS=%d "
+		"NICKLEN=%d TOPICLEN=%d KICKLEN=%d MAXLIST=beI:%d "
+		"CHANNELLEN=%d CHIDLEN=%d CHANMODES=beI,k,l,imnpstaqr",
+		MAXMODEPARAMS, MAXCHANNELSPERUSER,
+		NICKLEN, TOPICLEN, TOPICLEN, MAXBANS, CHANNELLEN, CHIDLEN);
 
 	if (networkname)
 	{
@@ -807,7 +807,8 @@ char **make_isupport()
 		strcat(tis[0], networkname);
 	}
 	tis[1] = (char *) MyMalloc(BUFSIZE);
-	sprintf(tis[1],	"PENALTY FNC EXCEPTS INVEX");
+	sprintf(tis[1],	"PENALTY FNC EXCEPTS=e INVEX=I CASEMAPPING=rfc1459 "
+		"CHARSET=utf-8");
 
 	tis[2] = NULL;
 
