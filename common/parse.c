@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.42 2002/04/07 22:39:41 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.43 2002/04/16 20:44:51 jv Exp $";
 #endif
 
 #include "os.h"
@@ -199,6 +199,65 @@ Reg	aClient *cptr;
 	return acptr;
     }
 
+aClient *find_matching_client(char *mask)
+{
+	aClient *acptr;
+	aServer *asptr;
+	aService *sp;
+	char *ch;
+	int wild = 0, dot = 0;
+	
+	/* try to find exact match */	
+	acptr = find_client(mask, NULL);
+	
+	if (acptr)
+	{
+		return acptr;
+	}
+	/* check if we should check against wilds */
+	for (ch = mask; *ch; ch++)
+	{
+		if (*ch == '*' || *ch == '?')
+		{
+			wild = 1;
+			break;
+		}
+		if (*ch == '.')
+		{
+			dot = 1;
+			break;
+		}
+	}
+	
+	if (!wild && !dot)
+	{
+		return NULL;
+	}
+	
+	(void) collapse(mask);
+	
+	/* try to match some servername against mask */
+	for (asptr = svrtop; asptr; asptr = asptr->nexts)
+	{
+		if (!match(asptr->bcptr->name, mask) ||
+		    !match(mask, asptr->bcptr->name))
+		{
+			acptr = asptr->bcptr;
+			return acptr->serv->maskedby;
+		}
+	}
+	/* no match, try services */
+	for (sp = svctop; sp; sp = sp->nexts)
+	{
+		if (!match(sp->bcptr->name, mask) ||
+		    !match(mask, sp->bcptr->name))
+		{
+			acptr = sp->bcptr;
+			return acptr;	
+		}
+	}
+	return NULL;
+}
 #else /* CLIENT_COMPILE */
 
 aClient *find_client(name, cptr)
@@ -548,6 +607,9 @@ aClient *find_target(char *name,aClient *cptr)
 		}
 		if (!acptr && !match(name, ME))
 		{
+			/* Matches when the target is "*.ourmask" which
+			 * is not handled by above functions.
+			 */
 			acptr = &me;
 		}
 	}
