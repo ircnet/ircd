@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.157 2003/08/08 21:56:58 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.158 2003/08/31 18:48:25 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -514,7 +514,7 @@ char	*nick, *username;
 			struct msg_set { char shortm; char *longm; };
 			    
 			static struct msg_set exit_msg[7] = {
-			{ EXITC_GUHMAX, "To many user connections (global)" },
+			{ EXITC_GUHMAX, "Too many user connections (global)" },
 			{ EXITC_GHMAX, "Too many host connections (global)" },
 			{ EXITC_LUHMAX, "Too many user connections (local)" },
 			{ EXITC_LHMAX, "Too many host connections (local)" },
