@@ -1,132 +1,339 @@
-/* ../support/setup.h.in.  Generated automatically from configure.in by autoheader.  */
+/* ../support/setup.h.in.  Generated from configure.in by autoheader.  */
 
-/* Define if on AIX 3.
-   System headers sometimes define this.
-   We just want to avoid a redefinition error message.  */
-#ifndef _ALL_SOURCE
-#undef _ALL_SOURCE
-#endif
+/* Define if the operating system is AIX 3.2. */
+#undef AIX_3_2
 
-/* Define to empty if the keyword does not work.  */
-#undef const
+/* Define if <netdb.h> contains bad __const usages (Linux). */
+#undef BAD___CONST_NETDB_H
 
-/* Define to `int' if <sys/types.h> doesn't define.  */
-#undef gid_t
+/* Define if the system provides reliable BSD signals. */
+#undef BSD_RELIABLE_SIGNALS
 
-/* Define if system calls automatically restart after interruption
-   by a signal.  */
-#undef HAVE_RESTARTABLE_SYSCALLS
+/* Define if errno is declared in errno.h. */
+#undef ERRNO_DECLARED
 
-/* Define if you have <sys/wait.h> that is POSIX.1 compatible.  */
+/* Define to 1 if you have the <arpa/inet.h> header file. */
+#undef HAVE_ARPA_INET_H
+
+/* Define to 1 if you have the <arpa/nameser.h> header file. */
+#undef HAVE_ARPA_NAMESER_H
+
+/* Define to 1 if you have the `bcmp' function. */
+#undef HAVE_BCMP
+
+/* Define to 1 if you have the `bcopy' function. */
+#undef HAVE_BCOPY
+
+/* Define to 1 if you have the `bzero' function. */
+#undef HAVE_BZERO
+
+/* Define to 1 if you have the <ctype.h> header file. */
+#undef HAVE_CTYPE_H
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <errno.h> header file. */
+#undef HAVE_ERRNO_H
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
+/* Define to 1 if you have the `fork' function. */
+#undef HAVE_FORK
+
+/* Define to 1 if you have the `getipnodebyname' function. */
+#undef HAVE_GETIPNODEBYNAME
+
+/* Define to 1 if you have the `getrusage' function. */
+#undef HAVE_GETRUSAGE
+
+/* Define to 1 if you have the `index' function. */
+#undef HAVE_INDEX
+
+/* Define to 1 if you have the `inet_addr' function. */
+#undef HAVE_INET_ADDR
+
+/* Define to 1 if you have the `inet_aton' function. */
+#undef HAVE_INET_ATON
+
+/* Define to 1 if you have the `inet_netof' function. */
+#undef HAVE_INET_NETOF
+
+/* Define to 1 if you have the `inet_ntoa' function. */
+#undef HAVE_INET_NTOA
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `crypt' library (-lcrypt). */
+#undef HAVE_LIBCRYPT
+
+/* Define to 1 if you have the `nsl' library (-lnsl). */
+#undef HAVE_LIBNSL
+
+/* Define to 1 if you have the `socket' library (-lsocket). */
+#undef HAVE_LIBSOCKET
+
+/* Define to 1 if you have the <math.h> header file. */
+#undef HAVE_MATH_H
+
+/* Define to 1 if you have the `memcmp' function. */
+#undef HAVE_MEMCMP
+
+/* Define to 1 if you have the `memcpy' function. */
+#undef HAVE_MEMCPY
+
+/* Define to 1 if you have the `memmove' function. */
+#undef HAVE_MEMMOVE
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `memset' function. */
+#undef HAVE_MEMSET
+
+/* Define to 1 if you have the `mmap' function. */
+#undef HAVE_MMAP
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#undef HAVE_NETDB_H
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#undef HAVE_NETINET_IN_H
+
+/* Define to 1 if you have the <netinet/in_systm.h> header file. */
+#undef HAVE_NETINET_IN_SYSTM_H
+
+/* Define to 1 if you have the <netinfo/ni.h> header file. */
+#undef HAVE_NETINFO_NI_H
+
+/* Define to 1 if you have the `poll' function. */
+#undef HAVE_POLL
+
+/* Define to 1 if you have the <pwd.h> header file. */
+#undef HAVE_PWD_H
+
+/* Define to 1 if you have the <resolv.h> header file. */
+#undef HAVE_RESOLV_H
+
+/* Define to 1 if you have the `rindex' function. */
+#undef HAVE_RINDEX
+
+/* Define to 1 if you have the `select' function. */
+#undef HAVE_SELECT
+
+/* Define to 1 if you have the `setpgrp' function. */
+#undef HAVE_SETPGRP
+
+/* Define to 1 if you have the <sgtty.h> header file. */
+#undef HAVE_SGTTY_H
+
+/* Define to 1 if you have the `sigaction' function. */
+#undef HAVE_SIGACTION
+
+/* Define to 1 if you have the <signal.h> header file. */
+#undef HAVE_SIGNAL_H
+
+/* Define to 1 if you have the `sigset' function. */
+#undef HAVE_SIGSET
+
+/* Define to 1 if you have the <stdarg.h> header file. */
+#undef HAVE_STDARG_H
+
+/* Define to 1 if you have the <stddef.h> header file. */
+#undef HAVE_STDDEF_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strchr' function. */
+#undef HAVE_STRCHR
+
+/* Define to 1 if you have the `strerror' function. */
+#undef HAVE_STRERROR
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <stropts.h> header file. */
+#undef HAVE_STROPTS_H
+
+/* Define to 1 if you have the `strrchr' function. */
+#undef HAVE_STRRCHR
+
+/* Define to 1 if you have the `strtok' function. */
+#undef HAVE_STRTOK
+
+/* Define to 1 if you have the `strtoken' function. */
+#undef HAVE_STRTOKEN
+
+/* Define to 1 if you have the <syslog.h> header file. */
+#undef HAVE_SYSLOG_H
+
+/* Define to 1 if you have the <sys/bitypes.h> header file. */
+#undef HAVE_SYS_BITYPES_H
+
+/* Define to 1 if you have the <sys/errno.h> header file. */
+#undef HAVE_SYS_ERRNO_H
+
+/* Define to 1 if you have the <sys/file.h> header file. */
+#undef HAVE_SYS_FILE_H
+
+/* Define to 1 if you have the <sys/filio.h> header file. */
+#undef HAVE_SYS_FILIO_H
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
+
+/* Define to 1 if you have the <sys/poll.h> header file. */
+#undef HAVE_SYS_POLL_H
+
+/* Define to 1 if you have the <sys/resource.h> header file. */
+#undef HAVE_SYS_RESOURCE_H
+
+/* Define to 1 if you have the <sys/select.h> header file. */
+#undef HAVE_SYS_SELECT_H
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#undef HAVE_SYS_SOCKET_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/syscall.h> header file. */
+#undef HAVE_SYS_SYSCALL_H
+
+/* Define to 1 if you have the <sys/syslog.h> header file. */
+#undef HAVE_SYS_SYSLOG_H
+
+/* Define to 1 if you have the <sys/times.h> header file. */
+#undef HAVE_SYS_TIMES_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <sys/un.h> header file. */
+#undef HAVE_SYS_UN_H
+
+/* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
 #undef HAVE_SYS_WAIT_H
 
-/* Define if you have <vfork.h>.  */
+/* Define to 1 if you have the `times' function. */
+#undef HAVE_TIMES
+
+/* Define to 1 if you have the <time.h> header file. */
+#undef HAVE_TIME_H
+
+/* Define to 1 if you have the `truncate' function. */
+#undef HAVE_TRUNCATE
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <utmp.h> header file. */
+#undef HAVE_UTMP_H
+
+/* Define to 1 if you have the `vfork' function. */
+#undef HAVE_VFORK
+
+/* Define to 1 if you have the <vfork.h> header file. */
 #undef HAVE_VFORK_H
 
-/* Define if on MINIX.  */
-#undef _MINIX
+/* Define to 1 if you have the `vsyslog' function. */
+#undef HAVE_VSYSLOG
 
-/* Define to `int' if <sys/types.h> doesn't define.  */
-#undef mode_t
+/* Define to 1 if `fork' works. */
+#undef HAVE_WORKING_FORK
 
-/* Define to `long' if <sys/types.h> doesn't define.  */
-#undef off_t
+/* Define to 1 if `vfork' works. */
+#undef HAVE_WORKING_VFORK
 
-/* Define to `int' if <sys/types.h> doesn't define.  */
-#undef pid_t
+/* Define if h_errno is declared in errno.h or netdb.h. */
+#undef H_ERRNO_DECLARED
 
-/* Define if the system does not provide POSIX.1 features except
-   with this defined.  */
-#undef _POSIX_1_SOURCE
+/* Define to enable IPv6 support */
+#undef INET6
 
-/* Define if you need to in order for stat and other things to work.  */
-#undef _POSIX_SOURCE
-
-/* Define as the return type of signal handlers (int or void).  */
-#undef RETSIGTYPE
-
-/* Define if the `setpgrp' function takes no argument.  */
-#undef SETPGRP_VOID
-
-/* Define if the setvbuf function takes the buffering type as its second
-   argument and the buffer pointer as the third, as on System V
-   before release 3.  */
-#undef SETVBUF_REVERSED
-
-/* Define to `unsigned' if <sys/types.h> doesn't define.  */
-#undef size_t
-
-/* Define if the `S_IS*' macros in <sys/stat.h> do not work properly.  */
-#undef STAT_MACROS_BROKEN
-
-/* Define if you have the ANSI C header files.  */
-#undef STDC_HEADERS
-
-/* Define if you can safely include both <sys/time.h> and <time.h>.  */
-#undef TIME_WITH_SYS_TIME
-
-/* Define if your <sys/time.h> declares struct tm.  */
-#undef TM_IN_SYS_TIME
-
-/* Define to `int' if <sys/types.h> doesn't define.  */
-#undef uid_t
-
-/* Define vfork as fork if vfork does not work.  */
-#undef vfork
-
-/* Define if your processor stores words with the most significant
-   byte first (like Motorola and SPARC, unlike Intel and VAX).  */
-#undef WORDS_BIGENDIAN
-
-/* Define if zlib package must be used for compilation/linking. */
-#undef USE_ZLIB
-
-/* Define if ncurses library must be used for compilation/linking. */
-#undef USE_NCURSES
-
-/* Define if cursesX library must be used for compilation/linking. */
-#undef USE_CURSESX
-
-/* Define if curses library must be used for compilation/linking. */
-#undef USE_CURSES
-
-/* Define if termcap library must be used for compilation/linking. */
-#undef USE_TERMCAP
-
-/* Define if the second argument of waitpid must be an "union wait *" instead
-   of an "int *". */
-#undef USE_UNION_WAIT
-
-/* Define if int8_t, u_int8_t, int16_t, u_int16_t, int32_t, u_int32_t, u_char,
- * u_short, u_int, u_long are not known types. */
-#undef int8_t
-#undef u_int8_t
-#undef int16_t
-#undef u_int16_t
-#undef int32_t
-#undef u_int32_t
-#undef u_char
-#undef u_short
-#undef u_int
-#undef u_long
+/* Define as the resolver configuration file. */
+#undef IRC_RESCONF
 
 /* Define if memcmp is not 8-bit clean. */
 #undef MEMCMP_BROKEN
 
-/* Define if the operating system is AIX 3.2.  */
-#undef AIX_3_2
+/* Define if the system provides BSD non-blocking system. */
+#undef NBLOCK_BSD
 
-/* Define if the operating system is Solaris 2.x (SunOS 5.x).  */
+/* Define if the system provides POSIX non-blocking system. */
+#undef NBLOCK_POSIX
+
+/* Define if the system provides SystemV non-blocking system. */
+#undef NBLOCK_SYSV
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define if the system provides POSIX sigaction. */
+#undef POSIX_SIGNALS
+
+/* Define to 1 if the C compiler supports function prototypes. */
+#undef PROTOTYPES
+
+/* Define as the return type of signal handlers (`int' or `void'). */
+#undef RETSIGTYPE
+
+/* Define to 1 if the `setpgrp' function takes no argument. */
+#undef SETPGRP_VOID
+
+/* Define to 1 if the `setvbuf' function takes the buffering type as its
+   second argument and the buffer pointer as the third, as on System V before
+   release 3. */
+#undef SETVBUF_REVERSED
+
+/* Define if the operating system is Solaris 2.x (SunOS 5.x). */
 #undef SOLARIS_2
 
-/* Define if the operating system is Solaris 2.3 (SunOS 5.3).  */
-#undef SOLARIS_2_3
-
-/* Define if the operating system is Solaris 2.[0-2] (SunOS 5.[0-2]).  */
+/* Define if the operating system is Solaris 2.[0-2] (SunOS 5.[0-2]). */
 #undef SOLARIS_2_0_2_1_2_2
 
-/* Define if <netdb.h> contains bad __const usages (Linux). */
-#undef BAD___CONST_NETDB_H
+/* Define if the operating system is Solaris 2.3 (SunOS 5.3). */
+#undef SOLARIS_2_3
+
+/* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
+#undef STAT_MACROS_BROKEN
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define if the system provides unreliable SystemV signals. */
+#undef SYSV_UNRELIABLE_SIGNALS
 
 /* Define if sys_errlist is declared in stdio.h or errno.h. */
 #undef SYS_ERRLIST_DECLARED
@@ -134,289 +341,107 @@
 /* Define if sys_nerr is declared in stdio.h or errno.h. */
 #undef SYS_NERR_DECLARED
 
-/* Define if errno is declared in errno.h. */
-#undef ERRNO_DECLARED
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
 
-/* Define if h_errno is declared in errno.h or netdb.h. */
-#undef H_ERRNO_DECLARED
+/* Define to 1 if your <sys/time.h> declares `struct tm'. */
+#undef TM_IN_SYS_TIME
 
-/* Define if poll(2) must be used instead of select(2). */
-/* Note: some systems (e.g. linux 2.0.x) have a non-working poll() */
+/* Define to enable dynamically shared iauth module support. */
+#undef USE_DSM
+
+/* Define if poll(2) must be used instead of select(2). Note: some systems
+   (e.g. linux 2.0.x) have a non-working poll() */
 #undef USE_POLL
-
-/* Define if the system provides POSIX sigaction. */
-#undef POSIX_SIGNALS
-
-/* Define if the system provides reliable BSD signals through sigset instead
-   of signal. */
-/* #define signal sigset */
-
-/* Define if the system provides reliable BSD signals. */
-#undef BSD_RELIABLE_SIGNALS
-
-/* Define if the system provides unreliable SystemV signals. */
-#undef SYSV_UNRELIABLE_SIGNALS
-
-/* Define if the system provides POSIX non-blocking system. */
-#undef NBLOCK_POSIX
-
-/* Define if the system provides BSD non-blocking system. */
-#undef NBLOCK_BSD
-
-/* Define if the system provides SystemV non-blocking system. */
-#undef NBLOCK_SYSV
 
 /* Define is the system can use variable arguments. */
 #undef USE_STDARG
 
-/* Define as the resolver configuration file. */
-#undef IRC_RESCONF
+/* Define if the second argument of waitpid must be an "union wait *" instead
+   of an "int *". */
+#undef USE_UNION_WAIT
 
-/* Define to enable IPv6 support */
-#undef INET6
+/* Define if zlib package must be used for compilation/linking. */
+#undef USE_ZLIB
 
-/* Define to enable dynamically shared iauth module support */
-#undef USE_DSM
+/* Define to 1 if your processor stores words with the most significant byte
+   first (like Motorola and SPARC, unlike Intel and VAX). */
+#undef WORDS_BIGENDIAN
 
-/* Define if you have the bcmp function.  */
-#undef HAVE_BCMP
+/* Define to 1 if on AIX 3.
+   System headers sometimes define this.
+   We just want to avoid a redefinition error message.  */
+#ifndef _ALL_SOURCE
+# undef _ALL_SOURCE
+#endif
 
-/* Define if you have the bcopy function.  */
-#undef HAVE_BCOPY
+/* Define to 1 if on MINIX. */
+#undef _MINIX
 
-/* Define if you have the bzero function.  */
-#undef HAVE_BZERO
+/* Define to 2 if the system does not provide POSIX.1 features except with
+   this defined. */
+#undef _POSIX_1_SOURCE
 
-/* Define if you have the getipnodebyname function.  */
-#undef HAVE_GETIPNODEBYNAME
+/* Define to 1 if you need to in order for `stat' and other things to work. */
+#undef _POSIX_SOURCE
 
-/* Define if you have the getrusage function.  */
-#undef HAVE_GETRUSAGE
+/* Define like PROTOTYPES; this can be used by system headers. */
+#undef __PROTOTYPES
 
-/* Define if you have the index function.  */
-#undef HAVE_INDEX
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
 
-/* Define if you have the inet_addr function.  */
-#undef HAVE_INET_ADDR
+/* Define to `int' if <sys/types.h> doesn't define. */
+#undef gid_t
 
-/* Define if you have the inet_aton function.  */
-#undef HAVE_INET_ATON
+/* Define to `short' if <sys/types.h> does not define. */
+#undef int16_t
 
-/* Define if you have the inet_netof function.  */
-#undef HAVE_INET_NETOF
+/* Define to `int' if <sys/types.h> does not define. */
+#undef int32_t
 
-/* Define if you have the inet_ntoa function.  */
-#undef HAVE_INET_NTOA
+/* Define to `char' if <sys/types.h> does not define. */
+#undef int8_t
 
-/* Define if you have the memcmp function.  */
-#undef HAVE_MEMCMP
+/* Define to `int' if <sys/types.h> does not define. */
+#undef mode_t
 
-/* Define if you have the memcpy function.  */
-#undef HAVE_MEMCPY
+/* Define to `long' if <sys/types.h> does not define. */
+#undef off_t
 
-/* Define if you have the memmove function.  */
-#undef HAVE_MEMMOVE
+/* Define to `int' if <sys/types.h> does not define. */
+#undef pid_t
 
-/* Define if you have the memset function.  */
-#undef HAVE_MEMSET
+/* Define this to sigset if the system provides reliable BSD signals through
+   sigset instead of signal. */
+#undef signal
 
-/* Define if you have the mmap function.  */
-#undef HAVE_MMAP
+/* Define to `unsigned' if <sys/types.h> does not define. */
+#undef size_t
 
-/* Define if you have the poll function.  */
-#undef HAVE_POLL
+/* Define to `unsigned char' if <sys/types.h> does not define. */
+#undef u_char
 
-/* Define if you have the rindex function.  */
-#undef HAVE_RINDEX
+/* Define to `unsigned int' if <sys/types.h> does not define. */
+#undef u_int
 
-/* Define if you have the select function.  */
-#undef HAVE_SELECT
+/* Define to `unsigned short' if <sys/types.h> does not define. */
+#undef u_int16_t
 
-/* Define if you have the setpgrp function.  */
-#undef HAVE_SETPGRP
+/* Define to `unsigned int' if <sys/types.h> does not define. */
+#undef u_int32_t
 
-/* Define if you have the sigaction function.  */
-#undef HAVE_SIGACTION
+/* Define to `unsigned char' if <sys/types.h> does not define. */
+#undef u_int8_t
 
-/* Define if you have the sigset function.  */
-#undef HAVE_SIGSET
+/* Define to `unsigned long' if <sys/types.h> does not define. */
+#undef u_long
 
-/* Define if you have the strchr function.  */
-#undef HAVE_STRCHR
+/* Define to `unsigned short' if <sys/types.h> does not define. */
+#undef u_short
 
-/* Define if you have the strerror function.  */
-#undef HAVE_STRERROR
+/* Define to `int' if <sys/types.h> doesn't define. */
+#undef uid_t
 
-/* Define if you have the strrchr function.  */
-#undef HAVE_STRRCHR
-
-/* Define if you have the strtok function.  */
-#undef HAVE_STRTOK
-
-/* Define if you have the strtoken function.  */
-#undef HAVE_STRTOKEN
-
-/* Define if you have the times function.  */
-#undef HAVE_TIMES
-
-/* Define if you have the truncate function.  */
-#undef HAVE_TRUNCATE
-
-/* Define if you have the vsyslog function.  */
-#undef HAVE_VSYSLOG
-
-/* Define if you have the <arpa/inet.h> header file.  */
-#undef HAVE_ARPA_INET_H
-
-/* Define if you have the <arpa/nameser.h> header file.  */
-#undef HAVE_ARPA_NAMESER_H
-
-/* Define if you have the <ctype.h> header file.  */
-#undef HAVE_CTYPE_H
-
-/* Define if you have the <curses.h> header file.  */
-#undef HAVE_CURSES_H
-
-/* Define if you have the <cursesX.h> header file.  */
-#undef HAVE_CURSESX_H
-
-/* Define if you have the <dlfcn.h> header file.  */
-#undef HAVE_DLFCN_H
-
-/* Define if you have the <errno.h> header file.  */
-#undef HAVE_ERRNO_H
-
-/* Define if you have the <fcntl.h> header file.  */
-#undef HAVE_FCNTL_H
-
-/* Define if you have the <math.h> header file.  */
-#undef HAVE_MATH_H
-
-/* Define if you have the <memory.h> header file.  */
-#undef HAVE_MEMORY_H
-
-/* Define if you have the <ncurses.h> header file.  */
-#undef HAVE_NCURSES_H
-
-/* Define if you have the <ncurses/ncurses.h> header file.  */
-#undef HAVE_NCURSES_NCURSES_H
-
-/* Define if you have the <netdb.h> header file.  */
-#undef HAVE_NETDB_H
-
-/* Define if you have the <netinet/in.h> header file.  */
-#undef HAVE_NETINET_IN_H
-
-/* Define if you have the <netinet/in_systm.h> header file.  */
-#undef HAVE_NETINET_IN_SYSTM_H
-
-/* Define if you have the <netinfo/ni.h> header file.  */
-#undef HAVE_NETINFO_NI_H
-
-/* Define if you have the <pwd.h> header file.  */
-#undef HAVE_PWD_H
-
-/* Define if you have the <resolv.h> header file.  */
-#undef HAVE_RESOLV_H
-
-/* Define if you have the <sgtty.h> header file.  */
-#undef HAVE_SGTTY_H
-
-/* Define if you have the <signal.h> header file.  */
-#undef HAVE_SIGNAL_H
-
-/* Define if you have the <stdarg.h> header file.  */
-#undef HAVE_STDARG_H
-
-/* Define if you have the <stddef.h> header file.  */
-#undef HAVE_STDDEF_H
-
-/* Define if you have the <stdio.h> header file.  */
-#undef HAVE_STDIO_H
-
-/* Define if you have the <stdlib.h> header file.  */
-#undef HAVE_STDLIB_H
-
-/* Define if you have the <string.h> header file.  */
-#undef HAVE_STRING_H
-
-/* Define if you have the <strings.h> header file.  */
-#undef HAVE_STRINGS_H
-
-/* Define if you have the <stropts.h> header file.  */
-#undef HAVE_STROPTS_H
-
-/* Define if you have the <sys/bitypes.h> header file.  */
-#undef HAVE_SYS_BITYPES_H
-
-/* Define if you have the <sys/errno.h> header file.  */
-#undef HAVE_SYS_ERRNO_H
-
-/* Define if you have the <sys/file.h> header file.  */
-#undef HAVE_SYS_FILE_H
-
-/* Define if you have the <sys/filio.h> header file.  */
-#undef HAVE_SYS_FILIO_H
-
-/* Define if you have the <sys/ioctl.h> header file.  */
-#undef HAVE_SYS_IOCTL_H
-
-/* Define if you have the <sys/param.h> header file.  */
-#undef HAVE_SYS_PARAM_H
-
-/* Define if you have the <sys/poll.h> header file.  */
-#undef HAVE_SYS_POLL_H
-
-/* Define if you have the <sys/resource.h> header file.  */
-#undef HAVE_SYS_RESOURCE_H
-
-/* Define if you have the <sys/select.h> header file.  */
-#undef HAVE_SYS_SELECT_H
-
-/* Define if you have the <sys/socket.h> header file.  */
-#undef HAVE_SYS_SOCKET_H
-
-/* Define if you have the <sys/stat.h> header file.  */
-#undef HAVE_SYS_STAT_H
-
-/* Define if you have the <sys/syscall.h> header file.  */
-#undef HAVE_SYS_SYSCALL_H
-
-/* Define if you have the <sys/syslog.h> header file.  */
-#undef HAVE_SYS_SYSLOG_H
-
-/* Define if you have the <sys/time.h> header file.  */
-#undef HAVE_SYS_TIME_H
-
-/* Define if you have the <sys/times.h> header file.  */
-#undef HAVE_SYS_TIMES_H
-
-/* Define if you have the <sys/types.h> header file.  */
-#undef HAVE_SYS_TYPES_H
-
-/* Define if you have the <sys/un.h> header file.  */
-#undef HAVE_SYS_UN_H
-
-/* Define if you have the <syslog.h> header file.  */
-#undef HAVE_SYSLOG_H
-
-/* Define if you have the <term.h> header file.  */
-#undef HAVE_TERM_H
-
-/* Define if you have the <time.h> header file.  */
-#undef HAVE_TIME_H
-
-/* Define if you have the <unistd.h> header file.  */
-#undef HAVE_UNISTD_H
-
-/* Define if you have the <utmp.h> header file.  */
-#undef HAVE_UTMP_H
-
-/* Define if you have the crypt library (-lcrypt).  */
-#undef HAVE_LIBCRYPT
-
-/* Define if you have the nsl library (-lnsl).  */
-#undef HAVE_LIBNSL
-
-/* Define if you have the socket library (-lsocket).  */
-#undef HAVE_LIBSOCKET
+/* Define as `fork' if `vfork' does not work. */
+#undef vfork
