@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.49 1998/11/02 17:50:41 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.50 1998/11/03 21:39:48 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2117,8 +2117,10 @@ char	*parv[];
 		case STAT_ME:
 			break;
 		case STAT_UNKNOWN:
-			sendto_one(sptr, rpl_str(RPL_TRACEUNKNOWN, parv[0]),
-				   class, name);
+			if (IsAnOper(sptr) || MyClient(sptr))
+				sendto_one(sptr,
+					   rpl_str(RPL_TRACEUNKNOWN, parv[0]),
+					   class, name);
 			break;
 		case STAT_CLIENT:
 			/* Only opers see users if there is a wildcard
