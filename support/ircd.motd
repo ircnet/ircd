@@ -1,7 +1,5 @@
-@*-,-``-,,-`-,-=====================================================.
-  '                                                                 :
-  :  Welcome to the newly installed irc server, whose admin did not :
-  :  have time to fix this default MOTD.  He probably has not read  :
-  :  doc/INSTALL.txt as well. :)                                    :
-  :                                                                 ,
-  `====================================================-.-''-..-''-.-*@
+ .===============================================.
+ :  Being a fresh installation of an irc server, :
+ :  I have this default MOTD. Remind my admin to :
+ :  fix this and reread INSTALL file, please. :) :
+ `=============================================='
