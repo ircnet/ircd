@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.167 2004/02/09 19:32:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.168 2004/02/11 14:14:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -654,8 +654,13 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			istat.is_l_myclnt_t = timeofday;
 			istat.is_l_myclnt = istat.is_myclnt;
 		}
-		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
 		strcpy(sptr->user->uid, next_uid());
+		if (nick[0] == '0' && nick[1] == '\0')
+		{
+			strncpyzt(nick, sptr->user->uid, UIDLEN + 1);
+			(void)strcpy(sptr->name, nick);
+		}
+		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
 		add_to_uid_hash_table(sptr->user->uid, sptr);
 		sptr->exitc = EXITC_REG;
 		sendto_one(sptr, replies[RPL_WELCOME], ME, BadTo(nick), buf);
@@ -824,6 +829,14 @@ badparamcountkills:
 		}
 		else
 			user = host = "";
+	}
+	/* Only local unregistered clients, I hope. --B. */
+	if (MyConnect(sptr) && IsUnknown(sptr)
+		&& nick[0] == '0' && nick[1] == '\0')
+	{
+		/* Allow registering with nick "0", this will be
+		** overwritten in register_user() */
+		goto nickkilldone;
 	}
 
 	/* do_nick_name() can change "nick" (like: drop scandinavian
