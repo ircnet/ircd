@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.54 2002/04/05 03:04:08 jv Exp $
+ *   $Id: struct_def.h,v 1.55 2002/04/16 20:46:45 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -393,6 +393,7 @@ struct	Server	{
 	int	refcnt;		/* Number of times this block is referenced
 				** from anUser (field servp), aService (field
 				** servp) and aClient (field serv) */
+	int	usercnt[3];	/* # of clients - visible, invisible, opers */
 	struct	Server	*nexts, *prevs, *shnext;
 	aClient	*bcptr;
 	aClient	*maskedby;	/* Pointer to server masking this server.
