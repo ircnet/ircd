@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.42 1999/02/04 23:50:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.43 1999/02/12 04:00:47 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -31,7 +31,7 @@ static  char rcsid[] = "@(#)$Id: ircd.c,v 1.42 1999/02/04 23:50:21 kalt Exp $";
 aClient me;			/* That's me */
 aClient *client = &me;		/* Pointer to beginning of Client list */
 
-static	void	open_debugfile(), setup_signals();
+static	void	open_debugfile(), setup_signals(), io_loop();
 
 istat_t	istat;
 char	**myargv;
@@ -576,7 +576,6 @@ int	argc;
 char	*argv[];
 {
 	uid_t	uid, euid;
-	time_t	delay = 0;
 
 	(void) myctime(time(NULL));	/* Don't ask, just *don't* ask */
 	sbrk0 = (char *)sbrk((size_t)0);
@@ -733,6 +732,9 @@ char	*argv[];
 		    }
 	    }
 
+	if (argc > 0)
+		bad_command(); /* This exits out */
+
 #ifndef	CHROOTDIR
 	if (chdir(dpath))
 	    {
@@ -805,9 +807,6 @@ char	*argv[];
 		exit(-1);
 	    }
 
-	if (argc > 0)
-		bad_command(); /* This exits out */
-
 	initstats();
 	ircd_readtune(tunefile);
 	timeofday = time(NULL);
@@ -840,7 +839,7 @@ char	*argv[];
 	    }
 	else
 	    {
-		aClient *acptr;
+		aClient *acptr = NULL;
 		int i;
 
                 for (i = 0; i <= highest_fd; i++)
@@ -916,13 +915,13 @@ char	*argv[];
 #endif
 	timeofday = time(NULL);
 	while (1)
-		delay = io_loop(delay);
+		io_loop();
 }
 
 
-time_t	io_loop(delay)
-time_t	delay;
+void	io_loop()
 {
+	static	time_t	delay = 0;
 	int maxs = 4;
 
 	/*
@@ -1038,7 +1037,6 @@ time_t	delay;
 	checklists();
 #endif
 
-	return delay;
 }
 
 /*
