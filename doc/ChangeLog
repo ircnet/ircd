@@ -1,3 +1,9 @@
+2002-11-11  Jakub Vlasek
+	
+	* s_err.c: Changed text of ERR_TOOMANYMATCHES.
+	* channel.c/m_list(): Terminate LIST output when the client has less 
+	  than 10% of avaible sendQ free.
+	
 2002-10-13  Jakub Vlasek
 
 	* ircdwatch.c/sig_handler(): Removed extra semicolon after #endif.
