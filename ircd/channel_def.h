@@ -25,5 +25,3 @@
 #define NullChn	((aChannel *)0)
 
 #define ChannelExists(n)	(find_channel(n, NullChn) != NullChn)
-
-#define	MAXMODEPARAMS	3
