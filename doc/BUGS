@@ -1,4 +1,4 @@
-# @(#)$Id: BUGS,v 1.11 1998/08/08 00:21:12 kalt Exp $
+# @(#)$Id: BUGS,v 1.12 1998/09/13 16:50:38 kalt Exp $
 
 The list is probably not as scary as it once was.
 Anyone with some free time is welcome to fix those =)
@@ -11,3 +11,4 @@ Anyone with some free time is welcome to fix those =)
   for various reasons)
 
 * The operator count showed by /LUSERS becomes incorrect (negative).
+

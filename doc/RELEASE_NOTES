@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.24 1998/09/09 14:53:31 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.25 1998/09/13 16:50:40 kalt Exp $
 
 This is a development version of the IRC software.
 
@@ -15,6 +15,7 @@ New features in 2.10.0:
 	* added channel mode +I (invitations).
 	* /invite can now be used to override channel bans & limit.
 	* away status is propagated again. (away messages are not).
+	* users need +o (or +v) to speak on a channel where they're banned.
 
 Important configuration changes between 2.9.x and 2.10.x:
 

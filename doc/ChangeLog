@@ -1,3 +1,28 @@
+Sat Sep 12 18:53:39 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* ircd.c, s_bsd.c: SIGCHLD handling code to avoid zombies.
+	
+	* s_bsd.c:
+ 		* udpfd used in place of adfd in in read_message().
+		* silently deal with linux accept() way of life.
+
+	* a_io.c: loop_io() bugfix for select() systems.
+
+	* ircd.c:
+		* me.info from ircd.conf was overridden in setup_me().
+		* server_reboot() created a zombie.
+
+	* s_user.c: allow servers to speak on channels (reported by Q).
+
+	* channel.c:
+ 		* NJOIN bugfix related to unique ops (reported by Q).
+		* removed old core from msa.
+
+	* various little cleanups.
+	
+	* res.c: buffer overflow fix. (thanks to Leon Brouwers
+	<leonb@sci.kun.nl> and purify)
+
 Tue Sep  8 21:23:27 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* s_user.c: user mode +a propagation bugfix.
