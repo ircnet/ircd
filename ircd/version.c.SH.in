@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 
 echo "Building version.c..."
 
@@ -51,7 +51,7 @@ cat >version.c <<!SUB!THIS!
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.4 1997/07/15 04:35:48 kalt Exp $";
+static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.5 1997/07/21 21:07:42 kalt Exp $";
 #endif
 
 #include "struct.h"
