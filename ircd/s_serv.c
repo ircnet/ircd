@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.254 2004/11/02 12:47:06 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.255 2004/11/14 14:07:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1449,16 +1449,32 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	/*
 	** Last, pass all channels modes
 	** only sending modes for LIVE channels.
+	** Correction: now we send empty channels as well (with "." as
+	** a client), so other side can lock the channel if they don't
+	** know it (either "yet" (restarted server) or "already" (L/DCTL
+	** differences)). Also send modes for such !channels. --B.
 	*/
-	    {
+	{
 		Reg	aChannel *chptr;
+		int	rv = atoi(cptr->serv->verstr);
+
 		for (chptr = channel; chptr; chptr = chptr->nextch)
+		{
 			if (chptr->users)
-			    {
+			{
 				send_channel_members(cptr, chptr);
 				send_channel_modes(cptr, chptr);
-			    }
-	    }
+			}
+			else
+			if (rv >= 210991700) /* XXX remove soon */
+			{
+				sendto_one(cptr, ":%s NJOIN %s .",
+					me.serv->sid, chptr->chname);
+				if (*chptr->chname == '!')
+					send_channel_modes(cptr, chptr);
+			}
+		}
+	}
 	if (ST_UID(cptr))
 	{
 		if (istat.is_myserv == 1)
