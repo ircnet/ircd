@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.73 2002/01/08 04:07:24 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.74 2002/03/03 21:46:43 jv Exp $";
 #endif
 
 #include "os.h"
@@ -662,6 +662,7 @@ char	*argv[];
 	bzero((char *)&me, sizeof(me));
 
 	version = make_version();	/* Generate readable version string */
+	isupport = make_isupport();	/* Generate RPL_ISUPPORT (005) numerics */
 
 	/*
 	** All command line parameters have the syntax "-fstring"
