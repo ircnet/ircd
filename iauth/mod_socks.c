@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.4 1998/08/07 02:04:23 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.5 1999/01/12 23:54:25 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -26,6 +26,124 @@ static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.4 1998/08/07 02:04:23 kalt Exp 
 #define MOD_SOCKS_C
 #include "a_externs.h"
 #undef MOD_SOCKS_C
+
+#define CACHETIME 30
+
+#define SOCKSPORT 1080
+
+struct proxylog
+{
+	struct proxylog *next;
+	char ip[HOSTLEN+1];
+	u_char open; /* 1 = open proxy */
+	time_t expire;
+};
+
+#define OPT_LOG		0x01
+#define OPT_DENY	0x02
+#define OPT_PARANOID	0x04
+
+struct socks_private
+{
+	struct proxylog *cache;
+	u_int lifetime;
+	u_char options;
+};
+
+/*
+ * socks_open_proxy
+ *
+ *	Found an open proxy for cl: deal with it!
+ */
+static void
+socks_open_proxy(cl)
+int cl;
+{
+    struct socks_private *mydata = cldata[cl].instance->data;
+
+    /* open proxy */
+    if (mydata->options & OPT_DENY)
+	{
+	    cldata[cl].state |= A_DENY;
+	    sendto_ircd("K %d %s %u ", cl, cldata[cl].itsip,
+			cldata[cl].itsport);
+	}
+    if (mydata->options & OPT_LOG)
+	    sendto_log(ALOG_FLOG, LOG_INFO, "socks: open proxy: %s[%s]",
+		       cldata[cl].host, cldata[cl].itsip);
+}
+
+/*
+ * socks_add_cache
+ *
+ *	Add an entry to the cache.
+ */
+static void
+socks_add_cache(cl, open)
+int cl, open;
+{
+    struct socks_private *mydata = cldata[cl].instance->data;
+    struct proxylog *next;
+
+    if (mydata->lifetime == 0)
+	    return;
+
+    next = mydata->cache;
+    mydata->cache = (struct proxylog *)malloc(sizeof(struct proxylog));
+    mydata->cache->expire = time(NULL) + mydata->lifetime;
+    strcpy(mydata->cache->ip, cldata[cl].itsip);
+    mydata->cache->open = open;
+    mydata->cache->next = next;
+    DebugLog((ALOG_DSOCKSC, 0, "socks_add_cache(%d): new cache %s, open=%d",
+	      cl, mydata->cache->ip, open));
+}
+
+/*
+ * socks_check_cache
+ *
+ *	Check cache for an entry.
+ */
+static int
+socks_check_cache(cl)
+{
+    struct socks_private *mydata = cldata[cl].instance->data;
+    struct proxylog **last, *pl;
+    time_t now = time(NULL);
+
+    if (mydata->lifetime == 0)
+	    return 0;
+
+    DebugLog((ALOG_DSOCKSC, 0, "socks_check_cache(%d): Checking cache for %s",
+	      cl, cldata[cl].itsip));
+
+    last = &(mydata->cache);
+    while (pl = *last)
+	{
+	    DebugLog((ALOG_DSOCKSC, 0, "socks_check_cache(%d): cache %s",
+		      cl, pl->ip));
+	    if (pl->expire < now)
+		{
+		    DebugLog((ALOG_DSOCKSC, 0,
+			      "socks_check_cache(%d): free %s (%d < %d)",
+			      cl, pl->ip, pl->expire, now));
+		    *last = pl->next;
+		    free(pl);
+		    continue;
+		}
+	    if (!strcasecmp(pl->ip, cldata[cl].itsip))
+		{
+		    DebugLog((ALOG_DSOCKSC, 0,
+			      "socks_check_cache(%d): match (%u)",
+			      cl, pl->open));
+		    pl->expire = now + mydata->lifetime; /* dubious */
+		    if (pl->open)
+			    socks_open_proxy(cl);
+		    return -1;
+		}
+	    last = &(pl->next);
+	}
+    return 0;
+}
 
 /*
  * socks_init
@@ -38,24 +156,61 @@ char *
 socks_init(self)
 AnInstance *self;
 {
+	struct socks_private *mydata;
+	char tmpbuf[32], cbuf[32];
+	static char txtbuf[80];
+
+#if defined(INET6)
+	return "IPv6 unsupported.";
+#endif
 	if (self->opt == NULL)
 		return "Aie! no option(s): nothing to be done!";
-	if (strstr(self->opt, "log") && strstr(self->opt, "reject"))
-	    {
-		self->popt = "log,reject";
-		return "Set to log and reject.";
-	    }
+	
+	mydata = (void *) malloc(sizeof(struct socks_private));
+	mydata->cache = NULL;
+	mydata->lifetime = CACHETIME;
+	mydata->options = 0;
+
+	tmpbuf[0] = txtbuf[0] = '\0';
 	if (strstr(self->opt, "log"))
 	    {
-		self->popt = "log";
-		return "Set to log (but not reject).";
+		mydata->options = OPT_LOG;
+		strcat(tmpbuf, ",log");
+		strcat(txtbuf, ", Log");
 	    }
 	if (strstr(self->opt, "reject"))
 	    {
-		self->popt = "reject";
-		return "Set to reject without logging.";
+		mydata->options = OPT_DENY;
+		strcat(tmpbuf, ",reject");
+		strcat(txtbuf, ", Reject");
 	    }
-	return "Aie! unknown option(s): nothing to be done!";
+	if (strstr(self->opt, "paranoid"))
+	    {
+		mydata->options = OPT_PARANOID;
+		strcat(tmpbuf, ",paranoid");
+		strcat(txtbuf, ", Paranoid");
+	    }
+
+	if (mydata->options == 0)
+		return "Aie! unknown option(s): nothing to be done!";
+
+	if (strstr(self->opt, "cache"))
+	    {
+		char *ch = index(self->opt, '=');
+		char cbuf[10];
+		
+		if (ch)
+			mydata->lifetime = atoi(ch+1);
+	    }
+	sprintf(cbuf, ",cache=%d", mydata->lifetime);
+	strcat(tmpbuf, cbuf);
+	sprintf(cbuf, ", Cache %d (min)", mydata->lifetime);
+	strcat(txtbuf, cbuf);
+	mydata->lifetime *= 60;
+
+	self->popt = mystrdup(tmpbuf+1);
+	self->data = mydata;
+	return txtbuf+2;
 }
 
 /*
@@ -75,15 +230,27 @@ u_int cl;
 {
 	char *error;
 	int fd;
-	
-	DebugLog((ALOG_DSOCKS, 0, "socks_start(%d): Connecting to %s %u", cl,
-		  cldata[cl].itsip, 1080));
-	fd = tcp_connect(cldata[cl].ourip, cldata[cl].itsip, 1080, &error);
+
+	if (cldata[cl].state & A_DENY)
+	    {
+		/* no point of doing anything */
+		DebugLog((ALOG_DSOCKS, 0,
+			  "socks_start(%d): A_DENY alredy set ", cl));
+		return -1;
+	    }
+
+	if (socks_check_cache(cl))
+		return -1;
+
+	DebugLog((ALOG_DSOCKS, 0, "socks_start(%d): Connecting to %s", cl,
+		  cldata[cl].itsip));
+	fd= tcp_connect(cldata[cl].ourip, cldata[cl].itsip, SOCKSPORT, &error);
 	if (fd < 0)
 	    {
 		DebugLog((ALOG_DSOCKS, 0,
 			  "socks_start(%d): tcp_connect() reported %s",
 			  cl, error));
+		socks_add_cache(cl, 0);
 		return -1;
 	    }
 
@@ -104,6 +271,9 @@ int
 socks_work(cl)
 u_int cl;
 {
+	static	u_char query[13] =
+		{ 4, 1, 26, 11, 0, 0, 0, 0, 'u', 's', 'e', 'r', 0 };
+
     	DebugLog((ALOG_DSOCKS, 0, "socks_work(%d): %d %d buflen=%d", cl,
 		  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
 	if (cldata[cl].wfd > 0)
@@ -112,14 +282,30 @@ u_int cl;
 		** We haven't sent the query yet, the connection was just
 		** established.
 		*/
-		static u_char   query[3] = {5, 1, 0};
+		u_int a, b, c, d;
 
-		if (write(cldata[cl].wfd, query, 3) != 3)
+		if (sscanf(cldata[cl].ourip, "%u.%u.%u.%u", &a,&b,&c,&d) != 4)
+		    {
+			sendto_log(ALOG_DSOCKS|ALOG_IRCD, LOG_ERR,
+				  "socks_work(%d): sscanf(\"%s\") failed", 
+				   cl, cldata[cl].ourip);
+			close(cldata[cl].wfd);
+			cldata[cl].wfd = 0;
+			return -1;
+		    }
+		query[2] = ((cldata[cl].ourport & 0xff00) >> 8);
+		query[3] = (cldata[cl].ourport & 0x00ff);
+		query[4] = a; query[5] = b; query[6] = c; query[7] = d;
+		
+		DebugLog((ALOG_DSOCKS, 0, "socks_work(%d): Checking %s %u",
+			  cl, cldata[cl].ourip, SOCKSPORT));
+		if (write(cldata[cl].wfd, query, 13) != 13)
 		    {
 			/* most likely the connection failed */
 			DebugLog((ALOG_DSOCKS, 0,
-				  "socks_work(%d): write() failed: %s", cl,
-				  strerror(errno)));
+				  "socks_work(%d): write() failed: %s",
+				  cl, strerror(errno)));
+			socks_add_cache(cl, 0);
 			close(cldata[cl].wfd);
 			cldata[cl].rfd = cldata[cl].wfd = 0;
 			return 1;
@@ -137,29 +323,37 @@ u_int cl;
 				  "socks_work(%d): Got [%d.%d]",
 				  cl, cldata[cl].inbuffer[0],
 				  cldata[cl].inbuffer[1]));
-			if (cldata[cl].inbuffer[0] == 5 &&
-			    cldata[cl].inbuffer[1] == 0)
+			if (cldata[cl].inbuffer[0] == 0)
 			    {
-				/* ack, open SOCKS proxy! */
-				if (cldata[cl].instance->opt &&
-				    strstr(cldata[cl].instance->opt, "reject"))
+				struct socks_private *mydata;
+				u_char open = 0;
+
+				mydata = cldata[cl].instance->data;
+				if (cldata[cl].inbuffer[1] == 90)
+					open = 1;
+				else if (cldata[cl].inbuffer[1] == 91)
+						;
+				else if (mydata->options & OPT_PARANOID)
+					open = 1;
+				if (open)
+					socks_open_proxy(cl);
+				socks_add_cache(cl, open);
+				if (cldata[cl].inbuffer[1] != 90 &&
+				    cldata[cl].inbuffer[1] != 91)
 				    {
-					sendto_ircd("K %d %s %u ", cl,
-						    cldata[cl].itsip,
-						    cldata[cl].itsport);
-					cldata[cl].state |= A_DENY;
-				    }
-				if (cldata[cl].instance->opt &&
-				    strstr(cldata[cl].instance->opt, "log"))
-					sendto_log(ALOG_FLOG, LOG_INFO,
-						   "socks: open proxy: %s[%s]",
+					sendto_log(ALOG_FLOG, LOG_WARNING,
+				   "socks: unexpected reply: %d %s[%s]",
+						   cldata[cl].inbuffer[1],
 						   cldata[cl].host,
 						   cldata[cl].itsip);
+					sendto_log(ALOG_IRCD, 0,
+					   "socks: unexpected reply: %d",
+						   cldata[cl].inbuffer[1]);
+				    }
 			    }
-			/* else there's some error */
-			/*
-			** In any case, our job is done, let's cleanup.
-			*/
+			else
+				/* hm. looks like it's not proxy */
+				socks_add_cache(cl, 0);
 			close(cldata[cl].rfd);
 			cldata[cl].rfd = 0;
 			return -1;

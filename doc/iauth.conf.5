@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.3 1998/09/21 18:30:39 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1998/09/21 18:30:39 $"
+.\" @(#)$Id: iauth.conf.5,v 1.4 1999/01/12 23:54:25 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1999/01/12 23:54:25 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -39,16 +39,22 @@ syntax using the \fIiauth\fP program to avoid later problems.
 .TP
 .B socks
 This module performs a basic check to verify that the host where the
-connection originated from doesn't run a proxy server on port 1080 that is
-open to the world.  It is useful to reject abusive clients using a relay to
-evade kill lines and bans.
+connection originated from doesn't run a SOCKS v4 proxy server on port 1080
+that is open to the world.  It is useful to reject abusive clients using a
+relay to evade kill lines and bans.
 
-This module takes two options:
+This module understands four options:
 .B reject
 to reject connections originating from a host where an open proxy
 was detected,
 .B log
 to log hostnames where an open proxy is detected.
+.B paranoid
+to consider proxies which deny the request because of a userid/ident
+mismatch to be OPEN proxies.
+.B cache[=value]
+to set the cache lifetime in minutes.  By default, caching is enabled for
+30 minutes.  A value of 0 disables caching.
 .TP
 .B rfc931
 This module is for authentication TCP connections using the protocol

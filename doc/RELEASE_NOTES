@@ -1,10 +1,14 @@
-# @(#)$Id: RELEASE_NOTES,v 1.28 1998/12/13 00:02:34 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.29 1999/01/12 23:54:25 kalt Exp $
 
 This is a development version of the IRC software.
 
 ===============================================================================
 
 This version of the software adds support for IPv6.
+
+Important changes in 2.10.2 (since 2.10.1):
+	* iauth's socks module now uses an internal cache.
+	* iauth's socks module now checks for SOCKSv4 (rather than v5) proxies.
 
 ===============================================================================
 
