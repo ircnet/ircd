@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.94 1999/02/19 19:00:12 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.95 1999/04/15 21:00:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -774,7 +774,7 @@ aChannel *chptr;
 	Reg	aClient *c2ptr;
 	Reg	int	cnt = 0, len = 0, nlen;
 
-	if (check_channelmask(&me, cptr, chptr->chname))
+	if (check_channelmask(&me, cptr, chptr->chname) == -1)
 		return;
 	if (*chptr->chname == '!' && !(cptr->serv->version & SV_NCHAN))
 		return;
@@ -2300,6 +2300,14 @@ char	*parv[];
 		/* get channel pointer */
 		if (!chptr)
 		    {
+			if (check_channelmask(sptr, cptr, parv[1]) == -1)
+			    {
+				sendto_flag(SCH_DEBUG,
+					    "received NJOIN for %s from %s",
+					    parv[1],
+					    get_client_name(cptr, TRUE));
+				return 0;
+			    }
 			chptr = get_channel(acptr, parv[1], CREATE);
 			if (chptr == NULL)
 			    {
