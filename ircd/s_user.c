@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.13 1997/06/09 14:50:18 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.14 1997/06/09 20:22:02 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -2070,11 +2070,7 @@ char	*parv[];
 	    {
 		if ((acptr = find_client(destination, NULL)) ||
 		    (acptr = find_server(destination, NULL))) {
-			if (MyClient(sptr) && mycmp(origin, sptr->name))
-				sendto_flag(SCH_ERROR, "PONG origin %s by %s",
-					    origin,
-					    get_client_name(sptr, TRUE));
-			else
+			if (!(MyClient(sptr) && mycmp(origin, sptr->name)))
 				sendto_one(acptr,":%s PONG %s %s",
 					   parv[0], origin, destination);
 		} else
