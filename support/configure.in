@@ -1052,7 +1052,7 @@ EOF
   -logdir | --logdir | --logdi | --logd)
     ac_prev=logdir ;;
   -logdir=* | --logdir=* | --logdi=* | --logd=*)
-    logdir="$ac_optarg/" ;;
+    logdir="$ac_optarg" ;;
 
   -mandir | --mandir | --mandi | --mand | --man | --ma | --m)
     ac_prev=mandir ;;
@@ -1433,7 +1433,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.51 2004/03/05 23:56:11 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.52 2004/03/07 01:45:36 chopin Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)

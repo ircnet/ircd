@@ -246,7 +246,7 @@ EOF
   -logdir | --logdir | --logdi | --logd)
     ac_prev=logdir ;;
   -logdir=* | --logdir=* | --logdi=* | --logd=*)
-    logdir="$ac_optarg/" ;;
+    logdir="$ac_optarg" ;;
 
   -mandir | --mandir | --mandi | --mand | --man | --ma | --m)
     ac_prev=mandir ;;
