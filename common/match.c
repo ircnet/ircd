@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: match.c,v 1.8 2002/01/02 03:12:14 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: match.c,v 1.9 2003/02/14 00:27:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -190,6 +190,9 @@ char	*mask, *name;
 	if (!*mask)
 		return 1;
 
+	if (mask[0]=='*' && mask[1]=='\0')
+		return 0;
+
 	while (1)
 	    {
 #ifdef	MAX_ITERATIONS
@@ -222,7 +225,8 @@ char	*mask, *name;
 		    }
 		else if (!*n)
 			return 1;
-		if ((*m == '\\') && ((m[1] == '*') || (m[1] == '?')))
+		if ((*m == '\\') &&
+			((m[1] == '*') || (m[1] == '?') || (m[1] == '#')))
 		    {
 			m++;
 			q = 1;
@@ -230,19 +234,21 @@ char	*mask, *name;
 		else
 			q = 0;
 
-		if ((tolower(*m) != tolower(*n)) && ((*m != '?') || q))
-		    {
-			if (!wild)
-				return 1;
-			m = (u_char *)ma;
-			n = (u_char *)++na;
-		    }
-		else
+		if ((tolower(*m) == tolower(*n))
+			|| (*m == '?' && !q)
+			|| (*m == '#' && !q && isdigit(*n)))
 		    {
 			if (*m)
 				m++;
 			if (*n)
 				n++;
+		    }
+		else
+		    {
+			if (!wild)
+				return 1;
+			m = (u_char *)ma;
+			n = (u_char *)++na;
 		    }
 	    }
 

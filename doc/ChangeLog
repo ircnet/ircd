@@ -1,3 +1,15 @@
+2003-02-13  Piotr Kucharski
+
+	* match.c/match(): added quick parsing of '*' mask; added '#'
+	  wildcard matching only digits.
+	* s_serv.c/m_stats(): be aware of '#' wildcard.
+	* struct_def.h, channel.c/match_modeid(), add_modeid(), del_modeid(),
+	  set_mode(), s_err.c: changed value.cp to struct holding nick, user,
+	  host separately, this allowed for faster match()es and better beI
+	  lists parsing.
+	* channel.c: added make_bei() and free_bei() functions.
+	* channel.c/match_modeid(): added full CIDR support for beI lists.
+
 2003-02-13  Jakub Vlasek
 	
 	* s_user.c/m_user(): Parse user text modes sent in USER command

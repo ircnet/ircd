@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.142 2003/02/11 18:42:38 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.143 2003/02/14 00:27:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -40,6 +40,11 @@ static	char rcsid[] = "@(#)$Id: channel.c,v 1.142 2003/02/11 18:42:38 chopin Exp
 #define CHANNEL_C
 #include "s_externs.h"
 #undef CHANNEL_C
+
+static	char	asterix[2]="*";
+#define	BanLen(x)	((strlen(x->nick)+strlen(x->user)+strlen(x->host)))
+#define BanMatch(x,y)	((!match(x->nick,y->nick)&&!match(x->user,y->user)&&!match(x->host,y->host)))
+#define BanExact(x,y)	((!mycmp(x->nick,y->nick)&&!mycmp(x->user,y->user)&&!mycmp(x->host,y->host)))
 
 aChannel *channel = NullChn;
 
@@ -52,8 +57,8 @@ static	int	set_mode __P((aClient *, aClient *, aChannel *, int *,
 			int, char **));
 static	void	free_channel __P((aChannel *));
 
-static	int	add_modeid __P((int, aClient *, aChannel *, char *));
-static	int	del_modeid __P((int, aChannel *, char *));
+static	int	add_modeid __P((int, aClient *, aChannel *, aListItem *));
+static	int	del_modeid __P((int, aChannel *, aListItem *));
 static	Link	*match_modeid __P((int, aClient *, aChannel *));
 static  void    names_channel __P((aClient *,aClient *,char *,aChannel *,int));
 
@@ -156,6 +161,60 @@ Reg	char	*nick, *name, *host;
 	return (namebuf);
 }
 
+void	free_bei(aListItem *bei)
+{
+	if (bei->nick != asterix)
+	{
+		MyFree(bei->nick);
+	}
+	if (bei->user != asterix)
+	{
+		MyFree(bei->user);
+	}
+	if (bei->host != asterix)
+	{
+		MyFree(bei->host);
+	}
+	MyFree(bei);
+}
+
+aListItem	*make_bei(char *nick, char *user, char *host)
+{
+	aListItem	*tmp;
+
+	tmp = (struct ListItem *)MyMalloc(sizeof(aListItem));
+
+	if (!nick || !*nick || (nick[0]=='*' && nick[1]=='\0'))
+	{
+		tmp->nick=asterix;
+	}
+	else
+	{
+		tmp->nick=(char *) MyMalloc( strlen(nick)+1 );
+		strcpy(tmp->nick, nick);
+	}
+	if (!user || !*user || (user[0]=='*' && user[1]=='\0'))
+	{
+		tmp->user=asterix;
+	}
+	else
+	{
+		tmp->user=(char *) MyMalloc( strlen(user)+1 );
+		strcpy(tmp->user, user);
+	}
+	if (!host || !*host || (host[0]=='*' && host[1]=='\0'))
+	{
+		tmp->host=asterix;
+	}
+	else
+	{
+		tmp->host=(char *) MyMalloc( strlen(host)+1 );
+		strcpy(tmp->host, host);
+	}
+
+	return tmp;
+}
+
 /*
  * Ban functions to work with mode +b/+e/+I
  */
@@ -167,28 +226,35 @@ static	int	add_modeid(type, cptr, chptr, modeid)
 int type;
 aClient	*cptr;
 aChannel *chptr;
-char	*modeid;
+aListItem	*modeid;
 {
 	Reg	Link	*mode;
 	Reg	int	cnt = 0, len = 0;
 
 	if (MyClient(cptr))
-		(void) collapse(modeid);
+	{
+		(void) collapse(modeid->nick);
+		(void) collapse(modeid->user);
+		(void) collapse(modeid->host);
+	}
+
 	for (mode = chptr->mlist; mode; mode = mode->next)
 	    {
-		len += strlen(mode->value.cp);
+		len += BanLen(mode->value.alist);
 		if (MyClient(cptr))
 		    {
 			if ((len > MAXBANLENGTH) || (++cnt >= MAXBANS))
 			    {
 				sendto_one(cptr, replies[ERR_BANLISTFULL],
-							 ME, BadTo(cptr->name),
-					   chptr->chname, modeid);
+					ME, BadTo(cptr->name),
+					chptr->chname, modeid->nick,
+					modeid->user, modeid->host);
+				free_bei(modeid);
 				return -1;
 			    }
 			if (type == mode->flags &&
-			    (!match(mode->value.cp, modeid) ||
-			    !match(modeid, mode->value.cp)))
+			    (BanMatch(mode->value.alist, modeid) ||
+			    BanMatch(modeid, mode->value.alist)))
 			    {
 				int rpl;
 
@@ -200,12 +266,18 @@ char	*modeid;
 					rpl = RPL_INVITELIST;
 
 				sendto_one(cptr, replies[rpl], ME, BadTo(cptr->name),
-					   chptr->chname, mode->value.cp);
+					chptr->chname, mode->value.alist->nick,
+					mode->value.alist->user,
+					mode->value.alist->host);
+				free_bei(modeid);
 				return -1;
 			    }
 		    }
-		else if (type == mode->flags && !mycmp(mode->value.cp, modeid))
+		else if (type == mode->flags && BanExact(mode->value.alist, modeid))
+		{
+			free_bei(modeid);
 			return -1;
+		}
 		
 	    }
 	mode = make_link();
@@ -213,9 +285,8 @@ char	*modeid;
 	bzero((char *)mode, sizeof(Link));
 	mode->flags = type;
 	mode->next = chptr->mlist;
-	mode->value.cp = (char *)MyMalloc(len = strlen(modeid)+1);
-	istat.is_banmem += len;
-	(void)strcpy(mode->value.cp, modeid);
+	mode->value.alist = modeid;
+	istat.is_banmem += BanLen(modeid);
 	chptr->mlist = mode;
 	return 0;
 }
@@ -227,37 +298,26 @@ char	*modeid;
 static	int	del_modeid(type, chptr, modeid)
 int type;
 aChannel *chptr;
-char	*modeid;
+aListItem *modeid;
 {
 	Reg	Link	**mode;
 	Reg	Link	*tmp;
 
-	if (modeid == NULL)
-	    {
-	        for (mode = &(chptr->mlist); *mode; mode = &((*mode)->next))
-		    if (type == (*mode)->flags)
-		        {
-			    tmp = *mode;
-			    *mode = tmp->next;
-			    istat.is_banmem -= (strlen(tmp->value.cp) + 1);
-			    istat.is_bans--;
-			    MyFree(tmp->value.cp);
-			    free_link(tmp);
-			    break;
-			}
-	    }
-	else for (mode = &(chptr->mlist); *mode; mode = &((*mode)->next))
+	/* mode == NULL rewritten inside loop */
+        for (mode = &(chptr->mlist); *mode; mode = &((*mode)->next))
+	{
 		if (type == (*mode)->flags &&
-		    mycmp(modeid, (*mode)->value.cp)==0)
-		    {
+			modeid == NULL ? 1 : BanExact(modeid, (*mode)->value.alist))
+		{
 			tmp = *mode;
 			*mode = tmp->next;
-			istat.is_banmem -= (strlen(modeid) + 1);
+			istat.is_banmem -= BanLen(tmp->value.alist);
 			istat.is_bans--;
-			MyFree(tmp->value.cp);
+			free_bei(tmp->value.alist);
 			free_link(tmp);
 			break;
-		    }
+		}
+	}
 	return 0;
 }
 
@@ -271,9 +331,6 @@ aChannel *chptr;
 {
 	Reg	Link	*tmp;
 	char	*s;
-	char	mode_nick[NICKLEN+1];
-	char	mode_user[USERLEN+1];
-	char	mode_host[HOSTLEN+1];
 
 	if (!IsPerson(cptr))
 		return NULL;
@@ -282,40 +339,39 @@ aChannel *chptr;
 	{
 		if (tmp->flags == type)
 		{
-			/* voting for putting n!u@h in proper value.cp struct */
-			if (sscanf(tmp->value.cp, "%[^!]!%[^@]@%s", mode_nick,
-				mode_user, mode_host) != 3)
+			if (match(tmp->value.alist->nick, cptr->name) != 0 ||
+				((isdigit(tmp->value.alist->nick[0]) || 
+				tmp->value.alist->nick[0] == '#') &&
+				match(tmp->value.alist->nick, cptr->user->uid) != 0))
 			{
-				/* perhaps SCH_ERROR should be notified?
-				   anyway, any beI line not matching above
-				   pattern will never match anyone */
+				/* no match on nick part */
 				continue;
 			}
-			if (match(mode_user, cptr->username) != 0 &&
-				(match(mode_nick, cptr->name) != 0 ||
-				match(mode_user, cptr->user->uid) != 0))
+			if (match(tmp->value.alist->user, cptr->username) != 0)
 			{
-				/* client doesn't match them, no point
-				   checking hostname */
+				/* no match on user part */
 				continue;
 			}
-			if (match(mode_host, cptr->user->host) == 0)
+			/* So now we know n!u of a client matches that of a beI */
+			/* Proceeding to more intensive checks of hostname, IP, CIDR */
+			if (match(tmp->value.alist->host, cptr->user->host) == 0)
 			{
 				/* match */
 				break;
 			}
 			/* if our client, let's check IP and CIDR */
+			/* perhaps we could relax it and check remotes too? */
 			if (MyConnect(cptr))
 			{
 				/* Yay, it's 2.11, we have string ip! */
-				if (match(mode_host, cptr->user->sip) == 0)
+				if (match(tmp->value.alist->host, cptr->user->sip) == 0)
 				{
 					/* match */
 					break;
 				}
 				/* so now we check CIDR */
-				if (strchr(mode_host, '/') &&
-					match_ipmask(mode_host, cptr, 0) == 0)
+				if (strchr(tmp->value.alist->host, '/') &&
+					match_ipmask(tmp->value.alist->host, cptr, 0) == 0)
 				{
 					break;
 				}
@@ -690,6 +746,7 @@ char	flag, *chname;
 	Reg	Link	*lp;
 	Reg	char	*cp, *name;
 	int	count = 0, send = 0;
+	char	tmpbei[NICKLEN+1+USERLEN+1+HOSTLEN+1];
 
 	cp = modebuf + strlen(modebuf);
 	if (*parabuf)
@@ -707,7 +764,12 @@ char	flag, *chname;
 			continue;
 		if (mask == CHFL_BAN || mask == CHFL_EXCEPTION ||
 		    mask == CHFL_INVITE)
-			name = lp->value.cp;
+		{
+			/* XXX: rewrite latter to simply use alist, DO NOT copy it --B. */
+			sprintf(tmpbei, "%s!%s@%s", lp->value.alist->nick,
+				lp->value.alist->user, lp->value.alist->host);
+			name = tmpbei;
+		}
 		else
 			name = lp->value.cptr->name;
 		if (strlen(parabuf) + strlen(name) + 10 < (size_t) MODEBUFLEN)
@@ -977,6 +1039,7 @@ char	*parv[];
 	int	compat = -1; /* to prevent mixing old/new modes */
 #endif
 	char	*mbuf = modebuf, *pbuf = parabuf, *upbuf = uparabuf;
+	int tmp_chfl, tmp_rpl, tmp_rpl2, tmp_mode;
 
 	*mbuf = *pbuf = *upbuf = '\0';
 	if (parc < 1)
@@ -1214,108 +1277,47 @@ char	*parv[];
 			*penalty += 2;
 			break;
 		case 'b':
-			*penalty += 1;
-			if (--parc <= 0)	/* ban list query */
-			    {
-				/* Feature: no other modes after ban query */
-				*(curr+1) = '\0';	/* Stop MODE # bb.. */
-				for (lp = chptr->mlist; lp; lp = lp->next)
-					if (lp->flags == CHFL_BAN)
-						sendto_one(cptr,
-							   replies[RPL_BANLIST],
-								   ME, BadTo(cptr->name),
-							   chptr->chname,
-							   lp->value.cp);
-				sendto_one(cptr, replies[RPL_ENDOFBANLIST],
-					   ME, BadTo(cptr->name), chptr->chname);
-				break;
-			    }
-			parv++;
-			if (BadPtr(*parv))
-				break;
-			if (opcnt >= MAXMODEPARAMS)
-#ifndef V29PlusOnly
-			    if (MyClient(sptr) || opcnt >= MAXMODEPARAMS + 1)
-#endif
-				break;
-			if (whatt == MODE_ADD)
-			    {
-				if (**parv == ':')
-					/* this won't propagate right */
-					break;
-				lp = &chops[opcnt++];
-				lp->value.cp = *parv;
-				lp->flags = MODE_ADD|MODE_BAN;
-			    }
-			else if (whatt == MODE_DEL)
-			    {
-				lp = &chops[opcnt++];
-				lp->value.cp = *parv;
-				lp->flags = MODE_DEL|MODE_BAN;
-			    }
-			count++;
-			*penalty += 2;
-			break;
 		case 'e':
-			*penalty += 1;
-			if (--parc <= 0)	/* exception list query */
-			    {
-				/* Feature: no other modes after query */
-				*(curr+1) = '\0';	/* Stop MODE # bb.. */
-				for (lp = chptr->mlist; lp; lp = lp->next)
-					if (lp->flags == CHFL_EXCEPTION)
-						sendto_one(cptr,
-						   replies[RPL_EXCEPTLIST],
-								   ME, BadTo(cptr->name),
-							   chptr->chname,
-							   lp->value.cp);
-				sendto_one(cptr, replies[RPL_ENDOFEXCEPTLIST],
-					   ME, BadTo(cptr->name), chptr->chname);
-				break;
-			    }
-			parv++;
-			if (BadPtr(*parv))
-				break;
-			if (opcnt >= MAXMODEPARAMS)
-#ifndef V29PlusOnly
-			    if (MyClient(sptr) || opcnt >= MAXMODEPARAMS + 1)
-#endif
-				break;
-			if (whatt == MODE_ADD)
-			    {
-				if (**parv == ':')
-					/* this won't propagate right */
-					break;
-				lp = &chops[opcnt++];
-				lp->value.cp = *parv;
-				lp->flags = MODE_ADD|MODE_EXCEPTION;
-			    }
-			else if (whatt == MODE_DEL)
-			    {
-				lp = &chops[opcnt++];
-				lp->value.cp = *parv;
-				lp->flags = MODE_DEL|MODE_EXCEPTION;
-			    }
-			count++;
-			*penalty += 2;
-			break;
 		case 'I':
+			switch (*curr)
+			{
+			case 'b':
+				tmp_chfl = CHFL_BAN;
+				tmp_rpl = RPL_BANLIST;
+				tmp_rpl2 = RPL_ENDOFBANLIST;
+				tmp_mode = MODE_BAN;
+				break;
+			case 'e':
+				tmp_chfl = CHFL_EXCEPTION;
+				tmp_rpl = RPL_EXCEPTLIST;
+				tmp_rpl2 = RPL_ENDOFEXCEPTLIST;
+				tmp_mode = MODE_EXCEPTION;
+			case 'I':
+				break;
+				tmp_chfl = CHFL_INVITE;
+				tmp_rpl = RPL_INVITELIST;
+				tmp_rpl2 = RPL_ENDOFINVITELIST;
+				tmp_mode = MODE_INVITE;
+				break;
+			}
 			*penalty += 1;
-			if (--parc <= 0)	/* invite list query */
-			    {
+			if (--parc <= 0)	/* beI list query */
+			{
 				/* Feature: no other modes after query */
 				*(curr+1) = '\0';	/* Stop MODE # bb.. */
 				for (lp = chptr->mlist; lp; lp = lp->next)
-					if (lp->flags == CHFL_INVITE)
+					if (lp->flags == tmp_chfl)
 						sendto_one(cptr,
-						   replies[RPL_INVITELIST],
-								   ME, BadTo(cptr->name),
+							   replies[tmp_rpl],
+							   ME, BadTo(cptr->name),
 							   chptr->chname,
-							   lp->value.cp);
-				sendto_one(cptr, replies[RPL_ENDOFINVITELIST],
+							   lp->value.alist->nick,
+							   lp->value.alist->user,
+							   lp->value.alist->host);
+				sendto_one(cptr, replies[tmp_rpl2],
 					   ME, BadTo(cptr->name), chptr->chname);
 				break;
-			    }
+			}
 			parv++;
 			if (BadPtr(*parv))
 				break;
@@ -1325,20 +1327,23 @@ char	*parv[];
 #endif
 				break;
 			if (whatt == MODE_ADD)
-			    {
+			{
 				if (**parv == ':')
 					/* this won't propagate right */
 					break;
 				lp = &chops[opcnt++];
-				lp->value.cp = *parv;
-				lp->flags = MODE_ADD|MODE_INVITE;
-			    }
+				/* this is horribly temporary,
+				** we deal with it later, find
+				** parseNUH to check */
+				lp->value.alist = *parv;
+				lp->flags = MODE_ADD|tmp_mode;
+			}
 			else if (whatt == MODE_DEL)
-			    {
+			{
 				lp = &chops[opcnt++];
-				lp->value.cp = *parv;
-				lp->flags = MODE_DEL|MODE_INVITE;
-			    }
+				lp->value.alist = *parv;
+				lp->flags = MODE_DEL|tmp_mode;
+			}
 			count++;
 			*penalty += 2;
 			break;
@@ -1422,7 +1427,7 @@ char	*parv[];
 				else
 				    {
 					/*
-				        ** If the channel is +s, ignore +p
+					** If the channel is +s, ignore +p
 					** modes coming from a server.
 					** (Otherwise, it's desynch'ed) -kalt
 					*/
@@ -1587,38 +1592,25 @@ char	*parv[];
 					lp->value.cptr->user->uid : cp;
 				break;
 			case MODE_BAN :
-				c = 'b';
-				cp = lp->value.cp;
-				if ((user = index(cp, '!')))
-					*user++ = '\0';
-				if ((host = rindex(user ? user : cp, '@')))
-					*host++ = '\0';
-				cp = make_nick_user_host(cp, user, host);
-				if (user)
-					*(--user) = '!';
-				if (host)
-					*(--host) = '@';
-				break;
 			case MODE_EXCEPTION :
-				c = 'e';
-				cp = lp->value.cp;
-				if ((user = index(cp, '!')))
-					*user++ = '\0';
-				if ((host = rindex(user ? user : cp, '@')))
-					*host++ = '\0';
-				cp = make_nick_user_host(cp, user, host);
-				if (user)
-					*(--user) = '!';
-				if (host)
-					*(--host) = '@';
-				break;
 			case MODE_INVITE :
-				c = 'I';
-				cp = lp->value.cp;
+				switch(lp->flags & MODE_WPARAS)
+				{
+				case MODE_BAN :
+					c = 'b'; break;
+				case MODE_EXCEPTION :
+					c = 'e'; break;
+				case MODE_INVITE :
+					c = 'I'; break;
+				}
+				/* parseNUH: */
+				cp = lp->value.alist;	/* see? we get it back */
 				if ((user = index(cp, '!')))
 					*user++ = '\0';
 				if ((host = rindex(user ? user : cp, '@')))
 					*host++ = '\0';
+				lp->value.alist = make_bei(cp, user, host);
+				/* XXX: rewrite to get rid of this function --B. */
 				cp = make_nick_user_host(cp, user, host);
 				if (user)
 					*(--user) = '!';
@@ -1703,48 +1695,25 @@ char	*parv[];
 					change_chan_flag(lp, chptr);
 				break;
 			case MODE_BAN :
-				if (ischop &&
-				    (((whatt & MODE_ADD) &&
-				      !add_modeid(CHFL_BAN, sptr, chptr, cp))||
-				     ((whatt & MODE_DEL) &&
-				      !del_modeid(CHFL_BAN, chptr, cp))))
-				    {
-					*mbuf++ = c;
-					(void)strcat(pbuf, cp);
-					(void)strcat(upbuf, cp);
-					len += strlen(cp);
-					ulen += strlen(cp);
-					(void)strcat(pbuf, " ");
-					(void)strcat(upbuf, " ");
-					len++;
-					ulen++;
-				    }
-				break;
 			case MODE_EXCEPTION :
-				if (ischop &&
-				    (((whatt & MODE_ADD) &&
-			      !add_modeid(CHFL_EXCEPTION, sptr, chptr, cp))||
-				     ((whatt & MODE_DEL) &&
-				      !del_modeid(CHFL_EXCEPTION, chptr, cp))))
-				    {
-					*mbuf++ = c;
-					(void)strcat(pbuf, cp);
-					(void)strcat(upbuf, cp);
-					len += strlen(cp);
-					ulen += strlen(cp);
-					(void)strcat(pbuf, " ");
-					(void)strcat(upbuf, " ");
-					len++;
-					ulen++;
-				    }
-				break;
 			case MODE_INVITE :
+				switch(lp->flags & MODE_WPARAS)
+				{
+				case MODE_BAN :
+					tmp_chfl = CHFL_BAN; break;
+				case MODE_EXCEPTION :
+					tmp_chfl = CHFL_EXCEPTION; break;
+				case MODE_INVITE :
+					tmp_chfl = CHFL_INVITE; break;
+				}
 				if (ischop &&
-				    (((whatt & MODE_ADD) &&
-			      !add_modeid(CHFL_INVITE, sptr, chptr, cp))||
-				     ((whatt & MODE_DEL) &&
-				      !del_modeid(CHFL_INVITE, chptr, cp))))
-				    {
+					(((whatt & MODE_ADD) &&
+					!add_modeid(tmp_chfl, sptr, chptr,
+						lp->value.alist))||
+					((whatt & MODE_DEL) &&
+					!del_modeid(tmp_chfl, chptr,
+						lp->value.alist))))
+				{
 					*mbuf++ = c;
 					(void)strcat(pbuf, cp);
 					(void)strcat(upbuf, cp);
@@ -1754,7 +1723,7 @@ char	*parv[];
 					(void)strcat(upbuf, " ");
 					len++;
 					ulen++;
-				    }
+				}
 				break;
 			}
 		    } /* for (; i < opcnt; i++) */
@@ -1867,9 +1836,11 @@ char	*key;
 	{
 		sendto_channel_butone(&me, &me, chptr,
 			":%s NOTICE %s :%s carries an invitation from %s"
-			" (overriding ban on %s).",
+			" (overriding ban on %s!%s@%s).",
 			ME, chptr->chname, sptr->name,
-			lp->who, banned->value.cp);
+			lp->who, banned->value.alist->nick,
+			banned->value.alist->user,
+			banned->value.alist->host);
 	}
 	return 0;
 }
@@ -2081,9 +2052,9 @@ aChannel *chptr;
 		    {
 			obtmp = tmp;
 			tmp = tmp->next;
-			istat.is_banmem -= (strlen(obtmp->value.cp) + 1);
+			istat.is_banmem -= BanLen(obtmp->value.alist);
 			istat.is_bans--;
-			MyFree(obtmp->value.cp);
+			free_bei(obtmp->value.alist);
 			free_link(obtmp);
 		    }
 		chptr->mlist = NULL;

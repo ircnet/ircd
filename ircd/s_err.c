@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.39 2002/11/25 21:11:15 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.40 2003/02/14 00:27:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -388,9 +388,9 @@ char *	replies[] = {
 /* 343 */ (char *)NULL,
 /* 344 */ (char *)NULL,
 /* 345 */ (char *)NULL,
-/* 346 RPL_INVITELIST */	":%s 346 %s %s %s",
+/* 346 RPL_INVITELIST */	":%s 346 %s %s %s!%s@%s",
 /* 347 RPL_ENDOFINVITELIST */	":%s 347 %s %s :End of Channel Invite List",
-/* 348 RPL_EXCEPTLIST */	":%s 348 %s %s %s",
+/* 348 RPL_EXCEPTLIST */	":%s 348 %s %s %s!%s@%s",
 /* 349 RPL_ENDOFEXCEPTLIST */	":%s 349 %s %s :End of Channel Exception List",
 /* 350 */ (char *)NULL,
 /* 351 RPL_VERSION */	":%s 351 %s %s.%s %s :%s",
@@ -409,7 +409,7 @@ char *	replies[] = {
 /* 364 RPL_LINKS */	":%s 364 %s %s %s :%d %s",
 /* 365 RPL_ENDOFLINKS */	":%s 365 %s %s :End of LINKS list.",
 /* 366 RPL_ENDOFNAMES */	":%s 366 %s %s :End of NAMES list.",
-/* 367 RPL_BANLIST */	":%s 367 %s %s %s",
+/* 367 RPL_BANLIST */	":%s 367 %s %s %s!%s@%s",
 /* 368 RPL_ENDOFBANLIST */	":%s 368 %s %s :End of Channel Ban List",
 /* 369 RPL_ENDOFWHOWAS */	":%s 369 %s %s :End of WHOWAS",
 /* 370 */ (char *)NULL,
@@ -535,7 +535,7 @@ char *	replies[] = {
 /* 475 ERR_BADCHANNELKEY */	":%s 475 %s %s :Cannot join channel (+k)",
 /* 476 ERR_BADCHANMASK */	":%s 476 %s %s :Bad Channel Mask",
 /* 477 ERR_NOCHANMODES */	":%s 477 %s %s :Channel doesn't support modes",
-/* 478 ERR_BANLISTFULL */	":%s 478 %s %s %s :Channel list is full",
+/* 478 ERR_BANLISTFULL */	":%s 478 %s %s %s!%s@%s :Channel list is full",
 /* 479 */ (char *)NULL,
 /* 480 */ (char *)NULL,
 /* 481 ERR_NOPRIVILEGES */	":%s 481 %s :Permission Denied- You're not an IRC operator",
