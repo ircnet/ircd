@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.91 2004/06/29 23:56:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.92 2004/08/02 15:52:54 jv Exp $";
 #endif
 
 #include "os.h"
@@ -778,6 +778,8 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 						  sptr->from);
 		del_from_sid_hash_table(sptr->serv);
 		remove_server_from_tree(sptr);
+		/* remove server from svrtop */
+		unregister_server(sptr);
 	}
 	else if (!IsPerson(sptr) && !IsService(sptr))
 	{
@@ -909,7 +911,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			{
 				del_from_uid_hash_table(sptr->user->uid, sptr);
 			}
-
+#if 0
 			/* Add user to history */
 #ifndef BETTER_NDELAY
 			add_history(sptr, (sptr->flags & FLAGS_QUIT) ? 
@@ -918,6 +920,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			add_history(sptr, (sptr == cptr) ? &me : NULL);
 #endif
 			off_history(sptr);
+#endif
 			del_from_hostname_hash_table(sptr->user->host,
 						     sptr->user);
 		    }
