@@ -1,3 +1,13 @@
+1999-07-11  Christophe Kalt
+
+	* a_defines.h was missing support_def.h (from KIKUCHI Takahiro).
+
+	* Makefile.in: ircdwatch.c uses strerror(), needs clsupport.o
+	(from KIKUCHI Takahiro).
+
+	* config.h.dist, ircd.c, s_debug.c: renamed CONNECTTIMEOUT to
+	ACCEPTTIMEOUT, and changed from 30 to 90.
+
 1999-07-11  Piotr Kucharski
 
 	* mod_socks.c:
