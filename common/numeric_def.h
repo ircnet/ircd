@@ -345,5 +345,4 @@
 #define	RPL_TRACEEND         262
 #define	RPL_TRYAGAIN         263
 
-#define	RPL_LOCALUSERS       265
-#define	RPL_GLOBALUSERS      266
+#define	RPL_LUSERMAX         265

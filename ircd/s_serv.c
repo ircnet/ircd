@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.198 2004/06/15 16:34:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.199 2004/06/15 20:12:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2431,10 +2431,8 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	
 	sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]), m_clients,
 		   m_services, m_servers);
-        sendto_one(sptr, replies[RPL_LOCALUSERS], ME, BadTo(parv[0]),
-			istat.is_myclnt, istat.is_m_myclnt);
-	sendto_one(sptr, replies[RPL_GLOBALUSERS], ME, BadTo(parv[0]),
-			c_count + i_count, istat.is_m_users);
+        sendto_one(sptr, replies[RPL_LUSERMAX], ME, BadTo(parv[0]),
+			istat.is_m_myclnt, istat.is_m_users);
 	return 2;
 }
 

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.49 2004/05/12 16:39:53 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.50 2004/06/15 20:12:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -303,8 +303,8 @@ char *	replies[] = {
 /* 262 RPL_TRACEEND */	":%s 262 %s %s %s.%s :End of TRACE",
 /* 263 RPL_TRYAGAIN */	":%s 263 %s %s :Please wait a while and try again.",
 /* 264 */ (char *)NULL,
-/* 265 RPL_LOCALUSERS */	":%s 265 %s %d %d :local users current, max",
-/* 266 RPL_GLOBALUSERS */	":%s 266 %s %d %d :global users current, max",
+/* 265 RPL_LUSERMAX */	":%s 265 %s %d %d :max local users, max global users",
+/* 266 */ (char *)NULL,
 /* 267 */ (char *)NULL,
 /* 268 */ (char *)NULL,
 /* 269 */ (char *)NULL,
