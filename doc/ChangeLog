@@ -1,4 +1,14 @@
+1998-12-12  Christophe Kalt
+
+	* iauth.c, a_io.c: added nonexistant INET6 code.
+	
+	* os.h, nameser_def.h, resolv_def.h: OSF portability fix from Roar
+	Thronæs.
+
+	* s_auth.c: added missing INET6 code. (Roar Thronæs)
+
 1998-09-25  Christophe Kalt
+	
 	* configure.in: Check for IPv6 system type and update $LIBS (from
 	KIKUCHI Takahiro <kick@kyoto.wide.ad.jp>)
 
