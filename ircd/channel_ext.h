@@ -53,7 +53,6 @@ EXTERN int m_njoin __P((Reg aClient *cptr, Reg aClient *sptr, int parc,
 		        char *parv[]));
 EXTERN int m_part __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_kick __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int count_channels __P((aClient *sptr));
 EXTERN int m_topic __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_invite __P((aClient *cptr, aClient *sptr, int parc,
 			 char *parv[]));
