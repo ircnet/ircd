@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.35 1999/03/10 00:32:46 kalt Exp $
+  $Id: INSTALL.txt,v 1.36 1999/04/12 19:31:25 kalt Exp $
 
   This document describes how to install, and configure IRC 2.10.2.
 
@@ -1392,7 +1392,8 @@
         The matching version number strings will be rejected.
 
      FFllaaggss
-        The matching version flags strings will be rejected.
+        If any flag specified in this field is found in the peer's flags
+        string, it will be rejected.
 
      SSeerrvveerr MMaasskk
         This field is used to match server names.  The V line will be
@@ -1409,12 +1410,12 @@
         Disallows any ``IRC'' server which version is 2.10.1* to
         connect.
 
-        V:IRC/021001*:IRC/*D*:*::
+        V:IRC/021001*:IRC/D:*::
 
         Disallows any ``IRC'' server which version is 2.10.1* or which
         has been compiled with DEBUGMODE defined to connect.
 
-        V:*/0209*::*::
+        V:*/0209*::::
 
         Disallows any server using the 2.9 protocol to connect.
 
@@ -1422,9 +1423,9 @@
         It is possible to have and use multiple V-lines for the one
         server mask.
 
-        V:IRC/021001*:*:*::
+        V:IRC/021001*::*::
 
-        V:IRC/021002*:*:*::
+        V:IRC/021002*::*::
 
         is allowed.
 
@@ -1511,7 +1512,6 @@
         unallowed command. Services however, are not affected by flood
         control and can be granted special privileges. It is therefore
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
-
 
 
 

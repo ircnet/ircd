@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info18063tmp2.
+input file /tmp/sgml2info13331tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.35 1999/03/10 00:32:45 kalt Exp $
+     $Id: INSTALL.info,v 1.36 1999/04/12 19:31:25 kalt Exp $
 
    This document describes how to install, and configure IRC 2.10.2.
 
@@ -1430,7 +1430,8 @@ Version limitations
      The matching version number strings will be rejected.
 
 `Flags'
-     The matching version flags strings will be rejected.
+     If any flag specified in this field is found in the peer's flags
+     string, it will be rejected.
 
 `Server Mask'
      This field is used to match server names.  The V line will be used
@@ -1446,12 +1447,12 @@ Version limitations
 
      Disallows any "IRC" server which version is 2.10.1* to connect.
 
-     V:IRC/021001*:IRC/*D*:*::
+     V:IRC/021001*:IRC/D:*::
 
      Disallows any "IRC" server which version is 2.10.1* or which has
      been compiled with DEBUGMODE defined to connect.
 
-     V:*/0209*::*::
+     V:*/0209*::::
 
      Disallows any server using the 2.9 protocol to connect.
 
@@ -1459,9 +1460,9 @@ Version limitations
      It is possible to have and use multiple V-lines for the one server
      mask.
 
-     V:IRC/021001*:*:*::
+     V:IRC/021001*::*::
 
-     V:IRC/021002*:*:*::
+     V:IRC/021002*::*::
 
      is allowed.
 
@@ -1744,13 +1745,13 @@ Node: Deny auto-connections48371
 Node: Hub connections49744
 Node: Leaf connections50960
 Node: Version limitations53043
-Node: Excluded machines54759
-Node: Service connections56066
-Node: Bounce server57659
-Node: Default local server (for local clients) `*OBSOLETED*'59361
-Node: Related resources60244
-Node: Reporting a bug61182
-Node: How to report a bug61442
-Node: Where to send a bug report62455
+Node: Excluded machines54800
+Node: Service connections56107
+Node: Bounce server57700
+Node: Default local server (for local clients) `*OBSOLETED*'59402
+Node: Related resources60285
+Node: Reporting a bug61223
+Node: How to report a bug61483
+Node: Where to send a bug report62496
 
 End Tag Table
