@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.75 2004/02/12 21:43:21 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.76 2004/02/13 01:43:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1264,13 +1264,6 @@ int 	initconf(int opt)
 			case 's': /* CONF_OPERATOR                */
 				aconf->status = CONF_SERVICE;
 				break;
-#if 0
-			case 'U': /* Uphost, ie. host where client reading */
-			case 'u': /* this should connect.                  */
-			/* This is for client only, I must ignore this */
-			/* ...U-line should be removed... --msa */
-				break;
-#endif
 			case 'V': /* Server link version requirements */
 				aconf->status = CONF_VER;
 				break;
