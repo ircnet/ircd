@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: irc_sprintf.c,v 1.1 2002/07/29 23:06:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: irc_sprintf.c,v 1.1 2002/07/30 23:12:21 chopin Exp $";
 #endif
 
 #define IRC_SPRINTF_C
