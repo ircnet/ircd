@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.233 2004/10/01 20:22:16 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.234 2004/10/07 00:16:47 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2877,38 +2877,27 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int	m_ping(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	char	*origin, *destination;
+	char	*destination;
 
-	if (parc < 2 || *parv[1] == '\0')
-	    {
-		sendto_one(sptr, replies[ERR_NOORIGIN], ME, BadTo(parv[0]));
-		return 1;
-	    }
-	origin = parv[1];
 	destination = parv[2]; /* Will get NULL or pointer (parc >= 2!!) */
 
-	acptr = find_client(origin, NULL);
-	if (!acptr)
-		acptr = find_server(origin, NULL);
-	if (!acptr || acptr != sptr)
-		origin = cptr->name;
 	if (!BadPtr(destination) && match(destination, ME) != 0)
-	    {
+	{
 		if ((acptr = find_server(destination, NULL)))
-			sendto_one(acptr,":%s PING %s :%s", parv[0],
-				   origin, destination);
+			sendto_one(acptr, ":%s PING %s :%s", parv[0],
+				cptr->name, destination);
 	    	else
-		    {
-			sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]),
-				   destination);
+		{
+			sendto_one(sptr, replies[ERR_NOSUCHSERVER],
+				ME, BadTo(parv[0]), destination);
 			return 1;
-		    }
-	    }
+		}
+	}
 	else
 		sendto_one(sptr, ":%s PONG %s :%s", ME,
-			   (destination) ? destination : ME, origin);
+			(destination) ? destination : ME, parv[1]);
 	return 1;
-    }
+}
 
 /*
 ** m_pong
