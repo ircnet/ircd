@@ -1,6 +1,20 @@
 2002-04-05  Jakub Vlasek
 	* s_service.c/m_service(),m_servset(),m_servlist(): Changed atoi()
 	  to strtol() to allow hexadecimal arguments.
+	* msg_dev.h: Added EOB, removed useless comments.
+	* parse.c: Added m_eob to msgtab. Added find_target().
+	* parse_ext.h: Added declaration of m_eob().
+	* struct_def.h: Added IsBursting(), SetEOB() defines and FLAGS_EOB.
+	  Added is_eobservers to istat array.
+	* s_misc.c/exit_one_client(): Decrease istat.is_eobservers if EOBed
+	  server quits.
+	* s_numeric.c/do_numeric(): Added EOB emulation support, use
+	  find_target().
+	* s_serv.c/m_server(): Send PINGs on server introduction for EOB
+	  emulation. m_server_estab(): Send EOB(s) after burst.
+	  Added: m_eob(), do_emulated_eob(),
+	* s_serv_ext.h: Added declaration for do_emulated_eob().
+	* s_user.c/m_pong(): Added support for EOB emulation.
 
 2002-03-29  Jakub Vlasek
 
