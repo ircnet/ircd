@@ -983,7 +983,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id configure.in,v 1.2 1995/01/07 01:50:18 mrg Exp $])
+AC_REVISION([$Id: configure.in,v 1.9 1997/07/22 12:41:54 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../include/setup.h.in)
