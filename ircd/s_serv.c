@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.170 2004/03/10 19:25:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.171 2004/03/11 02:42:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1396,7 +1396,9 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			    match(mlname, acptr->user->server) == 0)
 				stok = me.serv->tok;
 			else
-				stok = acptr->user->servp->tok;
+				stok = ST_UID(cptr) ?
+					acptr->user->servp->tok :
+					acptr->user->servp->maskedby->serv->tok;
 			send_umode(NULL, acptr, 0, SEND_UMODES, buf);
 			if (ST_UID(cptr) && *acptr->user->uid)
 				sendto_one(cptr,
