@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.61 2002/07/29 22:38:49 chopin Exp $
+ *   $Id: struct_def.h,v 1.62 2002/08/01 01:56:52 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -27,6 +27,7 @@ typedef	struct	User	anUser;
 typedef	struct	Server	aServer;
 typedef	struct	Service	aService;
 typedef	struct	SLink	Link;
+typedef	struct	invSLink	invLink;
 typedef	struct	SMode	Mode;
 typedef	struct	fdarray	FdAry;
 typedef	struct	CPing	aCPing;
@@ -369,7 +370,7 @@ struct LineItem
  */
 struct	User	{
 	Link	*channel;	/* chain of channel pointer blocks */
-	Link	*invited;	/* chain of invite pointer blocks */
+	invLink	*invited;	/* chain of invite pointer blocks */
 	Link	*uwas;		/* chain of whowas pointer blocks */
 	char	*away;		/* pointer to away message */
 	time_t	last;		/* "idle" time */
@@ -598,6 +599,21 @@ struct	SLink	{
 		char	*cp;
 		int	i;
 	} value;
+	int	flags;
+};
+
+/* link structure used for invites */
+
+struct	invSLink	{
+	struct	invSLink	*next;
+	union {
+		aClient	*cptr;
+		aChannel *chptr;
+		aConfItem *aconf;
+		char	*cp;
+		int	i;
+	} value;
+	char	*who;
 	int	flags;
 };
 

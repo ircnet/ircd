@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.127 2002/07/30 00:14:58 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.128 2002/08/01 01:56:52 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -43,7 +43,7 @@ static	char rcsid[] = "@(#)$Id: channel.c,v 1.127 2002/07/30 00:14:58 chopin Exp
 
 aChannel *channel = NullChn;
 
-static	void	add_invite __P((aClient *, aChannel *));
+static	void	add_invite __P((aClient *, aClient *, aChannel *));
 static	int	can_join __P((aClient *, aChannel *, char *));
 void	channel_modes __P((aClient *, char *, char *, aChannel *));
 static	int	check_channelmask __P((aClient *, aClient *, char *));
@@ -1803,7 +1803,8 @@ aClient	*sptr;
 Reg	aChannel *chptr;
 char	*key;
 {
-	Link	*lp = NULL, *banned;
+	invLink	*lp = NULL;
+	Link	*banned;
 
 	if (chptr->users == 0 && (bootopt & BOOT_PROT) && 
 	    chptr->history != 0 && *chptr->chname != '!')
@@ -1838,10 +1839,13 @@ char	*key;
 		return (ERR_CHANNELISFULL);
 
 	if (banned)
+	{
 		sendto_channel_butone(&me, &me, chptr,
-       ":%s NOTICE %s :%s carries an invitation (overriding ban on %s).",
-				       ME, chptr->chname, sptr->name,
-				       banned->value.cp);
+			":%s NOTICE %s :%s carries an invitation from %s"
+			" (overriding ban on %s).",
+			ME, chptr->chname, sptr->name,
+			lp->who, banned->value.cp);
+	}
 	return 0;
 }
 
@@ -1931,43 +1935,61 @@ int	flag;
 	return chptr;
     }
 
-static	void	add_invite(cptr, chptr)
-aClient *cptr;
-aChannel *chptr;
+static	void	add_invite(sptr, cptr, chptr)
+aClient *sptr;		/* who invites */
+aClient *cptr;		/* who gets invitation */
+aChannel *chptr;	/* what channel */
 {
-	Reg	Link	*inv, **tmp;
+
+	/*
+	assert(sptr!=NULL);
+	assert(cptr!=NULL);
+	assert(chptr!=NULL);
+	*/
 
 	del_invite(cptr, chptr);
+
 	/*
 	 * delete last link in chain if the list is max length
 	 */
 	if (list_length(cptr->user->invited) >= MAXCHANNELSPERUSER)
-	    {
-/*		This forgets the channel side of invitation     -Vesa
-		inv = cptr->user->invited;
-		cptr->user->invited = inv->next;
-		free_link(inv);
-*/
+	{
 		del_invite(cptr, cptr->user->invited->value.chptr);
-	    }
+	}
+
 	/*
 	 * add client to channel invite list
 	 */
-	inv = make_link();
-	inv->value.cptr = cptr;
-	inv->next = chptr->invites;
-	chptr->invites = inv;
-	istat.is_useri++;
+	{
+		Reg	Link	*inv;
+
+		inv = make_link();
+		inv->value.cptr = cptr;
+		inv->next = chptr->invites;
+		chptr->invites = inv;
+		istat.is_useri++;
+	}
 	/*
 	 * add channel to the end of the client invite list
 	 */
-	for (tmp = &(cptr->user->invited); *tmp; tmp = &((*tmp)->next))
-		;
-	inv = make_link();
-	inv->value.chptr = chptr;
-	inv->next = NULL;
-	(*tmp) = inv;
-	istat.is_invite++;
+	{
+		Reg	invLink	*inv, **tmp;
+		char	who[NICKLEN+USERLEN+HOSTLEN+3];
+		int	len;
+
+		for (tmp = &(cptr->user->invited); *tmp; tmp = &((*tmp)->next))
+			;
+		inv = make_invlink();
+		(*tmp) = inv;
+		inv->value.chptr = chptr;
+		inv->next = NULL;
+		len = sprintf(who, "%s!%s@%s", sptr->name,
+			sptr->user->username, sptr->user->host);
+		inv->who = (char *)MyMalloc(len + 1);
+		istat.is_banmem += len;
+		strcpy(inv->who, who);
+		istat.is_invite++;
+	}
 }
 
 /*
@@ -1977,25 +1999,36 @@ void	del_invite(cptr, chptr)
 aClient *cptr;
 aChannel *chptr;
 {
-	Reg	Link	**inv, *tmp;
+	{
+		Reg	Link	**inv, *tmp;
 
-	for (inv = &(chptr->invites); (tmp = *inv); inv = &tmp->next)
-		if (tmp->value.cptr == cptr)
-		    {
-			*inv = tmp->next;
-			free_link(tmp);
-			istat.is_invite--;
-			break;
-		    }
+		for (inv = &(chptr->invites); (tmp = *inv); inv = &tmp->next)
+		{
+			if (tmp->value.cptr == cptr)
+			{
+				*inv = tmp->next;
+				free_link(tmp);
+				istat.is_invite--;
+				break;
+			}
+		}
+	}
+	{
+		Reg	invLink	**inv, *tmp;
 
-	for (inv = &(cptr->user->invited); (tmp = *inv); inv = &tmp->next)
-		if (tmp->value.chptr == chptr)
-		    {
-			*inv = tmp->next;
-			free_link(tmp);
-			istat.is_useri--;
-			break;
-		    }
+		for (inv = &(cptr->user->invited); (tmp = *inv); inv = &tmp->next)
+		{
+			if (tmp->value.chptr == chptr)
+			{
+				*inv = tmp->next;
+				istat.is_banmem -= (strlen(tmp->who)+1);
+				free(tmp->who);
+				free_invlink(tmp);
+				istat.is_useri--;
+				break;
+			}
+		}
+	}
 }
 
 /*
@@ -2955,7 +2988,7 @@ char	*parv[];
 	if (MyConnect(acptr))
 		if (chptr && /* (chptr->mode.mode & MODE_INVITEONLY) && */
 		    sptr->user && is_chan_op(sptr, chptr))
-			add_invite(acptr, chptr);
+			add_invite(sptr, acptr, chptr);
 
 	sendto_prefix_one(acptr, sptr, ":%s INVITE %s :%s",parv[0],
 			  acptr->name, ((chptr) ? (chptr->chname) : parv[2]));
