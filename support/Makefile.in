@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.52 2004/02/08 00:54:11 chopin Exp $
+#*   $Id: Makefile.in,v 1.53 2004/02/20 02:02:47 chopin Exp $
 #*
 #*/
 
@@ -373,14 +373,8 @@ class.o: ../ircd/class.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/class.c
 
 hash.o: ../common/struct_def.h ../common/os.h ../ircd/hash_def.h \
-	../ircd/hash_ext.h ../common/common_def.h ../ircd/s_bsd.c \
-	../ircd/s_serv.c ../ircd/s_user.c ../ircd/channel.c ../ircd/s_misc.c \
-	../ircd/hash.c ../ircd/ircd.c Makefile setup.h config.h
-	@cp ../ircd/hash.c .
-	@/bin/sh ./sums
-	$(CC) $(S_CFLAGS) -c -o $@ hash.c
-	@$(RM) hash.c hash.c.old
-	@touch hash.o
+	../ircd/hash_ext.h ../ircd/hash.c setup.h config.h
+	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/hash.c
 
 ircd.o: ../ircd/ircd.c setup.h config.h
 	$(CC) $(S_CFLAGS) -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" \
