@@ -212,8 +212,8 @@ void process_server_output(char *line)
 /* reformats the server output */
 void parse_server_output(char *buffer)
 {
-    char *ch, buf[TKS_MAXBUFFER];
-    static char tmp[TKS_MAXBUFFER];
+    char *ch, buf[TKS_MAXBUFFER+1];
+    static char tmp[TKS_MAXBUFFER+1];
 
     /* server sent an empty line, so just return */
     if (!buffer && !*buffer)
@@ -267,7 +267,7 @@ int server_output(int fd, char *buffer)
 int is_opered(void)
 {
     char *nick, *ch, *token, *u_num, *userh;
-    char buffer[TKS_MAXBUFFER];
+    char buffer[TKS_MAXBUFFER + 1];
     int retv = 0;
 
     nick = (char *) strdup(nuh);
@@ -351,7 +351,7 @@ int must_be_opered()
     /* if the access file exists, check for auth */
     if ((fp = fopen(TKSERV_ACCESSFILE, "r")) != NULL)
     {
-        char buffer[TKS_MAXBUFFER];
+        char buffer[TKS_MAXBUFFER + 1];
         char *access_uh, *token, *uh;
 
         while (fgets(buffer, TKS_MAXBUFFER, fp))
@@ -399,7 +399,7 @@ int is_authorized(char *pwd, char *host)
     char salt[3];
 #endif
     FILE *fp;
-    char buffer[TKS_MAXBUFFER];
+    char buffer[TKS_MAXBUFFER + 1];
     char *access_uh, *access_pwd;
     char *token, *uh, *ch, *tlds = NULL;
     int retv = 0; /* 0 not authorized (perhaps *yet*); negative: errors */
@@ -601,8 +601,8 @@ int check_tklines(char *host, char *user, int lifetime)
     {
         int count = 0, found = 0;
         time_t now;
-        char buffer[TKS_MAXBUFFER];
-        char buf_tmp[TKS_MAXBUFFER];
+        char buffer[TKS_MAXBUFFER + 1];
+        char buf_tmp[TKS_MAXBUFFER + 1];
         
         /* just in case... */
         chmod(TKSERV_IRCD_CONFIG_TMP, S_IRUSR | S_IWRITE);
@@ -628,7 +628,7 @@ int check_tklines(char *host, char *user, int lifetime)
                 if (lifetime == -1)
                 {
                     char *token;
-                    char buf[TKS_MAXBUFFER];
+                    char buf[TKS_MAXBUFFER + 1];
 
                     strcpy(buf, buffer);
 
@@ -668,7 +668,7 @@ int check_tklines(char *host, char *user, int lifetime)
                 else
                 {
                     char *ch, *token;
-                    char buf[TKS_MAXBUFFER];
+                    char buf[TKS_MAXBUFFER + 1];
                     unsigned long int lifetime, then;
                 
                     strcpy(buf, buffer);
@@ -1059,7 +1059,7 @@ void squery_quit(char **args)
 int main(int argc, char *argv[])
 {
 
-    char *host, *port, buffer[TKS_MAXBUFFER], last_buf[TKS_MAXBUFFER]; 
+    char *host, *port, buffer[TKS_MAXBUFFER + 1], last_buf[TKS_MAXBUFFER + 1];
     char tmp[TKS_MAXPATH];
 
     int is_unix    = (argv[1] && *argv[1] == '/');
