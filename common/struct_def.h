@@ -495,6 +495,12 @@ struct	stats {
 	u_long	is_lkt;   /* sum of elapsed time on when overwriting locked[]*/
 	u_long	is_lkMt;  /* max elapsed time on when overwriting locked[] */
 	u_long	is_lkmt;  /* min elapsed time on when overwriting locked[] */
+	u_int	is_ckl;   /* calls to check_link() */
+	u_int	is_cklQ;  /* rejected: SendQ too high */
+	u_int	is_ckly;  /* rejected: link too young */
+	u_int	is_cklno; /* rejected: "flood" */
+	u_int	is_cklok; /* accepted */
+	u_int	is_cklq;  /* accepted early */
 };
 
 /* mode structure for channels */

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.12 1997/10/08 20:20:02 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.13 1997/12/19 13:30:26 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -980,6 +980,10 @@ char	*name;
 		   ME, RPL_STATSDEBUG, name, sp->is_loc, sp->is_udpok);
 	sendto_one(cptr,":%s %d %s :udp errors %u udp dropped %u",
 		   ME, RPL_STATSDEBUG, name, sp->is_udperr, sp->is_udpdrop);
+	sendto_one(cptr,
+	   ":%s %d %s : link checks %u passed %u 15s/%u 30s dropped %uSq/%uFl",
+		   ME, RPL_STATSDEBUG, name, sp->is_ckl, sp->is_cklq,
+		   sp->is_cklok, sp->is_cklQ, sp->is_cklno);
 	if (sp->is_wwcnt)
 		sendto_one(cptr, ":%s %d %s :whowas turnover %u/%u/%u [%u]",
 			   ME, RPL_STATSDEBUG, name, sp->is_wwmt,

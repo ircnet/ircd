@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.28 1997/12/18 14:12:29 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.29 1997/12/19 13:30:27 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1020,7 +1020,11 @@ char	*parv[];
 
 	if (parc > 2)
 	    {
-		if (!IsOper(sptr) && IsServer(cptr) && check_link(cptr))
+		int	qlen = strlen(parv[2]);
+
+		if ((qlen < 4 || qlen < strlen(parv[1]) ||
+		     index(parv[2]+1, '*') || index(parv[2]+1, '?')) &&
+		    IsServer(cptr) && check_link(cptr))
 		    {
 			sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
 				   "LINKS");
@@ -1278,8 +1282,9 @@ char	*parv[];
 	char	*name = NULL, *cm = NULL;
 
 	if (IsServer(cptr) &&
-	    (stat != 'd' && stat != 'p' && stat != 's' &&
-	     stat != 'u' && stat != 'v'))
+	    (stat != 'd' && stat != 'p' && stat != 'q' && stat != 's' &&
+	     stat != 't' && stat != 'u' && stat != 'v') &&
+	    !(stat == 'o' && IsOper(sptr)))
 	    {
 		if (check_link(cptr))
 		    {
@@ -2352,14 +2357,19 @@ aClient	*cptr;
     if ((int)DBufLength(&cptr->sendQ) > 65536) /* SendQ is already (too) high*/
 	{
 	    cptr->serv->lastload = timeofday;
+	    ircstp->is_cklQ++;
 	    return -1;
 	}
     if (timeofday - cptr->firsttime < 60) /* link is too young */
+	{
+	    ircstp->is_ckly++;
 	    return -1;
+	}
     if (timeofday - cptr->serv->lastload > 30)
 	    /* last request more than 30 seconds ago => OK */
 	{
 	    cptr->serv->lastload = timeofday;
+	    ircstp->is_cklok++;
 	    return 0;
 	}
     if (timeofday - cptr->serv->lastload > 15
@@ -2367,7 +2377,9 @@ aClient	*cptr;
 	    /* last request between 15 and 30 seconds ago, but little SendQ */
 	{
 	    cptr->serv->lastload = timeofday;
+	    ircstp->is_cklq++;
 	    return 0;
 	}
+    ircstp->is_cklno++;
     return -1;
 }
