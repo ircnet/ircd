@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.89 1999/01/18 14:18:58 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.90 1999/01/18 15:22:44 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1999,7 +1999,15 @@ char	*parv[];
 					continue;
 				    }
 #if 0
-				/* someday, may be */
+				/*
+				** Note: creating !!!foo, e.g. !<ID>!foo is
+				** a stupid thing to do because /join !!foo
+				** will not join !<ID>!foo but create !<ID>foo
+				** Some logic here could be reversed, but only
+				** to find that !<ID>foo would be impossible to
+				** create if !<ID>!foo exists.
+				** which is better? it's hard to say -kalt
+				*/
 				if (*(name+3) == '!')
 				    {
 					sendto_one(sptr,
@@ -2037,7 +2045,7 @@ char	*parv[];
 					name+2);
 				name = buf;
 			    }
-			else if (!get_channel(sptr, name, 0) &&
+			else if (!find_channel(name, NullChn) &&
 				 !(*name == '!' && *name != 0 &&
 				   (chptr = hash_find_channels(name+1, NULL))))
 			    {
