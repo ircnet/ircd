@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.70 2004/02/22 18:18:43 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.71 2004/02/22 18:21:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -600,8 +600,10 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 		check_split();
 		if ((cptr == sptr))
 		{
+			/* It serves no purpose. --B.
 			sendto_flag(SCH_SERVER, "Sending SQUIT %s (%s)",
 				cptr->name, comment);
+			*/
 			return FLUSH_BUFFER;
 		}
 		return 0;
