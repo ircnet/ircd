@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.82 2002/01/06 02:53:39 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.83 2002/01/06 03:30:39 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -438,13 +438,179 @@ aClient	*cptr;
 	return 2;
 }
 
+
+/* 
+** send_server()
+** Sends server server to cptr.
+*/
+static void send_server(aClient *cptr, aClient *server)
+{
+	aConfItem *aconf;
+
+	if (cptr->from == server->from)
+	{
+		return;
+	}
+	aconf = cptr->serv->nline;
+
+	if (!aconf)
+	{
+		return;
+	}
+
+	if (!match(my_name_for_link(ME, aconf->port), server->name) ||
+		IsMasked(server))
+	{
+		/* I'm masking this server, or it was introduced to us with
+		** SMASK. */
+		if (ST_UID(cptr))
+		{
+			/* Introduce it to 2.11 with SMASK. */
+			sendto_one(cptr, ":%s SMASK %s %s",
+				server->serv->up->serv->sid, server->serv->sid,
+				server->serv->verstr);
+		}
+		/* We send nothing at all for a 2.10. */
+		return;
+	}
+	if (ST_UID(cptr))
+	{
+		/* 2.11 */
+		sendto_one(cptr,":%s SERVER %s %d %s %s :%s",
+			server->serv->up->serv->sid, server->name,
+			server->hopcount + 1, server->serv->sid,
+			server->serv->verstr, server->info);
+	}
+	else
+	{
+		/* 2.10 */
+		sendto_one(cptr,":%s SERVER %s %d %s :%s",
+			server->serv->up->serv->maskedby->name,
+			server->name, server->hopcount + 1,
+			server->serv->tok, server->info);
+	}
+
+	return;
+}
+
+
+/*
+** introduce_server()
+** Introduces a server I got from cptr to all my other servers.
+*/
+static int introduce_server(aClient *cptr, aClient *server)
+{
+	int i;
+	aClient *acptr;
+
+	for (i = fdas.highest; i >= 0; i--)
+	{
+		if (!(acptr = local[fdas.fd[i]]) || !IsServer(acptr) ||
+			(acptr == cptr) || IsMe(acptr))
+		{
+			continue;
+		}
+		send_server(acptr, server);
+	}
+
+	return;
+}
+
+
+/* 
+** send_server_burst()
+** Sends all servers I know to cptr.
+** Acptr is the current to send.
+*/
+static void send_server_burst(aClient *cptr, aClient *acptr)
+{
+	for (; acptr; acptr = acptr->serv->right)
+	{
+		if (cptr == acptr)
+		{
+			continue;
+		}
+		send_server(cptr, acptr);
+		send_server_burst(cptr, acptr->serv->down);
+	}
+
+	return;
+}
+
+
+/*
+** m_smask - Introduction of servers behind mask
+**     parv[0] = sender prefix
+**     parv[1] = sid
+**     parv[2] = version
+*/
+int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+       aClient *acptr;
+       int i;
+
+	if (parc < 3)
+	{
+		return exit_client(cptr, cptr, &me,
+			"Not enough parameters to SMASK");
+	}
+
+	if (!sid_valid(parv[1]))
+	{
+		sendto_flag(SCH_ERROR,
+			"Invalid SID (%s) in SMASK from %s, dropping link",
+			parv[1],sptr->name);
+		return exit_client(cptr, cptr, &me, "Invalid SID");
+	}
+
+	if (find_sid(parv[1],NULL))
+	{
+		char ecbuf[BUFSIZE];
+		sendto_flag(SCH_NOTICE,
+			"SID collision (SMASK) on %s brought by %s, "
+			"dropping link", parv[1],sptr->name);
+		SPRINTF(ecbuf, "SID collision (%s)", parv[1]);
+		return exit_client(cptr, cptr, &me, ecbuf);
+	}
+
+	acptr = make_client(cptr);
+	make_server(acptr, FALSE);
+	acptr->hopcount = sptr->hopcount + 1;
+	strncpyzt(acptr->name, sptr->name, sizeof(acptr->name));
+	acptr->info = mystrdup("Masked Server");
+	acptr->serv->up = sptr;
+	acptr->serv->stok = sptr->serv->maskedby->serv->stok;
+	strcpy(acptr->serv->tok, sptr->serv->maskedby->serv->tok);
+	acptr->serv->snum = sptr->serv->maskedby->serv->snum;
+	strncpyzt(acptr->serv->verstr, parv[2], sizeof(acptr->serv->verstr));
+	acptr->serv->version = get_version(parv[2], NULL);
+	acptr->serv->maskedby = sptr->serv->maskedby;
+	strncpyzt(acptr->serv->sid, parv[1], SIDLEN + 1);
+	SetServer(acptr);
+	istat.is_masked++;
+
+	/* We add this server to client list, but *only* to SID hash. */
+	add_client_to_list(acptr);
+	if (*parv[1] != '$')
+	{
+		add_to_sid_hash_table(parv[1], acptr);
+	}
+
+	add_server_to_tree(acptr);
+
+	/* And introduce the server to others. */
+	introduce_server(cptr, acptr);
+}
+
+
 /*
 ** m_server
 **	parv[0] = sender prefix
 **	parv[1] = servername
-**	parv[2] = serverinfo/hopcount
-**	parv[3] = token/serverinfo (2.9)
-**      parv[4] = serverinfo
+**	parv[2] = hopcount
+**	parv[3] = sid(2.11)/token(2.10)/serverinfo(local 2.10)
+**	parv[4] = server version (remote 2.11)/serverinfo(remote 2.10+local2.11)
+**	parv[5] = serverinfo (remote 2.11)
 */
 int	m_server(cptr, sptr, parc, parv)
 aClient *cptr, *sptr;
@@ -454,6 +620,7 @@ char	*parv[];
 	Reg	char	*ch;
 	Reg	int	i;
 	char	info[REALLEN+1], *inpath, *host, *stok;
+	char	versionbuf[11];		/* At least PATCHLEVEL size! */
 	aClient *acptr, *bcptr;
 	aConfItem *aconf;
 	int	hop = 0, token = 0;
@@ -471,24 +638,24 @@ char	*parv[];
 			sendto_one(cptr,"ERROR :No servername");
 			return 1;
 	    }
+
+	if (parc < 3 || (IsServer(cptr) && parc < 4))
+	{
+		return exit_client(cptr, cptr, &me, "Server version too old");
+	}
+
+	if (ST_UID(cptr) && parc < 6)
+	{
+		sendto_flag(SCH_ERROR,
+			"Not enough parameters to SERVER (%d < 6), "
+			"dropping link to %s",	parc, 
+			get_client_name(cptr,TRUE));
+		return exit_client(cptr, cptr, &me,
+			"Not enough parameters to SERVER");
+	}
+
 	host = parv[1];
-	if (parc > 3 && (hop = atoi(parv[2])))
-	    {
-		if (parc > 4 && (token = atoi(parv[3])))
-			(void)strncpy(info, parv[4], REALLEN);
-		else
-			(void)strncpy(info, parv[3], REALLEN);
-	    }
-	else if (parc > 2)
-	    {
-		(void)strncpy(info, parv[2], REALLEN);
-		i = strlen(info);
-		if (parc > 3 && ((i+2) < REALLEN))
-		    {
-				(void)strncat(info, " ", REALLEN - i - 1);
-				(void)strncat(info, parv[3], REALLEN - i - 2);
-		    }
-	    }
+	strncpyzt(info, parv[parc-1], REALLEN);
 
 	/* check if the servername is valid */
 	if ((tmperr = check_servername(host)))
@@ -636,38 +803,76 @@ char	*parv[];
 			MyFree(acptr->info);
 		acptr->info = mystrdup(info);
 		acptr->serv->up = sptr;
-		acptr->serv->stok = token;
 		acptr->serv->snum = find_server_num(acptr->name);
+		acptr->serv->maskedby = acptr;
+
+		if (ST_UID(cptr))
+		{
+			/* remote is 2.11+ */
+			if (!sid_valid(parv[3]))
+			{
+				sendto_flag(SCH_ERROR,
+					"Invalid sid %s from %s, dropping link",
+					parv[3], cptr->name);
+				return exit_client(cptr, cptr, &me,
+					"Invalid SID");
+			}
+			if (*parv[3] == '$')
+			{
+				/* compatibility SID */
+				acptr->serv->stok = idtol(parv[3] + 1,
+					SIDLEN - 1);
+				SPRINTF(acptr->serv->sid, "$%s",
+					ltoid(acptr->serv->ltok, SIDLEN - 1));
+			}
+			else
+			{
+				/* check for SID collision */
+				if (find_sid(parv[3],NULL))
+				{
+					char ecbuf[BUFSIZE];
+
+					sendto_flag(SCH_NOTICE,
+						"SID collision on %s brought"
+						" by %s, dropping link",
+						parv[3], sptr->name);
+					SPRINTF(ecbuf, "SID collision (%s)",
+						parv[3]);
+					return exit_client(cptr, cptr, &me,
+						ecbuf);
+				}
+
+				strncpyzt(acptr->serv->sid, parv[3], SIDLEN+1);
+				acptr->serv->stok = idtol(parv[3], SIDLEN);
+				acptr->serv->version |= SV_UID;
+				add_to_sid_hash_table(parv[3], acptr);
+			}
+
+			strncpyzt(acptr->serv->verstr,
+				parv[4], sizeof(acptr->serv->verstr));
+			acptr->serv->version = get_version(parv[4],NULL);
+		}
+		else
+		{
+			/* remote is 2.10 */
+			acptr->serv->stok = atoi(parv[3]);
+			strcpy(acptr->serv->verstr,"0");
+
+			SPRINTF(acptr->serv->sid, "$%s", 
+				ltoid(acptr->serv->ltok, SIDLEN - 1));
+		}
+
 		SetServer(acptr);
 		istat.is_serv++;
 		add_client_to_list(acptr);
+		add_server_to_tree(acptr);
 		(void)add_to_client_hash_table(acptr->name, acptr);
-		(void)add_to_server_hash_table(acptr->serv, cptr);
-		/*
-		** Old sendto_serv_but_one() call removed because we now
-		** need to send different names to different servers
-		** (domain name matching)
-		*/
-		for (i = fdas.highest; i >= 0; i--)
-		    {
-			if (!(bcptr = local[fdas.fd[i]]) || !IsServer(bcptr) ||
-			    bcptr == cptr || IsMe(bcptr))
-				continue;
-			if (!(aconf = bcptr->serv->nline))
-			    {
-				sendto_flag(SCH_NOTICE,
-					    "Lost N-line for %s on %s:Closing",
-					    get_client_name(cptr, TRUE), host);
-				return exit_client(cptr, cptr, &me,
-						   "Lost N line");
-			    }
-			if (match(my_name_for_link(ME, aconf->port),
-				    acptr->name) == 0)
-				continue;
-			stok = acptr->serv->tok;
-			sendto_one(bcptr, ":%s SERVER %s %d %s :%s", parv[0],
-				   acptr->name, hop+1, stok, acptr->info);
-		    }
+		if (!ST_UID(acptr))
+		{
+			(void)add_to_server_hash_table(acptr->serv, cptr);
+		}
+
+		introduce_server(cptr, acptr);
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_SERVER, acptr->name, acptr,
 				      ":%s SERVER %s %d %s :%s", parv[0],
@@ -693,13 +898,17 @@ char	*parv[];
 	if ((hop = check_version(cptr)) < 1)
 		return hop;	/* from exit_client() */
 	if (cptr->info != DefInfo)
+	{
+		strncpyzt(versionbuf, cptr->info, sizeof(versionbuf));
 		MyFree(cptr->info);
+	}
 	cptr->info = mystrdup(info[0] ? info : ME);
 
 	switch (check_server_init(cptr))
 	{
 	case 0 :
-		return m_server_estab(cptr);
+		return m_server_estab(cptr, (parc > 3) ? parv[3] : NULL,
+			versionbuf);
 	case 1 :
 		sendto_flag(SCH_NOTICE, "Checking access for %s",
 			    get_client_name(cptr,TRUE));
@@ -712,17 +921,15 @@ char	*parv[];
 	}
 }
 
-int	m_server_estab(cptr)
-Reg	aClient	*cptr;
+int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 {
 	Reg	aClient	*acptr;
 	Reg	aConfItem	*aconf, *bconf;
 	char	mlname[HOSTLEN+1], *inpath, *host, *s, *encr, *stok;
-	int	split, i;
+	int	i;
 
 	host = cptr->name;
 	inpath = get_client_name(cptr,TRUE); /* "refresh" inpath with host */
-	split = mycmp(cptr->name, cptr->sockhost);
 
 	if (!(aconf = find_conf(cptr->confs, host, CONF_NOCONNECT_SERVER)))
 	    {
@@ -797,6 +1004,22 @@ Reg	aClient	*cptr;
 		    }
 #endif
 	(void) strcpy(mlname, my_name_for_link(ME, aconf->port));
+
+	if (!match(cptr->name,mlname))
+	{
+		sendto_flag(SCH_NOTICE, "Mask of server %s is matching "
+			"my name %s, dropping link", cptr->name, mlname);
+		return exit_client(cptr, cptr, &me, 
+			"Server exists (mask matches)");
+	}
+	if (!match(mlname,cptr->name))
+	{
+		sendto_flag(SCH_NOTICE, "Server %s matches my name for link "
+			"%s, dropping link", cptr->name, mlname);
+		return exit_client(cptr, cptr, &me,
+			"Server exists (matches my mask)");
+	}
+
 	if (IsUnknown(cptr))
 	    {
 		if (bconf->passwd[0])
@@ -859,7 +1082,7 @@ Reg	aClient	*cptr;
 
 #ifdef	ZIP_LINKS
 	if ((cptr->flags & FLAGS_ZIPRQ) &&
-	    (bconf->status == CONF_ZCONNECT_SERVER))	    
+	    (bconf->status == CONF_ZCONNECT_SERVER))
 	    {
 		if (zip_init(cptr) == -1)
 		    {
@@ -873,6 +1096,37 @@ Reg	aClient	*cptr;
 		cptr->flags |= FLAGS_ZIP|FLAGS_ZIPSTART;
 	    }
 #endif
+
+	/* version has been temporarily stored in ->hopcount */
+	if (cptr->hopcount & SV_UID)
+	{
+		if (!sid)
+		{
+			abort();
+		}
+
+		if (!sid_valid(sid))
+		{
+			sendto_flag(SCH_ERROR, "Invalid SID %s from %s",
+				get_client_name(cptr, TRUE));
+			return exit_client(cptr,cptr,&me, "Invalid SID");
+		}
+		if (find_sid(sid, NULL))
+		{
+			sendto_flag(SCH_NOTICE,	"Link %s tried to introduce"
+				" already existing SID (%s), dropping link",
+				get_client_name(cptr,TRUE),sid);
+			return exit_client(cptr,cptr,&me,"SID collision");
+		}
+	}
+
+	if (!(cptr->hopcount & SV_2_10))
+	{
+		/* remote is older than 2.10.2 */
+		sendto_flag(SCH_ERROR, "Remote server %s is too old "
+			"(<2.10.2), dropping link", get_client_name(cptr,TRUE));
+		return exit_client(cptr,cptr,&me,"Too old version");
+	}
 
 	det_confs_butmask(cptr, CONF_LEAF|CONF_HUB|CONF_NOCONNECT_SERVER);
 	/*
@@ -898,13 +1152,31 @@ Reg	aClient	*cptr;
 	/* doesnt duplicate cptr->serv if allocted this struct already */
 	(void)make_server(cptr, TRUE);
 	cptr->serv->up = &me;
+	cptr->serv->maskedby = cptr;
 	cptr->serv->nline = aconf;
 	cptr->serv->version = cptr->hopcount;   /* temporary location */
 	cptr->hopcount = 1;			/* local server connection */
 	cptr->serv->snum = find_server_num(cptr->name);
 	cptr->serv->stok = 1;
+
+	strncpyzt(cptr->serv->verstr, versionbuf, sizeof(cptr->serv->verstr));
+	if (ST_UID(cptr))
+	{
+		strcpy(cptr->serv->sid, sid);
+		add_to_sid_hash_table(sid, cptr);
+	}
+	else
+	{
+		SPRINTF(cptr->serv->sid,"$%s", 
+			ltoid(cptr->serv->ltok, SIDLEN-1));
+	}
+
 	cptr->flags |= FLAGS_CBURST;
-	(void) add_to_server_hash_table(cptr->serv, cptr);
+	add_server_to_tree(cptr);
+	if (!ST_UID(cptr))
+	{
+		(void) add_to_server_hash_table(cptr->serv, cptr);
+	}
 	Debug((DEBUG_NOTICE, "Server link established with %s V%X %d",
 		cptr->name, cptr->serv->version, cptr->serv->stok));
 	add_fd(cptr->fd, &fdas);
@@ -915,28 +1187,8 @@ Reg	aClient	*cptr;
 #endif
 	sendto_flag(SCH_SERVER, "Sending SERVER %s (%d %s)", cptr->name,
 		    1, cptr->info);
-	/*
-	** Old sendto_serv_but_one() call removed because we now
-	** need to send different names to different servers
-	** (domain name matching) Send new server to other servers.
-	*/
-	for (i = fdas.highest; i >= 0; i--)
-	    {
-		if (!(acptr = local[fdas.fd[i]]) || !IsServer(acptr) ||
-		    acptr == cptr || IsMe(acptr))		    
-			continue;
-		if ((aconf = acptr->serv->nline) &&
-		    !match(my_name_for_link(ME, aconf->port), cptr->name))
-			continue;
-		stok = cptr->serv->tok;
-		if (split)
-			sendto_one(acptr,":%s SERVER %s 2 %s :[%s] %s",
-				   ME, cptr->name, stok,
-				   cptr->sockhost, cptr->info);
-		else
-			sendto_one(acptr,":%s SERVER %s 2 %s :%s",
-				   ME, cptr->name, stok, cptr->info);
-	    }
+	introduce_server(cptr, cptr);
+	
 	/*
 	** Pass on my client information to the new server
 	**
@@ -955,27 +1207,7 @@ Reg	aClient	*cptr;
 	**	see previous *WARNING*!!! (Also, original inpath
 	**	is destroyed...)
 	*/
-	aconf = cptr->serv->nline;
-	for (acptr = &me; acptr; acptr = acptr->prev)
-	    {
-		/* acptr->from == acptr for acptr == cptr */
-		if ((acptr->from == cptr) || !IsServer(acptr))
-			continue;
-		if (*mlname == '*' && match(mlname, acptr->name) == 0)
-			continue;
-		split = (MyConnect(acptr) &&
-			 mycmp(acptr->name, acptr->sockhost));
-		stok = acptr->serv->tok;
-		if (split)
-			sendto_one(cptr, ":%s SERVER %s %d %s :[%s] %s",
-				   acptr->serv->up->name,
-				   acptr->name, acptr->hopcount+1, stok,
-				   acptr->sockhost, acptr->info);
-		else
-			sendto_one(cptr, ":%s SERVER %s %d %s :%s",
-				   acptr->serv->up->name, acptr->name,
-				   acptr->hopcount+1, stok, acptr->info);
-	    }
+	send_server_burst(cptr, me.serv->down);
 
 	for (acptr = &me; acptr; acptr = acptr->prev)
 	    {
@@ -2516,5 +2748,55 @@ char *hostname;
 	}
 
 	return rc;
+}
+
+/*
+** adds server to server tree
+*/
+void	add_server_to_tree(aClient *acptr)
+{
+	acptr->serv->up->serv->servers++;
+
+	if (acptr->serv->up->serv->down)
+	{
+		acptr->serv->up->serv->down->serv->left = acptr;
+	}
+
+	acptr->serv->right = acptr->serv->up->serv->down;
+	acptr->serv->up->serv->down = acptr;
+
+	return;
+}
+
+/* 
+** Removes a server from the server tree.
+*/
+void	remove_server_from_tree(aClient *cptr)
+{
+	cptr->serv->up->serv->servers--;
+
+	if (cptr->serv->down)
+	{
+		/* FIXME - debug abort(). this must be *never* true
+		* at this point - jv */
+		abort();
+	}
+
+	if (cptr->serv->right)
+	{
+		cptr->serv->right->serv->left = cptr->serv->left;
+	}
+
+	if (cptr->serv->left)
+	{
+		cptr->serv->left->serv->right = cptr->serv->right;
+	}
+
+	if (cptr == cptr->serv->up->serv->down)
+	{
+		cptr->serv->up->serv->down = cptr->serv->right;
+	}
+
+	return;
 }
 

@@ -32,9 +32,10 @@ EXTERN int m_version __P((aClient *cptr, aClient *sptr, int parc,
 			  char *parv[]));
 EXTERN int m_squit __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int check_version __P((aClient *cptr));
+EXTERN int m_smask __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_server __P((aClient *cptr, aClient *sptr, int parc,
 			 char *parv[]));
-EXTERN int m_server_estab __P((Reg aClient *cptr));
+EXTERN int m_server_estab __P((aClient *cptr, char *sid, char *versionbuf));
 EXTERN int m_info __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_links __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_summon __P((aClient *cptr, aClient *sptr, int parc,
@@ -67,4 +68,6 @@ EXTERN int m_restart __P((aClient *cptr, aClient *sptr, int parc,
 #if defined(OPER_DIE) || defined(LOCOP_DIE)
 EXTERN int m_die __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 #endif /* OPER_DIE || LOCOP_DIE */
+void	add_server_to_tree(aClient *cptr);
+void	remove_server_from_tree(aClient *cptr);
 #undef EXTERN

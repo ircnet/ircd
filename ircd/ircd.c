@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.71 2002/01/05 02:53:09 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.72 2002/01/06 03:30:39 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -560,6 +560,7 @@ aClient	*mp;
 	istat.is_users++;	/* here, cptr->next is NULL, see make_user() */
 	mp->user->flags |= FLAGS_OPER;
 	mp->serv->up = mp;
+	mp->serv->maskedby = mp;
 	mp->user->server = find_server_string(mp->serv->snum);
 	strncpyzt(mp->user->username, (p) ? p->pw_name : "unknown",
 		  sizeof(mp->user->username));

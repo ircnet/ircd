@@ -1,3 +1,44 @@
+2002-01-06  Piotr Kucharski
+
+	* parse.c/find_sender(): sid and fake sid aware now.
+	* parse.c, msg_def.h: aware of m_smask().
+	* struct_def.h: ismasked, left, right, down, servers to Server struct.
+	* struct_def.h, ircd.c: changed FLAGS_RESTRICTED to FLAGS_RESTRICT,
+	  used SetRestricted or IsRestricted wherever possible.
+	* struct_def.h, send.c: changed FLAGS_DEADSOCKET to FLAGS_DEADSOCK,
+	  used SetDead wherever possible.
+	* hash.c/del_from_sid_hash_table(): remove unnecessary parameter,
+	  use sptr, not cptr->server for sidhashv.
+	* s_misc.c/mark_blind_servers(): use ptr to server, not server->name
+	  as argument.
+	* following work came from jv, cleaned by Q.
+	* s_serv.c/m_squit(): made aware of sids; removed issuing additional
+	  squit (we'll do it in exit_client); don't show received squits if
+	  they come from masked servers.
+	* ircd.c/setup_me(), s_bsd.c/connect_server(): initialize ->maskedby.
+	* s_misc.c: added exit_server().
+	* s_misc.c/exit_client(): rewritten to use exit_server().
+	* s_misc.c/exit_one_client(): rewritten to be aware of SIDs and doing
+	  proper SQUITs/QUITs; also added using servers' tree.
+	* s_serv.c: added functions send_server(), introduce_server(), m_smask(),
+	  send_server_burst(), add_server_to_tree(), remove_server_from_tree().
+	* s_serv.c/m_server(): simplified checks of parameters; added checks
+	  of SID we receive; add using servers' tree; removed checks of C/N
+	  (should be in m_rehash).
+	* s_serv.c/m_server_estab(): check masks to avoid same mask inside;
+	  store temporarily version we received in PASS in hopcount; add
+	  using servers' tree; fill in (compatibility) SIDs and ltok; change
+	  some (repeating) code to functions (introduce_server).
+
+2002-01-04  Piotr Kucharski
+
+	* ircd.c/main(): check if SERVER_ID is valid.
+	* config.h.dist: changed default SERVER_ID.
+	* s_err.c: changed ERR_YOUREBANNEDCREEP format.
+	* s_conf.c/find_kill(): show user@host in K:line error.
+	* list.c/make_server(): add parameter used for deciding
+	  whether to add server to tree or not.
+
 2001-12-31  Piotr Kucharski
 
 	* s_user.c/m_unick(): while creating client we messed with server

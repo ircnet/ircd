@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.38 2002/01/06 02:43:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.39 2002/01/06 03:30:39 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -341,6 +341,72 @@ int	mark_blind_servers (aClient *cptr, *aClient server)
 }
 
 /*
+** exit_server(): Removes all dependent servers and clients, and
+** sends the right messages to the right client/servers.
+**
+** We will send all SQUITs to &servers, and QUITs to local users.
+** We only send 1 SQUIT to a 2.11 servers.
+** We send all SQUITs to a 2.10 servers that can see it, or QUITs otherwise.
+**
+** Argument:
+**	cptr: The real server to SQUIT.
+**	acptr: One of the depended servers to SQUIT.
+**	comment: The original comment for the SQUIT. (Onle for cptr itself.)
+**	comment2: The comment for (S)QUIT reasons for the rest.
+*/
+void	exit_server(aClient *cptr, aClient *acptr, char *comment, char
+		*comment2)
+{
+	aClient	*acptr2;
+	int	flags;
+
+	/* Remove all the servers recursively. */
+	while (acptr->serv->down)
+	{
+		exit_server(cptr, acptr->serv->down, comment, comment2);
+	}
+
+	/* This server doesn't have any depedent servers anymore, only
+	** users/services left. */
+
+	flags = FLAGS_SPLIT;
+
+	/*
+	** We'll mark all servers that can't see that server as hidden.
+	** If we found any, we'll also mark all users on that server hidden.
+	** If a user is marked hidden, and we try to send it to a currently
+	** marked server, the server can't see that user's server.
+	** Note that a 2.11 can see it, so we don't have to send the QUITs
+	** to it.
+	*/
+	if (mark_blind_servers(cptr, acptr))
+	{
+		flags |= FLAGS_HIDDEN;
+	}
+
+	/* Quit all users and services. */
+	while (GotDependantClient(acptr))
+	{
+		acptr2 = acptr->prev;
+		acptr2->flags |= flags;
+		exit_one_client(cptr->from, acptr2, &me, comment2);
+	}
+
+	/* Make sure we only send the last SQUIT to a 2.11 server. */
+	if (acptr == cptr)
+	{
+		acptr->flags |= FLAGS_SQUIT;
+		exit_one_client(cptr->from, acptr, &me, comment);
+	}
+	else
+	{
+		exit_one_client(cptr->from, acptr, &me, comment2);
+	}
+	
+	return;
+}
+
+/*
 ** exit_client
 **	This is old "m_bye". Name  changed, because this is not a
 **	protocol function, but a general server utility function.
@@ -452,96 +518,30 @@ char	*comment;	/* Reason for the exit */
 		*/
 		close_connection(sptr);
 
-		if (IsServer(sptr))
-		    {
-		/*
-		** First QUIT all NON-servers which are behind this link
-		**
-		** Note	There is no danger of 'cptr' being exited in
-		**	the following loops. 'cptr' is a *local* client,
-		**	all dependants are *remote* clients.
-		*/
-
-		/* This next bit is a a bit ugly but all it does is take the
-		** name of us.. me.name and tack it together with the name of
-		** the server sptr->name that just broke off and puts this
-		** together into exit_one_client() to provide some useful
-		** information about where the net is broken.      Ian 
-		*/
-			(void)strcpy(comment1, ME);
-			(void)strcat(comment1," ");
-			(void)strcat(comment1, sptr->name);
-
-			/* This will quit all the *users*, without checking the
-			** whole list of clients.
-			*/
-			for (asptr = svrtop; asptr; asptr = (aServer *)next)
-			    {
-				next = (aClient *)asptr->nexts;
-				if ((asptr->bcptr == NULL) ||
-				    (asptr->bcptr->from != sptr
-				     && asptr->bcptr != sptr))
-					continue;
-				/*
-				** This version doesn't need QUITs to be
-				** propagaged unless the remote server is
-				** hidden (by a hostmask)
-				*/
-				flags = FLAGS_SPLIT;
-				if (mark_blind_servers(NULL,
-						       asptr->bcptr))
-					flags |= FLAGS_HIDDEN;
-				while (GotDependantClient(asptr->bcptr))
-				    {
-					acptr = asptr->bcptr->prev;
-					acptr->flags |= flags;
-					exit_one_client(NULL, acptr, &me,
-							comment1);
-				    }
-			    }
-			/*
-			** Second SQUIT all servers behind this link
-			*/
-			for (asptr = svrtop; asptr; asptr = (aServer *)next)
-			    {
-				next = (aClient *)asptr->nexts;
-				if ((acptr = asptr->bcptr) &&
-				    acptr->from == sptr)
-				    {
-					sendto_flag(SCH_SERVER,
-						    "Sending SQUIT %s (%s)",
-						    acptr->name, comment);
-					exit_one_client(NULL, acptr, &me, ME);
-				    }
-			    }
-		    } /* If (IsServer(sptr)) */
 	    } /* if (MyConnect(sptr) */
 
- 	if (IsServer(sptr) && GotDependantClient(sptr))
+ 	if (IsServer(sptr))
  	{
- 		/*
-		** generate QUITs locally when receiving a SQUIT
-		** check for hostmasking.
- 		*/
- 		flags = FLAGS_SPLIT;
- 		if (mark_blind_servers(cptr, sptr))
- 			flags |= FLAGS_HIDDEN;
-
-		if (IsServer(from))
-			/* this is a guess */
-			(void)strcpy(comment1, from->name);
+		/* Remove all dependent servers and clients. */
+		if (!IsMasked(sptr))
+		{
+			sprintf(comment1, "%s %s", sptr->serv->up->name,
+				sptr->name);
+		}
 		else
-			/* this is right */
-			(void)strcpy(comment1, sptr->serv->up->name);
- 		(void)strcat(comment1, " ");
- 		(void)strcat(comment1, sptr->name);
-
-		while (GotDependantClient(sptr))
- 		{
- 			acptr = sptr->prev;
- 			acptr->flags |= flags;
-			exit_one_client(cptr, acptr, &me, comment1);
- 		}
+		{
+			/* It was a masked server, the squit reason should
+			** give the right quit reason for clients. */
+			strncpyzt(comment1, comment, sizeof(comment1));
+		}
+		exit_server(sptr, sptr, comment, comment1);
+		if ((cptr == sptr))
+		{
+			sendto_flag(SCH_SERVER, "Sending SQUIT %s (%s)",
+				cptr->name, comment);
+			return FLUSH_BUFFER;
+		}
+		return 0;
  	}
  	
 	/*
@@ -551,7 +551,7 @@ char	*comment;	/* Reason for the exit */
 	** "server.some.where splitting.some.where"
 	*/
 	comment1[0] = '\0';
-	if (!IsServer(sptr) && ((sptr->flags & FLAGS_KILLED) == 0))
+	if ((sptr->flags & FLAGS_KILLED) == 0)
 	    {
 	        char *c = comment;
 		int i = 0;
@@ -582,10 +582,6 @@ char	*comment;	/* Reason for the exit */
 			sptr->flags |= FLAGS_QUIT;
 		    }
 	    }
-	
-	if (IsServer(sptr) && (cptr == sptr))
-		sendto_flag(SCH_SERVER, "Sending SQUIT %s (%s)",
-			    cptr->name, comment);
 	
 	exit_one_client(cptr, sptr, from, (*comment1) ? comment1 : comment);
 	return cptr == sptr ? FLUSH_BUFFER : 0;
@@ -628,13 +624,49 @@ char	*comment;
 
 			if (!(acptr = local[fdas.fd[i]]) || !IsServer(acptr) ||
 			    acptr == cptr || IsMe(acptr))
+			{
 				continue;
-			if ((aconf = acptr->serv->nline) &&
-			    (match(my_name_for_link(ME, aconf->port),
-				     sptr->name) == 0))
+			}
+			if (ST_UID(acptr) && !(sptr->flags & FLAGS_SQUIT))
+			{
+				/* Make sure we only send the last SQUIT
+				** to a 2.11. */
 				continue;
-			sendto_one(acptr, ":%s SQUIT %s :%s",
-				   from->name, sptr->name, comment);
+			}
+			if ((acptr->flags & FLAGS_HIDDEN) && !ST_UID(acptr))
+			{
+				/* A 2.10 can't see this server, so don't send
+				** the SQUIT.
+				*/ 
+				continue;
+			}
+			if (ST_UID(acptr))
+			{
+				if ((acptr->flags & FLAGS_HIDDEN) &&
+					!IsMasked(sptr))
+				{
+					/* We need a special SQUIT reason, so
+					** the remote server can send the
+					** right quit message. */
+					sendto_one(acptr, ":%s SQUIT %s :%s %s",
+						sptr->serv->up->serv->sid,
+						sptr->serv->sid,
+						sptr->serv->up->name,
+						sptr->name);
+				}
+				else
+				{
+					sendto_one(acptr, ":%s SQUIT %s :%s",
+						sptr->serv->up->serv->sid,
+						sptr->serv->sid, comment);
+				}
+			}
+			else if (!IsMasked(sptr))
+			{
+				sendto_one(acptr, ":%s SQUIT %s :%s",
+					sptr->serv->up->name, sptr->name,
+					comment);
+			}
 		    }
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_SQUIT, sptr->name, sptr,
@@ -643,6 +675,8 @@ char	*comment;
 #endif
 		(void) del_from_server_hash_table(sptr->serv, cptr ? cptr :
 						  sptr->from);
+		del_from_sid_hash_table(sptr->serv);
+		remove_server_from_tree(sptr);
 	} else if (!IsPerson(sptr) && !IsService(sptr))
 				    /* ...this test is *dubious*, would need
 				    ** some thougth.. but for now it plugs a
@@ -681,13 +715,14 @@ char	*comment;
 						if (!(acptr =local[fdas.fd[i]])
 						    || !IsServer(acptr)
 						    || acptr == cptr
+						    || ST_UID(acptr)
 						    || IsMe(acptr))
 							continue;
-						if (acptr->flags &FLAGS_HIDDEN)
+						if (acptr->flags & FLAGS_HIDDEN)
 							sendto_one(acptr,
 								":%s QUIT :%s",
-								   sptr->name,
-								   comment);
+								sptr->name,
+								comment);
 					}
 #ifdef	USE_SERVICES
 				check_services_butone(SERVICE_WANT_QUIT, 

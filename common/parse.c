@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.36 2002/01/06 01:51:29 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.37 2002/01/06 03:30:38 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -389,8 +389,8 @@ aClient *cptr;
 		return cptr;
     }
 
-
-/* find_sender(): 
+/*
+** find_sender(): 
 ** Find the client structure for the sender of the message we got from cptr
 ** and checks it to be valid.
 ** Stores the result in *sptr.
@@ -462,7 +462,14 @@ int	find_sender(aClient *cptr, aClient **sptr, char *sender, char *buffer)
 	}
 #endif
 
-	para[0] = from->name;
+	if (isdigit(sender[0]) || sender[0] == '$')
+	{
+		para[0] = from->name;
+	}
+	else
+	{
+		para[0] = sender;
+	}
 
 	/* Hmm! If the client corresponding to the
 	** prefix is not found--what is the correct
@@ -510,7 +517,7 @@ int	parse(cptr, buffer, bufend)
 aClient *cptr;
 char	*buffer, *bufend;
     {
-	Reg	aClient *from = cptr;
+	aClient *from = cptr;
 	Reg	char	*ch, *s;
 	Reg	int	len, i, numeric = 0, paramcount;
 	Reg	struct	Message *mptr = NULL;
