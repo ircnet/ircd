@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.243 2005/01/30 22:08:16 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.244 2005/02/04 18:34:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -62,7 +62,6 @@ static	int	add_modeid (int, aClient *, aChannel *, aListItem *);
 static	int	del_modeid (int, aChannel *, aListItem *);
 static	Link	*match_modeid (int, aClient *, aChannel *);
 static  void    names_channel (aClient *,aClient *,char *,aChannel *,int);
-static	void	convert_scandinavian (Reg char *cn, aClient *);
 static	void	free_bei (aListItem *bei);
 static	aListItem	*make_bei (char *nick, char *user, char *host);
 
@@ -967,7 +966,6 @@ int	m_mode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	     name = strtoken(&p, NULL, ","))
 	    {
 		clean_channelname(name);
-		convert_scandinavian(name, cptr);
 		chptr = find_channel(name, NullChn);
 		if (chptr == NullChn)
 		    {
@@ -1961,38 +1959,6 @@ void	clean_channelname(char *cn)
 }
 
 /*
-** This will convert channel name from {}\~ to []|^ set.
-** It should be done on all channel names coming from 2.10 servers,
-** as 2.11+ do not treat them case equivalent. Hence we stick to
-** on set of chars (which are treated equivalent on old servers)
-** and drop it in the next version.
-** Local clients are treated likewise.
-**
-** XXX: Do NOT allow 2.10 and next version on the same net!
-**
-*/
-static	void   convert_scandinavian(Reg char *cn, aClient *cptr)
-{
-	if (ST_NOTUID(cptr) || MyPerson(cptr))
-	{
-		for (; *cn; cn++)
-		{
-			switch (*cn)
-			{
-			case    '{':
-				*cn = '['; break;
-			case    '}':
-				*cn = ']'; break;
-			case    '~':
-				*cn = '^'; break;
-			case    '\\':
-				*cn = '|'; break;
-			}
-		}
-	}
-}
-
-/*
 ** Return -1 if mask is present and doesnt match our server name.
 */
 static	int	check_channelmask(aClient *sptr, aClient *cptr, char *chname)
@@ -2250,7 +2216,6 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    {
 			clean_channelname(name);
 		    }
-		convert_scandinavian(name, cptr);
 		if (*name == '!')
 		    {
 			chptr = NULL;
@@ -2636,7 +2601,6 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			parv[1], get_client_name(cptr, TRUE));
 		return 0;
 	}
-	convert_scandinavian(parv[1], cptr);
 	/* Use '&me', because NJOIN is, unlike JOIN, always for
 	** remote clients, see get_channel() what's that for. --B. */
 	chptr = get_channel(&me, parv[1], CREATE);
@@ -2905,7 +2869,6 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	size = BUFSIZE - strlen(parv[0]) - 10;
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	    {
-		convert_scandinavian(name, cptr);
 		chptr = get_channel(sptr, name, 0);
 		if (!chptr)
 		    {
@@ -3013,7 +2976,6 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    {
 		if (penalty >= MAXPENALTY && MyPerson(sptr))
 			break;
-		convert_scandinavian(name, cptr);
 		chptr = get_channel(sptr, name, !CREATE);
 		if (!chptr)
 		    {
@@ -3183,7 +3145,6 @@ int	m_topic(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				parv[0], name);
 			continue;
 		}
-		convert_scandinavian(name, cptr);
 		chptr = find_channel(name, NullChn);
 		if (!chptr)
 		{
@@ -3273,7 +3234,6 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return 1;
 	    }
 	clean_channelname(parv[2]);
-	convert_scandinavian(parv[2], cptr);
 	if (check_channelmask(sptr, acptr->user->servp->bcptr, parv[2]))
 		return 1;
 	if (*parv[2] == '&' && !MyClient(acptr))
@@ -3658,7 +3618,6 @@ int	m_names(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 		{
 			clean_channelname(name);
-			convert_scandinavian(name, cptr);
 			if BadPtr(name)
 			{
 				continue;
