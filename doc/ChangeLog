@@ -1,3 +1,11 @@
+2004-02-15  Piotr Kucharski
+
+	* s_serv.c/m_squit(): return when illegal port is found.
+	* support.c/make_isupport(): removed CHARSET, changed CASEMAPPING
+	  to ascii.
+	* s_serv.c/m_squit(): fixed core (introduced 2004-02-13) when squit
+	  issued by oper. ;)
+
 2004-02-13  Jakub Vlasek
 
 	* s_serv.c/dump_map(): Make *prevserver NULL after processing it.
