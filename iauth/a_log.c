@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_log.c,v 1.1 1998/07/19 19:37:24 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_log.c,v 1.2 1998/08/04 02:31:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -85,7 +85,7 @@ vsendto_log(int flags, int slflag, char *pattern, va_list va)
 #endif
 	if (authlog && (flags & ALOG_FLOG))
 	    {
-		fprintf(authlog, logbuf+1);
+		fprintf(authlog, "%s: %s", myctime(time(NULL)), logbuf+1);
 		fflush(authlog);
 	    }
 	if (flags & ALOG_IRCD)
