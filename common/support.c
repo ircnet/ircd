@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.32 2003/10/18 19:48:21 q Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.33 2003/10/19 23:11:57 q Exp $";
 #endif
 
 #include "os.h"
@@ -773,7 +773,7 @@ char	**make_isupport(void)
 	
 	tis = (char **) MyMalloc(3 * sizeof(char *));
 	
-	/* Warning: There must be up to 13 tokens in each string */
+	/* Warning: There must be up to 12 tokens in each string */
 	tis[0] = (char *) MyMalloc(BUFSIZE);
 	sprintf(tis[0],
 		"RFC2812 PREFIX=(ov)@+ CHANTYPES=#&!+ MODES=%d MAXCHANNELS=%d "
@@ -782,14 +782,14 @@ char	**make_isupport(void)
 		MAXMODEPARAMS, MAXCHANNELSPERUSER,
 		ONICKLEN, TOPICLEN, TOPICLEN, MAXBANS, CHANNELLEN, CHIDLEN);
 
-	if (networkname)
-	{
-		strcat(tis[0], " NETWORK=");
-		strcat(tis[0], networkname);
-	}
 	tis[1] = (char *) MyMalloc(BUFSIZE);
 	sprintf(tis[1],	"PENALTY FNC EXCEPTS=e INVEX=I CASEMAPPING=rfc1459 "
 		"CHARSET=utf-8");
+	if (networkname)
+	{
+		strcat(tis[1], " NETWORK=");
+		strcat(tis[1], networkname);
+	}
 
 	tis[2] = NULL;
 
