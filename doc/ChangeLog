@@ -1,3 +1,8 @@
+2003-06-03  Piotr Kucharski
+
+	* s_user.c/m_nick(): bad param count NICK coming from server must
+	  be dealt with.
+
 2003-04-13  Piotr Kucharski
 
 	* channel.c/set_mode(): 'break' misplaced (reported by BitKoenig).
