@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.30 2001/12/21 19:22:51 q Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.31 2001/12/21 19:40:08 q Exp $";
 #endif
 
 #include "os.h"
@@ -495,7 +495,7 @@ int	find_sender(aClient *cptr, aClient **sptr, char *sender, char *buffer)
 	}
 
 	*sptr = from;
-	return 0;
+	return 1;
 }
 
 /*
