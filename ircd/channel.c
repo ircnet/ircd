@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.84 1998/12/29 20:14:15 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.85 1999/01/16 22:10:51 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2287,7 +2287,7 @@ char	*parv[];
 			    {
 				sendto_one(sptr, err_str(ERR_NOSUCHCHANNEL,
 							 parv[0]), parv[1]);
-				return;
+				return 0;
 			    }
 		    }
 		/* make sure user isn't already on channel */
