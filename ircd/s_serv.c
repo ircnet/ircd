@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.212 2004/06/24 17:46:09 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.213 2004/06/26 00:42:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -297,10 +297,10 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    {
 		sendto_ops_butone(NULL, ME,
 			"Received SQUIT %s from %s (%s)",
-			server, parv[0], comment);
+			acptr->name, parv[0], comment);
 #if defined(USE_SYSLOG) && defined(SYSLOG_SQUIT)
 		syslog(LOG_DEBUG,"SQUIT From %s : %s (%s)",
-		       parv[0], server, comment);
+		       parv[0], acptr->name, comment);
 #endif
 	    }
 	if (MyConnect(acptr))
