@@ -40,13 +40,14 @@ Server:
 
 Admin:
 	* Ability to specify outgoing IP in C: line.
-	* I-line flags
+	* I:line now requires both addr and name fields to match.
+	* I:line flags
+		F - fall-through to next I: if password did not match.
 		R - restricted.
-		D - restricted, when client has no reverse DNS
 		I - restricted, when client has no ident.
-		E - client is exempted from K: lines
-		N - do not show resolved hostname (but bans still match)
-		F - fall-through if password not matched.
+		E - client is exempted from K: lines.
+		N - disable resolved hostname to be used.
+		D - restricted, when client has no reverse DNS.
 	* Reject reason sent to client can be specified in iauth.conf.
 	* Client's username and hostname are checked for valid chars.
 	* C:lines can have negative ports to disable autoconnects; these
@@ -60,5 +61,5 @@ Admin:
 	  ircd values during runtime (like dbuf poolsize and autoconnect).
 	* Stats Z no longer computes real memory statistics unless DEBUGMODE
 	  set.
-	* Stats l shows count in Bytes, not kBytes.
+	* Stats l/L shows count in Bytes, not kBytes.
 
