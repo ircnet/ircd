@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.13 1997/09/13 15:07:28 kalt Exp $
+#*   $Id: Makefile.in,v 1.14 1997/09/15 13:48:11 kalt Exp $
 #*
 #*/
 
@@ -105,7 +105,7 @@ $(SERVER): $(SERVER_COMMON_OBJS) $(SERVER_OBJS)
 
 $(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 	$(RM) $@
-	$(CC) $(LDFLAGS) -DCHKCONF_COMPILE -o $@ $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS) $(LIBS)
 
 install: install-client install-server
 
@@ -290,7 +290,7 @@ res_mkquery.o: ../ircd/res_mkquery.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/res_mkquery.c
 
 chkconf.o: ../ircd/chkconf.c setup.h config.h
-	$(CC) $(CC_CFLAGS) -DDPATH="\"$(ircd_dir)\"" -c -o $@ ../ircd/chkconf.c
+	$(CC) $(CC_CFLAGS) -DCHKCONF_COMPILE -DDPATH="\"$(ircd_dir)\"" -c -o $@ ../ircd/chkconf.c
 
 clean:
 	$(RM) $(CLIENT) $(SERVER) $(CHKCONF) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
