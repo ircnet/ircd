@@ -1,3 +1,22 @@
+2004-06-11  Piotr Kucharski
+
+	* struct_def.h: added minparams to Message struct.
+	* parse.c/parse(): check for minparams and reject command without even
+	  calling function.
+	* irc/*, doc/irc.1: removed irc client.
+	* match.c, support.c: remove c_*.h includes.
+	* configure.in, configure, setup.h.in: adopted to autoheader.
+	* acconfig.h: removed (now it's kind of in configure.in).
+	* Makefile.in: adapted to no client.
+	* s_user.c/m_message(): parse checks param count, removed.
+	* msg_def.h: removed.
+	* parse.c: merged msg_def.h
+	* s_user.c/m_message(): no MSG_PRIVATE, simply "PRIVMSG".
+	* removed unneeded occurrences of CLIENT_COMPILE.
+	* parse.c/parse(): minparams check failed when it was 0.
+	* parse.c, parse_ext.h: new functions: m_ignore, m_noprivileges,
+	  m_unregistered and m_registered.
+
 2004-06-08  Piotr Kucharski
 
 	* channel.c/del_modeid(): do not free modeid.
