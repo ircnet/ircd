@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.249 2004/10/23 13:54:29 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.250 2004/10/26 19:33:04 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2980,6 +2980,8 @@ int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	register aMotd *temp;
 	struct tm *tm;
 
+	if (!IsUnknown(sptr))
+	{
 	if (check_link(sptr))
 	    {
 		sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]), "MOTD");
@@ -2987,6 +2989,7 @@ int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    }
 	if (hunt_server(cptr, sptr, ":%s MOTD :%s", 1,parc,parv)!=HUNTED_ISME)
 		return 5;
+	}
 	tm = localtime(&motd_mtime);
 	if (motd == NULL)
 	    {
@@ -2995,7 +2998,7 @@ int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    }
 	sendto_one(sptr, replies[RPL_MOTDSTART], ME, BadTo(parv[0]), ME);
 	sendto_one(sptr, ":%s %d %s :- %d/%d/%d %d:%02d", ME, RPL_MOTD,
-		   parv[0], tm->tm_mday, tm->tm_mon + 1, 1900 + tm->tm_year,
+		   BadTo(parv[0]), tm->tm_mday, tm->tm_mon + 1, 1900 + tm->tm_year,
 		   tm->tm_hour, tm->tm_min);
 	temp = motd;
 	for(temp=motd;temp != NULL;temp = temp->next)
