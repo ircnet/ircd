@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.74 2001/12/25 15:38:42 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.75 2001/12/25 23:53:25 q Exp $";
 #endif
 
 #include "os.h"
@@ -1006,8 +1006,6 @@ Reg	aClient	*cptr;
 					   acptr->user->username,
 					   acptr->user->host, stok,
 					   (*buf) ? buf : "+", acptr->info);
-			if ((cptr->serv->version & SV_NJOIN) == 0)
-				send_user_joins(cptr, acptr);
 		    }
 		else if (IsService(acptr) &&
 			 match(acptr->service->dist, cptr->name) == 0)
@@ -1036,8 +1034,7 @@ Reg	aClient	*cptr;
 		for (chptr = channel; chptr; chptr = chptr->nextch)
 			if (chptr->users)
 			    {
-				if (cptr->serv->version & SV_NJOIN)
-					send_channel_members(cptr, chptr);
+				send_channel_members(cptr, chptr);
 				send_channel_modes(cptr, chptr);
 			    }
 	    }

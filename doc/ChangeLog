@@ -1,7 +1,21 @@
+2001-12-25  Kurt Roeckx
+
+	* send.c, struct_def.h, channel.c, channel_ext.h, s_send.c,
+	  s_serv.c: Removed some 2.9 protocol support. (From jv)
+
 2001-12-24  Piotr Kucharski
 
 	* s_user.c/m_unick(): changes, including ip, removing token and
 	  hopcount
+
+2001-12-24  Kurt Roeckx
+
+	* channel.c/set_mode(): Only allow UIDs from the server.
+	* s_user.c/m_message(): privmsg/notice now support UIDs.
+
+2001-12-23  Kurt Roeckx
+
+	* parse.c/find_sender(): Default parv[0] to sptr->from.
 
 2001-12-22  Piotr Kucharski
 
@@ -11,9 +25,28 @@
 	  few changes to it.
 	* parse.c: added find_sid().
 
+2001-12-21  Kurt Roeckx
+
+	* parse.c/parse(), find_sender():  Add support for UID as source of a
+	  message. (From jv)
+	* channel.c/m_mode(), set_mode(): Made MODE use UID when posible.
+
+2001-12-20  Kurt Roeckx
+
+	* msg_def.h, numeric_def.h, parse.c, send.c, struct_def.h, ircd.c, 
+	  s_bsd.c, s_bsd_ext.h, s_err.c, s_misc.c, s_serv.c, s_serv_ext.h:
+	  Get rid of reconnect.
+
 2001-12-13  Piotr Kucharski
 
 	* configure: a typo made FreeBSD 5.0 be taken for Solaris 2.0
+
+2001-12-08  Kurt Roeckx
+
+	* struct_def.h, hash.c, hash_ext.h, ircd.c: Add a sid hash table, and
+	  add ourself to it. (From jv)
+	* channel.c/m_njoin, send_channel_members(): Make NJOIN use UIDs
+	  (based on work from Zobo)
 
 2001-10-25  Piotr Kucharski
 

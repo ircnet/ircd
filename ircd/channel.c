@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.116 2001/12/24 14:10:26 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.117 2001/12/25 23:53:25 q Exp $";
 #endif
 
 #include "os.h"
@@ -776,22 +776,19 @@ uncommented may just lead to desynchs..
 	*modebuf = '+';
 	modebuf[1] = '\0';
 	send_mode_list(cptr, chptr->chname, chptr->mlist, CHFL_BAN, 'b');
-	if (cptr->serv->version & SV_NMODE)
+	if (modebuf[1] || *parabuf)
 	    {
-		if (modebuf[1] || *parabuf)
-		    {
-			/* only needed to help compatibility */
-			sendto_one(cptr, ":%s MODE %s %s %s",
-				   ME, chptr->chname, modebuf, parabuf);
-			*parabuf = '\0';
-			*modebuf = '+';
-			modebuf[1] = '\0';
-		    }
-		send_mode_list(cptr, chptr->chname, chptr->mlist,
-			       CHFL_EXCEPTION, 'e');
-		send_mode_list(cptr, chptr->chname, chptr->mlist,
-			       CHFL_INVITE, 'I');
+		/* only needed to help compatibility */
+		sendto_one(cptr, ":%s MODE %s %s %s",
+			   ME, chptr->chname, modebuf, parabuf);
+		*parabuf = '\0';
+		*modebuf = '+';
+		modebuf[1] = '\0';
 	    }
+	send_mode_list(cptr, chptr->chname, chptr->mlist,
+		       CHFL_EXCEPTION, 'e');
+	send_mode_list(cptr, chptr->chname, chptr->mlist,
+		       CHFL_INVITE, 'I');
 	if (modebuf[1] || *parabuf)
 		sendto_one(cptr, ":%s MODE %s %s %s",
 			   ME, chptr->chname, modebuf, parabuf);
@@ -812,9 +809,6 @@ aChannel *chptr;
 
 	if (check_channelmask(&me, cptr, chptr->chname) == -1)
 		return;
-	if (*chptr->chname == '!' && !(cptr->serv->version & SV_NCHAN))
-		return;
-
 	sprintf(buf, ":%s NJOIN %s :", ME, chptr->chname);
 	len = strlen(buf);
 
@@ -3241,67 +3235,6 @@ char	*parv[];
 	return 2;
 }
 
-void	send_user_joins(cptr, user)
-aClient	*cptr, *user;
-{
-	Reg	Link	*lp;
-	Reg	aChannel *chptr;
-	Reg	int	cnt = 0, len = 0, clen;
-	char	 *mask;
-
-	*buf = ':';
-	(void)strcpy(buf+1, user->name);
-	(void)strcat(buf, " JOIN ");
-	len = strlen(user->name) + 7;
-
-	for (lp = user->user->channel; lp; lp = lp->next)
-	    {
-		chptr = lp->value.chptr;
-		if (*chptr->chname == '&')
-			continue;
-		if (*chptr->chname == '!' && !(cptr->serv->version & SV_NCHAN))
-			/* in reality, testing SV_NCHAN here is pointless */
-			continue;
-		if ((mask = rindex(chptr->chname, ':')))
-			if (match(++mask, cptr->name))
-				continue;
-		clen = strlen(chptr->chname);
-		if ((clen + len) > (size_t) BUFSIZE - 7)
-		    {
-			if (cnt)
-				sendto_one(cptr, "%s", buf);
-			*buf = ':';
-			(void)strcpy(buf+1, user->name);
-			(void)strcat(buf, " JOIN ");
-			len = strlen(user->name) + 7;
-			cnt = 0;
-		    }
-		if (cnt)
-		    {
-			len++;
-			(void)strcat(buf, ",");
-		    }
-		(void)strcpy(buf + len, chptr->chname);
-		len += clen;
-		if (lp->flags & (CHFL_UNIQOP|CHFL_CHANOP|CHFL_VOICE))
-		    {
-			buf[len++] = '\007';
-			if (lp->flags & CHFL_UNIQOP) /*this should be useless*/
-				buf[len++] = 'O';
-			if (lp->flags & CHFL_CHANOP)
-				buf[len++] = 'o';
-			if (lp->flags & CHFL_VOICE)
-				buf[len++] = 'v';
-			buf[len] = '\0';
-		    }
-		cnt++;
-	    }
-	if (*buf && cnt)
-		sendto_one(cptr, "%s", buf);
-
-	return;
-}
-
 #define CHECKFREQ	300
 /* consider reoping an opless !channel */
 static int
@@ -3351,7 +3284,7 @@ aChannel *chptr;
 			    mbuf[cnt] = '\0';
 			    if (lp != chptr->members)
 				{
-				    sendto_match_servs_v(chptr, NULL, SV_NCHAN,
+				    sendto_match_servs(chptr, NULL,
 							 ":%s MODE %s +%s %s",
 							 ME, chptr->chname,
 							 mbuf, nbuf);
@@ -3377,7 +3310,7 @@ aChannel *chptr;
 	    if (cnt)
 		{
 		    mbuf[cnt] = '\0';
-		    sendto_match_servs_v(chptr, NULL, SV_NCHAN,
+		    sendto_match_servs(chptr, NULL,
 					 ":%s MODE %s +%s %s",
 					 ME, chptr->chname, mbuf, nbuf);
 		    sendto_channel_butserv(chptr, &me, ":%s MODE %s +%s %s",
@@ -3412,7 +3345,7 @@ aChannel *chptr;
 					   chptr->chname, now - chptr->reop);
 	    op.flags = MODE_ADD|MODE_CHANOP;
 	    change_chan_flag(&op, chptr);
-	    sendto_match_servs_v(chptr, NULL, SV_NCHAN, ":%s MODE %s +o %s",
+	    sendto_match_servs(chptr, NULL, ":%s MODE %s +o %s",
 				 ME, chptr->chname, op.value.cptr->name);
 	    sendto_channel_butserv(chptr, &me, ":%s MODE %s +o %s",
 				   ME, chptr->chname, op.value.cptr->name);

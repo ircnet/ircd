@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.43 2001/12/20 22:42:24 q Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.44 2001/12/25 23:53:23 q Exp $";
 #endif
 
 #include "os.h"
@@ -1073,9 +1073,6 @@ void	sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
 			continue;
-		if (chptr &&
-		    *chptr->chname == '!' && !(cptr->serv->version & SV_NJOIN))
-			continue;
 		if (!len)
 		    {
 #if ! USE_STDARG
@@ -1127,9 +1124,6 @@ sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
 		    IsMe(cptr))
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
-			continue;
-		if (chptr &&
-		    *chptr->chname == '!' && !(cptr->serv->version & SV_NJOIN))
 			continue;
 		if ((ver & cptr->serv->version) == 0)
 		    {
@@ -1188,9 +1182,6 @@ sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
 		    IsMe(cptr))
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
-			continue;
-		if (chptr &&
-		    *chptr->chname == '!' && !(cptr->serv->version & SV_NJOIN))
 			continue;
 		if ((ver & cptr->serv->version) != 0)
 		    {

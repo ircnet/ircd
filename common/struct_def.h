@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.46 2001/12/25 15:38:40 chopin Exp $
+ *   $Id: struct_def.h,v 1.47 2001/12/25 23:53:24 q Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -758,18 +758,13 @@ typedef	struct	{
 /* used for sendto_serv */
 
 #define	SV_OLD		0x0000
-#define	SV_29		0x0001	/* useless, but preserved for coherence */
-#define	SV_NJOIN	0x0002	/* server understands the NJOIN command */
-#define	SV_NMODE	0x0004	/* server knows new MODEs (+e/+I) */
-#define	SV_NCHAN	0x0008	/* server knows new channels !????name */
-				/* ! SV_NJOIN implies ! SV_NCHAN */
-#define	SV_2_10		(SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN)
-#define	SV_UID		0x0010	/* unique IDs for users = SID + CID */
+#define SV_2_10		0x0001 /* 2.10.2+, 2.10.1 is considered to be SV_OLD
+				  because it would kill SAVEd users */
+#define SV_UID		0x0002
 #define	SV_2_11		(SV_2_10|SV_UID)
 
 #define	SV_OLDSQUIT	0x1000	/* server uses OLD SQUIT logic */
 
-#define	ST_NJOIN(x)	(IsServer(x) && (x->serv->version & SV_NJOIN))
 #define	ST_UID(x)	(IsServer(x) && (x->serv->version & SV_UID))
 
 /* used for sendto_flag */

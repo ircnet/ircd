@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_send.c,v 1.1 1999/09/19 23:58:46 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_send.c,v 1.2 2001/12/25 23:53:25 q Exp $";
 #endif
 
 #include "os.h"
@@ -329,9 +329,6 @@ esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr, char *fmt, ...)
 		    continue;
 	    if (!BadPtr(mask) && match(mask, cptr->name))
 		    continue;
-	    if (chptr && *chptr->chname == '!' && !ST_NJOIN(cptr))
-		    continue;
-
 	    if (newplen == 0 && ST_UID(cptr))
 		    build_new_prefix(orig, imsg, NULL, chptr->chname);
 	    if (oldplen == 0 && (!ST_UID(cptr) || newplen <= 0))

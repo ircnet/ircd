@@ -59,6 +59,5 @@ EXTERN int m_invite __P((aClient *cptr, aClient *sptr, int parc,
 			 char *parv[]));
 EXTERN int m_list __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_names __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN void send_user_joins __P((aClient *cptr, aClient *user));
 EXTERN time_t collect_channel_garbage __P((time_t now));
 #undef EXTERN
