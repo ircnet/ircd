@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: match.c,v 1.9 2003/02/14 00:27:14 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: match.c,v 1.10 2003/08/08 00:33:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -46,7 +46,7 @@ unsigned char tolowertab[] =
 		  ':', ';', '<', '=', '>', '?',
 		  '@', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
 		  'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
-		  't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~',
+		  't', 'u', 'v', 'w', 'x', 'y', 'z', '[', '\\', ']', '^',
 		  '_',
 		  '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
 		  'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
@@ -84,7 +84,7 @@ unsigned char touppertab[] =
 		  0x5f,
 		  '`', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
 		  'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
-		  'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^',
+		  'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '~',
 		  0x7f,
 		  0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89,
 		  0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
@@ -152,7 +152,7 @@ unsigned char char_atribs[] = {
 		PRINT|ALPHA|NVALID|UVALID, PRINT|ALPHA|NVALID|UVALID,
 /* yz  */	PRINT|ALPHA|NVALID|UVALID, PRINT|ALPHA|NVALID|UVALID,
 /* {|  */	PRINT|NVALID|UVALID, PRINT|NVALID|UVALID,
-/* }~  */	PRINT|NVALID|UVALID, PRINT|NVALID|UVALID,
+/* }~  */	PRINT|NVALID|UVALID, PRINT|UVALID,
 /* del */	0,
 /* 80-8f */	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 /* 90-9f */	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
