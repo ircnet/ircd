@@ -55,6 +55,7 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 	aConfig *ConfigTop = NULL;
 	aConfig *ConfigCur = NULL;
 	char	line[BUFSIZE+1];
+	FILE	*fdn;
 
 	if (curfile == NULL)
 	{
@@ -117,7 +118,8 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 			}
 			if (*start != '/')
 			{
-				filep += sprintf(file, IRCDCONF_DIR);
+				filep += snprintf(file, FILEMAX,
+					"%s", IRCDCONF_DIR);
 			}
 			if ((end - start) + (filep - file) >= FILEMAX)
 			{
@@ -140,15 +142,15 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 					goto eatline;
 				}
 			}
-			if ((fd = fopen(file, "r")) == NULL)
+			if ((fdn = fopen(file, "r")) == NULL)
 			{
 				config_error(CF_ERR, curfile, linenum,
 					"cannot open \"%s\"", savefilep);
 				goto eatline;
 			}
-			ret = config_read(fd, depth + 1,
+			ret = config_read(fdn, depth + 1,
 				new_config_file(file, curfile, linenum));
-			fclose(fd);
+			fclose(fdn);
 			if (ConfigCur)
 			{
 				ConfigCur->next = ret;
