@@ -366,6 +366,8 @@
 /*
  * Defining this will enable the use of compressed server-server links.
  * In order to have it work, you must have the zlib version 1.0 or higher.
+ * The library and the include files must have been found by configure,
+ * if you have installed the zlib after running configure, run it again.
  */
 #undef ZIP_LINKS
 
