@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.9 1999/01/15 14:45:39 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.10 1999/01/15 15:55:21 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -261,7 +261,7 @@ AnInstance *self;
 	struct socks_private *mydata = self->data;
 
 	sendto_ircd("S socks open[%u/%u] closed[%u/%u] cache miss %u (%u < %u)",
-		    mydata->open, ,mydata->chit, mydata->closed, mydata->chit2,
+		    mydata->open, mydata->chit, mydata->closed, mydata->chit2,
 		    mydata->cmiss, mydata->cnow, mydata->cmax);
 }
 
