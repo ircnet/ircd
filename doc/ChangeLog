@@ -1,3 +1,14 @@
+2004-06-12  Piotr Kucharski
+
+	* struct_def.h: new enum type ACL.
+	* s_user.c: new function is_allowed() meant to replace #ifdef based
+	  command restrictions.
+	* parse.c, s_serv_ext.h, s_serv.c/m_rehash(), m_restart(), m_die(),
+	  m_set(): remove #ifdef OPER_mumble.
+	* s_user.c/m_kill(), s_serv.c/m_rehash(), m_restart(), m_die(),
+	  m_set(): use is_allowed().
+	* s_user.c/m_umode(): remove STAT_OPER status after -o/-O.
+	
 2004-06-11  Piotr Kucharski
 
 	* struct_def.h: added minparams to Message struct.
