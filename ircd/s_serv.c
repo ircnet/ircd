@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.10 1997/05/15 13:49:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.11 1997/05/21 20:19:30 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -893,19 +893,20 @@ Reg	aClient	*cptr;
 			send_user_joins(cptr, acptr);
 		    }
 		else if (IsService(acptr) &&
-			 (match(acptr->service->dist, acptr->name) == 0
+			 (match(acptr->service->dist, cptr->name) == 0
 			  && cptr->serv->version != SV_OLD))
 		    {
 			if (*mlname == '*' &&
 			    match(mlname, acptr->service->server) == 0)
 				stok = me.serv->tok;
 			else
-				stok = acptr->user->servp->tok;
+				stok = acptr->service->servp->tok;
 			sendto_one(cptr, "SERVICE %s %s %s %d %d :%s",
 				   acptr->name, stok, acptr->service->dist,
 				   acptr->service->type, acptr->hopcount + 1,
 				   acptr->info);
 		    }
+		/* the previous if does NOT catch all services.. ! */
 	    }
 	/*
 	** Last, pass all channels modes
