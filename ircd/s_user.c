@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.243 2005/01/30 17:56:33 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.244 2005/02/04 18:08:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -254,8 +254,7 @@ int	do_nick_name(char *nick, int server)
 	if (strcasecmp(nick, "anonymous") == 0)
 		return 0;
 
-	/* when no 2.10, allow NICKLEN */
-	for (ch = nick; *ch && (ch - nick) < (server?NICKLEN:ONICKLEN); ch++)
+	for (ch = nick; *ch && (ch-nick) < (server?NICKLEN:LOCALNICKLEN); ch++)
 	{
 		/* Transition period. Until all 2.10 are gone, disable
 		** these chars in nicks for users. --B. */
@@ -808,7 +807,7 @@ int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	int	delayed = 0;
 	char	nick[NICKLEN+2], *user, *host;
 	Link	*lp = NULL;
-	int	donickname;
+	int	donickname, allowednicklen;
 
 	if (MyConnect(cptr) && IsUnknown(cptr) &&
 		IsConfServeronly(cptr->acpt->confs->value.aconf))
@@ -829,8 +828,9 @@ int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[ERR_NONICKNAMEGIVEN], ME, BadTo(parv[0]));
 		return 1;
 	    }
-	/* local clients' nick size can be ONICKLEN max */
-	strncpyzt(nick, parv[1], (MyConnect(sptr) ? ONICKLEN : NICKLEN)+1);
+	/* local clients' nick size can be LOCALNICKLEN max */
+	allowednicklen = MyConnect(sptr) ? LOCALNICKLEN : NICKLEN;
+	strncpyzt(nick, parv[1], allowednicklen + 1);
 
 	if (IsServer(cptr))
 	{
@@ -936,10 +936,8 @@ badparamcountkills:
 	 * creation) then reject it. If from a server and we reject it,
 	 * we have to KILL it. -avalon 4/4/92
 	 */
-	/* when no 2.10, allow NICKLEN */
-	if (donickname == 0 || strncmp(nick, parv[1], 
-		IsServer(cptr)?NICKLEN:ONICKLEN))
-	    {
+	if (donickname == 0 || strncmp(nick, parv[1], allowednicklen))
+	{
 		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, BadTo(parv[0]),
 			   parv[1]);
 
@@ -964,7 +962,7 @@ badparamcountkills:
 			    }
 		    }
 		return 2;
-	    }
+	}
 
 	if (!(acptr = find_client(nick, NULL)))
 	    {

@@ -687,6 +687,12 @@
 #define LISTENER_MAXACCEPT 10
 #endif
 
+/*
+** If you don't feel your users should use too long nicknames, you can
+** restrict length of their dnicks here.
+*/
+#define LOCALNICKLEN 12
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.41 2005/01/03 17:33:54 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.42 2005/02/04 18:08:48 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -773,7 +773,7 @@ char	**make_isupport(void)
 		"NICKLEN=%d TOPICLEN=%d KICKLEN=%d MAXLIST=beIR:%d "
 		"CHANNELLEN=%d IDCHAN=!:%d CHANMODES=beIR,k,l,imnpstaqr",
 		MAXMODEPARAMS, MAXCHANNELSPERUSER,
-		ONICKLEN, TOPICLEN, TOPICLEN, MAXBANS, CHANNELLEN, CHIDLEN);
+		LOCALNICKLEN, TOPICLEN, TOPICLEN, MAXBANS, CHANNELLEN, CHIDLEN);
 
 	tis[1] = (char *) MyMalloc(BUFSIZE);
 	sprintf(tis[1],	"PENALTY FNC EXCEPTS=e INVEX=I CASEMAPPING=ascii");

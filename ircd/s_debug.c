@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_debug.c,v 1.47 2004/10/01 20:22:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_debug.c,v 1.48 2005/02/04 18:08:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -295,7 +295,7 @@ void	send_defines(aClient *cptr, char *nick)
 		   DELAYCHASETIMELIMIT, LDELAYCHASETIMELIMIT,
 		   CLIENT_FLOOD, MAXCHANNELSPERUSER);
 	sendto_one(cptr, ":%s %d %s :H:%d N:%d D:%d U:%d R:%d T:%d C:%d P:%d K:%d",
-		   ME, RPL_STATSDEFINE, nick, HOSTLEN, ONICKLEN, UIDLEN, USERLEN,
+		   ME, RPL_STATSDEFINE, nick, HOSTLEN, LOCALNICKLEN, UIDLEN, USERLEN,
 		   REALLEN, TOPICLEN, CHANNELLEN, PASSWDLEN, KEYLEN);
 	sendto_one(cptr, ":%s %d %s :BS:%d MXR:%d MXB:%d MXBL:%d PY:%d",
 		   ME, RPL_STATSDEFINE, nick, BUFSIZE, MAXRECIPIENTS, MAXBANS,
