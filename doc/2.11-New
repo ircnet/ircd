@@ -78,7 +78,8 @@ Admin:
 	  information about client TCP connection.
 	* -t option (foreground mode) is now avaible even without DEBUGMODE
 	* Added SET command which makes possible to fine-tune certain
-	  ircd values during runtime (like dbuf poolsize and autoconnect).
+	  ircd values during runtime (like dbuf poolsize, autoconnect and client
+	  accepting).
 	* Stats Z no longer computes real memory statistics unless DEBUGMODE
 	  set.
 	* Stats l/L shows count in Bytes, not kBytes.

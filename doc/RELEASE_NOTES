@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.59 2004/09/28 23:19:48 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.60 2004/10/02 01:25:26 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -43,7 +43,8 @@ New features in 2.11.0:
 	* New "STATS f" shows detailed information about client TCP connection
 	  (local opers only).
 	* New "SET" command, which makes possible to fine-tune certain ircd
-	  values during runtime (like dbuf poolsize and autoconnect).
+	  values during runtime (like dbuf poolsize, autoconnect and client
+	  accepting).
 	* New iauth module: mod_webproxy.
 	* Modules socks and webproxy can work on multiple different ports.
 	* New keyword "delayed" in iauth configuration (shortening time client
