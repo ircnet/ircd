@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.79 2004/09/08 18:56:54 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.80 2004/09/12 21:56:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1314,7 +1314,7 @@ void	sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 		/* hmm, let me take an educated guess... a hostname? */
 		hostname,
 		/* ident, if available */
-		cptr->auth ? cptr->auth : "",
+		cptr->auth ? cptr->auth : "?",
 		/* client IP */
 		cptr->user ? cptr->user->sip :
 #ifdef INET6
