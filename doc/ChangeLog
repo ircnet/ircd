@@ -1,3 +1,21 @@
+2004-02-17  Piotr Kucharski
+
+	* s_user.c/m_nick(): do not add to hash table nick of "0".
+	* s_user.c/register_user(): when NICK 0 was before USER, wait until
+	  USER is sent and we know UID -- then change this nick and add it
+	  to hash table.
+	* s_serv.c/m_stats(): cleanup of what to check_link (RPL_TRYAGAIN).
+	* s_serv.c: new function report_listeners() showing P:lines (IP, port)
+	  and number of clients using it.
+	* s_serv.c: new stats (P) for report_listeners().
+
+2004-02-16  Piotr Kucharski
+
+	* s_serv.c/dump_sid_map(): add bursting time; also rewritten a bit.
+	* s_serv.c/m_server_estab(): do not append own SID to "mass" EOB,
+	  being source is enough.
+	* channel.c/set_mode(): set ->reop when +R from server.
+
 2004-02-15  Piotr Kucharski
 
 	* s_serv.c/m_squit(): return when illegal port is found.
@@ -12,6 +30,11 @@
 	* channel.c/reop_channel(): use ->reop, not ->history, for checking if
 	  channel reop is overdue.
 	* s_serv.c/report_ping(): comment out debug message.
+
+2004-02-14  Piotr Kucharski
+
+	* s_user.c/m_join(): show nick in error, not UID, when restricted
+	  clients does "NICK 0".
 
 2004-02-13  Jakub Vlasek
 
