@@ -1,3 +1,17 @@
+2004-04-14  Piotr Kucharski
+
+	* s_misc.c/exit_client(): if remote server matching C-line exits and
+	  AC is temporarily disabled, enable it.
+	* ircd.c/check_pings(): forgotten IsListener().
+	* ircd.c/try_connections(): if no conf suitable for AC found, disable
+	  AC temporarily.
+	* s_bsd.c/close_connection(): if AC was temporarily disabled and local,
+	  not matching C-line server quits, no need for enabling AC; however,
+	  if it was in Handshake or Connecting state (not yet Server), enable
+	  AC so it tries again.
+	* s_bsd.c/get_my_name(): do not fill mysk with resolved hostname from
+	  M-line.
+
 2004-04-13  Piotr Kucharski
 
 	* s_misc.c/initstats(): set localc, not remc.
@@ -24,6 +38,7 @@
 2004-03-29  Piotr Kucharski
 
 	* s_user.c/do_nick_name(): allow '~' in nicks from servers.
+	* common_def.h: exclude '^' from isscandinavian (no need to disable it).
 	* s_user.c/m_nick(): if user used not allowed char in nick, inform him
 	  about it, not silently cut given nick.
 
