@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.53 2004/02/20 02:02:47 chopin Exp $
+#*   $Id: Makefile.in,v 1.54 2004/03/05 20:29:04 chopin Exp $
 #*
 #*/
 
@@ -93,6 +93,9 @@ IRCD_PATH = $(server_bin_dir)/$(SERVER)
 IAUTH_PATH = $(server_bin_dir)/$(IAUTH)
 # Path to the m4 configuration file
 IRCDM4_PATH = $(ircd_conf_dir)/ircd.m4
+
+# Path to the m4 executable
+M4_PATH = @M4_PATH@
 
 # server configuration file
 IRCDCONF_PATH = $(ircd_conf_dir)/ircd.conf
@@ -397,7 +400,9 @@ s_bsd.o: ../ircd/s_bsd.c setup.h config.h
 	$(CC) $(S_CFLAGS) -DIRCDPID_PATH="\"$(IRCDPID_PATH)\"" -DIAUTH_PATH="\"$(IAUTH_PATH)\"" -DIAUTH="\"$(IAUTH)\"" -c -o $@ ../ircd/s_bsd.c
 
 s_conf.o: ../ircd/s_conf.c setup.h config.h
-	$(CC) $(S_CFLAGS) -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" -DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" -c -o $@ ../ircd/s_conf.c
+	$(CC) $(S_CFLAGS) -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" \
+	-DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" \
+	-DM4_PATH="\"$(M4_PATH)\"" -c -o $@ ../ircd/s_conf.c
 
 s_debug.o: ../ircd/s_debug.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_debug.c
@@ -469,7 +474,8 @@ mod_socks.o: ../iauth/mod_socks.c config.h setup.h
 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_socks.c
 
 chkconf.o: ../ircd/chkconf.c setup.h config.h
-	$(CC) $(CC_CFLAGS) -DCHKCONF_COMPILE -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" -DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" -c -o $@ ../ircd/chkconf.c
+	$(CC) $(CC_CFLAGS) -DCHKCONF_COMPILE -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" \
+	-DM4_PATH="\"$(M4_PATH)\"" -DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" -c -o $@ ../ircd/chkconf.c
 
 # stuff in contrib/
 

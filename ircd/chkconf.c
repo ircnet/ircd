@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.23 2004/03/05 16:10:28 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.24 2004/03/05 20:29:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -136,7 +136,7 @@ static	int	openconf()
 		 * goes out with report_error.  Could be dangerous,
 		 * two servers running with the same fd's >:-) -avalon
 		 */
-		(void)execlp("m4", "m4", IRCDM4_PATH, configfile, 0);
+		(void)execlp(M4_PATH, "m4", IRCDM4_PATH, configfile, 0);
 		perror("m4");
 		exit(-1);
 	default :

@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.93 2004/03/05 16:24:54 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.94 2004/03/05 20:29:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1054,7 +1054,7 @@ int	openconf(void)
 		 * goes out with report_error.  Could be dangerous,
 		 * two servers running with the same fd's >:-) -avalon
 		 */
-		(void)execlp("m4", "m4", IRCDM4_PATH, configfile, 0);
+		(void)execlp(M4_PATH, "m4", IRCDM4_PATH, configfile, 0);
 		if (serverbooting)
 		{
 			fprintf(stderr,"Fatal Error: Error executing m4 (%s)",
