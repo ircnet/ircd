@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.191 2004/05/18 23:13:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.192 2004/05/19 14:39:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3779,4 +3779,16 @@ static void report_listeners(aClient *sptr, char *to)
 			acptr->confs->value.aconf->clients,
 			IsListenerInactive(acptr) ? "inactive" : "active" );
 	}
+}
+
+/* allows ENCAPsulation of commands */
+int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+	return 0;
+}
+
+/* announces server DIE */
+int	m_sdie(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+	return 0;
 }

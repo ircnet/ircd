@@ -80,6 +80,8 @@
 #define MSG_SET      "SET"
 #define MSG_MAP	     "MAP"
 #define MSG_POST     "POST"
+#define MSG_ENCAP    "ENCAP"
+#define MSG_SDIE     "SDIE"
 
 #define MAXPARA		15
 
