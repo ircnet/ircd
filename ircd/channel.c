@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.88 1999/01/18 00:15:38 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.89 1999/01/18 14:18:58 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2811,7 +2811,8 @@ char	*parv[];
 					rlen += sendto_one(sptr,
 							   rpl_str(RPL_LIST,
 								   parv[0]),
-							   name, chptr->users,
+							   chptr->chname,
+							   chptr->users,
 							   chptr->topic);
 					if (!MyConnect(sptr) &&
 					    rlen > CHREPLLEN)
