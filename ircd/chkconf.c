@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.33 2004/07/15 13:34:19 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.34 2004/07/15 14:39:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -125,6 +125,9 @@ int	main(int argc, char *argv[])
 	 * I get loops when M4_PREPROC is defined - Babar */
 	result = initconf();
 	validate(result);
+#if defined(CONFIG_DIRECTIVE_INCLUDE)
+	config_free(files);
+#endif
 	return 0;
 }
 
@@ -300,6 +303,7 @@ static	aConfItem 	*initconf()
 		aconf->passwd = (char *)NULL;
 		aconf->name = (char *)NULL;
 		aconf->class = (aClass *)NULL;
+		/* abusing clients to store ircd.conf line number */
 		aconf->clients = ++nr;
 
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
@@ -363,7 +367,7 @@ static	aConfItem 	*initconf()
                     }
 
 		if (debugflag)
-			config_error(CF_WARN, CK_FILE, CK_LINE, "%s", line);
+			config_error(CF_NONE, CK_FILE, CK_LINE, "%s", line);
 
 		tmp = getfield(line);
 		if (!tmp)
@@ -563,10 +567,10 @@ static	aConfItem 	*initconf()
 
 		if (aconf->status & CONF_LISTEN_PORT)
 		{
-#ifdef	UNIXPORT
 			if (!aconf->host)
 				config_error(CF_ERR, CK_FILE, CK_LINE,
 					"null host field in P-line");
+#ifdef	UNIXPORT
 			else if (index(aconf->host, '/'))
 			{
 				struct	stat	sb;
@@ -583,13 +587,12 @@ static	aConfItem 	*initconf()
 						aconf->host);
 			}
 #else
-			if (!aconf->host)
-				config_error(CF_ERR, CK_FILE, CK_LINE,
-					"null host field in P-line");
 			else if (index(aconf->host, '/'))
+			{
 				config_error(CF_WARN, CK_FILE, CK_LINE,
 					"/ present in P-line but UNIXPORT "
 					"undefined");
+			}
 #endif
 			aconf->class = get_class(0, nr);
 			goto print_confline;
@@ -669,30 +672,32 @@ static	aConfItem 	*initconf()
 			else
 				flags |= aconf->status;
 			if (tmp && *tmp)
-			    {
+			{
 			    	/* Check for Network at the end of A: line */
 			    	if (debugflag > 2)
 			    		(void)printf("Network is set to: %s\n", tmp);
-			    }
+			}
 			else
 				config_error(CF_ERR, CK_FILE, CK_LINE,
 					"no network in A-line");
 		}
 
 		if (aconf->status & CONF_VER)
-		    {
+		{
 			if (*aconf->host && !index(aconf->host, '/'))
 				config_error(CF_WARN, CK_FILE, CK_LINE,
 					"no / in V line");
 			else if (*aconf->passwd && !index(aconf->passwd, '/'))
 				config_error(CF_WARN, CK_FILE, CK_LINE,
 					"no / in V line");
-		    }
+		}
 print_confline:
 		if (debugflag > 8)
+		{
 			(void)printf("(%d) (%s) (%s) (%s) (%d) (%s)\n",
 			      aconf->status, aconf->host, aconf->passwd,
 			      aconf->name, aconf->port, maxsendq);
+		}
 		(void)fflush(stdout);
 		if (aconf->status & (CONF_SERVER_MASK|CONF_HUB|CONF_LEAF))
 		    {
@@ -707,36 +712,30 @@ print_confline:
 #endif
 
 	if (!(mandatory_found & CONF_ME))
-	    {
+	{
 		config_error(CF_ERR, ftop, 0,
 			"no M-line found (mandatory)");
 		valid = 0;
-	    }
-
+	}
 	if (!(mandatory_found & CONF_ADMIN))
-	    {
+	{
 		config_error(CF_ERR, ftop, 0,
 			"no A-line found (mandatory)");
 		valid = 0;
-	    }
-
+	}
 	if (!(mandatory_found & CONF_LISTEN_PORT))
-	    {
+	{
 		config_error(CF_ERR, ftop, 0,
 			"no P-line found (mandatory)");
 		valid = 0;
-	    }
-
+	}
 	if (!(mandatory_found & CONF_CLIENT))
-	    {
+	{
 		config_error(CF_ERR, ftop, 0,
 			"no I-line found (mandatory)");
 		valid = 0;
-	    }
+	}
 
-#if defined(CONFIG_DIRECTIVE_INCLUDE)
-	config_free(ConfigTop);
-#endif
 	if (valid)
 	{
 		return ctop;
@@ -1096,7 +1095,7 @@ static void	mywc()
 	nr = simulateM4Include(listtmp, nr, configfile, 0);
 #endif
 }
-#endif
+#endif	/* CONFIG_DIRECTIVE_INCLUDE */
 
 static	char	confchar(u_int status)
 {
@@ -1171,7 +1170,7 @@ static	char *	mystrinclude(char *s, int nr)
 	{
 	    	filelist = findConfLineNumber(nr);
 		config_error(CF_WARN, CK_FILE, CK_LINE,
-			"spaces before include(%s): first line of include "
+			"spaces before include(%s): first line of included "
 			"file will be shifted", s);
 	}
 	return s;

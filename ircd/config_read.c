@@ -1,5 +1,6 @@
 
 /* used in config_error() */
+#define CF_NONE 0
 #define CF_WARN 1
 #define CF_ERR  2
 
@@ -31,11 +32,10 @@ struct Config
 static aConfig	*config_read(int, int, aFile *);
 static void	config_free(aConfig *);
 aFile	*new_config_file(char *, aFile *, int);
-#define STACKTYPE aFile
+void	config_error(int, aFile *, int, char *, ...);
 #else
-#define STACKTYPE char
+void	config_error(int, char *, int, char *, ...);
 #endif
-void	config_error(int, STACKTYPE *, int, char *, ...);
 
 
 #ifdef CONFIG_DIRECTIVE_INCLUDE
@@ -116,9 +116,8 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 				if (depth >= MAXDEPTH)
 				{
 					config_error(CF_ERR, curfile, linenum,
-						"config: too nested (%d)",
+						"config: too nested (max %d)",
 						depth);
-
 					goto eatline;
 				}
 				if (*(start+1) != '/')
@@ -258,7 +257,11 @@ aFile *new_config_file(char *filename, aFile *parent, int fnr)
 }
 #endif /* CONFIG_DIRECTIVE_INCLUDE */
 
-void config_error(int level, STACKTYPE *stack, int line, char *pattern, ...)
+#ifdef CONFIG_DIRECTIVE_INCLUDE
+void config_error(int level, aFile *curF, int line, char *pattern, ...)
+#else
+void config_error(int level, char *filename, int line, char *pattern, ...)
+#endif
 {
 	int len;
 	static int etclen = 0;
@@ -266,10 +269,7 @@ void config_error(int level, STACKTYPE *stack, int line, char *pattern, ...)
 	char vbuf[8192];
 	char *filep;
 #ifdef CONFIG_DIRECTIVE_INCLUDE
-	aFile *curF = stack;
-	char *filename = stack->filename;
-#else
-	char *filename = stack;
+	char *filename = curF->filename;
 #endif
 
 	if (!etclen)
@@ -290,19 +290,26 @@ void config_error(int level, STACKTYPE *stack, int line, char *pattern, ...)
 	if (0 == strncmp(filename, IRCDCONF_PATH, etclen))
 		filep += etclen;
 #ifdef CHKCONF_COMPILE
-	fprintf(stderr, "%s:%d %s%s\n", filep, line,
-		((level == CF_ERR) ? "ERROR: " : "WARNING: "), vbuf);
-# ifdef CONFIG_DIRECTIVE_INCLUDE
-	while ((curF && curF->parent))
+	if (level == CF_NONE)
 	{
-		filep = curF->parent->filename;
-		if (0 == strncmp(filep, IRCDCONF_PATH, etclen))
-			filep += etclen;
-		fprintf(stderr, "\tincluded in %s:%d\n",
-			filep, curF->includeline);
-		curF = curF->parent;
+		fprintf(stdout, "%s", vbuf);
 	}
+	else
+	{
+		fprintf(stderr, "%s:%d %s%s\n", filep, line,
+			((level == CF_ERR) ? "ERROR: " : "WARNING: "), vbuf);
+# ifdef CONFIG_DIRECTIVE_INCLUDE
+		while ((curF && curF->parent))
+		{
+			filep = curF->parent->filename;
+			if (0 == strncmp(filep, IRCDCONF_PATH, etclen))
+				filep += etclen;
+			fprintf(stderr, "\tincluded in %s:%d\n",
+				filep, curF->includeline);
+			curF = curF->parent;
+		}
 # endif
+	}
 #else
 	if (level != CF_ERR)
 		return;
