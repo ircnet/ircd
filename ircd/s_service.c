@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.55 2004/07/02 11:08:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.56 2004/07/02 14:59:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -130,8 +130,8 @@ void	check_services_butone(long action, char *server, aClient *cptr,
 		if ((sp->wants & action)
 		    && (!server || !match(sp->dist, server)))
 		{
-			if ((sp->wants & SERVICE_WANT_PREFIX) && 
-			    cptr && IsRegisteredUser(cptr) &&
+			if ((sp->wants & (SERVICE_WANT_PREFIX|SERVICE_WANT_UID))
+			    && cptr && IsRegisteredUser(cptr) &&
 			    (action & SERVICE_MASK_PREFIX))
 			{
 				char	buf[2048];
@@ -140,9 +140,14 @@ void	check_services_butone(long action, char *server, aClient *cptr,
 				(void)va_arg(va, char *);
 				vsprintf(buf, fmt+3, va);
 				va_end(va);
-				sprintf(nbuf, "%s!%s@%s", cptr->name,
-					cptr->user->username,cptr->user->host);
-				sendto_one(sp->bcptr, ":%s%s", nbuf, buf);
+				if ((sp->wants & SERVICE_WANT_UID))
+					sendto_one(sp->bcptr, ":%s%s", 
+						HasUID(cptr) ? cptr->user->uid :
+						cptr->name, buf);
+				else
+					sendto_one(sp->bcptr, ":%s!%s@%s%s",
+						cptr->name, cptr->user->username,
+						cptr->user->host, buf);
 			}
 			else
 			{
