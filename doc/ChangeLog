@@ -5,6 +5,10 @@
 	  discard it.
 	* s_user.c/do_nick_name(): disallow {}\ in nicks, so we can later
 	  drop scandinavian origin in match().
+	* match.c: change upper- and lowertable, so {|}~ is no longer
+	  lowercase of [\]^.
+	* match.c: make ~ not valid in nicknames (however it was
+	  forbidden in other place).
 
 2003-08-06  Piotr Kucharski
 
