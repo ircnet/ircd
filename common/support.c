@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.29 2003/08/08 21:56:28 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.30 2003/10/17 20:41:30 q Exp $";
 #endif
 
 #include "os.h"
@@ -450,14 +450,15 @@ inetaton(cp, addr)
 #endif
 
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE)
-void	dumpcore(msg, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
-char	*msg, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
+void	dumpcore(char *msg, ...)
 {
 	static	time_t	lastd = 0;
 	static	int	dumps = 0;
 	char	corename[12];
 	time_t	now;
 	int	p;
+	va_list	va;
+	char	s[BUFSIZE];
 
 	now = time(NULL);
 
@@ -480,10 +481,13 @@ char	*msg, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 	write_pidfile();
 	sprintf(corename, "core.%d", p);
 	(void)rename("core", corename);
-	Debug((DEBUG_FATAL, "Dumped core : core.%d", p));
+	va_start(va, msg);
+	vsprintf(s, msg, va);
+	va_end(va);
+	Debug((DEBUG_FATAL, s));
 	sendto_flag(SCH_ERROR, "Dumped core : core.%d", p);
-	Debug((DEBUG_FATAL, msg, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,p11));
-	sendto_flag(SCH_ERROR, msg, p1, p2, p3, p4, p5, p6, p7, p8,p9,p10,p11);
+	Debug((DEBUG_FATAL, s));
+	sendto_flag(SCH_ERROR, s);
 	(void)s_die(0);
 }
 #endif
