@@ -1,3 +1,12 @@
+2004-03-22  Jakub Vlasek
+
+	* struct_def.h, s_Bsd.c, s_serv.c: Rename IsListeningInactive and
+	  SetListeningInactive macros to IsListenerInactive and
+	  SetListenerInactive.
+	* s_bsd.c, s_bsd_ext.h: Added activate_delayed_listeners().
+	* s_misc.c/check_split(): Activate delayed listeners when the server
+	  rejoins the network for first time.
+
 2004-03-21  Jakub Vlasek
 	
 	* ircd.c, ircd_ext.h, s_misc.c/check_split(): Added firstrejoindone
@@ -7,7 +16,7 @@
 	* struct_def.h: Added IsListeningInactive(), SetListeningInactive(),
 	  ClearListenerInactive().
 
-2004-03-20  Piotr Kucharsk
+2004-03-20  Piotr Kucharski
 
 	* s_conf.c/find_bounce(): allow negative classes in B:lines.
 	* s_user.c/m_nick(), m_user(): reject user when it connects to
