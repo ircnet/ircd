@@ -1,3 +1,12 @@
+2003-11-13  Piotr Kucharski
+
+	* s_user.c/m_pass(): don't copy PASS params to info when issued 
+	  after USER or SERVICE (noted by fiction).
+
+2003-11-03  Piotr Kucharski
+
+	* struct_def.h: MODE_REOPLIST was added, MODE_FLAGS needed updating.
+
 2003-10-22  Jakub Vlasek
 
 	* hash.c/m_hash(): Spelling fixes, hash_channel_name() takes 3 params
