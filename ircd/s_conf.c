@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.113 2004/06/19 17:46:09 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.114 2004/06/22 23:01:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2157,69 +2157,61 @@ int	m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 		reason[TOPICLEN] = '\0';
 	}
 
-	/* Check if such u@h already exists in tkconf. */
-	for (tmp = tkconf; tmp; tmp = tmp->next)
-	{
-		if (0==strcasecmp(tmp->host, host) && 
-			0==strcasecmp(tmp->name, user))
-		{
-			tmp->hold = timeofday + time;
-			break;
-		}
-	}
-	if (!tmp)
-	{
-		tmp = do_tkline(status, time, user, host, reason, 1, parv[0]);
-	}
+	/* All parameters are now sane. Do the stuff. */
+	do_tkline(parv[0], time, user, host, reason, status);
 
-	if (!nexttkexpire || nexttkexpire > tmp->hold)
-	{
-		nexttkexpire = MAX(timeofday + 60, tmp->hold);
-	}
 	return 1;
 }
 
 /* 
- * Adds tkline, if doall removes matching clients.
- * status (CONF_TKILL or CONF_TOTHERKILL), time for how long is active,
- * user, host, reason self explanatory.
- * Returns created conf line or NULL.
+ * Adds tkline to tkconf.
+ * If tkline already existed, its expire time is updated.
+ *
+ * Returns created tkline expire time.
  */
-aConfItem *do_tkline(int status, int time, char *user, char *host, char *reason, int doall, char *who)
+void do_tkline(char *who, int time, char *user, char *host, char *reason, int status)
 {
 	char buff[BUFSIZE];
 	aClient	*acptr;
-	aConfItem	*aconf;
+	aConfItem *aconf;
 	int i;
 
 	buff[0] = '\0';
-	aconf = make_conf();
-	aconf->next = NULL;
-	aconf->status = status;
-	aconf->hold = timeofday + time;
-	aconf->port = 0;
-	Class(aconf) = find_class(0);
-	DupString(aconf->name, BadTo(user));
-	DupString(aconf->host, BadTo(host));
-	DupString(aconf->passwd, reason);
-	istat.is_confmem += strlen(aconf->name) + 1;
-	istat.is_confmem += strlen(aconf->host) + 1;
-	istat.is_confmem += strlen(aconf->passwd) + 1;
 
-	/* put on top of tkconf */
-	if (tkconf)
+	/* Check if such u@h already exists in tkconf. */
+	for (aconf = tkconf; aconf; aconf = aconf->next)
 	{
-		aconf->next = tkconf;
+		if (0==strcasecmp(aconf->host, host) && 
+			0==strcasecmp(aconf->name, user))
+		{
+			aconf->hold = timeofday + time;
+			break;
+		}
 	}
-	tkconf = aconf;
-
-	if (!doall)
+	if (aconf == NULL)
 	{
-		return NULL;
-	}
+		aconf = make_conf();
+		aconf->next = NULL;
+		aconf->status = status;
+		aconf->hold = timeofday + time;
+		aconf->port = 0;
+		Class(aconf) = find_class(0);
+		DupString(aconf->name, BadTo(user));
+		DupString(aconf->host, BadTo(host));
+		DupString(aconf->passwd, reason);
+		istat.is_confmem += strlen(aconf->name) + 1;
+		istat.is_confmem += strlen(aconf->host) + 1;
+		istat.is_confmem += strlen(aconf->passwd) + 1;
 
-	sendto_flag(SCH_NOTICE, "TKLINE %s@%s (%d) by %s",
-		aconf->name, aconf->host, time, who);
+		/* put on top of tkconf */
+		if (tkconf)
+		{
+			aconf->next = tkconf;
+		}
+		tkconf = aconf;
+		sendto_flag(SCH_NOTICE, "TKLINE %s@%s (%d) by %s",
+			aconf->name, aconf->host, time, who);
+	}
 
 	/* get rid of tklined clients */
 	for (i = highest_fd; i >= 0; i--)
@@ -2284,19 +2276,25 @@ aConfItem *do_tkline(int status, int time, char *user, char *host, char *reason,
 		{
 			sendto_one(acptr, replies[ERR_YOUREBANNEDCREEP],
 				ME, acptr->name, aconf->name, aconf->host,
-				": ", reason);
+				": ", aconf->passwd);
 			sendto_flag(SCH_NOTICE,
 				"TKill line active for %s",
 				get_client_name(acptr, FALSE));
 			if (buff[0] == '\0')
 			{
 				sprintf(buff, "Kill line active: %.80s",
-					reason);
+					aconf->passwd);
 			}
 			(void) exit_client(acptr, acptr, &me, buff);
 		}
 	}
-	return aconf;
+
+	/* do next tkexpire, but not more often than once a minute */
+	if (!nexttkexpire || nexttkexpire > aconf->hold)
+	{
+		nexttkexpire = MAX(timeofday + 60, aconf->hold);
+	}
+	return;
 }
 
 int	m_untkline(aClient *cptr, aClient *sptr, int parc, char **parv)
