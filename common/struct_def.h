@@ -93,7 +93,9 @@ typedef struct        MotdItem aMotd;
 #define	BOOT_TTY	0x010
 #define	BOOT_OPER	0x020
 #define	BOOT_AUTODIE	0x040
-#define BOOT_BADTUNE	0x080
+#define	BOOT_BADTUNE	0x080
+#define	BOOT_PROT	0x100
+#define	BOOT_STRICTPROT	0x200
 
 #define	STAT_RECONNECT	-7	/* Reconnect attempt for server connections */
 #define	STAT_LOG	-6	/* logfile for -x */
@@ -458,7 +460,6 @@ struct Client	{
  * statistics structures
  */
 struct	stats {
-	u_short	is_bignet; /* see config.h */
 	u_int	is_cl;	/* number of client connections */
 	u_int	is_sv;	/* number of server connections */
 	u_int	is_ni;	/* connection but no idea who it was

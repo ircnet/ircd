@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.17 1998/04/02 19:58:56 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.18 1998/05/05 21:26:56 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -994,8 +994,9 @@ char	*name;
 			   ME, RPL_STATSDEBUG, name, sp->is_lkmt,
 			   (u_int) (sp->is_lkt / sp->is_lkcnt), sp->is_lkMt,
 			   DELAYCHASETIMELIMIT);
-	sendto_one(cptr, ":%s %d %s :abuse protections %u", ME, RPL_STATSDEBUG,
-		   name, sp->is_bignet);
+	sendto_one(cptr, ":%s %d %s :abuse protections %u strict %u", ME,
+		   RPL_STATSDEBUG, name, (bootopt & BOOT_PROT) ? 1 : 0,
+		   (bootopt & BOOT_STRICTPROT) ? 1 : 0);
 	sendto_one(cptr, ":%s %d %s :Client - Server",
 		   ME, RPL_STATSDEBUG, name);
 	sendto_one(cptr, ":%s %d %s :connected %u %u",

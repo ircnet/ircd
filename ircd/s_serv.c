@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.38 1998/04/05 22:30:56 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.39 1998/05/05 21:26:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -292,6 +292,13 @@ aClient	*cptr;
 	/* Stop whining, and do it! ;) */
 	if (strchr(cptr->info+44, 'Z'))	/* Compression requested */
                 cptr->flags |= FLAGS_ZIPRQ;
+	/*
+	 * If server was started with -p strict, be careful about the
+	 * other server mode.
+	 */
+	if (strncmp(cptr->info, "020", 3) && (bootopt & BOOT_STRICTPROT) &&
+	    !strchr(cptr->info+44, 'P'))
+			return exit_client(cptr, cptr, &me, "Unsafe mode");
 
 	return 3;
 }
@@ -686,12 +693,14 @@ Reg	aClient	*cptr;
 	    {
 		if (bconf->passwd[0])
 #ifndef	ZIP_LINKS
-			sendto_one(cptr, "PASS %s %s %s", bconf->passwd,
-				   pass_version, serveropts);
-#else
 			sendto_one(cptr, "PASS %s %s %s %s", bconf->passwd,
 				   pass_version, serveropts,
-			   (bconf->status == CONF_ZCONNECT_SERVER) ? "Z" : "");
+				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
+#else
+			sendto_one(cptr, "PASS %s %s %s %s%s", bconf->passwd,
+				   pass_version, serveropts,
+			   (bconf->status == CONF_ZCONNECT_SERVER) ? "Z" : "",
+				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
 #endif
 		/*
 		** Pass my info to the new server
@@ -2372,7 +2381,7 @@ aClient	*cptr;
 {
     if (!IsServer(cptr))
 	    return 0;
-    if (!ircstp->is_bignet)
+    if (!(bootopt & BOOT_PROT))
 	    return 0;
 
     ircstp->is_ckl++;

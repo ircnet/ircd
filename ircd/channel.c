@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.35 1998/04/15 18:29:24 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.36 1998/05/05 21:26:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1489,11 +1489,7 @@ char	*key;
 	Link	*lp, *banned;
 	int	ckinvite = 0;
 
-	if (chptr->users == 0 &&
-#ifndef	BIG_NET
-	    ircstp->is_bignet &&
-#endif
-	    chptr->history != 0)
+	if (chptr->users == 0 && (bootopt & BOOT_PROT) && chptr->history != 0)
 		return (timeofday > chptr->history) ? 0 : ERR_UNAVAILRESOURCE;
 	if (banned = match_modeid(CHFL_BAN, sptr, chptr))
 		if (match_modeid(CHFL_EXCEPTION, sptr, chptr))

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.18 1998/04/03 17:12:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.19 1998/05/05 21:26:56 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -38,9 +38,6 @@ char	serveropts[] = {
 #endif
 #ifndef	NO_IDENT
 'a',
-#endif
-#ifdef	BIG_NET
-'B',
 #endif
 #ifdef	CHROOTDIR
 'c',

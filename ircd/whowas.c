@@ -24,7 +24,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: whowas.c,v 1.4 1998/04/02 19:58:58 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: whowas.c,v 1.5 1998/05/05 21:26:58 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -42,7 +42,6 @@ static	void	grow_history()
 {
 	int	osize = ww_size;
 
-	ircstp->is_bignet = 1;
 	Debug((DEBUG_ERROR, "Whowas/grow_history ww:%d, lk:%d, #%d, %#x/%#x",
 			    ww_size, lk_size, numclients, was, locked));
 	ww_size = (int)((float)numclients * 1.1);
