@@ -12,6 +12,9 @@ All:
 	  behaviour as beI, it serves as a hint list for reopping opless
 	  channels. Note that clients cannot set it yet, not until 2.10 exist.
 	* CIDR support in +beIR channelmodes.
+	* +beIR channelmodes have new wildcard `#' matching any digit; note
+	  that if ban starts with digit, it will match on UID, if with '#',
+	  it will match on nickname.
 
 Client:
 	* When collision occurs, clients get their nicks forcefully changed
@@ -26,6 +29,7 @@ Client:
 	* INVITE overriding ban shows inviter's n!u@h in channel notice.
 	* Support for text representation of user modes in USER command
 	  during registration.
+
 Server:
 	* New server to server protocol, based on Unique IDs
 	* Operator broadcast message syntax has been changed to:
@@ -36,7 +40,8 @@ Server:
 	  ircd will use port from ircd.conf
 	* Added DelayedKill feature to make ircd more responsible on rehash
 	  on big servers with many clients and many klines.
-	* Added new wildcard character '#' matching any digit.
+	* New server channel &CLIENTS with clients connects, quits and nick
+	  changes (may be undefined during compilation).
 
 Admin:
 	* Newest autoconf changed localstatedir (where ircd.pid is kept)
@@ -44,13 +49,14 @@ Admin:
 	* Ability to specify outgoing IP in C: line.
 	* I:line now requires both addr and name fields to match.
 	* I:line flags
-		F - fall-through to next I: if password did not match.
-		R - restricted.
-		I - restricted, when client has no ident.
+		D - restricted, when client has no reverse DNS.
 		E - client is exempted from K: lines.
+		e - client is exempted from X: lines.
+		F - fall-through to next I: if password did not match.
+		I - restricted, when client has no ident.
 		N - disable resolved hostname to be used.
 		M - disable resolved hostname to be shown.
-		D - restricted, when client has no reverse DNS.
+		R - restricted.
 	* Reject reason sent to client can be specified in iauth.conf.
 	* Client's username and hostname are checked for valid chars.
 	* C:lines can have negative ports to disable autoconnects; these
@@ -83,4 +89,5 @@ Admin:
 		D - allows DIE
 		e - allows SET
 		T - allows TKLINE
-
+		& - allows joining &CLIENTS
+	* New config X-line.

@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.54 2004/06/30 19:15:25 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.55 2004/06/30 19:27:40 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -40,6 +40,7 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* oper-only (access granted via O: flag) &CLIENTS channel reporting
 	  (if defined) clients connects, quits, nickchanges.
 	* new way of excluding users, X:line.
+	* new wildcard (#), matching any digit.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================
