@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info24785tmp2.
+input file /tmp/sgml2info16398tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.24 1998/04/05 00:15:55 kalt Exp $
+     $Id: INSTALL.info,v 1.25 1998/04/06 13:18:32 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.5.
 
@@ -53,6 +53,10 @@ default behaviour:
 
 `--libdir=DIR'
      changes the default directory where most irc files will go.
+     (default is prefix/lib/ircd)
+
+`--logdir=DIR'
+     changes the default directory where the irc log files will go.
      (default is prefix/lib/ircd)
 
 `--resconf=FILE'
@@ -1605,39 +1609,39 @@ Tag Table:
 Node: Top123
 Node: Installing IRC-610
 Node: The configure script801
-Node: Notes for Cygwin32 users2509
-Node: The config-h file3401
-Node: Define what type of UNIX your machine uses-4067
-Node: DEBUGMODE4467
-Node: SPATH CPATH MPATH LPATH PPATH TPATH5125
-Node: CACHED_MOTD6334
-Node: CHROOTDIR6804
-Node: ENABLE_SUMMON ENABLE_USERS7128
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7664
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY8347
-Node: ZIP_LINKS ZIP_LEVEL8979
-Node: SLOW_ACCEPT9990
-Node: CLONE_CHECK10608
-Node: Other #define's10948
-Node: Editing the Makefile and compiling11273
-Node: The ircd-conf file11909
-Node: Machine information13941
-Node: Administrative info16037
-Node: Port connections18072
-Node: Connection Classes20282
-Node: Client connections25733
-Node: Operator priviliges31246
-Node: Restrict connections33366
-Node: Excluded accounts34681
-Node: Server connections38647
-Node: Deny auto-connections47086
-Node: Hub connections48459
-Node: Leaf connections49675
-Node: Version limitations51758
-Node: Excluded machines52997
-Node: Service connections54304
-Node: Bounce server55897
-Node: Default local server (for local clients) `*OBSOLETED*'57599
-Node: Related resources58482
+Node: Notes for Cygwin32 users2627
+Node: The config-h file3519
+Node: Define what type of UNIX your machine uses-4185
+Node: DEBUGMODE4585
+Node: SPATH CPATH MPATH LPATH PPATH TPATH5243
+Node: CACHED_MOTD6452
+Node: CHROOTDIR6922
+Node: ENABLE_SUMMON ENABLE_USERS7246
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7782
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY8465
+Node: ZIP_LINKS ZIP_LEVEL9097
+Node: SLOW_ACCEPT10108
+Node: CLONE_CHECK10726
+Node: Other #define's11066
+Node: Editing the Makefile and compiling11391
+Node: The ircd-conf file12027
+Node: Machine information14059
+Node: Administrative info16155
+Node: Port connections18190
+Node: Connection Classes20400
+Node: Client connections25851
+Node: Operator priviliges31364
+Node: Restrict connections33484
+Node: Excluded accounts34799
+Node: Server connections38765
+Node: Deny auto-connections47204
+Node: Hub connections48577
+Node: Leaf connections49793
+Node: Version limitations51876
+Node: Excluded machines53115
+Node: Service connections54422
+Node: Bounce server56015
+Node: Default local server (for local clients) `*OBSOLETED*'57717
+Node: Related resources58600
 
 End Tag Table

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.24 1998/04/05 00:15:56 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.25 1998/04/06 13:18:32 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.5.
 </abstract>
@@ -26,6 +26,8 @@ ircd will install using ``make install''.  This defaults
 to /usr/local
 <tag/--libdir=DIR/ changes the default directory where most
 irc files will go. (default is prefix/lib/ircd)
+<tag/--logdir=DIR/ changes the default directory where the
+irc log files will go. (default is prefix/lib/ircd)
 <tag/--resconf=FILE/ defines the file to be used by ircd to
 initialize its resolver.  (default is /etc/resolv.conf)
 <tag/--zlib-include=DIR/ specifies in which directory the

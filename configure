@@ -29,11 +29,11 @@ else
   cd "${rev}"
   echo "now working in directory ${rev}..."
   cp -p ../support/configure .
-  if test ! -f config.h
-  then
-    echo "copying config.h from config.h.dist..."
-    cp -p ../support/config.h.dist config.h
-  fi
+#  if test ! -f config.h
+#  then
+#    echo "copying config.h from config.h.dist..."
+#    cp -p ../support/config.h.dist config.h
+#  fi
   ./configure $*
   if test $? = 0
   then

@@ -73,9 +73,9 @@
  *	FNAME_CONNLOG logs every user rejected or uncomplete connection
  * These are either full paths or files within "ircd_dir" (see Makefile).
  */
-#define FNAME_USERLOG "users" /* */
-#define FNAME_OPERLOG "opers" /* */
-#define FNAME_CONNLOG "rejects" /* */
+#define FNAME_USERLOG "@logdir@users" /* */
+#define FNAME_OPERLOG "@logdir@opers" /* */
+#define FNAME_CONNLOG "@logdir@rejects" /* */
 
 /* CHROOTDIR
  *

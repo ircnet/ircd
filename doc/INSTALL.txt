@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.24 1998/04/05 00:15:56 kalt Exp $
+  $Id: INSTALL.txt,v 1.25 1998/04/06 13:18:33 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.5.
 
@@ -23,6 +23,10 @@
 
      ----lliibbddiirr==DDIIRR
         changes the default directory where most irc files will go.
+        (default is prefix/lib/ircd)
+
+     ----llooggddiirr==DDIIRR
+        changes the default directory where the irc log files will go.
         (default is prefix/lib/ircd)
 
      ----rreessccoonnff==FFIILLEE
@@ -64,6 +68,7 @@
   carefully followed the Cygwin32 installation notes.  In particular,
   you will need to make sure that the following files exist:
   //bbiinn//ccpp..eexxee, //bbiinn//mmvv..eexxee, //bbiinn//rrmm..eexxee and //bbiinn//sshh..eexxee.
+
   Also, the IRC server needs a rreessoollvv..ccoonnff file in order to initialize
   the resolver.  This file can be anywhere (see configure options), and
   is typically in //eettcc on UNIX systems.
@@ -123,12 +128,13 @@
   the server to optimize memory use.
 
 
+
+
   22..44..  CCAACCHHEEDD__MMOOTTDD
 
   The server sends the ``motd'' to every client connecting.  Every time,
   it reads it from the disk.  This is quite intensive and can be
   undesirable for busy servers.
-
 
   Defining CACHED_MOTD will make the server store the ``motd'' in
   memory, and only read it again from the disk when rehashing if the
@@ -322,7 +328,6 @@
         If the machine on which you run the server has several IP
         addresses, you can define which IP# to use for outgoing
         connections.  This overrides overrides the ``Server NAME''.
-
         See Also the ``Port Connections'' section.
 
      GGeeooggrraapphhiicc LLooccaattiioonn
@@ -394,6 +399,7 @@
         A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu
         UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello
         in Finnish today?;)::
+
         Would look like this when printed out with the /admin command:
 
         Jeff Trim -  Denver Colorado, USA INET jtrim@orion.cair.du.edu
@@ -519,6 +525,7 @@
         is still alive.  Unless you are sure of what you are doing, use
         the default value which is in your config.h file.
 
+
      CCoonnnneecctt FFrreeqquueennccyy
         By changing this number, you change how often your server checks
         to see if it can connect to this server. If you want to check
@@ -585,13 +592,13 @@
         checked every 300 seconds.  The connection is allowed to remain
         silent for 120 seconds before a PING is sent.  NOTE: fields 3 &
         4 are in seconds.  The SendQ is set to 100000 bytes.
-
         Another feature of connection class is the ability to do
         automatic routing by using the class as a ``priority''.  If you
         are connected to a server which has a class lower than one of
         the servers that is ``behind'' it, the server will disconnect
         the lower class one and schedule a ``new'' connection for the
         higher class server.
+
         Y:1:60:0:50:20000:2:5: (client class)
 
         In case of a client class, the fields are interpreted a bit
@@ -651,13 +658,13 @@
      PPaasssswwoorrdd
         The password that must be given by the client to be allowed on
         the server.
-
      TTAARRGGEETT HHoosstt NNAAMMEE
         Specifies the host name(s) of the machines allowed to connect to
         the server.  If ``user@'' prefixes the actual IP address the
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
         Wildcards are permitted.
+
         This field can be empty, it then has a special meaning.  See
         Below.
 
@@ -717,13 +724,13 @@
         and take your network ports. Of course the same things can be
         done by simply telnetting to your machine's SMTP port (for
         example).
-
         I:x::*.fi:6667:1
 
         Allow clients from machines matching ``*.fi'' to connect on the
         port 6667.
 
         I:135.11.35.*::*.net::1
+
         Allows clients from machines which host name matches ``*.net''
         or which IP address matches ``135.11.35.*'' to connect to the
         server.  If the host name does not match ``*.net'' then the IP
@@ -922,6 +929,7 @@
      PPoorrtt
         The port on which the Kill line will be effective. 0 means all
         ports.
+
      EExxaammpplleess
         K:orion.cair.du.edu::jtrim:0:
 
@@ -978,6 +986,7 @@
   other machines:
 
   +o  ``garfield.mit.edu''        - Tertiary Connection
+
 
   +o  ``irc.nada.kth.se''         - Secondary Connection
 
@@ -1120,6 +1129,7 @@
      This line says: expect a connection from host ``garfield.mit.edu'',
      and expect a login password of ``golden'', and expect the host to
      identify itself as ``garfield.mit.edu''.
+
      N:18.72.0.252::garfield.mit.edu::
 
      This line says: expect a Connection from host ``18.72.0.252'', and
@@ -1186,6 +1196,9 @@
         I advice you to not to use wildcard servers before you know for
         sure how they are used, they are mostly beneficial for backbones
         of countries and other large areas with common domain.
+
+
+
   44..1100..  DDeennyy aauuttoo--ccoonnnneeccttiioonnss
 
 
@@ -1304,6 +1317,7 @@
         which doesnt have an L-line for it, the one which does will drop
         the connection, once again making the server a leaf.
 
+
      FFoorrmmaatt
 
         L:<Server Mask>:*:<Server Name>:<Max Depth>:
@@ -1316,7 +1330,6 @@
         be used within this field for matching purposes.  If this field
         is empty, it acts the same as if it were a single * (ie matches
         everything).
-
 
      SSeerrvveerr NNaammee
         The name of the server connected to you that for which you want
@@ -1449,7 +1462,6 @@
      CCllaassss
         The class field should refer to an existing class.
 
-
      NNootteess
         A service is not a very useful sort of client, it cannot join
         channels or issue certain commands although most are available
@@ -1504,7 +1516,6 @@
         ``irc.stealth.net'' on port 6660.
 
         B:*.fi::irc.funet.fi:6667:
-
         Finnish client should use irc.funet.fi when they cannot be taken
         anymore.
 
@@ -1512,8 +1523,6 @@
 
         When the server is completely full, clients should use the
         secondary server.
-
-
 
 
   44..1177..  DDeeffaauulltt llooccaall sseerrvveerr ((ffoorr llooccaall cclliieennttss)) **OOBBSSOOLLEETTEEDD**
@@ -1561,15 +1570,6 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
-
-
-
-
-
 
 
 

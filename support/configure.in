@@ -757,6 +757,7 @@ includedir='${prefix}/include'
 oldincludedir='/usr/include'
 infodir='${prefix}/info'
 mandir='${prefix}/man'
+logdir=''
 
 # Initialize some other variables.
 subdirs=
@@ -878,6 +879,7 @@ Directory and file names:
   --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc in DIR [/usr/include]
+  --logdir=DIR            log files in DIR [PREFIX/logs]
   --infodir=DIR           info documentation in DIR [PREFIX/info]
   --mandir=DIR            man documentation in DIR [PREFIX/man]
   --srcdir=DIR            find the sources in DIR [configure dir or ..]
@@ -944,6 +946,11 @@ EOF
   | --localstate=* | --localstat=* | --localsta=* | --localst=* \
   | --locals=* | --local=* | --loca=* | --loc=* | --lo=*)
     localstatedir="$ac_optarg" ;;
+
+  -logdir | --logdir | --logdi | --logd)
+    ac_prev=logdir ;;
+  -logdir=* | --logdir=* | --logdi=* | --logd=*)
+    logdir="$ac_optarg/" ;;
 
   -mandir | --mandir | --mandi | --mand | --man | --ma | --m)
     ac_prev=mandir ;;
@@ -1132,6 +1139,8 @@ done
 if test -n "$ac_prev"; then
   AC_MSG_ERROR(missing argument to --`echo $ac_prev | sed 's/_/-/g'`)
 fi
+
+AC_SUBST(logdir)
 ])
 
 
@@ -1313,7 +1322,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.19 1998/02/17 20:27:47 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.20 1998/04/06 13:18:36 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1389,5 +1398,5 @@ IRC_STDARG
 IRC_PATH_RESCONF
 IRC_ALPHA_BETA
 
-AC_OUTPUT(Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../ircd/crypt/sums.in)
+AC_OUTPUT(Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../ircd/crypt/sums.in config.h:../support/config.h.dist)
 AC_OUTPUT_COMMANDS(chmod a+x version.c.SH)
