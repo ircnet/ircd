@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: match.c,v 1.11 2003/10/18 15:31:28 q Exp $";
+static  char rcsid[] = "@(#)$Id: match.c,v 1.12 2004/06/02 13:59:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -363,8 +363,8 @@ int	isvalidusername(char *username)
 		}
 	}
 	/* we require at least one alphanum and no more than
-	   one nonalphanum */
-	if (nan > 1 || an == 0)
+	   two nonalphanum */
+	if (nan > 2 || an == 0)
 	{
 		return 0;
 	}
