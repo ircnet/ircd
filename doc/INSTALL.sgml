@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.47 2004/02/22 20:23:13 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.48 2004/03/04 13:49:30 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0.
 </abstract>
@@ -517,6 +517,7 @@ pass through your machine.
 <tag/Format/
 <verb>I:&lt;TARGET Host Addr&gt;:&lt;Password&gt;:&lt;TARGET Hosts NAME&gt;:&lt;Port&gt;:&lt;Class&gt;:&lt;Flags&gt;</verb>
 <tag/Note/Lower case ``i'' is equal to an ``R'' flag in plain ``I''.
+Lower case ``i'' will be removed in the next version.
 <tag/TARGET Host Addr/Specifies the IP address(es) of the
 machine(s) that are allowed to connect.  If ``user@''
 prefixes the actual IP address the server will require that
@@ -524,21 +525,19 @@ the remote username returned by the ident server be the same
 as the one given before the ``@''.  Wildcards are permitted
 unless using a bitmask (e.g. 1.2.3.0/24). Note that bitmask
 are encouraged over wildcards, as they are more accurate.
+<p>Empty field is equal to '*' (matches any).
 <tag/Password/The password that must be given by the client
 to be allowed on the server.
 <tag/TARGET Host NAME/Specifies the host name(s) of the
 machines allowed to connect to the server.  If ``user@''
-prefixes the actual IP address the server will require that
+prefixes the actual name the server will require that
 the remote username returned by the ident server be the same
 as the one given before the ``@''.  Wildcards are permitted,
 but <bf>please</bf> rather leave this field empty and use bitmask
 in <bf>Host Addr</bf> field.
-<p>
-This field can be empty, it then has a special meaning.  See
-below.
-<p>
-Using this field to enforce that clients have no Host Name set
-is obsolete, see ``N'' <bf>flag</bf>.
+<p>Empty field is equal to '*' (matches any).
+<p>Using this field to enforce that clients have no Host Name set
+is not working. Use ``N'' <bf>flag</bf>.
 <tag/Port/Specifies the port number for which this
 configuration line is valid.  An empty field, or ``0''
 matches all ports.
@@ -548,31 +547,29 @@ allowed on the server.
 <tag/Flags/This field contains flags of an I:line; flags are
 one character in size, can be combined and their order does not matter.
 <itemize>
+<item>F - fall-through to next I:line if password did not match
 <item>R - restricted
-<item>D - restricted, when client has no reverse DNS
 <item>I - restricted, when client has no ident.
 <item>E - client is exempted from K: lines
-<item>N - do not show resolved hostname (bans still match)
-<item>F - fall-through to next I:line if password not matched
+<item>N - disable resolved host name to be used (clients appear with IP)
+<item>D - restricted, when client has no reverse DNS
 </itemize>
 <tag/Note/Restricted I: line means that
 clients matching such I line will not be able to use their operator
 privileges (no nick/mode change, no kick). Such users will also
 have their username prefixed by +, = or - depending on the ident reply.
-<tag/Note/The server first checks if the client hostname (or
+
+<tag/Note/The server checks if the client hostname (or
 any aliases) matches the <bf>TARGET Host NAME</bf> field.
-If a match is found, the client is accepted.  If not, the
-server checks if the IP address of the client matches the
-<bf>TARGET Host Addr</bf> field.  The matching field is used
-to set the name of the client: for example, if the client
-matches the <bf>TARGET Host Addr</bf> field, it will show on
-IRC with a numerical address (even if this address is
-resolvable).  If the <bf>TARGET Host NAME</bf> field is
-empty, then the host name is always used (when available).
+If a match is found, server checks <bf>TARGET Host Addr</bf> field.
+If a match is found, the client is accepted.
+If ``N'' flag is not used and the host name is available, it
+is used -- either matching <bf>TARGET Host NAME</bf> field or,
+if this field is empty, first returned by DNS. Using ``N'' flag
+sets the name of the client to its IP.
 <tag/Examples/
 For example, if you were installing IRC on tolsun.oulu.fi
-and you wanted to allow examples sake let us assume you were
-making this file for tolsun and you wanted to let your own
+and you wanted to let your own
 clients to connect to your server, you would add this entry
 to the file:
 <p>
@@ -588,9 +585,8 @@ Allow any clients from machines whose names end in
 <p>
 I:128.214.6.100::nic.funet.fi::1
 <p>
-Allow clients from a machine with that IP number to
-connect. Numeric match is enough, name is not required
-anymore.
+Allow clients from a machine with that IP number <bf>and</bf>
+that hostname to connect.
 <p>
 I::secret:*.tut.fi::1
 <p>
@@ -599,14 +595,7 @@ with the password ``secret''.
 <p>
 I:::*::1
 <p>
-Allow anyone from anywhere to connect your server.
-<p>
-This is the easiest way, but it also allows people to for
-example dump files to your server, or connect 1000 (or how
-many open sockets per process your OS allows) clients to
-your machine and take your network ports. Of course the same
-things can be done by simply telnetting to your machine's
-SMTP port (for example).
+Allow anyone from anywhere to connect to your server.
 <p>
 I:::*.fi:6667:1
 <p>
@@ -616,10 +605,18 @@ the port 6667.
 I:135.11.35.0/24::*.net::1
 <p>
 Allows clients from machines which host name matches
-``*.net'' or which IP address is within block ``135.11.35.0/24'' to
+``*.net'' <bf>and</bf> which IP address is within block ``135.11.35.0/24'' to
+connect to the server.
+<p>
+I:135.11.35.0/24::::1:N
+I:135.11.35.0/24::*.net::1
+<p>
+This set of two I:lines 
+allows clients from machines which host name matches
+``*.net'' <bf>and</bf> which IP address is within block ``135.11.35.0/24'' to
 connect to the server.  If the host name does not match
-``*.net'' then the IP address is used for these clients,
-even if the host name is known.
+``*.net'' then another I:line is used and because of ``N'' flag,
+the IP address is used for these clients, even if the host name is known.
 <p>
 I:135.11.35.0/24::::1
 <p>
