@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.51 1999/01/15 20:12:48 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.52 1999/02/03 22:12:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1065,7 +1065,16 @@ aClient	*cptr;
 	sendto_one(cptr, "SERVER %s 1 :%s",
 		   my_name_for_link(ME, aconf->port), me.info);
 	if (!IsDead(cptr))
+	    {
 		start_auth(cptr);
+#if defined(USE_IAUTH)
+		/*
+		** This could become a bug.. but I don't think iauth needs the
+		** hostname/aliases in this case. -kalt
+		*/
+		sendto_iauth("%d d", cptr->fd);
+#endif
+	    }
 
 	return (IsDead(cptr)) ? -1 : 0;
 }
