@@ -492,6 +492,9 @@ irc_precode='#ifdef HAVE_SYS_TYPES_H
 #if HAVE_SIGNAL_H
 #include <signal.h>
 #endif
+#if HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
 
 RETSIGTYPE alarmed()
 {
@@ -500,7 +503,8 @@ RETSIGTYPE alarmed()
 
 main()
 {
-  char b[12], x[32];
+  char b[12];
+  struct sockaddr_in x;
   int f, l = sizeof(x);
   f = socket(AF_INET, SOCK_DGRAM, 0);
   if (f >= 0 && !(fcntl(f, F_SETFL, '
@@ -508,7 +512,7 @@ irc_postcode=')))
     {
       signal(SIGALRM, alarmed);
       alarm(3);
-      recvfrom(f, b, 12, 0, x, &l);
+      recvfrom(f, b, 12, 0, &x, &l);
       alarm(0);
       exit(0);
     }
@@ -1311,7 +1315,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.14 1997/10/13 17:42:29 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.15 1997/10/18 13:42:12 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1333,7 +1337,7 @@ IRC_LINUX
 
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(stdio.h stdlib.h sys/types.h sys/bitypes.h stddef.h stdarg.h unistd.h ctype.h memory.h curses.h cursesX.h errno.h sys/errno.h sys/syscall.h pwd.h math.h utmp.h fcntl.h signal.h sys/ioctl.h sys/file.h sys/filio.h sys/socket.h sys/stat.h sys/resource.h sys/select.h sys/poll.h stropts.h netdb.h netinet/in.h sys/un.h arpa/inet.h sys/param.h syslog.h sys/syslog.h string.h strings.h sys/time.h time.h sys/times.h netinet/in_systm.h netinfo/ni.h)
+AC_CHECK_HEADERS(stdio.h stdlib.h sys/types.h sys/bitypes.h stddef.h stdarg.h unistd.h ctype.h memory.h curses.h cursesX.h term.h sgtty.h errno.h sys/errno.h sys/syscall.h pwd.h math.h utmp.h fcntl.h signal.h sys/ioctl.h sys/file.h sys/filio.h sys/socket.h sys/stat.h sys/resource.h sys/select.h sys/poll.h stropts.h netdb.h netinet/in.h sys/un.h arpa/inet.h sys/param.h syslog.h sys/syslog.h string.h strings.h sys/time.h time.h sys/times.h netinet/in_systm.h netinfo/ni.h)
 IRC_DECL_SYS_ERRLIST
 IRC_DECL_SYS_NERR
 IRC_DECL_ERRNO

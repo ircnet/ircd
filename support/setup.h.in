@@ -219,6 +219,12 @@
 /* Define if you have the setpgrp function.  */
 #undef HAVE_SETPGRP
 
+/* Define if you have the sigaction function.  */
+#undef HAVE_SIGACTION
+
+/* Define if you have the sigset function.  */
+#undef HAVE_SIGSET
+
 /* Define if you have the strchr function.  */
 #undef HAVE_STRCHR
 
@@ -275,6 +281,9 @@
 
 /* Define if you have the <pwd.h> header file.  */
 #undef HAVE_PWD_H
+
+/* Define if you have the <sgtty.h> header file.  */
+#undef HAVE_SGTTY_H
 
 /* Define if you have the <signal.h> header file.  */
 #undef HAVE_SIGNAL_H
@@ -353,6 +362,9 @@
 
 /* Define if you have the <syslog.h> header file.  */
 #undef HAVE_SYSLOG_H
+
+/* Define if you have the <term.h> header file.  */
+#undef HAVE_TERM_H
 
 /* Define if you have the <time.h> header file.  */
 #undef HAVE_TIME_H

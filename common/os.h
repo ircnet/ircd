@@ -445,9 +445,10 @@ extern char *inet_ntoa __P((struct in_addr in));
 #define	HAVE_RELIABLE_SIGNALS
 #endif
 
-/*  Curses/Termcap portability problems.
+/*  Curses/Termcap portability problems (client only).
  */
 
+#ifdef CLIENT_COMPILE
 #if USE_NCURSES || USE_CURSESX || USE_CURSES
 # define DOCURSES
 # if USE_CURSESX && HAVE_CURSESX_H
@@ -458,13 +459,17 @@ extern char *inet_ntoa __P((struct in_addr in));
 # endif
 #else
 # undef DOCURSES
-#endif
+#endif /* USE_NCURSES || ... */
 
 #if USE_TERMCAP
 # define DOTERMCAP
+# if HAVE_SGTTY_H
+#  include <sgtty.h>
+# endif
 #else
 # undef DOTERMCAP
-#endif
+#endif /* USE_TERMCAP */
+#endif /* CLIENT_COMPILE */
 
 /*  ctime portability problems.
  */
@@ -555,6 +560,8 @@ extern struct hostent *_switch_gethostbyname_r __P((const char *name,
 # else
 #  define SELECT_FDSET_TYPE fd_set
 # endif
+#else /* should not be here - due to irc/c_bsd.c that does not support poll */
+# define SELECT_FDSET_TYPE fd_set
 #endif /* USE_POLL */
 
 /*  <sys/wait.h> POSIX.1 portability problems - HAVE_SYS_WAIT_H is defined
