@@ -46,7 +46,7 @@ Operator:
 	* New server channel &CLIENTS with clients connects, quits and nick
 	  changes (may be undefined during compilation).
 	* New command: TKLINE (syntax: TKLINE seconds user@host :reason),
-	  available for services and (depending on O: flag) opers.
+	  available for services and (depending on O-line flag) opers.
 
 Admin:
 	* File layout changed slightly:
@@ -59,20 +59,20 @@ Admin:
 	  - log file names changed from $(logdir)/{users,rejects,auth}
 	    to $(logdir)/ircd.{users,rejects,auth}
 	  - config and log file names depend on $(IRCD) name.
-	* Ability to specify outgoing IP in C: line.
-	* I:line now requires both addr and name fields to match.
-	* I:line flags
+	* Ability to specify outgoing IP in C-line.
+	* I-line now requires both addr and name fields to match.
+	* I-line flags
 		D - restricted, when client has no reverse DNS.
-		E - client is exempted from K: lines.
-		e - client is exempted from X: lines.
-		F - fall-through to next I: if password did not match.
+		E - client is exempted from K-lines.
+		e - client is exempted from X-lines.
+		F - fall-through to next I-line if password did not match.
 		I - restricted, when client has no ident.
 		N - disable resolved hostname to be used.
 		M - disable resolved hostname to be shown.
 		R - restricted.
 	* Reject reason sent to client can be specified in iauth.conf.
 	* Client's username and hostname are checked for valid chars.
-	* C:lines can have negative ports to disable autoconnects; these
+	* C-lines can have negative ports to disable autoconnects; these
 	  will be used when CONNECT with port "0" is used.
 	* STATS ? shows quick information about connected servers.
 	* STATS f, avaible to local operators only, shows detailed
@@ -85,7 +85,7 @@ Admin:
 	  set.
 	* Stats l/L shows count in Bytes, not kBytes.
 	* SERVICE command changed, it uses SID now.
-	* O:line flags for better control
+	* O-line flags for better control
 		L - local operator (disables all remote functions)
 		P - removes penalty
 		p - allows flooding
@@ -110,3 +110,4 @@ Admin:
 	* New module to iauth: mod_webproxy.
 	* socks and webproxy modules can connect to different ports.
 	* "delayed" execution mode for iauth.
+	* P-line flags

@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.7 from
-/tmp/linuxdoc-dir-4096/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-7027/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.73 2005/01/31 13:14:06 chopin Exp $
+     $Id: INSTALL.info,v 1.74 2005/02/15 21:01:37 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -148,8 +148,9 @@ This is done by editing the "config.h" file and changing the various
 
 * DEBUGMODE::
 * CHROOTDIR::
-* ENABLE_SUMMON ENABLE_USERS::
-* NO_DEFAULT_INVISIBLE::
+* USERS_RFC1459 USERS_SHOWS_UTMP::
+* ENABLE_SUMMON::
+* DEFAULT_INVISIBLE::
 * OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---::
 * ZIP_LINKS ZIP_LEVEL::
 * SLOW_ACCEPT::
@@ -173,7 +174,7 @@ this induces a large overhead for the server as it does a large amount
 of self diagnostics whilst running.
 
 
-File: INSTALL.info,  Node: CHROOTDIR,  Next: ENABLE_SUMMON ENABLE_USERS,  Prev: DEBUGMODE,  Up: The config-h file
+File: INSTALL.info,  Node: CHROOTDIR,  Next: USERS_RFC1459 USERS_SHOWS_UTMP,  Prev: DEBUGMODE,  Up: The config-h file
 
 2.2 CHROOTDIR
 =============
@@ -184,30 +185,41 @@ setting up chroot environment for ircd and run it from there, not
 requiring to run as root.
 
 
-File: INSTALL.info,  Node: ENABLE_SUMMON ENABLE_USERS,  Next: NO_DEFAULT_INVISIBLE,  Prev: CHROOTDIR,  Up: The config-h file
+File: INSTALL.info,  Node: USERS_RFC1459 USERS_SHOWS_UTMP,  Next: ENABLE_SUMMON,  Prev: CHROOTDIR,  Up: The config-h file
 
-2.3 ENABLE_SUMMON ENABLE_USERS
-==============================
+2.3 USERS_RFC1459 USERS_SHOWS_UTMP
+==================================
 
-For security conscious server admins, they may wish to leave
-ENABLE_USERS undefined, disabling the USERS command which can be used
-to glean information the same as finger can.  ENABLE_SUMMON toggles
-whether the server will attempt to summon local users to irc by writing
-a message similar to that from talk(1) to a user's tty.
+Leaving USERS_RFC1459 undefined makes ircd return RPL_LOCALUSERS and
+RPL_GLOBALUSERS numerics (part of NAMES). Defining USERS_RFC1459 makes
+USERS command to behave like it is defined in RFC. If defined, security
+conscious server admins may still wish to leave USERS_SHOWS_UTMP
+undefined, effectively disabling the USERS command which can be used to
+glean information the same as finger can.
 
 
-File: INSTALL.info,  Node: NO_DEFAULT_INVISIBLE,  Next: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---,  Prev: ENABLE_SUMMON ENABLE_USERS,  Up: The config-h file
+File: INSTALL.info,  Node: ENABLE_SUMMON,  Next: DEFAULT_INVISIBLE,  Prev: USERS_RFC1459 USERS_SHOWS_UTMP,  Up: The config-h file
 
-2.4 NO_DEFAULT_INVISIBLE
-========================
+2.4 ENABLE_SUMMON
+=================
 
-The NO_DEFAULT_INVISIBLE define is used to toggle whether clients are
+ENABLE_SUMMON toggles whether the server will attempt to summon local
+users to irc by writing a message similar to that from talk(1) to a
+user's tty.
+
+
+File: INSTALL.info,  Node: DEFAULT_INVISIBLE,  Next: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---,  Prev: ENABLE_SUMMON,  Up: The config-h file
+
+2.5 DEFAULT_INVISIBLE
+=====================
+
+The DEFAULT_INVISIBLE define is used to toggle whether clients are
 automatically made invisible when they register.
 
 
-File: INSTALL.info,  Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---,  Next: ZIP_LINKS ZIP_LEVEL,  Prev: NO_DEFAULT_INVISIBLE,  Up: The config-h file
+File: INSTALL.info,  Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---,  Next: ZIP_LINKS ZIP_LEVEL,  Prev: DEFAULT_INVISIBLE,  Up: The config-h file
 
-2.5 OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET--
+2.6 OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET--
 =======================================================================
 
 Any operator priviledge can be precisely applied to a given user using
@@ -217,7 +229,7 @@ some of above thus disabling access to corresponding command at all.
 
 File: INSTALL.info,  Node: ZIP_LINKS ZIP_LEVEL,  Next: SLOW_ACCEPT,  Prev: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---,  Up: The config-h file
 
-2.6 ZIP_LINKS ZIP_LEVEL
+2.7 ZIP_LINKS ZIP_LEVEL
 =======================
 
 As of the 2.9.3 version of the server, server-server connections may be
@@ -238,7 +250,7 @@ Comments) 1950 to 1952 in the files
 
 File: INSTALL.info,  Node: SLOW_ACCEPT,  Next: CLONE_CHECK,  Prev: ZIP_LINKS ZIP_LEVEL,  Up: The config-h file
 
-2.7 SLOW_ACCEPT
+2.8 SLOW_ACCEPT
 ===============
 
 This option is undefined by default, however is needed on some OSes.
@@ -253,7 +265,7 @@ decide to keep SLOW_ACCEPT undefined you MUST define CLONE_CHECK.
 
 File: INSTALL.info,  Node: CLONE_CHECK,  Next: Other #define's,  Prev: SLOW_ACCEPT,  Up: The config-h file
 
-2.8 CLONE_CHECK
+2.9 CLONE_CHECK
 ===============
 
 This option is defined by default and acts as a wrapper, by checking
@@ -264,8 +276,8 @@ within 2 seconds.
 
 File: INSTALL.info,  Node: Other #define's,  Prev: CLONE_CHECK,  Up: The config-h file
 
-2.9 Other #define's
-===================
+2.10 Other #define's
+====================
 
 The rest of the user changable #define's should be pretty much self
 explanatory in the config.h file.  It is *NOT* recommended that any of
@@ -1803,36 +1815,37 @@ Node: The configure script879
 Node: Notes for Cygwin32 users3177
 Node: Notes concerning IPv6 support3918
 Node: The config-h file4407
-Node: DEBUGMODE4966
-Node: CHROOTDIR5551
-Node: ENABLE_SUMMON ENABLE_USERS5928
-Node: NO_DEFAULT_INVISIBLE6447
-Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---6805
-Node: ZIP_LINKS ZIP_LEVEL7340
-Node: SLOW_ACCEPT8385
-Node: CLONE_CHECK9023
-Node: Other #define's9394
-Node: Editing the Makefile and compiling9724
-Node: The ircd-conf file11450
-Node: Machine information13951
-Node: Administrative info16574
-Node: Port connections18733
-Node: Connection Classes20890
-Node: Client connections26195
-Node: Operator priviliges31982
-Node: Excluded accounts35292
-Node: X Excluded accounts39213
-Node: Server connections40511
-Node: Deny auto-connections49149
-Node: Hub connections50728
-Node: Leaf connections52226
-Node: Version limitations54320
-Node: Excluded machines56088
-Node: Service connections57403
-Node: Bounce server59007
-Node: Related resources60878
-Node: Reporting a bug61921
-Node: How to report a bug62182
-Node: Where to send a bug report63201
+Node: DEBUGMODE4985
+Node: CHROOTDIR5570
+Node: USERS_RFC1459 USERS_SHOWS_UTMP5951
+Node: ENABLE_SUMMON6539
+Node: DEFAULT_INVISIBLE6860
+Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7193
+Node: ZIP_LINKS ZIP_LEVEL7725
+Node: SLOW_ACCEPT8770
+Node: CLONE_CHECK9408
+Node: Other #define's9779
+Node: Editing the Makefile and compiling10111
+Node: The ircd-conf file11837
+Node: Machine information14338
+Node: Administrative info16961
+Node: Port connections19120
+Node: Connection Classes21277
+Node: Client connections26582
+Node: Operator priviliges32369
+Node: Excluded accounts35679
+Node: X Excluded accounts39600
+Node: Server connections40898
+Node: Deny auto-connections49536
+Node: Hub connections51115
+Node: Leaf connections52613
+Node: Version limitations54707
+Node: Excluded machines56475
+Node: Service connections57790
+Node: Bounce server59394
+Node: Related resources61265
+Node: Reporting a bug62308
+Node: How to report a bug62569
+Node: Where to send a bug report63588
 
 End Tag Table
