@@ -16,6 +16,7 @@
 	  improper info in server field).
 	* version.c.SH.in: INFO update.
 	* s_conf.c, chkconf.c: removed U:lines.
+	* s_err.c, s_user.c/save_user(): added UID to RPL_SAVENICK.
 
 2004-02-12  Piotr Kucharski
 
