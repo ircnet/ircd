@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.53 1999/06/07 21:01:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.54 1999/06/21 02:03:47 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1196,14 +1196,15 @@ char *filename;
 		if (write(fd, buf, strlen(buf)) == -1)
 			sendto_flag(SCH_ERROR,
 				    "Failed (%d) to write tune file: %s.",
-				    errno, filename);
+				    errno, basename(filename));
 		else
-			sendto_flag(SCH_NOTICE, "Updated %s.", filename);
+			sendto_flag(SCH_NOTICE, "Updated %s.",
+				    basename(filename));
 		close(fd);
 	    }
 	else
 		sendto_flag(SCH_ERROR, "Failed (%d) to open tune file: %s.",
-			    errno, filename);
+			    errno, basename(filename));
 }
 
 /*

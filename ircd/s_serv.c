@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.62 1999/06/16 22:20:00 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.63 1999/06/21 02:03:47 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2006,7 +2006,8 @@ aClient	*cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	sendto_one(sptr, rpl_str(RPL_REHASHING, parv[0]), configfile);
+	sendto_one(sptr, rpl_str(RPL_REHASHING, parv[0]),
+		   basename(configfile));
 	sendto_flag(SCH_NOTICE,
 		    "%s is rehashing Server config file", parv[0]);
 #ifdef USE_SYSLOG
