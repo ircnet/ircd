@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.187 2004/02/21 19:29:15 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.188 2004/02/22 16:40:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2614,6 +2614,11 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* make sure user isn't already on channel */
 		if (IsMember(acptr, chptr))
 		    {
+			/* I know, it's hiding the bug under the carpet. But
+			** all 2.10 servers have this bug (and ignore it!),
+			** so we don't show it for them. --B. */
+			if (ST_UID(sptr))
+			{
 			sendto_flag(SCH_ERROR, "NJOIN protocol error from %s"
 				" (%s already on %s)",
 				    get_client_name(cptr, TRUE), acptr->name,
@@ -2621,6 +2626,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			sendto_one(cptr, "ERROR :NJOIN protocol error"
 				" (%s already on %s)",
 				acptr->name, chptr->chname);
+			}
 			continue;
 		    }
 		/* add user to channel */
