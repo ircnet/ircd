@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.98 2005/01/30 16:59:41 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.99 2005/01/30 17:26:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -142,42 +142,17 @@ int	send_message(aClient *to, char *msg, int len)
 	    }
 	if (IsDead(to))
 		return 0; /* This socket has already been marked as dead */
-	if (DBufLength(&to->sendQ) > get_sendq(to, CBurst(to)))
+	if (DBufLength(&to->sendQ) > (i=get_sendq(to, CBurst(to))))
 	{
-# ifdef HUB
-		if (CBurst(to))
+		to->exitc = EXITC_SENDQ;
+		if (IsService(to) || IsServer(to))
 		{
-			/* Allow bursting clients (servers or services) to
-			 * exceed their maxsendq. --B. */
-#  ifdef MAXSENDQ_NOTICES
-			static	time_t	lastnotice = 0;
-
-			/* It's total, not per destination, so it can
-			 * happen some notices escape us. Better this
-			 * than getting 50Hz notices. --B. */
-			if (timeofday - lastnotice >= 60)
-			{
-				sendto_flag(SCH_NOTICE, "Max SendQ limit "
-					"exceeded for %s: %d > %d",
-					to->name,
-					DBufLength(&to->sendQ), get_sendq(to, CBurst(to)));
-				lastnotice = timeofday;
-			}
-#  endif
-		}
-		else
-# endif
-		{
-			to->exitc = EXITC_SENDQ;
-			if (IsService(to) || IsServer(to))
-			{
-				return dead_link(to,
+			return dead_link(to,
 				"Max SendQ limit exceeded for %s: %d > %d",
-					get_client_name(to, FALSE),
-					DBufLength(&to->sendQ), get_sendq(to, CBurst(to)));
-			}
-			return dead_link(to, "Max Sendq exceeded");
+				get_client_name(to, FALSE),
+				DBufLength(&to->sendQ), i);
 		}
+		return dead_link(to, "Max Sendq exceeded");
 	}
 # ifdef	ZIP_LINKS
 	/*
