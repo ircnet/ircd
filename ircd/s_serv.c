@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.195 2004/06/12 22:28:36 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.196 2004/06/15 11:07:52 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -575,12 +575,6 @@ static	void	send_server_burst(aClient *cptr, aClient *acptr)
 int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-
-	if (parc < 3)
-	{
-		return exit_client(cptr, cptr, &me,
-			"Not enough parameters to SMASK");
-	}
 
 	if (!sid_valid(parv[1]))
 	{
