@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.188 2004/03/07 00:42:05 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.189 2004/03/07 03:09:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -595,8 +595,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			return exit_client(cptr, sptr, &me, (reason) ? buf :
 					   "K-lined");
 		    }
-		if (oldstatus == STAT_MASTER && MyConnect(sptr))
-			(void)m_oper(&me, sptr, 1, parv);
 		sp = user->servp;
 	    }
 	else

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.113 2004/03/07 03:02:14 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.114 2004/03/07 03:09:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -167,7 +167,7 @@ void	server_reboot()
 	if ((bootopt & BOOT_CONSOLE) || isatty(0))
 		(void)close(0);
 	ircd_writetune(tunefile);
-	if (!(bootopt & (BOOT_INETD|BOOT_OPER)))
+	if (!(bootopt & BOOT_INETD))
 	    {
 		(void)execv(IRCD_PATH, myargv);
 #ifdef USE_SYSLOG
@@ -652,7 +652,7 @@ static	void	setup_me(aClient *mp)
 static	int	bad_command(void)
 {
   (void)printf(
-	 "Usage: ircd [-a] [-b] [-c]%s [-h servername] [-q] [-o] [-i]"
+	 "Usage: ircd [-a] [-b] [-c]%s [-h servername] [-q] [-i]"
 	 "[-T tunefile] [-p (strict|on|off)] [-s] [-v] [-t] %s\n",
 #ifdef CMDLINE_CONFIG
 	 " [-f config]",
@@ -758,10 +758,6 @@ int	main(int argc, char *argv[])
 		    case 'q':
 			bootopt |= BOOT_QUICK;
 			break;
-		    case 'o': /* Per user local daemon... */
-                        (void)setuid((uid_t)uid);
-			bootopt |= BOOT_OPER;
-		        break;
 #ifdef CMDLINE_CONFIG
 		    case 'f':
                         (void)setuid((uid_t)uid);
@@ -1021,17 +1017,6 @@ int	main(int argc, char *argv[])
 		    exit(5);
 	    }
 	
-	if (bootopt & BOOT_OPER)
-	    {
-		aClient *tmp = add_connection(&me, 0);
-
-		if (!tmp)
-			exit(1);
-		SetMaster(tmp);
-		local[0] = tmp;
-	    }
-
-
 	Debug((DEBUG_NOTICE,"Server ready..."));
 #ifdef USE_SYSLOG
 	syslog(LOG_NOTICE, "Server Ready: v%s (%s #%s)", version, creation,
@@ -1050,10 +1035,6 @@ int	main(int argc, char *argv[])
 	mysrand(timeofday);
 	
 	daemonize();	
-	if (!(bootopt & BOOT_OPER))
-	{
-		write_pidfile();
-	}
 	dbuf_init();
 	
 	serverbooting = 0;

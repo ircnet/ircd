@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.119 2004/03/07 03:02:14 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.120 2004/03/07 03:09:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -631,7 +631,7 @@ void	daemonize(void)
 		(void)close(2);
 
 	if (((bootopt & BOOT_CONSOLE) || isatty(0)) &&
-	    !(bootopt & (BOOT_INETD|BOOT_OPER)))
+	    !(bootopt & BOOT_INETD))
 	    {
 		if (fork())
 			exit(0);

@@ -1,5 +1,5 @@
 .\" @(#)$Id ircd.8 2.0 (beta version) 29 Mar 1989 $
-.TH IRCD 8 "$Date: 1999/04/08 22:12:19 $"
+.TH IRCD 8 "$Date: 2004/03/07 03:09:34 $"
 .SH NAME
 ircd \- The Internet Relay Chat Program Server 
 .SH SYNOPSIS
@@ -62,22 +62,6 @@ up ircd automatically when needed:
 ircd stream tcp wait irc /etc/ircd ircd \-i
 
 allows inetd to start up ircd on request.
-.TP
-.B \-o
-Starts up a local ircdaemon. Standard input can be used to send IRC
-commands to the daemon. The user logging in from standard input will
-be given operator privileges on this local ircd. If ircd is a setuid program,
-it will call setuid(getuid()) before going to local mode. This option
-can be used in inetd.conf to allow users to open their own irc clients
-by simply connecting their clients to the correct ports. For example:
-.TP
-.B
-irc stream tcp nowait irc /etc/ircd ircd \\-f/etc/ircd.conf \\-o
-
-allows users connecting to irc port (specified in /etc/services) to start
-up their own ircdaemon. The configuration file should be used to check from
-which hosts these connections are allowed from. This option also turns
-on the autodie option -a.
 .TP
 .B \-q
 Using this option stops the server from doing DNS lookups on all the

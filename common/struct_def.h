@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.88 2004/03/07 03:02:13 chopin Exp $
+ *   $Id: struct_def.h,v 1.89 2004/03/07 03:09:34 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -104,14 +104,13 @@ typedef struct        LineItem aExtData;
 #define	BOOT_DEBUG	0x004
 #define	BOOT_INETD	0x008
 #define	BOOT_TTY	0x010
-#define	BOOT_OPER	0x020
+
 #define	BOOT_AUTODIE	0x040
 #define	BOOT_BADTUNE	0x080
 #define	BOOT_PROT	0x100
 #define	BOOT_STRICTPROT	0x200
 #define	BOOT_NOIAUTH	0x400
 
-#define	STAT_MASTER	-5	/* Local ircd master before identification */
 #define	STAT_CONNECTING	-4
 #define	STAT_HANDSHAKE	-3
 #define	STAT_UNKNOWN	-2
@@ -129,13 +128,11 @@ typedef struct        LineItem aExtData;
 #define	IsConnecting(x)		((x)->status == STAT_CONNECTING)
 #define	IsHandshake(x)		((x)->status == STAT_HANDSHAKE)
 #define	IsMe(x)			((x)->status == STAT_ME)
-#define	IsUnknown(x)		((x)->status == STAT_UNKNOWN || \
-				 (x)->status == STAT_MASTER)
+#define	IsUnknown(x)		((x)->status == STAT_UNKNOWN)
 #define	IsServer(x)		((x)->status == STAT_SERVER)
 #define	IsClient(x)		((x)->status == STAT_CLIENT)
 #define	IsService(x)		((x)->status == STAT_SERVICE && (x)->service)
 
-#define	SetMaster(x)		((x)->status = STAT_MASTER)
 #define	SetConnecting(x)	((x)->status = STAT_CONNECTING)
 #define	SetHandshake(x)		((x)->status = STAT_HANDSHAKE)
 #define	SetMe(x)		((x)->status = STAT_ME)
