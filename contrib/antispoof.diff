@@ -424,7 +424,7 @@ diff -urN irc-cvs/ircd/s_user.c irc-cvs-nospoof/ircd/s_user.c
 +
 + 	if (parc < 2 || *parv[1] == '\0')
  	    {
- 		sendto_one(sptr, err_str(ERR_NOORIGIN, parv[0]));
+ 		sendto_one(sptr, replies[ERR_NOORIGIN], ME, BadTo(parv[0]));
  		return 1;
 diff -urN irc-cvs/support/Makefile.in irc-cvs-nospoof/support/Makefile.in
 --- irc-cvs/support/Makefile.in	Fri Mar 12 20:06:00 1999

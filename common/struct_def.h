@@ -659,6 +659,7 @@ struct Channel	{
 /* Misc macros */
 
 #define	BadPtr(x) (!(x) || (*(x) == '\0'))
+#define	BadTo(x) (BadPtr((x)) ? "*" : (x))
 
 #define	isvalid(c) (((c) >= 'A' && (c) <= '~') || isdigit(c) || (c) == '-')
 

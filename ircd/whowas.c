@@ -24,7 +24,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: whowas.c,v 1.6 1999/06/27 19:08:46 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: whowas.c,v 1.7 1999/09/20 22:39:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -358,7 +358,7 @@ char	*parv[];
 
  	if (parc < 2)
 	    {
-		sendto_one(sptr, err_str(ERR_NONICKNAMEGIVEN, parv[0]));
+		sendto_one(sptr, replies[ERR_NONICKNAMEGIVEN], ME, BadTo(parv[0]));
 		return 1;
 	    }
 	if (parc > 2)
@@ -381,15 +381,15 @@ char	*parv[];
 			if (mycmp(nick, wp->ww_nick) == 0)
 			    {
 				up = wp->ww_user;
-				sendto_one(sptr, rpl_str(RPL_WHOWASUSER,
-					   parv[0]), wp->ww_nick, up->username,
+				sendto_one(sptr, replies[RPL_WHOWASUSER],
+					   ME, BadTo(parv[0]), wp->ww_nick, up->username,
 					   up->host, wp->ww_info);
-				sendto_one(sptr, rpl_str(RPL_WHOISSERVER,
-					   parv[0]), wp->ww_nick, up->server,
+				sendto_one(sptr, replies[RPL_WHOISSERVER],
+					   ME, BadTo(parv[0]), wp->ww_nick, up->server,
 					   myctime(wp->ww_logout));
 				if (up->away)
-					sendto_one(sptr, rpl_str(RPL_AWAY,
-						   parv[0]),
+					sendto_one(sptr, replies[RPL_AWAY],
+						   ME, BadTo(parv[0]),
 						   wp->ww_nick, up->away);
 				j++;
 			    }
@@ -402,14 +402,14 @@ char	*parv[];
 		    {
 			if (strlen(parv[1]) > (size_t) NICKLEN)
 				parv[1][NICKLEN] = '\0';
-			sendto_one(sptr, err_str(ERR_WASNOSUCHNICK, parv[0]),
+			sendto_one(sptr, replies[ERR_WASNOSUCHNICK], ME, BadTo(parv[0]),
 				   parv[1]);
 		    }
 
 		if (p)
 			p[-1] = ',';
 	    }
-	sendto_one(sptr, rpl_str(RPL_ENDOFWHOWAS, parv[0]), parv[1]);
+	sendto_one(sptr, replies[RPL_ENDOFWHOWAS], ME, BadTo(parv[0]), parv[1]);
 	return 2;
     }
 

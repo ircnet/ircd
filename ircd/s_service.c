@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.30 1999/07/02 16:49:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.31 1999/09/20 22:39:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -325,15 +325,15 @@ char	*parv[];
 
 	if (sptr->user)
 	    {
-		sendto_one(sptr, err_str(ERR_ALREADYREGISTRED, parv[0]));
+		sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, BadTo(parv[0]));
 		return 1;
 	    }
 
 	if (parc < 7 || *parv[1] == '\0' || *parv[2] == '\0' ||
 	    *parv[3] == '\0' || *parv[6] == '\0')
 	    {
-		sendto_one(cptr, err_str(ERR_NEEDMOREPARAMS,
-			   BadPtr(parv[0]) ? "*" : parv[0]), "SERVICE");
+		sendto_one(cptr, replies[ERR_NEEDMOREPARAMS],
+			   BadTo(parv[0]), "SERVICE");
 		return 1;
 	    }
 
@@ -387,8 +387,8 @@ char	*parv[];
 		sp = me.serv;
 		if (!do_nick_name(parv[1], 0))
 		    {
-			sendto_one(sptr, err_str(ERR_ERRONEUSNICKNAME,
-				   parv[0]), parv[1]);
+			sendto_one(sptr, replies[ERR_ERRONEUSNICKNAME],
+				   ME, BadTo(parv[0]), parv[1]);
 			return 1;
 		    }
 		if (strlen(parv[1]) + strlen(server) + 2 >= (size_t) HOSTLEN)
@@ -429,11 +429,11 @@ char	*parv[];
 			return exit_client(cptr, sptr, &me, "Service Exists");
 		    }
 		attach_conf(sptr, aconf);
-		sendto_one(sptr, rpl_str(RPL_YOURESERVICE, sptr->name),
+		sendto_one(sptr, replies[RPL_YOURESERVICE], ME, BadTo(sptr->name),
 			   sptr->name);
-		sendto_one(sptr, rpl_str(RPL_YOURHOST, sptr->name),
+		sendto_one(sptr, replies[RPL_YOURHOST], ME, BadTo(sptr->name),
                            get_client_name(&me, FALSE), version);
-		sendto_one(sptr, rpl_str(RPL_MYINFO, sptr->name), ME, version);
+		sendto_one(sptr, replies[RPL_MYINFO], ME, BadTo(sptr->name), ME, version);
 		sendto_flag(SCH_NOTICE, "Service %s connected",
 			    get_client_name(sptr, TRUE));
 		istat.is_unknown--;
@@ -506,10 +506,10 @@ char	*parv[];
 	for (sp = svctop; sp; sp = sp->nexts)
 		if  ((acptr = sp->bcptr) && (!type || type == sp->type) &&
 		     (match(mask, acptr->name) == 0))
-			sendto_one(sptr, rpl_str(RPL_SERVLIST, parv[0]),
+			sendto_one(sptr, replies[RPL_SERVLIST], ME, BadTo(parv[0]),
 				   acptr->name, sp->server, sp->dist,
 				   sp->type, acptr->hopcount, acptr->info);
-	sendto_one(sptr, rpl_str(RPL_SERVLISTEND, parv[0]), mask, type);
+	sendto_one(sptr, replies[RPL_SERVLISTEND], ME, BadTo(parv[0]), mask, type);
 	return 2;
 }
 
@@ -538,12 +538,12 @@ char	*parv[];
 	    }
 	if (!IsService(sptr) || (IsService(sptr) && sptr->service->wants))
 	    {
-		sendto_one(sptr, err_str(ERR_NOPRIVILEGES, parv[0]));
+		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
 		return 1;
 	    }
 	if (parc < 2)
 	    {
-		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]),
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
 			   "SERVSET");
 		return 1;
 	    }
@@ -686,10 +686,10 @@ char	*parv[];
 	if (parc <= 2)
 	    {
 		if (parc == 1)
-			sendto_one(sptr, err_str(ERR_NORECIPIENT, parv[0]),
+			sendto_one(sptr, replies[ERR_NORECIPIENT], ME, BadTo(parv[0]),
 				   "SQUERY");
 		else if (parc == 2 || BadPtr(parv[1]))
-			sendto_one(sptr, err_str(ERR_NOTEXTTOSEND, parv[0]));
+			sendto_one(sptr, replies[ERR_NOTEXTTOSEND], ME, BadTo(parv[0]));
 		return 1;
 	    }
 
@@ -703,6 +703,6 @@ char	*parv[];
 			sendto_one(acptr, ":%s SQUERY %s :%s",
 				   parv[0], acptr->name, parv[2]);
 	else
-		sendto_one(sptr, err_str(ERR_NOSUCHSERVICE, parv[0]), parv[1]);
+		sendto_one(sptr, replies[ERR_NOSUCHSERVICE], ME, BadTo(parv[0]), parv[1]);
 	return 2;
 }

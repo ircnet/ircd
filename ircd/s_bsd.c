@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.73 1999/07/23 17:15:14 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.74 1999/09/20 22:39:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -267,7 +267,7 @@ int	port;
 	    {
 		char	buf[1024];
 
-		(void)sprintf(buf, rpl_str(RPL_MYPORTIS, "*"),
+		(void)sprintf(buf, replies[RPL_MYPORTIS], ME, "*",
 			ntohs(server.SIN_PORT));
 		(void)write(0, buf, strlen(buf));
 	    }
@@ -2797,7 +2797,7 @@ Chat on\n\r");
 	    }
 	(void)close(fd);
 	(void)alarm(0);
-	sendto_one(who, rpl_str(RPL_SUMMONING, who->name), namebuf);
+	sendto_one(who, replies[RPL_SUMMONING], ME, BadTo(who->name), namebuf);
 	return;
 }
 #  endif

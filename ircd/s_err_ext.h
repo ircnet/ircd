@@ -21,13 +21,9 @@
     defined in ircd/s_err.c.
  */
 
-/*  External definitions for global functions.
+/* External definitions for global variables.
  */
 #ifndef S_ERR_C
-#define EXTERN extern
-#else /* S_ERR_C */
-#define EXTERN
+extern char *replies[];
 #endif /* S_ERR_C */
-EXTERN char *err_str __P((int numeric, char *to));
-EXTERN char *rpl_str __P((int numeric, char *to));
-#undef EXTERN
+

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: class.c,v 1.6 1997/12/19 13:35:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: class.c,v 1.7 1999/09/20 22:39:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -227,7 +227,7 @@ char	*to;
 	Reg	aClass	*cltmp;
 
 	for (cltmp = FirstClass(); cltmp; cltmp = NextClass(cltmp))
-		sendto_one(sptr, rpl_str(RPL_STATSYLINE, to), 'Y',
+		sendto_one(sptr, replies[RPL_STATSYLINE], ME, BadTo(to), 'Y',
 			   Class(cltmp), PingFreq(cltmp), ConFreq(cltmp),
 			   MaxLinks(cltmp), MaxSendq(cltmp),
 			   MaxHLocal(cltmp), MaxUHLocal(cltmp),

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.31 1999/08/15 21:05:28 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.32 1999/09/20 22:39:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -103,7 +103,7 @@ aClient	*sptr;
 {
 	if (!IsRegisteredUser(sptr))
 	    {
-		sendto_one(sptr, err_str(ERR_NOTREGISTERED, "*"));
+		sendto_one(sptr, replies[ERR_NOTREGISTERED], ME, "*");
 		return -1;
 	    }
 	return 0;
@@ -119,7 +119,7 @@ aClient	*sptr;
 {
 	if (!IsRegistered(sptr))
 	    {
-		sendto_one(sptr, err_str(ERR_NOTREGISTERED, "*"));
+		sendto_one(sptr, replies[ERR_NOTREGISTERED], ME, "*");
 		return -1;
 	    }
 	return 0;
@@ -134,7 +134,7 @@ aClient	*sptr;
 {
 	if (!IsService(sptr))
 	    {
-		sendto_one(sptr, err_str(ERR_NOTREGISTERED, "*"));
+		sendto_one(sptr, replies[ERR_NOTREGISTERED], ME, "*");
 		return -1;
 	    }
 	return 0;

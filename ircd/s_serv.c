@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.66 1999/08/15 21:07:43 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.67 1999/09/20 22:39:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -103,7 +103,7 @@ int	parc;
 char	*parv[];
 {
 	if (hunt_server(cptr,sptr,":%s VERSION :%s",1,parc,parv)==HUNTED_ISME)
-		sendto_one(sptr, rpl_str(RPL_VERSION, parv[0]),
+		sendto_one(sptr, replies[RPL_VERSION], ME, BadTo(parv[0]),
 			   version, debugmode, ME, serveropts);
 	return 2;
 }
@@ -196,17 +196,17 @@ char	*parv[];
 	*/
 	if (!acptr)
 	    {
-		sendto_one(sptr, err_str(ERR_NOSUCHSERVER, parv[0]), server);
+		sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), server);
 		return 1;
 	    }
 	if (MyConnect(sptr) && !MyConnect(acptr) && parc < 3)
 	    {
-                sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS,parv[0]), "SQUIT");
+                sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "SQUIT");
 		return 0;
             }
 	if (IsLocOp(sptr) && !MyConnect(acptr))
 	    {
-		sendto_one(sptr, err_str(ERR_NOPRIVILEGES, parv[0]));
+		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
 		return 1;
 	    }
 	if (!MyConnect(acptr) && (cptr != acptr->from))
@@ -391,7 +391,7 @@ char	*parv[];
 
 	if (sptr->user) /* in case NICK hasn't been received yet */
             {
-                sendto_one(sptr, err_str(ERR_ALREADYREGISTRED, parv[0]));
+                sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, BadTo(parv[0]));
                 return 1;
             }
 	info[0] = info[REALLEN] = '\0';	/* strncpy() doesn't guarantee NULL */
@@ -1082,23 +1082,23 @@ char	*parv[];
 
 	if (IsServer(cptr) && check_link(cptr))
 	    {
-		sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
+		sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]),
 			   "INFO");
 		return 5;
 	    }
 	if (hunt_server(cptr,sptr,":%s INFO :%s",1,parc,parv) == HUNTED_ISME)
 	    {
 		while (*text)
-			sendto_one(sptr, rpl_str(RPL_INFO, parv[0]), *text++);
+			sendto_one(sptr, replies[RPL_INFO], ME, BadTo(parv[0]), *text++);
 
-		sendto_one(sptr, rpl_str(RPL_INFO, parv[0]), "");
+		sendto_one(sptr, replies[RPL_INFO], ME, BadTo(parv[0]), "");
 		sendto_one(sptr,
 			   ":%s %d %s :Birth Date: %s, compile # %s",
 			   ME, RPL_INFO, parv[0], creation, generation);
 		sendto_one(sptr, ":%s %d %s :On-line since %s",
 			   ME, RPL_INFO, parv[0],
 			   myctime(me.firsttime));
-		sendto_one(sptr, rpl_str(RPL_ENDOFINFO, parv[0]));
+		sendto_one(sptr, replies[RPL_ENDOFINFO], ME, BadTo(parv[0]));
 		return 5;
 	    }
 	else
@@ -1127,7 +1127,7 @@ char	*parv[];
 	    {
 		if (IsServer(cptr) && check_link(cptr) && !IsOper(sptr))
 		    {
-			sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
+			sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]),
 				   "LINKS");
 			return 5;
 		    }
@@ -1144,13 +1144,13 @@ char	*parv[];
 		acptr = asptr->bcptr;
 		if (!BadPtr(mask) && match(mask, acptr->name))
 			continue;
-		sendto_one(sptr, rpl_str(RPL_LINKS, parv[0]),
+		sendto_one(sptr, replies[RPL_LINKS], ME, BadTo(parv[0]),
 			   acptr->name, acptr->serv->up,
 			   acptr->hopcount, (acptr->info[0] ? acptr->info :
 			   "(Unknown Location)"));
 	    }
 
-	sendto_one(sptr, rpl_str(RPL_ENDOFLINKS, parv[0]),
+	sendto_one(sptr, replies[RPL_ENDOFLINKS], ME, BadTo(parv[0]),
 		   BadPtr(mask) ? "*" : mask);
 	return 2;
 }
@@ -1183,7 +1183,7 @@ char	*parv[];
 
 	if (parc < 2 || *parv[1] == '\0')
 	    {
-		sendto_one(sptr, err_str(ERR_NORECIPIENT, parv[0]), "SUMMON");
+		sendto_one(sptr, replies[ERR_NORECIPIENT], ME, BadTo(parv[0]), "SUMMON");
 		return 1;
 	    }
 	user = parv[1];
@@ -1203,7 +1203,7 @@ char	*parv[];
 #ifdef ENABLE_SUMMON
 		if ((fd = utmp_open()) == -1)
 		    {
-			sendto_one(sptr, err_str(ERR_FILEERROR, parv[0]),
+			sendto_one(sptr, replies[ERR_FILEERROR], ME, BadTo(parv[0]),
 				   "open", UTMP);
 			return 1;
 		    }
@@ -1227,8 +1227,8 @@ char	*parv[];
 				if (stat(ttyname,&stb) == -1)
 				    {
 					sendto_one(sptr,
-						   err_str(ERR_FILEERROR,
-						   sptr->name),
+						   replies[ERR_FILEERROR],
+						   ME, BadTo(sptr->name),
 						   "stat", ttyname);
 					return 1;
 				    }
@@ -1251,11 +1251,11 @@ char	*parv[];
 #  else
 		if (flag == -1)
 #  endif
-			sendto_one(sptr, err_str(ERR_NOLOGIN, parv[0]), user);
+			sendto_one(sptr, replies[ERR_NOLOGIN], ME, BadTo(parv[0]), user);
 		else
 			summon(sptr, user, linebuf, chname);
 #else
-		sendto_one(sptr, err_str(ERR_SUMMONDISABLED, parv[0]));
+		sendto_one(sptr, replies[ERR_SUMMONDISABLED], ME, BadTo(parv[0]));
 #endif /* ENABLE_SUMMON */
 	    }
 	else
@@ -1337,11 +1337,11 @@ int	mask;
 			if (tmp->status == CONF_KILL
 			    || tmp->status == CONF_OTHERKILL
 			    || tmp->status == CONF_VER)
-				sendto_one(sptr, rpl_str(p[1], to), c, host,
+				sendto_one(sptr, replies[p[1]], ME, BadTo(to), c, host,
 					   (pass) ? pass : null,
 					   name, port, get_conf_class(tmp));
 			else
-				sendto_one(sptr, rpl_str(p[1], to), c, host,
+				sendto_one(sptr, replies[p[1]], ME, BadTo(to), c, host,
 					   (pass) ? "*" : null,
 					   name, port, get_conf_class(tmp));
 		    }
@@ -1362,7 +1362,7 @@ char	*to;
 				SPRINTF(buf,"%s[%s]",tmp->name, tmp->host);
 			else
 				(void)strcpy(buf, tmp->name);
-			sendto_one(sptr, rpl_str(RPL_STATSPING, to),
+			sendto_one(sptr, replies[RPL_STATSPING], ME, BadTo(to),
 				   buf, cp->lseq, cp->lrecvd,
 				   cp->ping / (cp->recvd ? cp->recvd : 1),
 				   tmp->pref);
@@ -1391,7 +1391,7 @@ char	*parv[];
 	    {
 		if (check_link(cptr))
 		    {
-			sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
+			sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]),
 				   "STATS");
 			return 5;
 		    }
@@ -1498,8 +1498,8 @@ char	*parv[];
 	case 'M' : case 'm' : /* commands use/stats */
 		for (mptr = msgtab; mptr->cmd; mptr++)
 			if (mptr->count)
-				sendto_one(cptr, rpl_str(RPL_STATSCOMMANDS,
-					   parv[0]), mptr->cmd,
+				sendto_one(cptr, replies[RPL_STATSCOMMANDS],
+					   ME, BadTo(parv[0]), mptr->cmd,
 					   mptr->count, mptr->bytes,
 					   mptr->rcount);
 		break;
@@ -1526,7 +1526,7 @@ char	*parv[];
 		register time_t now;
 
 		now = timeofday - me.since;
-		sendto_one(sptr, rpl_str(RPL_STATSUPTIME, parv[0]),
+		sendto_one(sptr, replies[RPL_STATSUPTIME], ME, BadTo(parv[0]),
 			   now/86400, (now/3600)%24, (now/60)%60, now%60);
 		break;
 	    }
@@ -1545,7 +1545,7 @@ char	*parv[];
 		if (MyOper(sptr))
 			count_memory(cptr, parv[0], 1);
 		else
-			sendto_one(sptr, err_str(ERR_NOPRIVILEGES, parv[0]));
+			sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
 		break;
 	case 'z' :	      /* memory use */
 		count_memory(cptr, parv[0], 0);
@@ -1554,7 +1554,7 @@ char	*parv[];
 		stat = '*';
 		break;
 	}
-	sendto_one(cptr, rpl_str(RPL_ENDOFSTATS, parv[0]), stat);
+	sendto_one(cptr, replies[RPL_ENDOFSTATS], ME, BadTo(parv[0]), stat);
 	return 2;
     }
 
@@ -1578,26 +1578,26 @@ char	*parv[];
 #ifdef ENABLE_USERS
 		if ((fd = utmp_open()) == -1)
 		    {
-			sendto_one(sptr, err_str(ERR_FILEERROR, parv[0]),
+			sendto_one(sptr, replies[ERR_FILEERROR], ME, BadTo(parv[0]),
 				   "open", UTMP);
 			return 1;
 		    }
 
-		sendto_one(sptr, rpl_str(RPL_USERSSTART, parv[0]));
+		sendto_one(sptr, replies[RPL_USERSSTART], ME, BadTo(parv[0]));
 		while (utmp_read(fd, namebuf, linebuf,
 				 hostbuf, sizeof(hostbuf)) == 0)
 		    {
 			flag = 1;
-			sendto_one(sptr, rpl_str(RPL_USERS, parv[0]),
+			sendto_one(sptr, replies[RPL_USERS], ME, BadTo(parv[0]),
 				   namebuf, linebuf, hostbuf);
 		    }
 		if (flag == 0) 
-			sendto_one(sptr, rpl_str(RPL_NOUSERS, parv[0]));
+			sendto_one(sptr, replies[RPL_NOUSERS], ME, BadTo(parv[0]));
 
-		sendto_one(sptr, rpl_str(RPL_ENDOFUSERS, parv[0]));
+		sendto_one(sptr, replies[RPL_ENDOFUSERS], ME, BadTo(parv[0]));
 		(void)utmp_close(fd);
 #else
-		sendto_one(sptr, err_str(ERR_USERSDISABLED, parv[0]));
+		sendto_one(sptr, replies[ERR_USERSDISABLED], ME, BadTo(parv[0]));
 #endif
 	    }
 	else
@@ -1686,19 +1686,19 @@ char	*parv[];
 
 	if (parc == 1 || !MyConnect(sptr))
 	    {
-		sendto_one(sptr, rpl_str(RPL_LUSERCLIENT, parv[0]),
+		sendto_one(sptr, replies[RPL_LUSERCLIENT], ME, BadTo(parv[0]),
 			   istat.is_user[0] + istat.is_user[1],
 			   istat.is_service, istat.is_serv);
 		if (istat.is_oper)
-			sendto_one(sptr, rpl_str(RPL_LUSEROP, parv[0]),
+			sendto_one(sptr, replies[RPL_LUSEROP], ME, BadTo(parv[0]),
 				   istat.is_oper);
 		if (istat.is_unknown > 0)
-			sendto_one(sptr, rpl_str(RPL_LUSERUNKNOWN, parv[0]),
+			sendto_one(sptr, replies[RPL_LUSERUNKNOWN], ME, BadTo(parv[0]),
 				   istat.is_unknown);
 		if (istat.is_chan)
-			sendto_one(sptr, rpl_str(RPL_LUSERCHANNELS, parv[0]),
+			sendto_one(sptr, replies[RPL_LUSERCHANNELS], ME, BadTo(parv[0]),
 				   istat.is_chan);
-		sendto_one(sptr, rpl_str(RPL_LUSERME, parv[0]),
+		sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]),
 			   istat.is_myclnt, istat.is_myservice,
 			   istat.is_myserv);
 		return 2;
@@ -1764,21 +1764,21 @@ char	*parv[];
 #ifndef	SHOW_INVISIBLE_LUSERS
 	if (IsAnOper(sptr) && i_count)
 #endif
-	sendto_one(sptr, rpl_str(RPL_LUSERCLIENT, parv[0]),
+	sendto_one(sptr, replies[RPL_LUSERCLIENT], ME, BadTo(parv[0]),
 		   c_count + i_count, v_count, s_count);
 #ifndef	SHOW_INVISIBLE_LUSERS
 	else
-		sendto_one(sptr, rpl_str(RPL_LUSERCLIENT, parv[0]),
+		sendto_one(sptr, replies[RPL_LUSERCLIENT], ME, BadTo(parv[0]),
 			   c_count, v_count, s_count);
 #endif
 	if (o_count)
-		sendto_one(sptr, rpl_str(RPL_LUSEROP, parv[0]), o_count);
+		sendto_one(sptr, replies[RPL_LUSEROP], ME, BadTo(parv[0]), o_count);
 	if (u_count > 0)
-		sendto_one(sptr, rpl_str(RPL_LUSERUNKNOWN, parv[0]), u_count);
+		sendto_one(sptr, replies[RPL_LUSERUNKNOWN], ME, BadTo(parv[0]), u_count);
 	if ((c_count = count_channels(sptr))>0)
-		sendto_one(sptr, rpl_str(RPL_LUSERCHANNELS, parv[0]),
+		sendto_one(sptr, replies[RPL_LUSERCHANNELS], ME, BadTo(parv[0]),
 			   count_channels(sptr));
-	sendto_one(sptr, rpl_str(RPL_LUSERME, parv[0]), m_client, m_service,
+	sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]), m_client, m_service,
 		   m_server);
 	return 2;
     }
@@ -1806,7 +1806,7 @@ char	*parv[];
 
 	if (parc > 3 && IsLocOp(sptr))
 	    {
-		sendto_one(sptr, err_str(ERR_NOPRIVILEGES, parv[0]));
+		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
 		return 1;
 	    }
 
@@ -1816,7 +1816,7 @@ char	*parv[];
 
 	if (parc < 3 || *parv[1] == '\0')
 	    {
-		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]),
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
 			   "CONNECT");
 		return 0;
 	    }
@@ -1933,7 +1933,7 @@ char	*parv[];
 
 	if (BadPtr(message))
 	    {
-		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]),
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
 			   "WALLOPS");
 		return 1;
 	    }
@@ -1966,7 +1966,7 @@ int	parc;
 char	*parv[];
 {
 	if (hunt_server(cptr,sptr,":%s TIME :%s",1,parc,parv) == HUNTED_ISME)
-		sendto_one(sptr, rpl_str(RPL_TIME, parv[0]), ME, date((long)0));
+		sendto_one(sptr, replies[RPL_TIME], ME, BadTo(parv[0]), ME, date((long)0));
 	return 2;
 }
 
@@ -1989,15 +1989,15 @@ char	*parv[];
 	if ((aconf = find_admin()) && aconf->host && aconf->passwd
 	    && aconf->name)
 	    {
-		sendto_one(sptr, rpl_str(RPL_ADMINME, parv[0]), ME);
-		sendto_one(sptr, rpl_str(RPL_ADMINLOC1, parv[0]), aconf->host);
-		sendto_one(sptr, rpl_str(RPL_ADMINLOC2, parv[0]),
+		sendto_one(sptr, replies[RPL_ADMINME], ME, BadTo(parv[0]), ME);
+		sendto_one(sptr, replies[RPL_ADMINLOC1], ME, BadTo(parv[0]), aconf->host);
+		sendto_one(sptr, replies[RPL_ADMINLOC2], ME, BadTo(parv[0]),
 			   aconf->passwd);
-		sendto_one(sptr, rpl_str(RPL_ADMINEMAIL, parv[0]),
+		sendto_one(sptr, replies[RPL_ADMINEMAIL], ME, BadTo(parv[0]),
 			   aconf->name);
 	    }
 	else
-		sendto_one(sptr, err_str(ERR_NOADMININFO, parv[0]), ME);
+		sendto_one(sptr, replies[ERR_NOADMININFO], ME, BadTo(parv[0]), ME);
 	return 2;
     }
 
@@ -2011,7 +2011,7 @@ aClient	*cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	sendto_one(sptr, rpl_str(RPL_REHASHING, parv[0]),
+	sendto_one(sptr, replies[RPL_REHASHING], ME, BadTo(parv[0]),
 		   mybasename(configfile));
 	sendto_flag(SCH_NOTICE,
 		    "%s is rehashing Server config file", parv[0]);
@@ -2094,7 +2094,7 @@ char	*parv[];
 		aClient	*ac2ptr;
 
 		ac2ptr = next_client(client, parv[1]);
-		sendto_one(sptr, rpl_str(RPL_TRACELINK, parv[0]),
+		sendto_one(sptr, replies[RPL_TRACELINK], ME, BadTo(parv[0]),
 			   version, debugmode, tname, ac2ptr->from->name,
 			   ac2ptr->from->serv->version,
 			   (ac2ptr->from->flags & FLAGS_ZIP) ? "z" : "",
@@ -2152,11 +2152,11 @@ char	*parv[];
 		switch(acptr->status)
 		{
 		case STAT_CONNECTING:
-			sendto_one(sptr, rpl_str(RPL_TRACECONNECTING,
-				   parv[0]), class, name);
+			sendto_one(sptr, replies[RPL_TRACECONNECTING],
+				   ME, BadTo(parv[0]), class, name);
 			break;
 		case STAT_HANDSHAKE:
-			sendto_one(sptr, rpl_str(RPL_TRACEHANDSHAKE, parv[0]),
+			sendto_one(sptr, replies[RPL_TRACEHANDSHAKE], ME, BadTo(parv[0]),
 				   class, name);
 			break;
 		case STAT_ME:
@@ -2164,7 +2164,7 @@ char	*parv[];
 		case STAT_UNKNOWN:
 			if (IsAnOper(sptr) || MyClient(sptr))
 				sendto_one(sptr,
-					   rpl_str(RPL_TRACEUNKNOWN, parv[0]),
+					   replies[RPL_TRACEUNKNOWN], ME, BadTo(parv[0]),
 					   class, name);
 			break;
 		case STAT_CLIENT:
@@ -2182,56 +2182,56 @@ char	*parv[];
 */
 			if (IsAnOper(acptr))
 				sendto_one(sptr,
-					   rpl_str(RPL_TRACEOPERATOR, parv[0]),
+					   replies[RPL_TRACEOPERATOR], ME, BadTo(parv[0]),
 					   class, name);
 			else if (!dow || (MyConnect(sptr) && IsAnOper(sptr)))
 				sendto_one(sptr,
-					   rpl_str(RPL_TRACEUSER, parv[0]),
+					   replies[RPL_TRACEUSER], ME, BadTo(parv[0]),
 					   class, name);
 /*
 			    {
 				if (IsAnOper(acptr))
 					sendto_one(sptr,
-						   rpl_str(RPL_TRACEOPERATOR,
-						   parv[0]), class, name);
+						   replies[RPL_TRACEOPERATOR],
+						   ME, BadTo(parv[0]), class, name);
 				else
-					sendto_one(sptr, rpl_str(RPL_TRACEUSER,
-						   parv[0]), class, name);
+					sendto_one(sptr, replies[RPL_TRACEUSER],
+						   ME, BadTo(parv[0]), class, name);
 			    }
 */
 			break;
 		case STAT_SERVER:
 			if (acptr->serv->user)
-				sendto_one(sptr, rpl_str(RPL_TRACESERVER,
-					   parv[0]), class, link_s[i],
+				sendto_one(sptr, replies[RPL_TRACESERVER],
+					   ME, BadTo(parv[0]), class, link_s[i],
 					   link_u[i], name, acptr->serv->by,
 					   acptr->serv->user->username,
 					   acptr->serv->user->host,
 					   acptr->serv->version,
 					   (acptr->flags & FLAGS_ZIP) ?"z":"");
 			else
-				sendto_one(sptr, rpl_str(RPL_TRACESERVER,
-					   parv[0]), class, link_s[i],
+				sendto_one(sptr, replies[RPL_TRACESERVER],
+					   ME, BadTo(parv[0]), class, link_s[i],
 					   link_u[i], name,
 					   *(acptr->serv->by) ?
 					   acptr->serv->by : "*", "*", ME,
 					   acptr->serv->version,
 					   (acptr->flags & FLAGS_ZIP) ?"z":"");			break;
 		case STAT_RECONNECT:
-			sendto_one(sptr, rpl_str(RPL_TRACERECONNECT, parv[0]),
+			sendto_one(sptr, replies[RPL_TRACERECONNECT], ME, BadTo(parv[0]),
 				   class, name);
 			break;
 		case STAT_SERVICE:
-			sendto_one(sptr, rpl_str(RPL_TRACESERVICE, parv[0]),
+			sendto_one(sptr, replies[RPL_TRACESERVICE], ME, BadTo(parv[0]),
 				   class, name, acptr->service->type,
 				   acptr->service->wants);
 			break;
 		case STAT_LOG:
-			sendto_one(sptr, rpl_str(RPL_TRACELOG, parv[0]),
+			sendto_one(sptr, replies[RPL_TRACELOG], ME, BadTo(parv[0]),
 				   ME, acptr->port);
 			break;
 		default: /* ...we actually shouldn't come here... --msa */
-			sendto_one(sptr, rpl_str(RPL_TRACENEWTYPE, parv[0]),
+			sendto_one(sptr, replies[RPL_TRACENEWTYPE], ME, BadTo(parv[0]),
 				   name);
 			break;
 		}
@@ -2244,9 +2244,9 @@ char	*parv[];
 	if (IsPerson(sptr) && SendWallops(sptr))
 	    for (cltmp = FirstClass(); doall && cltmp; cltmp = NextClass(cltmp))
 		if (Links(cltmp) > 0)
-			sendto_one(sptr, rpl_str(RPL_TRACECLASS, parv[0]),
+			sendto_one(sptr, replies[RPL_TRACECLASS], ME, BadTo(parv[0]),
 				   Class(cltmp), Links(cltmp));
-	sendto_one(sptr, rpl_str(RPL_TRACEEND, parv[0]), tname, version,
+	sendto_one(sptr, replies[RPL_TRACEEND], ME, BadTo(parv[0]), tname, version,
 		   debugmode);
 	return 2;
     }
@@ -2274,7 +2274,7 @@ char	*parv[];
 
 	if (check_link(cptr))
 	    {
-		sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]), "MOTD");
+		sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]), "MOTD");
 		return 5;
 	    }
 	if (hunt_server(cptr, sptr, ":%s MOTD :%s", 1,parc,parv)!=HUNTED_ISME)
@@ -2283,17 +2283,17 @@ char	*parv[];
 	tm = &motd_tm;
 	if (motd == NULL)
 	    {
-		sendto_one(sptr, err_str(ERR_NOMOTD, parv[0]));
+		sendto_one(sptr, replies[ERR_NOMOTD], ME, BadTo(parv[0]));
 		return 1;
 	    }
-	sendto_one(sptr, rpl_str(RPL_MOTDSTART, parv[0]), ME);
+	sendto_one(sptr, replies[RPL_MOTDSTART], ME, BadTo(parv[0]), ME);
 	sendto_one(sptr, ":%s %d %s :- %d/%d/%d %d:%02d", ME, RPL_MOTD,
 		   parv[0], tm->tm_mday, tm->tm_mon + 1, 1900 + tm->tm_year,
 		   tm->tm_hour, tm->tm_min);
 	temp = motd;
 	for(temp=motd;temp != NULL;temp = temp->next)
-		sendto_one(sptr, rpl_str(RPL_MOTD, parv[0]), temp->line);
-	sendto_one(sptr, rpl_str(RPL_ENDOFMOTD, parv[0]));
+		sendto_one(sptr, replies[RPL_MOTD], ME, BadTo(parv[0]), temp->line);
+	sendto_one(sptr, replies[RPL_ENDOFMOTD], ME, BadTo(parv[0]));
 	return 2;
 #else
 	/*
@@ -2305,11 +2305,11 @@ char	*parv[];
 	(void)alarm(0);
 	if (fd == -1)
 	    {
-		sendto_one(sptr, err_str(ERR_NOMOTD, parv[0]));
+		sendto_one(sptr, replies[ERR_NOMOTD], ME, BadTo(parv[0]));
 		return 1;
 	    }
 	(void)fstat(fd, &sb);
-	sendto_one(sptr, rpl_str(RPL_MOTDSTART, parv[0]), ME);
+	sendto_one(sptr, replies[RPL_MOTDSTART], ME, BadTo(parv[0]), ME);
 	tm = localtime(&sb.st_mtime);
 	sendto_one(sptr, ":%s %d %s :- %d/%d/%d %d:%02d", ME, RPL_MOTD,
 		   parv[0], tm->tm_mday, tm->tm_mon + 1, 1900 + tm->tm_year,
@@ -2321,10 +2321,10 @@ char	*parv[];
 			*tmp = '\0';
 		if ((tmp = (char *)index(line,'\r')))
 			*tmp = '\0';
-		sendto_one(sptr, rpl_str(RPL_MOTD, parv[0]), line);
+		sendto_one(sptr, replies[RPL_MOTD], ME, BadTo(parv[0]), line);
 	    }
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
-	sendto_one(sptr, rpl_str(RPL_ENDOFMOTD, parv[0]));
+	sendto_one(sptr, replies[RPL_ENDOFMOTD], ME, BadTo(parv[0]));
 	(void)close(fd);
 	return 2;
 #endif	/* CACHED_MOTD */
@@ -2349,12 +2349,12 @@ char	*parv[];
 		if (!IsUnknown(acptr) && !IsConnecting(acptr) &&
 		    !IsHandshake(acptr))
 			continue;
-		sendto_one(sptr, rpl_str(RPL_CLOSING, parv[0]),
+		sendto_one(sptr, replies[RPL_CLOSING], ME, BadTo(parv[0]),
 			   get_client_name(acptr, TRUE), acptr->status);
 		(void)exit_client(acptr, acptr, &me, "Oper Closing");
 		closed++;
 	    }
-	sendto_one(sptr, rpl_str(RPL_CLOSEEND, parv[0]), closed);
+	sendto_one(sptr, replies[RPL_CLOSEEND], ME, BadTo(parv[0]), closed);
 	return 1;
 }
 

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.88 1999/08/31 20:31:44 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.89 1999/09/20 22:39:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -205,7 +205,7 @@ int	server, parc;
 		    && (IsServer(acptr->from)
 			&& match(sptr->service->dist,acptr->name) != 0))
 		    {
-			sendto_one(sptr, err_str(ERR_NOSUCHSERVER, parv[0]), 
+			sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), 
 				   parv[server]);
 			return(HUNTED_NOSUCH);
 		    }
@@ -214,7 +214,7 @@ int	server, parc;
 			   parv[5], parv[6], parv[7], parv[8]);
 		return(HUNTED_PASS);
 	    } 
-	sendto_one(sptr, err_str(ERR_NOSUCHSERVER, parv[0]), parv[server]);
+	sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), parv[server]);
 	return(HUNTED_NOSUCH);
     }
 
@@ -550,7 +550,7 @@ char	*nick, *username;
 		    !StrEq(sptr->passwd, aconf->passwd))
 		    {
 			ircstp->is_ref++;
-			sendto_one(sptr, err_str(ERR_PASSWDMISMATCH, parv[0]));
+			sendto_one(sptr, replies[ERR_PASSWDMISMATCH], ME, BadTo(parv[0]));
 			return exit_client(cptr, sptr, &me, "Bad Password");
 		    }
 		bzero(sptr->passwd, sizeof(sptr->passwd));
@@ -613,14 +613,14 @@ char	*nick, *username;
 		strcpy(sptr->user->uid, next_uid());
 		add_to_uid_hash_table(sptr->user->uid, sptr);
 		sptr->exitc = EXITC_REG;
-		sendto_one(sptr, rpl_str(RPL_WELCOME, nick), buf);
+		sendto_one(sptr, replies[RPL_WELCOME], ME, BadTo(nick), buf);
 		/* This is a duplicate of the NOTICE but see below...*/
-		sendto_one(sptr, rpl_str(RPL_YOURHOST, nick),
+		sendto_one(sptr, replies[RPL_YOURHOST], ME, BadTo(nick),
 			   get_client_name(&me, FALSE), version);
-		sendto_one(sptr, rpl_str(RPL_CREATED, nick), creation);
-		sendto_one(sptr, rpl_str(RPL_MYINFO, parv[0]),
+		sendto_one(sptr, replies[RPL_CREATED], ME, BadTo(nick), creation);
+		sendto_one(sptr, replies[RPL_MYINFO], ME, BadTo(parv[0]),
 			   ME, version);
-		sendto_one(sptr, rpl_str(RPL_YOURID, parv[0]),
+		sendto_one(sptr, replies[RPL_YOURID], ME, BadTo(parv[0]),
 			   sptr->user->uid);
 		(void)m_lusers(sptr, sptr, 1, parv);
 		(void)m_motd(sptr, sptr, 1, parv);
@@ -681,7 +681,7 @@ char	*nick, *username;
 	if (MyConnect(sptr))
 	    {
 		if (IsRestricted(sptr))
-			sendto_one(sptr, err_str(ERR_RESTRICTED, nick));
+			sendto_one(sptr, replies[ERR_RESTRICTED], ME, BadTo(nick));
 		send_umode(sptr, sptr, 0, ALL_UMODES, buf);
 	    }
 
@@ -737,13 +737,13 @@ char	*parv[];
 
 	if (IsService(sptr))
    	    {
-		sendto_one(sptr, err_str(ERR_ALREADYREGISTRED, parv[0]));
+		sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, BadTo(parv[0]));
 		return 1;
 	    }
 
 	if (parc < 2)
 	    {
-		sendto_one(sptr, err_str(ERR_NONICKNAMEGIVEN, parv[0]));
+		sendto_one(sptr, replies[ERR_NONICKNAMEGIVEN], ME, BadTo(parv[0]));
 		return 1;
 	    }
 	if (MyConnect(sptr) && (s = (char *)index(parv[1], '~')))
@@ -774,7 +774,7 @@ char	*parv[];
 	if (do_nick_name(nick, IsServer(cptr)) == 0 ||
 	    (IsServer(cptr) && strcmp(nick, parv[1])))
 	    {
-		sendto_one(sptr, err_str(ERR_ERRONEUSNICKNAME, parv[0]),
+		sendto_one(sptr, replies[ERR_ERRONEUSNICKNAME], ME, BadTo(parv[0]),
 			   parv[1]);
 
 		if (IsServer(cptr))
@@ -811,7 +811,7 @@ char	*parv[];
 	if ((acptr = find_server(nick, NULL)))
 		if (MyConnect(sptr))
 		    {
-			sendto_one(sptr, err_str(ERR_NICKNAMEINUSE, parv[0]),
+			sendto_one(sptr, replies[ERR_NICKNAMEINUSE], ME, BadTo(parv[0]),
 				   nick);
 			return 2; /* NICK message ignored */
 		    }
@@ -913,9 +913,9 @@ char	*parv[];
 		** NICK is coming from local client connection. Just
 		** send error reply and ignore the command.
 		*/
-		sendto_one(sptr, err_str((delayed) ? ERR_UNAVAILRESOURCE
-						   : ERR_NICKNAMEINUSE,
-					 parv[0]), nick);
+		sendto_one(sptr, replies[(delayed) ? ERR_UNAVAILRESOURCE
+						   : ERR_NICKNAMEINUSE],
+					 ME, BadTo(parv[0]), nick);
 		return 2; /* NICK message ignored */
 	    }
 	/*
@@ -929,7 +929,7 @@ char	*parv[];
 	** The client indicated by 'acptr' is dead meat, give at least some
 	** indication of the reason why we are just dropping it cold.
 	*/
-	sendto_one(acptr, err_str(ERR_NICKCOLLISION, acptr->name),
+	sendto_one(acptr, replies[ERR_NICKCOLLISION], ME, BadTo(acptr->name),
 		   acptr->name, user, host);
 	/*
 	** This seemingly obscure test (sptr == cptr) differentiates
@@ -1029,7 +1029,7 @@ nickkilldone:
 			if (IsRestricted(sptr))
 			    {
 				sendto_one(sptr,
-					   err_str(ERR_RESTRICTED, nick));
+					   replies[ERR_RESTRICTED], ME, BadTo(nick));
 				return 2;
 			    }
 			/* is the user banned on any channel ? */
@@ -1115,7 +1115,7 @@ char	*parv[];
 
 	if (parc < 9)
 	    {
-		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]),
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
 			   "UNICK");
 		return 1;
 	    }
@@ -1134,7 +1134,7 @@ char	*parv[];
 	do_nick_name(nick, 1);
 	if (strcmp(nick, parv[2]))
 	    {
-		sendto_one(sptr, err_str(ERR_ERRONEUSNICKNAME, parv[0]),
+		sendto_one(sptr, replies[ERR_ERRONEUSNICKNAME], ME, BadTo(parv[0]),
 			   parv[2]);
 		
 		ircstp->is_kill++;
@@ -1220,7 +1220,7 @@ char	*parv[];
 			**   get to the new user introduced here.
 			*/
 			sendto_one(acptr,
-				   err_str(ERR_NICKCOLLISION, acptr->name),
+				   replies[ERR_NICKCOLLISION], ME, BadTo(acptr->name),
 				   acptr->name, user, host);
 			sendto_flag(SCH_KILL,
 			    "Nick collision on %s (%s@%s)%s <- (%s@%s)%s",
@@ -1307,13 +1307,13 @@ int	parc, notice;
 
 	if (parc < 2 || *parv[1] == '\0')
 	    {
-		sendto_one(sptr, err_str(ERR_NORECIPIENT, parv[0]), cmd);
+		sendto_one(sptr, replies[ERR_NORECIPIENT], ME, BadTo(parv[0]), cmd);
 		return 1;
 	    }
 
 	if (parc < 3 || *parv[2] == '\0')
 	    {
-		sendto_one(sptr, err_str(ERR_NOTEXTTOSEND, parv[0]));
+		sendto_one(sptr, replies[ERR_NOTEXTTOSEND], ME, BadTo(parv[0]));
 		return 1;
 	    }
 
@@ -1328,8 +1328,8 @@ int	parc, notice;
 		*/ 
 		if (2*penalty >= MAXPENALTY) {
 		    if (!notice)
-			    sendto_one(sptr, err_str(ERR_TOOMANYTARGETS,
-						     parv[0]),
+			    sendto_one(sptr, replies[ERR_TOOMANYTARGETS],
+				       ME, BadTo(parv[0]),
 				       "Too many",nick,"No Message Delivered");
 		    continue;      
 		}   
@@ -1340,7 +1340,7 @@ int	parc, notice;
 		    {
 			if (!notice && MyConnect(sptr) &&
 			    acptr->user && (acptr->user->flags & FLAGS_AWAY))
-				sendto_one(sptr, rpl_str(RPL_AWAY, parv[0]),
+				sendto_one(sptr, replies[RPL_AWAY], ME, BadTo(parv[0]),
 					   acptr->name,
 					   (acptr->user->away) ? 
 					   acptr->user->away : "Gone");
@@ -1360,8 +1360,8 @@ int	parc, notice;
 						      parv[0], cmd, nick,
 						      parv[2]);
 			else if (!notice)
-				sendto_one(sptr, err_str(ERR_CANNOTSENDTOCHAN,
-					   parv[0]), nick);
+				sendto_one(sptr, replies[ERR_CANNOTSENDTOCHAN],
+					   ME, BadTo(parv[0]), nick);
 			continue;
 		    }
 	
@@ -1375,8 +1375,8 @@ int	parc, notice;
 		    {
 			if (!(s = (char *)rindex(nick, '.')))
 			    {
-				sendto_one(sptr, err_str(ERR_NOTOPLEVEL,
-					   parv[0]), nick);
+				sendto_one(sptr, replies[ERR_NOTOPLEVEL],
+					   ME, BadTo(parv[0]), nick);
 				continue;
 			    }
 			while (*++s)
@@ -1384,8 +1384,8 @@ int	parc, notice;
 					break;
 			if (*s == '*' || *s == '?')
 			    {
-				sendto_one(sptr, err_str(ERR_WILDTOPLEVEL,
-					   parv[0]), nick);
+				sendto_one(sptr, replies[ERR_WILDTOPLEVEL],
+					   ME, BadTo(parv[0]), nick);
 				continue;
 			    }
 			sendto_match_butone(IsServer(cptr) ? cptr : NULL, 
@@ -1457,9 +1457,8 @@ int	parc, notice;
 					 		  parv[0], cmd,
 							  nick, parv[2]);
 				else if (!notice)
-					sendto_one(sptr, err_str(
-						   ERR_TOOMANYTARGETS,
-						   parv[0]), "Duplicate", nick,
+					sendto_one(sptr, replies[ERR_TOOMANYTARGETS],
+						   ME, BadTo(parv[0]), "Duplicate", nick,
 						   "No Message Delivered");
 				continue;
 			    }
@@ -1480,15 +1479,14 @@ int	parc, notice;
 					 		  parv[0], cmd,
 							  nick, parv[2]);
 				else if (!notice)
-					sendto_one(sptr, err_str(
-						   ERR_TOOMANYTARGETS,
-						   parv[0]), "Duplicate", nick,
+					sendto_one(sptr, replies[ERR_TOOMANYTARGETS],
+						   ME, BadTo(parv[0]), "Duplicate", nick,
 						   "No Message Delivered");
 				continue;
 			    }
 		    }
 		if (!notice)
-			sendto_one(sptr, err_str(ERR_NOSUCHNICK, parv[0]),
+			sendto_one(sptr, replies[ERR_NOSUCHNICK], ME, BadTo(parv[0]),
 				   nick);
 	    }
     return penalty;
@@ -1552,7 +1550,7 @@ Link *lp;
 			status[i++] = '+';
 	    }
 	status[i] = '\0';
-	sendto_one(sptr, rpl_str(RPL_WHOREPLY, sptr->name),
+	sendto_one(sptr, replies[RPL_WHOREPLY], ME, BadTo(sptr->name),
 		   (repchan) ? (repchan->chname) : "*", acptr->user->username,
 		   acptr->user->host, acptr->user->server, acptr->name,
 		   status, acptr->hopcount, acptr->info);
@@ -1683,7 +1681,7 @@ char	*parv[];
 	if (parc < 2)
 	    {
 		who_find(sptr, NULL, oper);
-		sendto_one(sptr, rpl_str(RPL_ENDOFWHO, parv[0]), "*");
+		sendto_one(sptr, replies[RPL_ENDOFWHO], ME, BadTo(parv[0]), "*");
 		return 5;
 	    }
 
@@ -1732,7 +1730,7 @@ char	*parv[];
 			else
 				penalty += 5;
 		    }
-		sendto_one(sptr, rpl_str(RPL_ENDOFWHO, parv[0]),
+		sendto_one(sptr, replies[RPL_ENDOFWHO], ME, BadTo(parv[0]),
 			   BadPtr(mask) ?  "*" : mask);
 	    }
 	return penalty;
@@ -1772,7 +1770,7 @@ aClient	*sptr, *acptr;
 
 	a2cptr = find_server(user->server, NULL);
 
-	sendto_one(sptr, rpl_str(RPL_WHOISUSER, sptr->name),
+	sendto_one(sptr, replies[RPL_WHOISUSER], ME, BadTo(sptr->name),
 		   name, user->username, user->host, acptr->info);
 
 	mlen = strlen(ME) + strlen(sptr->name) + 6 + strlen(name);
@@ -1805,22 +1803,22 @@ aClient	*sptr, *acptr;
 		    }
 	    }
 	if (buf[0] != '\0')
-		sendto_one(sptr, rpl_str(RPL_WHOISCHANNELS, sptr->name), name,
+		sendto_one(sptr, replies[RPL_WHOISCHANNELS], ME, BadTo(sptr->name), name,
 			   buf);
 
-	sendto_one(sptr, rpl_str(RPL_WHOISSERVER, sptr->name),
+	sendto_one(sptr, replies[RPL_WHOISSERVER], ME, BadTo(sptr->name),
 		   name, user->server,
 		   a2cptr ? a2cptr->info:"*Not On This Net*");
 
 	if (user->flags & FLAGS_AWAY)
-		sendto_one(sptr, rpl_str(RPL_AWAY, sptr->name), name,
+		sendto_one(sptr, replies[RPL_AWAY], ME, BadTo(sptr->name), name,
 			   (user->away) ? user->away : "Gone");
 
 	if (IsAnOper(acptr))
-		sendto_one(sptr, rpl_str(RPL_WHOISOPERATOR, sptr->name), name);
+		sendto_one(sptr, replies[RPL_WHOISOPERATOR], ME, BadTo(sptr->name), name);
 
 	if (acptr->user && MyConnect(acptr))
-		sendto_one(sptr, rpl_str(RPL_WHOISIDLE, sptr->name),
+		sendto_one(sptr, replies[RPL_WHOISIDLE], ME, BadTo(sptr->name),
 			   name, timeofday - user->last);
 }
 
@@ -1843,7 +1841,7 @@ char	*parv[];
 
     	if (parc < 2)
 	    {
-		sendto_one(sptr, err_str(ERR_NONICKNAMEGIVEN, parv[0]));
+		sendto_one(sptr, replies[ERR_NONICKNAMEGIVEN], ME, BadTo(parv[0]));
 		return 1;
 	    }
 
@@ -1878,7 +1876,7 @@ char	*parv[];
 			acptr = hash_find_client(nick, (aClient *)NULL);
 			if (!acptr || !IsPerson(acptr))
 				sendto_one(sptr,
-					   err_str(ERR_NOSUCHNICK, parv[0]),
+					   replies[ERR_NOSUCHNICK], ME, BadTo(parv[0]),
 					   nick);
 			else
 				send_whois(sptr, acptr);
@@ -1937,13 +1935,13 @@ char	*parv[];
 		    {
 			if (strlen(nick) > (size_t) NICKLEN)
 				nick[NICKLEN] = '\0';
-			sendto_one(sptr, err_str(ERR_NOSUCHNICK, parv[0]),
+			sendto_one(sptr, replies[ERR_NOSUCHNICK], ME, BadTo(parv[0]),
 				   nick);
 		    }
 		if (p)
 			p[-1] = ',';
 	    }
-	sendto_one(sptr, rpl_str(RPL_ENDOFWHOIS, parv[0]), parv[1]);
+	sendto_one(sptr, replies[RPL_ENDOFWHOIS], ME, BadTo(parv[0]), parv[1]);
 
 	return 2;
 }
@@ -1970,7 +1968,7 @@ char	*parv[];
 	/* Reject new USER */
 	if (IsServer(sptr) || IsService(sptr) || sptr->user)
 	    {
-		sendto_one(sptr, err_str(ERR_ALREADYREGISTRED, parv[0]));
+		sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, BadTo(parv[0]));
 		return 1;
    	    }
 	if (parc > 2 && (username = (char *)index(parv[1],'@')))
@@ -1978,7 +1976,7 @@ char	*parv[];
 	if (parc < 5 || *parv[1] == '\0' || *parv[2] == '\0' ||
 	    *parv[3] == '\0' || *parv[4] == '\0')
 	    {
-		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]), "USER");
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "USER");
 		if (IsServer(cptr))
 		    {
 			/* send error */
@@ -2121,14 +2119,14 @@ aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	aClient *acptr = NULL;
+	aClient *acptr;
 	char	*inpath = get_client_name(cptr,FALSE);
 	char	*user, *path, *killer;
 	int	chasing = 0;
 
 	if (parc < 2 || *parv[1] == '\0')
 	    {
-		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]), "KILL");
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "KILL");
 		return 1;
 	    }
 
@@ -2139,7 +2137,7 @@ char	*parv[];
 	    {
 		if (BadPtr(path))
 		    {
-			sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]),
+			sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
 				   "KILL");
 			return 1;
 		    }
@@ -2162,8 +2160,8 @@ char	*parv[];
 		if (!(acptr = get_history(user, (long)KILLCHASETIMELIMIT)))
 		    {
 			if (!IsServer(sptr))
-				sendto_one(sptr, err_str(ERR_NOSUCHNICK, 
-							 parv[0]), user);
+				sendto_one(sptr, replies[ERR_NOSUCHNICK], 
+					   ME, BadTo(parv[0]), user);
 			return 1;
 		    }
 		sendto_one(sptr,":%s NOTICE %s :KILL changed from %s to %s",
@@ -2172,14 +2170,14 @@ char	*parv[];
 	    }
 	if (!MyConnect(acptr) && IsLocOp(cptr))
 	    {
-		sendto_one(sptr, err_str(ERR_NOPRIVILEGES, parv[0]));
+		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
 		return 1;
 	    }
 	if (IsServer(acptr) || IsMe(acptr))
 	    {
 		sendto_flag(SCH_ERROR, "%s tried to KILL server %s: %s %s %s",
 			    sptr->name, acptr->name, parv[0], parv[1], parv[2]);
-		sendto_one(sptr, err_str(ERR_CANTKILLSERVER, parv[0]),
+		sendto_one(sptr, replies[ERR_CANTKILLSERVER], ME, BadTo(parv[0]),
 			   acptr->name);
 		return 1;
 	    }
@@ -2227,7 +2225,7 @@ char	*parv[];
 	*/
 	if (IsLocOp(sptr) && !MyConnect(acptr))
 	    {
-		sendto_one(sptr, err_str(ERR_NOPRIVILEGES, parv[0]));
+		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
 		return 1;
 	    }
 	sendto_flag(SCH_KILL,
@@ -2343,7 +2341,7 @@ char	*parv[];
 					   parv[0]);
 		/* sendto_serv_butone(cptr, ":%s AWAY", parv[0]); */
 		if (MyConnect(sptr))
-			sendto_one(sptr, rpl_str(RPL_UNAWAY, parv[0]));
+			sendto_one(sptr, replies[RPL_UNAWAY], ME, BadTo(parv[0]));
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_AWAY, NULL, sptr,
 				      ":%s AWAY", parv[0]);
@@ -2385,7 +2383,7 @@ char	*parv[];
 	    {
 		sptr->user->away = away;
 		(void)strcpy(away, awy2);
-		sendto_one(sptr, rpl_str(RPL_NOWAWAY, parv[0]));
+		sendto_one(sptr, replies[RPL_NOWAWAY], ME, BadTo(parv[0]));
 	    }
 	return 2;
 }
@@ -2406,7 +2404,7 @@ char	*parv[];
 
 	if (parc < 2 || *parv[1] == '\0')
 	    {
-		sendto_one(sptr, err_str(ERR_NOORIGIN, parv[0]));
+		sendto_one(sptr, replies[ERR_NOORIGIN], ME, BadTo(parv[0]));
 		return 1;
 	    }
 	origin = parv[1];
@@ -2424,7 +2422,7 @@ char	*parv[];
 				   origin, destination);
 	    	else
 		    {
-			sendto_one(sptr, err_str(ERR_NOSUCHSERVER, parv[0]),
+			sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]),
 				   destination);
 			return 1;
 		    }
@@ -2451,7 +2449,7 @@ char	*parv[];
 
 	if (parc < 2 || *parv[1] == '\0')
 	    {
-		sendto_one(sptr, err_str(ERR_NOORIGIN, parv[0]));
+		sendto_one(sptr, replies[ERR_NOORIGIN], ME, BadTo(parv[0]));
 		return 1;
 	    }
 
@@ -2468,7 +2466,7 @@ char	*parv[];
 				sendto_one(acptr,":%s PONG %s %s",
 					   parv[0], origin, destination);
 		} else
-			sendto_one(sptr, err_str(ERR_NOSUCHSERVER, parv[0]),
+			sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]),
 				   destination);
 		return 2;
 	    }
@@ -2504,7 +2502,7 @@ char	*parv[];
 
 	if (!IsServer(cptr) && (BadPtr(name) || BadPtr(password)))
 	    {
-		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]), "OPER");
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "OPER");
 		return 1;
 	    }
 	
@@ -2516,7 +2514,7 @@ char	*parv[];
 		sptr->user->flags |= FLAGS_OPER;
 		sendto_serv_butone(cptr, ":%s MODE %s :+o", parv[0], parv[0]);
 		if (IsMe(cptr))
-			sendto_one(sptr, rpl_str(RPL_YOUREOPER, parv[0]));
+			sendto_one(sptr, replies[RPL_YOUREOPER], ME, BadTo(parv[0]));
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_OPER, sptr->user->server, 
 				      sptr, ":%s MODE %s :+o", parv[0], 
@@ -2527,7 +2525,7 @@ char	*parv[];
 	else if (IsAnOper(sptr))
 	    {
 		if (MyConnect(sptr))
-			sendto_one(sptr, rpl_str(RPL_YOUREOPER, parv[0]));
+			sendto_one(sptr, replies[RPL_YOUREOPER], ME, BadTo(parv[0]));
 		return 1;
 	    }
 	if (!(aconf = find_conf_exact(name, sptr->username, sptr->sockhost,
@@ -2542,7 +2540,7 @@ char	*parv[];
 #endif
 				      CONF_OPS)))
 	    {
-		sendto_one(sptr, err_str(ERR_NOOPERHOST, parv[0]));
+		sendto_one(sptr, replies[ERR_NOOPERHOST], ME, BadTo(parv[0]));
 		return 1;
 	    }
 #ifdef CRYPT_OPER_PASSWORD
@@ -2594,7 +2592,7 @@ char	*parv[];
 			    parv[0], sptr->user->username, sptr->user->host,
 			   IsOper(sptr) ? 'o' : 'O');
 		send_umode_out(cptr, sptr, old);
- 		sendto_one(sptr, rpl_str(RPL_YOUREOPER, parv[0]));
+ 		sendto_one(sptr, replies[RPL_YOUREOPER], ME, BadTo(parv[0]));
 #if !defined(CRYPT_OPER_PASSWORD) && (defined(FNAME_OPERLOG) ||\
     (defined(USE_SYSLOG) && defined(SYSLOG_OPER)))
 		encr = "";
@@ -2657,7 +2655,7 @@ char	*parv[];
 	else
 	    {
 		(void)detach_conf(sptr, aconf);
-		sendto_one(sptr,err_str(ERR_PASSWDMISMATCH, parv[0]));
+		sendto_one(sptr,replies[ERR_PASSWDMISMATCH], ME, BadTo(parv[0]));
 	    }
 	return 3;
     }
@@ -2683,7 +2681,7 @@ char	*parv[];
 
 	if (BadPtr(password))
 	    {
-		sendto_one(cptr, err_str(ERR_NEEDMOREPARAMS, parv[0]), "PASS");
+		sendto_one(cptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "PASS");
 		return 1;
 	    }
 	/* Temporarily store PASS pwd *parameters* into info field */
@@ -2726,12 +2724,12 @@ char	*parv[];
 
 	if (parc < 2)
 	    {
-		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]),
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
 			   "USERHOST");
 		return 1;
 	    }
 
-	(void)strcpy(buf, rpl_str(RPL_USERHOST, parv[0]));
+	(void)sprintf(buf, replies[RPL_USERHOST], ME, BadTo(parv[0]));
 	len = strlen(buf);
 	*buf2 = '\0';
 
@@ -2750,8 +2748,8 @@ char	*parv[];
 			if (len > BUFSIZE - (NICKLEN + 5 + HOSTLEN + USERLEN))
 			    {
 				sendto_one(sptr, "%s", buf);
-				(void)strcpy(buf, rpl_str(RPL_USERHOST,
-					     parv[0]));
+				(void)sprintf(buf, replies[RPL_USERHOST],
+					     ME, BadTo(parv[0]));
 				len = strlen(buf);
 				*buf2 = '\0';
 			    }
@@ -2789,11 +2787,11 @@ char	*parv[];
 
 	if (parc < 2)
 	    {
-		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]), "ISON");
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "ISON");
 		return 1;
 	    }
 
-	(void)strcpy(buf, rpl_str(RPL_ISON, *parv));
+	(void)sprintf(buf, replies[RPL_ISON], ME, BadTo(*parv));
 	len = strlen(buf);
 
 	for (s = strtoken(&p, *++pav, " "); s; s = strtoken(&p, NULL, " "))
@@ -2828,14 +2826,14 @@ char	*parv[];
 
 	if (parc < 2)
 	    {
-		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]), "MODE");
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "MODE");
 		return 1;
 	    }
 
 	if (cptr && !(acptr = find_person(parv[1], NULL)))
 	    {
 		if (MyConnect(sptr))
-			sendto_one(sptr, err_str(ERR_NOSUCHCHANNEL, parv[0]),
+			sendto_one(sptr, replies[ERR_NOSUCHCHANNEL], ME, BadTo(parv[0]),
 				   parv[1]);
 		return 1;
 	    }
@@ -2852,7 +2850,7 @@ char	*parv[];
 				  ME, parv[1],
 				  get_client_name(cptr, FALSE), sptr->name);
 		else
-			sendto_one(sptr, err_str(ERR_USERSDONTMATCH, parv[0]));
+			sendto_one(sptr, replies[ERR_USERSDONTMATCH], ME, BadTo(parv[0]));
 			return 1;
 	    }
  
@@ -2865,7 +2863,7 @@ char	*parv[];
 			if (sptr->user->flags & flag)
 				*m++ = (char)(*(s+1));
 		*m = '\0';
-		sendto_one(sptr, rpl_str(RPL_UMODEIS, parv[0]), buf);
+		sendto_one(sptr, replies[RPL_UMODEIS], ME, BadTo(parv[0]), buf);
 		return 1;
 	    }
 
@@ -2930,9 +2928,8 @@ char	*parv[];
 					break;
 				    }
 				if (flag == 0 && MyConnect(sptr))
-					sendto_one(sptr, err_str(
-						ERR_UMODEUNKNOWNFLAG, parv[0]),
-						*m);
+					sendto_one(sptr, replies[ERR_UMODEUNKNOWNFLAG],
+						ME, BadTo(parv[0]), *m);
 				break;
 			}
 	/*
@@ -2949,7 +2946,7 @@ char	*parv[];
 		if ((setflags & FLAGS_RESTRICTED) &&
 		    !(sptr->user->flags & FLAGS_RESTRICTED))
 		    {
-			sendto_one(sptr, err_str(ERR_RESTRICTED, parv[0]));
+			sendto_one(sptr, replies[ERR_RESTRICTED], ME, BadTo(parv[0]));
 			SetRestricted(sptr);
 			/* Can't return; here since it could mess counters */
 		    }

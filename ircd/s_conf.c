@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.42 1999/05/01 21:29:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.43 1999/09/20 22:39:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1594,7 +1594,7 @@ int	class, fd;
 			    {
 				char rpl[BUFSIZE];
 				
-				SPRINTF(rpl, rpl_str(RPL_BOUNCE,"unknown"),
+				SPRINTF(rpl, replies[RPL_BOUNCE], ME, "unknown",
 					aconf->name, aconf->port);
 				strcat(rpl, "\r\n");
 #ifdef INET6
@@ -1628,7 +1628,7 @@ int	class, fd;
 			else if (match(aconf->host, cptr->sockhost))
 				continue;
 
-		sendto_one(cptr, rpl_str(RPL_BOUNCE, cptr->name), aconf->name,
+		sendto_one(cptr, replies[RPL_BOUNCE], ME, BadTo(cptr->name), aconf->name,
 			   aconf->port);
 		return;
 	    }
