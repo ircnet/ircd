@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.49 2004/06/11 23:22:35 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.50 2004/06/19 00:56:39 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -33,6 +33,8 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* user mode +w is doing nothing: class usage is in stats Y and wallops
 	  are sent to a new server channel &WALLOPS.
 	* irc client is no longer included.
+	* rehash q was changed to rehash d (dns flush).
+	* ircd is capable of including files to config file without need of m4.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================
