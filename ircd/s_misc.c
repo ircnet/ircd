@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.95 2004/09/16 16:53:54 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.96 2004/10/01 16:08:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1021,6 +1021,7 @@ void	initruntimeconf(void)
 	memset((char *)&iconf, 0, sizeof(iconf));
 	iconf.aconnect = 1; /* default to ON */
 	iconf.split = 1; /* ircd starts in split-mode */
+	iconf.caccept = 2; /* accept clients when no split */
 
 	/* Defaults set in config.h */
 	iconf.split_minservers = SPLIT_SERVERS;
