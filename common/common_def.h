@@ -83,11 +83,6 @@
 # define LOGFILE "/dev/null"
 #endif
 
-#ifdef	CLIENT_COMPILE
-#undef	SENDQ_ALWAYS
-#undef	ZIP_LINKS
-#endif
-
-#ifdef	CHKCONF_COMPILE
+#if defined(CHKCONF_COMPILE) || defined(CLIENT_COMPILE)
 #undef	ZIP_LINKS
 #endif
