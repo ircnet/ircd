@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.51 2002/06/06 13:49:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.52 2002/06/06 13:55:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1583,9 +1583,12 @@ char	msg, *username, *hostname;
 			case EXITC_AREF:
 			case EXITC_AREFQ:	anyptr=" Denied  "; break;
 			case EXITC_KLINE:	anyptr=" K lined "; break;
+			case EXITC_RLINE:	anyptr=" R lined "; break;
 			case EXITC_CLONE:	anyptr=" ?Clone? "; break;
 			case EXITC_YLINEMAX:	anyptr="   max   "; break;
 			case EXITC_NOILINE:	anyptr=" No Auth "; break;
+			case EXITC_AUTHFAIL:	anyptr="No iauth!"; break;
+			case EXITC_AUTHTOUT:	anyptr="iauth t/o"; break;
 			default:		anyptr=" Unknown ";
 		}
 		(void)sprintf(buf, "%s", anyptr);
