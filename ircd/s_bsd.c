@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.60 1999/03/07 23:01:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.61 1999/03/08 17:06:45 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2152,9 +2152,9 @@ int	ro;
 #endif
 	    TST_READ_EVENT(resfd))
 	    {
-		do_dns_async();
-		nfds--;
 		CLR_READ_EVENT(resfd);
+		nfds--;
+		do_dns_async();
 	    }
 	if (nfds > 0 &&
 #if ! USE_POLL
@@ -2164,9 +2164,9 @@ int	ro;
 #endif
 	    TST_READ_EVENT(udpfd))
 	    {
-		polludp();
-		nfds--;
 		CLR_READ_EVENT(udpfd);
+		nfds--;
+		polludp();
 	    }
 #if defined(USE_IAUTH)
 	if (nfds > 0 &&
@@ -2177,9 +2177,9 @@ int	ro;
 # endif
 	    TST_READ_EVENT(adfd))
 	    {
-		read_iauth();
-		nfds--;
 		CLR_READ_EVENT(adfd);
+		nfds--;
+		read_iauth();
 	    }
 #endif
 
