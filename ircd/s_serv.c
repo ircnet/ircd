@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.16 1997/06/27 18:53:40 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.17 1997/07/02 15:49:15 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -333,7 +333,7 @@ char	*parv[];
 	    {
 		(void)strncpy(info, parv[2], REALLEN);
 		i = strlen(info);
-		if (parc > 3 && ((i+2) > REALLEN))
+		if (parc > 3 && ((i+2) < REALLEN))
 		    {
 				(void)strncat(info, " ", REALLEN - i - 1);
 				(void)strncat(info, parv[3], REALLEN - i - 2);
