@@ -668,7 +668,7 @@ struct Channel	{
 #define	GotDependantClient(x)	(x->prev &&				\
 		 		 ((IsRegisteredUser(x->prev) &&		\
 				  x->prev->user->servp == x->serv) ||	\
-				  (IsRegisteredUser(x->prev) &&		\
+				  (IsService(x->prev) &&		\
 				  x->prev->service->servp == x->serv)))
 
 typedef	struct	{
