@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.176 2004/02/22 02:02:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.177 2004/02/22 19:27:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -374,7 +374,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			strncpyzt(sptr->user->username, username, USERLEN+1);
 			if (sptr->passwd[0])
 				sendto_iauth("%d P %s", sptr->fd,sptr->passwd);
-			sendto_iauth("%d U %s", sptr->fd, username);
+			sendto_iauth("%d U %s", sptr->fd, sptr->user->username);
 			return 1;
 		    }
 		if (!DoneXAuth(sptr) && (iauth_options & XOPT_REQUIRED))
