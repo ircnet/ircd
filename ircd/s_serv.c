@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.205 2004/06/19 18:43:45 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.206 2004/06/21 11:51:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2460,7 +2460,7 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		   istat.is_chan);
 	
 	sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]), m_clients,
-		   m_services, m_servers,
+		   m_services, m_servers, m_clients,
 		   m_services, m_servers);
         sendto_one(sptr, replies[RPL_LUSERMAX], ME, BadTo(parv[0]),
 			istat.is_m_myclnt, istat.is_m_users,
