@@ -1,3 +1,22 @@
+2004-06-22  Piotr Kucharski
+
+	* Makefile.in: add implicit dependency for struct_def.h
+	* struct_def.h: change definition of SetClient.
+	* s_user.c/m_umode(): use SetClient macro.
+	* s_conf.c/m_tkline(): moved tkline existence check and nexttkexpire
+	  setting to do_tkline().
+	* s_conf.c/do_tkline(): removed doall parameter (it always removes all
+	  matching clients); also send notice only when new tkline is set. 
+
+2004-06-21  Piotr Kucharski
+
+	* parse.c/parse(): minparams check was flawed.
+	* parse.c/parse(): status was computed too early.
+	* class.c/initclass(): add default 1.1 limits.
+	* s_user.c/m_umode(): incorrect STAT_CLIENT/STAT_OPER change.
+	* config_read.c/config_read(): do not prepend ircd conf dir if filename
+	  to include begins with slash; also drop <> convention, use only "".
+
 2004-06-19  Piotr Kucharski
 
 	* parse.c/parse(): don't check for min param count for commands which
