@@ -1,4 +1,39 @@
-1999-01-12  Christophe Kalt  <kalt@azurite>
+1999-01-19  Christophe Kalt
+
+	* resolv_def.h, res_comp.c, res_init.c: updated (BIND 4.9.7-REL).
+
+	* packet.c/dopacket(): don't call unzip_packet() without data at
+	beginning of connection only! (from Q).
+
+	* numeric_def.h, s_err.c, channel.c: added numerics RPL_UNIQOPIS
+	(325), ERR_BANLISTFULL (478) and ERR_UNIQOPPRIVSNEEDED (485).
+
+	* channel.c:
+		* m_njoin(): missing return value (reported by Insure++).
+		* m_mode(): use ERR_RESTRICTED for restricted clients.
+		* m_join(): it's now possible to create	!!#foo if #foo exists.
+		* m_list(): now works for !shortname.
+
+	* hash_ext.h, hash.c: added hash_find_channels().
+
+	* configure.in, os.h:
+		* update for autoconf 2.13.
+		* let's trust autoconf to decide to use poll() or not.
+
+	* s_bsd.c: sendto_flags() doesn't exist, it's sendto_flag().
+
+	* mod_rfc931.c:
+		* stats weren't initialized.
+		* added undocumented "protocol" option (it's boring!).
+
+	* mod_socks.c:
+		* fixed never occuring memory leak.
+		* improved stats (from Piotr Kucharski).
+	
+	* s_user_ext.h, s_user.c, s_service.c: added a parameter to
+	do_nick_name() [UID].
+
+1999-01-12  Christophe Kalt
 
 	* a_log_def.h, mod_pipe_ext.h, a_externs.h, mod_pipe.c, a_conf.c:
 	finally wrote the pipe module.
