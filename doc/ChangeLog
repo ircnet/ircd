@@ -1,3 +1,15 @@
+2004-08-12  Piotr Kucharski
+
+	* ircd.c/try_connections(), config.h.dist: DISABLE_DOUBLE_CONNECTS to
+	  overcome problems with two autoconnects to each other.
+	* ircd.c/main(): better check for tune filename length.
+	* channel.c/m_invite(): as invite works different for existing and
+	  non-existing channels, try best and search for shortname !channel
+	  (from fiction).
+	* s_serv.c/m_squit(): don't quit oper trying to squit ME (from fiction).
+	* ircd.c/s_die(): send SDIE to 2.11 servers.
+	* s_serv.c/m_sdie(): broadcast received SDIE to 2.11 servers.
+
 2004-08-10  Piotr Kucharski
 
 	* s_bsd.c/check_server(): as trace shows last attached class, attach
