@@ -1,3 +1,36 @@
+Thu Jun 19 18:35:37 1997  Christophe Kalt
+
+	* h.h, struct.h, s_debug.c, send.c, dbuf.c:
+		* dbuf stats.
+		* send_message() #ifndef SENDQ_ALWAYS was not uptodate,
+		tried to bring it back up to date.
+
+	* res.c: fixed possible buffer overflow.
+	
+	* h.h, s_debug.c, send.c: fixes for STDARG (Olivier Galibert)
+
+	* ircd.c: server_reboot() would crash when called because of "out
+	of memory".
+
+Mon Jun  9 20:49:55 1997  Christophe Kalt
+
+	* config.h.dist, h.h, struct.h, send.c, ircd.c, list.c, s_debug.c,
+	s_serv.c, s_user.c: removed #define KRYS, it is now always `defined'.
+	
+	* config.h.dist, h.h, common.h, service.h, sys.h, configure.in,
+	send.c, support.c, s_auth.c, s_service.c, s_debug.c, s_conf.c:
+	removed references to varargs, added support for stdargs.
+	It is controlled by #define USE_STDARG set by configure. (adapted
+	from Olivier Galibert)
+
+	* ircd.c: CHROOT is really called CHROOTDIR.
+
+	* s_user.c:
+		* extended m_message() to accept n!u@h as recipient.
+		* removed notice for bogus PONG.
+
+	* s_serv.c: /SQUIT now requires 2 arguments from opers.
+
 Sun Jun  1 16:57:39 1997  Christophe Kalt
 
 	* dbuf.h, dbuf.c: #define DBUF_TAIL is back.
