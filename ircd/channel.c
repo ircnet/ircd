@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.189 2004/03/01 01:36:11 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.190 2004/03/01 02:16:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -873,10 +873,11 @@ void	send_channel_members(aClient *cptr, aChannel *chptr)
 	Reg	aClient *c2ptr;
 	Reg	int	cnt = 0, len = 0, nlen;
 	char	*p;
+	char	*me2 = ST_UID(cptr) ? me.serv->sid : ME;
 
 	if (check_channelmask(&me, cptr, chptr->chname) == -1)
 		return;
-	sprintf(buf, ":%s NJOIN %s :", ME, chptr->chname);
+	sprintf(buf, ":%s NJOIN %s :", me2, chptr->chname);
 	len = strlen(buf);
 
 	for (lp = chptr->members; lp; lp = lp->next)
@@ -888,7 +889,7 @@ void	send_channel_members(aClient *cptr, aChannel *chptr)
 		if ((len + nlen) > (size_t) (BUFSIZE - 9)) /* ,@+ \r\n\0 */
 		    {
 			sendto_one(cptr, "%s", buf);
-			sprintf(buf, ":%s NJOIN %s :", ME, chptr->chname);
+			sprintf(buf, ":%s NJOIN %s :", me2, chptr->chname);
 			len = strlen(buf);
 			cnt = 0;
 		    }
