@@ -1,3 +1,32 @@
+2005-01-30  Piotr Kucharski, Kurt Roeckx
+
+	* struct_def.h: removed stok, tok, ltok.
+	* parse.c, parse_ext.h: removed find_tokserver().
+	* hash.c,hash_def.h,hash_ext.h: removed SERVERSIZE (using SIDSIZE
+	  on its own), removed serverTable hash, removed hash_find_stoken(),
+	  clear_server_hash_table(), add_to_server_hash_table(),
+	  del_from_server_hash_table(), functions and updated inithashtables(),
+	  bigger_hash_table(), show_hash_bucket().
+	* ircd.c/ircd_writetune(), ircd_readtune(): store and retrieve _SIDSIZE
+	  instead of _SERVERSIZE.
+	* list.c: removed used_tokens[] bit table.
+	* list.c/make_server(): removed tokens.
+	* s_misc.c/exit_one_client(): del_from_server_hash_table() call removed.
+	* s_serv.c/m_server_estab(): removed sending old syntax SERVICE.
+	* s_serv.c/m_server(), m_server_estab(): add_to_server_hash_table() call
+	  removed.
+	* s_serv.c/m_squit(), send_server(), m_server(), m_server_estab(),
+	  m_smask(), m_eob(): removed sending, parsing and receiving tokens (use
+	  sids, if possible) and compatibility sids.
+	* s_serv.c/m_smask(), m_server(): make_server() cannot fail due to lack
+	  of tokens, removed if-failure code.
+	* service_def.h: removed SERVICE_WANT_TOKEN, added SERVICE_WANT_SID.
+	* s_service.c/sendnum_toone(), m_service(), m_servset(): removed tokens
+	  and 2.10 protocol.
+	* s_user.c/register_user(): NICK introducing new client is no longer
+	  used between servers.
+	* s_user.c/m_user(): find_tokserver() call removed.
+
 2005-01-03  Kurt Roeckx
 
 	* ircd.c/check_pings(): Initialise the reason variable.  It could be
@@ -12,7 +41,7 @@
 	  or #if defined(VAR)
 	* s_bsd.c, s_bsd_ext.h, send.c, mkpasswd.c, iauth.c, chkconf.c,
 	  class.c, hash.c, ircd.c, list.c, res.c, res_init.c: Give all
-	  defenitions and declartions of function a proper prototype:
+	  definitions and declarations of function a proper prototype:
 	  add void as parameter if none is used.
 	* parse.c/find_target(): When using $SID, it checked the wrong
 	  variable which was always NULL, resulting in it never finding 
