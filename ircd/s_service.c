@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.56 2004/07/02 14:59:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.57 2004/07/02 15:06:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -172,6 +172,17 @@ static	void	sendnum_toone(aClient *cptr, int wants, aClient *sptr,
 	if (!*umode)
 		umode = "+";
 
+	if ((wants & SERVICE_WANT_UID) && HasUID(sptr))
+		sendto_one(cptr, ":%s UNICK %s %s %s %s %s %s :%s",
+			sptr->user->servp->sid,
+			(wants & SERVICE_WANT_NICK) ? sptr->name : ".",
+			sptr->user->uid,
+			(wants & SERVICE_WANT_USER) ? sptr->user->username : ".",
+			(wants & SERVICE_WANT_USER) ? sptr->user->host : ".",
+			(wants & SERVICE_WANT_USER) ? sptr->user->sip : ".",
+			(wants & (SERVICE_WANT_UMODE|SERVICE_WANT_OPER)) ? umode : "+",
+			(wants & SERVICE_WANT_USER) ? sptr->info : "");
+	else
 	if (wants & SERVICE_WANT_EXTNICK)
 		/* extended NICK syntax */
 		sendto_one(cptr, "NICK %s %d %s %s %s %s :%s",
