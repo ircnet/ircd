@@ -1,3 +1,11 @@
+1999-06-??  Christophe Kalt
+
+	* hash_ext.h, msg_def.h, numeric_def.h, parse_ext.h, struct_def.h,
+	s_id_ext.h, s_user_ext.h, channel.c, hash.c, ircd.c, list.c,
+	parse.c, send.c, s_err.c, s_id.c, s_misc.c, s_serv.c, s_user.c:
+	basic 2.11 functionnality: added uid hash tables, &SAVE channel,
+	m_unick(), m_save(), save_user(), new numeric 42.
+
 2.10.3
 
 1999-08-13  Christophe Kalt
