@@ -1,3 +1,8 @@
+2002-10-09  Kurt Roeckx
+
+	* support.c, support_ext.h, channel.c, list.c res.c, s_bsd.c, s_id.c,
+	  s_misc.c, s_service.c, s_zip.c: MyFree now takes a void * as argument.
+
 2002-09-29  Jakub Vlasek
 
 	* iauth-internals.txt: Update for 2.11 protocol (added kill reason).
