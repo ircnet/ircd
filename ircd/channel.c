@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.103 1999/07/20 17:12:17 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.104 1999/07/20 17:13:43 q Exp $";
 #endif
 
 #include "os.h"
@@ -2730,7 +2730,7 @@ int	m_invite(cptr, sptr, parc, parv)
 aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
-    {
+{
 	aClient *acptr;
 	aChannel *chptr;
 
@@ -2751,15 +2751,25 @@ char	*parv[];
 		return 1;
 	if (*parv[2] == '&' && !MyClient(acptr))
 		return 1;
-	if (!(chptr = find_channel(parv[2], NullChn)))
-	    {
+	chptr = find_channel(parv[2], NullChn);
 
+	if (!chptr)
+	    {
 		sendto_prefix_one(acptr, sptr, ":%s INVITE %s :%s",
 				  parv[0], parv[1], parv[2]);
+		if (MyConnect(sptr))
+		    {
+        	        sendto_one(sptr, rpl_str(RPL_INVITING, parv[0]),
+	                           acptr->name, parv[2]);
+			if (acptr->user->flags & FLAGS_AWAY)
+				sendto_one(sptr, rpl_str(RPL_AWAY, parv[0]),
+					   acptr->name, (acptr->user->away) ? 
+					   acptr->user->away : "Gone");
+		    }
 		return 3;
 	    }
 
-	if (chptr && !IsMember(sptr, chptr))
+	if (!IsMember(sptr, chptr))
 	    {
 		sendto_one(sptr, err_str(ERR_NOTONCHANNEL, parv[0]), parv[2]);
 		return 1;
@@ -2771,21 +2781,12 @@ char	*parv[];
 			   parv[1], parv[2]);
 		return 1;
 	    }
-	if (chptr && (chptr->mode.mode & MODE_INVITEONLY))
+
+	if ((chptr->mode.mode & MODE_INVITEONLY) &&  !is_chan_op(sptr, chptr))
 	    {
-		if (!is_chan_op(sptr, chptr))
-		    {
-			sendto_one(sptr, err_str(ERR_CHANOPRIVSNEEDED,
-				   parv[0]), chptr->chname);
-			return 1;
-		    }
-		else if (!IsMember(sptr, chptr))
-		    {
-			sendto_one(sptr, err_str(ERR_CHANOPRIVSNEEDED,
-				   parv[0]),
-				   ((chptr) ? (chptr->chname) : parv[2]));
-			return 1;
-		    }
+		sendto_one(sptr, err_str(ERR_CHANOPRIVSNEEDED,
+			   parv[0]), chptr->chname);
+		return 1;
 	    }
 
 	if (MyConnect(sptr))
@@ -2798,14 +2799,16 @@ char	*parv[];
 				   (acptr->user->away) ? acptr->user->away :
 				   "Gone");
 	    }
+
 	if (MyConnect(acptr))
 		if (chptr && /* (chptr->mode.mode & MODE_INVITEONLY) && */
 		    sptr->user && is_chan_op(sptr, chptr))
 			add_invite(acptr, chptr);
+
 	sendto_prefix_one(acptr, sptr, ":%s INVITE %s :%s",parv[0],
 			  acptr->name, ((chptr) ? (chptr->chname) : parv[2]));
 	return 2;
-    }
+}
 
 
 /*
