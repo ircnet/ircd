@@ -413,14 +413,17 @@
 
 /*
 ** This adds ability to ban users with specified realnames from
-** connecting to the server. Useful for various drones.
-** Also define the reason users as a rejection message.
+** connecting to the server. May be useful for various drones.
 */
 #undef XLINE
 
-#ifdef XLINE
+/*
+** Define the reason users get as a rejection message.
+** Some may use first form for the sake of transparency, some may believe it
+** is not good that users can see the real reason behind X-rejection.
+*/
+/* #define XLINE_EXIT_REASON "X-denied user" */
 #define XLINE_EXIT_REASON "Too many host connections (global)"
-#endif
 
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
