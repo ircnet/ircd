@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.16 1999/03/11 19:53:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.17 1999/03/11 23:35:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -41,7 +41,7 @@ static int		iob_len = 0, rb_len = 0;
 void
 init_io()
 {
-    bzero((char *) &cldata, sizeof(cldata));
+    bzero((char *) cldata, sizeof(cldata));
 }
 
 /* sendto_ircd() functions */
