@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.151 2004/11/10 00:08:34 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.152 2004/11/14 14:45:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -658,8 +658,8 @@ ping_timeout:
 #endif
 	if (!oldest || oldest < currenttime)
 		oldest = currenttime + PINGFREQUENCY;
-	if (oldest < currenttime + 2)
-		oldest += 2;
+	if (oldest < currenttime + 30)
+		oldest += 30;
 	Debug((DEBUG_NOTICE,"Next check_ping() call at: %s, %d %d %d",
 		myctime(oldest), ping, oldest, currenttime));
 	return (oldest);
