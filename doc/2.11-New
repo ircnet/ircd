@@ -5,6 +5,7 @@
 		I - restricted, when client has no ident.
 		R - restricted.
 		E - client is exempted from K: lines
+		N - do not show resolved hostname (but bans still match)
 		
 	* Channels now keep information who set the topic.
 	* LIST does not disconnect if client's sendQ fills.

@@ -17,6 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+/* perhaps let's get rid of all comments here? :> */
 /*
  * -- Avalon -- 1 Sep 1992
  *
