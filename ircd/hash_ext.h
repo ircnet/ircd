@@ -38,12 +38,15 @@ extern int _SERVERSIZE;
 #endif /* HASH_C */
 EXTERN void inithashtables();
 EXTERN int add_to_client_hash_table __P((char *name, aClient *cptr));
+EXTERN int add_to_uid_hash_table __P((char *uid, aClient *cptr));
 EXTERN int add_to_channel_hash_table __P((char *name, aChannel *chptr));
 EXTERN int add_to_server_hash_table __P((aServer *sptr, aClient *cptr));
 EXTERN int del_from_client_hash_table __P((char *name, aClient *cptr));
+EXTERN int del_from_uid_hash_table __P((char *uid, aClient *cptr));
 EXTERN int del_from_channel_hash_table __P((char *name, aChannel *chptr));
 EXTERN int del_from_server_hash_table __P((aServer *sptr, aClient *cptr));
 EXTERN aClient *hash_find_client __P((char *name, aClient *cptr));
+EXTERN aClient *hash_find_uid __P((char *uid, aClient *cptr));
 EXTERN aClient *hash_find_server __P((char *server, aClient *cptr));
 EXTERN aChannel *hash_find_channel __P((char *name, aChannel *chptr));
 EXTERN aChannel *hash_find_channels __P((char *name, aChannel *chptr));
