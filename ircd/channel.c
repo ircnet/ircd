@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.26 1998/01/23 16:35:52 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.27 1998/01/23 22:37:52 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2488,7 +2488,7 @@ aClient	*cptr, *user;
 			if (match(++mask, cptr->name))
 				continue;
 		clen = strlen(chptr->chname);
-		if (clen > (size_t) BUFSIZE - 7 - len)
+		if ((clen + len) > (size_t) BUFSIZE - 7)
 		    {
 			if (cnt)
 				sendto_one(cptr, "%s", buf);
