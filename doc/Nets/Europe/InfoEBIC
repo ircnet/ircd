@@ -1,0 +1,48 @@
+InfoEBIC - General information about European IRC	//941115
+
+Online information sources in Europe
+====================================
+- By IRC
+#EU-Opers is an adminstrative channel for European IRC networking.
+
+- Help automatons in the IRC net (based on ircII help pages)
+Help_EU, Help_UK	Send PRIVMSG, receive NOTICE
+Help_IT			Requires DCC Chat
+
+- By WWW
+http://www.funet.fi/~irc/
+http://irc.pages.de/
+http://www.nvg.unit.no/irc/IRCNO-page.html
+
+Public IRC servers in Europe
+============================
+- Open for all domains
+irc.funet.fi		Finland
+irc.Univ-Lyon1.FR	France
+
+- Open for national and some neighbouring domains
+irc.cdc.polimi.it	Italy
+irc.span.ch		Switzerland
+irc.ludd.luth.se	Sweden
+irc.nvg.unit.no		Norway
+irc.sci.kun.nl		Netherlands
+irc.uni-stuttgart.de	Germany
+stork.doc.ic.ac.uk	United Kingdom
+
+Anonymous FTP archives with IRC software in Europe
+==================================================
+ftp.funet.fi:/pub/unix/irc
+ftp.informatik.tu-muenchen.de:/pub/comp/networking/irc
+hplyot.obspm.fr:/irc
+src.doc.ic.ac.uk:/packages/irc
+
+Mailing list
+============
+There is administrative mailing list for european IRC networking.
+The list address is irc-eu@ifens01.insa-lyon.fr. This list is run by
+an automated mailing-list manager tool, so all requests concerning
+the list should be mailed to listserv@ifens01.insa-lyon.fr. To get help,
+send "help" in mail message to the listserv address, and you will
+get help file in reply.
+
+

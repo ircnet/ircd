@@ -1,0 +1,55 @@
+Rules for IRC networking - Ratified July 6th 1994
+
+1.)	The establishment of new servers and intra-domain linking should
+	be a local toplevel domain (IE: country) decision.
+
+        Guidelines:
+
+        + Only a link for ONE server should be given to the new
+          server site, that means the new site shouldn't be able to
+          connect test-servers to other than its own server.
+          (This avoids confusion about linking hierachy).
+
+	+ If a toplevel domain hostmask link is given, ensure that all
+	  hubs of that domain have connect access to the masked server
+	  (this should avoid disagreements between hub admins within a
+	  domain).
+
+2.)	Hacked or cracked servers (and the machines they run on) are the
+	concern of all Admins, and override all local interests.
+
+        Guidelines:
+
+        + In a server with non-standard source code which breaks
+          the current irc protocol (especially the incorrect
+          manipulation of channel modes and user/hostname authen-
+          tication) Admins will take action, this includes the
+	  testing of these patches.
+
+        + The recommended action is permanent withdrawl of the
+          server from the IRC-net by removal from all its uplinks
+          configuration files.
+
+3.)	The Admins are responsible for all operator access.
+	IRC Administrators should therefore be approved by the
+	machine and network admins for the site in question.
+
+4.)	Operator power may be used only on server and network
+	maintenance purposes. KILL may be used only when other
+	methods to fix a problem don't exist.
+
+Infringement of the rules as outlined above should lead to
+operator and/or admin changes on the offending server.
+Responsibility for these changes is primarily that of the uplink
+server administrators.
+
+In the event of continued transgression, further action may be
+taken by remote IRC Administrators 24 hours after the problem
+has been identified and all responsible parties have been
+notified.
+
+All intended additions to this document must be announced to IRC
+Administrators for at least one week prior to ratification.
+
+--
+Edited June 29th by #EU-Opers

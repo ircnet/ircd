@@ -1,0 +1,85 @@
+/************************************************************************
+ *   IRC - Internet Relay Chat, ircd/ChangeLog
+ *   Copyright (C) 1990 Jarkko Oikarinen
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 1, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+Sat Jul 25 05:52:43 1992
+	* common.h	Dynix (sequent) doesnt have malloc.h but it appears
+			Dynix/PTX does. Blah.
+
+Fri Jul 24 18:43:35 1992
+	* config.h, sys.h, common.h
+			Applied patches from Adrian Hall for compiling on
+			Dynix/PTX (email: csc260@central1.lancaster.ac.uk).
+
+Mon Sep 02 17:06:59 1991  Darren Reed  <avalon@coombs.anu.edu.au>
+
+	* config.h
+	  added MAXCONNECTIONS (see config.h for details)
+	  added NICKNAMEHISTORYLENGTH
+
+	* hash.h
+	  Added to support for ../ircd/hash.c
+
+	* msg.h
+	  Commands reordered in (hopefully) order of useage.
+	  All commands now marked for flood protection.
+
+Tue Jul 02 11:10:26 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* config.h
+	  changed MSG_MAIL to MSG_NOTE as requested by the author.
+
+Mon Jul 01 20:37:38 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* config.h
+	  #define WALL a priori. WALL should be go away in future version.
+
+	* numeric.h
+	  ERR_TOOMANYTARGETS added.
+
+Mon Dec 03 13:56:36 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* config.h
+	  Switches for NEED_* added.
+
+Mon Nov 26 10:33:43 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* sys.h[.SH]
+	  declaration of dummy() and restart() depending on configuration
+	  process.
+
+Sat Nov 10 18:00:44 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* New header file: common.h, should be included into all source
+	  files. Created sys.h.SH, Makefile.SH, config.h.SH; these files
+	  are extracted by running Configure.
+
+	* Added some function declarations
+	  Removed Makefile (do we need one here ?).
+
+Wed Jun 20 11:44:00 1990  Jarkko Oikarinen (jto@tolsun.oulu.fi)
+
+	* config.h
+	MAIL changes to config.h
+        * struct.h
+	Numerous changes to file to make string channels work
+ 
+Thu May 10 22:37:23 1990  Jarkko Oikarinen (jto@tolsun.oulu.fi)
+
+        * config.h
+        Added UPHOST into config.h (Who removed it ?)

@@ -1,0 +1,34 @@
+
+This directory contains the documentation related to this package.
+
+
+
+The files relevant to the software compilation and configuration are:
+
+RELEASE_NOTES	- useful information for people upgrading from a previous
+		  version
+INSTALL		- detailed information about compilation and configuration
+example.conf	- server configuration example file (useful complement to
+		  INSTALL)
+
+
+
+Other files of interest:
+
+ChangeLog	- log of source changes
+2.9-New		- transition documentation from 2.8 to 2.9 version
+Etiquette	- IRC Etiquette
+NOTE		- documentation concerning the NOTE command/feature
+irc.1		- man page for the client
+Nets/		- documentation about various IRC networks
+ircd.8		- man page for the server
+Authors		- irc contributors
+Juped/		- old/obsolete documentation files
+alt-irc-faq	- alt.irc faw
+m4macros	- note on m4 macros for the server configuration file
+
+
+
+related documents on the World Wide Web:
+
+		http://www.irc.org/~irc/server/

@@ -1,0 +1,19 @@
+
+This is a development version of the package,
+
+			USE AT YOUR OWN RISK
+
+---
+
+2.9.3b7 introduces a change in the PASS syntax which makes
+the `link compression negociation' *incompatible* with
+previous betas.
+
+---
+
+2.9.3 doesn't support 2.7 protocol anymore.  Don't run 2.9.3
+and 2.7 servers on the same network.
+
+---
+
+2.9.3 supports compression of server links, see INSTALL.

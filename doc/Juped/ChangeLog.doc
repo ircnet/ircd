@@ -1,0 +1,90 @@
+/************************************************************************
+ *   IRC - Internet Relay Chat, doc/ChangeLog
+ *   Copyright (C) 1990, Mike Bolotski
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 1, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+
+Tue Mar 22 17:32:33 1994  Helen T. Rose Davis  (hrose@rocza.kei.com)
+
+	* Re-rewrite of documentation to coincide with 2.8.17 release.
+
+Mon Mar 29 01:26:16 1993
+
+	* INTSALL	updated.
+	* m4macros	added.
+
+Fri Jan 22 22:49:20 1993
+
+	* INTSALL	updated.
+
+Thu Dec 17 19:41:19 1992  Darren Reed <avalon@coombs.anu.edu.au>
+
+	* general	Well, these docs were updated for 2.7, nobody
+			documented it - must be a general distaste for
+			documentation I'd say :)
+
+			Work on 2.8 documentation slowly creaping along.
+
+Mon Sep 02 17:12:41 1991  Darren Reed <avalon@coombs.anu.edu.au>
+
+	* Documentation brought upto date with new features to 2.6.2
+
+
+Mon Aug 26 16:51:01 1991  Helen Trillian Rose  (hrose@eff.org)
+
+	* Rewrite of documentation (again) to coincide with the 2.6.2
+	release. 
+
+Wed Oct 31 18:05:12 1990  Jarkko Oikarinen
+
+	* Added hrose@cs.bu.edu's patches to irc2.6
+	  - Documentation rewrites...
+	  - patches
+
+Fri Jun 29 18:54:40 1990  Armin Gruner (gruner@informatik.tu-muenchen.de)
+
+       * NETWORKING
+
+       Added some sites in Germany
+
+Sat Dec 16 15:56:41 1989  Mike Bolotski  (mikeb at coho.ee.ubc.ca)
+
+	* INSTALL
+
+	Modified the installation document as per Valdis's nitpicking.
+	Improved the grammer and speling of a lot of dokumentation.
+	Removed lots and lots of informal wording, eh? and especially
+	the long run on sentences that try to say a lot but really don't
+	and are present only to show the author's superiority, especially
+	when quoting from a prestigious work like Webster's New Collegiate
+	Dictionary, gosh, specifically the 1979 version (ISBN
+	0-87779-3580-1), which I guess I should run out and purchase
+	immediately, for otherwise I might be considered ignorant by
+	wise men who have written a great deal of code in VS/Pascal and
+	even IBM Assembler and still can't manage not to avoid including
+	.QUIT in every goddam mail message.
+
+
+	* HISTORY
+
+	Added a recent history of the version numbers and the new
+	patchlevel mechanism.
+
+
+	* BugList
+
+	Added a BugList file including the notation of bug numbers.

@@ -1,0 +1,86 @@
+Appendix A: Difference between IP addresses and hostnames
+
+
+   There are 2 different types of INTERNET addresses, NAME addresses and
+   NUMERIC addresses.  NAME addresses look like ENGLISH words (and indeed
+   they are ENGLISH words that refer to a given host).  A NAME address looks
+   like "tolsun.oulu.fi" - and that particular address refers to the machine 
+   named TOLSUN in Finland.  It is a UNIQUE address because no other machine
+   in the world has its NAME address the same as "tolsun.oulu.fi".  Anytime
+   you say "telnet tolsun.oulu.fi" - you would always connect to TOLSUN in
+   Finland.  NUMERIC addresses refer to those addresses that are made up of
+   NUMBERS for example "128.214.5.6" is the NUMERIC address for TOLSUN.  This
+   address is also UNIQUE in that no other machine in the world will be use 
+   those NUMERIC numbers.  The NUMERIC address is usually more reliable than
+   the NAME address because not all sites can recognize and translate the
+   NAME address into it's numeric counterpart.  NUMERIC always seems to work
+   best, but use a NAME address when you can because it is easier to tell
+   what host you are connected to.
+
+
+   Every Unix machine has a file called "/etc/hosts" on it.  This file 
+   contains NAME and NUMERIC addresses.  When you supply IRC with a NAME 
+   address it will at first try to find it in /etc/hosts, and then (if it's 
+   really smart), use the local Domain Name Server (DNS) to find the NUMERIC
+   address for the host you want to connect to.  Thus if you plan to use NAME
+   addresses keep in mind that on SOME sites the entry for the TARGET machine
+   must be found in /etc/hosts or the NAME address will fail.  A typical 
+   entry in /etc/hosts looks like this:
+
+   130.253.1.15    orion.cair.du.edu orion.du.edu orion    # BSD 4.3
+
+   This particular example is the Host ORION at the University of Denver. 
+   Notice that on the far left is the NUMERIC Address for orion.  The
+   next few ENGLISH words are the NAME addresses that can be used for orion,
+   "orion.cair.du.edu", "orion.du.edu", "orion".  ALL of these NAME addresses
+   will return the NUMERIC address "130.253.1.15" which IRC will use to
+   connect to the TARGET UNIX. (when I say TARGET UNIX I am refering to the
+   UNIX you want to connect to for IRC). Any futher questions about
+   /etc/hosts should be directed to "man hosts".
+
+
+Appendix B: Enabling Summon Messages
+
+   +-----------------------------------------------------------------------+
+   |            E N A B L I N G    / S U M M O N    M E S S A G E S        |
+   +-----------------------------------------------------------------------+
+
+   *NOTE* You must have ROOT or special access to the GROUP tty ('/dev')
+   to do this. If you want to allow users around the world to summon
+   users at your site to irc, then you should make sure that summon works.
+
+   The "IRCD" program needs access to the GROUP of '/dev'.   This
+   directory is where user TTY's are stored (as UNIX treats each Terminal
+   as a FILE!)   IRCD needs GROUP ACCESS to /dev so that users can be
+   SUMMONED to the program by others users that are *in* the program.
+   This allows people from other Universities around the world to SUMMON
+   your users to IRC so that they can chat with them.  Berkeley, SUN, HP-UX
+   and most of the newer versions of UNIX check to see if a USER is
+   accepting MESSAGES via the GROUP access rights on their TTY listing
+   in the /dev directory. For example an entry in '/dev' looks like this:
+
+  (Unix Path on BSD 4.3 UNIX is:  /dev/ttyp0)
+
+        crw------- 1 jtrim     20,     0 Apr 29 10:35 ttyp0
+
+   You will note that 'jtrim' OWNS this terminal and can READ/WRITE to this
+   terminal as well (which makes sense because I am ENTERING DATA and
+   RECEIVEING DATA back from the UNIX).  I logged into this particular
+   UNIX on "April 29th" at "10:35am" and my TTY is "ttyp0".  But further
+   of *note* is that I do not have my MESSAGES ON! (mesg n)  -- This is
+   how my terminal would look with MESSAGES ON (mesg y):
+
+        crw--w---- 1 jtrim     20,     0 Apr 29 10:35 ttyp0
+
+   With my MESSAGES ON (mesg y) I can receive TALK(1) requests, use the 
+   UNIX WRITE(1) command and other commands that allow users to talk
+   to one another.  In IRC this would also allow me to get IRC /SUMMON
+   messages.  To set up the "IRCD" program to work with /SUMMON type
+   the following:  (using ROOT or an account that has access to '/dev').
+
+       % chgrp tty ircd
+       % chmod 6111 ircd 
+
+   The above commands read: "Give IRCD access to GROUP tty (which is /dev)
+   and then when ANYONE runs the IRCD allow SETUID and SETGID priviliges
+   so that they can use the /SUMMON command.
