@@ -1,3 +1,16 @@
+Sun Jul 19 15:32:48 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* s_conf.c, ircd.c: unitialized K line comment in check_pings().
+
+	* channel.c:
+		* beI modes to multiple channels were corrupted.
+		* mode parameters starting with : don't propagate correctly.
+		* !channel creation propagation was broken (reported by Eumel).
+
+	* send.c, struct_def.h, channel.s, res.c, ircd.c, s_auth.c,
+	s_auth_ext.h, s_bsd.c, s_bsd_ext.h, s_conf.c, s_user.c,
+	Makefile.in, config.h.dist: added iauth.
+
 Fri Jun 12 19:00:03 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* ircd.c: fix for inetd support (from Jonathan Chapman
