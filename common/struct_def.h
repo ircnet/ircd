@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.115 2004/06/30 18:08:36 chopin Exp $
+ *   $Id: struct_def.h,v 1.116 2004/06/30 18:59:12 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -256,6 +256,7 @@ typedef enum Status {
 #ifdef XLINE
 #define IsXlined(x)		((x)->user && (x)->user->flags & FLAGS_XLINED)
 #define SetXlined(x)		((x)->user->flags |= FLAGS_XLINED)
+#define ClearXlined(x)		((x)->user->flags &= ~FLAGS_XLINED)
 #endif
 
 
@@ -362,6 +363,9 @@ struct	ListItem	{
 #define CFLAG_NORESOLVE		0x00010
 #define CFLAG_FALL		0x00020
 #define CFLAG_NORESOLVEMATCH	0x00040
+#ifdef XLINE
+#define CFLAG_XEXEMPT		0x00080
+#endif
 
 #define IsConfRestricted(x)	((x)->flags & CFLAG_RESTRICTED)
 #define IsConfRNoDNS(x)		((x)->flags & CFLAG_RNODNS)
@@ -370,6 +374,9 @@ struct	ListItem	{
 #define IsConfNoResolve(x)	((x)->flags & CFLAG_NORESOLVE)
 #define IsConfNoResolveMatch(x)	((x)->flags & CFLAG_NORESOLVEMATCH)
 #define IsConfFallThrough(x)	((x)->flags & CFLAG_FALL)
+#ifdef XLINE
+#define IsConfXlineExempt(x)	((x)->flags & CFLAG_XEXEMPT)
+#endif
 
 #define PFLAG_DELAYED		0x00001
 #define PFLAG_SERVERONLY	0x00002
