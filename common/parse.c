@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.34 2001/12/23 14:52:19 q Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.35 2002/01/06 01:25:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -389,7 +389,7 @@ aClient *cptr;
     }
 
 
-/* find_serder(): 
+/* find_sender(): 
 ** Find the client structure for the sender of the message we got from cptr
 ** and checks it to be valid.
 ** Stores the result in *sptr.
