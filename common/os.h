@@ -212,7 +212,8 @@
 # include <netinfo/ni.h>
 #endif
 
-#if USE_ZLIB && !defined(CLIENT_COMPILE) && !defined(CHKCONF_COMPILE)
+#if USE_ZLIB && !defined(CLIENT_COMPILE) && !defined(CHKCONF_COMPILE) && \
+	!defined(CONTRIB_COMPILE)
 # include <zlib.h>
 #endif
 
