@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.141 2004/04/14 21:40:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.142 2004/04/15 13:17:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1238,6 +1238,10 @@ void	close_connection(aClient *cptr)
 		if (nextconnect > aconf->hold || nextconnect == 0)
 			nextconnect = aconf->hold;
 	    }
+	if (nextconnect == 0 && (IsHandshake(cptr) || IsConnecting(cptr)))
+	{
+		nextconnect = timeofday + HANGONRETRYDELAY;
+	}
 
 	if (cptr->authfd >= 0)
 	    {
