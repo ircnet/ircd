@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.29 1998/07/19 20:06:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.30 1998/08/03 01:26:51 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1138,7 +1138,7 @@ aClient *cptr;
 	if ((i = cptr->fd) >= 0)
 	    {
 #if defined(USE_IAUTH)
-		char buf[10];
+		char buf[20];
 
 		sprintf(buf, "%d D\n", cptr->fd);
 		sendto_iauth(buf);
@@ -1201,6 +1201,10 @@ aClient *cptr;
 					add_fd(i, &fdaa);
 				while (!local[highest_fd])
 					highest_fd--;
+#if defined(USE_IAUTH)
+				sprintf(buf, "%d R %d\n", j, i);
+				sendto_iauth(buf);
+#endif
 			    }
 		    }
 		cptr->fd = -2;
