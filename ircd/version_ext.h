@@ -29,4 +29,5 @@ extern char *creation;
 extern char *version;
 extern char *pass_version;
 extern char *infotext[];
+extern char **isupport;
 #endif /* VERSION_C */
