@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.245 2005/02/04 18:31:44 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.246 2005/02/04 18:40:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -229,16 +229,10 @@ int	hunt_server(aClient *cptr, aClient *sptr, char *command, int server,
 **  Nickname characters are in range
 **	'A'..'}', '_', '-', '0'..'9'
 **  anything outside the above set will terminate nickname.
-**  In addition, the first character cannot be '-'
-**  or a Digit.
+**  In addition, the first character cannot be '-' or a digit.
 **  Finally forbid the use of "anonymous" because of possible
 **  abuses related to anonymous channnels. -kalt
 **
-**  Note:
-**	'~'-character should be allowed, but
-**	a change should be global, some confusion would
-**	result if only few servers allowed it...
-**	It will be allowed in 2.11.1 (and is now accepted from servers).
 */
 
 int	do_nick_name(char *nick, int server)
@@ -256,12 +250,6 @@ int	do_nick_name(char *nick, int server)
 
 	for (ch = nick; *ch && (ch-nick) < (server?NICKLEN:LOCALNICKLEN); ch++)
 	{
-		/* 2.11.1 should remove this if() and fix
-		** match.c to make '~' NVALID --B. */
-		if (server && *ch == '~')
-		{
-			continue;
-		}
 		if (!isvalidnick(*ch))
 		{
 			break;

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: match.c,v 1.15 2004/10/27 13:21:34 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: match.c,v 1.16 2005/02/04 18:40:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -144,7 +144,7 @@ unsigned char char_atribs[] = {
 		PRINT|ALPHA|NVALID|UVALID, PRINT|ALPHA|NVALID|UVALID,
 /* yz  */	PRINT|ALPHA|NVALID|UVALID, PRINT|ALPHA|NVALID|UVALID,
 /* {|  */	PRINT|NVALID|UVALID, PRINT|NVALID|UVALID,
-/* }~  */	PRINT|NVALID|UVALID, PRINT|UVALID,
+/* }~  */	PRINT|NVALID|UVALID, PRINT|NVALID|UVALID,
 /* del */	0,
 /* 80-8f */	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 /* 90-9f */	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
