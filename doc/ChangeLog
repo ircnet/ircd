@@ -1,3 +1,13 @@
+2004-04-07  Piotr Kucharski
+
+	* ircd.c, s_bsd.c, s_bsd_ext.h: reverting changes from 2004-03-07
+	  regarding listeners[] table.
+	* s_serv.c/report_listeners(): use local[], not listeners[].
+	* channel.c/add_modeid(): allow redundant bans for it is users problem,
+	  not server, to maintain banlist.
+	* struct_def.h, ircd.c, s_bsd.c, s_serv.c: changed IsListening() macro
+	  name to IsListener().
+
 2004-03-29  Piotr Kucharski
 
 	* s_user.c/do_nick_name(): allow '~' in nicks from servers.
