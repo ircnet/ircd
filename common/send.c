@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.3 1997/04/14 20:02:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.4 1997/04/18 12:23:59 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -869,9 +869,8 @@ char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 			else
 			    {
 				if (!len2)
-					len2 = sendprep(cptr, pattern,
-							p1, p2, p3, p4,
-							p5, p6, p7, p8,
+					len2 = sendprep(pattern, p1, p2, p3,
+							p4, p5, p6, p7, p8,
 							p9, p10, p11);
 				(void)send_message(cptr, sendbuf, len2);
 			    }
