@@ -1,0 +1,11 @@
+
+ALIS - Advanced List Service
+http://aliserv.sourceforge.net/
+
+This service is an alternative to the /LIST command.
+
+Unlike the LIST command ALIS has various search parameters such
+as minimum users per channel and searching for specific topics.
+
+The server has to be compiled with USE_SERVICES in config.h
+
