@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.85 2002/01/24 01:56:58 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.86 2002/03/14 02:08:15 jv Exp $";
 #endif
 
 #include "os.h"
@@ -166,6 +166,11 @@ aClient *cptr;
 #ifdef USE_SYSLOG
 	syslog(LOG_WARNING, text, host, strerror(errtmp));
 #endif
+	if (serverbooting)
+	{
+		fprintf(stderr,text,host,strerror(errtmp));
+		fprintf(stderr,"\n");
+	}
 	return;
 }
 
@@ -586,13 +591,16 @@ void	init_sys()
 	bzero((char *)&fdas, sizeof(fdas));
 	bzero((char *)&fdall, sizeof(fdall));
 	fdas.highest = fdall.highest = -1;
-
+	bzero((char *)&local, sizeof(local));
 	for (fd = 3; fd < MAXCONNECTIONS; fd++)
-	    {
+	{
 		(void)close(fd);
-		local[fd] = NULL;
-	    }
-	local[1] = NULL;
+	}
+}
+
+void	daemonize()
+{
+	int fd;
 	(void) fclose(stdout);
 	(void)close(1);
 
@@ -630,8 +638,8 @@ init_dgram:
 	resfd = init_resolver(0x1f);
 
 	start_iauth(0);
-}
 
+}
 void	write_pidfile()
 {
 	int fd;
