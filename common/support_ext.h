@@ -29,13 +29,13 @@
 #define EXTERN
 #endif /* SUPPORT_C */
 EXTERN char *mystrdup (char *s);
-#if ! HAVE_STRTOKEN
+#if !defined(HAVE_STRTOKEN)
 EXTERN char *strtoken (char **save, char *str, char *fs);
 #endif /* HAVE_STRTOKEN */
-#if ! HAVE_STRTOK
+#if !defined(HAVE_STRTOK)
 EXTERN char *strtok (char *str, char *fs);
 #endif /* HAVE_STRTOK */
-#if ! HAVE_STRERROR
+#if !defined(HAVE_STRERROR)
 EXTERN char *strerror (int err_no);
 #endif /* HAVE_STRERROR */
 EXTERN char *myctime (time_t value);
@@ -44,16 +44,16 @@ EXTERN char *mybasename (char *);
 EXTERN char *inetntop(int af, const void *in, char *local_dummy, size_t the_size);
 EXTERN int inetpton(int af, const char *src, void *dst);
 #endif
-#if ! HAVE_INET_NTOA
+#if !defined(HAVE_INET_NTOA)
 EXTERN char *inetntoa (char *in);
 #endif /* HAVE_INET_NTOA */
-#if ! HAVE_INET_NETOF
+#if !defined(HAVE_INET_NETOF)
 EXTERN int inetnetof (struct in_addr in);
 #endif /* HAVE_INET_NETOF */
-#if ! HAVE_INET_ADDR
+#if !defined(HAVE_INET_ADDR)
 EXTERN u_long inetaddr (register const char *cp);
 #endif /* HAVE_INET_ADDR */
-#if ! HAVE_INET_ATON
+#if !defined(HAVE_INET_ATON)
 EXTERN int inetaton (register const char *cp, struct in_addr *addr);
 #endif /* HAVE_INET_ATON */
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE)
@@ -70,10 +70,10 @@ EXTERN char *MyRealloc (char *x, size_t y);
 EXTERN int dgets (int fd, char *buf, int num);
 EXTERN char *make_version(void);
 EXTERN char **make_isupport(void);
-#if SOLARIS_2_3
+#ifdef SOLARIS_2_3
 EXTERN struct hostent *solaris_gethostbyname (const char *name);
 #endif /* SOLARIS_2_3 */
-#if HAVE_MEMCMP && MEMCMP_BROKEN
+#if defined(HAVE_MEMCMP) && defined(MEMCMP_BROKEN)
 EXTERN int irc_memcmp (const __ptr_t s1, const __ptr_t s2, size_t len);
 #endif /* HAVE_MEMCMP && MEMCMP_BROKEN */
 #undef EXTERN

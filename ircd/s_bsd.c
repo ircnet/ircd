@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.171 2004/11/19 15:42:08 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.172 2005/01/03 17:33:55 q Exp $";
 #endif
 
 #include "os.h"
@@ -509,7 +509,7 @@ void	open_listener(aClient *cptr)
 }
 
 /* Reopens listening sockets on all listeners */
-void	reopen_listeners()
+void	reopen_listeners(void)
 {
 	aClient *acptr;
 	aConfItem *aconf;
@@ -698,7 +698,7 @@ void	init_sys(void)
 		    }
 	    }
 #endif
-#if ! USE_POLL
+#if !defined(USE_POLL)
 # ifdef sequent
 #  ifndef	DYNIXPTX
 	int	fd_limit;
@@ -1459,7 +1459,7 @@ static	int	set_sock_opts(int fd, aClient *cptr)
 #endif
 #if  defined(SO_DEBUG) && defined(DEBUGMODE) && 0
 /* Solaris 2.x with SO_DEBUG writes to syslog by default */
-#if ! SOLARIS_2 || defined(USE_SYSLOG)
+#if !defined(SOLARIS_2) || defined(USE_SYSLOG)
 	opt = 1;
 	if (SETSOCKOPT(fd, SOL_SOCKET, SO_DEBUG, &opt, opt) < 0)
 		report_error("setsockopt(SO_DEBUG) %s:%s", cptr);
@@ -1567,13 +1567,13 @@ void	set_non_blocking(int fd, aClient *cptr)
 	**	 as can be seen by the PCS one.  They are *NOT* all the same.
 	**	 Heed this well. - Avalon.
 	*/
-#if NBLOCK_POSIX
+#ifdef NBLOCK_POSIX
 	nonb |= O_NONBLOCK;
 #endif
-#if NBLOCK_BSD
+#ifdef NBLOCK_BSD
 	nonb |= O_NDELAY;
 #endif
-#if NBLOCK_SYSV
+#ifdef NBLOCK_SYSV
 	/* This portion of code might also apply to NeXT.  -LynX */
 	res = 1;
 
@@ -2073,7 +2073,7 @@ static	int	read_packet(aClient *cptr, int msg_ready)
  */
 int	read_message(time_t delay, FdAry *fdp, int ro)
 {
-#if ! USE_POLL
+#if !defined(USE_POLL)
 # define SET_READ_EVENT( thisfd )	FD_SET( thisfd, &read_set)
 # define SET_WRITE_EVENT( thisfd )	FD_SET( thisfd, &write_set)
 # define CLR_READ_EVENT( thisfd )	FD_CLR( thisfd, &read_set)
@@ -2126,7 +2126,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 
 	for (res = 0;;)
 	    {
-#if ! USE_POLL
+#if !defined(USE_POLL)
 		FD_ZERO(&read_set);
 		FD_ZERO(&write_set);
 #else
@@ -2140,7 +2140,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 #endif	/* USE_POLL */
 		auth = 0;
 
-#if USE_POLL
+#if defined(USE_POLL)
 		if ( auth == 0 )
 			bzero((char *) authclnts, sizeof( authclnts ));
 #endif
@@ -2161,7 +2161,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 					fd));
 				if (cptr->flags & FLAGS_WRAUTH)
 					SET_WRITE_EVENT(cptr->authfd);
-#if USE_POLL
+#if defined(USE_POLL)
 				authclnts[cptr->authfd] = cptr;
 #else
 				if (cptr->authfd > highfd)
@@ -2181,7 +2181,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 			if (DoingDNS(cptr) || DoingAuth(cptr))
 #endif
 				continue;
-#if ! USE_POLL
+#if !defined(USE_POLL)
 			if (fd > highfd)
 				highfd = fd;
 #endif
@@ -2240,7 +2240,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 		if (udpfd >= 0)
 		    {
 			SET_READ_EVENT(udpfd);
-#if ! USE_POLL
+#if !defined(USE_POLL)
 			if (udpfd > highfd)
 				highfd = udpfd;
 #else
@@ -2250,7 +2250,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 		if (resfd >= 0)
 		    {
 			SET_READ_EVENT(resfd);
-#if ! USE_POLL
+#if !defined(USE_POLL)
 			if (resfd > highfd)
 				highfd = resfd;
 #else
@@ -2271,13 +2271,13 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 #endif
 		Debug((DEBUG_L11, "udpfd %d resfd %d adfd %d", udpfd, resfd,
 		       adfd));
-#if ! USE_POLL
+#if !defined(USE_POLL)
 		Debug((DEBUG_L11, "highfd %d", highfd));
 #endif
 		
 		wait.tv_sec = MIN(delay2, delay);
 		wait.tv_usec = (delay == 0) ? 200000 : 0;
-#if ! USE_POLL
+#if !defined(USE_POLL)
 		nfds = select(highfd + 1, (SELECT_FDSET_TYPE *)&read_set,
 			      (SELECT_FDSET_TYPE *)&write_set, 0, &wait);
 #else
@@ -2289,7 +2289,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 			return -1;
 		else if (nfds >= 0)
 			break;
-#if ! USE_POLL
+#if !defined(USE_POLL)
 		report_error("select %s:%s", &me);
 #else
 		report_error("poll %s:%s", &me);
@@ -2303,7 +2303,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 	
 	timeofday = time(NULL);
 	if (nfds > 0 &&
-#if ! USE_POLL
+#if !defined(USE_POLL)
 	    resfd >= 0 &&
 #else
 	    (pfd = res_pfd) &&
@@ -2315,7 +2315,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 		do_dns_async();
 	    }
 	if (nfds > 0 &&
-#if ! USE_POLL
+#if !defined(USE_POLL)
 	    udpfd >= 0 &&
 #else
 	    (pfd = udp_pfd) &&
@@ -2341,13 +2341,13 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 	    }
 #endif
 
-#if ! USE_POLL
+#if !defined(USE_POLL)
 	for (i = fdp->highest; i >= 0; i--)
 #else
 	for (pfd = poll_fdarray, i = 0; i < nbr_pfds; i++, pfd++ )
 #endif
 	    {
-#if ! USE_POLL
+#if !defined(USE_POLL)
 		fd = fdp->fd[i];
 		if (!(cptr = local[fd]))
 			continue;
@@ -2360,7 +2360,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 			 * check for the auth fd's
 			 */
 			if (auth > 0 && nfds > 0
-#if ! USE_POLL
+#if !defined(USE_POLL)
 			    && cptr->authfd >= 0
 #endif
 			    )
@@ -2378,7 +2378,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 				    }
 				continue;
 			    }
-#if USE_POLL
+#if defined(USE_POLL)
 		    }
 		fd = pfd->fd;
 		if (!(cptr = local[fd]))

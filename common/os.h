@@ -31,122 +31,122 @@
 # define _GNU_SOURCE 1
 #endif
 
-#if HAVE_STDIO_H
+#ifdef HAVE_STDIO_H
 # include <stdio.h>
 #endif
 
-#if HAVE_STDLIB_H
+#ifdef HAVE_STDLIB_H
 # include <stdlib.h>
 #endif
 
-#if HAVE_SYS_TYPES_H
+#ifdef HAVE_SYS_TYPES_H
 # include <sys/types.h>
 #endif
 
-#if HAVE_SYS_BITYPES_H
+#ifdef HAVE_SYS_BITYPES_H
 # include <sys/bitypes.h>
 #endif
 
-#if HAVE_STDDEF_H
+#ifdef HAVE_STDDEF_H
 # include <stddef.h>
 #endif
 
-#if HAVE_STDARG_H
+#ifdef HAVE_STDARG_H
 # include <stdarg.h>
 #else
 #error You need working stdarg.
 #endif
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
 
-#if HAVE_CTYPE_H
+#ifdef HAVE_CTYPE_H
 # include <ctype.h>
 #endif
 
-#if HAVE_MEMORY_H
+#ifdef HAVE_MEMORY_H
 # include <memory.h>
 #endif
 
-#if HAVE_VFORK_H
+#ifdef HAVE_VFORK_H
 # include <vfork.h>
 #endif
 
-#if HAVE_ERRNO_H
+#ifdef HAVE_ERRNO_H
 # include <errno.h>
 #endif
 
-#if HAVE_SYS_ERRNO_H
+#ifdef HAVE_SYS_ERRNO_H
 # include <sys/errno.h>
 #endif
 
-#if HAVE_SYS_SYSCALL_H
+#ifdef HAVE_SYS_SYSCALL_H
 # include <sys/syscall.h>
 #endif
 
-#if HAVE_PWD_H
+#ifdef HAVE_PWD_H
 # include <pwd.h>
 #endif
 
-#if HAVE_MATH_H
+#ifdef HAVE_MATH_H
 # include <math.h>
 #endif
 
-#if HAVE_UTMP_H
+#ifdef HAVE_UTMP_H
 # include <utmp.h>
 #endif
 
-#if HAVE_FCNTL_H
+#ifdef HAVE_FCNTL_H
 # include <fcntl.h>
 #endif
 
-#if HAVE_SIGNAL_H
+#ifdef HAVE_SIGNAL_H
 # include <signal.h>
 #endif
 
-#if HAVE_SYS_WAIT_H
+#ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
 #endif
 
-#if HAVE_SYS_IOCTL_H
+#ifdef HAVE_SYS_IOCTL_H
 # include <sys/ioctl.h>
 #endif
 
-#if HAVE_SYS_FILE_H
+#ifdef HAVE_SYS_FILE_H
 # include <sys/file.h>
 #endif
 
-#if HAVE_SYS_FILIO_H
+#ifdef HAVE_SYS_FILIO_H
 # include <sys/filio.h>
 #endif
 
-#if HAVE_SYS_SOCKET_H
+#ifdef HAVE_SYS_SOCKET_H
 # include <sys/socket.h>
 #endif
 
-#if HAVE_SYS_STAT_H
+#ifdef HAVE_SYS_STAT_H
 # include <sys/stat.h>
 #endif
 
-#if HAVE_SYS_SELECT_H
+#ifdef HAVE_SYS_SELECT_H
 # include <sys/select.h>
 #endif
 
-#if HAVE_SYS_POLL_H
+#ifdef HAVE_SYS_POLL_H
 # include <sys/poll.h>
-# if linux && !defined(POLLRDNORM)
+# if defined(linux) && !defined(POLLRDNORM)
 /* Linux 2.1.xx supports poll(), header files are not upto date yet */
 #  define POLLRDNORM 0x0040
 # endif
 #endif
 
-#if HAVE_STROPTS_H
+#ifdef HAVE_STROPTS_H
 # include <stropts.h>
 #endif
 
-#if HAVE_NETDB_H
-# if BAD___CONST_NETDB_H
+#ifdef HAVE_NETDB_H
+# ifdef BAD___CONST_NETDB_H
 #  ifndef __const
 #   define __const
 #   include <netdb.h>
@@ -159,67 +159,67 @@
 # endif
 #endif
 
-#if HAVE_NETINET_IN_H
+#ifdef HAVE_NETINET_IN_H
 # include <netinet/in.h>
 #endif
 
-#if HAVE_SYS_UN_H
+#ifdef HAVE_SYS_UN_H
 # include <sys/un.h>
 #endif
 
-#if HAVE_ARPA_INET_H
+#ifdef HAVE_ARPA_INET_H
 # include <arpa/inet.h>
 #endif
 
-#if HAVE_SYS_PARAM_H
+#ifdef HAVE_SYS_PARAM_H
 # include <sys/param.h>
 #endif
 
-#if HAVE_SYSLOG_H
+#ifdef HAVE_SYSLOG_H
 # include <syslog.h>
 #endif
 
-#if HAVE_SYS_SYSLOG_H
+#ifdef HAVE_SYS_SYSLOG_H
 # include <sys/syslog.h>
 #endif
 
-#if HAVE_STRING_H
+#ifdef HAVE_STRING_H
 # include <string.h>
 #else
-# if HAVE_STRINGS_H
+# ifdef HAVE_STRINGS_H
 #  include <strings.h>
 # endif
 #endif
 
-#if TIME_WITH_SYS_TIME
+#ifdef TIME_WITH_SYS_TIME
 # include <sys/time.h>
 # include <time.h>
 #else
-# if HAVE_SYS_TIME_H
+# ifdef HAVE_SYS_TIME_H
 #  include <sys/time.h>
 # else
 #  include <time.h>
 # endif
 #endif
 
-#if HAVE_SYS_RESOURCE_H
+#ifdef HAVE_SYS_RESOURCE_H
 # include <sys/resource.h>
 #endif
 
-#if HAVE_SYS_TIMES_H
+#ifdef HAVE_SYS_TIMES_H
 # include <sys/times.h>
 #endif
 
-#if HAVE_NETINET_IN_SYSTM_H
+#ifdef HAVE_NETINET_IN_SYSTM_H
 # include <netinet/in_systm.h>
 #endif
 
-#if HAVE_NETINFO_NI_H
+#ifdef HAVE_NETINFO_NI_H
 # include <netinfo/ni.h>
 #endif
 
-#if USE_ZLIB && !defined(CLIENT_COMPILE) && !defined(CHKCONF_COMPILE) && \
-	!defined(CONTRIB_COMPILE)
+#if defined(USE_ZLIB) && !defined(CLIENT_COMPILE) && \
+	!defined(CHKCONF_COMPILE) && !defined(CONTRIB_COMPILE)
 # include <zlib.h>
 #endif
 
@@ -328,67 +328,67 @@
 /*  Strings and memory functions portability problems.
  */
 
-#if HAVE_MEMCMP && MEMCMP_BROKEN
+#if defined(HAVE_MEMCMP) && defined(MEMCMP_BROKEN)
 # define memcmp irc_memcmp
 #endif
 
-#if HAVE_STRCHR
+#ifdef HAVE_STRCHR
 # ifdef index
 #  undef index
 # endif
 # define index strchr
 #endif
 
-#if HAVE_STRRCHR
+#ifdef HAVE_STRRCHR
 # ifdef rindex
 #  undef rindex
 # endif
 # define rindex strrchr
 #endif
 
-#if ! HAVE_STRCHR && HAVE_INDEX
+#if !defined(HAVE_STRCHR) && defined(HAVE_INDEX)
 # ifdef strchr
 #  undef strchr
 # endif
 # define strchr index
 #endif
 
-#if ! HAVE_STRRCHR && HAVE_RINDEX
+#if !defined(HAVE_STRRCHR) && defined(HAVE_RINDEX)
 # ifdef strrchr
 #  undef strrchr
 # endif
 # define strrchr rindex
 #endif
 
-#if HAVE_MEMCMP
+#ifdef HAVE_MEMCMP
 # ifdef bcmp
 #  undef bcmp
 # endif
 # define bcmp memcmp
 #endif
 
-#if HAVE_MEMSET
+#ifdef HAVE_MEMSET
 # ifdef bzero
 #  undef bzero
 # endif
 # define bzero(a,b) memset((a),0,(b))
 #endif
 
-#if HAVE_MEMMOVE
+#ifdef HAVE_MEMMOVE
 # ifdef bcopy
 #  undef bcopy
 # endif
 # define bcopy(a,b,c) memmove((b),(a),(c))
 #endif
 
-#if ! HAVE_MEMCMP && HAVE_BCMP
+#if !defined(HAVE_MEMCMP) && defined(HAVE_BCMP)
 # ifdef memcmp
 #  undef memcmp
 # endif
 # define memcmp bcmp
 #endif
 
-#if ! HAVE_MEMCPY && HAVE_BCOPY
+#if !defined(HAVE_MEMCPY) && defined(HAVE_BCOPY)
 # ifdef memcpy
 #  undef memcpy
 # endif
@@ -406,35 +406,35 @@
  *  Bind 8.x installing /usr[/local]/include/arpa/inet.h -krys
  */
 
-#if HAVE_INET_NTOA
+#ifdef HAVE_INET_NTOA
 # ifdef inet_ntoa
 #  undef inet_ntoa
 extern char *inet_ntoa (struct in_addr in);
 # endif
 # define inetntoa(x) inet_ntoa(*(struct in_addr *)(x))
 #endif
-#if HAVE_INET_ATON
+#ifdef HAVE_INET_ATON
 # ifdef inet_aton
 #  undef inet_aton
 extern int inet_aton (const char *cp, struct in_addr *addr);
 # endif
 # define inetaton inet_aton
 #endif
-#if HAVE_INET_ADDR
+#ifdef HAVE_INET_ADDR
 # ifdef inet_addr
 #  undef inet_addr
 extern unsigned long int inet_addr (const char *cp);
 # endif
 # define inetaddr inet_addr
 #endif
-#if HAVE_INET_NETOF
+#ifdef HAVE_INET_NETOF
 # ifdef inet_netof
 #  undef inet_netof
 extern int inet_netof (struct in_addr in);
 # endif
 # define inetnetof inet_netof
 #endif
-#if ! HAVE_ARPA_INET_H
+#if !defined(HAVE_ARPA_INET_H)
 extern unsigned long int inet_addr (const char *cp);
 extern int inet_aton (const char *cp, struct in_addr *addr);
 extern int inet_netof (struct in_addr in);
@@ -450,14 +450,14 @@ extern char *inet_ntoa (struct in_addr in);
 # endif
 #endif
 
-#if BSD_RELIABLE_SIGNALS || POSIX_SIGNALS
+#if defined(BSD_RELIABLE_SIGNALS) || defined(POSIX_SIGNALS)
 #define	HAVE_RELIABLE_SIGNALS
 #endif
 
 /*  ctime portability problems.
  */
 
-#if defined(HPUX) && __STDC__
+#if defined(HPUX) && defined(__STDC__)
 # define ctime(x) (ctime((const time_t *)(x)))
 #endif
 
@@ -479,7 +479,7 @@ extern char *inet_ntoa (struct in_addr in);
 /*  gethostbyname portability problems.
  */
 
-#if SOLARIS_2_0_2_1_2_2
+#ifdef SOLARIS_2_0_2_1_2_2
 /* 
  * On Solaris 2.0, 2.1 and 2.2 (SunOS 5.0, 5.1 and 5.2) systems,
  * gethostbyname() has a bug, it always returns null in h->aliases.
@@ -489,7 +489,7 @@ extern struct hostent *__switch_gethostbyname (const char *name);
 #define gethostbyname __switch_gethostbyname
 #endif
 
-#if SOLARIS_2_3
+#ifdef SOLARIS_2_3
 /* 
  * On Solaris 2.3 (SunOS 5.3) systems, gethostbyname() has a bug, it always
  * returns null in h->aliases.  Workaround: use the undocumented
@@ -516,7 +516,7 @@ extern struct hostent *_switch_gethostbyname_r (const char *name,
 /*  getrusage portability problems.
  */
 
-#if defined(HPUX) && ! HAVE_GETRUSAGE
+#if defined(HPUX) && !defined(HAVE_GETRUSAGE)
 # define getrusage(a,b) (syscall(SYS_GETRUSAGE, (a), (b)))
 # define HAVE_GETRUSAGE 1
 #endif
@@ -531,7 +531,7 @@ extern struct hostent *_switch_gethostbyname_r (const char *name,
  *        please tell it to me. :)                   -- Alain.Nissen@ulg.ac.be
  */
 
-#if ! USE_POLL
+#if !defined(USE_POLL)
 # ifndef FD_ZERO
 #  define FD_ZERO(set)      (((set)->fds_bits[0]) = 0)
 #  define FD_SET(s1, set)   (((set)->fds_bits[0]) |= 1 << (s1))
@@ -552,8 +552,8 @@ extern struct hostent *_switch_gethostbyname_r (const char *name,
  *  prototype must be supplied for wait (wait3 and waitpid are unused here).
  */
 
-#if ! HAVE_SYS_WAIT_H
-# if USE_UNION_WAIT
+#if !defined(HAVE_SYS_WAIT_H)
+# ifdef USE_UNION_WAIT
 extern pid_t wait (union wait *);
 # else
 extern pid_t wait (int *);
@@ -589,7 +589,7 @@ extern pid_t wait (int *);
 /*  Stupid typo in AIX 3.2's <sys/stropts.h>.
  */
 
-#if AIX_3_2
+#ifdef AIX_3_2
 # ifdef _IO
 # undef _IO
 # endif
@@ -599,7 +599,7 @@ extern pid_t wait (int *);
 /*  These macros may be broken.
  */
 
-#if STAT_MACROS_BROKEN
+#ifdef STAT_MACROS_BROKEN
 # ifdef S_ISFIFO
 # undef S_ISFIFO
 # endif
@@ -626,7 +626,7 @@ extern pid_t wait (int *);
  */
 
 #ifndef NULL
-#define NULL 0
+#define NULL ((void *)0)
 #endif
 #ifdef FALSE
 #undef FALSE
@@ -650,19 +650,19 @@ extern pid_t wait (int *);
 /*  These external may be missing.
  */
 
-#if ! SYS_ERRLIST_DECLARED
+#if !defined(SYS_ERRLIST_DECLARED)
 extern char *sys_errlist[];
 #endif
 
-#if ! SYS_NERR_DECLARED
+#if !defined(SYS_NERR_DECLARED)
 extern int sys_nerr;
 #endif
 
-#if ! ERRNO_DECLARED
+#if !defined(ERRNO_DECLARED)
 extern int errno;
 #endif
 
-#if ! H_ERRNO_DECLARED
+#if !defined(H_ERRNO_DECLARED)
 extern int h_errno;
 #endif
 
@@ -704,34 +704,34 @@ char mydummy2[MYDUMMY_SIZE];
 #endif
 
 /* Courtesy of AC_CHECK_TYPES autoconf macro in configure */
-#if !HAVE_INT16_T
+#if !defined(HAVE_INT16_T)
 typedef short int16_t;
 #endif
-#if !HAVE_INT32_T
+#if !defined(HAVE_INT32_T)
 typedef int int32_t;
 #endif
-#if !HAVE_INT8_T
+#if !defined(HAVE_INT8_T)
 typedef char int8_t;
 #endif
-#if !HAVE_U_CHAR
+#if !defined(HAVE_U_CHAR)
 typedef unsigned char u_char;
 #endif
-#if !HAVE_U_INT
+#if !defined(HAVE_U_INT)
 typedef unsigned int u_int;
 #endif
-#if !HAVE_U_INT32_T
+#if !defined(HAVE_U_INT32_T)
 typedef unsigned int u_int32_t;
 #endif
-#if !HAVE_U_INT16_T
+#if !defined(HAVE_U_INT16_T)
 typedef unsigned short u_int16_t;
 #endif
-#if !HAVE_U_INT8_T
+#if !defined(HAVE_U_INT8_T)
 typedef unsigned char u_int8_t;
 #endif
-#if !HAVE_U_LONG
+#if !defined(HAVE_U_LONG)
 typedef unsigned long u_long;
 #endif
-#if !HAVE_U_SHORT
+#if !defined(HAVE_U_SHORT)
 typedef unsigned short u_short;
 #endif
 

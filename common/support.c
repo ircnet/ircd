@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.40 2004/10/01 20:22:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.41 2005/01/03 17:33:54 q Exp $";
 #endif
 
 #include "os.h"
@@ -43,7 +43,7 @@ char	*mystrdup(char *s)
 	return NULL;
 }
 
-#if ! HAVE_STRTOKEN
+#if !defined(HAVE_STRTOKEN)
 /*
 ** 	strtoken.c --  	walk through a string of tokens, using a set
 **			of separators
@@ -79,7 +79,7 @@ char	*strtoken(char **save, char *str, char *fs)
 }
 #endif /* HAVE_STRTOKEN */
 
-#if ! HAVE_STRTOK
+#if !defined(HAVE_STRTOK)
 /*
 ** NOT encouraged to use!
 */
@@ -93,7 +93,7 @@ char	*strtok(char *str, char *fs)
 
 #endif /* HAVE_STRTOK */
 
-#if ! HAVE_STRERROR
+#if !defined(HAVE_STRERROR)
 /*
 **	strerror - return an appropriate system error string to a given errno
 **
@@ -263,7 +263,7 @@ int	inetpton(int af, const char *src, void *dst)
 }
 #endif
 
-#if ! HAVE_INET_NTOA
+#if !defined(HAVE_INET_NTOA)
 /*
 **	inetntoa  --	changed name to remove collision possibility and
 **			so behaviour is gaurunteed to take a pointer arg.
@@ -290,7 +290,7 @@ char	*inetntoa(char *in)
 }
 #endif
 
-#if ! HAVE_INET_NETOF
+#if !defined(HAVE_INET_NETOF)
 /*
 **	inet_netof --	return the net portion of an internet number
 **			argv 11/90
@@ -308,7 +308,7 @@ int inetnetof(struct in_addr in)
 }
 #endif
 
-#if ! HAVE_INET_ADDR
+#if !defined(HAVE_INET_ADDR)
 # ifndef INADDR_NONE
 #  define INADDR_NONE   0xffffffff
 # endif
@@ -326,7 +326,7 @@ u_long	inetaddr(const char *cp)
 }
 #endif
 
-#if ! HAVE_INET_ATON
+#if !defined(HAVE_INET_ATON)
 /* 
  * Check whether "cp" is a valid ascii representation
  * of an Internet address and convert to a binary address.
@@ -807,7 +807,7 @@ int	truncate(const char *path, off_t length)
 }
 #endif /* HAVE_TRUNCATE */
 
-#if SOLARIS_2_3
+#ifdef SOLARIS_2_3
 /* 
  * On Solaris 2.3 (SunOS 5.3) systems, gethostbyname() has a bug, it always
  * returns null in h->aliases.  Workaround: use the undocumented
@@ -824,7 +824,7 @@ struct hostent	*solaris_gethostbyname(const char *name)
 }
 #endif /* SOLARIS_2_3 */
 
-#if HAVE_MEMCMP && MEMCMP_BROKEN
+#if defined(HAVE_MEMCMP) && defined(MEMCMP_BROKEN)
 /*
  * Some OS may have a memcmp that is not 8-bit clean.
  *
@@ -847,13 +847,13 @@ struct hostent	*solaris_gethostbyname(const char *name)
 /* Type to use for unaligned operations.  */
 typedef unsigned char byte;
 
-#if ! WORDS_BIGENDIAN
+#if !defined(WORDS_BIGENDIAN)
 #define MERGE(w0, sh_1, w1, sh_2) (((w0) >> (sh_1)) | ((w1) << (sh_2)))
 #else
 #define MERGE(w0, sh_1, w1, sh_2) (((w0) << (sh_1)) | ((w1) >> (sh_2)))
 #endif
 
-#if WORDS_BIGENDIAN
+#if defined(WORDS_BIGENDIAN)
 #define CMP_LT_OR_GT(a, b) ((a) > (b) ? 1 : -1)
 #else
 #define CMP_LT_OR_GT(a, b) memcmp_bytes ((a), (b))
@@ -872,7 +872,7 @@ typedef unsigned char byte;
 
    3. Compare the few remaining bytes.  */
 
-#if ! WORDS_BIGENDIAN
+#if !defined(WORDS_BIGENDIAN)
 /* memcmp_bytes -- Compare A and B bytewise in the byte order of the machine.
    A and B are known to be different.
    This is needed only on little-endian machines.  */

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: a_io.c,v 1.30 2004/10/01 20:22:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: a_io.c,v 1.31 2005/01/03 17:33:55 q Exp $";
 #endif
 
 #include "os.h"
@@ -489,7 +489,7 @@ static	void	parse_ircd(void)
 void	loop_io(void)
 {
     /* the following is from ircd/s_bsd.c */
-#if ! USE_POLL
+#if !defined(USE_POLL)
 # define SET_READ_EVENT( thisfd )       FD_SET( thisfd, &read_set)
 # define SET_WRITE_EVENT( thisfd )      FD_SET( thisfd, &write_set)
 # define CLR_READ_EVENT( thisfd )       FD_CLR( thisfd, &read_set)
@@ -573,7 +573,7 @@ void	loop_io(void)
 		else if (cldata[i].wfd > 0)
 		    {
 			SET_WRITE_EVENT(cldata[i].wfd);
-#if ! USE_POLL
+#if !defined(USE_POLL)
 			if (cldata[i].wfd > highfd)
 				highfd = cldata[i].wfd;
 #else
@@ -585,7 +585,7 @@ void	loop_io(void)
 
 	DebugLog((ALOG_DIO, 0, "io_loop(): checking for %d fd's", nfds));
 	wait.tv_sec = 5; wait.tv_usec = 0;
-#if ! USE_POLL
+#if !defined(USE_POLL)
 	nfds = select(highfd + 1, (SELECT_FDSET_TYPE *)&read_set,
 		      (SELECT_FDSET_TYPE *)&write_set, 0, &wait);
 	DebugLog((ALOG_DIO, 0, "io_loop(): select() returned %d, errno = %d",
@@ -744,13 +744,13 @@ static	void	set_non_blocking(int fd, char *ip, u_short port)
 {
 	int     res, nonb = 0;
 
-#if NBLOCK_POSIX
+#ifdef NBLOCK_POSIX
         nonb |= O_NONBLOCK;
 #endif
-#if NBLOCK_BSD
+#ifdef NBLOCK_BSD
         nonb |= O_NDELAY;
 #endif
-#if NBLOCK_SYSV
+#ifdef NBLOCK_SYSV
         /* This portion of code might also apply to NeXT.  -LynX */
         res = 1;
  

@@ -1,12 +1,17 @@
 2005-01-03  Kurt Roeckx
 
-	* check_pings: Initialise reason.  Could be used unintialised
-	  when TIMEDKLINES is not defined.
+	* ircd.c/check_pings(): Initialise the reason variable.  It could be
+	  used unintialised when TIMEDKLINES is not defined.
 	* configure, setup.h.in, os.h: Make configure detect the arguments of
 	  accept() and use the 3rd argument for SOCK_LEN_TYPE, which should be
           socklen_t in most cases.
-	* mode_pipe.c: Properly terminate the call to execlp() with a
-	  (char *)NULL.
+	* mode_pipe.c/pipe_start(): Properly terminate the call to execlp()
+	  with a (char *)NULL.
+	* os.h, support.c, support_ext.h, a_io.c, nameser_def.h, res.c,
+	  s_bsd.c: Don't use macro variables as #if VAR but use #ifdef VAR
+	  or #if defined(VAR)
+	* s_bsd.c, s_bsd_ext.h: Make reopen_listeners() a function with
+	  prototype: set parameter to void.
 
 2005-01-02  Kurt Roeckx
 

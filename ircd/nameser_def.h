@@ -77,7 +77,7 @@
 
 /*
  *      @(#)nameser.h	8.1 (Berkeley) 6/2/93
- *	$Id: nameser_def.h,v 1.4 2003/10/18 19:25:45 q Exp $
+ *	$Id: nameser_def.h,v 1.5 2005/01/03 17:33:55 q Exp $
  */
 
 /*
@@ -248,7 +248,7 @@
 
 typedef struct {
 	unsigned	id :16;		/* query identification number */
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 			/* fields in third byte */
 	unsigned	qr: 1;		/* response flag */
 	unsigned	opcode: 4;	/* purpose of message */
