@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.224 2004/07/11 18:39:52 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.225 2004/08/02 15:53:50 jv Exp $";
 #endif
 
 #include "os.h"
@@ -603,6 +603,7 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	/* We add this server to client list, but *only* to SID hash. */
 	add_client_to_list(acptr);
+	register_server(acptr);
 
 	if (*parv[1] == '$')
 	{
@@ -898,6 +899,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		SetServer(acptr);
 		istat.is_serv++;
 		add_client_to_list(acptr);
+		register_server(acptr);
 		add_server_to_tree(acptr);
 		(void)add_to_client_hash_table(acptr->name, acptr);
 		if (ST_NOTUID(acptr))
@@ -1325,6 +1327,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	}
 
 	cptr->flags |= FLAGS_CBURST;
+	register_server(cptr);
 	add_server_to_tree(cptr);
 	/* why no add_client_to_list() here? --B. */
 	if (ST_NOTUID(cptr))
@@ -3787,5 +3790,46 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 /* announces server DIE */
 int	m_sdie(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
+	return 0;
+}
+
+/* Register server to the network.
+ *
+ * to be called whenever server associates client struct.
+ * Also registers the server in global svrtop list.
+ */
+int	register_server(aClient *cptr)
+{
+
+	if (svrtop)
+	{
+		svrtop->prevs = cptr->serv;
+		cptr->serv->nexts = svrtop;
+	}
+	svrtop = cptr->serv;
+		
+	return 0;
+}
+
+/* Unregister server from the network.
+ *
+ * to be called when a server loses associated client struct.
+ * Also removes given server from global svrtop list.
+ */
+int	unregister_server(aClient *cptr)
+{
+	if (cptr->serv->nexts)
+		cptr->serv->nexts->prevs = cptr->serv->prevs;
+	
+	if (cptr->serv->prevs)
+		cptr->serv->prevs->nexts = cptr->serv->nexts;
+			
+	if (svrtop == cptr->serv)
+		svrtop = cptr->serv->nexts;
+		
+	cptr->serv->prevs = NULL;
+	cptr->serv->nexts = NULL;
+	cptr->serv->bcptr = NULL;
+	
 	return 0;
 }

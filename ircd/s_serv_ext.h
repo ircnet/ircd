@@ -71,4 +71,7 @@ void	add_server_to_tree(aClient *cptr);
 void	remove_server_from_tree(aClient *cptr);
 void	do_emulated_eob(aClient *sptr);
 int	check_servername(char *);
+
+EXTERN int register_server(aClient *cptr);
+EXTERN int unregister_server(aClient *cptr);
 #undef EXTERN
