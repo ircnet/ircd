@@ -553,3 +553,6 @@ error ZIP_MINIMUM needs redefining.
 error FD_SETSIZE must be bigger than MAXCONNECTIONS
 # endif
 #endif
+
+#define NO_USRTOP
+
