@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.111 2004/03/05 16:36:15 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.112 2004/03/07 02:47:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -609,8 +609,8 @@ static	void	setup_me(aClient *mp)
 #endif
 	mp->hostp->h_addr_list[1] = NULL ;
 
-	if (mp->name[0] == '\0')
-		strncpyzt(mp->name, mp->sockhost, sizeof(mp->name));
+	if (mp->serv->namebuf[0] == '\0')
+		strncpyzt(mp->serv->namebuf, mp->sockhost, sizeof(mp->serv->namebuf));
 	if (me.info == DefInfo)
 		me.info = mystrdup("IRCers United");
 	mp->lasttime = mp->since = mp->firsttime = time(NULL);
@@ -771,7 +771,7 @@ int	main(int argc, char *argv[])
 		    case 'h':
 			if (*p == '\0')
 				bad_command();
-			strncpyzt(me.name, p, sizeof(me.name));
+			strncpyzt(me.serv->namebuf, p, sizeof(me.serv->namebuf));
 			break;
 		    case 'i':
 			bootopt |= BOOT_INETD|BOOT_AUTODIE;
@@ -988,6 +988,7 @@ int	main(int argc, char *argv[])
 		aConfItem *aconf;
 
 		tmp = make_client(NULL);
+		make_server(tmp);
 
 		tmp->fd = 0;
 		tmp->flags = FLAGS_LISTEN;
@@ -997,7 +998,7 @@ int	main(int argc, char *argv[])
 
                 SetMe(tmp);
 
-                (void)strcpy(tmp->name, "*");
+                (void)strcpy(tmp->serv->namebuf, "*");
 
                 if (inetport(tmp, 0, "0.0.0.0", 0))
                         tmp->fd = -1;

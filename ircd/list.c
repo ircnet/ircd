@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.30 2004/03/06 22:11:07 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.31 2004/03/07 02:47:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -138,6 +138,7 @@ aClient	*make_client(aClient *from)
 	cptr->hnext = NULL;
 	cptr->user = NULL;
 	cptr->serv = NULL;
+	cptr->name = cptr->namebuf;
 	cptr->status = STAT_UNKNOWN;
 	cptr->fd = -1;
 	(void)strcpy(cptr->username, "unknown");
@@ -248,6 +249,8 @@ aServer	*make_server(aClient *cptr)
 		servs.inuse++;
 #endif
 		cptr->serv = serv;
+		cptr->name = serv->namebuf;
+		*serv->namebuf = '\0';
 		serv->user = NULL;
 		serv->snum = -1;
 		*serv->by = '\0';

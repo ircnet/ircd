@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.164 2004/03/06 11:32:41 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.165 2004/03/07 02:47:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -606,7 +606,7 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return exit_client(cptr, cptr, &me, "No more tokens");
 	}
 	acptr->hopcount = sptr->hopcount + 1;
-	strncpyzt(acptr->name, sptr->name, sizeof(acptr->name));
+	strncpyzt(acptr->serv->namebuf, sptr->name, sizeof(acptr->serv->namebuf));
 	acptr->info = mystrdup("Masked Server");
 	acptr->serv->up = sptr;
 	acptr->serv->snum = sptr->serv->maskedby->serv->snum;
@@ -866,7 +866,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			return exit_client(cptr, cptr, &me, "No more tokens");
 		}
 		acptr->hopcount = hop;
-		strncpyzt(acptr->name, host, sizeof(acptr->name));
+		strncpyzt(acptr->serv->namebuf, host, sizeof(acptr->serv->namebuf));
 		if (acptr->info != DefInfo)
 			MyFree(acptr->info);
 		acptr->info = mystrdup(info);
@@ -944,7 +944,18 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	** to be a SERVER. Check if this is allowed and change
 	** status accordingly...
 	*/
-	strncpyzt(cptr->name, host, sizeof(cptr->name));
+	/* Oh joy. :( I had to move this if() here from m_server_estab()
+	 * (it was there just before SetServer), because we no longer
+	 * use cptr->name, only cptr->serv->namebuf, which is allocated
+	 * in make_server()... --B. */
+	/* doesnt duplicate cptr->serv if allocated this struct already */
+	if (!make_server(cptr))
+	{
+		sendto_flag(SCH_ERROR, "Ran out of compatibility tokens for %s"
+				", dropping link", inpath);
+		return exit_client(cptr, cptr, &me, "No more tokens");
+	}
+	strncpyzt(cptr->serv->namebuf, host, sizeof(cptr->serv->namebuf));
 	/* cptr->name has to exist before check_version(), and cptr->info
 	 * may not be filled before check_version(). */
 	if ((hop = check_version(cptr)) < 1)
@@ -1312,20 +1323,6 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			(cptr->flags & FLAGS_ZIP) ? "z" : "");
 	}
 	(void)add_to_client_hash_table(cptr->name, cptr);
-	/* doesnt duplicate cptr->serv if allocted this struct already */
-	if (!make_server(cptr))
-	{
-		sendto_flag(SCH_ERROR, "Ran out of compatibility tokens for %s"
-				", dropping link", inpath);
-		if (bysptr)
-		{
-			sendto_one(bysptr, ":%s NOTICE %s :Ran out of "
-				"compatibility tokens for %s, dropping link",
-				ME, bysptr->name, inpath);
-					
-		}
-		return exit_client(cptr, cptr, &me, "No more tokens");
-	}
 	cptr->serv->up = &me;
 	cptr->serv->maskedby = cptr;
 	cptr->serv->nline = aconf;

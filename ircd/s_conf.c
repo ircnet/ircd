@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.96 2004/03/07 00:38:11 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.97 2004/03/07 02:47:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1510,9 +1510,9 @@ int 	initconf(int opt)
 				MyFree(me.info);
 			me.info = MyMalloc(REALLEN+1);
 			strncpyzt(me.info, aconf->name, REALLEN+1);
-			if (ME[0] == '\0' && aconf->host[0])
-				strncpyzt(ME, aconf->host,
-					  sizeof(ME));
+			if (me.serv->namebuf[0] == '\0' && aconf->host[0])
+				strncpyzt(me.serv->namebuf, aconf->host,
+					  sizeof(me.serv->namebuf));
 			if (me.serv->sid[0] == '\0' && tmp && *tmp)
 				strncpyzt(me.serv->sid, tmp,
 					sizeof(me.serv->sid));

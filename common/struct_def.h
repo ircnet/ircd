@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.86 2004/03/05 22:06:09 chopin Exp $
+ *   $Id: struct_def.h,v 1.87 2004/03/07 02:47:50 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -419,6 +419,7 @@ struct	User	{
 };
 
 struct	Server	{
+	char	namebuf[HOSTLEN+1];
 	anUser	*user;		/* who activated this connection */
 	aClient	*up;		/* uplink for this server */
 	aConfItem *nline;	/* N-line pointer for this server */
@@ -453,6 +454,7 @@ struct	Server	{
 };
 
 struct	Service	{
+	char	namebuf[HOSTLEN+1];
 	int	wants;
 	int	type;
 	char	*server;
@@ -473,7 +475,8 @@ struct Client	{
 	int	fd;		/* >= 0, for local clients */
 	int	hopcount;	/* number of servers to this 0 = local */
 	short	status;		/* Client type */
-	char	name[HOSTLEN+1]; /* Unique name of the client, nick or host */
+	char	*name;		/* Pointer to unique name of the client */
+	char	namebuf[NICKLEN+1]; /* nick of the client */
 	char	username[USERLEN+1]; /* username here now for auth stuff */
 	char	*info;		/* Free form additional client information */
 	/*

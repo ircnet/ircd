@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.117 2004/02/27 15:43:48 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.118 2004/03/07 02:47:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -229,7 +229,6 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port)
 
 	(void)sprintf(cptr->sockhost, "%-.42s.%u", ip ? ip : ME,
 		      (unsigned int)port);
-	(void)strcpy(cptr->name, ME);
 	DupString(cptr->auth, ipname);
 	/*
 	 * At first, open a new socket
@@ -331,11 +330,11 @@ int	add_listener(aConfItem *aconf)
 	cptr->acpt = cptr;
 	cptr->from = cptr;
 	cptr->firsttime = time(NULL);
+	cptr->name = ME;
 	SetMe(cptr);
 #ifdef	UNIXPORT
 	if (*aconf->host == '/')
 	    {
-		strncpyzt(cptr->name, aconf->host, sizeof(cptr->name));
 		if (unixport(cptr, aconf->host, aconf->port))
 			cptr->fd = -2;
 	    }
@@ -380,7 +379,7 @@ int	unixport(aClient *cptr, char *path, int port)
 	else if (cptr->fd >= MAXCLIENTS)
 	    {
 		sendto_flag(SCH_ERROR,
-			    "No more connections allowed (%s)", cptr->name);
+			    "No more connections allowed (%s)", path);
 		(void)close(cptr->fd);
 		return -1;
 	    }
@@ -390,7 +389,6 @@ int	unixport(aClient *cptr, char *path, int port)
 	sprintf(unixpath, "%s/%d", path, port);
 	(void)unlink(unixpath);
 	strncpyzt(un.sun_path, unixpath, sizeof(un.sun_path));
-	(void)strcpy(cptr->name, ME);
 	errno = 0;
 	get_sockhost(cptr, unixpath);
 
@@ -2330,27 +2328,32 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 		    }
 	    }
 	cptr = make_client(NULL);
+	if (!make_server(cptr))
+	{
+		free_client(cptr);
+		return -1;
+	}
 	cptr->hostp = hp;
 	/*
 	 * Copy these in so we have something for error detection.
 	 */
-	strncpyzt(cptr->name, aconf->name, sizeof(cptr->name));
+	strncpyzt(cptr->serv->namebuf, aconf->name, sizeof(cptr->serv->namebuf));
 	strncpyzt(cptr->sockhost, aconf->host, HOSTLEN+1);
 
 #ifdef	UNIXPORT
 	if (*aconf->host == '/') /* (/ starts a 2), Unix domain -- dl*/
 		svp = connect_unix(aconf, cptr, &len);
 	else
-		svp = connect_inet(aconf, cptr, &len);
-#else
-	svp = connect_inet(aconf, cptr, &len);
 #endif
+	svp = connect_inet(aconf, cptr, &len);
 
 	if (!svp)
 	    {
 		if (cptr->fd != -1)
 			(void)close(cptr->fd);
 		cptr->fd = -2;
+		cptr->serv->bcptr = NULL;
+		free_server(cptr->serv, cptr);
 		free_client(cptr);
 		return -1;
 	    }
@@ -2370,6 +2373,8 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 			     ME, by->name, cptr);
 		(void)close(cptr->fd);
 		cptr->fd = -2;
+		cptr->serv->bcptr = NULL;
+		free_server(cptr->serv, cptr);
 		free_client(cptr);
 		errno = i;
 		if (errno == EINTR)
@@ -2400,17 +2405,14 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 		det_confs_butmask(cptr, 0);
 		(void)close(cptr->fd);
 		cptr->fd = -2;
+		cptr->serv->bcptr = NULL;
+		free_server(cptr->serv, cptr);
 		free_client(cptr);
 		return(-1);
 	    }
 	/*
 	** The socket has been connected or connect is in progress.
 	*/
-	if (!make_server(cptr))
-	{
-		free_client(cptr);
-		return(-1);
-	}
 	if (by && IsPerson(by))
 	    {
 		(void)strcpy(cptr->serv->by, by->name);
