@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.12 1999/01/20 13:59:47 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.13 1999/02/03 22:32:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -204,6 +204,9 @@ u_int cl;
 				  cl, cldata[cl].inbuffer));
 			if (cldata[cl].buflen > 1024)
 			    cldata[cl].inbuffer[1024] = '\0';
+			if (ch = index(cldata[cl].inbuffer, '\n'))
+				/* delimiter for ircd<->iauth messages. */
+				*ch = '\0';
 			ch = cldata[cl].inbuffer;
 			while (*ch && !isdigit(*ch)) ch++;
 			if (!*ch || atoi(ch) != cldata[cl].itsport)
