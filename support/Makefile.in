@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.36 1999/02/21 00:33:46 kalt Exp $
+#*   $Id: Makefile.in,v 1.37 1999/03/05 18:42:15 kalt Exp $
 #*
 #*/
 
@@ -253,8 +253,8 @@ install-server: server
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(CHKCONF) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) ircd-mkpasswd $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(IRCDWATCH) $(server_bin_dir)
-	$(RM) $(PATH4)
-	../ircd/buildm4 $(PATH4)
+	$(RM) $(IRCDM4_PATH)
+	../ircd/buildm4 $(IRCDM4_PATH)
 	$(INSTALL_DATA) ../doc/ircd.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/iauth.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/iauth.conf.5 $(conf_man_dir)
