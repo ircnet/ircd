@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.122 2002/04/11 21:38:32 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.123 2002/04/16 21:02:56 jv Exp $";
 #endif
 
 #include "os.h"
@@ -636,9 +636,16 @@ char	*nick, *username;
 	    }
 	/* below !MyConnect, as it can remove user */
 	if (IsInvisible(sptr))		/* Can be initialized in m_user() */
+	{
 		istat.is_user[1]++;	/* Local and server defaults +i */
+		user->servp->usercnt[1]++;
+	}
 	else
+	{
+		user->servp->usercnt[0]++;
 		istat.is_user[0]++;
+	}
+
 	if (MyConnect(sptr))
 	    {
 		char **isup;
@@ -2782,7 +2789,10 @@ char	*parv[];
 				      parv[0], IsOper(sptr) ? 'o' : 'O');
 #endif
 		if (IsAnOper(sptr))
+		{
 			istat.is_oper++;
+			sptr->user->servp->usercnt[2]++;
+		}
 	    }
 	else
 	    {
@@ -3099,21 +3109,26 @@ char	*parv[];
 		    {
 			istat.is_user[1]--;
 			istat.is_user[0]++;
+			sptr->user->servp->usercnt[1]--;
+			sptr->user->servp->usercnt[0]++;
 		    }
 		if (IsInvisible(sptr) && !(setflags & FLAGS_INVISIBLE))
 		    {
 			istat.is_user[1]++;
 			istat.is_user[0]--;
+			sptr->user->servp->usercnt[1]++;
+			sptr->user->servp->usercnt[0]--;
 		    }
 		send_umode_out(cptr, sptr, setflags);
 	    }
 
-	/* update counters */	   
+	/* update counters */
 	if (IsOper(sptr) && !(setflags & FLAGS_OPER))
 	    {
 		istat.is_oper++;
+		sptr->user->servp->usercnt[2]++;
 #ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_OPER, sptr->user->server, 
+		check_services_butone(SERVICE_WANT_OPER, sptr->user->server,
 				      sptr, ":%s MODE %s :+o", parv[0],
 				      parv[0]);
 #endif
@@ -3121,6 +3136,7 @@ char	*parv[];
 	else if (!IsOper(sptr) && (setflags & FLAGS_OPER))
 	    {
 		istat.is_oper--;
+		sptr->user->servp->usercnt[2]--;
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_OPER, sptr->user->server,
 				      sptr, ":%s MODE %s :-o", parv[0],
@@ -3130,12 +3146,13 @@ char	*parv[];
 	else if (MyConnect(sptr) && !IsLocOp(sptr) && (setflags & FLAGS_LOCOP))
 	    {
 		istat.is_oper--;
+		sptr->user->servp->usercnt[2]--;
 #ifdef USE_SERVICES
 		check_services_butone(SERVICE_WANT_OPER, sptr->user->server,
-				      sptr, ":%s MODE %s :-O", parv[0],     
+				      sptr, ":%s MODE %s :-O", parv[0],
 				      parv[0]);
-#endif                               
-	    }                         
+#endif
+	    }
 
 	return penalty;
 }
