@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.68 2004/02/12 20:59:27 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.69 2004/02/13 01:37:09 jv Exp $";
 #endif
 
 #include "os.h"
@@ -514,6 +514,37 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 				istat.is_l_myclnt_t = timeofday;
 				istat.is_l_myclnt = istat.is_myclnt;
 			}
+			/* Send SQUIT message to 2.11 servers to tell them
+			 * the squit reason for rebroadcast on the other side
+			 * - jv
+			 */
+			if (IsServer(sptr) && ST_UID(sptr))
+			{
+				char buf2[BUFSIZE];
+				buf2[0] = '\0';
+				if (cptr != NULL)
+				{
+					if (IsServer(cptr))
+					{
+						sprintf(buf2, "(by %s(%s))",
+							cptr->name,
+							cptr->serv->sid);
+					}
+					else
+					{
+						sprintf(buf2, "(by %s)",
+							cptr->name);
+					}
+				}
+				else
+				{
+					strcpy(buf2, ME);
+				}
+				sendto_one(sptr, ":%s SQUIT %s :Remote: %s %s",
+					   me.serv->sid, sptr->serv->sid,
+					   comment, buf2);
+			}
+
 			if (cptr != NULL && sptr != cptr)
 			{
 				sendto_one(sptr, "ERROR :Closing Link: "
