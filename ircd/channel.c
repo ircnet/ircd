@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.112 2001/10/20 17:57:27 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.113 2001/12/08 01:49:02 q Exp $";
 #endif
 
 #include "os.h"
@@ -808,6 +808,7 @@ aChannel *chptr;
 	Reg	Link	*lp;
 	Reg	aClient *c2ptr;
 	Reg	int	cnt = 0, len = 0, nlen;
+	char	*p;
 
 	if (check_channelmask(&me, cptr, chptr->chname) == -1)
 		return;
@@ -820,7 +821,9 @@ aChannel *chptr;
 	for (lp = chptr->members; lp; lp = lp->next)
 	    {
 		c2ptr = lp->value.cptr;
-		nlen = strlen(c2ptr->name);
+		p = (ST_UID(cptr) && HasUID(c2ptr)) ?
+			c2ptr->user->uid : c2ptr->name;
+		nlen = strlen(p);
 		if ((len + nlen) > (size_t) (BUFSIZE - 9)) /* ,@+ \r\n\0 */
 		    {
 			sendto_one(cptr, "%s", buf);
@@ -849,7 +852,7 @@ aChannel *chptr;
 				buf[len++] = '+';
 			buf[len] = '\0';
 		    }
-		(void)strcpy(buf + len, c2ptr->name);
+		(void)strcpy(buf + len, p);
 		len += nlen;
 		cnt++;
 	    }
@@ -2333,6 +2336,7 @@ int	parc;
 char	*parv[];
 {
 	char nbuf[BUFSIZE], *q, *name, *target, mbuf[MAXMODEPARAMS + 1];
+	char uidbuf[BUFSIZE], *u;
 	char *p = NULL;
 	int chop, cnt = 0, nj = 0;
 	aChannel *chptr = NULL;
@@ -2344,6 +2348,8 @@ char	*parv[];
 		return 1;
 	    }
 	*nbuf = '\0'; q = nbuf;
+	u = uidbuf;
+	*u = '\0';
 	for (target = strtoken(&p, parv[2], ","); target;
 	     target = strtoken(&p, NULL, ","))
 	    {
@@ -2394,7 +2400,8 @@ char	*parv[];
 		else
 			name = target;
 		/* find user */
-		if (!(acptr = find_person(name, (aClient *)NULL)))
+		if (!(acptr = find_person(name, NULL)) &&
+			!(acptr = find_uid(name, NULL)))
 			continue;
 		/* is user who we think? */
 		if (acptr->from != cptr)
@@ -2428,20 +2435,38 @@ char	*parv[];
 		    }
 		/* add user to channel */
 		add_user_to_channel(chptr, acptr, UseModes(parv[1]) ? chop :0);
-		/* build buffer for NJOIN capable servers */
+
+		/* build buffer for NJOIN and UID capable servers */
+
 		if (q != nbuf)
+		{
 			*q++ = ',';
+			*u++ = ',';
+		}
+
+		/* Copy the modes. */
+		for (; target < name; target++)
+		{
+			*q++ = *target;
+			*u++ = *target;
+		}
+
+		/* For 2.10 server. */
+		target = acptr->name;
 		while (*target)
+		{
 			*q++ = *target++;
-		/* send 2.9 style join to other servers */
-		if (*chptr->chname != '!')
-			nj = sendto_match_servs_notv(chptr, cptr, SV_NJOIN,
-						     ":%s JOIN %s%s", name,
-						     parv[1], 
-						     UseModes(parv[1]) ? mbuf : 
-						     "");
+		}
+
+		/* For 2.11 servers. */
+		target = HasUID(acptr) ? acptr->name : acptr->user->uid;
+		while (*target)
+		{
+			*u++ = *target++;
+		}
+
 		/* send join to local users on channel */
-		sendto_channel_butserv(chptr, acptr, ":%s JOIN %s", name,
+		sendto_channel_butserv(chptr, acptr, ":%s JOIN %s", acptr->name,
 				       parv[1]);
 		/* build MODE for local users on channel, eventually send it */
 		if (*mbuf)
@@ -2464,11 +2489,11 @@ char	*parv[];
 				    {
 					strcat(parabuf, " ");
 				    }
-				strcat(parabuf, name);
+				strcat(parabuf, acptr->name);
 				if (mbuf[2])
 				    {
 					strcat(parabuf, " ");
-					strcat(parabuf, name);
+					strcat(parabuf, acptr->name);
 				    }
 				break;
 			case 2:
@@ -2476,11 +2501,11 @@ char	*parv[];
 					       ":%s MODE %s +%s%c %s %s",
 						       sptr->name, parv[1], 
 						       modebuf, mbuf[1],
-						       parabuf, name);
+						       parabuf, acptr->name);
 				if (mbuf[2])
 				    {
 					strcpy(modebuf, mbuf+2);
-					strcpy(parabuf, name);
+					strcpy(parabuf, acptr->name);
 					cnt = 1;
 				    }
 				else
@@ -2502,11 +2527,17 @@ char	*parv[];
 		sendto_channel_butserv(chptr, &me, ":%s MODE %s +%s %s",
 				       sptr->name, parv[1], modebuf, parabuf);
 
-	/* send NJOIN to capable servers */
+	/* send NJOIN */
 	*q = '\0';
+	*u = '\0';
 	if (nbuf[0])
-		sendto_match_servs_v(chptr, cptr, SV_NJOIN, ":%s NJOIN %s :%s",
+	{
+		sendto_match_servs_notv(chptr, cptr, SV_UID, ":%s NJOIN %s :%s",
 				     parv[0], parv[1], nbuf);
+		sendto_match_servs_v(chptr, cptr, SV_UID, ":%s NJOIN %s :%s",
+				     parv[0], parv[1], uidbuf);
+	}
+
 	return 0;
 }
 
