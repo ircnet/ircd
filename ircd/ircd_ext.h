@@ -32,7 +32,7 @@ extern char **myargv;
 extern int rehashed;
 extern int portnum;
 extern int serverbooting;
-extern int firstrejoin;
+extern int firstrejoindone;
 extern char *configfile;
 extern int debuglevel;
 extern int bootopt;
