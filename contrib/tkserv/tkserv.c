@@ -3,8 +3,8 @@
 **
 ** Copyright (c) 1998 Kaspar 'Kasi' Landsberg, <kl@berlin.Snafu.DE> 
 **
-** File     : tkserv.c v1.0.9
-** Author   : Kaspar 'Kasi' Landsberg, <kl@berlin.Snafu.DE>
+** File     : tkserv.c v1.2
+** Author   : Kaspar 'Kasi' Landsberg, <kl@snafu.de>
 ** Desc.    : Temporary K-line Service.
 **            For further info see the README file.
 ** Location : http://www.snafu.de/~kl/tkserv
@@ -44,9 +44,9 @@
 #define TKS_MAXARGS 250
 
 /* The version information */
-#define TKS_VERSION "Hello, i'm TkServ v1.0.9."
+#define TKS_VERSION "Hello, i'm TkServ v1.2."
 
-static char *nuh, *passwd;
+static char *nuh;
 FILE *tks_logf;
 int fd = -1, tklined = 0;
 
@@ -119,7 +119,7 @@ void sendto_server(char *buf, ...)
     write(fd, buffer, strlen(buffer));
     va_end(va);
     
-#ifdef TKSERV_DEBUGGING
+#ifdef TKSERV_DEBUG
     printf("%s", buffer);
 #endif
 }
@@ -217,7 +217,7 @@ int server_output(int fd, char *buffer)
     int n     = read(fd, buffer, TKS_MAXBUFFER);
     buffer[n] = '\0';
     
-#ifdef TKSERV_DEBUGGING
+#ifdef TKSERV_DEBUG
     printf("%s", buffer);
 #endif
 
@@ -849,7 +849,12 @@ void squery_tkline(char **args)
             sendto_user("Error while trying to edit the ircd.conf file.");
 }
 
-/* SQUERY QUIT */
+/* SQUERY QUIT 
+** Each time we receive a QUIT via SQUERY we check whether
+** the supplied password matches the one in the conf file or not.
+** If not, an error is sent out. If yes, we close the connection to
+** the server.
+*/
 void squery_quit(char **args)
 {
     char *ch;
@@ -857,10 +862,15 @@ void squery_quit(char **args)
     if (ch = (char *) strchr(args[4], '\r'))
         *ch = '\0';
 
-    if (!strcmp(args[4], passwd))
+    if (!strcmp(args[4], TKSERV_PASSWORD))
     {
         tks_log("Got QUIT from %s. Terminating.", nuh);
         sendto_server("QUIT :Linux makes the world go round. :)\n");
+    }
+    else
+    {
+        sendto_user("I refuse to QUIT. Have a look at the log to see why.");
+        tks_log("Got QUIT from %s with wrong password. Continuing.", nuh);
     }
 }
 
@@ -886,16 +896,16 @@ int main(int argc, char *argv[])
     fd_set read_set;
     fd_set write_set;
 
-    if ((is_unix) && (argc != 3))
+    if ((is_unix) && (argc != 2))
     {
-        fprintf(stderr, "Usage: %s <server> <port> <password>\n", argv[0]);
-        fprintf(stderr, "       %s <Unix domain socket> <password>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <server> <port>\n", argv[0]);
+        fprintf(stderr, "       %s <Unix domain socket>\n", argv[0]);
         exit(1);
     }
-    else if (argc != 4)
+    else if (argc != 3)
     {
-        fprintf(stderr, "Usage: %s <server> <port> <password>\n", argv[0]);
-        fprintf(stderr, "       %s <Unix domain socket> <password>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <server> <port>\n", argv[0]);
+        fprintf(stderr, "       %s <Unix domain socket>\n", argv[0]);
         exit(1);
     }
 
@@ -922,15 +932,10 @@ int main(int argc, char *argv[])
     }
 
     /* copy the args into something more documentable */
-    host= argv[1];
+    host = argv[1];
 
-    if (is_unix)
-        passwd = argv[2];
-    else
-    {
-        port   = argv[2];
-        passwd = argv[3];
-    }
+    if (!is_unix)
+        port = argv[2];
 
     /* Unix domain socket */
     if (is_unix)
@@ -982,12 +987,29 @@ int main(int argc, char *argv[])
     }
 
     /* register the service with SERVICE_WANT_NOTICE */
-    sendto_server("PASS %s\n", passwd);
+    sendto_server("PASS %s\n", TKSERV_PASSWORD);
     sendto_server("SERVICE %s localhost %s 33554432 0 :%s\n", TKSERV_NAME, TKSERV_DIST, TKSERV_DESC);
     sendto_server("SERVSET 33619968\n");
 
     timeout.tv_usec = 1000;
     timeout.tv_sec  = 10;
+
+	/* daemonization... i'm sure it's not complete */	
+	switch (fork())
+	{
+		case -1:
+			perror("fork()");
+			exit(3);
+		case 0:
+			close(STDIN_FILENO);
+			close(STDOUT_FILENO);
+			close(STDERR_FILENO);
+			if (setsid() == -1)
+				exit(4);
+			break;
+		default:
+			return 0;
+	}
 
     /* listen for server output and parse it */
     while (!eof)

@@ -1,6 +1,9 @@
 Welcome to TkServ !
 =+=+=+=+=+=+=+=+=+=
 
+This program is released under the GNU General Public License.
+A copy of this license is included in the distribution.
+
 I) Introduction
 ---------------
 
@@ -88,7 +91,7 @@ B) Editing the configuration file (config.h)
    TKSERV_LOGFILE (the abs. path to your tkserv logfile, no trailing slash)
    TKSERV_ACCESSFILE (the abs. path to your tkserv access file, ditto)
    
-   TKSERV_DEBUGGING (for debugging only, displayes traffic to standard output)
+   TKSERV_DEBUG (for debugging only, displayes traffic to standard output)
    
 C) Compiling the source
 
@@ -241,7 +244,7 @@ Be aware that anyone who knows that password can make your TkServ quit.
 
 J) Debugging
 
-If you #define DEBUGGING in the config.h file, everything which is sent
+If you #define TKSERV_DEBUG in the config.h file, everything which is sent
 to the server from the service and from the server to the service will be
 displayed to the standard output.
 
@@ -272,7 +275,7 @@ See the CREDITS file.
 
 VI) Bugs, comments, suggestions...
 
-Send everything to kl@berlin.Snafu.DE or to Kasi@IRC. :-)
+Send everything to kl@snafu.de or to Kasi@IRC.
 
 
 VII) The TkServ-mailinglist

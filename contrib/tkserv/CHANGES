@@ -33,3 +33,5 @@
           (Fusion & viha)
 1.0.9	: renamed the function logf due to a conflict in *BSD? (Virginie)
 1.0.9	: General rename of some tkserv functions
+1.2	: Password migration from cmd line to conf file (Earthpig)
+1.2	: TkServ now daemonizes itself. (Earthpig)

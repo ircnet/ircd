@@ -26,6 +26,10 @@ to the development of TkServ:
   + RedHat Linux cludge
   + no crashes anymore when a bad lifetime is given
 
+- Andrew ´Earthpig´ Snare
+  + password back to conf file (more secure)
+  + automatic daemonization
+
 - 'tumble'
   + possibility to explicitly disallow specific hosts from getting tklined
   + leading colons for the /squery commands in the README

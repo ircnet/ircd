@@ -9,8 +9,8 @@
 
 /* This will be shown on ADMIN requests */
 #define TKSERV_ADMIN_NAME    "Admin: Someone Somewhere"
-#define TKSERV_ADMIN_CONTACT "EMail: i.didnt@edit.my.ADMIN.info"
-#define TKSERV_ADMIN_OTHER   "SomeIRCer@IRCnet"
+#define TKSERV_ADMIN_CONTACT "Mail: i.didnt@edit.my.ADMIN.info"
+#define TKSERV_ADMIN_OTHER   "SomeAdmin@IRCnet"
 
 /* This is the name of the service which appears on /servlist */
 #define TKSERV_NAME "TkServ"
@@ -27,5 +27,8 @@
 /* The absolute path to the access file */
 #define TKSERV_ACCESSFILE "@libdir@/tkserv.access"
 
+/* The password for the service (must match the one in the S: line) */
+#define TKSERV_PASSWORD "blah"
+
 /* Debugging (displays service<->server traffic to standard output) */
-#undef TKSERV_DEBUGGING
+#undef TKSERV_DEBUG
