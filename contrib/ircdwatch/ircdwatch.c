@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.3 1999/02/21 00:33:44 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.4 2002/10/12 22:30:43 jv Exp $";
 #endif
 
 #include <stdio.h>
@@ -128,7 +128,7 @@ static void sig_handler (int signo)
 
 #ifndef POSIX_SIGNALS
     (void)signal(SIGALRM, &sig_handler);
-#endif;
+#endif
 
     return;
   }
