@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.95 2004/03/21 20:26:20 jv Exp $
+ *   $Id: struct_def.h,v 1.96 2004/03/22 14:03:51 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -201,7 +201,7 @@ typedef struct        LineItem aExtData;
 #define	IsUnixSocket(x)		((x)->flags & FLAGS_UNIX)
 #endif
 #define	IsListening(x)		((x)->flags & FLAGS_LISTEN)
-#define IsListeningInactive(x)	((x)->flags & FLAGS_LISTENINACTIVE)
+#define IsListenerInactive(x)	((x)->flags & FLAGS_LISTENINACTIVE)
 #define	IsLocal(x)		(MyConnect(x) && (x)->flags & FLAGS_LOCAL)
 #define	IsDead(x)		((x)->flags & FLAGS_DEADSOCK)
 #define	IsBursting(x)		(!((x)->flags & FLAGS_EOB))
@@ -220,7 +220,7 @@ typedef struct        LineItem aExtData;
 #define	SetDNS(x)		((x)->flags |= FLAGS_DOINGDNS)
 #define	SetDoneXAuth(x)		((x)->flags |= FLAGS_XAUTHDONE)
 #define	SetEOB(x)		((x)->flags |= FLAGS_EOB)
-#define SetListeningInactive(x)	((x)->flags |= FLAGS_LISTENINACTIVE)
+#define SetListenerInactive(x)	((x)->flags |= FLAGS_LISTENINACTIVE)
 #define SetKlineExempt(x)	((x)->user->flags |= FLAGS_EXEMPT)
 
 #define	DoingDNS(x)		((x)->flags & FLAGS_DOINGDNS)

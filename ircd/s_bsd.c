@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.135 2004/03/21 20:26:21 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.136 2004/03/22 14:03:51 jv Exp $";
 #endif
 
 #include "os.h"
@@ -349,7 +349,7 @@ int	add_listener(aConfItem *aconf)
 		if (IsConfDelayed(aconf) && !firstrejoindone)
 		{
 			dolisten = 0;
-			SetListeningInactive(cptr);
+			SetListenerInactive(cptr);
 		}
 		if (inetport(cptr, aconf->host, aconf->name, aconf->port,
 				dolisten))
