@@ -1,3 +1,13 @@
+2003-08-12  Piotr Kucharski
+
+	* res.c/do_query_name(), s_bsd.c/add_local_domain(): fix possible
+	  buffer overflow (noted by cras).
+
+2003-08-10  Piotr Kucharski
+
+	* s_serv.c/m_eob(): sid was not initialized, use sptr->serv->sid.
+	* s_serv.c/m_eob(): deal with protocol errors (eob coming from 2.10).
+
 2003-08-08  Piotr Kucharski
 
 	* common_def.h: added isscandinavian() macro checking ~^{}[]|\ chars.
