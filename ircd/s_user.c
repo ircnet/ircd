@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.136 2002/08/16 01:10:05 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.137 2002/08/23 18:47:03 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1398,8 +1398,12 @@ int	parc, notice;
 		** (for OPERs only)
 		**
 		** Armin, 8Jun90 (gruner@informatik.tu-muenchen.de)
+		**
+		** NOTE: 2.11 changed syntax from $/#-mask to $$/$#-mask
 		*/
-		if ((*nick == '$' || *nick == '#') && IsAnOper(sptr))
+		if (*nick == '$' &&
+			(*(nick+1) == '$' || *(nick+1) == '#')
+			&& IsAnOper(sptr))
 		    {
 			if (!(s = (char *)rindex(nick, '.')))
 			    {
@@ -1417,8 +1421,8 @@ int	parc, notice;
 				continue;
 			    }
 			sendto_match_butone(IsServer(cptr) ? cptr : NULL, 
-					    sptr, nick + 1,
-					    (*nick == '#') ? MATCH_HOST :
+					    sptr, nick + 2,
+					    (*(nick+1) == '#') ? MATCH_HOST :
 							     MATCH_SERVER,
 					    ":%s %s %s :%s", parv[0],
 					    cmd, nick, parv[2]);
