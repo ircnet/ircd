@@ -88,3 +88,6 @@
 #undef	ZIP_LINKS
 #endif
 
+#ifdef	CHKCONF_COMPILE
+#undef	ZIP_LINKS
+#endif
