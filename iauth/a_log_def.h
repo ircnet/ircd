@@ -35,6 +35,6 @@
 #define	ALOG_D931	0x10000	/* debug: module rfc931 */
 #define	ALOG_DSOCKS	0x20000	/* debug: module socks */
 #define	ALOG_DSOCKSC	0x40000	/* debug: module socks cache */
-#define	ALOG_DPIPE	0x80000	/* debug: module socks cache */
+#define	ALOG_DPIPE	0x80000	/* debug: module pipe */
 
 #define	ALOG_DALL	0xF3700	/* any debug flag */
