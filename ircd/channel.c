@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.82 1998/12/14 18:12:55 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.83 1998/12/21 15:06:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2277,6 +2277,14 @@ char	*parv[];
 							 parv[0]), parv[1]);
 				return;
 			    }
+		    }
+		/* make sure user isn't already on channel */
+		if (IsMember(acptr, chptr))
+		    {
+			sendto_flag(SCH_ERROR, "NJOIN protocol error from %s",
+				    get_client_name(cptr, TRUE));
+			sendto_one(cptr, "ERROR :NJOIN protocol error");
+			continue;
 		    }
 		/* add user to channel */
 		add_user_to_channel(chptr, acptr, chop);
