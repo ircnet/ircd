@@ -18,6 +18,8 @@
 
 	* channel.c/set_mode(): also allow +R from servers. :)
 
+2.11.0b11
+
 2004-08-13  Piotr Kucharski
 
 	* channel.c/set_mode(): allow +R from opers.
@@ -182,6 +184,8 @@
 	* struct_def.h: new ACL_TRACE (t).
 	* s_serv.c/m_trace(): ACL_TRACE guard.
 
+2.11.0a10
+
 2004-07-02  Piotr Kucharski
 
 	* s_user.c/find_denied(): added reverse D: (disable AC when given server
@@ -271,6 +275,8 @@
 	* s_serv.c/check_link(): free opers from RPL_TRYAGAIN.
 	* s_serv.c/m_stats(): change a little what's subject to RPL_TRYAGAIN
 	  for users (now only stats i c k m t z).
+
+2.11.0a9
 
 2004-06-26  Piotr Kucharski
 
@@ -460,6 +466,8 @@
 	* ircd.c/try_connections(): move send_ping() to calculate_preference.
 	* ircd.c/calculcate_preference(): skip non AC C-lines.
 
+2.11.0a8
+
 2004-05-14  Piotr Kucharski
 
 	* msg_def.h, parse.c, s_serv.c, s_serv_ext.h: new command EOBACK
@@ -502,6 +510,8 @@
 	  breaking apart).
 	* s_misc.c/exit_server(): use from, not &me or else -- otherwise squits
 	  get messed up for 2.10 (after all, that's what from is for, eh?)
+
+2.11.0a7
 
 2004-04-17  Piotr Kucharski
 
@@ -561,6 +571,8 @@
 
 	* s_service.c/m_service(): tiny yet fatal bug messing up hash tables
 	  (introduced 2004-03-19).
+
+2.11.0a6
 
 2004-03-24  Piotr Kucharski
 
@@ -658,6 +670,8 @@
 	  s_serv.c: removed CACHE_MOTD, it's default and not possible to turn
 	  off; also fixed tiny bug of always reloading motd, not when changed.
 
+2.11.0a5
+
 2004-03-10  Piotr Kucharski
 
 	* s_bsd.c, s_bsd_ext.h: added delay_close() function.
@@ -721,6 +735,8 @@
 	* ircd.c, s_bsd.c, s_debug.c, s_err.c, s_serv.c, numeric_def.h,
 	  struct_def.h: removed ancient STAT_LOG (and RPL_TRACELOG).
 
+2.11.0a4
+
 2004-03-05  Piotr Kucharski
 
 	* res.c/proc_answer(), get_res(): fix CNAMEs resolving; now we use the
@@ -780,6 +796,8 @@
 	* parse.c, msg_def.h: add "POST" command being alias for "QUIT"
 	  to cut w3cache abuse (idea from ircu).
 
+2.11.0a3
+
 2004-02-23  Piotr Kucharski
 
 	* s_serv.c/m_squit(): do not send compatibility sids in SQUIT.
@@ -829,6 +847,8 @@
 	  user nick.
 	* channel.c/m_part(): buffer overflow resulting in network desync.
 
+2.11.0a2
+
 2004-02-17  Piotr Kucharski
 
 	* s_user.c/m_nick(): do not add to hash table nick of "0".
@@ -866,6 +886,8 @@
 
 	* s_user.c/m_join(): show nick in error, not UID, when restricted
 	  clients does "NICK 0".
+
+2.11.0a1
 
 2004-02-13  Jakub Vlasek
 
