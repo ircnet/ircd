@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.244 2004/10/06 14:40:06 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.245 2004/10/06 14:52:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2274,13 +2274,14 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int	m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	if (parc > 1 &&
-		hunt_server(cptr,sptr,":%s USERS :%s",1,parc,parv) != HUNTED_ISME)
+		hunt_server(cptr, sptr, ":%s USERS :%s", 1, parc, parv)
+		!= HUNTED_ISME)
 	{
 		return 3;
 	}
 
 #ifdef USERS_RFC1459
-	    {
+	{
 #ifdef ENABLE_USERS
 		char	namebuf[10],linebuf[10],hostbuf[17];
 		int	fd, flag = 0;
@@ -2308,7 +2309,7 @@ int	m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #else
 		sendto_one(sptr, replies[ERR_USERSDISABLED], ME, BadTo(parv[0]));
 #endif
-	    }
+	}
 #else /* USERS_RFC1459 */
 	(void) send_users(cptr, sptr, parc, parv);
 #endif /* USERS_RFC1459 */
@@ -2417,9 +2418,9 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		m_services = istat.is_myservice;
 	}
 	else
-	{	
+	{
 		aClient 	*acptr;
-        	aServer 	*asptr;
+		aServer 	*asptr;
 		aService 	*svcp;
 		
 		if ((acptr = find_client(parv[1], NULL)) && IsServer(acptr))
