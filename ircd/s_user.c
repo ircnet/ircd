@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.55 1998/09/23 12:56:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.56 1998/09/27 19:12:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -332,7 +332,10 @@ char	*nick, *username;
 	aServer	*sp = NULL;
 	anUser	*user = sptr->user;
 	short	oldstatus = sptr->status;
-	char	*parv[3], prefix;
+	char	*parv[3];
+#ifndef NO_PREFIX
+	char	*prefix;
+#endif
 	int	i;
 
 	user->last = timeofday;
@@ -394,7 +397,6 @@ char	*nick, *username;
 			strncpyzt(buf2, sptr->username, USERLEN+1);
 		else /* No ident, or unusable ident string */
 		     /* because username may point to user->username */
-#endif
 			strncpyzt(buf2, username, USERLEN+1);
 
 		if (prefix)
@@ -406,6 +408,9 @@ char	*nick, *username;
 			strncpy(user->username, buf2, USERLEN+1);
 		user->username[USERLEN] = '\0';
 		/* eos */
+#else
+		strncpyzt(user->username, username, USERLEN+1);
+#endif
 
 		if (sptr->exitc == EXITC_AREF)
 		    {
