@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.93 2002/04/06 05:55:42 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.94 2002/04/07 19:38:45 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2684,19 +2684,38 @@ char	*parv[];
 		if (MyConnect(sptr))
 		{
 			sendto_flag(SCH_NOTICE,
-				"End of burst from %s after %d seconds.",
-				sptr->name, timeofday - sptr->firsttime);
+			       "End of burst from %s after %d seconds.",
+			       sptr->name, timeofday - sptr->firsttime);
+		}
+		else
+		{
+			if (!IsMasked(sptr))
+			{
+				sendto_flag(SCH_NOTICE, "End of burst from %s",
+					sptr->name);
+			}
 		}
 		SetEOB(sptr);
 		istat.is_eobservers++;
+		
+		if (parc < 2)
+		{
+			sendto_serv_v(sptr, SV_UID, ":%s EOB", sptr->serv->sid);
+			return 1;
+		}
+	
+	}
+	else
+	{
+		if (parc < 2)
+		{
+			sendto_flag(SCH_ERROR,
+				"Received another EOB for server %s (%s)",
+				 sid, sptr->name);
+			return 1;
+		}
 	}
 	
-	if (parc < 2)	
-	{
-		sendto_serv_v(sptr, SV_UID, ":%s EOB", sptr->serv->sid);
-		return 1;
-	}
-
 	eobmaxlen = BUFSIZE
 		- 1             /*     ":"     */
 		- SIDLEN        /*   my SID    */
@@ -2712,6 +2731,8 @@ char	*parv[];
 	
 	for (; (sid = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	{
+		acptr = NULL;
+		
 		if (sid[0] == '$')
 		{
 			aServer *asptr;
@@ -2749,8 +2770,10 @@ char	*parv[];
 		if (!IsBursting(acptr))
 		{
 			sendto_flag(SCH_ERROR,
-				"Received another EOB for server %s from %s",
-					sid, cptr->name);
+				"Received another EOB for server %s (%s) from "
+				"%s (%s) via %s", sid, acptr->name,
+				sptr->serv->sid, sptr->name, cptr->name);
+
 			continue;
 		}
 
