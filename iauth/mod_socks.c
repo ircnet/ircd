@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.22 1999/07/04 22:35:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.23 1999/07/11 00:04:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -214,7 +214,7 @@ char *strver;
 	    cldata[cl].wfd = 0;
 	    return -1;
 	}
-    if (cldata[cl].mod_status == 4)
+    if (cldata[cl].mod_status == ST_V4)
 	{
 	    query[0] = 4; query[1] = 1;
 	    query[2] = ((cldata[cl].ourport & 0xff00) >> 8);
