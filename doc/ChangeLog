@@ -1,6 +1,6 @@
 2004-03-22  Jakub Vlasek
 
-	* struct_def.h, s_Bsd.c, s_serv.c: Rename IsListeningInactive and
+	* struct_def.h, s_bsd.c, s_serv.c: Rename IsListeningInactive and
 	  SetListeningInactive macros to IsListenerInactive and
 	  SetListenerInactive.
 	* s_bsd.c, s_bsd_ext.h: Added activate_delayed_listeners().
