@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.110 2002/08/24 01:33:32 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.111 2002/08/30 15:14:09 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1586,7 +1586,64 @@ char	*parv[];
 		return 3;
 	return 2;
 }
+/* stats ? - quick info about connected servers
+ */
+static void report_myservers(sptr,to)
+aClient *sptr;
+char *to;
+{
+	int i;
+	int timeconnected;
+	aClient *acptr;
+	aServer *asptr;
+	int users = 0, servers = 0;
 
+	for (i = fdas.highest; i >= 0; i--)
+	{
+		if (!(acptr = local[fdas.fd[i]]))
+		{
+			continue;
+		}
+		
+		if (IsMe(acptr) || !IsServer(acptr))
+		{
+			continue;
+		}
+		timeconnected = timeofday - acptr->firsttime;
+#ifdef HUB
+                        for (asptr = svrtop;asptr;asptr = asptr->nexts)
+                        {
+				if (IsMasked(asptr))
+				{
+					continue;
+				}
+                                if (asptr->bcptr->from == acptr)
+                                {
+                                        servers++;
+                                        users += asptr->usercnt[0];
+					users += asptr->usercnt[1];
+				}
+			}
+#else /* !HUB */
+			servers = istat.is_serv - 1;
+			users = istat.is_user[0] + istat.is_user[1];
+			users -= istat.is_myclnt;
+#endif
+		sendto_one(sptr,
+			   ":%s %d %s :%s (%d, %02d:%02d:%02d) %dS %dC"
+			   " %lldkB sent %lldkB recv %ldkB sq%s",
+			   ME, RPL_STATSDEBUG, to, acptr->name,
+			   timeconnected / 86400,
+			   (timeconnected % 86400) / 3600,
+			   (timeconnected % 3600)/60,
+			   timeconnected % 60,
+			   servers, users,
+			   (acptr->sendB / 1024) ,
+			   (acptr->receiveB / 1024),
+			   (int) ((int)DBufLength(&acptr->sendQ) / 1024),
+			   IsBursting(acptr) ? " BURST" : "");
+	}
+}
 
 /*
 ** m_stats
@@ -1878,6 +1935,9 @@ char	*parv[];
 		break;
 	case 'z' :	      /* memory use */
 		count_memory(cptr, parv[0], 0);
+		break;
+	case '?' :
+		report_myservers(sptr, parv[0]);
 		break;
 	default :
 		stat = '*';
