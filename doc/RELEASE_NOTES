@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.65 2004/10/27 13:35:05 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.66 2004/11/01 16:32:38 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -25,8 +25,9 @@ New features in 2.11.0:
 	* Resolving slightly changed: when host has CNAMEs, use the name that
 	  client IP PTR points to, not the CNAME that points to client IP.
 	* It is now possible to include files in config without need of m4.
-	* New "TKLINE seconds user@host :reason" and "UNTKLINE user@host"
+	* New "TKLINE timeformat user@host :reason" and "UNTKLINE user@host"
 	  commands, available for services and (depending on O: flag) opers.
+	  Timeformat is like 1w2d3h4m5s and defaults to minutes.
 	* New "REHASH t" removes all tklines.
 	* Oper-only (access granted via O: flag) &CLIENTS channel reporting
 	  (if defined) clients connects, quits, nickchanges.
@@ -54,6 +55,8 @@ New features in 2.11.0:
 	  numerics).
 	* "USERS" defaults now to non-rfc1459 compatible variant (shows local
 	  and global usercounts and maximums (new 265/266 numerics).
+	* New command "MAP [*.mask] [s]" showing ascii tree version of LINKS
+	  and including (with "s" param) user counts and server versions.
 
 Important changes in 2.11.0 (since 2.10.3):
 	* Nicknames of local clients cannot have [\]{|} chars. (Will be removed

@@ -1,3 +1,29 @@
+2004-11-01  Piotr Kucharski
+
+	* Makefile.in: config file define for tkserv (not always ircd.conf).
+	* tkconf.h.dist: use ".bak" suffix for config file backup.
+	* s_conf.c/do_tkline(): show notice only if there were more than four
+	  hits for a tkline.
+	* Makefile.in: introduce IRCDCONF_DIR for chkconf and s_conf.o pointing
+	  to dir where ircd.conf is located.
+	* chkconf.c/showconf(), config_read.c/config_read(),config_error(): use
+	  IRCDCONF_DIR instead of extracting it from IRCDCONF_PATH.
+	* tkserv.c: use IRCDCONF_DELIMITER (from fiction).
+	* tkserv.c/main(): updated registration for ircd 2.11.
+	* s_conf.c: new function wdhms2sec() allowing to use 1w2d3h4m5s format
+	  in tkline commands. Default (only number) is minutes.
+
+2004-10-30  Piotr Kucharski
+
+	* s_bsd.c/check_client(): nullify cptr->hostp when IP mismatch, so
+	  "Unauthorized" shows IP, not an incorrect hostname (from fiction).
+	* channel.c/m_topic(): simplified a bit.
+
+2004-10-29  Piotr Kucharski
+
+	* res.c/proc_answer(): allow any char in CNAME to allow RFC2317 reverse
+	  delegation.
+
 2004-10-27  Piotr Kucharski
 
 	* match.c/match(): return NOMATCH for null masks too.
