@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.99 1999/06/20 21:24:20 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.100 1999/06/25 21:41:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2055,8 +2055,20 @@ char	*parv[];
 				/* from a server, it is legitimate */
 			    }
 			else if (chptr)
+			    {
 				/* joining a !channel using the short name */
+				if (MyConnect(sptr) &&
+				    hash_find_channels(name+1, chptr))
+				    {
+					sendto_one(sptr,
+						   err_str(ERR_TOOMANYTARGETS,
+							   parv[0]),
+						   "Duplicate", name,
+						   "Join aborted.");
+					continue;
+				    }
 				name = chptr->chname;
+			    }
 		    }
 		if (!IsChannelName(name) ||
 		    (*name == '!' && IsChannelName(name+1)))
