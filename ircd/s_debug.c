@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.11 1997/09/03 17:45:59 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.12 1997/10/01 17:43:59 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -617,10 +617,12 @@ int	debug;
 		   _CHANNELHASHSIZE, sizeof(aHashEntry) * _CHANNELHASHSIZE);
 	d_db = db = istat.is_dbufnow * sizeof(dbufbuf);
 	db = istat.is_dbufnow * sizeof(dbufbuf);
-	sendto_one(cptr, ":%s %d %s :Dbuf blocks %u(%d) (> %u) (%u < %u) [%u]",
+	sendto_one(cptr,
+		   ":%s %d %s :Dbuf blocks %u(%d) (> %u [%u]) (%u < %u) [%u]",
 		   me.name, RPL_STATSDEBUG, nick, istat.is_dbufnow, db,
-		   istat.is_dbuf, istat.is_dbufuse, istat.is_dbufmax,
-		   istat.is_dbufmore);
+		   istat.is_dbuf,
+		   (u_int) (((u_int)BUFFERPOOL) / ((u_int)sizeof(dbufbuf))),
+		   istat.is_dbufuse, istat.is_dbufmax, istat.is_dbufmore);
 
 	d_rm = rm = cres_mem(cptr, nick);
 
