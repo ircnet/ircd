@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.17 1998/04/07 21:20:53 kalt Exp $
+#*   $Id: Makefile.in,v 1.18 1998/04/07 21:22:32 kalt Exp $
 #*
 #*/
 
@@ -112,7 +112,7 @@ $(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 
 mkpasswd: mkpasswd.o
 	$(RM) $@
-	$(CC) $(LDFLAGS) -o $@ mkpasswd.o $(LIBS)
+	$(CC) $(LDFLAGS) -o ircd-mkpasswd mkpasswd.o $(LIBS)
 
 install: install-server install-client
 
@@ -139,7 +139,7 @@ install-server: server
 	fi
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(CHKCONF) $(server_bin_dir)
-	$(INSTALL_PROGRAM) -m $(ircd_mode) mkpasswd $(server_bin_dir)
+	$(INSTALL_PROGRAM) -m $(ircd_mode) ircd-mkpasswd $(server_bin_dir)
 	$(RM) $(ircd_dir)/ircd.m4
 	../ircd/buildm4 $(ircd_dir)
 	(cd ../doc; $(INSTALL_DATA) ircd.8 $(server_man_dir))
