@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.51 2004/02/07 23:41:27 chopin Exp $
+#*   $Id: Makefile.in,v 1.52 2004/02/08 00:54:11 chopin Exp $
 #*
 #*/
 
@@ -448,7 +448,7 @@ res_mkquery.o: ../ircd/res_mkquery.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/res_mkquery.c
 
 iauth.o: ../iauth/iauth.c config.h setup.h
-	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/iauth.c
+	$(CC) $(A_CFLAGS) -DIAUTHPID_PATH="\"$(IAUTHPID_PATH)\"" -c -o $@ ../iauth/iauth.c
 
 a_conf.o: ../iauth/a_conf.c config.h setup.h
 	$(CC) $(A_CFLAGS) -DIAUTHCONF_PATH="\"$(IAUTHCONF_PATH)\"" -c -o $@ ../iauth/a_conf.c
