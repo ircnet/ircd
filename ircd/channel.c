@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.152 2003/08/08 19:22:00 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.153 2003/08/08 19:23:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -62,6 +62,7 @@ static	int	add_modeid __P((int, aClient *, aChannel *, aListItem *));
 static	int	del_modeid __P((int, aChannel *, aListItem *));
 static	Link	*match_modeid __P((int, aClient *, aChannel *));
 static  void    names_channel __P((aClient *,aClient *,char *,aChannel *,int));
+static	void	convert_scandinavian __P((Reg char *cn, aClient *));
 
 static	char	*PartFmt = ":%s PART %s :%s";
 
@@ -975,6 +976,7 @@ char	*parv[];
 	     name = strtoken(&p, NULL, ","))
 	    {
 		clean_channelname(name);
+		convert_scandinavian(name, cptr);
 		chptr = find_channel(name, NullChn);
 		if (chptr == NullChn)
 		    {
@@ -2193,6 +2195,7 @@ char	*parv[];
 		    {
 			clean_channelname(name);
 		    }
+		convert_scandinavian(name, cptr);
 		if (*name == '!')
 		    {
 			chptr = NULL;
@@ -2590,6 +2593,7 @@ char	*parv[];
 					    get_client_name(cptr, TRUE));
 				return 0;
 			    }
+			convert_scandinavian(parv[1], cptr);
 			chptr = get_channel(acptr, parv[1], CREATE);
 			if (!IsChannelName(parv[1]) || chptr == NULL)
 			    {
@@ -2737,6 +2741,7 @@ char	*parv[];
 
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	    {
+		convert_scandinavian(name, cptr);
 		chptr = get_channel(sptr, name, 0);
 		if (!chptr)
 		    {
@@ -2832,6 +2837,7 @@ char	*parv[];
 	    {
 		if (penalty >= MAXPENALTY && MyPerson(sptr))
 			break;
+		convert_scandinavian(name, cptr);
 		chptr = get_channel(sptr, name, !CREATE);
 		if (!chptr)
 		    {
@@ -2934,6 +2940,7 @@ char	*parv[];
 				   name);
 			continue;
 		    }
+		convert_scandinavian(name, cptr);
 		if (parc > 1 && IsChannelName(name))
 		    {
 			chptr = find_channel(name, NullChn);
@@ -3032,6 +3039,7 @@ char	*parv[];
 		return 1;
 	    }
 	clean_channelname(parv[2]);
+	convert_scandinavian(parv[2], cptr);
 	if (check_channelmask(sptr, acptr->user->servp->bcptr, parv[2]))
 		return 1;
 	if (*parv[2] == '&' && !MyClient(acptr))
@@ -3422,6 +3430,7 @@ char	*parv[];
 		for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 		{
 			clean_channelname(name);
+			convert_scandinavian(name, cptr);
 			if BadPtr(name)
 			{
 				continue;
