@@ -1,4 +1,4 @@
-/* $Id: acconfig.h,v 1.8 1998/12/13 00:02:38 kalt Exp $ */
+/* $Id: acconfig.h,v 1.9 1999/03/10 00:30:17 kalt Exp $ */
 
 /* Define if zlib package must be used for compilation/linking. */
 #undef USE_ZLIB
@@ -96,3 +96,6 @@
 
 /* Define to enable IPv6 support */
 #undef INET6
+
+/* Define to enable dynamically shared iauth module support */
+#undef USE_DSM

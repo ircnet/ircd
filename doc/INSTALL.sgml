@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.34 1999/02/21 00:33:45 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.35 1999/03/10 00:30:16 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.10.2.
 </abstract>
@@ -50,6 +50,7 @@ for this you also need to define ZIP_LINKS (see section below).
 <tag/--without-zlib/ tells ``configure'' not to look for the zlib.
 Defining this will keep you from using server link compression.
 <tag/--enable-ip6/ Enable IPv6 support (See notes below)
+<tag/--enable-dsm/ Enable Dynamically Shared Modules support for iauth
 </descrip>
 
 <sect1>Notes for Cygwin32 users

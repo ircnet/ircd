@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.10 1999/03/08 21:59:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.11 1999/03/10 00:30:17 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -27,8 +27,7 @@ static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.10 1999/03/08 21:59:07 kalt Exp $"
 #include "a_externs.h"
 #undef A_CONF_C
 
-static aModule *Mlist[] =
-	{ &Module_rfc931, &Module_socks, &Module_pipe, (aModule *)NULL };
+static aModule *Mlist[16];
 
 u_int	debuglevel = 0;
 u_char	iauth_required = 0;
@@ -56,10 +55,15 @@ char *cfile;
 	u_char needh = 0; /* do we need hostname information for any host? */
 	u_char o_req = 0, o_dto = 0;
 	static char o_all[5];
-	u_int lnnb = 0, i;
+	u_int lnnb = 0, i, Mcnt = 0;
 	char buffer[160], *ch;
 	AnInstance **last = &instances, *itmp;
 	FILE *cfh;
+
+	Mlist[Mcnt++] = &Module_rfc931;
+	Mlist[Mcnt++] = &Module_socks;
+	Mlist[Mcnt++] = &Module_pipe;
+	Mlist[Mcnt] = NULL;
 
 	cfh = fopen((cfile) ? cfile : IAUTHCONF_PATH, "r");
 	if (cfh)
@@ -100,6 +104,54 @@ char *cfile;
 						   debuglevel);
 				continue;
 			    }
+#if defined(USE_DSM)
+			if (!strncmp("shared ", buffer, 7))
+			    {
+				char lfname[80];
+				void *mod_handle;
+				aModule *(*load_func)();
+
+				ch = index(buffer+7, ' ');
+				if (ch == NULL)
+				    {
+					conf_err(lnnb, "Syntax error.", cfile);
+					continue;
+				    }
+				*ch++ = '\0';
+				mod_handle = dlopen(ch, RTLD_NOW);
+				if (mod_handle == NULL)
+				    {
+					conf_err(lnnb, dlerror(), cfile);
+					continue;
+				    }
+# if defined(DLSYM_NEEDS_UNDERSCORE)
+				sprintf(lfname, "_%s_load", buffer+7);
+# else
+				sprintf(lfname, "%s_load", buffer+7);
+# endif
+				load_func = (aModule *(*)())dlsym(mod_handle,
+								  lfname);
+				if (load_func == NULL)
+				    {
+					conf_err(lnnb,"Invalid shared object.",
+						 cfile);
+					dlclose(mod_handle);
+					continue;
+				    }
+				Mlist[Mcnt] = load_func();
+				if (Mlist[Mcnt])
+				    {
+					Mcnt += 1;
+					Mlist[Mcnt] = NULL;
+				    }
+				else
+				    {
+					conf_err(lnnb, "Failed.", cfile);
+					dlclose(mod_handle);
+				    }
+				continue;
+			    }
+#endif
 			if (buffer[0] == '\t')
 			    {
 				conf_err(lnnb, "Ignoring unexpected property.",

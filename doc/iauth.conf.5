@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.7 1999/03/08 21:59:07 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1999/03/08 21:59:07 $"
+.\" @(#)$Id: iauth.conf.5,v 1.8 1999/03/10 00:30:16 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1999/03/10 00:30:16 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -44,6 +44,10 @@ connections unless the authentication is handled by iauth.
 .B notimeout
 By specifying this keyword, the IRC server is told not to accept new user
 connections if iauth hasn't finished its work in time.
+.B shared <name> <mod_name.so>
+If iauth was compiled with Dynamically Shared Module support, it can be
+told to dynamically load a module using this option.  The module can then
+be loaded.
 .SH MODULES
 .TP
 .B pipe

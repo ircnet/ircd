@@ -175,6 +175,9 @@
 /* Define to enable IPv6 support */
 #undef INET6
 
+/* Define to enable dynamically shared iauth module support */
+#undef USE_DSM
+
 /* Define if you have the bcmp function.  */
 #undef HAVE_BCMP
 
@@ -270,6 +273,9 @@
 
 /* Define if you have the <cursesX.h> header file.  */
 #undef HAVE_CURSESX_H
+
+/* Define if you have the <dlfcn.h> header file.  */
+#undef HAVE_DLFCN_H
 
 /* Define if you have the <errno.h> header file.  */
 #undef HAVE_ERRNO_H

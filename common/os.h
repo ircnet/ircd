@@ -227,6 +227,16 @@
 # endif
 #endif
 
+#if defined(HAVE_DLFCN_H)
+# include <dlfcn.h>
+#endif
+
+#if (defined(__FreeBSD__) ||\
+     defined(__OpenBSD__) ||\
+     defined(__NetBSD__)     ) && !defined(__ELF__)
+# define DLSYM_NEEDS_UNDERSCORE
+#endif
+
 /*  Some special include files for a special OS. :)
  */
 
