@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.21 2004/09/21 14:10:27 chopin Exp $
-.TH IAUTH.CONF 5 "$Date: 2004/09/21 14:10:27 $"
+.\" @(#)$Id: iauth.conf.5,v 1.22 2004/12/06 16:09:21 chopin Exp $
+.TH IAUTH.CONF 5 "$Date: 2004/12/06 16:09:21 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -57,8 +57,8 @@ NOT mean that the server will wait forever to get the data from iauth, see
 the \fInotimeout\fP option.
 .TP
 .B notimeout
-By specifying this keyword, the IRC server is told not to accept new user
-connections if \fIiauth\fP hasn't finished its work in time. Note that
+By specifying this keyword, the IRC server is told not to accept a user
+connection if \fIiauth\fP hasn't finished its work in time. Note that
 modules specified after \fIdelayed\fP keyword are not considered.
 .TP
 .B extinfo
