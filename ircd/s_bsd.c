@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.53 1999/02/04 23:50:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.54 1999/02/12 04:10:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2277,7 +2277,7 @@ int	ro;
 deadsocket:
 				if (TST_READ_EVENT(fd))
 					CLR_READ_EVENT(fd);
-				if (cptr->exitc =! EXITC_UNDEF)
+				if (cptr->exitc != EXITC_UNDEF)
 					sendto_flag(SCH_DEBUG,
 						    "EXITC overwritten: %c",
 						    cptr->exitc);
