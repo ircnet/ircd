@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.67 1999/02/12 04:06:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.68 1999/03/05 01:53:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -357,6 +357,7 @@ char	*nick, *username;
 
 #if defined(USE_IAUTH)
 		/* this should not be needed, but there's a bug.. -kalt */
+		/* haven't seen any notice like this, ever.. no bug no more? */
 		if (*cptr->username == '\0')
 		    {
 			sendto_flag(SCH_AUTH,
@@ -421,40 +422,12 @@ char	*nick, *username;
 		strncpyzt(user->username, username, USERLEN+1);
 #endif
 
-		if (sptr->exitc == EXITC_AREF)
+		if (sptr->exitc == EXITC_AREF || sptr->exitc == EXITC_AREFQ)
 		    {
-			char *masked = NULL, *format;
-
-			/*
-			** All this masking is rather ugly but prompted by
-			** the fact that the hostnames should not be made
-			** available in realtime. (first iauth module using
-			** this detects open proxies)
-			** Then again, if detailed information is needed,
-			** the admin should check logs and/or the module
-			** should be changed to send details to &AUTH.
-			*/
-			if (sptr->hostp)
-			    {
-				masked = index(sptr->hostp->h_name, '.');
-				format = "Denied connection from ???%s.";
-			    }
-			else
-			    {
-				char *dot;
-
-				masked = inetntoa((char *)&sptr->ip);
-				dot = rindex(masked, '.');
-				if (dot)
-					*(dot+1) = '\0';
-				else
-					masked = NULL;
-				format = "Denied connection from %s???.";
-			    }
-			if (masked) /* just to be safe */
-				sendto_flag(SCH_LOCAL, format, masked);
-			else
-				sendto_flag(SCH_LOCAL, "Denied connection.");
+			if (sptr->exitc == EXITC_AREF)
+				sendto_flag(SCH_LOCAL,
+					    "Denied connection from %s.",
+					    get_client_host(sptr));
 #if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
 			syslog(LOG_NOTICE, "%s ( %s ): <none>@%s [%s] %c\n",
 			       myctime(sptr->firsttime), " Denied  ",

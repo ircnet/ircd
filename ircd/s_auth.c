@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.26 1999/02/01 20:35:50 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.27 1999/03/05 01:53:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -197,7 +197,8 @@ read_iauth()
 			    continue;
 			}
 		    if (*start != 'U' && *start != 'u' &&
-			*start != 'K' && *start != 'D')
+			*start != 'K' && *start != 'k' &&
+			*start != 'D')
 			{
 			    sendto_flag(SCH_AUTH, "Garbage from iauth [%s]",
 					start);
@@ -306,7 +307,10 @@ read_iauth()
 			    ** yet: we don't even know if this is a server
 			    ** or a user connection!
 			    */
-			    cptr->exitc = EXITC_AREF;
+			    if (start[0] == 'K')
+				    cptr->exitc = EXITC_AREF;
+			    else
+				    cptr->exitc = EXITC_AREFQ;
 			    /* should also check to make sure it's still
 			       an unregistered client.. */
 			    /* should be extended to work after registration */

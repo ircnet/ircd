@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.12 1999/02/06 21:43:52 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.13 1999/03/05 01:53:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -70,7 +70,7 @@ int cl;
     if (mydata->options & OPT_DENY)
 	{
 	    cldata[cl].state |= A_DENY;
-	    sendto_ircd("K %d %s %u ", cl, cldata[cl].itsip,
+	    sendto_ircd("k %d %s %u ", cl, cldata[cl].itsip,
 			cldata[cl].itsport);
 	}
     if (mydata->options & OPT_LOG)
