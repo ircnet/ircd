@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.137 2003/02/10 16:23:09 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.138 2003/02/10 16:26:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -321,6 +321,10 @@ aChannel *chptr;
 			if (sscanf(tmp->value.cp, "%*[^@]@%[0-9.]/%d",
 				buf, &mask) == 2)
 			{
+				if (mask == 0)
+					break;
+				if (mask > 32 || mask < 0)
+					continue;
 				mask=32-mask;
 				/* BUG: where is nick!user@ part checking? */
 				if (htonl(cptr->ip.s_addr) >> mask ==
