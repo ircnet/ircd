@@ -220,6 +220,9 @@
 /* Define if you have the memset function.  */
 #undef HAVE_MEMSET
 
+/* Define if you have the mmap function.  */
+#undef HAVE_MMAP
+
 /* Define if you have the poll function.  */
 #undef HAVE_POLL
 
