@@ -1,6 +1,8 @@
 Sun Jun  1 16:57:39 1997  Christophe Kalt
 
-	* s_conf.c: fixed B lines behaviour.
+	* dbuf.h, dbuf.c: #define DBUF_TAIL is back.
+	
+	* s_conf.c: fixed B lines behaviour, port number is now mandatory.
 
 	* send.c: missing arg to dead_link(). (Olivier Galibert)
 

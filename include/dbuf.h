@@ -20,6 +20,8 @@
 #ifndef __dbuf_include__
 #define __dbuf_include__
 
+#define	DBUF_TAIL
+
 /*
 ** dbuf is a collection of functions which can be used to
 ** maintain a dynamic buffering of a byte stream.

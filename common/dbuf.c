@@ -36,12 +36,8 @@
 */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.3 1997/05/05 14:50:43 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.4 1997/06/02 14:49:53 kalt Exp $";
 #endif
-
-/* Do not define until it is fixed. -krys
-#define	DBUF_TAIL
- */
 
 #include <stdio.h>
 #include "struct.h"
