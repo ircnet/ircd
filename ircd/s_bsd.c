@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.30 1998/08/03 01:26:51 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.31 1998/08/04 15:28:25 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -414,15 +414,78 @@ void	close_listeners()
 	    }
 }
 
+void
+start_iauth()
+{
+#if defined(USE_IAUTH)
+	static char first = 1;
+	int sp[2], fd;
+
+	if (adfd >= 0)
+	    {
+		sendto_flag(SCH_AUTH,
+			    "Attempted to start iauth a second time!");
+		return;
+	    }
+	sendto_flag(SCH_AUTH, "Starting iauth...");
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sp) < 0)
+	    {
+		sendto_flag(SCH_ERROR, "socketpair() failed!");
+		sendto_flag(SCH_AUTH, "Failed to restart iauth!");
+	    }
+	adfd = sp[0];
+	set_non_blocking(sp[0], NULL);
+	set_non_blocking(sp[1], NULL); /* less to worry about in iauth */
+	switch (vfork())
+	    {
+	case -1:
+		sendto_flag(SCH_ERROR, "vfork() failed!");
+		sendto_flag(SCH_AUTH, "Failed to restart iauth!");
+		close(sp[0]); close(sp[1]);
+		adfd = -1;
+		return;
+	case 0:
+		for (fd = 0; fd < MAXCONNECTIONS; fd++)
+			if (fd != sp[1])
+				(void)close(fd);
+		if (sp[1] != 0)
+		    {
+			(void)dup2(sp[1], 0);
+			close(sp[1]);
+		    }
+		if (execl(APATH, APATH, NULL) < 0)
+			_exit(-1); /* should really not happen.. */
+	default:
+		close(sp[1]);
+	    }
+
+	if (first)
+		first = 0;
+	else
+	    {
+		char buf[10];
+		int i;
+		aClient *cptr;
+
+		for (i = 0; i <= highest_fd; i++)
+		    {   
+			if (!(cptr = local[i]))
+				continue;
+			if (IsServer(cptr) || IsService(cptr))
+				continue;
+			sprintf(buf, "%d O\n", i);
+			sendto_iauth(buf);
+		    }
+	    }
+#endif
+}
+
 /*
  * init_sys
  */
 void	init_sys()
 {
 	Reg	int	fd;
-#if defined(USE_IAUTH)
-	int sp[2];
-#endif
 
 #ifdef RLIMIT_FD_MAX
 	struct rlimit limit;
@@ -524,35 +587,7 @@ void	init_sys()
 init_dgram:
 	resfd = init_resolver(0x1f);
 
-#if defined(USE_IAUTH)
-	/* finally, start up the authentication slave process */
-	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sp) < 0)
-		abort(); /* hmmpf! */
-	adfd = sp[0];
-	set_non_blocking(sp[0], NULL);
-	set_non_blocking(sp[1], NULL); /* less to worry about in iauth */
-	switch (vfork())
-	    {
-	case -1:
-		/* hmmpf */
-		exit(-1);
-	case 0:
-		for (fd = 0; fd < MAXCONNECTIONS; fd++)
-			if (fd != sp[1])
-				(void)close(fd);
-		if (sp[1] != 0)
-		    {
-			(void)dup2(sp[1], 0);
-			close(sp[1]);
-		    }
-		if (execl(APATH, APATH, NULL) < 0)
-			_exit(-1); /* should really not happen.. */
-	default:
-		close(sp[1]);
-	    }
-#endif
-
-	return;
+	start_iauth();
 }
 
 void	write_pidfile()

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.23 1998/07/19 21:10:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.24 1998/08/04 15:28:24 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -44,7 +44,9 @@ char	*debugmode = "";		/*  -"-    -"-   -"-   -"- */
 char	*sbrk0;				/* initial sbrk(0) */
 char	*tunefile = TPATH;
 static	int	dorehash = 0,
-		dorestart = 0;
+		dorestart = 0,
+		restart_iauth = 0;
+
 static	char	*dpath = DPATH;
 
 time_t	nextconnect = 1;	/* time for next try_connections call */
@@ -88,6 +90,25 @@ int s;
 	flush_connections(me.fd);
 	exit(-1);
 }
+
+#if defined(USE_IAUTH)
+RETSIGTYPE s_slave(s)
+int s;
+{
+# if POSIX_SIGNALS
+	struct	sigaction act;
+
+	act.sa_handler = s_slave;
+	act.sa_flags = 0;
+	(void)sigemptyset(&act.sa_mask);
+	(void)sigaddset(&act.sa_mask, SIGUSR1);
+	(void)sigaction(SIGUSR1, &act, NULL);
+# else
+	(void)signal(SIGUSR1, s_slave);
+# endif
+	restart_iauth = 1;
+}
+#endif
 
 static RETSIGTYPE s_rehash(s)
 int s;
@@ -395,7 +416,7 @@ time_t	currenttime;
 					get_client_name(cptr,TRUE)));
 				del_queries((char *)cptr);
 				ClearAuth(cptr);
-#if defined(USE_IAUTHD)
+#if defined(USE_IAUTH)
 				if (DoingDNS(cptr) || DoingXAuth(cptr))
 				    {
 					char buf[80];
@@ -985,6 +1006,11 @@ time_t	delay;
 		(void)rehash(&me, &me, 1);
 		dorehash = 0;
 	    }
+	if (restart_iauth)
+	    {
+		start_iauth();
+		restart_iauth = 0;
+	    }
 	/*
 	** Flush output buffers on all connections now if they
 	** have data in them (or at least try to flush)
@@ -1080,6 +1106,11 @@ static	void	setup_signals()
 	act.sa_handler = s_die;
 	(void)sigaddset(&act.sa_mask, SIGTERM);
 	(void)sigaction(SIGTERM, &act, NULL);
+#if defined(USE_IAUTH)
+	act.sa_handler = s_slave;
+	(void)sigaddset(&act.sa_mask, SIGUSR1);
+	(void)sigaction(SIGUSR1, &act, NULL);
+#endif
 
 #else
 # ifndef	HAVE_RELIABLE_SIGNALS
@@ -1097,6 +1128,9 @@ static	void	setup_signals()
 	(void)signal(SIGHUP, s_rehash);
 	(void)signal(SIGTERM, s_die); 
 	(void)signal(SIGINT, s_restart);
+# if defined(USE_IAUTH)
+	(void)signal(SIGUSR1, s_slave);
+# endif
 #endif
 
 #ifdef RESTARTING_SYSTEMCALLS
