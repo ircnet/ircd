@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.236 2004/11/02 16:41:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.237 2004/11/03 14:07:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -808,7 +808,8 @@ static	void	send_mode_list(aClient *cptr, char *chname, Link *top,
 			** or long enough that they filled up parabuf
 			*/
 			sendto_one(cptr, ":%s MODE %s %s %s",
-				   ME, chname, modebuf, parabuf);
+				ST_UID(cptr) ? me.serv->sid : ME,
+				chname, modebuf, parabuf);
 			send = 0;
 			*parabuf = '\0';
 			cp = modebuf;
@@ -839,6 +840,7 @@ static	void	send_mode_list(aClient *cptr, char *chname, Link *top,
  */
 void	send_channel_modes(aClient *cptr, aChannel *chptr)
 {
+	char	*me2 = ST_UID(cptr) ? me.serv->sid : ME;
 
 	if (check_channelmask(&me, cptr, chptr->chname))
 		return;
@@ -849,7 +851,7 @@ void	send_channel_modes(aClient *cptr, aChannel *chptr)
 	if (modebuf[1] || *parabuf)
 	{
 		sendto_one(cptr, ":%s MODE %s %s %s",
-			ME, chptr->chname, modebuf, parabuf);
+			me2, chptr->chname, modebuf, parabuf);
 	}
 
 	*parabuf = '\0';
@@ -868,7 +870,7 @@ void	send_channel_modes(aClient *cptr, aChannel *chptr)
 			** clearing these buffers before using them
 			** for R lists, so new/old modes don't mix */
 			sendto_one(cptr, ":%s MODE %s %s %s",
-				ME, chptr->chname, modebuf, parabuf);
+				me2, chptr->chname, modebuf, parabuf);
 			*parabuf = '\0';
 			*modebuf = '+';
 			modebuf[1] = '\0';
@@ -880,7 +882,7 @@ void	send_channel_modes(aClient *cptr, aChannel *chptr)
 	{
 		/* complete sending, if anything left in buffers */
 		sendto_one(cptr, ":%s MODE %s %s %s",
-			ME, chptr->chname, modebuf, parabuf);
+			me2, chptr->chname, modebuf, parabuf);
 	}
 }
 
