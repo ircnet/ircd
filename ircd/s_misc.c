@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.90 2004/06/29 17:27:54 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.91 2004/06/29 23:56:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -467,6 +467,19 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 	(defined(USE_SYSLOG) && defined(SYSLOG_USERS))
 			sendto_flog(sptr, EXITC_REG, sptr->user->username,
 				    sptr->user->host);
+# endif
+# if defined(CLIENTS_CHANNEL) && (CLIENTS_CHANNEL_LEVEL & CCL_QUIT)
+			sendto_flag(SCH_CLIENT, "%s %s %s %s QUIT %c"
+#  if (CLIENTS_CHANNEL_LEVEL & CCL_QUITINFO)
+				" :%s"
+#  endif
+				, sptr->user->uid, sptr->name,
+				sptr->user->username, sptr->user->host,
+				sptr->exitc
+#  if (CLIENTS_CHANNEL_LEVEL & CCL_QUITINFO)
+				, comment
+#  endif
+				);
 # endif
 		}
 		else if (!IsService(sptr))
