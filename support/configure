@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Id: configure.in,v 1.28 1999/01/16 22:01:33 kalt Exp 
+# From configure.in Id: configure.in,v 1.29 1999/01/18 00:24:17 kalt Exp 
 
 # Guess values for system-dependent variables and create Makefiles.
 # Generated automatically using autoconf version 2.13 
@@ -3559,22 +3559,34 @@ rm -f conftest*
 
 fi
 
-if test $irc_cv_select_poll = poll; then
+#if test $irc_cv_select_poll = poll; then
+#  AC_MSG_RESULT(poll)
+#  AC_DEFINE(USE_POLL)
+#else
+#  AC_MSG_RESULT(select)
+#  if test $ac_cv_func_poll = yes; then
+#    AC_MSG_WARN([poll() seems to exist on your system, edit setup.h to use it.])
+#  fi
+#fi
+if test $ac_cv_func_poll = yes; then
   echo "$ac_t""poll" 1>&6
   cat >> confdefs.h <<\EOF
 #define USE_POLL 1
 EOF
 
-else
-  echo "$ac_t""select" 1>&6
-  if test $ac_cv_func_poll = yes; then
-    echo "configure: warning: poll() seems to exist on your system, edit setup.h to use it." 1>&2
+  if test $irc_cv_select_poll = select; then
+    echo "configure: warning: poll() was unexpectedly found on this system, it will be used; please report system type and version to ircd-dev@irc.org" 1>&2
   fi
+  if test ! $irc_cv_linux = no; then
+    echo "configure: warning: Aiiie.. This is linux.  poll() is known to be broken for some releases (2.0.x with libc ?).  You may want to edit setup.h to undefine USE_POLL" 1>&2
+  fi
+else
+  echo "$ac_t""select" 1>&6 
 fi
 
 
 echo $ac_n "checking for signal implementation""... $ac_c" 1>&6
-echo "configure:3578: checking for signal implementation" >&5
+echo "configure:3590: checking for signal implementation" >&5
 if eval "test \"`echo '$''{'irc_cv_signal_implementation'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3587,7 +3599,7 @@ else
     { echo "configure: error: can not run test program while cross compiling" 1>&2; exit 1; }
 else
   cat > conftest.$ac_ext <<EOF
-#line 3591 "configure"
+#line 3603 "configure"
 #include "confdefs.h"
 
 #if HAVE_SYS_TYPES_H
@@ -3618,7 +3630,7 @@ main()
 }
 
 EOF
-if { (eval echo configure:3622: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3634: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   irc_cv_signal_implementation=bsd_signal
 else
@@ -3665,7 +3677,7 @@ EOF
 fi
 
 echo $ac_n "checking for a working non-blocking system""... $ac_c" 1>&6
-echo "configure:3669: checking for a working non-blocking system" >&5
+echo "configure:3681: checking for a working non-blocking system" >&5
 if eval "test \"`echo '$''{'irc_cv_non_blocking_system'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3721,11 +3733,11 @@ if test "$cross_compiling" = yes; then
     { echo "configure: error: can not run test program while cross compiling" 1>&2; exit 1; }
 else
   cat > conftest.$ac_ext <<EOF
-#line 3725 "configure"
+#line 3737 "configure"
 #include "confdefs.h"
 $irc_code_posix
 EOF
-if { (eval echo configure:3729: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3741: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   irc_cv_non_blocking_system=posix
 else
@@ -3736,11 +3748,11 @@ else
     { echo "configure: error: can not run test program while cross compiling" 1>&2; exit 1; }
 else
   cat > conftest.$ac_ext <<EOF
-#line 3740 "configure"
+#line 3752 "configure"
 #include "confdefs.h"
 $irc_code_bsd
 EOF
-if { (eval echo configure:3744: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3756: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   irc_cv_non_blocking_system=bsd
 else
@@ -3751,11 +3763,11 @@ else
     { echo "configure: error: can not run test program while cross compiling" 1>&2; exit 1; }
 else
   cat > conftest.$ac_ext <<EOF
-#line 3755 "configure"
+#line 3767 "configure"
 #include "confdefs.h"
 $irc_code_sysv
 EOF
-if { (eval echo configure:3759: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3771: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   irc_cv_non_blocking_system=sysv
 else
@@ -3802,7 +3814,7 @@ else
 fi
 
 echo $ac_n "checking for working stdarg""... $ac_c" 1>&6
-echo "configure:3806: checking for working stdarg" >&5
+echo "configure:3818: checking for working stdarg" >&5
 if eval "test \"`echo '$''{'irc_cv_stdarg'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3810,7 +3822,7 @@ else
     { echo "configure: error: can not run test program while cross compiling" 1>&2; exit 1; }
 else
   cat > conftest.$ac_ext <<EOF
-#line 3814 "configure"
+#line 3826 "configure"
 #include "confdefs.h"
 
 #if HAVE_STDIO_H
@@ -3892,7 +3904,7 @@ int main(void)
 }
 
 EOF
-if { (eval echo configure:3896: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3908: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext} && (./conftest; exit) 2>/dev/null
 then
   irc_cv_stdarg=yes
 else
@@ -3918,7 +3930,7 @@ else
 fi
 
 echo $ac_n "checking for resolver configuration file""... $ac_c" 1>&6
-echo "configure:3922: checking for resolver configuration file" >&5
+echo "configure:3934: checking for resolver configuration file" >&5
 if eval "test \"`echo '$''{'irc_cv_path_resconf'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3951,7 +3963,7 @@ if test "x$enable_ip6" != x; then
 EOF
 
     echo $ac_n "checking IPv6 system type""... $ac_c" 1>&6
-echo "configure:3955: checking IPv6 system type" >&5
+echo "configure:3967: checking IPv6 system type" >&5
   if eval "test \"`echo '$''{'irc_cv_v6type'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3962,7 +3974,7 @@ else
       irc_cv_v6type=linux
     else
       cat > conftest.$ac_ext <<EOF
-#line 3966 "configure"
+#line 3978 "configure"
 #include "confdefs.h"
 dnl
 #include <netinet/in.h>
@@ -3977,7 +3989,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   rm -rf conftest*
   cat > conftest.$ac_ext <<EOF
-#line 3981 "configure"
+#line 3993 "configure"
 #include "confdefs.h"
 #include <netinet/in.h>
 #ifdef __KAME__
@@ -3991,7 +4003,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   rm -rf conftest*
   cat > conftest.$ac_ext <<EOF
-#line 3995 "configure"
+#line 4007 "configure"
 #include "confdefs.h"
 #include <sys/param.h>
 #ifdef _TOSHIBA_INET6
@@ -4005,7 +4017,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   rm -rf conftest*
   cat > conftest.$ac_ext <<EOF
-#line 4009 "configure"
+#line 4021 "configure"
 #include "confdefs.h"
 #include </usr/local/v6/include/sys/types.h>
 #ifdef __V6D__
@@ -4019,7 +4031,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   rm -rf conftest*
   cat > conftest.$ac_ext <<EOF
-#line 4023 "configure"
+#line 4035 "configure"
 #include "confdefs.h"
 #include <sys/param.h>
 #ifdef _ZETA_MINAMI_INET6
@@ -4073,7 +4085,7 @@ fi
 	esac
 
     echo $ac_n "checking for IPv6 name server addresses in resolv.conf ($irc_cv_path_resconf)""... $ac_c" 1>&6
-echo "configure:4077: checking for IPv6 name server addresses in resolv.conf ($irc_cv_path_resconf)" >&5
+echo "configure:4089: checking for IPv6 name server addresses in resolv.conf ($irc_cv_path_resconf)" >&5
   if grep nameserver $irc_cv_path_resconf | grep ':' >/dev/null 2>&1; then
     echo "$ac_t""yes" 1>&6
     echo "configure: warning: $irc_cv_path_resconf is not setup correctly." 1>&2
@@ -4083,12 +4095,12 @@ echo "configure:4077: checking for IPv6 name server addresses in resolv.conf ($i
 fi
 
 echo $ac_n "checking whether this is an alpha/beta release""... $ac_c" 1>&6
-echo "configure:4087: checking whether this is an alpha/beta release" >&5
+echo "configure:4099: checking whether this is an alpha/beta release" >&5
 if eval "test \"`echo '$''{'irc_cv_alpha_beta'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 4092 "configure"
+#line 4104 "configure"
 #include "confdefs.h"
 #include "../common/patchlevel.h"
 #ifdef PATCHLEVEL

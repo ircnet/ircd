@@ -408,14 +408,26 @@ yes
 ],
 irc_cv_select_poll=poll,
 )])
-if test $irc_cv_select_poll = poll; then
+#if test $irc_cv_select_poll = poll; then
+#  AC_MSG_RESULT(poll)
+#  AC_DEFINE(USE_POLL)
+#else
+#  AC_MSG_RESULT(select)
+#  if test $ac_cv_func_poll = yes; then
+#    AC_MSG_WARN([poll() seems to exist on your system, edit setup.h to use it.])
+#  fi
+#fi
+if test $ac_cv_func_poll = yes; then
   AC_MSG_RESULT(poll)
   AC_DEFINE(USE_POLL)
-else
-  AC_MSG_RESULT(select)
-  if test $ac_cv_func_poll = yes; then
-    AC_MSG_WARN([poll() seems to exist on your system, edit setup.h to use it.])
+  if test $irc_cv_select_poll = select; then
+    AC_MSG_WARN([poll() was unexpectedly found on this system, it will be used; please report system type and version to ircd-dev@irc.org])
   fi
+  if test ! $irc_cv_linux = no; then
+    AC_MSG_WARN([Aiiie.. This is linux.  poll() is known to be broken for some releases (2.0.x with libc ?).  You may want to edit setup.h to undefine USE_POLL])
+  fi
+else
+  AC_MSG_RESULT(select) 
 fi
 ])
 
@@ -1398,7 +1410,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.29 1999/01/18 00:24:17 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.30 1999/01/18 00:54:20 kalt Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
