@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.17 2001/12/29 04:26:24 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.18 2001/12/30 05:38:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -297,16 +297,20 @@ static	long	curr_cid = 0;
 /*
  * check_uid
  *	various sanity checks to ensure that a UID is valid.
+ * returns 1 when it's valid, 0 when not.
  */
 int
 check_uid(uid)
 char *uid;
 {
-	if (!isdigit(uid[0]))
-		return 1;
+	if (isdigit(uid[0]) && strlen(uid) == NICKLEN)
+	{
+		return cid_ok(uid, NICKLEN - 1);
+	}
 	/*
 	 * need to check for sid collisions.. ick, how?
 	 * another function? -syrk
+	 * rather compare SID part of UID with source of message? --Beeth
 	 */
 	return 0;
 }
