@@ -639,6 +639,31 @@ fi
 ])
 
 
+AC_DEFUN(IRC_PATH_RESCONF,
+[AC_MSG_CHECKING([for resolver configuration file])
+AC_CACHE_VAL(irc_cv_path_resconf,
+[no_resconf=yes
+for irc_file in `test -z "$irc_resconf" || echo "$irc_resconf"` \
+                /etc/resolv.conf; \
+  do
+    if test -r "$irc_file"; then
+      no_resconf=
+      irc_cv_path_resconf="$irc_file"
+      break
+    fi
+  done
+])
+if test "$no_resconf" = yes; then
+  AC_MSG_RESULT(not found... falling back on default (/etc/resolv.conf))
+  AC_MSG_WARN([without resolver configuration file, the server won't work.])
+  AC_DEFINE(IRC_RESCONF, "/etc/resolv.conf")
+else
+  AC_MSG_RESULT($irc_cv_path_resconf)
+  AC_DEFINE_UNQUOTED(IRC_RESCONF, "$irc_cv_path_resconf")
+fi
+])
+
+
 dnl -------------------------------------------------------------------
 dnl modified Autoconf tests; their names begin with IRC_ instead of AC_
 dnl -------------------------------------------------------------------
@@ -820,6 +845,7 @@ Host type:
 Features and packages:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --resconf=FILE          use FILE as resolver config file [/etc/resolv.conf]
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --zlib-prefix=ZDIR      zlib installation prefix is ZDIR
@@ -935,6 +961,13 @@ EOF
   -q | -quiet | --quiet | --quie | --qui | --qu | --q \
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
+
+  -resconf | --resconf | --rescon | --resco | --resc | --res \
+  | --re | --r)
+    ac_prev=irc_resconf ;;
+  -resconf=* | --resconf=* | --rescon=* | --resco=* | --resc=* \
+  | --res=* | --re=* | --r=*)
+    irc_resconf="$ac_optarg" ;;
 
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
@@ -1233,7 +1266,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.12 1997/09/08 12:17:01 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.13 1997/09/24 18:41:03 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1304,6 +1337,7 @@ IRC_SELECT_POLL
 IRC_SIGNAL_IMPLEMENTATION
 IRC_NON_BLOCKING_SYSTEM
 IRC_STDARG
+IRC_PATH_RESCONF
 IRC_ALPHA_BETA
 
 AC_OUTPUT(Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../ircd/crypt/sums.in)

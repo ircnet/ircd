@@ -1,4 +1,4 @@
-/* $Id: acconfig.h,v 1.4 1997/09/03 17:46:13 kalt Exp $ */
+/* $Id: acconfig.h,v 1.5 1997/09/24 18:40:59 kalt Exp $ */
 
 /* Define if zlib package must be used for compilation/linking. */
 #undef USE_ZLIB
@@ -83,3 +83,6 @@
 
 /* Define is the system can use variable arguments. */
 #undef USE_STDARG
+
+/* Define as the resolver configuration file. */
+#undef IRC_RESCONF

@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info7812tmp2.
+input file /tmp/sgml2info22835tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.15 1997/09/23 20:38:21 kalt Exp $
+     $Id: INSTALL.info,v 1.16 1997/09/24 18:40:52 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.4.
 
@@ -43,6 +43,10 @@ default behaviour:
 `--libdir=DIR'
      changes the default directory where most irc files will go.
      (default is prefix/lib/ircd)
+
+`--resconf=FILE'
+     defines the file to be used by ircd to initialize its resolver.
+     (default is /etc/resolv.conf)
 
 `--zlib-include=DIR'
      specifies in which directory the include file from the zlib is
@@ -641,8 +645,19 @@ Connection Classes
      The connections are allowed to remain silent for 60 seconds
      before a PING is set.  The SendQ is set to 20000 bytes.  A new
      connection in this class will only be allowed if there aren't more
-     than 2 other local connections fom the same IP address, or more
+     than 2 other local connections from the same IP address, or more
      than 5 other connections on the net from the same hostname.
+
+     Y:2:60:0:50:20000:2.1:5: (client class)
+
+     In case of a client class, the fields are interpreted a bit
+     differently.  This class (number 1) can be used by up to 50 users.
+     The connections are allowed to remain silent for 60 seconds
+     before a PING is set.  The SendQ is set to 20000 bytes.  A new
+     connection in this class will only be allowed if there aren't more
+     than 2 other local connections from the same IP address, 1 other
+     local connection from the same user from the same IP address, or
+     more than 5 other connections on the net from the same hostname.
 
 
 File: INSTALL.info,  Node: Client connections,  Next: Operator priviliges,  Prev: Connection Classes,  Up: The ircd-conf file
@@ -1432,39 +1447,39 @@ Related resources
 
 
 Tag Table:
-Node: Top122
-Node: Installing IRC-609
-Node: The config-h file2173
-Node: Define what type of UNIX your machine uses-2839
-Node: DEBUGMODE3239
-Node: SPATH CPATH MPATH LPATH PPATH TPATH3897
-Node: CACHED_MOTD5106
-Node: CHROOTDIR5576
-Node: ENABLE_SUMMON ENABLE_USERS5900
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6436
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY7119
-Node: ZIP_LINKS ZIP_LEVEL7751
-Node: SLOW_ACCEPT8762
-Node: CLONE_CHECK9380
-Node: Other #define's9720
-Node: Editing the Makefile and compiling10045
-Node: The ircd-conf file10681
-Node: Machine information12365
-Node: Administrative info14461
-Node: Port connections16496
-Node: Connection Classes18706
-Node: Client connections23542
-Node: Operator priviliges26827
-Node: Restrict connections28947
-Node: Excluded accounts30262
-Node: Server connections33562
-Node: Hub connections41995
-Node: Leaf connections43208
-Node: Version limitations45291
-Node: Excluded machines46530
-Node: Service connections47837
-Node: Bounce server49430
-Node: Default local server (for local clients) `*OBSOLETED*'51053
-Node: Related resources51936
+Node: Top123
+Node: Installing IRC-610
+Node: The config-h file2296
+Node: Define what type of UNIX your machine uses-2962
+Node: DEBUGMODE3362
+Node: SPATH CPATH MPATH LPATH PPATH TPATH4020
+Node: CACHED_MOTD5229
+Node: CHROOTDIR5699
+Node: ENABLE_SUMMON ENABLE_USERS6023
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6559
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY7242
+Node: ZIP_LINKS ZIP_LEVEL7874
+Node: SLOW_ACCEPT8885
+Node: CLONE_CHECK9503
+Node: Other #define's9843
+Node: Editing the Makefile and compiling10168
+Node: The ircd-conf file10804
+Node: Machine information12488
+Node: Administrative info14584
+Node: Port connections16619
+Node: Connection Classes18829
+Node: Client connections24265
+Node: Operator priviliges27550
+Node: Restrict connections29670
+Node: Excluded accounts30985
+Node: Server connections34285
+Node: Hub connections42718
+Node: Leaf connections43931
+Node: Version limitations46014
+Node: Excluded machines47253
+Node: Service connections48560
+Node: Bounce server50153
+Node: Default local server (for local clients) `*OBSOLETED*'51776
+Node: Related resources52659
 
 End Tag Table

@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.15 1997/09/23 20:38:23 kalt Exp $
+  $Id: INSTALL.txt,v 1.16 1997/09/24 18:40:54 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.4.
 
@@ -22,6 +22,10 @@
      ----lliibbddiirr==DDIIRR
         changes the default directory where most irc files will go.
         (default is prefix/lib/ircd)
+
+     ----rreessccoonnff==FFIILLEE
+        defines the file to be used by ircd to initialize its resolver.
+        (default is /etc/resolv.conf)
 
      ----zzlliibb--iinncclluuddee==DDIIRR
         specifies in which directory the include file from the zlib is
@@ -125,10 +129,6 @@
   to glean information the same as finger can.  ENABLE_SUMMON toggles
   whether the server will attempt to summon local users to irc by
   writing a message similar to that from talk(1) to a user's tty.
-
-
-
-
 
   22..77..  SSHHOOWW__IINNVVIISSIIBBLLEE__LLUUSSEERRSS,, NNOO__DDEEFFAAUULLTT__IINNVVIISSIIBBLLEE
 
@@ -568,9 +568,21 @@
         users.  The connections are allowed to remain silent for 60
         seconds before a PING is set.  The SendQ is set to 20000 bytes.
         A new connection in this class will only be allowed if there
-        aren't more than 2 other local connections fom the same IP
+        aren't more than 2 other local connections from the same IP
         address, or more than 5 other connections on the net from the
         same hostname.
+
+        Y:2:60:0:50:20000:2.1:5: (client class)
+
+        In case of a client class, the fields are interpreted a bit
+        differently.  This class (number 1) can be used by up to 50
+        users.  The connections are allowed to remain silent for 60
+        seconds before a PING is set.  The SendQ is set to 20000 bytes.
+        A new connection in this class will only be allowed if there
+        aren't more than 2 other local connections from the same IP
+        address, 1 other local connection from the same user from the
+        same IP address, or more than 5 other connections on the net
+        from the same hostname.
 
 
   44..55..  CClliieenntt ccoonnnneeccttiioonnss
@@ -778,8 +790,6 @@
 
         k:<Host Name>:<time interval(s)|comment>:<Auth>:<port>:
 
-
-
      KK  ``K'' tells the IRCD that you are making a KILL USER command
         entry.
 
@@ -856,6 +866,8 @@
 
   WWAARRNNIINNGG:: The hostnames used as examples are really only examples and
   not meant to be used (simply because they don't work) in real life.
+
+
   Now you must decide WHICH hosts you want to connect to and WHAT ORDER
   you want to connect to them in.  For my example let us assume I am on
   the machine "rieska.oulu.fi" and I want to connect to irc daemons on 3
@@ -976,7 +988,6 @@
   C:garfield.mit.edu::garfield.mit.edu:6667:1
   C:irc.nada.kth.se::irc.nada.kth.se:6667:1
   C:nic.funet.fi::nic.funet.fi:6667:1
-
   Ircd will attempt to connect to nic.funet.fi first, then to irc.nada
   and finally to garfield.
 
@@ -1043,7 +1054,6 @@
         we take an example of such:
 
         *.de  - a domain name matching all machines in Germany.
-
         Wildcard domains are useful in that ALL SERVERS in Germany (or
         any other domain area) can be shown as one to the rest of the
         world. Imagine 100 servers in Germany, it would be incredible
@@ -1109,6 +1119,7 @@
         Allows ``eff.org'' to introduce (and act as a hub for) any
         server.
 
+
      NNoottee
         It is possible to have and use multiple H-lines (or L-lines) for
         the one server.  eg:
@@ -1120,6 +1131,8 @@
 
 
      is allowed as is
+
+
      L:*.edu:*:*.au::
      L:*.com:*:*.au::
 
@@ -1250,8 +1263,6 @@
         polite). The first field is unused, so leave it empty.
 
 
-
-
   44..1144..  SSeerrvviiccee ccoonnnneeccttiioonnss
 
 
@@ -1307,7 +1318,6 @@
         This information is provided to clients which are denied
         connection, either because their connection class is full, or
         the server is full, or they are not authorized to connect.
-
      FFoorrmmaatt
 
         B:<Class|Host Mask>::<Server Name>:<Port>:
@@ -1374,7 +1384,6 @@
         U:128.214.5.6::tolsun.oulu.fi:6667
 
         U:tolsun.oulu.fi::tolsun.oulu.fi
-
         If the port number is omitted, irc will default to using 6667.
 
 
@@ -1397,15 +1406,6 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
-
-
-
-
-
 
 
 

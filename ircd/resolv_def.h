@@ -55,7 +55,7 @@
 
 /*
  *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id: resolv_def.h,v 1.1 1997/09/03 17:45:56 kalt Exp $
+ *	$Id: resolv_def.h,v 1.2 1997/09/24 18:40:57 kalt Exp $
  */
 
 /*
@@ -67,16 +67,6 @@
  */
 
 #define	__RES	19960801
-
-/*
- * Resolver configuration file.
- * Normally not present, but may contain the address of the
- * inital name server(s) to query and the domain search list.
- */
-
-#ifndef _PATH_RESCONF
-#define _PATH_RESCONF        "/etc/resolv.conf"
-#endif
 
 /*
  * Global defines and variables for resolver stub.

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.15 1997/09/23 20:38:22 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.16 1997/09/24 18:40:53 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.4.
 </abstract>
@@ -25,6 +25,8 @@ ircd will install using ``make install''.  This defaults
 to /usr/local
 <tag/--libdir=DIR/ changes the default directory where most
 irc files will go. (default is prefix/lib/ircd)
+<tag/--resconf=FILE/ defines the file to be used by ircd to
+initialize its resolver.  (default is /etc/resolv.conf)
 <tag/--zlib-include=DIR/ specifies in which directory the
 include file from the zlib is located.
 <tag/--zlib-library=DIR/ specifies in which directory the
@@ -474,9 +476,21 @@ differently.  This class (number 1) can be used by up to 50
 users.  The connections are allowed to remain silent for 60
 seconds before a PING is set.  The SendQ is set to 20000
 bytes.  A new connection in this class will only be allowed
-if there aren't more than 2 other local connections fom the
+if there aren't more than 2 other local connections from the
 same IP address, or more than 5 other connections on the net
 from the same hostname.
+<p>
+Y:2:60:0:50:20000:2.1:5: (client class)
+<p>
+In case of a client class, the fields are interpreted a bit
+differently.  This class (number 1) can be used by up to 50
+users.  The connections are allowed to remain silent for 60
+seconds before a PING is set.  The SendQ is set to 20000
+bytes.  A new connection in this class will only be allowed
+if there aren't more than 2 other local connections from the
+same IP address, 1 other local connection from the same user
+from the same IP address, or more than 5 other connections
+on the net from the same hostname.
 </descrip>
 
 <sect1>Client connections
