@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.180 2004/03/24 23:01:33 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.181 2004/03/24 23:25:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2186,11 +2186,11 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	case 'V' : case 'v' : /* V conf lines */
 		report_configured_links(cptr, parv[0], CONF_VER);
 		break;
-	case 'X' : case 'x' : /* lists */
 #ifdef	DEBUGMODE
+	case 'X' : case 'x' : /* lists */
 		send_listinfo(cptr, parv[0]);
-#endif
 		break;
+#endif
 	case 'Y' : case 'y' : /* Y lines */
 		report_classes(cptr, parv[0]);
 		break;
