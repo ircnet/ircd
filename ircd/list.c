@@ -37,7 +37,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.8 1999/06/07 21:01:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.9 1999/07/02 16:49:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -55,9 +55,6 @@ static	struct	liststats {
 
 #endif
 
-#ifndef NO_USRTOP
-anUser	*usrtop = NULL;
-#endif
 aServer	*svrtop = NULL;
 
 int	numclients = 0;
@@ -92,12 +89,6 @@ void	checklists()
 		if (sp->bcptr->serv != sp)
 			Debug((DEBUG_ERROR, "svrtop: %#x->%#x->%#x != %#x",
 				sp, sp->bcptr, sp->bcptr->serv, sp));
-#ifndef NO_USRTOP
-	for (up = usrtop; up; up = up->nextu)
-		if (up->bcptr->user != up)
-			Debug((DEBUG_ERROR, "usrtop: %#x->%#x->%#x != %#x",
-				up, up->bcptr, up->bcptr->user, up));
-#endif
 }
 #endif
 	
@@ -194,10 +185,6 @@ aClient *cptr;
 		user->invited = NULL;
 		user->uwas = NULL;
 		cptr->user = user;
-#ifndef NO_USRTOP
-		user->nextu = NULL;
-		user->prevu = NULL;
-#endif
 		user->servp = NULL;
 		user->bcptr = cptr;
 		if (cptr->next)	/* the only cptr->next == NULL is me */
@@ -218,9 +205,6 @@ aClient	*cptr;
 		servs.inuse++;
 #endif
 		serv->user = NULL;
-#ifndef NO_USRTOP
-		serv->userlist = NULL;
-#endif
 		serv->snum = -1;
 		*serv->by = '\0';
 		*serv->tok = '\0';
@@ -286,21 +270,13 @@ aClient	*cptr;
 		 */
 		if (user->joined || user->refcnt < 0 ||
 		    user->invited || user->channel || user->uwas ||
-#ifndef NO_USRTOP
-		    user->prevu || user->nextu ||
-#endif
 		    user->bcptr)
 		    {
 			char buf[512];
 			/*too many arguments for dumpcore() and sendto_flag()*/
-			SPRINTF(buf, "%#x %#x %#x %#x %d %d %#x %#x %#x (%s)",
+			SPRINTF(buf, "%#x %#x %#x %#x %d %d %#x (%s)",
 				user, user->invited, user->channel, user->uwas,
 				user->joined, user->refcnt,
-#ifndef NO_USRTOP
-				user->prevu, user->nextu,
-#else
-				0, 0,
-#endif
 				user->bcptr,
 				(user->bcptr) ? user->bcptr->name :"none");
 #ifdef DEBUGMODE
@@ -328,20 +304,11 @@ aClient	*cptr;
 	if (--serv->refcnt <= 0)
 	    {
 		if (serv->refcnt < 0 ||	serv->prevs || serv->nexts ||
-		    serv->bcptr ||
-#ifndef NO_USRTOP
-		    serv->userlist ||
-#endif
-		    serv->user)
+		    serv->bcptr || serv->user)
 		    {
 			char buf[512];
-			SPRINTF(buf, "%d %#x %#x %#x %#x %#x (%s)",
+			SPRINTF(buf, "%d %#x %#x %#x %#x (%s)",
 				serv->refcnt, serv->prevs, serv->nexts,
-#ifndef NO_USRTOP
-				serv->userlist,
-#else
-				0,
-#endif
 				serv->user, serv->bcptr,
 				(serv->bcptr) ? serv->bcptr->name : "none");
 #ifdef DEBUGMODE
@@ -384,31 +351,6 @@ Reg	aClient	*cptr;
 	if (cptr->user)
 	    {
 		istat.is_users--;
-#ifndef NO_USRTOP		
-		/*
-		** has to be removed from the list of aUser structures,
-		** be careful of user->servp->userlist
-		*/
-		if (cptr->user->servp
-		    && cptr->user->servp->userlist == cptr->user)
-			if (cptr->user->nextu
-			    && cptr->user->nextu->servp == cptr->user->servp)
-				cptr->user->servp->userlist =cptr->user->nextu;
-			else
-				cptr->user->servp->userlist = NULL;
-		if (cptr->user->nextu)
-			cptr->user->nextu->prevu = cptr->user->prevu;
-		if (cptr->user->prevu)
-			cptr->user->prevu->nextu = cptr->user->nextu;
-		if (usrtop == cptr->user)
-		    {
-			usrtop = cptr->user->nextu;
-			usrtop->prevu = NULL;
-		    }
-		cptr->user->prevu = NULL;
-		cptr->user->nextu = NULL;
-#endif
-		
 		/* decrement reference counter, and eventually free it */
 		cptr->user->bcptr = NULL;
 		(void)free_user(cptr->user, cptr);
@@ -416,19 +358,6 @@ Reg	aClient	*cptr;
 
 	if (cptr->serv)
 	    {
-#ifndef NO_USRTOP
-		if (cptr->serv->userlist)
-# ifdef DEBUGMODE
-			dumpcore("%#x server %s %#x",
-				 cptr, cptr ? cptr->name : "<noname>",
-				 cptr->serv->userlist);
-# else
-			sendto_flag(SCH_ERROR, "* %#x server %s %#x *",
-				    cptr, cptr ? cptr->name : "<noname>",
-				    cptr->serv->userlist);
-# endif
-#endif
-
 		/* has to be removed from the list of aServer structures */
 		if (cptr->serv->nexts)
 			cptr->serv->nexts->prevs = cptr->serv->prevs;
@@ -470,7 +399,6 @@ Reg	aClient	*cptr;
 	return;
 }
 
-#ifdef NO_USRTOP
 /*
  * move the client aClient struct before its server's
  */
@@ -512,7 +440,6 @@ aClient	*cptr;
 	    client = cptr;
     cptr->next->prev = cptr;
 }
-#endif
 
 /*
  * although only a small routine, it appears in a number of places

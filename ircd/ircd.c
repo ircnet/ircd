@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.55 1999/06/25 15:36:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.56 1999/07/02 16:49:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -558,9 +558,6 @@ aClient	*mp;
 	mp->serv->snum = find_server_num (ME);
 	(void) make_user(mp);
 	istat.is_users++;	/* here, cptr->next is NULL, see make_user() */
-#ifndef NO_USRTOP
-	usrtop = mp->user;
-#endif
 	mp->user->flags |= FLAGS_OPER;
 	mp->serv->up = mp->name;
 	mp->user->server = find_server_string(mp->serv->snum);

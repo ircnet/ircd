@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.28 1999/06/27 19:27:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.29 1999/07/02 16:49:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -470,16 +470,12 @@ char	*comment;	/* Reason for the exit */
 			(void)strcat(comment1, sptr->name);
 
 			/* This will quit all the *users*, without checking the
-			** whole list of clients. I like it, unfortunately,
-			** there's more below..
+			** whole list of clients.
 			*/
 			for (asptr = svrtop; asptr; asptr = (aServer *)next)
 			    {
 				next = (aClient *)asptr->nexts;
 				if ((asptr->bcptr == NULL) ||
-#ifndef NO_USRTOP
-				    (asptr->userlist == NULL) ||
-#endif
 				    (asptr->bcptr->from != sptr
 				     && asptr->bcptr != sptr))
 					continue;
@@ -493,16 +489,6 @@ char	*comment;	/* Reason for the exit */
 					flags |= FLAGS_SPLIT | FLAGS_HIDDEN;
 				else
 					flags |= FLAGS_SPLIT;
-#ifndef NO_USRTOP
-				do
-				    {
-					acptr = asptr->userlist->bcptr;
-					acptr->flags |= flags;
-					exit_one_client(NULL, acptr, &me,
-							comment1);
-				    }
-				while (asptr->userlist);
-#else
 				while (GotDependantClient(asptr->bcptr))
 				    {
 					acptr = asptr->bcptr->prev;
@@ -510,66 +496,7 @@ char	*comment;	/* Reason for the exit */
 					exit_one_client(NULL, acptr, &me,
 							comment1);
 				    }
-#endif
 			    }
-			/* Here is more..
-			** I don't know what use this can have for now, but
-			** the above breaks the old code, which I just pasted
-			** below.
-			** Nothing should happen here, unless there is another
-			** remote entity than "user" (and servers) depending
-			** on remote servers: services,it would be much smarter
-			** to only check services instead of wasting CPU - krys
-			*/
-#if 0
-			for (acptr = client; acptr; acptr = next)
-			    {
-				next = acptr->next;
-				if (!IsServer(acptr) && acptr->from == sptr)
-				    {
-					/*
-					** Let's see if things are ever wrong.
-					** Second step would be: finally change
-					** this loop to go through the services
-					** list. -krys
-					*/
-					if (!IsService(acptr))
-						sendto_flag(SCH_ERROR,
-			    "lists seem corrupted: %s %#x %#x %#x (%s)",
-							    acptr->name,
-							    acptr->user,
-							    acptr->serv,
-							    acptr->service,
-							    sptr->name);
-					exit_one_client(NULL, acptr, &me,
-							comment1);
-				    }
-			    }
-#else
-			/*
-			** I'm now trying to put more comments in this function
-			** than code.  The above could be re-enabled some time
-			** for curiosity/debugging.
-			** I've only heard of one instance when the above
-			** notice showed up, and it was due to a bug, now
-			** fixed.
-			** With 2.9 combined NICK protocol, it should never
-			** happen, as a NICK is immediately associated to a
-			** server.
-			** Avalon made me do it. ;) -krys
-			*/
-# ifndef NO_USRTOP
-			/* no need, if using new code */
-			for (asvptr = svctop; asvptr; asvptr =(aService *)next)
-			    {
-				next = (aClient *)asvptr->nexts;
-				if ((acptr = asvptr->bcptr) && 
-				    acptr->from == sptr)
-					exit_one_client(NULL, acptr, &me,
-                                                        comment1);
-			    }
-# endif
-#endif
 			/*
 			** Second SQUIT all servers behind this link
 			*/
@@ -588,36 +515,6 @@ char	*comment;	/* Reason for the exit */
 		    } /* If (IsServer(sptr)) */
 	    } /* if (MyConnect(sptr) || (sptr->flags & FLAGS_HELD)) */
 
-#ifndef NO_USRTOP
- 	if (IsServer(sptr) && sptr->serv->userlist)
- 	{
- 		/*
-		** generate QUITs locally when receiving a SQUIT
-		** check for hostmasking.
- 		*/
- 		if (mark_blind_servers(cptr, sptr->name))
- 			flags = FLAGS_SPLIT | FLAGS_HIDDEN;
- 		else
- 			flags = FLAGS_SPLIT;
-
-		if (IsServer(from))
-			/* this is a guess */
-			(void)strcpy(comment1, from->name);
-		else
-			/* this is right */
-			(void)strcpy(comment1, sptr->serv->up);
- 		(void)strcat(comment1, " ");
- 		(void)strcat(comment1, sptr->name);
-
- 		do
- 		{
- 			acptr = sptr->serv->userlist->bcptr;
- 			acptr->flags |= flags;
-			exit_one_client(cptr, acptr, &me, comment1);
- 		}
- 		while (sptr->serv->userlist);
- 	}
-#else
  	if (IsServer(sptr) && GotDependantClient(sptr))
  	{
  		/*
@@ -645,7 +542,6 @@ char	*comment;	/* Reason for the exit */
 			exit_one_client(cptr, acptr, &me, comment1);
  		}
  	}
-#endif
  	
 	/*
 	** Try to guess from comment if the client is exiting

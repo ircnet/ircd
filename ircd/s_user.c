@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.81 1999/07/02 16:30:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.82 1999/07/02 16:49:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1543,9 +1543,6 @@ aClient	*sptr, *acptr;
 		0,	/* joined */
 		0,	/* flags */
 		NULL,	/* servp */
-#ifndef NO_USRTOP
-		NULL, NULL,
-#endif
 		NULL,	/* next, prev, bcptr */
 		"<Unknown>",	/* user */
 		"<Unknown>",	/* host */
@@ -1850,37 +1847,7 @@ char	*parv[];
 	user->server = find_server_string(me.serv->snum);
 
 user_finish:
-#ifdef NO_USRTOP
 	reorder_client_in_list(sptr);
-#else
-	/* 
-	** servp->userlist's are pointers into usrtop linked list.
-	** Users aren't added to the top always, but only when they come
-	** from a new server.
-	*/
-	if ((user->nextu = user->servp->userlist) == NULL)
-	    {
-		/* First user on this server goes to top of anUser list */
-		user->nextu = usrtop;
-		usrtop->prevu = user;
-		usrtop = user;	/* user->prevu == usrtop->prevu == NULL */
-	    } else {
-		/*
-		** This server already has users,
-		** insert this new user in the middle of the anUser list,
-		** update its neighbours..
-		*/
-		if (user->servp->userlist->prevu) /* previous user */
-		    {
-			user->prevu = user->servp->userlist->prevu;
-			user->servp->userlist->prevu->nextu = user;
-		    } else	/* user->servp->userlist == usrtop */
-			usrtop = user; /* there is no previous user */
-		user->servp->userlist->prevu = user; /* next user */
-	    }
-	user->servp->userlist = user;
-#endif
-	
 	if (sptr->info != DefInfo)
 		MyFree(sptr->info);
 	if (strlen(realname) > REALLEN)

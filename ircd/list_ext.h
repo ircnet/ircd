@@ -50,9 +50,7 @@ EXTERN aServer *make_server __P((aClient *cptr));
 EXTERN void free_user __P((Reg anUser *user, aClient *cptr));
 EXTERN void free_server __P((aServer *serv, aClient *cptr));
 EXTERN void remove_client_from_list __P((Reg aClient *cptr));
-#ifdef NO_USRTOP
 EXTERN void reorder_client_in_list __P((aClient *cptr));
-#endif
 EXTERN void add_client_to_list __P((aClient *cptr));
 EXTERN Link *find_user_link __P((Reg Link *lp, Reg aClient *ptr));
 EXTERN Link *find_channel_link __P((Reg Link *lp, Reg aChannel *ptr));

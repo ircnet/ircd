@@ -364,9 +364,6 @@ struct	User	{
 				** not yet be in links while USER is
 				** introduced... --msa
 				*/
-#ifndef NO_USRTOP
-	struct	User	*nextu, *prevu;
-#endif
 	aClient	*bcptr;
 	char	username[USERLEN+1];
 	char	host[HOSTLEN+1];
@@ -375,9 +372,6 @@ struct	User	{
 
 struct	Server	{
 	anUser	*user;		/* who activated this connection */
-#ifndef NO_USRTOP
-	anUser  *userlist;      /* first user on this server in the user list*/
-#endif
 	char	*up;	/* uplink for this server */
 	aConfItem *nline;	/* N-line pointer for this server */
 	int	version;        /* version id for local client */

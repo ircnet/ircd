@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.29 1999/06/07 21:01:58 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.30 1999/07/02 16:49:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -455,9 +455,7 @@ char	*parv[];
 	svc->wants = 0;
 	svc->type = type;
 	sptr->hopcount = metric;
-#ifdef NO_USRTOP
 	reorder_client_in_list(sptr);
-#endif
 	(void)add_to_client_hash_table(sptr->name, sptr);
 
 #ifdef	USE_SERVICES

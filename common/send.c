@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.35 1999/06/20 21:21:40 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.36 1999/07/02 16:49:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -383,9 +383,6 @@ aClient *to;
 
 #ifndef CLIENT_COMPILE
 static	anUser	ausr = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL,
-# ifndef NO_USRTOP			 
-			 NULL, NULL,
-# endif
 			 NULL, "anonymous", "anonymous.", "anonymous."};
 
 static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
@@ -1223,12 +1220,7 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
 {
 	int	i;
 	aClient *cptr,
-#ifndef NO_USRTOP
-		*acptr = NULL;
-	anUser	*user;
-#else
 		*srch;
-#endif
   
 	for (i = 0; i <= highest_fd; i++)
 	    {
@@ -1238,15 +1230,6 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
 			continue;
 		if (IsServer(cptr))
 		    {
-#ifndef NO_USRTOP			
-			for (user = usrtop; user; user = user->nextu)
-				if (IsRegisteredUser(acptr = user->bcptr) &&
-				    acptr->from == cptr &&
-				    match_it(acptr, mask, what))
-					break;
-			if (!user)
-				continue;
-#else
 			/*
 			** we can save some CPU here by not searching the
 			** entire list of users since it is ordered!
@@ -1264,7 +1247,6 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
 				    match_it(srch, mask, what))
 					break;
 			}
-#endif
 		    }
 		/* my client, does he match ? */
 		else if (!(IsRegisteredUser(cptr) && 
