@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.81 2004/10/01 20:22:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.82 2004/10/01 20:59:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -345,22 +345,28 @@ int	send_queued(aClient *to)
 }
 
 
-static	anUser	ausr = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL,
-			 0, NULL, NULL,
-			 "anonymous", "0", "anonymous.", "anonymous.",
-			 0,NULL, ""};
+static	anUser	ausr;
+static	aClient	anon;
 
-static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
-			 &anon, -2, 0, STAT_CLIENT, anon.namebuf, "anonymous",
-			 "anonymous", "anonymous identity hider", 0, "",
-# ifdef	ZIP_LINKS
-			 NULL,
-# endif
-			 0, {0, 0, NULL }, {0, 0, NULL },
-			 0, 0, 0L, 0L, 0, 0, 0, NULL, NULL, 0, NULL, 0
-			/* hack around union{} initialization	-Vesa */
-			 , {0}, NULL, "", "", EXITC_UNDEF
-			};
+void initanonymous()
+{
+	memset(&ausr, 0, sizeof(anUser));
+	strcpy(ausr.username, "anonymous");
+	strcpy(ausr.uid, "0ANONYM");
+	strcpy(ausr.host, "anonymous.");
+	ausr.server = "anonymous.";
+
+	memset(&anon, 0, sizeof(aClient));
+	anon.user = &ausr;
+	anon.from = &anon;
+	anon.fd = -2;
+	anon.status = STAT_CLIENT;
+	anon.name = anon.namebuf;
+	strcpy(anon.namebuf, "anonymous");
+	strcpy(anon.username, "anonymous");
+	anon.info = "anonymous identity hider";
+	anon.exitc = EXITC_UNDEF;
+}
 
 /*
  * sendprep: takes care of building the string according to format & args

@@ -62,4 +62,5 @@ EXTERN void sendto_prefix_one (aClient *to, aClient *from, char *pattern,
 EXTERN void sendto_flag (u_int chan, char *pattern, ...);
 EXTERN void sendto_match_butone_old(aClient *one, aClient *from,
 		char *mask, int what, char *pattern, ...);
+EXTERN void initanonymous(void);
 #undef EXTERN
