@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.114 2004/03/07 03:09:35 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.115 2004/03/07 03:25:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1035,6 +1035,7 @@ int	main(int argc, char *argv[])
 	mysrand(timeofday);
 	
 	daemonize();	
+	write_pidfile();
 	dbuf_init();
 	
 	serverbooting = 0;
