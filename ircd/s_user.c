@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.151 2003/07/19 12:23:52 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.152 2003/07/19 12:27:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1392,7 +1392,7 @@ int	parc, notice;
 	Reg	char	*s;
 	aChannel *chptr;
 	char	*nick, *server, *p, *cmd, *user, *host;
-	int	count = 0, penalty = 0;
+	int	count = 0, penalty = 0, syntax = 0;
 
 	cmd = notice ? MSG_NOTICE : MSG_PRIVATE;
 
@@ -1465,44 +1465,82 @@ int	parc, notice;
 		**
 		** NOTE: 2.11 changed syntax from $/#-mask to $$/$#-mask
 		*/
-		if (*nick == '$' &&
-			(*(nick+1) == '$' || *(nick+1) == '#')
-			&& IsAnOper(sptr))
-		    {
+		if (IsAnOper(sptr))
+		{
+			if (*nick == '$')
+			{
+				if (*(nick+1) == '$')
+				{
+					syntax = MATCH_SERVER;
+				}
+				else if (*(nick+1) == '#')
+				{
+					syntax = MATCH_HOST;
+				}
+				else
+				{
+					syntax = MATCH_SERVER|MATCH_OLDSYNTAX;
+				}
+			}
+			else if (*nick == '#')
+			{
+				syntax = MATCH_HOST|MATCH_OLDSYNTAX;
+			}
+		}
+		if (syntax)
+		{
 			if (!(s = (char *)rindex(nick, '.')))
-			    {
+			{
 				sendto_one(sptr, replies[ERR_NOTOPLEVEL],
 					   ME, BadTo(parv[0]), nick);
 				continue;
-			    }
+			}
 			while (*++s)
 				if (*s == '.' || *s == '*' || *s == '?')
 					break;
 			if (*s == '*' || *s == '?')
-			    {
+			{
 				sendto_one(sptr, replies[ERR_WILDTOPLEVEL],
-					   ME, BadTo(parv[0]), nick);
+					ME, BadTo(parv[0]), nick);
 				continue;
-			    }
-			/* this function now sends it to local clients and
-			** new (2.11) servers */
-			sendto_match_butone(IsServer(cptr) ? cptr : NULL, 
-					    sptr, nick + 2,
-					    (*(nick+1) == '#') ? MATCH_HOST :
-							     MATCH_SERVER,
-					    ":%s %s %s :%s", parv[0],
-					    cmd, nick, parv[2]);
-			/* old servers don't know new syntax, so send them
-			** old syntax (observe ++nick) --Beeth */
-			sendto_match_butone_old(IsServer(cptr) ? cptr : NULL, 
-					    sptr, nick + 2,
-					    (*(nick+1) == '#') ? MATCH_HOST :
-							     MATCH_SERVER,
-					    ":%s %s %s :%s", parv[0],
-					    cmd, ++nick, parv[2]);
+			}
+			if (syntax & MATCH_OLDSYNTAX)
+			{
+				/* Send to new servers, but add '$' in front
+				** of nick */
+				sendto_match_butone(
+					IsServer(cptr) ? cptr : NULL, 
+					sptr, nick + 1,
+					syntax - MATCH_OLDSYNTAX,
+					":%s %s $%s :%s", parv[0],
+					cmd, nick, parv[2]);
+				/* Send to old servers as is */
+				sendto_match_butone_old(
+					IsServer(cptr) ? cptr : NULL, 
+					sptr, nick + 1,
+					syntax - MATCH_OLDSYNTAX,
+					":%s %s %s :%s", parv[0],
+					cmd, nick, parv[2]);
+			}
+			else	/* new syntax, that is $$ or $# */
+			{
+				/* Send as is to new servers */
+				sendto_match_butone(
+					IsServer(cptr) ? cptr : NULL, 
+					sptr, nick + 2, syntax,
+					":%s %s %s :%s", parv[0],
+					cmd, nick, parv[2]);
+				/* Remove first '$' (nick + 1) and send
+				** it to old servers */
+				sendto_match_butone_old(
+					IsServer(cptr) ? cptr : NULL, 
+					sptr, nick + 2, syntax,
+					":%s %s %s :%s", parv[0],
+					cmd, nick + 1, parv[2]);
+			}
 			continue;
-		    }
-		
+		}	/* syntax */
+
 		/*
 		** nick!user@host addressed?
 		*/

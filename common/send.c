@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.59 2003/02/15 19:25:13 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.60 2003/07/19 12:27:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -966,7 +966,8 @@ sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
  * Send to all clients which match the mask in a way defined on 'what';
  * either by user hostname or user servername.
  * NOTE: we send it only to new servers and local clients. Old servers
- * are covered by sendto_match_butone_old()
+ * are covered by sendto_match_butone_old() and upper function takes care
+ * of calling both with properly formatted parameters.
  */
 void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char *pattern, ...)
 {
@@ -981,8 +982,8 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
  		if (cptr == one)	/* must skip the origin !! */
 			continue;
 		/* This used to be IsServer(cptr), but we have to use
-		** another (however looking very similar) function to
-		** send $#/$$-mask messages to old servers, which does
+		** another (sendto_match_butone_old()) function to
+		** send $#/$$-mask messages to old servers, which do
 		** not understand new syntax. --Beeth */
 		if (ST_UID(cptr))
 		{
@@ -1030,8 +1031,8 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
  *
  * Send to all clients which match the mask in a way defined on 'what';
  * either by user hostname or user servername.
- * NOTE: we send it only to new servers and local clients. Old servers
- * are covered by sendto_match_butone_old()
+ * NOTE: we send it only to old servers (pre-2.11). The rest is
+ * covered by sendto_match_butone()
  */
 void	sendto_match_butone_old(aClient *one, aClient *from, char *mask, int what, char *pattern, ...)
 {
