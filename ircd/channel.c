@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.250 2005/02/08 02:03:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.251 2005/02/09 16:17:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2170,7 +2170,38 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	aChannel *chptr;
 	Reg	char	*name, *key = NULL;
 	int	i, tmplen, flags = 0;
-	char	*p = NULL, *p2 = NULL, *s, chop[5];
+	char	*p = NULL, *p2 = NULL;
+
+	/* This is the only case we get JOIN over s2s link. --B. */
+	/* It could even be its own command. */
+	if (IsServer(cptr))
+	{
+		if (parv[1][0] == '0' && parv[1][1] == '\0')
+		{
+			if (sptr->user->channel == NULL)
+				return 0;
+			while ((lp = sptr->user->channel))
+			{
+				chptr = lp->value.chptr;
+				sendto_channel_butserv(chptr, sptr,
+						PartFmt,
+						parv[0], chptr->chname,
+						key ? key : "");
+				remove_user_from_channel(sptr, chptr);
+			}
+			sendto_match_servs(NULL, cptr, ":%s JOIN 0 :%s",
+				parv[0], key ? key : parv[0]);
+		}
+		else
+		{
+			/* Well, technically this is an error.
+			** Let's ignore it for now. --B. */
+		}
+		return 0;
+	}
+	/* These should really be assert()s. */
+	if (!sptr || !sptr->user)
+		return 0;
 
 	*jbuf = '\0';
 	/*
@@ -2184,19 +2215,14 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    {
 		if (check_channelmask(sptr, cptr, name)==-1)
 			continue;
-		if (*name == '&' && !MyConnect(sptr))
-			continue;
 		if (*name == '0' && !atoi(name))
-		    {
+		{
 			(void)strcpy(jbuf, "0");
 			continue;
-		    }
-		if (MyClient(sptr))
-		    {
-			clean_channelname(name);
-		    }
+		}
+		clean_channelname(name);
 		if (*name == '!')
-		    {
+		{
 			chptr = NULL;
 			/*
 			** !channels are special:
@@ -2209,55 +2235,26 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			if (*(name+1) == '\0' ||
 			    (*(name+1) == '#' && *(name+2) == '\0') ||
 			    (*(name+1) == '!' && *(name+2) == '\0'))
-			    {
-				if (MyClient(sptr))
-					sendto_one(sptr,
-						   replies[ERR_NOSUCHCHANNEL],
-							   ME, BadTo(parv[0]), name);
+			{
+				sendto_one(sptr, replies[ERR_NOSUCHCHANNEL],
+					ME, BadTo(parv[0]), name);
 				continue;
-			    }
+			}
 			if (*name == '!' && (*(name+1) == '#' ||
 					     *(name+1) == '!'))
-			    {
-				if (!MyClient(sptr))
-				    {
-					sendto_flag(SCH_NOTICE,
-				   "Invalid !%c channel from %s for %s",
-						    *(name+1),
-						    get_client_name(cptr,TRUE),
-						    sptr->name);
-					continue;
-				    }
-#if 0
-				/*
-				** Note: creating !!!foo, e.g. !<ID>!foo is
-				** a stupid thing to do because /join !!foo
-				** will not join !<ID>!foo but create !<ID>foo
-				** Some logic here could be reversed, but only
-				** to find that !<ID>foo would be impossible to
-				** create if !<ID>!foo exists.
-				** which is better? it's hard to say -kalt
-				*/
-				if (*(name+3) == '!')
-				    {
-					sendto_one(sptr,
-						   replies[ERR_NOSUCHCHANNEL],
-							   ME, BadPtr(parv[0]), name);
-					continue;
-				    }
-#endif
+			{
 				chptr = hash_find_channels(name+2, NULL);
 				if (chptr)
-				    {
+				{
 					sendto_one(sptr,
 						   replies[ERR_TOOMANYTARGETS],
 							   ME, BadTo(parv[0]),
 						   "Duplicate", name,
 						   "Join aborted.");
 					continue;
-				    }
+				}
 				if (check_chid(name+2))
-				    {
+				{
 					/*
 					 * This is a bit wrong: if a channel
 					 * rightfully ceases to exist, it
@@ -2269,55 +2266,47 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					sendto_one(sptr, replies[ERR_UNAVAILRESOURCE],
 							   ME, BadTo(parv[0]), name);
 					continue;
-				    }
+				}
 				sprintf(buf, "!%.*s%s", CHIDLEN, get_chid(),
 					name+2);
 				name = buf;
-			    }
+			}
 			else if (!find_channel(name, NullChn) &&
 				 !(*name == '!' && *name != 0 &&
 				   (chptr = hash_find_channels(name+1, NULL))))
-			    {
-				if (MyClient(sptr))
-					sendto_one(sptr,
-						   replies[ERR_NOSUCHCHANNEL],
-							   ME, BadTo(parv[0]), name);
-				if (!IsServer(cptr))
-					continue;
-				/* from a server, it is legitimate */
-			    }
+			{
+				sendto_one(sptr, replies[ERR_NOSUCHCHANNEL],
+					ME, BadTo(parv[0]), name);
+				continue;
+			}
 			else if (chptr)
-			    {
+			{
 				/* joining a !channel using the short name */
-				if (MyConnect(sptr) &&
-				    hash_find_channels(name+1, chptr))
-				    {
+				if (hash_find_channels(name+1, chptr))
+				{
 					sendto_one(sptr,
 						   replies[ERR_TOOMANYTARGETS],
 							   ME, BadTo(parv[0]),
 						   "Duplicate", name,
 						   "Join aborted.");
 					continue;
-				    }
+				}
 				name = chptr->chname;
-			    }
-		    }
+			}
+		}
 		if (!IsChannelName(name) ||
 		    (*name == '+' && (*(name+1) == '#' || *(name+1) == '!')) ||
 		    (*name == '!' && IsChannelName(name+1)))
-		    {
-			if (MyClient(sptr))
-				sendto_one(sptr, replies[ERR_NOSUCHCHANNEL],
-					   ME, BadTo(parv[0]), name);
+		{
+			sendto_one(sptr, replies[ERR_NOSUCHCHANNEL],
+				ME, BadTo(parv[0]), name);
 			continue;
-		    }
+		}
 		tmplen = strlen(name);
 		if (i + tmplen + 2 /* comma and \0 */
 			>= sizeof(jbuf) )
 		{
-
 			break;
-
 		}
 		if (*jbuf)
 		{
@@ -2333,33 +2322,30 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	for (name = strtoken(&p, jbuf, ","); name;
 	     key = (key) ? strtoken(&p2, NULL, ",") : NULL,
 	     name = strtoken(&p, NULL, ","))
-	    {
+	{
 		/*
 		** JOIN 0 sends out a part for all channels a user
 		** has joined.
 		*/
 		if (*name == '0' && !atoi(name))
-		    {
+		{
 			if (sptr->user->channel == NULL)
 				continue;
 			while ((lp = sptr->user->channel))
-			    {
+			{
 				chptr = lp->value.chptr;
 				sendto_channel_butserv(chptr, sptr,
 						PartFmt,
 						parv[0], chptr->chname,
 						key ? key : "");
 				remove_user_from_channel(sptr, chptr);
-			    }
+			}
 			sendto_match_servs(NULL, cptr, ":%s JOIN 0 :%s",
-					   parv[0], key ? key : parv[0]);
+				parv[0], key ? key : parv[0]);
 			continue;
-		    }
+		}
 
-		if (cptr->serv && (s = index(name, '\007')))
-			*s++ = '\0';
-		else
-			clean_channelname(name), s = NULL;
+		clean_channelname(name);
 
 		/* Get chptr for given name. Do not create channel yet.
 		** Can return NULL. */
@@ -2367,13 +2353,6 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 		if (chptr && IsMember(sptr, chptr))
 		{
-			if (IsServer(cptr))
-			{
-				/* Valid only for 2.10 servers, as we use
-				** NJOIN for 2.11 */
-				sendto_flag(SCH_CHAN, "Fake: %s JOIN %s",
-					sptr->name, chptr->chname);
-			}
 			continue;
 		}
 
@@ -2386,8 +2365,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			continue;
 		}
 
-		if (MyConnect(sptr) &&
-		    !strncmp(name, "\x23\x1f\x02\xb6\x03\x34\x63\x68\x02\x1f",
+		if (!strncmp(name, "\x23\x1f\x02\xb6\x03\x34\x63\x68\x02\x1f",
 			     10))
 		{
 			sptr->exitc = EXITC_VIRUS;
@@ -2409,7 +2387,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			continue;
 		}
 
-		if (MyConnect(sptr) && (i = can_join(sptr, chptr, key)))
+		if ((i = can_join(sptr, chptr, key)))
 		{
 			sendto_one(sptr, replies[i], ME, BadTo(parv[0]), name);
 			continue;
@@ -2421,91 +2399,46 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		** Operator.
 		*/
 		flags = 0;
-		chop[0] = '\0';
-		if (MyConnect(sptr) && UseModes(name) &&
+		if (UseModes(name) &&
 			(*name != '#' || !IsSplit()) &&
 		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users &&
 		    !(chptr->history && *chptr->chname == '!'))
-		    {
+		{
 			if (*name == '!')
-				strcpy(chop, "\007O");
-			else
-				strcpy(chop, "\007o");
-			s = chop+1; /* tricky */
-		    }
-		/*
-		**  Complete user entry to the new channel (if any)
-		*/
-		if (s && UseModes(name))
-		    {
-			if (*s == 'O')
-				/*
-				 * there can never be another mode here,
-				 * because we use NJOIN for netjoins.
-				 * here, it *must* be a channel creation. -kalt
-				 */
 				flags |= CHFL_UNIQOP|CHFL_CHANOP;
-			else if (*s == 'o')
-			    {
+			else
 				flags |= CHFL_CHANOP;
-				if (*(s+1) == 'v')
-					flags |= CHFL_VOICE;
-			    }
-			else if (*s == 'v')
-				flags |= CHFL_VOICE;
-		    }
+		}
+		/* Complete user entry to the new channel */
 		add_user_to_channel(chptr, sptr, flags);
-		/*
-		** notify all users on the channel
-		*/
+		/* Notify all users on the channel */
 		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
-						parv[0], name);
-		if (s && UseModes(name))
-		    {
-			/* no need if user is creating the channel */
-			if (chptr->users != 1)
-				sendto_channel_butserv(chptr, sptr,
-						       ":%s MODE %s +%s %s %s",
-						       cptr->name, name, s,
-						       parv[0],
-						       *(s+1)=='v'?parv[0]:"");
-		    }
-		/*
-		** If s wasn't set to chop+1 above, name is now #chname^Gov
-		** again (if coming from a server, and user is +o and/or +v
-		** of course ;-)
-		** This explains the weird use of name and chop..
-		** Is this insane or subtle? -krys
-		** This is no longer true, name is now just the name of the
-		** channel. - Q
-		*/
-		if (MyClient(sptr))
-		    {
-			del_invite(sptr, chptr);
-			if (chptr->topic[0] != '\0')
-			{
-				sendto_one(sptr, replies[RPL_TOPIC], ME,
-					BadTo(parv[0]), name, chptr->topic);
-#ifdef TOPIC_WHO_TIME
-				if (chptr->topic_t > 0)
-				{
-					sendto_one(sptr, replies[RPL_TOPIC_WHO_TIME],
-						ME, BadTo(parv[0]),
-						name, IsAnonymous(chptr) ?
-						"anonymous!anonymous@anonymous." :
-						chptr->topic_nuh,
-						chptr->topic_t);
-				}
-#endif
-			}
+			parv[0], name);
 
-			names_channel(cptr, sptr, parv[0], chptr, 1);
-			if (IsAnonymous(chptr) && !IsQuiet(chptr))
-			    {
-				sendto_one(sptr, ":%s NOTICE %s :Channel %s has the anonymous flag set.", ME, chptr->chname, chptr->chname);
-				sendto_one(sptr, ":%s NOTICE %s :Be aware that anonymity on IRC is NOT securely enforced!", ME, chptr->chname);
-			    }
-		    }
+		del_invite(sptr, chptr);
+		if (chptr->topic[0] != '\0')
+		{
+			sendto_one(sptr, replies[RPL_TOPIC], ME,
+				BadTo(parv[0]), name, chptr->topic);
+#ifdef TOPIC_WHO_TIME
+			if (chptr->topic_t > 0)
+			{
+				sendto_one(sptr, replies[RPL_TOPIC_WHO_TIME],
+					ME, BadTo(parv[0]),
+					name, IsAnonymous(chptr) ?
+					"anonymous!anonymous@anonymous." :
+					chptr->topic_nuh,
+					chptr->topic_t);
+			}
+#endif
+		}
+
+		names_channel(cptr, sptr, parv[0], chptr, 1);
+		if (IsAnonymous(chptr) && !IsQuiet(chptr))
+		{
+			sendto_one(sptr, ":%s NOTICE %s :Channel %s has the anonymous flag set.", ME, chptr->chname, chptr->chname);
+			sendto_one(sptr, ":%s NOTICE %s :Be aware that anonymity on IRC is NOT securely enforced!", ME, chptr->chname);
+		}
 		/*
 	        ** notify other servers
 		*/
@@ -2513,41 +2446,19 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{
 			sendto_match_servs_v(chptr, cptr, SV_UID,
 				":%s NJOIN %s :%s%s", me.serv->sid, name,
-				s && s[0] == 'O' && s[1] == 'v' ? "@@+" : 
-				s && s[0] == 'O' ? "@@" : 
-				s && s[0] == 'o' && s[1] == 'v' ? "@+" :
-				s && s[0] == 'o' ? "@" :
-				s && s[0] == 'v' ? "+" : "",
+				flags & CHFL_UNIQOP ? "@@" : 
+				flags & CHFL_CHANOP ? "@" : "",
 				sptr->user ? sptr->user->uid : parv[0]);
-			sendto_match_servs_notv(chptr, cptr, SV_UID,
-				":%s NJOIN %s :%s%s", ME, name,
-				s && s[0] == 'O' && s[1] == 'v' ? "@@+" : 
-				s && s[0] == 'O' ? "@@" : 
-				s && s[0] == 'o' && s[1] == 'v' ? "@+" :
-				s && s[0] == 'o' ? "@" :
-				s && s[0] == 'v' ? "+" : "",
-				parv[0]);
 		}
 		else if (*chptr->chname != '&')
 		{
 			sendto_serv_v(cptr, SV_UID, ":%s NJOIN %s :%s%s",
 				me.serv->sid, name,
-				s && s[0] == 'O' && s[1] == 'v' ? "@@+" : 
-				s && s[0] == 'O' ? "@@" : 
-				s && s[0] == 'o' && s[1] == 'v' ? "@+" :
-				s && s[0] == 'o' ? "@" :
-				s && s[0] == 'v' ? "+" : "",
+				flags & CHFL_UNIQOP ? "@@" : 
+				flags & CHFL_CHANOP ? "@" : "",
 				sptr->user ? sptr->user->uid : parv[0]);
-			sendto_serv_notv(cptr, SV_UID, ":%s NJOIN %s :%s%s",
-				ME, name,
-				s && s[0] == 'O' && s[1] == 'v' ? "@@+" : 
-				s && s[0] == 'O' ? "@@" : 
-				s && s[0] == 'o' && s[1] == 'v' ? "@+" :
-				s && s[0] == 'o' ? "@" :
-				s && s[0] == 'v' ? "+" : "",
-				parv[0]);
 		}
-	    }
+	}
 	return 2;
 }
 
