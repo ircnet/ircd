@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.77 2004/03/14 17:45:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.78 2004/03/18 00:31:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -179,6 +179,7 @@ char	*get_client_name(aClient *sptr, int showip)
 
 	if (MyConnect(sptr))
 	    {
+#ifdef UNIXPORT
 		if (IsUnixSocket(sptr))
 		    {
 			if (showip)
@@ -189,6 +190,7 @@ char	*get_client_name(aClient *sptr, int showip)
 					sptr->name, me.sockhost);
 		    }
 		else
+#endif
 		    {
 			if (showip)
 				(void)sprintf(nbuf, "%s[%.*s@%s]",
