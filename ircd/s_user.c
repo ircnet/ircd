@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.152 2003/07/19 12:27:41 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.153 2003/08/07 23:05:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -812,14 +812,36 @@ badparamcountkills:
 			user = host = "";
 	}
 	
-	/* Special case - user changing his nick to UID */
-	if (MyPerson(sptr) && ((nick[0] == '0' && nick[1] == '\0') ||
-		!mycmp(nick, sptr->user->uid)))
+	if (MyPerson(sptr))
 	{
-		strncpyzt(nick, sptr->user->uid, UIDLEN + 1);
-		goto nickkilldone;
+		if (!strcmp(sptr->name, nick))
+		{
+			/*
+			** This is just ':old NICK old' type thing.
+			** Just forget the whole thing here. There is
+			** no point forwarding it to anywhere.
+			*/
+			return 2; /* NICK Message ignored */
+		}
+		/* "NICK 0" or "NICK UID" received */
+		if ((nick[0] == '0' && nick[1] == '\0') ||
+		    !mycmp(nick, sptr->user->uid))
+		{
+			/* faster equivalent of
+			** !strcmp(sptr->name, sptr->user->uid) */
+			if (isdigit(sptr->name[0]))
+			{
+				/* user nick is already an UID */
+				return 2; /* NICK message ignored */
+			}
+			else
+			{
+				/* user changing his nick to UID */
+				strncpyzt(nick, sptr->user->uid, UIDLEN + 1);
+				goto nickkilldone;
+			}
+		}
 	}
-	
 	/*
 	 * if do_nick_name() returns a null name OR if the server sent a nick
 	 * name and do_nick_name() changed it in some way (due to rules of nick
@@ -884,20 +906,12 @@ badparamcountkills:
 	** nickname or somesuch)
 	*/
 	if (acptr == sptr)
-		if (strcmp(acptr->name, nick) != 0)
-			/*
-			** Allows change of case in his/her nick
-			*/
-			goto nickkilldone; /* -- go and process change */
-		else
-			/*
-			** This is just ':old NICK old' type thing.
-			** Just forget the whole thing here. There is
-			** no point forwarding it to anywhere,
-			** especially since servers prior to this
-			** version would treat it as nick collision.
-			*/
-			return 2; /* NICK Message ignored */
+	{
+		/*
+		** Allows change of case in his/her nick
+		*/
+		goto nickkilldone; /* -- go and process change */
+	}
 	/*
 	** Note: From this point forward it can be assumed that
 	** acptr != sptr (point to different client structures).
