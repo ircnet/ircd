@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.3 1998/08/07 04:03:31 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.4 1998/08/08 03:57:39 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -140,36 +140,34 @@ u_int cl;
 			if (ch) ch = index(ch, ':');
 			if (ch) ch += 1;
 			while (ch && *ch && *ch == ' ') ch++;
-			if (ch && !strncmp(ch, "OTHER", 5))
+			if (ch)
 			    {
+				int other = 0;
+
+				if (!strncmp(ch, "OTHER", 5))
+					other = 1;
 				ch = rindex(ch, ':');
 				if (ch) ch += 1;
 				while (ch && *ch && *ch == ' ') ch++;
 				if (ch && *ch)
 				    {
+					char *chk = ch-1;
+
+					while (*++chk)
+						if (*chk == ':' ||
+						    *chk == '@' ||
+						    isspace(*chk))
+							break;
+					if (*chk)
+						other = 1;
 					if (cldata[cl].authuser)
 						free(cldata[cl].authuser);
 					cldata[cl].authuser = mystrdup(ch);
 					cldata[cl].best = cldata[cl].instance;
-					sendto_ircd("u %d %s %u %s", cl,
-						    cldata[cl].itsip,
-						    cldata[cl].itsport,
-						    cldata[cl].authuser);
-				    }
-			    }
-			else if (ch)
-			    {
-				ch = rindex(ch, ':');
-				if (ch) ch += 1;
-				while (ch && *ch && *ch == ' ') ch++;
-				if (ch && *ch)
-				    {
-					if (cldata[cl].authuser)
-						free(cldata[cl].authuser);
-					cldata[cl].authuser = mystrdup(ch);
-					cldata[cl].best = cldata[cl].instance;
-					cldata[cl].state |= A_UNIX;
-					sendto_ircd("U %d %s %u %s", cl,
+					if (unix)
+						cldata[cl].state |= A_UNIX;
+					sendto_ircd("%c %d %s %u %s",
+						    (other) ? 'u' : 'U', cl,
 						    cldata[cl].itsip,
 						    cldata[cl].itsport,
 						    cldata[cl].authuser);
