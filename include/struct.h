@@ -500,7 +500,8 @@ struct Client	{
 struct	stats {
 	u_int	is_cl;	/* number of client connections */
 	u_int	is_sv;	/* number of server connections */
-	u_int	is_ni;	/* connection but no idea who it was */
+	u_int	is_ni;	/* connection but no idea who it was
+			 * (can be a P: line that has been removed -krys) */
 	u_short	is_cbs;	/* bytes sent to clients */
 	u_short	is_cbr;	/* bytes received to clients */
 	u_short	is_sbs;	/* bytes sent to servers */

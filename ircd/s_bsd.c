@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.9 1997/06/23 14:03:32 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.10 1997/07/08 12:24:00 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1144,7 +1144,7 @@ aClient *cptr;
 	if ((i = cptr->fd) >= 0)
 	    {
 		flush_connections(i);
-		if (IsServer(cptr))
+		if (IsServer(cptr) || IsListening(cptr))
 		    {
 			del_fd(i, &fdas);
 #ifdef	ZIP_LINKS

@@ -1,4 +1,4 @@
-# @(#)$Id: BUGS,v 1.5 1997/06/09 15:24:09 kalt Exp $
+# @(#)$Id: BUGS,v 1.6 1997/07/08 12:24:01 kalt Exp $
 
 The list is probably not as scary as it once was.
 Anyone with some free time is welcome to fix those =)
@@ -13,5 +13,3 @@ Anyone with some free time is welcome to fix those =)
   for various reasons)
 
 * NOTE is part of the server code.
-
-* Rehashing after removing P: line(s) occasionally makes the server crash.
