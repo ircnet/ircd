@@ -57,7 +57,7 @@
  * WARNING! Better to use external chroot and then run ircd without
  * this option.
  *
- * CPATH, MPATH, LPATH, PPATH, TPATH, QPATH, OPATH, 
+ * CPATH, MPATH, LPATH, PPATH, TPATH, QPATH, OPATH,
  * FNAME_USERLOG, FNAME_OPERLOG, FNAME_CONNLOG, FNAME_AUTHLOG
  * must have RPATH as root directory! Set them in Makefile
  *
@@ -103,7 +103,7 @@
  * commands however.  OPER_REHASH and OPER_RESTART allow operators to
  * issue the REHASH and RESTART commands when connected to your server.
  * Left undefined they increase the security of your server from wayward
- * operators and accidents.  
+ * operators and accidents.
  * OPER_SET enables SET command which can be used for fine-tuning of certain
  * aspects of ircd behaviour during runtime.
  * The 'LOCOP_' #defines are for making the respective commands available
@@ -315,7 +315,7 @@
 #define	UPHOST	"irc"
 
 /*
- * If you wish to run services, define USE_SERVICES. 
+ * If you wish to run services, define USE_SERVICES.
  * This can make the server noticeably bigger and slower.
  * services are not fully implemented yet, so don't use it unless you really
  * know what you are doing.
@@ -424,7 +424,7 @@
  * Note that your system limits this, too. FreeBSD, for instance, has sysctl
  * kern.ipc.somaxconn for that. Such must be bigger than this define prior to
  * ircd start.
- */ 
+ */
 #define LISTENQUEUE 128
 
 /* define DEBUGMODE to enable debugging mode.*/
@@ -432,7 +432,7 @@
 
 /*
  * Time interval to wait and if no messages have been received, then check for
- * PINGFREQUENCY and CONNECTFREQUENCY 
+ * PINGFREQUENCY and CONNECTFREQUENCY
  */
 #define TIMESEC  60		/* Recommended value: 60 */
 
@@ -445,7 +445,7 @@
 #define PINGFREQUENCY    120	/* Recommended value: 120 */
 
 /*
- * If the connection to to uphost is down, then attempt to reconnect every 
+ * If the connection to to uphost is down, then attempt to reconnect every
  * CONNECTFREQUENCY  seconds.
  */
 #define CONNECTFREQUENCY 600	/* Recommended value: 600 */
@@ -512,7 +512,7 @@
  * the compression level used. (Suggested values: 3, 4, 5)
  * Above 5 will only give a *very* marginal increase in compression for a
  * *very* large increase in CPU usage.
- */ 
+ */
 # define	ZIP_LEVEL	5
 #endif
 
@@ -557,7 +557,7 @@
 #define SPLIT_SERVERS	15
 
 /*
-** Notice sent to connecting users if the server is in the split-mode. 
+** Notice sent to connecting users if the server is in the split-mode.
 */
 #define SPLIT_CONNECT_NOTICE "Server is currently in split-mode."
 
@@ -566,7 +566,7 @@
 #  undef LEAST_IDLE
 #endif
 
-#define SEQ_NOFILE    128	/* For Dynix (sequent OS) users : 
+#define SEQ_NOFILE    128	/* For Dynix (sequent OS) users :
 				 * set to your current kernel impl,
 				 * max number of socket connections;
 				 * ignored on other OS.	
@@ -609,8 +609,8 @@
 
 #if !defined(SLOW_ACCEPT) && !defined(CLONE_CHECK)
 # define	CLONE_CHECK
-# define	CLONE_MAX       2                                     
-# define	CLONE_PERIOD    10       
+# define	CLONE_MAX       2
+# define	CLONE_PERIOD    10
 #endif
 
 /*
@@ -690,8 +690,8 @@
 #error SPLIT_SERVERS must be defined
 #endif
 /*
- * Undefining NO_OPER_REMOTE removes the restriction that O-lines only become 
- * fully effective for people on the 'same network' as the server.  
+ * Undefining NO_OPER_REMOTE removes the restriction that O-lines only become
+ * fully effective for people on the 'same network' as the server.
  * Defined, it increases the security of the server by
  * placing restrictions on where people can use operator powers from.
  * Dubious consideration, IMO.
