@@ -1,3 +1,8 @@
+2003-10-22  Jakub Vlasek
+
+	* hash.c/m_hash(): Spelling fixes, hash_channel_name() takes 3 params
+	  - removed the hashfunc from HashTables[].
+
 2003-10-18  Kurt Roeckx
 
 	* support.c/make_isupport(): Limit to sending 12 tokens in
