@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.88 2002/11/23 18:04:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.89 2002/12/28 21:20:41 jv Exp $";
 #endif
 
 #include "os.h"
@@ -34,6 +34,7 @@ aClient *client = &me;		/* Pointer to beginning of Client list */
 static	void	open_debugfile(), setup_signals(), io_loop();
 
 istat_t	istat;
+iconf_t iconf;
 char	**myargv;
 int	rehashed = 0;
 int	portnum = -1;		    /* Server port number, listening this */
@@ -300,7 +301,13 @@ time_t	currenttime;
 					*pconf = aconf->next;
 			(*pconf = con_conf)->next = 0;
 		    }
-		if (connect_server(con_conf, (aClient *)NULL,
+		if (!iconf.aconnect)
+		{
+			sendto_one(sptr, "Connection to %s deferred. Autoconnect
+					administratively disabled",
+					con_conf->name)
+		}
+		else if (connect_server(con_conf, (aClient *)NULL,
 				   (struct hostent *)NULL) == 0)
 			sendto_flag(SCH_NOTICE,
 				    "Connection to %s[%s] activated.",
@@ -937,6 +944,7 @@ char	*argv[];
 #endif
 	timeofday = time(NULL);
 	initstats();
+	initruntimeconf();
 	ircd_readtune(tunefile);
 #ifdef	CACHED_MOTD
 	motd = NULL;
