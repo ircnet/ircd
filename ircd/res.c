@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.23 2002/04/18 23:45:51 jv Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.24 2002/07/30 00:14:59 chopin Exp $";
 #endif
 
 /* #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -883,13 +883,13 @@ char	*lp;
 	a = proc_answer(rptr, hptr, buf, buf+rc);
 	if (a == -1) {
 #ifdef	INET6
-		SPRINTF(buffer, "Bad hostname returned from %s for %s",
+		sprintf(buffer, "Bad hostname returned from %s for %s",
 			inetntop(AF_INET, &sin.sin_addr, mydummy2, 
 				MYDUMMY_SIZE),
 			inetntop(AF_INET6, rptr->he.h_addr.s6_addr,
 				mydummy, MYDUMMY_SIZE));
 #else
-		SPRINTF(buffer, "Bad hostname returned from %s for ", 
+		sprintf(buffer, "Bad hostname returned from %s for ", 
 			inetntoa((char *)&sin.sin_addr));
 		strcat(buffer, inetntoa((char *)&rptr->he.h_addr));
 #endif

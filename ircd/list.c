@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.18 2002/07/05 23:14:58 jv Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.19 2002/07/30 00:14:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -264,7 +264,7 @@ aServer	*make_server(aClient *cptr)
 
 		SetBit(tok);
 		serv->ltok = tok;
-		SPRINTF(serv->tok, "%d", serv->ltok);
+		sprintf(serv->tok, "%d", serv->ltok);
 		serv->bcptr = cptr;
 		serv->lastload = 0;
 	    }
@@ -304,7 +304,7 @@ aClient	*cptr;
 		    {
 			char buf[512];
 			/*too many arguments for dumpcore() and sendto_flag()*/
-			SPRINTF(buf, "%#x %#x %#x %#x %d %d %#x (%s)",
+			sprintf(buf, "%#x %#x %#x %#x %d %d %#x (%s)",
 				user, user->invited, user->channel, user->uwas,
 				user->joined, user->refcnt,
 				user->bcptr,
@@ -337,7 +337,7 @@ aClient	*cptr;
 		    serv->bcptr || serv->user)
 		    {
 			char buf[512];
-			SPRINTF(buf, "%d %#x %#x %#x %#x (%s)",
+			sprintf(buf, "%d %#x %#x %#x %#x (%s)",
 				serv->refcnt, serv->prevs, serv->nexts,
 				serv->user, serv->bcptr,
 				(serv->bcptr) ? serv->bcptr->name : "none");

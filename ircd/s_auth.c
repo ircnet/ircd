@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.45 2002/07/29 21:36:07 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.46 2002/07/30 00:14:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -676,7 +676,7 @@ aClient	*cptr;
 		goto authsenderr;
 	    }
 
-	SPRINTF(authbuf, "%u , %u\r\n",
+	sprintf(authbuf, "%u , %u\r\n",
 		(unsigned int)ntohs(them.SIN_PORT),
 		(unsigned int)ntohs(us.SIN_PORT));
 

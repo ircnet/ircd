@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.133 2002/07/29 22:38:50 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.134 2002/07/30 00:15:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2318,7 +2318,7 @@ char	*parv[];
 			inpath = cptr->sockhost;
 		if (!BadPtr(path))
 		    {
-			SPRINTF(buf, "%s%s (%s)",
+			sprintf(buf, "%s%s (%s)",
 				cptr->name, IsOper(sptr) ? "" : "(L)", path);
 			path = buf;
 		    }
@@ -2394,7 +2394,7 @@ char	*parv[];
 	if (MyConnect(acptr) && MyConnect(sptr) && IsAnOper(sptr))
 	    {
 		acptr->exitc = EXITC_KILL;
-		SPRINTF(buf2, "Local Kill by %s (%s)", sptr->name,
+		sprintf(buf2, "Local Kill by %s (%s)", sptr->name,
 			BadPtr(parv[2]) ? sptr->name : parv[2]);
 	    }
 	else
@@ -2408,7 +2408,7 @@ char	*parv[];
 		    }
 		else
 			killer = path;
-		SPRINTF(buf2, "Killed (%s)", killer);
+		sprintf(buf2, "Killed (%s)", killer);
 	    }
 	return exit_client(cptr, acptr, sptr, buf2);
 }
@@ -2732,7 +2732,7 @@ char	*parv[];
 		    (logfile = open(FNAME_OPERLOG, O_WRONLY|O_APPEND)) != -1)
 		{
 		  (void)alarm(0);
-		  SPRINTF(buf, "%s OPER (%s) (%s) by (%s!%s@%s) [%s@%s]\n",
+		  sprintf(buf, "%s OPER (%s) (%s) by (%s!%s@%s) [%s@%s]\n",
 			  myctime(timeofday), name, encr,
 			  parv[0], sptr->user->username, sptr->user->host,
 			  sptr->auth, IsUnixSocket(sptr) ? sptr->sockhost :
@@ -2849,7 +2849,7 @@ char	*parv[];
 		    {
 			if (*buf2)
 				(void)strcat(buf, " ");
-			SPRINTF(buf2, "%s%s=%c%s@%s", acptr->name,
+			sprintf(buf2, "%s%s=%c%s@%s", acptr->name,
 				IsAnOper(acptr) ? "*" : "",
 				(acptr->user->flags & FLAGS_AWAY) ? '-' : '+',
 				acptr->user->username, acptr->user->host);

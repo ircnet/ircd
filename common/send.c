@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.56 2002/07/29 22:38:48 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.57 2002/07/30 00:14:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -184,7 +184,7 @@ int	len;
 			ebuf[0] = '\0';
 			if (IsService(to) || IsServer(to))
 			{
-				SPRINTF(ebuf,
+				sprintf(ebuf,
 				"Max SendQ limit exceeded for %s: %d > %d",
 					get_client_name(to, FALSE),
 					DBufLength(&to->sendQ), get_sendq(to));

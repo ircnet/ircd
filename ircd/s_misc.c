@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.48 2002/06/06 13:49:50 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.49 2002/07/30 00:14:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -185,10 +185,10 @@ int	showip;
 		if (IsUnixSocket(sptr))
 		    {
 			if (showip)
-				SPRINTF(nbuf, "%s[%s]",
+				sprintf(nbuf, "%s[%s]",
 					sptr->name, sptr->sockhost);
 			else
-				SPRINTF(nbuf, "%s[%s]",
+				sprintf(nbuf, "%s[%s]",
 					sptr->name, me.sockhost);
 		    }
 		else
@@ -211,7 +211,7 @@ int	showip;
 					/* Show username for clients and
 					 * ident for others.
 					 */
-					SPRINTF(nbuf, "%s[%.*s@%s]",
+					sprintf(nbuf, "%s[%.*s@%s]",
 						sptr->name, USERLEN,
 						IsPerson(sptr) ?
 							sptr->user->username :
@@ -236,7 +236,7 @@ aClient	*cptr;
 	if (!cptr->hostp)
 		return get_client_name(cptr, FALSE);
 	if (IsUnixSocket(cptr))
-		SPRINTF(nbuf, "%s[%s]", cptr->name, ME);
+		sprintf(nbuf, "%s[%s]", cptr->name, ME);
 	else
 		(void)sprintf(nbuf, "%s[%-.*s@%-.*s]",
 			cptr->name, USERLEN,

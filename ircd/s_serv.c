@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.105 2002/07/06 03:15:10 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.106 2002/07/30 00:15:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -570,7 +570,7 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_flag(SCH_NOTICE,
 			"SID collision (SMASK) on %s brought by %s, "
 			"dropping link", parv[1],sptr->name);
-		SPRINTF(ecbuf, "SID collision (%s)", parv[1]);
+		sprintf(ecbuf, "SID collision (%s)", parv[1]);
 		return exit_client(cptr, cptr, &me, ecbuf);
 	}
 
@@ -596,7 +596,7 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (*parv[1] == '$')
 	{
 		acptr->serv->stok = idtol(parv[1] + 1, SIDLEN - 1);
-		SPRINTF(acptr->serv->sid, "$%s",
+		sprintf(acptr->serv->sid, "$%s",
 			ltoid(acptr->serv->ltok, SIDLEN - 1));
 		add_to_server_hash_table(acptr->serv, cptr);
 	}
@@ -688,7 +688,7 @@ char	*parv[];
 				   || (acptr = find_mask(host, NULL))))
 	    {
 		char tbuf[BUFSIZE];
-		SPRINTF(tbuf, "Server %s Exists",host);
+		sprintf(tbuf, "Server %s Exists",host);
 		/*
 		** This link is trying feed me a server that I already have
 		** access through another path -- multiple paths not accepted
@@ -839,7 +839,7 @@ char	*parv[];
 				/* compatibility SID */
 				acptr->serv->stok = idtol(parv[3] + 1,
 					SIDLEN - 1);
-				SPRINTF(acptr->serv->sid, "$%s",
+				sprintf(acptr->serv->sid, "$%s",
 					ltoid(acptr->serv->ltok, SIDLEN - 1));
 			}
 			else
@@ -853,7 +853,7 @@ char	*parv[];
 						"SID collision on %s brought"
 						" by %s, dropping link",
 						parv[3], sptr->name);
-					SPRINTF(ecbuf, "SID collision (%s)",
+					sprintf(ecbuf, "SID collision (%s)",
 						parv[3]);
 					return exit_client(cptr, cptr, &me,
 						ecbuf);
@@ -875,7 +875,7 @@ char	*parv[];
 			acptr->serv->stok = atoi(parv[3]);
 			strcpy(acptr->serv->verstr,"0");
 
-			SPRINTF(acptr->serv->sid, "$%s",
+			sprintf(acptr->serv->sid, "$%s",
 				ltoid(acptr->serv->ltok, SIDLEN - 1));
 			
 			aconf = cptr->serv->nline;
@@ -1195,7 +1195,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	}
 	else
 	{
-		SPRINTF(cptr->serv->sid,"$%s", 
+		sprintf(cptr->serv->sid,"$%s", 
 			ltoid(cptr->serv->ltok, SIDLEN-1));
 	}
 
@@ -1547,7 +1547,7 @@ char	*parv[];
 		    {
 			if (StrEq(namebuf,user))
 			    {
-				SPRINTF(ttyname,"/dev/%s",linetmp);
+				sprintf(ttyname,"/dev/%s",linetmp);
 				if (stat(ttyname,&stb) == -1)
 				    {
 					sendto_one(sptr,
@@ -1693,7 +1693,7 @@ char	*to;
 		if ((cp = tmp->ping) && cp->lseq)
 		    {
 			if (mycmp(tmp->name, tmp->host))
-				SPRINTF(buf,"%s[%s]",tmp->name, tmp->host);
+				sprintf(buf,"%s[%s]",tmp->name, tmp->host);
 			else
 				(void)strcpy(buf, tmp->name);
 			sendto_one(sptr, replies[RPL_STATSPING], ME, BadTo(to),
@@ -2385,7 +2385,7 @@ char	*parv[];
 	char	killer[HOSTLEN * 2 + USERLEN + 5];
 
 	strcpy(killer, get_client_name(sptr, TRUE));
-	SPRINTF(buf, "RESTART by %s", get_client_name(sptr, TRUE));
+	sprintf(buf, "RESTART by %s", get_client_name(sptr, TRUE));
 	for (i = 0; i <= highest_fd; i++)
 	    {
 		if (!(acptr = local[i]))

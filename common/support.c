@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.24 2002/07/29 21:36:06 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.25 2002/07/30 00:14:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -119,7 +119,7 @@ int err_no;
 	if (errp == (char *)NULL)
 	    {
 		errp = buff;
-		SPRINTF(errp, "Unknown Error %d", err_no);
+		sprintf(errp, "Unknown Error %d", err_no);
 	    }
 	return errp;
 }
@@ -478,7 +478,7 @@ char	*msg, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 		kill(p, 9);
 	}
 	write_pidfile();
-	SPRINTF(corename, "core.%d", p);
+	sprintf(corename, "core.%d", p);
 	(void)rename("core", corename);
 	Debug((DEBUG_FATAL, "Dumped core : core.%d", p));
 	sendto_flag(SCH_ERROR, "Dumped core : core.%d", p);
@@ -795,7 +795,7 @@ char **make_isupport()
 	
 	/* Warning: There must be up to 13 tokens in each string */
 	tis[0] = (char *) MyMalloc(BUFSIZE);
-	SPRINTF(tis[0],
+	sprintf(tis[0],
 	"RFC2812 PREFIX=(ov)@+ CHANTYPES=#&!+ MODES=%d MAXCHANNELS=%d "
 	"NICKLEN=%d TOPICLEN=%d KICKLEN=%d MAXBANS=%d CHANNELLEN=%d CHIDLEN=%d "
 	"CHANMODES=beI,k,l,imnpstaqr",
@@ -808,7 +808,7 @@ char **make_isupport()
 		strcat(tis[0], networkname);
 	}
 	tis[1] = (char *) MyMalloc(BUFSIZE);
-	SPRINTF(tis[1],	"PENALTY FNC EXCEPTS INVEX");
+	sprintf(tis[1],	"PENALTY FNC EXCEPTS INVEX");
 
 	tis[2] = NULL;
 

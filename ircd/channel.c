@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.126 2002/07/04 22:28:28 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.127 2002/07/30 00:14:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -652,7 +652,7 @@ aChannel *chptr;
 	    {
 		*mbuf++ = 'l';
 		if (IsMember(cptr, chptr) || IsServer(cptr))
-			SPRINTF(pbuf, "%d ", chptr->mode.limit);
+			sprintf(pbuf, "%d ", chptr->mode.limit);
 	    }
 	if (*chptr->mode.key)
 	    {

@@ -2,6 +2,8 @@
 
 	* got rid of !STDARG from everywhere.
 	* got rid of R lines from everywhere.
+	* got rid of SPRINTF define from everywhere.
+	* added irc_sprintf() function, which will handle %y.
 
 2002-07-06  Jakub Vlasek
 

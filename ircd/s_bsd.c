@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.87 2002/06/01 22:11:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.88 2002/07/30 00:14:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -366,7 +366,7 @@ int	port;
 
 	un.sun_family = AF_UNIX;
 	(void)mkdir(path, 0755);
-	SPRINTF(unixpath, "%s/%d", path, port);
+	sprintf(unixpath, "%s/%d", path, port);
 	(void)unlink(unixpath);
 	strncpyzt(un.sun_path, unixpath, sizeof(un.sun_path));
 	(void)strcpy(cptr->name, ME);
@@ -422,7 +422,7 @@ void	close_listeners()
 #ifdef	UNIXPORT
 			if (IsUnixSocket(cptr))
 			    {
-				SPRINTF(unixpath, "%s/%d",
+				sprintf(unixpath, "%s/%d",
 					aconf->host, aconf->port);
 				(void)unlink(unixpath);
 			    }
@@ -953,7 +953,7 @@ check_serverback:
 			add_local_domain(fullname, HOSTLEN-strlen(fullname));
 			Debug((DEBUG_DNS, "sv_cl: gethostbyaddr: %s->%s",
 				sockname, fullname));
-			SPRINTF(abuff, "%s@%s", cptr->username, fullname);
+			sprintf(abuff, "%s@%s", cptr->username, fullname);
 			if (!c_conf)
 				c_conf = find_conf_host(lp, abuff, CFLAG);
 			if (!n_conf)
@@ -973,7 +973,7 @@ check_serverback:
 	 */
 	if (IsUnknown(cptr) && (!c_conf || !n_conf))
 	    {
-		SPRINTF(abuff, "%s@%s", cptr->username, sockname);
+		sprintf(abuff, "%s@%s", cptr->username, sockname);
 		if (!c_conf)
 			c_conf = find_conf_host(lp, abuff, CFLAG);
 		if (!n_conf)
@@ -2639,7 +2639,7 @@ char	*namebuf, *linebuf, *chname;
 		return;
 	    }
 
-	SPRINTF(line,"/dev/%s", linebuf);
+	sprintf(line,"/dev/%s", linebuf);
 	(void)alarm(5);
 #ifdef	O_NOCTTY
 	if ((fd = open(line, O_WRONLY | O_NDELAY | O_NOCTTY)) == -1)
@@ -2678,7 +2678,7 @@ Chat on\n\r");
 		return;
 	    }
 	(void)alarm(0);
-	SPRINTF(line, "ircd: Channel %s, by %s@%s (%s) %s\n\r", chname,
+	sprintf(line, "ircd: Channel %s, by %s@%s (%s) %s\n\r", chname,
 		who->user->username, who->user->host, who->name, who->info);
 	(void)alarm(5);
 	if (write(fd, line, strlen(line)) != strlen(line))

@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.56 2002/07/29 22:38:50 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.57 2002/07/30 00:14:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -628,7 +628,7 @@ int	statmask;
 	Reg	aConfItem *tmp;
 	char	userhost[USERLEN+HOSTLEN+3];
 
-	SPRINTF(userhost, "%s@%s", user, host);
+	sprintf(userhost, "%s@%s", user, host);
 
 	for (tmp = conf; tmp; tmp = tmp->next)
 	    {
@@ -668,8 +668,8 @@ aClient	*cptr;
 	char	userhost[USERLEN+HOSTLEN+3];
 	char	userip[USERLEN+HOSTLEN+3];
 
-	SPRINTF(userhost, "%s@%s", cptr->username, cptr->sockhost);
-	SPRINTF(userip, "%s@%s", cptr->username, 
+	sprintf(userhost, "%s@%s", cptr->username, cptr->sockhost);
+	sprintf(userip, "%s@%s", cptr->username, 
 #ifdef INET6
 		(char *)inetntop(AF_INET6, (char *)&cptr->ip, mydummy,
 			MYDUMMY_SIZE)
@@ -1403,7 +1403,7 @@ int	opt;
 
 				len += strlen(aconf->host);
 				newhost = (char *)MyMalloc(len);
-				SPRINTF(newhost, "*@%s", aconf->host);
+				sprintf(newhost, "*@%s", aconf->host);
 				MyFree(aconf->host);
 				aconf->host = newhost;
 				istat.is_confmem += 2;
@@ -1825,7 +1825,7 @@ int	class, fd;
 			    {
 				char rpl[BUFSIZE];
 				
-				SPRINTF(rpl, replies[RPL_BOUNCE], ME, "unknown",
+				sprintf(rpl, replies[RPL_BOUNCE], ME, "unknown",
 					aconf->name, aconf->port);
 				strcat(rpl, "\r\n");
 #ifdef INET6

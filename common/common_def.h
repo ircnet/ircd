@@ -17,11 +17,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifdef	SPRINTF
-#undef	SPRINTF
-#endif
-#define	SPRINTF	(void) sprintf
-
 #define DupString(x,y) do {x = (char *)MyMalloc(strlen((char *)y) + 1);\
 			   (void)strcpy((char *)x, (char *)y);\
 			  } while(0)
