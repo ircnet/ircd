@@ -1,3 +1,7 @@
+2004-02-23  Piotr Kucharski
+
+	* s_serv.c/m_squit(): do not send compatibility sids in SQUIT.
+
 2004-02-22  Jakub Vlasek
 
 	* s_misc.c/exit_server(): moved "Received SQUIT", so the sequence on
