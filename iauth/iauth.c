@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: iauth.c,v 1.5 1998/08/07 03:28:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: iauth.c,v 1.6 1998/12/13 00:34:18 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -156,6 +156,9 @@ char	*argv[];
 		    }
 		else
 		    {
+#if defined(INET6)
+			(void)printf("\t+INET6\n");
+#endif
 #if defined(IAUTH_DEBUG)
 			(void)printf("\t+IAUTH_DEBUG\n");
 #endif

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.13 1998/11/03 18:00:06 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.14 1998/12/13 00:34:18 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -784,9 +784,9 @@ u_short port;
 {
 	int fd;
 	static char errbuf[BUFSIZ];
-	struct  sockaddr_in sk;
+	struct SOCKADDR_IN sk;
 
-	fd = socket(AF_INET, SOCK_STREAM, 0);
+	fd = socket(AFINET, SOCK_STREAM, 0);
 	if (fd < 0)
 	    {
 		sprintf(errbuf, "socket() failed: %s", strerror(errno));
@@ -798,9 +798,14 @@ u_short port;
 	 * AIX 4.1.5 doesn't like not having it tho.. I have no clue why -kalt
 	 */
 	bzero((char *)&sk, sizeof(sk));
-	sk.sin_family = AF_INET;
+	sk.SIN_FAMILY = AFINET;
+#if defined(INET6)
+	if(!inet_pton(AF_INET6, ourIP, sk.sin6_addr.s6_addr))
+		bcopy(minus_one, sk.sin6_addr.s6_addr, IN6ADDRSZ);
+#else
 	sk.sin_addr.s_addr = inetaddr(ourIP);
-	sk.sin_port = htons(0);
+#endif
+	sk.SIN_PORT = htons(0);
 	if (bind(fd, (SAP)&sk, sizeof(sk)) < 0)
 	    {
 		sprintf(errbuf, "bind() failed: %s", strerror(errno));
@@ -809,8 +814,13 @@ u_short port;
 		return -1;
 	    }
 	set_non_blocking(fd, theirIP, port);
+#if defined(INET6)
+	if(!inet_pton(AF_INET6, theirIP, sk.sin6_addr.s6_addr))
+		bcopy(minus_one, sk.sin6_addr.s6_addr, IN6ADDRSZ);
+#else
 	sk.sin_addr.s_addr = inetaddr(theirIP);
-	sk.sin_port = htons(port);
+#endif
+	sk.SIN_PORT = htons(port);
 	if (connect(fd, (SAP)&sk, sizeof(sk)) < 0 && errno != EINPROGRESS)
 	    {
 		sprintf(errbuf, "connect() to %s %u failed: %s", theirIP, port,
