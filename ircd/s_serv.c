@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.148 2004/02/16 02:27:42 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.149 2004/02/16 09:48:41 jv Exp $";
 #endif
 
 #include "os.h"
@@ -3593,7 +3593,9 @@ static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf)
 	/* Check if we still have space  */
 	if (pbuf - buf > BUFSIZE - (HOSTLEN + 5
 				    + 1 /* ' ' */
-				    + SIDLEN + 2 /* '(SID)' */
+				    + 10 /* 2147483647 */
+				    + 1 /* ' ' */
+				    + SIDLEN /* '(SID)' */
 				    + 1 /* ' ' */
 				    + sizeof(root->serv->verstr)
 				    + 6 /* ' BURST' */
@@ -3607,15 +3609,18 @@ static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf)
         *pbuf= '\0';
 	if (IsMasked(root))
 	{
-		sprintf(pbuf, "%s %s%s", root->serv->sid, root->serv->verstr,
-				IsBursting(root) ? " BURST" : "");
+		sprintf(pbuf, "%s %d %s%s", root->serv->sid,
+			 root->serv->usercnt[0] + root->serv->usercnt[1],
+			 root->serv->verstr,
+			 IsBursting(root) ? " BURST" : "");
 	}
 	else
 	{
-		sprintf(pbuf, "%s (%s)%s%s%s", root->name, root->serv->sid,
-				      	root->serv->verstr[0] ? " " : "",
-				      	root->serv->verstr,
-					IsBursting(root) ? " BURST" : "");
+		sprintf(pbuf, "%s %d %s %s%s%s", root->name, root->serv->sid,
+			  root->serv->usercnt[0] + root->serv->usercnt[2],
+			  root->serv->verstr[0] ? " " : "",
+			  root->serv->verstr,
+			  IsBursting(root) ? " BURST" : "");
 	}
 
 	sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
