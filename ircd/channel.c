@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.253 2005/02/10 17:53:56 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.254 2005/02/10 18:08:20 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2465,7 +2465,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	char nbuf[BUFSIZE], *q, *name, *target, mbuf[MAXMODEPARAMS + 1];
+	char *name, *target, mbuf[MAXMODEPARAMS + 1];
 	char uidbuf[BUFSIZE], *u;
 	char *p = NULL;
 	int chop, cnt = 0;
@@ -2510,7 +2510,6 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return 0;
 	}
 
-	*nbuf = '\0'; q = nbuf;
 	*uidbuf = '\0'; u = uidbuf;
  	/* 17 comes from syntax ": NJOIN  :,@@+\r\n\0" */ 
 	maxlen = BUFSIZE - 17 - strlen(parv[0]) - strlen(parv[1]) - NICKLEN;
@@ -2603,41 +2602,26 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* build buffer for NJOIN and UID capable servers */
 
 		/* send it out if too big to fit buffer */
-		if (MAX(q-nbuf, u-uidbuf) >= maxlen)
+		if (u-uidbuf >= maxlen)
 		{
-			*q = '\0';
 			*u = '\0';
-			sendto_match_servs_notv(chptr, cptr, SV_UID,
-				":%s NJOIN %s :%s",
-				parv[0], parv[1], nbuf);
 			sendto_match_servs_v(chptr, cptr, SV_UID,
 				":%s NJOIN %s :%s",
 				sptr->serv->sid, parv[1], uidbuf);
-			*nbuf = '\0'; q = nbuf;
 			*uidbuf = '\0'; u = uidbuf;
 		}
 
-		if (q != nbuf)
+		if (u != uidbuf)
 		{
-			*q++ = ',';
 			*u++ = ',';
 		}
 
 		/* Copy the modes. */
 		for (; target < name; target++)
 		{
-			*q++ = *target;
 			*u++ = *target;
 		}
 
-		/* For 2.10 server. */
-		target = acptr->name;
-		while (*target)
-		{
-			*q++ = *target++;
-		}
-
-		/* For 2.11 servers. */
 		target = acptr->user ? acptr->user->uid : acptr->name;
 		while (*target)
 		{
@@ -2712,12 +2696,9 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				       sptr->name, parv[1], modebuf, parabuf);
 
 	/* send NJOIN */
-	*q = '\0';
 	*u = '\0';
-	if (nbuf[0])
+	if (uidbuf[0])
 	{
-		sendto_match_servs_notv(chptr, cptr, SV_UID, ":%s NJOIN %s :%s",
-			parv[0], parv[1], nbuf);
 		sendto_match_servs_v(chptr, cptr, SV_UID, ":%s NJOIN %s :%s",
 			sptr->serv->sid, parv[1], uidbuf);
 	}
@@ -2823,7 +2804,6 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	*tmp, *tmp2;
 	char	*sender;
 	char	nbuf[BUFSIZE+1];
-	char	obuf[BUFSIZE+1];
 	int	clen, maxlen;
 
 	if (IsServer(sptr))
@@ -2894,7 +2874,6 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 		clen = maxlen - strlen(name) - 1; /* for comma, see down */
 		nbuf[0] = '\0';
-		obuf[0] = '\0';
 		tmp = mystrdup(parv[2]);
 		for (tmp2 = tmp; (user = strtoken(&p2, tmp2, ",")); tmp2 = NULL)
 		    {
@@ -2909,7 +2888,7 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					":%s KICK %s %s :%s", sptr->name,
 					name, who->name, comment);
 
-				/* nick buffer to kick out, build for 2.11 */
+				/* Nick buffer to kick out. */
 				/* as we need space for ",nick", we should add
 				** 1 on the left side; instead we subtracted 1
 				** on the right side, before the loop. */
@@ -2928,22 +2907,6 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				strcat(nbuf, who->user ? who->user->uid :
 					who->name);
 
-				/* nick buffer to kick out, build for 2.10 */
-				/* same thing with +/- 1 for comma as above */
-				if (strlen(obuf) + strlen(who->name) >= clen)
-				{
-					sendto_match_servs_notv(chptr, cptr,
-						SV_UID, ":%s KICK %s %s :%s",
-						sptr->name, name, obuf,
-						comment);
-					obuf[0] = '\0';
-				}
-				if (*obuf)
-				{
-					strcat(obuf, ",");
-				}
-				strcat(obuf, who->name);
-
 				/* kicking last one out may destroy chptr */
 				if (chptr->users == 1)
 				{
@@ -2955,15 +2918,6 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 							sender, name,
 							nbuf, comment);
 						nbuf[0] = '\0';
-					}
-					if (*obuf)
-					{
-						sendto_match_servs_notv(chptr,
-							cptr, SV_UID,
-							":%s KICK %s %s :%s",
-							sptr->name, name,
-							obuf, comment);
-						obuf[0] = '\0';
 					}
 				}
 				remove_user_from_channel(who, chptr);
@@ -2990,12 +2944,6 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			sendto_match_servs_v(chptr, cptr, SV_UID,
 				":%s KICK %s %s :%s", sender, name,
 				nbuf, comment);
-		}
-		if (*obuf)
-		{
-			sendto_match_servs_notv(chptr, cptr, SV_UID,
-				":%s KICK %s %s :%s", sptr->name, name,
-				 obuf, comment);
 		}
 	    } /* loop on parv[1] */
 
