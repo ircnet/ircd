@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.72 2004/06/11 23:22:34 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.73 2004/06/25 18:02:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1163,12 +1163,20 @@ static int connlog;
 void	logfiles_open(void)
 {
 #ifdef  FNAME_USERLOG
-	userlog = open(FNAME_USERLOG, O_WRONLY|O_APPEND|O_NDELAY);
+	userlog = open(FNAME_USERLOG, O_WRONLY|O_APPEND|O_NDELAY
+# ifdef	LOGFILES_ALWAYS_CREATE
+			|O_CREAT, S_IRUSR|S_IWUSR
+# endif
+			);
 #else
 	userlog = -1;
 #endif
 #ifdef  FNAME_CONNLOG
-	connlog = open(FNAME_CONNLOG, O_WRONLY|O_APPEND|O_NDELAY);
+	connlog = open(FNAME_CONNLOG, O_WRONLY|O_APPEND|O_NDELAY
+# ifdef	LOGFILES_ALWAYS_CREATE
+		|O_CREAT, S_IRUSR|S_IWUSR
+# endif
+			);
 #else
 	connlog = -1;
 #endif
