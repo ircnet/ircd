@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.80 1999/06/27 17:53:26 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.81 1999/07/02 16:30:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -822,13 +822,21 @@ char	*parv[];
 		sptr->flags |= FLAGS_KILLED;
 		return exit_client(cptr, sptr, &me, "Nick/Server collision");
 	    }
+	if ((acptr = get_history(nick, (long)(KILLCHASETIMELIMIT))) &&
+	    !MyConnect(acptr))  
+		/*
+		** Lock nick for KCTL so one cannot nick collide (due to kill
+		** chase) people who recently changed their nicks. --Beeth
+		*/
+		delayed = 1;
+	else
+		delayed = find_history(nick, (long)DELAYCHASETIMELIMIT);
 	/*
 	** Nick is free, and it comes from another server or
 	** it has been free for a while here
 	*/
 	if (!(acptr = find_client(nick, NULL)) &&
-	    (IsServer(cptr) || !(bootopt & BOOT_PROT) ||
-	     !(delayed = find_history(nick, (long)DELAYCHASETIMELIMIT))))
+	    (IsServer(cptr) || !(bootopt & BOOT_PROT) || !delayed))
 		goto nickkilldone;  /* No collisions, all clear... */
 	/*
 	** If acptr == sptr, then we have a client doing a nick
