@@ -14,6 +14,9 @@
 
 	* s_serv.c/trace_one(): removed duplicated argument causing core.
 	* channel.c/set_mode(): use ->uid only if it HasUID (from Zobo).
+	* s_conf.c/find_kill(): don't check interval if TIMEDKLINE is not
+	  defined.
+	* s_conf.c/check_time_interval(): surround it by #ifdef TIMEDKLINE.
 
 2002-07-04  Jakub Vlasek
 
