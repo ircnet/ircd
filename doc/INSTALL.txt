@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.56 2004/03/24 18:59:55 chopin Exp $
+  $Id: INSTALL.txt,v 1.57 2004/04/02 21:26:57 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0.
 
@@ -413,8 +413,8 @@
 
      FFoorrmmaatt
 
-        P:<Internet IP#>:<*>::<Port>:<Flags>:
-        P:<Directory>:<*>:<*>:<Port>:<Flags>:
+        P:<Internet IP#>:::<Port>::<Flags>
+        P:<Directory>:::<Port>::<Flags>
 
 
 

@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-16816/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-22355/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.56 2004/03/24 18:59:54 chopin Exp $
+     $Id: INSTALL.info,v 1.57 2004/04/02 21:26:57 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0.
 
@@ -511,8 +511,7 @@ Port connections
      connections on as well as extra internet ports.
 
 `Format'
-     P:<Internet IP#>:<*>::<Port>:<Flags>:
-     P:<Directory>:<*>:<*>:<Port>:<Flags>:
+     P:<Internet IP#>:::<Port>::<Flags> P:<Directory>:::<Port>::<Flags>
 
 
    * Internet Ports
@@ -1694,21 +1693,21 @@ Node: The ircd-conf file11052
 Node: Machine information12901
 Node: Administrative info15516
 Node: Port connections17667
-Node: Connection Classes19830
-Node: Client connections24957
-Node: Operator priviliges30691
-Node: Excluded accounts32864
-Node: Server connections36776
-Node: Deny auto-connections45404
-Node: Hub connections46778
-Node: Leaf connections48266
-Node: Version limitations50350
-Node: Excluded machines52108
-Node: Service connections53413
-Node: Bounce server55007
-Node: Related resources56868
-Node: Reporting a bug57907
-Node: How to report a bug58164
-Node: Where to send a bug report59175
+Node: Connection Classes19816
+Node: Client connections24943
+Node: Operator priviliges30677
+Node: Excluded accounts32850
+Node: Server connections36762
+Node: Deny auto-connections45390
+Node: Hub connections46764
+Node: Leaf connections48252
+Node: Version limitations50336
+Node: Excluded machines52094
+Node: Service connections53399
+Node: Bounce server54993
+Node: Related resources56854
+Node: Reporting a bug57893
+Node: How to report a bug58150
+Node: Where to send a bug report59161
 
 End Tag Table
