@@ -218,7 +218,7 @@
 #endif
 
 #if defined(INET6) && defined(CLIENT_COMPILE)
-# if (defined(linux) || defined(__NetBSD__)) && HAVE_RESOLV_H
+# if (defined(linux) || defined(__NetBSD__)) || defined(osf) && HAVE_RESOLV_H
 #  include <resolv.h>
 # endif
 # if HAVE_ARPA_NAMESER_H
