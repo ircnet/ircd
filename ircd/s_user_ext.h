@@ -43,6 +43,7 @@ EXTERN int m_notice (aClient *cptr, aClient *sptr, int parc,
 EXTERN int m_who (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_whois (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_user (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_post (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_quit (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_kill (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_away (aClient *cptr, aClient *sptr, int parc, char *parv[]);
