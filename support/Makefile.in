@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.12 1997/09/12 17:59:29 kalt Exp $
+#*   $Id: Makefile.in,v 1.13 1997/09/13 15:07:28 kalt Exp $
 #*
 #*/
 
@@ -28,7 +28,7 @@ exec_prefix = @exec_prefix@
 
 CC = @CC@
 S_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common @IRC_ZLIB_INCLUDE@
-CC_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common @IRC_ZLIB_INCLUDE@
+CC_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common
 C_CFLAGS = @CFLAGS@ -I. -I../irc -I../common
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
@@ -105,7 +105,7 @@ $(SERVER): $(SERVER_COMMON_OBJS) $(SERVER_OBJS)
 
 $(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 	$(RM) $@
-	$(CC) $(LDFLAGS) -o $@ $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -DCHKCONF_COMPILE -o $@ $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS) $(LIBS)
 
 install: install-client install-server
 
