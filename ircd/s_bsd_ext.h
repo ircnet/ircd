@@ -62,7 +62,7 @@ EXTERN void get_my_name __P((aClient *cptr, char *name, int len));
 EXTERN int setup_ping __P((aConfItem *aconf));
 EXTERN void send_ping __P((aConfItem *aconf));
 #if defined(ENABLE_SUMMON) || defined(ENABLE_USERS)
-EXTERN int utmp_open()
+EXTERN int utmp_open();
 EXTERN int utmp_read __P((int fd, char *name, char *line, char *host,
 			  int hlen));
 EXTERN int utmp_close(int fd);
