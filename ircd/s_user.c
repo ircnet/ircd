@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.197 2004/03/18 00:54:46 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.198 2004/03/21 00:52:39 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -822,6 +822,14 @@ int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Link	*lp = NULL;
 	int	donickname;
 
+	if (MyConnect(cptr) && IsUnknown(cptr) &&
+		IsConfServeronly(cptr->acpt->confs->value.aconf))
+	{
+		sendto_flag(SCH_LOCAL, "User connection to server-only P-line "
+			"from %s", get_client_host(cptr));
+		find_bounce(cptr, -1, -1);
+		return exit_client(NULL, cptr, &me, "Server only port");
+	}
 	if (IsService(sptr))
    	    {
 		sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, BadTo(parv[0]));
@@ -2332,6 +2340,14 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	int	what,i;
 	char 	*s;
 
+	if (MyConnect(cptr) && IsUnknown(cptr) &&
+		IsConfServeronly(cptr->acpt->confs->value.aconf))
+	{
+		sendto_flag(SCH_LOCAL, "User connection to server-only P-line "
+			"from %s", get_client_host(cptr));
+		find_bounce(cptr, -1, -1);
+		return exit_client(NULL, cptr, &me, "Server only port");
+	}
 	/* Reject new USER */
 	if (IsServer(sptr) || IsService(sptr) || sptr->user)
 	    {
