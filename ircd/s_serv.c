@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.9 1997/05/14 19:52:49 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.10 1997/05/15 13:49:09 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -387,10 +387,10 @@ char	*parv[];
 			** which we got the SERVER message.  Thus we canNOT
 			** `return' yet! -krys
 			*/
+			strcpy(buf, get_client_name(bcptr, TRUE));
 			sendto_flag(SCH_ERROR,
 			    "Link %s cancelled, server %s reintroduced by %s",
-				    get_client_name(bcptr, TRUE), host,
-				    get_client_name(cptr, TRUE));
+				    buf, host, get_client_name(cptr, TRUE));
 			(void) exit_client(bcptr, bcptr, &me, "Server Exists");
 		    }
 	    }
