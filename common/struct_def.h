@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.72 2003/07/18 17:31:31 chopin Exp $
+ *   $Id: struct_def.h,v 1.73 2003/07/18 19:40:23 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -63,7 +63,7 @@ typedef struct        LineItem aExtData;
 #define	BANLEN		(USERLEN + NICKLEN + HOSTLEN + 3)
 #define MAXPENALTY	10
 #define	CHIDLEN		5		/* WARNING: *DONT* CHANGE THIS!!!! */
-#define	SIDLEN		3		/* WARNING: *DONT* CHANGE THIS!!!! */
+#define	SIDLEN		4		/* WARNING: *DONT* CHANGE THIS!!!! */
 #define	MAXMODEPARAMS	3		/* WARNING: *DONT* CHANGE THIS!!!! */
 
 #define	READBUF_SIZE	16384	/* used in s_bsd.c *AND* s_zip.c ! */
@@ -430,10 +430,11 @@ struct	Server	{
 	aClient	*maskedby;	/* Pointer to server masking this server.
 				** Self if not masked, *NEVER* NULL. */
 	char	by[NICKLEN+1];
-	char	tok[6];		/* This is the prepared token we'll be
+	char	tok[7];		/* This is the prepared token we'll be
 				** sending to 2.10 servers.
 				** Note: The size of this depends on the 
-				** on idtol(), with n set to SIDLEN. */
+				** on idtol(), with n set to SIDLEN.
+				** To be exact: strlen(CHIDNB^(SIDLEN-1))+1 */
 	char	sid[SIDLEN + 1];/* The Server ID. */
 	char	verstr[11];	/* server version, PATCHLEVEL format */
 	u_int	sidhashv;	/* Raw hash value. */

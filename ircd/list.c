@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.23 2002/11/24 15:28:57 jv Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.24 2003/07/18 19:40:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -46,8 +46,8 @@ int	numclients = 0;
 ** with tokens (ie. 2.10).
 */
 
-#if CHIDNB == 36 && SIDLEN == 3
-# define MAX210SERVERS 1296
+#if CHIDNB == 36 && SIDLEN == 4
+# define MAX210SERVERS 46656
 #else
 # error Fix MAX210SERVERS.
 #endif
