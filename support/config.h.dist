@@ -111,6 +111,10 @@
 /* If you want tklines to be limited in time, define this (seconds). */
 /* #define TKLINE_MAXTIME 86400 */
 
+/* Choose tkill notices to be sent either to &OPER or &NOTICES */
+/* #define SCH_TKILL SCH_OPER */
+#define SCH_TKILL SCH_NOTICE
+
 /* 
  * Operator rights can be precisely defined in O:line flags. However
  * if you undefine any of the following, it will make given function
@@ -804,4 +808,8 @@
 
 #if defined(TKLINE_MAXTIME) && (TKLINE_MAXTIME + 0) == 0
 #undef TKLINE_MAXTIME
+#endif
+
+#if !defined(SCH_TKILL)
+#define SCH_TKILL SCH_NOTICE
 #endif
