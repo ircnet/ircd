@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.112 2004/06/19 17:40:52 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.113 2004/06/19 17:46:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1045,6 +1045,10 @@ int	rehash(aClient *cptr, aClient *sptr, int sig)
 
 	if (sig == 'd')
 		flush_cache();
+#ifdef TKLINE
+	if (sig == 't')
+		tkline_expire(1);
+#endif
 	(void) initconf(0);
 	close_listeners();
 
