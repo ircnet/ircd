@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.72 1999/07/18 01:26:03 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.73 1999/07/23 17:15:14 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -226,14 +226,15 @@ int	port;
 	if (port)
 	    {
 		server.SIN_FAMILY = AFINET;
-		if (!ip || !isdigit(*ip))
 #ifdef INET6
+		if (!ip || (!isxdigit(*ip) && *ip != ':'))
 			server.sin6_addr = in6addr_any;
 		else
 			if(!inet_pton(AF_INET6, ip, server.sin6_addr.s6_addr))
 				bcopy(minus_one, server.sin6_addr.s6_addr,
 				      IN6ADDRSZ);
 #else
+		if (!ip || !isdigit(*ip))
 			server.sin_addr.s_addr = INADDR_ANY;
 		else
 			server.sin_addr.s_addr = inetaddr(ip);
