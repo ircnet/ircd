@@ -1,3 +1,11 @@
+2004-02-13  Jakub Vlasek
+
+	* s_serv.c/dump_map(): Make *prevserver NULL after processing it.
+	* s_serv.c/m_squit(): Handle SQUIT sent by remote server. Send SID
+	  to 2.11 servers in SQUIT message.
+	* s_misc.c/exit_client(): Send SQUIT to remote server when closing
+	  link.
+
 2004-02-11  Piotr Kucharski
 
 	* parse.c: unick requires registered connection (msgtab).
