@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.98 2004/03/14 17:45:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.99 2004/03/19 00:32:40 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1428,6 +1428,7 @@ int 	initconf(int opt)
 					bconf->class->links -= bconf->clients;
 					bconf->class = aconf->class;
 					bconf->class->links += bconf->clients;
+					bconf->flags = aconf->flags;
 				    }
 				free_conf(aconf);
 				aconf = bconf;
