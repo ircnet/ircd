@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.69 2001/12/20 22:42:26 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.70 2001/12/23 03:52:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -34,6 +34,7 @@ static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.69 2001/12/20 22:42:26 q Exp $";
 static	char	buf[BUFSIZE];
 
 static	int	check_link __P((aClient *));
+static	int	get_version __P((char *version, char *id));
 
 /*
 ** m_functions execute protocol messages on this server:
@@ -283,6 +284,62 @@ char	*parv[];
     }
 
 /*
+** get_version()
+** Tries to guess what version or, rather, what
+** capabilities remote server has.
+*/
+static int	get_version(version, id)
+char	*version;
+char	*id;
+{
+	int result = 0;
+
+	if (!strncmp(version, "0210", 4))
+	{
+		int vers;
+
+		vers = atoi(version+4);
+ 		if (vers < 20000)
+		{
+			/* earlier than 2.10.2 would kill saved users */
+			result = SV_OLD;
+		}
+		else if (vers >= 990000)
+		{
+			/* alpha/beta of 2.11 */
+			result = SV_2_11;
+		}
+		else
+		{
+			/* plain 2.10 */
+			result = SV_2_10;
+		}
+	}
+	else if (!strncmp(version, "021", 3))
+	{
+		/* 2.11 or newer (you wish!) */
+		/* btw, it will work until we do 2.20+ or 3.0+ version */
+		result = SV_2_11;
+	}
+	else
+	{
+		/* if it doesn't match above, it is too old
+		   to coexist with us, sorry! */
+		result = SV_OLD;
+	}
+
+	if ((!id || !strcmp("IRC", id))
+		&& !strncmp(version, "02100", 5)
+		&& atoi(version+5) < 20600)
+	{
+		/* before 2.10.3a6 ( 2.10.3a5 is just broken ) */
+		result |= SV_OLDSQUIT;
+	}
+
+	return result;
+}
+
+/*
 ** check_version
 **      The PASS command delivers additional information about incoming
 **	connection. The data is temporarily stored to info/name/username
@@ -317,21 +374,7 @@ aClient	*cptr;
 	else
 		id = "";
 
-	if (!strncmp(cptr->info, "021099", 6))
-		cptr->hopcount = SV_2_10|SV_UID;
-	else if (!strncmp(cptr->info, "0210", 4))
-		cptr->hopcount = SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN; /* SV_2_10*/
-	else if (!strncmp(cptr->info, "021", 3))
-		cptr->hopcount = SV_2_10|SV_UID;
-	else if (!strncmp(cptr->info, "0209", 4))
-		cptr->hopcount = SV_29|SV_OLDSQUIT;	/* 2.9+ protocol */
-	else
-		cptr->hopcount = SV_OLD; /* uhuh */
-
-	if (!strcmp("IRC", id) && !strncmp(cptr->info, "02100", 5) &&
-	    atoi(cptr->info+5) < 20600)
-		/* before 2.10.3a6 ( 2.10.3a5 is just broken ) */
-		cptr->hopcount |= SV_OLDSQUIT;
+	cptr->hopcount = get_version(cptr->info, id);
 
 	/* Check version number/mask from conf */
 	sprintf(buf, "%s/%s", id, cptr->info);
