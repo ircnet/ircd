@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.60 1999/05/01 21:29:14 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.61 1999/06/07 21:01:58 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -904,12 +904,14 @@ Reg	aClient	*cptr;
 			** These are only true when *BOTH* NICK and USER have
 			** been received. -avalon
 			*/
+#ifndef NO_USRTOP
 			if (acptr->user->servp->userlist == NULL)
 				sendto_flag(SCH_ERROR,
 			    "ERROR: USER:%s without SERVER:%s(%d) (to %s)",
 					    acptr->name, acptr->user->server,
 					    acptr->user->servp->tok,
 					    cptr->name);
+#endif
 			if (*mlname == '*' &&
 			    match(mlname, acptr->user->server) == 0)
 				stok = me.serv->tok;

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.26 1999/01/13 02:14:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.27 1999/06/07 21:01:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -476,10 +476,12 @@ char	*comment;	/* Reason for the exit */
 			for (asptr = svrtop; asptr; asptr = (aServer *)next)
 			    {
 				next = (aClient *)asptr->nexts;
-				if ((asptr->userlist == NULL)
-				    || (asptr->bcptr == NULL)
-				    || (asptr->bcptr->from != sptr
-					&& asptr->bcptr != sptr))
+				if ((asptr->bcptr == NULL) ||
+#ifndef NO_USRTOP
+				    (asptr->userlist == NULL) ||
+#endif
+				    (asptr->bcptr->from != sptr
+				     && asptr->bcptr != sptr))
 					continue;
 				/*
 			        ** This version doesn't need QUITs to be
@@ -491,6 +493,7 @@ char	*comment;	/* Reason for the exit */
 					flags |= FLAGS_SPLIT | FLAGS_HIDDEN;
 				else
 					flags |= FLAGS_SPLIT;
+#ifndef NO_USRTOP
 				do
 				    {
 					acptr = asptr->userlist->bcptr;
@@ -499,6 +502,15 @@ char	*comment;	/* Reason for the exit */
 							comment1);
 				    }
 				while (asptr->userlist);
+#else
+				while (GotDependantClient(asptr->bcptr))
+				    {
+					acptr = asptr->bcptr->prev;
+					acptr->flags |= flags;
+					exit_one_client(NULL, acptr, &me,
+							comment1);
+				    }
+#endif
 			    }
 			/* Here is more..
 			** I don't know what use this can have for now, but
@@ -546,6 +558,8 @@ char	*comment;	/* Reason for the exit */
 			** server.
 			** Avalon made me do it. ;) -krys
 			*/
+# ifndef NO_USRTOP
+			/* no need, if using new code */
 			for (asvptr = svctop; asvptr; asvptr =(aService *)next)
 			    {
 				next = (aClient *)asvptr->nexts;
@@ -554,6 +568,7 @@ char	*comment;	/* Reason for the exit */
 					exit_one_client(NULL, acptr, &me,
                                                         comment1);
 			    }
+# endif
 #endif
 			/*
 			** Second SQUIT all servers behind this link
@@ -573,6 +588,7 @@ char	*comment;	/* Reason for the exit */
 		    } /* If (IsServer(sptr)) */
 	    } /* if (MyConnect(sptr) || (sptr->flags & FLAGS_HELD)) */
 
+#ifndef NO_USRTOP
  	if (IsServer(sptr) && sptr->serv->userlist)
  	{
  		/*
@@ -601,6 +617,35 @@ char	*comment;	/* Reason for the exit */
  		}
  		while (sptr->serv->userlist);
  	}
+#else
+ 	if (IsServer(sptr) && GotDependantClient(sptr))
+ 	{
+ 		/*
+		** generate QUITs locally when receiving a SQUIT
+		** check for hostmasking.
+ 		*/
+ 		if (mark_blind_servers(cptr, sptr->name))
+ 			flags = FLAGS_SPLIT | FLAGS_HIDDEN;
+ 		else
+ 			flags = FLAGS_SPLIT;
+
+		if (IsServer(from))
+			/* this is a guess */
+			(void)strcpy(comment1, from->name);
+		else
+			/* this is right */
+			(void)strcpy(comment1, sptr->serv->up);
+ 		(void)strcat(comment1, " ");
+ 		(void)strcat(comment1, sptr->name);
+
+		while (GotDependantClient(sptr))
+ 		{
+ 			acptr = sptr->prev;
+ 			acptr->flags |= flags;
+			exit_one_client(cptr, acptr, &me, comment1);
+ 		}
+ 	}
+#endif
  	
 	/*
 	** Try to guess from comment if the client is exiting

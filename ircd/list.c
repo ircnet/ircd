@@ -37,7 +37,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.7 1998/12/28 15:44:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.8 1999/06/07 21:01:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -55,7 +55,9 @@ static	struct	liststats {
 
 #endif
 
+#ifndef NO_USRTOP
 anUser	*usrtop = NULL;
+#endif
 aServer	*svrtop = NULL;
 
 int	numclients = 0;
@@ -90,11 +92,12 @@ void	checklists()
 		if (sp->bcptr->serv != sp)
 			Debug((DEBUG_ERROR, "svrtop: %#x->%#x->%#x != %#x",
 				sp, sp->bcptr, sp->bcptr->serv, sp));
-	
+#ifndef NO_USRTOP
 	for (up = usrtop; up; up = up->nextu)
 		if (up->bcptr->user != up)
 			Debug((DEBUG_ERROR, "usrtop: %#x->%#x->%#x != %#x",
 				up, up->bcptr, up->bcptr->user, up));
+#endif
 }
 #endif
 	
@@ -191,8 +194,10 @@ aClient *cptr;
 		user->invited = NULL;
 		user->uwas = NULL;
 		cptr->user = user;
+#ifndef NO_USRTOP
 		user->nextu = NULL;
 		user->prevu = NULL;
+#endif
 		user->servp = NULL;
 		user->bcptr = cptr;
 		if (cptr->next)	/* the only cptr->next == NULL is me */
@@ -213,7 +218,9 @@ aClient	*cptr;
 		servs.inuse++;
 #endif
 		serv->user = NULL;
+#ifndef NO_USRTOP
 		serv->userlist = NULL;
+#endif
 		serv->snum = -1;
 		*serv->by = '\0';
 		*serv->tok = '\0';
@@ -279,14 +286,22 @@ aClient	*cptr;
 		 */
 		if (user->joined || user->refcnt < 0 ||
 		    user->invited || user->channel || user->uwas ||
-		    user->bcptr || user->prevu || user->nextu)
+#ifndef NO_USRTOP
+		    user->prevu || user->nextu ||
+#endif
+		    user->bcptr)
 		    {
 			char buf[512];
 			/*too many arguments for dumpcore() and sendto_flag()*/
 			SPRINTF(buf, "%#x %#x %#x %#x %d %d %#x %#x %#x (%s)",
 				user, user->invited, user->channel, user->uwas,
 				user->joined, user->refcnt,
-				user->prevu, user->nextu, user->bcptr,
+#ifndef NO_USRTOP
+				user->prevu, user->nextu,
+#else
+				0, 0,
+#endif
+				user->bcptr,
 				(user->bcptr) ? user->bcptr->name :"none");
 #ifdef DEBUGMODE
 			dumpcore("%#x user (%s!%s@%s) %s",
@@ -313,12 +328,21 @@ aClient	*cptr;
 	if (--serv->refcnt <= 0)
 	    {
 		if (serv->refcnt < 0 ||	serv->prevs || serv->nexts ||
-		    serv->bcptr || serv->userlist || serv->user)
+		    serv->bcptr ||
+#ifndef NO_USRTOP
+		    serv->userlist ||
+#endif
+		    serv->user)
 		    {
 			char buf[512];
 			SPRINTF(buf, "%d %#x %#x %#x %#x %#x (%s)",
 				serv->refcnt, serv->prevs, serv->nexts,
-				serv->userlist, serv->user, serv->bcptr,
+#ifndef NO_USRTOP
+				serv->userlist,
+#else
+				0,
+#endif
+				serv->user, serv->bcptr,
 				(serv->bcptr) ? serv->bcptr->name : "none");
 #ifdef DEBUGMODE
 			dumpcore("%#x server %s %s",
@@ -360,6 +384,7 @@ Reg	aClient	*cptr;
 	if (cptr->user)
 	    {
 		istat.is_users--;
+#ifndef NO_USRTOP		
 		/*
 		** has to be removed from the list of aUser structures,
 		** be careful of user->servp->userlist
@@ -382,6 +407,7 @@ Reg	aClient	*cptr;
 		    }
 		cptr->user->prevu = NULL;
 		cptr->user->nextu = NULL;
+#endif
 		
 		/* decrement reference counter, and eventually free it */
 		cptr->user->bcptr = NULL;
@@ -390,15 +416,17 @@ Reg	aClient	*cptr;
 
 	if (cptr->serv)
 	    {
+#ifndef NO_USRTOP
 		if (cptr->serv->userlist)
-#ifdef DEBUGMODE
+# ifdef DEBUGMODE
 			dumpcore("%#x server %s %#x",
 				 cptr, cptr ? cptr->name : "<noname>",
 				 cptr->serv->userlist);
-#else
+# else
 			sendto_flag(SCH_ERROR, "* %#x server %s %#x *",
 				    cptr, cptr ? cptr->name : "<noname>",
 				    cptr->serv->userlist);
+# endif
 #endif
 
 		/* has to be removed from the list of aServer structures */
@@ -442,6 +470,50 @@ Reg	aClient	*cptr;
 	return;
 }
 
+#ifdef NO_USRTOP
+/*
+ * move the client aClient struct before its server's
+ */
+void	reorder_client_in_list(cptr)
+aClient	*cptr;
+{
+    if (cptr->user == NULL && cptr->service == NULL)
+	    return;
+
+    /* update neighbours */
+    if (cptr->next)
+	    cptr->next->prev = cptr->prev;
+    if (cptr->prev)
+	    cptr->prev->next = cptr->next;
+    else
+	    client = cptr->next;
+
+    /* re-insert */
+    if (cptr->user)
+	{
+	    cptr->next = cptr->user->servp->bcptr;
+	    cptr->prev = cptr->user->servp->bcptr->prev;
+#ifdef DEBUGMODE
+	    sendto_flag(SCH_DEBUG, "%p [%s] moved before server: %p [%s]", 
+			cptr, cptr->name, cptr->user->servp->bcptr, 
+			cptr->user->servp->bcptr->name);
+#endif
+	}
+    else if (cptr->service)
+	{
+	    cptr->next = cptr->service->servp->bcptr;
+	    cptr->prev = cptr->service->servp->bcptr->prev;
+	}
+
+    /* update new neighbours */
+    if (cptr->prev)
+	    cptr->prev->next = cptr;
+    else
+	    client = cptr;
+    cptr->next->prev = cptr;
+}
+#endif
+
 /*
  * although only a small routine, it appears in a number of places
  * as a collection of a few lines...functions like this *should* be
@@ -461,10 +533,13 @@ aClient	*cptr;
 		istat.is_remc++;
 	if (cptr->user)
 		istat.is_users++;
+	
 	cptr->next = client;
 	client = cptr;
+	
 	if (cptr->next)
 		cptr->next->prev = cptr;
+
 	numclients++;
 	return;
 }

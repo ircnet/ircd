@@ -364,7 +364,9 @@ struct	User	{
 				** not yet be in links while USER is
 				** introduced... --msa
 				*/
+#ifndef NO_USRTOP
 	struct	User	*nextu, *prevu;
+#endif
 	aClient	*bcptr;
 	char	username[USERLEN+1];
 	char	host[HOSTLEN+1];
@@ -373,7 +375,9 @@ struct	User	{
 
 struct	Server	{
 	anUser	*user;		/* who activated this connection */
+#ifndef NO_USRTOP
 	anUser  *userlist;      /* first user on this server in the user list*/
+#endif
 	char	*up;	/* uplink for this server */
 	aConfItem *nline;	/* N-line pointer for this server */
 	int	version;        /* version id for local client */
@@ -660,6 +664,12 @@ struct Channel	{
 #define	MyOper(x)			(MyConnect(x) && IsOper(x))
 #define	MyService(x)			(MyConnect(x) && IsService(x))
 #define	ME	me.name
+
+#define	GotDependantClient(x)	(x->prev &&				\
+		 		 ((IsRegisteredUser(x->prev) &&		\
+				  x->prev->user->servp == x->serv) ||	\
+				  (IsRegisteredUser(x->prev) &&		\
+				  x->prev->service->servp == x->serv)))
 
 typedef	struct	{
 	u_long	is_user[2];	/* users, non[0] invis and invis[1] */

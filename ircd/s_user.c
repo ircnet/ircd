@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.74 1999/04/10 16:24:28 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.75 1999/06/07 21:01:58 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1513,7 +1513,10 @@ aClient	*sptr, *acptr;
 		0,	/* joined */
 		0,	/* flags */
 		NULL,	/* servp */
-		NULL, NULL, NULL,	/* next, prev, bcptr */
+#ifndef NO_USRTOP
+		NULL, NULL,
+#endif
+		NULL,	/* next, prev, bcptr */
 		"<Unknown>",	/* user */
 		"<Unknown>",	/* host */
 		"<Unknown>",	/* server */
@@ -1817,6 +1820,9 @@ char	*parv[];
 	user->server = find_server_string(me.serv->snum);
 
 user_finish:
+#ifdef NO_USRTOP
+	reorder_client_in_list(sptr);
+#else
 	/* 
 	** servp->userlist's are pointers into usrtop linked list.
 	** Users aren't added to the top always, but only when they come
@@ -1843,6 +1849,7 @@ user_finish:
 		user->servp->userlist->prevu = user; /* next user */
 	    }
 	user->servp->userlist = user;
+#endif
 	
 	if (sptr->info != DefInfo)
 		MyFree(sptr->info);
