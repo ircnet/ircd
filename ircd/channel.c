@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.195 2004/03/17 15:06:35 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.196 2004/04/07 16:59:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -249,8 +249,7 @@ static	int	add_modeid(int type, aClient *cptr, aChannel *chptr,
 				return -1;
 			    }
 			if (type == mode->flags &&
-			    (BanMatch(mode->value.alist, modeid) ||
-			    BanMatch(modeid, mode->value.alist)))
+				BanExact(mode->value.alist, modeid))
 			    {
 				int rpl;
 
