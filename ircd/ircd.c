@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.102 2003/10/18 21:33:53 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.103 2003/10/18 21:37:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -313,7 +313,7 @@ static	time_t	try_connections(time_t currenttime)
 ** Only MAXDELAYEDKILLS at a time or all, if not defined.
 ** Returns 1, if still work to do, 0 if finished.
 */
-int delayed_klines(time_t currenttime)
+int delayed_kills(time_t currenttime)
 {
 	static	time_t	dk_rehashed = 0;	/* time of last rehash we're processing */
 	static	int	dk_lastfd;		/* fd we last checked */
