@@ -1,5 +1,5 @@
 .\" @(#)$Id ircd.8 2.0 (beta version) 29 Mar 1989 $
-.TH IRCD 8 "$Date: 1998/06/12 22:57:37 $"
+.TH IRCD 8 "$Date: 1998/08/06 02:44:24 $"
 .SH NAME
 ircd \- The Internet Relay Chat Program Server 
 .SH SYNOPSIS
@@ -31,7 +31,13 @@ and user messages are passed directly to the \fIircd\fP for processing
 and relaying to other ircd sites.  The \fIirc(1)\fP program depends upon
 there being an \fIircd\fP server running somewhere (either on your local
 UNIX site or a remote ircd site) so that it will have somewhere to connect
-to and thus allow the user to begin talking to other users. 
+to and thus allow the user to begin talking to other users.
+
+\fIircd\fP will reread its configuration file whenever it received a hangup
+signal, SIGHUP.
+
+Sending an interrupt signal to \fIircd\fP process will cause it to restart.
+
 .SH OPTIONS
 .TP
 .B \-a
@@ -187,7 +193,7 @@ For full COPYRIGHT see LICENSE file with IRC package.
  /etc/utmp
  "ircd.conf"
 .SH "SEE ALSO"
-irc(1) ircdwatch(8)
+iauth(8) irc(1) ircdwatch(8)
 .SH BUGS
 None... ;-) if somebody finds one, please inform author
 .SH AUTHOR

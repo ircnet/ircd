@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.8,v 1.1 1998/07/19 19:37:17 kalt Exp $
-.TH IRCD 8 "$Date: 1998/07/19 19:37:17 $"
+.\" @(#)$Id: iauth.8,v 1.2 1998/08/06 02:44:24 kalt Exp $
+.TH IRCD 8 "$Date: 1998/08/06 02:44:24 $"
 .SH NAME
 iauth \- The Internet Relay Chat Authentication Program
 .SH SYNOPSIS
@@ -15,6 +15,9 @@ iauth \- The Internet Relay Chat Authentication Program
 \fIiauth\fP is a slave process used by the \fIircd\fP program to perform
 the authentication of incoming connections.  The \fIircd\fP program starts
 \fIiauth\fP upon startup.
+
+\fIiauth\fP will close and reopen the log file whenever it receives a user
+signal 2, SIGUSR2.  This is useful to rotate the log file.
 .SH OPTIONS
 .TP
 .BI \-c " filename"
