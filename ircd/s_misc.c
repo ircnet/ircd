@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.55 2003/02/15 19:25:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.56 2003/02/16 03:53:12 jv Exp $";
 #endif
 
 #include "os.h"
@@ -571,6 +571,7 @@ char	*comment;	/* Reason for the exit */
 			strncpyzt(comment1, comment, sizeof(comment1));
 		}
 		exit_server(sptr, sptr, comment, comment1);
+		check_split();
 		if ((cptr == sptr))
 		{
 			sendto_flag(SCH_SERVER, "Sending SQUIT %s (%s)",
@@ -579,7 +580,7 @@ char	*comment;	/* Reason for the exit */
 		}
 		return 0;
  	}
- 	
+	
 	/*
 	** Try to guess from comment if the client is exiting
 	** normally (KILL or issued QUIT), or if it is splitting
@@ -620,6 +621,8 @@ char	*comment;	/* Reason for the exit */
 	    }
 	
 	exit_one_client(cptr, sptr, from, (*comment1) ? comment1 : comment);
+	/* XXX: we probably should not call it every client exit */
+	check_split();
 	return cptr == sptr ? FLUSH_BUFFER : 0;
     }
 
@@ -938,6 +941,10 @@ void	initruntimeconf()
 {
 	memset((char *)&iconf, 0, sizeof(iconf));
 	iconf.aconnect = 1; /* default to ON */
+
+	/* Defaults set in config.h */
+	iconf.split_minservers = SPLIT_SERVERS;
+	iconf.split_minusers = SPLIT_USERS;
 }
 
 void	tstats(cptr, name)
@@ -1073,5 +1080,31 @@ char *filename;
 	    }
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
 	close(fd);
-}     
+}
 #endif
+
+void check_split()
+{
+	/* -1 for this server  */
+	if (istat.is_eobservers < iconf.split_minservers  - 1 ||
+	    istat.is_user[0] + istat.is_user[1] < iconf.split_minusers)
+	{
+		/* Split detected */
+		if (!IsSplit())
+		{
+			sendto_flag(SCH_NOTICE,
+				"Network split detected, split mode activated");
+			iconf.split = 1;
+		}
+	}
+	else
+	{
+		/* End of split */
+		if (IsSplit())
+		{
+			sendto_flag(SCH_NOTICE,
+				"Network rejoined, split mode deactivated");
+		}
+		iconf.split = 0;
+	}
+}
