@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.30 1998/09/11 21:25:19 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.31 1998/09/13 16:44:46 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -169,6 +169,7 @@ void	server_reboot()
 	(void)closelog();
 #endif
 #if defined(USE_IAUTH)
+#if 0
 	if (adfd >= 0)
 	    {
 		/* if iauth is running, it'll become a zombie unless we wait
@@ -180,6 +181,7 @@ void	server_reboot()
 		wait(NULL);
 		alarm(0);
 	    }
+#endif
 #endif
 	for (i = 3; i < MAXCONNECTIONS; i++)
 		(void)close(i);
@@ -635,7 +637,6 @@ char	*argv[];
 	(void)umask(077);                /* better safe than sorry --SRB */
 	bzero((char *)&me, sizeof(me));
 
-	setup_signals();
 	version = make_version();	/* Generate readable version string */
 
 	/*
@@ -778,6 +779,8 @@ char	*argv[];
 		    }
 		    }
 #endif
+
+	setup_signals();
 
 #ifndef IRC_UID
 	if ((uid != euid) && !euid)
@@ -1140,32 +1143,42 @@ static	void	setup_signals()
 	act.sa_handler = s_die;
 	(void)sigaddset(&act.sa_mask, SIGTERM);
 	(void)sigaction(SIGTERM, &act, NULL);
-#if defined(USE_IAUTH)
+# if defined(USE_IAUTH)
 	act.sa_handler = s_slave;
 	(void)sigaddset(&act.sa_mask, SIGUSR1);
 	(void)sigaction(SIGUSR1, &act, NULL);
-#endif
+	act.sa_handler = SIG_IGN;
+#  ifdef SA_NOCLDWAIT
+        act.sa_flags = SA_NOCLDWAIT;
+#  else
+        act.sa_flags = 0;
+#  endif
+	(void)sigaddset(&act.sa_mask, SIGCHLD);
+	(void)sigaction(SIGCHLD, &act, NULL);
+# endif
 
-#else
+#else /* POSIX_SIGNALS */
+
 # ifndef	HAVE_RELIABLE_SIGNALS
 	(void)signal(SIGPIPE, dummy);
 #  ifdef	SIGWINCH
 	(void)signal(SIGWINCH, dummy);
 #  endif
-# else
+# else /* HAVE_RELIABLE_SIGNALS */
 #  ifdef	SIGWINCH
 	(void)signal(SIGWINCH, SIG_IGN);
 #  endif
 	(void)signal(SIGPIPE, SIG_IGN);
-# endif
+# endif /* HAVE_RELIABLE_SIGNALS */
 	(void)signal(SIGALRM, dummy);   
 	(void)signal(SIGHUP, s_rehash);
 	(void)signal(SIGTERM, s_die); 
 	(void)signal(SIGINT, s_restart);
 # if defined(USE_IAUTH)
 	(void)signal(SIGUSR1, s_slave);
+	(void)signal(SIGCHLD, SIG_IGN);
 # endif
-#endif
+#endif /* POSIX_SIGNAL */
 
 #ifdef RESTARTING_SYSTEMCALLS
 	/*

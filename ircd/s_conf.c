@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.32 1998/08/24 02:26:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.33 1998/09/13 16:44:46 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -809,7 +809,7 @@ int	opt;
 	Debug((DEBUG_DEBUG, "initconf(): ircd.conf = %s", configfile));
 	if ((fd = openconf()) == -1)
 	    {
-#ifdef	M4_PREPROC
+#if defined(M4_PREPROC) && !defined(USE_IAUTH)
 		(void)wait(0);
 #endif
 		return -1;
@@ -1152,7 +1152,7 @@ int	opt;
 		free_conf(aconf);
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
 	(void)close(fd);
-#ifdef	M4_PREPROC
+#if defined(M4_PREPROC) && !defined(USE_IAUTH)
 	(void)wait(0);
 #endif
 	check_class();
@@ -1430,7 +1430,9 @@ aClient	*cptr;
 		(void)dgets(-1, NULL, 0); /* make sure buffer marked empty */
 		(void)close(pi[0]);
 		(void)kill(rc, SIGKILL); /* cleanup time */
+#if !defined(USE_IAUTH)
 		(void)wait(0);
+#endif
 
 		rc = 0;
 		while (*rplhold == ' ')
