@@ -48,7 +48,7 @@
 #define TKS_MAXARGS 250
 
 /* The version information */
-#define TKS_VERSION "Hello, i'm TkServ v1.3.6."
+#define TKS_VERSION "Hello, I'm TkServ v1.3.6+ircd211"
 
 static char *nuh;
 int fd = -1, tklined = 0;
@@ -1145,7 +1145,7 @@ int main(int argc, char *argv[])
     }
     /* register the service with SERVICE_WANT_NOTICE */
     sendto_server("PASS %s\n", TKSERV_PASSWORD);
-    sendto_server("SERVICE %s localhost %s 33554432 0 :%s\n", TKSERV_NAME, TKSERV_DIST, TKSERV_DESC);
+    sendto_server("SERVICE %s %s 33554432 :%s\n", TKSERV_NAME, TKSERV_DIST, TKSERV_DESC);
     sendto_server("SERVSET 33619968\n");
 
     timeout.tv_usec = 1000;
