@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.95 2004/03/05 22:06:10 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.96 2004/03/07 00:38:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -331,6 +331,17 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 
 		if (*aconf->host)
 		{
+#ifdef UNIXPORT
+			if (IsUnixSocket(cptr) && aconf->host[0] == '/')
+			{
+				if (match(aconf->host, uaddr+ulen))
+				{
+					/* Try another I:line. */
+					continue;
+				}
+			}
+			else
+#endif
 			if (strchr(aconf->host, '/'))	/* 1.2.3.0/24 */
 			{
 				
