@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.120 2002/03/28 22:52:37 jv Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.121 2002/03/29 01:21:35 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2979,21 +2979,48 @@ char	*parv[];
 	if (parc > 2 &&
 	    hunt_server(cptr, sptr, ":%s LIST %s %s", 2, parc, parv))
 		return 10;
+	
 	if (BadPtr(parv[1]))
+	{
+		Link *lp;
+		
+		if (!sptr->user)
+		{
+			sendto_one(sptr, replies[RPL_LISTEND], ME,
+				   BadTo(parv[0]));
+			return 2;
+		}
+		
+		/* First, show all +s/+p channels user is on */
+		for (lp = sptr->user->channel; lp; lp = lp->next)
+		{
+			chptr = lp->value.chptr;
+			if (SecretChannel(chptr) || HiddenChannel(chptr))
+			{
+				sendto_one(sptr, replies[RPL_LIST], ME,
+					   BadTo(parv[0]), chptr->chname,
+					   chptr->users, chptr->topic);
+			}
+		}
+
+		/* Second, show all visible channels; +p channels are not
+		 * reported if user is not their member - jv.
+		 */
 		for (chptr = channel; chptr; chptr = chptr->nextch)
-		    {
-			if (!sptr->user ||
-			    !chptr->users ||	/* empty locked channel */
-			    (SecretChannel(chptr) && !IsMember(sptr, chptr)))
+		{
+			if (!chptr->users ||    /* empty locked channel */
+			    SecretChannel(chptr) || HiddenChannel(chptr))
+			{
 				continue;
-			name = ShowChannel(sptr, chptr) ? chptr->chname : NULL;
-			rlen += sendto_one(sptr, replies[RPL_LIST], ME, BadTo(parv[0]),
-				   name ? name : "*", chptr->users,
-				   name ? chptr->topic : "");
-			if (!MyConnect(sptr) && rlen > CHREPLLEN)
-				break;
-		    }
-	else {
+			}
+			sendto_one(sptr, replies[RPL_LIST], ME, BadTo(parv[0]),
+				chptr->chname, chptr->users,
+				chptr->topic);
+			
+		}
+	}
+	else
+	{
 		parv[1] = canonize(parv[1]);
 		for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 		    {
@@ -3086,7 +3113,7 @@ static void names_channel(aClient *cptr, aClient *sptr, char *to,
 		*pbuf++ = ' ';
 		*pbuf++ = ':';
 		*pbuf = '\0';
-		pxlen += 4;  /* ' ' + ' ' + ':' + '\0' */
+		pxlen += 4;  /* '[=|*|@]' ' + ' ' + ':'  */
 		
 		if (IsAnonymous(chptr))
 		{
@@ -3231,8 +3258,9 @@ char	*parv[];
 				break;
 			}
 		}
-		return sent ?
-		   (int) ((float) MAXCHANNELSPERUSER / (float) MAXPENALTY) : 2;
+
+		sent = sent < 2 ? 2 : (sent * MAXCHANNELSPERUSER) / MAXPENALTY;	
+		return sent < 2 ? 2 : sent;
 	}
 	/* Client wants all nicks/channels which is seriously cpu intensive
 	 * Allowed for local clients only.
