@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: iauth.c,v 1.2 1998/08/06 02:06:12 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: iauth.c,v 1.3 1998/08/06 02:22:14 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -26,6 +26,8 @@ static  char rcsid[] = "@(#)$Id: iauth.c,v 1.2 1998/08/06 02:06:12 kalt Exp $";
 #define IAUTH_C
 #include "a_externs.h"
 #undef IAUTH_C
+
+static int do_log = 0;
 
 RETSIGTYPE dummy(s)
 int s;
@@ -60,6 +62,23 @@ int s;
 #endif
 }
 
+RETSIGTYPE s_log(s)
+int s;
+{
+# if POSIX_SIGNALS
+        struct  sigaction act;
+
+        act.sa_handler = s_log;
+        act.sa_flags = 0;
+        (void)sigemptyset(&act.sa_mask);
+        (void)sigaddset(&act.sa_mask, SIGUSR2);
+        (void)sigaction(SIGUSR2, &act, NULL);
+# else  
+        (void)signal(SIGUSR2, s_log);
+# endif
+        do_log = 1;
+}
+
 void
 init_signals()
 {
@@ -91,6 +110,9 @@ init_signals()
 	(void)sigaddset(&act.sa_mask, SIGTERM);
 	(void)sigaction(SIGTERM, &act, NULL);
 */
+	act.sa_handler = s_log;
+	(void)sigaddset(&act.sa_mask, SIGUSR2);
+	(void)sigaction(SIGUSR2, &act, NULL);
 #else
 # ifndef	HAVE_RELIABLE_SIGNALS
 	(void)signal(SIGPIPE, dummy);
@@ -109,6 +131,7 @@ init_signals()
 	(void)signal(SIGTERM, s_die); 
 	(void)signal(SIGINT, s_restart);
 */
+	(void)signal(SIGUSR2, s_log);
 #endif
 }
 
@@ -144,7 +167,7 @@ char	*argv[];
 	    }
 
 	init_signals();
-	init_log();
+	init_syslog();
 	sendto_log(ALOG_DMISC, LOG_NOTICE, "Daemon starting (%s%s).",
 		   make_version(),
 #if defined(IAUTH_DEBUG)
@@ -164,5 +187,15 @@ char	*argv[];
 		sendto_ircd("0 G");
 
 	while (1)
+	    {
 		loop_io();
+
+		if (do_log)
+		    {
+			sendto_log(ALOG_IRCD|ALOG_DMISC, LOG_INFO,
+				   "Got SIGUSR2, reinitializing log file(s).");
+			init_filelogs();
+			do_log = 0;
+		    }
+	    }
 }
