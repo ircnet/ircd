@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.200 2004/05/14 14:22:19 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.201 2004/05/18 09:56:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2693,6 +2693,8 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* send it out if too big to fit buffer */
 		if (MAX(q-nbuf, u-uidbuf) >= maxlen)
 		{
+			*q = '\0';
+			*u = '\0';
 			sendto_match_servs_notv(chptr, cptr, SV_UID,
 				":%s NJOIN %s :%s",
 				parv[0], parv[1], nbuf);
