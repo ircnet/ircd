@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.46 1999/03/07 00:30:01 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.47 1999/03/07 22:00:43 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -727,33 +727,6 @@ char	*argv[];
 	if (argc > 0)
 		bad_command(); /* This exits out */
 
-#if defined(USE_IAUTH)
-	if ((bootopt & BOOT_NOIAUTH) == 0)
-		switch (vfork())
-		    {
-		case -1:
-			fprintf(stderr, "%s: Unable to fork!", myargv[0]);
-			exit(-1);
-		case 0:
-			close(0); close(1); close(3);
-			if (execl(IAUTH_PATH, IAUTH, "-X", NULL) < 0)
-				_exit(-1);
-		default:
-		    {
-			int rc;
-			
-			(void)wait(&rc);
-			if (rc != 0)
-			    {
-				fprintf(stderr,
-					"%s: error: unable to find \"%s\".\n",
-					myargv[0], IAUTH_PATH);
-				exit(-1);
-			    }
-		    }
-		    }
-#endif
-
 	setup_signals();
 
 #ifndef IRC_UID
@@ -780,6 +753,33 @@ char	*argv[];
 	    } 
 # endif
 #endif /*CHROOTDIR/UID/GID*/
+
+#if defined(USE_IAUTH)
+	if ((bootopt & BOOT_NOIAUTH) == 0)
+		switch (vfork())
+		    {
+		case -1:
+			fprintf(stderr, "%s: Unable to fork!", myargv[0]);
+			exit(-1);
+		case 0:
+			close(0); close(1); close(3);
+			if (execl(IAUTH_PATH, IAUTH, "-X", NULL) < 0)
+				_exit(-1);
+		default:
+		    {
+			int rc;
+			
+			(void)wait(&rc);
+			if (rc != 0)
+			    {
+				fprintf(stderr,
+					"%s: error: unable to find \"%s\".\n",
+					myargv[0], IAUTH_PATH);
+				exit(-1);
+			    }
+		    }
+		    }
+#endif
 
 	/* didn't set debuglevel */
 	/* but asked for debugging output to tty */
