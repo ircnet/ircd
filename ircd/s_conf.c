@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.89 2004/03/04 21:47:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.90 2004/03/05 11:26:34 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -250,47 +250,26 @@ badmask:
 int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 {
 	Reg	aConfItem	*aconf;
-	char	*uhosts[MAXALIASES+2];
-	char	ipname[HOSTLEN+USERLEN+2];
+	char	uhost[HOSTLEN+USERLEN+2];
+	char	uaddr[HOSTLEN+USERLEN+2];
 	int	ulen = strlen(cptr->username) + 1; /* for '@' */
-	int	i, hostnum;
 	int	retval = -2; /* EXITC_NOILINE in register_user() */
 
+	/* We fill uaddr and uhost now, before aconf loop. */
+	sprintf(uaddr, "%s@%s", cptr->username, sockhost);
 	if (hp)
 	{
-		char	*hname;
+		char	fullname[HOSTLEN+1];
 
-		/* start with h_name */
-		hname = hp->h_name;
-		/* and repeat with all h_aliases */
-		/* XXX: check one day if we really need h_aliases[]
-		** to be checked against I:lines --B. */
-		for (i = 0; hname; hname = hp->h_aliases[i++])
-		{
-			char	fullname[HOSTLEN+1];
-
-			/* If not for add_local_domain, I wouldn't need this
-			** fullname. Can't we add_local_domain somewhere in
-			** dns code? --B. */
-			strncpyzt(fullname, hname, sizeof(fullname));
-			add_local_domain(fullname, HOSTLEN - strlen(fullname));
-			Debug((DEBUG_DNS, "a_il: %s->%s", sockhost, fullname));
-
-			/* What if no memory available? Let it core. :-> */
-			uhosts[i] = (char *)MyMalloc(ulen+strlen(fullname)+1);
-
-			/* filling uhosts[] with user@hostname/hostalias; we
-			** later check either whole, or from after '@',
-			** depending on aconf. I could fill two arrays, one
-			** with username@, another without, but that'd be pure
-			** waste, wouldn't it? --B. */
-			sprintf(uhosts[i], "%s@%s", cptr->username, fullname);
-		}
-		uhosts[i] = NULL;
+		/* If not for add_local_domain, I wouldn't need this
+		** fullname. Can't we add_local_domain somewhere in
+		** dns code? --B. */
+		strncpyzt(fullname, hp->h_name, sizeof(fullname));
+		add_local_domain(fullname, HOSTLEN - strlen(fullname));
+		Debug((DEBUG_DNS, "a_il: %s->%s", sockhost, fullname));
+		sprintf(uhost, "%s@%s", cptr->username, fullname);
 	}
-	/* Fill in the ipname (like uhosts[] table), not to do it
-	** (over and over again) inside aconf loop. */
-	sprintf(ipname, "%s@%s", cptr->username, sockhost);
+	/* all uses of uhost are guarded by if (hp), so no need to zero it. */
 
 	for (aconf = conf; aconf; aconf = aconf->next)
 	{
@@ -303,17 +282,15 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		{
 			continue;
 		}
-		/* That's weird. I managed to get aconf->name NULL by putting
-		** wrong I:line in the config (without all required fields).
-		** Don't know how to make aconf->host NULL. Anyway, this is an
-		** error! It should've been caught earlier. --B. */
+		/* aconf->name can be NULL with wrong I:line in the config
+		** (without all required fields). If aconf->host can be NULL,
+		** I don't know. Anyway, this is an error! --B. */
 		if (!aconf->host || !aconf->name)
 		{
 			/* Try another I:line. */
 			continue;
 		}
 
-		hostnum = 0;
 		/* If anything in aconf->name... */
 		if (*aconf->name)
 		{
@@ -321,16 +298,10 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 
 			if (hp)
 			{
-				/* We have some DNS of client, match
-				** each of aliases. */
-				for (; uhosts[hostnum]; hostnum++)
+				if (!UHConfMatch(aconf->name, uhost, ulen))
 				{
-					if (!UHConfMatch(aconf->name,
-						uhosts[hostnum], ulen))
-					{
-						namematched = 1;
-						break;
-					}
+					namematched = 1;
+					break;
 				}
 			}
 			/* Note: here we could do else (!hp) and try to
@@ -363,7 +334,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 			}
 			else	/* 1.2.3.* */
 			{
-				if (UHConfMatch(aconf->host, ipname, ulen))
+				if (UHConfMatch(aconf->host, uaddr, ulen))
 				{
 					/* Try another I:line. */
 					continue;
@@ -405,18 +376,14 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		/* Copy uhost (hostname) over sockhost, if conf flag permits. */
 		if (hp && !IsConfNoResolve(aconf))
 		{
-			get_sockhost(cptr, uhosts[hostnum]+ulen);
+			get_sockhost(cptr, uhost+ulen);
 		}
+		/* Note that attach_conf() should not return -2. */
 		if ((retval = attach_conf(cptr, aconf)) < -1)
-			find_bounce(cptr, ConfClass(aconf), -1);
-		break;
-	}
-	if (hp)
-	{
-		for (i=0; uhosts[i]; i++)
 		{
-			MyFree(uhosts[i]);
+			find_bounce(cptr, ConfClass(aconf), -1);
 		}
+		break;
 	}
 	if (retval == -2)
 	{
