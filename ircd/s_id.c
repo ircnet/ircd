@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.4 1999/07/04 18:43:26 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.5 1999/07/04 18:47:58 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -87,12 +87,11 @@ idtol(id)
 char *id;
 {
     unsigned long l = 0;
+    char c = CHIDLEN-1;
 
     l = alphabet_id[*id++];
-    l = l * CHIDNB + alphabet_id[*id++];
-    l = l * CHIDNB + alphabet_id[*id++];
-    l = l * CHIDNB + alphabet_id[*id++];
-    l = l * CHIDNB + alphabet_id[*id++];
+    while (c-- > 0)
+	l = l * CHIDNB + alphabet_id[*id++];
     return l;
 }
 
@@ -103,7 +102,7 @@ get_chid()
     return ltoid(time(NULL));
 }
 
-/* close_chid: is the ID in the close future? */
+/* close_chid: is the ID in the close future? (written for CHIDLEN == 5) */
 int
 close_chid(id)
 char *id;
@@ -121,7 +120,7 @@ char *id;
     if (id_alphabet[1 + alphabet_id[current]] == id[1])
 	    return 1;
     if (id[0] == current &&
-	idtol(id) >= (timeofday % (CHIDNB*CHIDNB*CHIDNB*CHIDNB*CHIDNB)))
+	idtol(id) >= (timeofday % pow(CHIDNB, CHIDLEN)))
 	    return 1;
     return 0;
 }
