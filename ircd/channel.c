@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.148 2003/06/22 15:15:02 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.149 2003/06/22 16:12:17 q Exp $";
 #endif
 
 #include "os.h"
@@ -2366,7 +2366,6 @@ char	*parv[];
 						       cptr->name, name, s,
 						       parv[0],
 						       *(s+1)=='v'?parv[0]:"");
-//			*--s = '\007';
 		    }
 		/*
 		** If s wasn't set to chop+1 above, name is now #chname^Gov
@@ -2374,6 +2373,8 @@ char	*parv[];
 		** of course ;-)
 		** This explains the weird use of name and chop..
 		** Is this insane or subtle? -krys
+		** This is no longer true, name is now just the name of the
+		** channel. - Q
 		*/
 		if (MyClient(sptr))
 		    {
@@ -2408,19 +2409,28 @@ char	*parv[];
 		/* Here also could be some #ifdef COMPAT29 --B.
 		*/
 		if (index(name, ':') || *chptr->chname == '!') /* compat */
-			sendto_match_servs(chptr, cptr, ":%s JOIN :%s%s",
-					   parv[0], name, chop);
+		{
+			sendto_match_servs(chptr, cptr, ":%s NJOIN %s :%s%s",
+				ME, name,
+				s && s[0] == 'O' && s[1] == 'v' ? "@@+" : 
+				s && s[0] == 'O' ? "@@" : 
+				s && s[0] == 'o' && s[1] == 'v' ? "@+" :
+				s && s[0] == 'o' ? "@" :
+				s && s[0] == 'v' ? "+" : "",
+				parv[0]);
+		}
 		else if (*chptr->chname != '&')
-		    {
-			if (*cbuf)
-				strcat(cbuf, ",");
-			strcat(cbuf, name);
-			if (chop)
-				strcat(cbuf, chop);
-		    }
+		{
+			sendto_serv_butone(cptr, ":%s NJOIN %s :%s%s",
+				ME, name,
+				s && s[0] == 'O' && s[1] == 'v' ? "@@+" : 
+				s && s[0] == 'O' ? "@@" : 
+				s && s[0] == 'o' && s[1] == 'v' ? "@+" :
+				s && s[0] == 'o' ? "@" :
+				s && s[0] == 'v' ? "+" : "",
+				parv[0]);
+		}
 	    }
-	if (*cbuf)
-		sendto_serv_butone(cptr, ":%s JOIN :%s", parv[0], cbuf);
 	return 2;
 }
 
