@@ -1,3 +1,51 @@
+1999-04-15  Christophe Kalt
+
+	* service_def.h, channel.c/m_topic(), s_service.c/m_servset():
+	added SERVICE_WANT_TOPIC.
+	
+	* s_serv.c/m_squit(): fixed serious and old bug that caused
+	servers to be removed from memory (but not dependants!!!) while
+	squit is going upstream.
+
+	* s_debug.c/send_usage(): divide by zero bugfix (reported by Aaron
+	Campbell).
+
+	* channel.c/m_njoin(): ignore channels with an invalid mask.
+
+	* common/parse.c: extended MSG_NOU to include services.
+
+1999-04-10  Christophe Kalt
+
+	* Makefile.in, a_conf_def.h, a_externs.h, a_conf.c, mod_lhex_ext.h,
+	mod_lhex.c: New module (from Andrew Snare).
+
+	* s_debug.c: increased size of debugbuf[] to avoid overflows (from
+	Eugene L. Vorokov).
+
+	* send.c/send_message(): catch more unlikely errors (from Eugene
+	L. Vorokov).
+
+	* s_bsd.c/set_sock_opts(): silently ignore errors for SO_SNDLOWAT.
+
+	* common/os.h: FreeBSD portability (from KIKUCHI Takahiro).
+
+	* s_bsd.c/read_message():
+		* debug notice format bugfix (from Q).
+		* INET6 fix (from KIKUCHI Takahiro).
+
+	* s_conf.c:
+		* initconf(): allow service type to be in hex in the
+		configuration (from Thomas Kuiper).
+		* find_conf_flags(): case sensitivity fix (from Q).
+
+1999-03-19  Christophe Kalt
+
+	* mod_socks.c/socks_work(): closed proxies would get rejected on
+	first attempt and accepted later as the "closed" status was in the
+	cache.
+
+	* s_user.c/register_user(): fixed iauth failure notice timing bug.
+
 1999-03-13  Christophe Kalt
 
 	* struct_def.h, ircd.c, s_auth.c, s_bsd.c, s_user_ext.h, s_user.c,
@@ -93,7 +141,7 @@
 
 	* packet.c/dopacket(), s_bsd.c/read_packet(): bugfix.
 
-1999-02-18  Christophe Kalt  <kalt@azurite>
+1999-02-18  Christophe Kalt
 
 	* res.c/proc_answer(): fixed T_PTR processing (problem reported by
 	Michal Svoboda).
