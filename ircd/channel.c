@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.141 2003/02/11 13:13:57 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.142 2003/02/11 18:42:38 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2414,7 +2414,7 @@ char	*parv[];
 					sendto_one(sptr, replies[RPL_TOPIC_WHO_TIME],
 						ME, BadTo(parv[0]),
 						name, IsAnonymous(chptr) ?
-						"anonymous!anonymous@anomyous" :
+						"anonymous!anonymous@anonymous" :
 						chptr->topic_nuh,
 						chptr->topic_t);
 				}
