@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.148 2004/07/11 18:39:10 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.149 2004/07/15 06:05:28 jv Exp $";
 #endif
 
 #include "os.h"
@@ -489,24 +489,19 @@ void	close_listeners(void)
 }
 void	activate_delayed_listeners(void)
 {
-	int i;
 	int cnt = 0;
-	aClient *cptr;
-	
-	for (i = highest_fd; i >= 0; i--)
-	{
-		if (!(cptr = local[i]))
-			continue;
-		if (cptr == &me || !IsListener(cptr))
-			continue;
+	aClient *acptr;
 
-		if (IsListenerInactive(cptr))
+	for (acptr = ListenerLL; acptr; acptr = acptr->next)
+	{
+		if (IsListenerInactive(acptr))
 		{
-			listen(cptr->fd, LISTENQUEUE);
+			listen(acptr->fd, LISTENQUEUE);
+			ClearListenerInactive(acptr);
 			cnt++;
-			ClearListenerInactive(cptr);
 		}
 	}
+
 	if (cnt > 0)
 	{
 		sendto_flag(SCH_NOTICE, "%d listeners activated", cnt);
