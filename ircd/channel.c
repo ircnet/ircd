@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.215 2004/06/13 12:32:10 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.216 2004/06/29 23:25:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -678,6 +678,12 @@ void	setup_server_channels(aClient *mp)
 	strcpy(chptr->topic, "SERVER MESSAGES: wallops received");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
+#ifdef CLIENTS_CHANNEL
+	chptr = get_channel(mp, "&CLIENTS", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: clients activity");
+	add_user_to_channel(chptr, mp, CHFL_CHANOP);
+	chptr->mode.mode = smode|MODE_SECRET;
+#endif
 
 	setup_svchans();
 }
