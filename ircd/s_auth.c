@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.15 1998/08/07 03:33:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.16 1998/08/07 17:22:00 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -199,6 +199,15 @@ read_iauth()
 			}
 		    if (start[0] == 'U')
 			{
+			    if (*(start+strlen(tbuf)) == '\0')
+				{
+				    sendto_flag(SCH_AUTH,
+						"Null U message! %d [%s]",
+						i, start);
+				    sendto_iauth("%d E Null U [%s]", i, start);
+				    start = end;
+				    continue;
+				}
 			    if (cptr->auth != cptr->username)
 				{   
 				    istat.is_authmem -= sizeof(cptr->auth);
@@ -213,6 +222,15 @@ read_iauth()
 			}
 		    else if (start[0] == 'u')
 			{
+			    if (*(start+strlen(tbuf)) == '\0')
+				{
+				    sendto_flag(SCH_AUTH,
+						"Null u message! %d [%s]",
+						i, start);
+				    sendto_iauth("%d E Null u [%s]", i, start);
+				    start = end;
+				    continue;
+				}
 			    if (cptr->auth != cptr->username)
 				{
 				    istat.is_authmem -= sizeof(cptr->auth);
@@ -242,16 +260,17 @@ read_iauth()
 			    ** or a user connection!
 			    */
 			    cptr->exitc = EXITC_AREF;
+			    /* should also check to make sure it's still
+			       an unregistered client.. */
+			    /* should be extended to work after registration */
 			}
 		    start = end;
 		}
 	    if (start != buf+olen)
-		    bcopy(start, obuf, olen = (buf+olen)-start);
+		    bcopy(start, obuf, olen = (buf+olen)-start+1);
 	    else
 		    olen = 0;
 	}
-/*    if (olen)
-	    bcopy(buf, obuf, olen); /* for next time */		    
 }
 
 /*

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.48 1998/08/05 21:43:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.49 1998/08/07 17:22:01 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -342,6 +342,20 @@ char	*nick, *username;
 	    {
 		char *reason = NULL;
 
+#if defined(USE_IAUTH)
+		/* this should not be needed, but there's a bug.. -kalt */
+		if (*cptr->username == '\0')
+		    {
+			sendto_flag(SCH_AUTH,
+				    "Ouch! Null username for %s (%d %X)",
+				    get_client_name(cptr, TRUE), cptr->fd,
+				    cptr->flags);
+			sendto_iauth("%d E Null username [%s] %X", cptr->fd,
+				     get_client_name(cptr, TRUE), cptr->flags);
+			return exit_client(cptr, sptr, &me,
+					   "Fatal Bug - Try Again");
+		    }
+#endif
 		/*
 		** the following insanity used to be after check_client()
 		** but check_client()->attach_Iline() now needs to know the
