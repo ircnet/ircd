@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.198 2004/04/10 11:54:52 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.199 2004/05/13 14:35:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2584,8 +2584,9 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return 1;
 	    }
 	*nbuf = '\0'; q = nbuf;
-	u = uidbuf;
-	*u = '\0';
+	*uidbuf = '\0'; u = uidbuf;
+ 	/* 17 comes from syntax ": NJOIN  :,@@+\r\n\0" */ 
+	maxlen = BUFSIZE - 17 - strlen(parv[0]) - strlen(parv[1]) - NICKLEN;
 	for (target = strtoken(&p, parv[2], ","); target;
 	     target = strtoken(&p, NULL, ","))
 	    {
@@ -2687,6 +2688,19 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		add_user_to_channel(chptr, acptr, UseModes(parv[1]) ? chop :0);
 
 		/* build buffer for NJOIN and UID capable servers */
+
+		/* send it out if too big to fit buffer */
+		if (MAX(q-nbuf, u-uidbuf) >= maxlen)
+		{
+			sendto_match_servs_notv(chptr, cptr, SV_UID,
+				":%s NJOIN %s :%s",
+				parv[0], parv[1], nbuf);
+			sendto_match_servs_v(chptr, cptr, SV_UID,
+				":%s NJOIN %s :%s",
+				parv[0], parv[1], uidbuf);
+			*nbuf = '\0'; q = nbuf;
+			*uidbuf = '\0'; u = uidbuf;
+		}
 
 		if (q != nbuf)
 		{
