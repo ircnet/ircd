@@ -8,13 +8,15 @@ All:
 	* Channel names cannot contain {\}~ chars. If used (or from remote),
 	  they will be changed to [|]^ accordingly. (This restriction will be
 	  removed in 2.11.1)
-	* New channel list type: R (aka reop list). With the same syntax and
+	* New channel list type: R (aka reop hints). With the same syntax and
 	  behaviour as beI, it serves as a hint list for reopping opless
-	  channels. Note that clients cannot set it yet, not until 2.10 exist.
+	  channels.
+	* Clients cannot set +R. (This restriction will be removed in 2.11.1)
 	* CIDR support in +beIR channelmodes.
 	* +beIR channelmodes have new wildcard `#' matching any digit; note
 	  that if ban starts with digit, it will match on UID, if with '#',
 	  it will match on nickname.
+	* New stats k to show tklines (stats K shows klines).
 
 Client:
 	* When collision occurs, clients get their nicks forcefully changed
@@ -30,7 +32,7 @@ Client:
 	* Support for text representation of user modes in USER command
 	  during registration.
 
-Server:
+Operator:
 	* New server to server protocol, based on Unique IDs
 	* Operator broadcast message syntax has been changed to:
 		$$*.mask - message all users matching given server mask
@@ -42,6 +44,8 @@ Server:
 	  on big servers with many clients and many klines.
 	* New server channel &CLIENTS with clients connects, quits and nick
 	  changes (may be undefined during compilation).
+	* New command: TKLINE (syntax: TKLINE seconds user@host :reason),
+	  available for services and (depending on O: flag) opers.
 
 Admin:
 	* File layout changed slightly:
