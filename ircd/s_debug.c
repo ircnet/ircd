@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.24 1998/12/13 00:02:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.25 1999/02/04 23:44:16 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -33,9 +33,6 @@ static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.24 1998/12/13 00:02:37 kalt Exp $
  * spaces are not allowed.
  */
 char	serveropts[] = {
-#ifdef	SENDQ_ALWAYS
-'A',
-#endif
 #ifndef	NO_IDENT
 'a',
 #endif
@@ -324,17 +321,12 @@ void	send_defines(cptr, nick)
 aClient *cptr;
 char	*nick;
 {
-    	sendto_one(cptr, ":%s %d %s :HUB:%s P_S:%d MS:%d", 
+    	sendto_one(cptr, ":%s %d %s :HUB:%s MS:%d", 
 		   ME, RPL_STATSDEFINE, nick,
 #ifdef HUB
 		   "yes",
 #else
 		   "no",
-#endif
-#ifdef PREFER_SERVER
-		   PREFER_SERVER,
-#else
-		   -1,
 #endif
 		   MAXSERVERS);
     	sendto_one(cptr,
