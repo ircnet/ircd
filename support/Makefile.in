@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.30 1998/08/16 20:02:25 kalt Exp $
+#*   $Id: Makefile.in,v 1.31 1998/09/07 21:54:53 kalt Exp $
 #*
 #*/
 
@@ -183,6 +183,7 @@ install-server: server
 	$(MKDIRHIER) $(ircd_dir); \
 	fi
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
+	$(INSTALL_PROGRAM) -m $(ircd_mode) $(IAUTH) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(CHKCONF) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) ircd-mkpasswd $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) ircdwatch $(server_bin_dir)
