@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.34 2003/10/22 19:10:14 jv Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.35 2004/02/29 21:47:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -419,7 +419,7 @@ static	void	bigger_hash_table(int *size, aHashEntry *table, int new)
 			if (cptr->user)
 				cptr->user->uhnext = NULL;
 		for (cptr = client; cptr; cptr = cptr->next)
-			if (cptr->user)
+			if (HasUID(cptr))
 				add_to_uid_hash_table(cptr->user->uid, cptr);
 		MyFree(otab);
 	    }
