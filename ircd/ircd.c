@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.9 1997/09/03 18:10:28 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.10 1997/09/14 23:49:46 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -865,6 +865,7 @@ time_t	delay;
 		(void)read_message(delay, &fdall);
 		nextc = timeofday + HUB;
 	    }
+/*
 	else
 	    {
 		if (timeofday > nextactive)
@@ -874,12 +875,15 @@ time_t	delay;
 		    }
 		(void)read_message(1, &fdas);
 	    }
+*/
 	timeofday = time(NULL);
+/*
 	if (timeofday > lastl)
 	    {
 		decay_activity();
 		lastl = timeofday;
 	    }
+*/
 #else
 	(void)read_message(delay, &fdall);
 	timeofday = time(NULL);
