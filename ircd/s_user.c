@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.252 2005/02/10 16:54:42 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.253 2005/02/15 19:20:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2990,7 +2990,11 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		 */
 		(void)alarm(3);
 		if (IsPerson(sptr) &&
-		    (logfile = open(FNAME_OPERLOG, O_WRONLY|O_APPEND)) != -1)
+		    (logfile = open(FNAME_OPERLOG, O_WRONLY|O_APPEND
+#ifdef LOGFILES_ALWAYS_CREATE
+					|O_CREAT, S_IRUSR|S_IWUSR
+#endif
+			)) != -1)
 		{
 			(void)alarm(0);
 		  	sprintf(buf, "%s %sOPER (%s) by (%s!%s@%s)"
