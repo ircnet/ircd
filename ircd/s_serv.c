@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.36 1998/04/02 19:58:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.37 1998/04/05 22:02:47 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1849,7 +1849,7 @@ char	*parv[];
 	if (!IsServer(sptr))
 	    {
 		pv[0] = parv[0];
-		pv[1] = "#wallops";
+		pv[1] = "+wallops";
 		pv[2] = message;
 		pv[3] = NULL;
 		return m_private(cptr, sptr, 3, pv);
