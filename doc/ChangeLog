@@ -7,7 +7,8 @@
 	  for outgoing connections.
 	* s_conf.c/initconf(): Fill aconf->source_ip.
 	* 2.11-New: Added.
-
+	* s_serv.c/m_stats(), report_fd(): Support for stats F.
+	 
 2002-11-22  Jakub Vlasek
 
 	* s_serv.c/m_stats(): Do not reply to stats requests with more than 
