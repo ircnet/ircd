@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.101 2005/02/08 01:55:06 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.102 2005/02/10 18:09:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -536,28 +536,32 @@ int	sendto_serv_v(aClient *one, int ver, char *pattern, ...)
 		if ((cptr = local[fdas.fd[i]]) &&
 		    (!one || cptr != one->from) && !IsMe(cptr))
 		{
-			if (cptr->serv->version & ver)
-			{
-				if (!len)
-				{
-					va_list	va;
-					va_start(va, pattern);
-					len = vsendprep(pattern, va);
-					va_end(va);
-				}
-
-				(void)send_message(cptr, sendbuf, len);
-			}
-			else
+#if 0
+/* We're not using it for now, so just save some cpu.
+** Revive once we need it --B. */
+			if ((cptr->serv->version & ver) == 0)
 			{
 				rc = 1;
+				continue;
 			}
+#endif
+			if (!len)
+			{
+				va_list	va;
+				va_start(va, pattern);
+				len = vsendprep(pattern, va);
+				va_end(va);
+			}
+			(void)send_message(cptr, sendbuf, len);
 		}
 	}
 
 	return rc;
 }
 
+#if 0
+/* We're not using it for now, so just save some cpu.
+** Revive once we need it --B. */
 int	sendto_serv_notv(aClient *one, int ver, char *pattern, ...)
 {
 	Reg	int	i, len=0, rc=0;
@@ -589,6 +593,7 @@ int	sendto_serv_notv(aClient *one, int ver, char *pattern, ...)
 
 	return rc;
 }
+#endif
 
 /*
  * sendto_common_channels()
@@ -826,11 +831,15 @@ int	sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
 			continue;
+#if 0
+/* We're not using it for now, so just save some cpu.
+** Revive once we need it --B. */
 		if ((ver & cptr->serv->version) == 0)
 		    {
 			rc = 1;
 			continue;
 		    }
+#endif
 		if (!len)
 		    {
 			va_list	va;
@@ -843,6 +852,9 @@ int	sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
 	return rc;
 }
 
+#if 0
+/* We're not using it for now, so just save some cpu.
+** Revive once we need it --B. */
 int	sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
 		char *format, ...)
 {
@@ -883,6 +895,7 @@ int	sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
 	    }
 	return rc;
 }
+#endif
 
 /*
  * sendto_match_butone
