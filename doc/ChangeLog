@@ -1,3 +1,8 @@
+2002-07-05  Piotr Kucharski
+
+	* s_serv.c/trace_one(): removed duplicated argument causing core.
+	* channel.c/set_mode(): use ->uid only if it HasUID (from Zobo).
+
 2002-07-04  Jakub Vlasek
 
 	* hash.c/m_hash(): rewritten to support all hashes.
