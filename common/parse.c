@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.80 2004/08/21 21:36:48 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.81 2004/09/07 15:14:39 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -91,7 +91,7 @@ struct Message msgtab[] = {
 #endif
 { "SQUERY",   2, MPAR, 0, 0, 0L, { m_nop, m_squery, m_squery, m_nop, m_unreg } },
 { "SERVLIST", 0, MPAR, 0, 0, 0L, { m_servlist, m_servlist, m_servlist, m_nop, m_unreg } },
-{ "HAZH",     1, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_hash, m_nop, m_nop } },
+{ "HAZH",     0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_hash, m_nop, m_nop } },
 { "DNS",      0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_dns, m_nop, m_nop } },
 { "REHASH",   0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_rehash, m_nop, m_unreg } },
 { "RESTART",  0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_restart, m_nop, m_unreg } },
