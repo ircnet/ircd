@@ -218,25 +218,30 @@ fi
 ])
 
 
-AC_DEFUN(IRC_SOLARIS_2,
-[AC_MSG_CHECKING([for Solaris 2.x (SunOS 5.x)])
-AC_CACHE_VAL(irc_cv_solaris_2,
-[if test "x`(uname) 2>/dev/null`" = "xSunOS" &&
-  uname -r 2>/dev/null | grep "^5" >/dev/null; then
-  irc_cv_solaris_2="`uname -r | sed -e \"s/^5/2/g\"`"
+AC_DEFUN(IRC_SUN,
+[AC_MSG_CHECKING([for SunOS])
+AC_CACHE_VAL(irc_cv_sun,
+[if test "x`(uname) 2>/dev/null`" = "xSunOS"; then
+  irc_cv_sun="`uname -r`"
 else
-  irc_cv_solaris_2=no
+  irc_cv_sun=no
 fi
 ])
-if test "$irc_cv_solaris_2" = no; then
+irc_cv_solaris_2=no
+if test "$irc_sun" = no; then
   AC_MSG_RESULT(no)
 else
-  AC_MSG_RESULT([yes, $irc_cv_solaris_2])
-  AC_DEFINE(SOLARIS_2)
-  if echo "$irc_cv_solaris_2" | egrep "^2\.(0|1|2)" >/dev/null; then
-    AC_DEFINE(SOLARIS_2_0_2_1_2_2)
-  elif echo "$irc_cv_solaris_2" | grep "^2\.3" >/dev/null; then
-    AC_DEFINE(SOLARIS_2_3)
+  if uname -r 2>/dev/null | grep "^5" >/dev/null; then
+    irc_cv_solaris_2="`uname -r | sed -e \"s/^5/2/g\"`"
+    AC_MSG_RESULT([yes, Solaris $irc_cv_solaris_2])
+    AC_DEFINE(SOLARIS_2)
+    if echo "$irc_cv_solaris_2" | egrep "^2\.(0|1|2)" >/dev/null; then
+      AC_DEFINE(SOLARIS_2_0_2_1_2_2)
+    elif echo "$irc_cv_solaris_2" | grep "^2\.3" >/dev/null; then
+      AC_DEFINE(SOLARIS_2_3)
+    fi
+  else
+    AC_MSG_RESULT([yes, SunOS $irc_cv_sun])
   fi
 fi
 ])
@@ -410,40 +415,25 @@ fi
 AC_DEFUN(IRC_SELECT_POLL,
 [AC_MSG_CHECKING([whether select or poll system call will be used])
 AC_CACHE_VAL(irc_cv_select_poll,
-[if test x$ac_cv_func_select = xyes; then
+[if test "$irc_cv_sun" != "no" && test "x$irc_solaris_2" = "x"; then
+  # we don't like SunOS' poll() function
   irc_cv_select_poll=select
-else
-  irc_cv_select_poll=poll
-fi
-AC_EGREP_CPP(yes,[
-#if (defined(sun) && (defined(__SVR4) || defined(__svr4__))) \
-    || defined(sgi) || defined(__sgi) \
-    || defined(_AIX)
-yes
-#endif
-],
-irc_cv_select_poll=poll,
-)])
-#if test $irc_cv_select_poll = poll; then
-#  AC_MSG_RESULT(poll)
-#  AC_DEFINE(USE_POLL)
-#else
-#  AC_MSG_RESULT(select)
-#  if test $ac_cv_func_poll = yes; then
-#    AC_MSG_WARN([poll() seems to exist on your system, edit setup.h to use it.])
-#  fi
-#fi
-if test $ac_cv_func_poll = yes; then
+else  
+  if test "$ac_cv_func_poll" = "yes"; then
+    irc_cv_select_poll=poll
+  else
+    irc_cv_select_poll=select
+  fi
+fi])
+
+if test "$irc_cv_select_poll" = "poll"; then
   AC_MSG_RESULT(poll)
   AC_DEFINE(USE_POLL)
-#  if test $irc_cv_select_poll = select; then
-#    AC_MSG_WARN([poll() was unexpectedly found on this system, it will be used; please report system type and version to ircd-stats@irc.org])
-#  fi
-  if test ! $irc_cv_linux = no; then
+  if test ! "$irc_cv_linux" = "no"; then
     AC_MSG_WARN([Aiiie.. This is linux.  poll() is known to be broken for some releases (2.0.x with libc6?).  You may want to edit setup.h to undefine USE_POLL])
   fi
 else
-  AC_MSG_RESULT(select) 
+  AC_MSG_RESULT(select)
 fi
 ])
 
@@ -1435,7 +1425,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.41 1999/07/09 22:54:34 q Exp $])
+AC_REVISION([$Id: configure.in,v 1.42 1999/07/14 17:27:03 kalt Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1454,7 +1444,7 @@ AC_ISC_POSIX
 AC_MINIX
 IRC_SGI_CC
 IRC_HPUX_CC
-IRC_SOLARIS_2
+IRC_SUN
 IRC_LINUX
 
 AC_HEADER_STDC
