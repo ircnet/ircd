@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.158 2004/02/23 12:41:00 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.159 2004/02/23 22:30:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -210,7 +210,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	** This logic here works the same way until "SQUIT host" hits
 	** the server having the target "host" as local link. Then it
 	** will do a real cleanup spewing SQUIT's and QUIT's to all
-	** directions, also to the link from which the orinal SQUIT
+	** directions, also to the link from which the original SQUIT
 	** came, generating one unnecessary "SQUIT host" back to that
 	** link.
 	**
@@ -243,6 +243,15 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
 		return 1;
 	    }
+	if (MyPerson(sptr))
+	{
+		char bufn[HOSTLEN+7];
+
+		sprintf(bufn, " (by %s)", sptr->name);
+		if (strlen(comment) > TOPICLEN)
+			comment[TOPICLEN] = '\0';
+		strcat(comment, bufn);
+	}
 	if (!MyConnect(acptr) && (cptr != acptr->from))
 	    {
 		/*
