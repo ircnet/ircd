@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.217 2004/06/29 23:34:33 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.218 2004/06/30 13:04:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -312,8 +312,7 @@ static	Link	*match_modeid(int type, aClient *cptr, aChannel *chptr)
 			if (match(tmp->value.alist->nick, cptr->name) != 0)
 			{
 				/* seems like no match on nick, but... */
-				if (isdigit(tmp->value.alist->nick[0]) || 
-					tmp->value.alist->nick[0] == '#')
+				if (isdigit(tmp->value.alist->nick[0]))
 				{
 					/* ...perhaps it is UID-ban? */
 					if (match(tmp->value.alist->nick, 
