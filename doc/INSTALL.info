@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-14244/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-2462/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.51 2004/03/05 22:23:11 chopin Exp $
+     $Id: INSTALL.info,v 1.52 2004/03/06 02:04:49 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0.
 
@@ -773,10 +773,9 @@ How to let clients connect to your IRCD.
 
         * D - restricted, when client has no reverse DNS
 
-        * N - disable host resolving (clients appear with IP)
+        * M - disable resolved host name to be shown
 
-        * M - disable resolved host name to be used (clients appear
-          with IP), but allow matching in beIR modes
+        * N - disable resolved host name to be used
 
 `Note'
      Restricted I: line means that clients matching such I line will
@@ -790,6 +789,12 @@ How to let clients connect to your IRCD.
      Addr' field.  If a match is found, the client is accepted. Clients
      host is set either to its hostname (if available) or, using "N" or
      "M" flag, to its IP.
+
+`Note'
+     The difference between "M" and "N" flags is simple: after host
+     resolving and I:line matching is done, "M" keeps hostname and uses
+     it for matching in beIR modes and printing in logs, while "N"
+     discards it completely.
 
 `Examples'
      For example, if you were installing IRC on tolsun.oulu.fi and you
@@ -1663,42 +1668,42 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top128
-Node: Installing IRC-652
-Node: The configure script877
-Node: Notes for Cygwin32 users3163
-Node: Notes concerning IPv6 support3896
-Node: The config-h file4499
-Node: DEBUGMODE5083
-Node: CACHED_MOTD5662
-Node: CHROOTDIR6103
-Node: ENABLE_SUMMON ENABLE_USERS6474
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7007
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7696
-Node: ZIP_LINKS ZIP_LEVEL8357
-Node: SLOW_ACCEPT9385
-Node: CLONE_CHECK10015
-Node: Other #define's10378
-Node: Editing the Makefile and compiling10700
-Node: The ircd-conf file11685
-Node: Machine information13534
-Node: Administrative info15960
-Node: Port connections18111
-Node: Connection Classes19942
-Node: Client connections25069
-Node: Operator priviliges30637
-Node: Excluded accounts32810
-Node: Server connections36722
-Node: Deny auto-connections45384
-Node: Hub connections46758
-Node: Leaf connections48246
-Node: Version limitations50330
-Node: Excluded machines52088
-Node: Service connections53393
-Node: Bounce server54987
-Node: Related resources56627
-Node: Reporting a bug57666
-Node: How to report a bug57923
-Node: Where to send a bug report58934
+Node: Top127
+Node: Installing IRC-651
+Node: The configure script876
+Node: Notes for Cygwin32 users3162
+Node: Notes concerning IPv6 support3895
+Node: The config-h file4498
+Node: DEBUGMODE5082
+Node: CACHED_MOTD5661
+Node: CHROOTDIR6102
+Node: ENABLE_SUMMON ENABLE_USERS6473
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7006
+Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7695
+Node: ZIP_LINKS ZIP_LEVEL8356
+Node: SLOW_ACCEPT9384
+Node: CLONE_CHECK10014
+Node: Other #define's10377
+Node: Editing the Makefile and compiling10699
+Node: The ircd-conf file11684
+Node: Machine information13533
+Node: Administrative info15959
+Node: Port connections18110
+Node: Connection Classes19941
+Node: Client connections25068
+Node: Operator priviliges30802
+Node: Excluded accounts32975
+Node: Server connections36887
+Node: Deny auto-connections45549
+Node: Hub connections46923
+Node: Leaf connections48411
+Node: Version limitations50495
+Node: Excluded machines52253
+Node: Service connections53558
+Node: Bounce server55152
+Node: Related resources56792
+Node: Reporting a bug57831
+Node: How to report a bug58088
+Node: Where to send a bug report59099
 
 End Tag Table

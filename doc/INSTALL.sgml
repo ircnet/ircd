@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.51 2004/03/05 22:23:11 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.52 2004/03/06 02:04:49 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0.
 </abstract>
@@ -552,8 +552,8 @@ one character in size, can be combined and their order does not matter.
 <item>R - restricted
 <item>I - restricted, when client has no ident.
 <item>D - restricted, when client has no reverse DNS
-<item>N - disable host resolving (clients appear with IP)
-<item>M - disable resolved host name to be used (clients appear with IP), but allow matching in beIR modes
+<item>M - disable resolved host name to be shown
+<item>N - disable resolved host name to be used
 </itemize>
 <tag/Note/Restricted I: line means that
 clients matching such I line will not be able to use their operator
@@ -565,6 +565,9 @@ matches the <bf>TARGET Host NAME</bf> field.
 If a match is found, server checks <bf>TARGET Host Addr</bf> field.
 If a match is found, the client is accepted. Clients host is set
 either to its hostname (if available) or, using ``N'' or ``M'' flag, to its IP.
+<tag/Note/The difference between ``M'' and ``N'' flags is simple: after host
+resolving and I:line matching is done, ``M'' keeps hostname and uses it for
+matching in beIR modes and printing in logs, while ``N'' discards it completely.
 <tag/Examples/
 For example, if you were installing IRC on tolsun.oulu.fi
 and you wanted to let your own

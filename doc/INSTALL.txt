@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.51 2004/03/05 22:23:11 chopin Exp $
+  $Id: INSTALL.txt,v 1.52 2004/03/06 02:04:50 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0.
 
@@ -680,10 +680,9 @@
 
         +o  D - restricted, when client has no reverse DNS
 
-        +o  N - disable host resolving (clients appear with IP)
+        +o  M - disable resolved host name to be shown
 
-        +o  M - disable resolved host name to be used (clients appear
-           with IP), but allow matching in beIR modes
+        +o  N - disable resolved host name to be used
 
      NNoottee
         Restricted I: line means that clients matching such I line will
@@ -698,6 +697,12 @@
         field.  If a match is found, the client is accepted. Clients
         host is set either to its hostname (if available) or, using
         ``N'' or ``M'' flag, to its IP.
+
+     NNoottee
+        The difference between ``M'' and ``N'' flags is simple: after
+        host resolving and I:line matching is done, ``M'' keeps hostname
+        and uses it for matching in beIR modes and printing in logs,
+        while ``N'' discards it completely.
 
      EExxaammpplleess
         For example, if you were installing IRC on tolsun.oulu.fi and
@@ -718,11 +723,11 @@
 
         Allow clients from a machine with that IP number aanndd that
         hostname to connect.
-
         I::secret:*.tut.fi::1
 
         Allow clients from machines matching ``*.tut.fi'' to connect
         with the password ``secret''.
+
         I:::*::1
 
         Allow anyone from anywhere to connect to your server.
@@ -855,6 +860,7 @@
         you can use ``*'' (Wild Card notation) and no matter what host
         the USERNAME (specified in Field 4) connects from s/he will be
         denied access.
+
         If you specify an IP address, IP mask, or an IP bitmask, it will
         match clients connecting from the matching addresses, no matter
         if they resolve or not.
@@ -986,7 +992,6 @@
      C:root@nic.funet.fi:passwd:nic.funet.fi:6667:1
 
 
-
      CC  This field tells the IRC program which option is being
         configured. "C" corresponds to a server Connect option.
 
@@ -1051,7 +1056,6 @@
      ``garfield.mit.edu''.  You will connect to Internet Port 6667 on
      this host. This connection will use (your) source IP of
      ``192.168.0.18''.
-
 
   +o  C:irc.nada.kth.se::irc.nada.kth.se:1
 
@@ -1181,10 +1185,10 @@
         D:<Denied Server Mask>:Denied Class:<Server Name>:Server Class:
 
 
-
      DDeenniieedd SSeerrvveerr MMaasskk
         This field is matched against all servers currently present on
         the network.
+
      DDeenniieedd CCllaassss
         If this field contains a class number, it will match if any
         server in that class is currently present on the network.  Note
@@ -1247,7 +1251,6 @@
         Allows a server named ``*.bu.edu'' to introduce only servers
         that match the ``*.edu'' name mask, no matter what SID they
         have.
-
         H:*:616*:eff.org::
 
         Allows ``eff.org'' to introduce (and act as a hub for) any
@@ -1316,6 +1319,8 @@
         fields, 2 and 4, must match up with the new server being
         introduced and the server which is responsible for introducing
         this new server.
+
+
   44..1122..  VVeerrssiioonn lliimmiittaattiioonnss
 
 
@@ -1376,10 +1381,10 @@
         implementation dependant; matches on this part should be used
         with particular identification.
 
+
      FFllaaggss
         are not standard.  Therefore, this field sshhoouulldd aallwwaayyss contain a
         specific identification.
-
 
 
   44..1133..  EExxcclluuddeedd mmaacchhiinneess
@@ -1443,10 +1448,8 @@
         The type of service. It defines the priviledges given to the
         service. Be very careful in the types you allow.  The types can
         be found in include/service.h
-
      CCllaassss
         The class field should refer to an existing class.
-
 
      NNootteess
         A service is not a very useful sort of client, it cannot join
@@ -1510,8 +1513,6 @@
 
         When the server is completely full, clients should use the
         secondary server.
-
-
 
   55..  RReellaatteedd rreessoouurrcceess
 
