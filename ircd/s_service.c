@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.53 2004/06/23 17:25:05 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.54 2004/06/29 17:21:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -601,7 +601,7 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	** distribution code is respected.
 	** service type also respected.
 	*/
-	/* cptr->flags |= FLAGS_CBURST; doesn't work.. */
+	cptr->flags |= FLAGS_CBURST;
 	if (burst & SERVICE_WANT_SERVER)
 	    {
 		int	split;

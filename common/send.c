@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.74 2004/06/28 22:45:42 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.75 2004/06/29 17:21:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -145,7 +145,12 @@ int	send_message(aClient *to, char *msg, int len)
 # ifdef HUB
 		if (CBurst(to))
 		{
-			aConfItem	*aconf = to->serv->nline;
+			aConfItem	*aconf;
+
+			if (IsServer(to))
+				aconf = to->serv->nline;
+			else
+				aconf = to->confs->value.aconf;
 
 			poolsize -= MaxSendq(aconf->class) >> 1;
 			IncSendq(aconf->class);
@@ -192,7 +197,12 @@ tryagain:
 	{
 		if (i == -2 && CBurst(to))
 		    {	/* poolsize was exceeded while connect burst */
-			aConfItem	*aconf = to->serv->nline;
+			aConfItem	*aconf;
+
+			if (IsServer(to))
+				aconf = to->serv->nline;
+			else
+				aconf = to->confs->value.aconf;
 
 			poolsize -= MaxSendq(aconf->class) >> 1;
 			IncSendq(aconf->class);
