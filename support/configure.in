@@ -787,21 +787,27 @@ yes
   case $irc_cv_v6type in
 	hydrangea)
 		LIBS="-L/usr/local/v6/lib -linet6 $LIBS"
+		CFLAGS="$CFLAGS -I/usr/local/v6/include"
 		;;
 	kame)
 		LIBS="-L/usr/local/v6/lib -linet6 $LIBS"
+		CFLAGS="$CFLAGS -I/usr/local/v6/include"
 		;;
 	linux)
 		LIBS="-L/usr/inet6/lib -linet6 $LIBS"
+		CFLAGS="$CFLAGS -I/usr/inet6/include"
 		;;
 	toshiba)
 		LIBS="-L/usr/local/v6/lib -linet6 $LIBS"
+		CFLAGS="$CFLAGS -I/usr/local/v6/include"
 		;;
 	v6d)
 		LIBS="-L/usr/local/v6/lib -lv6 $LIBS"
+		CFLAGS="$CFLAGS -I/usr/local/v6/include"
 		;;
 	zeta)
 		LIBS="-L/usr/local/v6/lib -linet6 $LIBS"
+		CFLAGS="$CFLAGS -I/usr/local/v6/include"
 		;;
 	esac
 
@@ -1436,7 +1442,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.38 1999/06/25 15:29:46 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.39 1999/07/02 23:40:21 q Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)

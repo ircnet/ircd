@@ -1,3 +1,7 @@
+1999-07-02  Kurt Roeckx
+
+	* configure.in, Makefile.in: Added -I for inet6.
+
 1999-07-02  Christophe Kalt
 
 	* res.c/proc_answer(): portability fix from hybrid6.

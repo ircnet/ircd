@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.41 1999/06/26 15:06:13 kalt Exp $
+#*   $Id: Makefile.in,v 1.42 1999/07/02 23:40:22 q Exp $
 #*
 #*/
 
@@ -368,7 +368,7 @@ class.o: ../ircd/class.c setup.h config.h
 hash.o: ../common/struct_def.h ../common/os.h ../ircd/hash_def.h \
 	../ircd/hash_ext.h ../common/common_def.h ../ircd/s_bsd.c \
 	../ircd/s_serv.c ../ircd/s_user.c ../ircd/channel.c ../ircd/s_misc.c \
-	../ircd/ircd.c Makefile setup.h config.h
+	../ircd/hash.c ../ircd/ircd.c Makefile setup.h config.h
 	@cp ../ircd/hash.c .
 	@/bin/sh ./sums
 	$(CC) $(S_CFLAGS) -c -o $@ hash.c
@@ -376,7 +376,12 @@ hash.o: ../common/struct_def.h ../common/os.h ../ircd/hash_def.h \
 	@touch hash.o
 
 ircd.o: ../ircd/ircd.c setup.h config.h
-	$(CC) $(S_CFLAGS) -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" -DIRCDTUNE_PATH="\"$(IRCDTUNE_PATH)\"" -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" -DIRCD_PATH="\"$(IRCD_PATH)\"" -DIAUTH_PATH="\"$(IAUTH_PATH)\"" -DIAUTH="\"$(IAUTH)\"" -DIRCDDBG_PATH="\"$(IRCDDBG_PATH)\"" -c -o $@ ../ircd/ircd.c
+	$(CC) $(S_CFLAGS) -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" \
+	-DIRCDTUNE_PATH="\"$(IRCDTUNE_PATH)\"" \
+	-DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\""  \
+	-DIRCD_PATH="\"$(IRCD_PATH)\"" -DIAUTH_PATH="\"$(IAUTH_PATH)\"" \
+	-DIAUTH="\"$(IAUTH)\"" -DIRCDDBG_PATH="\"$(IRCDDBG_PATH)\"" \
+	-c -o $@ ../ircd/ircd.c
 
 list.o: ../ircd/list.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/list.c
