@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.14 1997/09/12 17:47:23 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.15 1997/09/23 20:38:22 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.4.
 </abstract>
@@ -398,7 +398,7 @@ ping frequency, connection frequency (for servers) and
 maximum number of links that class should have.
 <p>Currently, the Y: line <bf>MUST</bf> appear in the
 ircd.conf file <bf>BEFORE</bf> it is used in any other way.
-<tag/Format/<verb>Y:&lt;Class&gt;:&lt;Ping Frequency&gt;:&lt;Connect freq&gt;:&lt;Max Links&gt;:&lt;Sendq&gt;:&lt;Local Limit&gt;:&lt;Global Limit&gt;</verb>
+<tag/Format/<verb>Y:&lt;Class&gt;:&lt;Ping Frequency&gt;:&lt;Connect freq&gt;:&lt;Max Links&gt;:&lt;SendQ&gt;:&lt;Local Limit&gt;:&lt;Global Limit&gt;</verb>
 <tag/Y/ This specifies a Class record.
 <tag/Class/ This is the class number which gains the following
 attributes and should match that which is on the end of the
@@ -419,23 +419,26 @@ links this class will allow from automatic connections (C
 lines).  Using /CONNECT overrides this feature.  Also
 defines the maximum number of users in this class (I/O
 lines).
-<tag/Sendq/ This field defines the ``sendq'' value for this
+<tag/SendQ/ This field defines the ``SendQ'' value for this
 class.  If this field is not present, the default (from
 config.h) is assigned.
 <tag/Local limit/  This field is used to limit the number
-of local concurrent connections:
+of local concurrent connections.  The format is
+&lt;x&gt;.&lt;y&gt;
 <itemize>
-<item> Positive value: defines the maximum number of clients
-from the same host (IP) will be allowed.
-<item> Negative value: defines the maximum number of clients
-from the same user@host (IP) will be allowed.  Read note
-below.
+<item> x: defines the maximum number of clients from the
+same host (IP) will be allowed.
+<item> y: defines the maximum number of clients from the
+same user@host (IP) will be allowed.  Read note below.
 </itemize>
+Only x or y may be set, any unset value defaults to zero.
 <tag/Global limit/  This field has the same use as the
 ``Local limit'' field.  But, the connection counts are done
 for all clients present on the net instead of only counting
 local clients.
-<tag/Note/ leaving any of the fields out means their value is 0 (ZERO)!!
+<tag/Note/ leaving any of the fields (except SendQ) out
+means their value is 0 (ZERO)!!  The SendQ field default
+value is dynamically determined.
 <tag/Note/ If you plan to use the local user@host limit,
 please read the following very carefully.  The ``user''
 value is the ident reply for the connection.  If no reply
@@ -447,6 +450,8 @@ every connection making the limit void.
 <tag/Note/ If you define a gobal limit, you should also
 define a local limit (same or lower) as it won't take more
 CPU and will make the global limit more accurate.
+<tag/Note/ The local and global limits only affect users (I
+lines), not servers nor services.
 <tag/Example/ Y:23:120:300:5:100000:0:0: (server class)
 <p>
 This defines class 23 to allow 5 auto-connections, which are

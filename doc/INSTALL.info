@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info19992tmp2.
+input file /tmp/sgml2info7812tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.14 1997/09/12 17:47:22 kalt Exp $
+     $Id: INSTALL.info,v 1.15 1997/09/23 20:38:21 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.4.
 
@@ -547,7 +547,7 @@ Connection Classes
 
 `Format'
      Y:<Class>:<Ping Frequency>:<Connect freq>:<Max
-     Links>:<Sendq>:<Local Limit>:<Global Limit>
+     Links>:<SendQ>:<Local Limit>:<Global Limit>
 
 `Y'
      This specifies a Class record.
@@ -575,18 +575,20 @@ Connection Classes
      overrides this feature.  Also defines the maximum number of users
      in this class (I/O lines).
 
-`Sendq'
-     This field defines the "sendq" value for this class.  If this
+`SendQ'
+     This field defines the "SendQ" value for this class.  If this
      field is not present, the default (from config.h) is assigned.
 
 `Local limit'
      This field is used to limit the number of local concurrent
-     connections:
-        *  Positive value: defines the maximum number of clients from
-          the same host (IP) will be allowed.
+     connections.  The format is <x>.<y>
+        *  x: defines the maximum number of clients from the same host
+          (IP) will be allowed.
 
-        *  Negative value: defines the maximum number of clients from
-          the same user@host (IP) will be allowed.  Read note below.
+        *  y: defines the maximum number of clients from the same
+          user@host (IP) will be allowed.  Read note below.
+
+     Only x or y may be set, any unset value defaults to zero.
 
 `Global limit'
      This field has the same use as the "Local limit" field.  But, the
@@ -594,7 +596,9 @@ Connection Classes
      instead of only counting local clients.
 
 `Note'
-     leaving any of the fields out means their value is 0 (ZERO)!!
+     leaving any of the fields (except SendQ) out means their value is
+     0 (ZERO)!!  The SendQ field default value is dynamically
+     determined.
 
 `Note'
      If you plan to use the local user@host limit, please read the
@@ -611,6 +615,10 @@ Connection Classes
      If you define a gobal limit, you should also define a local limit
      (same or lower) as it won't take more CPU and will make the global
      limit more accurate.
+
+`Note'
+     The local and global limits only affect users (I lines), not
+     servers nor services.
 
 `Example'
      Y:23:120:300:5:100000:0:0: (server class)
@@ -1424,39 +1432,39 @@ Related resources
 
 
 Tag Table:
-Node: Top123
-Node: Installing IRC-610
-Node: The config-h file2174
-Node: Define what type of UNIX your machine uses-2840
-Node: DEBUGMODE3240
-Node: SPATH CPATH MPATH LPATH PPATH TPATH3898
-Node: CACHED_MOTD5107
-Node: CHROOTDIR5577
-Node: ENABLE_SUMMON ENABLE_USERS5901
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6437
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY7120
-Node: ZIP_LINKS ZIP_LEVEL7752
-Node: SLOW_ACCEPT8763
-Node: CLONE_CHECK9381
-Node: Other #define's9721
-Node: Editing the Makefile and compiling10046
-Node: The ircd-conf file10682
-Node: Machine information12366
-Node: Administrative info14462
-Node: Port connections16497
-Node: Connection Classes18707
-Node: Client connections23298
-Node: Operator priviliges26583
-Node: Restrict connections28703
-Node: Excluded accounts30018
-Node: Server connections33318
-Node: Hub connections41751
-Node: Leaf connections42964
-Node: Version limitations45047
-Node: Excluded machines46286
-Node: Service connections47593
-Node: Bounce server49186
-Node: Default local server (for local clients) `*OBSOLETED*'50809
-Node: Related resources51692
+Node: Top122
+Node: Installing IRC-609
+Node: The config-h file2173
+Node: Define what type of UNIX your machine uses-2839
+Node: DEBUGMODE3239
+Node: SPATH CPATH MPATH LPATH PPATH TPATH3897
+Node: CACHED_MOTD5106
+Node: CHROOTDIR5576
+Node: ENABLE_SUMMON ENABLE_USERS5900
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6436
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY7119
+Node: ZIP_LINKS ZIP_LEVEL7751
+Node: SLOW_ACCEPT8762
+Node: CLONE_CHECK9380
+Node: Other #define's9720
+Node: Editing the Makefile and compiling10045
+Node: The ircd-conf file10681
+Node: Machine information12365
+Node: Administrative info14461
+Node: Port connections16496
+Node: Connection Classes18706
+Node: Client connections23542
+Node: Operator priviliges26827
+Node: Restrict connections28947
+Node: Excluded accounts30262
+Node: Server connections33562
+Node: Hub connections41995
+Node: Leaf connections43208
+Node: Version limitations45291
+Node: Excluded machines46530
+Node: Service connections47837
+Node: Bounce server49430
+Node: Default local server (for local clients) `*OBSOLETED*'51053
+Node: Related resources51936
 
 End Tag Table

@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.14 1997/09/12 17:47:23 kalt Exp $
+  $Id: INSTALL.txt,v 1.15 1997/09/23 20:38:23 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.4.
 
@@ -470,7 +470,7 @@
 
      FFoorrmmaatt
 
-        Y:<Class>:<Ping Frequency>:<Connect freq>:<Max Links>:<Sendq>:<Local Limit>:<Global Limit>
+        Y:<Class>:<Ping Frequency>:<Connect freq>:<Max Links>:<SendQ>:<Local Limit>:<Global Limit>
 
 
 
@@ -500,19 +500,21 @@
         overrides this feature.  Also defines the maximum number of
         users in this class (I/O lines).
 
-     SSeennddqq
-        This field defines the ``sendq'' value for this class.  If this
+     SSeennddQQ
+        This field defines the ``SendQ'' value for this class.  If this
         field is not present, the default (from config.h) is assigned.
 
      LLooccaall lliimmiitt
         This field is used to limit the number of local concurrent
-        connections:
+        connections.  The format is <x>.<y>
 
-     +o  Positive value: defines the maximum number of clients from the
-        same host (IP) will be allowed.
+     +o  x: defines the maximum number of clients from the same host (IP)
+        will be allowed.
 
-     +o  Negative value: defines the maximum number of clients from the
-        same user@host (IP) will be allowed.  Read note below.
+     +o  y: defines the maximum number of clients from the same user@host
+        (IP) will be allowed.  Read note below.
+
+        Only x or y may be set, any unset value defaults to zero.
 
      GGlloobbaall lliimmiitt
         This field has the same use as the ``Local limit'' field.  But,
@@ -520,7 +522,9 @@
         net instead of only counting local clients.
 
      NNoottee
-        leaving any of the fields out means their value is 0 (ZERO)!!
+        leaving any of the fields (except SendQ) out means their value
+        is 0 (ZERO)!!  The SendQ field default value is dynamically
+        determined.
 
      NNoottee
         If you plan to use the local user@host limit, please read the
@@ -537,6 +541,10 @@
         If you define a gobal limit, you should also define a local
         limit (same or lower) as it won't take more CPU and will make
         the global limit more accurate.
+
+     NNoottee
+        The local and global limits only affect users (I lines), not
+        servers nor services.
 
      EExxaammppllee
         Y:23:120:300:5:100000:0:0: (server class)
@@ -658,6 +666,7 @@
         To become an IRC Administrator, IRC must know who is authorized
         to become an operator and what their ``Nickname'' and
         ``Password'' is.
+
      FFoorrmmaatt
 
         O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>
@@ -722,7 +731,6 @@
         either ``Y'' or ``N'' meaning `Yes Let them in'' or ``No don't
         let them in''.  If the first word begins with neither ``Y'' or
         ``N'' the default is to let the person on.
-
 
      FFoorrmmaatt
 
@@ -848,13 +856,10 @@
 
   WWAARRNNIINNGG:: The hostnames used as examples are really only examples and
   not meant to be used (simply because they don't work) in real life.
-
-
   Now you must decide WHICH hosts you want to connect to and WHAT ORDER
   you want to connect to them in.  For my example let us assume I am on
   the machine "rieska.oulu.fi" and I want to connect to irc daemons on 3
   other machines:
-
 
   +o  ``garfield.mit.edu''        - Tertiary Connection
 
@@ -988,6 +993,8 @@
 
         N:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<Domain Mask>:<Class>
 
+
+
      Let us assume that ``garfield.mit.edu'' connects to your server and
      you want to place password authorization authorization on garfield.
      The ``N'' entry would be:
@@ -1113,10 +1120,9 @@
 
 
      is allowed as is
-
-
      L:*.edu:*:*.au::
      L:*.com:*:*.au::
+
 
 
 
@@ -1244,6 +1250,8 @@
         polite). The first field is unused, so leave it empty.
 
 
+
+
   44..1144..  SSeerrvviiccee ccoonnnneeccttiioonnss
 
 
@@ -1318,6 +1326,7 @@
         doesn't process the connections at all, and has no knowledge of
         the client's host name, or class number.  For these cases, this
         field must be empty.
+
      SSeerrvveerr NNaammee
         This specifies the IRC server hostname that the client should
         use.
@@ -1384,19 +1393,10 @@
      FFAAQQ
         It can be found on the WWW, at
         <http://www.stealth.net/~kalt/irc/faq.html>.
+
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
-
-
-
-
-
-
 
 
 
