@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.15 2003/07/18 20:10:48 chopin Exp $
+# $Id: ircd.conf.example,v 1.16 2004/02/13 19:08:46 chopin Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -411,8 +411,11 @@ L:*.edu::*.au::
 # server's name must be used). If the servername is a wildcard (e.g. *.au)
 # that is an acceptable name for the third field. 
 #
+# Empty 2nd field is equal to '*', that is all SIDs are allowed to be
+# introduced via this link.
+#
 # The fields are as follows:
-# H:servers which are permitted entry::hub server
+# H:servers which are permitted entry:sid mask:hub server::
 #
 # Example, permit cs-ftp.bu.edu to allow any servers behind it to connect:
 H:*::cs-ftp.bu.edu::
@@ -421,6 +424,9 @@ H:*::cs-ftp.bu.edu::
 # connect: 
 H:*.mit.edu::irc-2.mit.edu::
 #
+# Example, permit irc-2.mit.edu to allow any MIT servers behind it to
+# connect, but only if they have SID begining with "000":
+H:*.mit.edu:000*:irc-2.mit.edu::
 #
 ############################
 # D: [OPTIONAL]. Control how auto connections are done. This will be mostly 
