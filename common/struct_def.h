@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.74 2003/07/19 12:27:42 chopin Exp $
+ *   $Id: struct_def.h,v 1.75 2003/07/28 17:16:00 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -430,6 +430,7 @@ struct	Server	{
 	aClient	*maskedby;	/* Pointer to server masking this server.
 				** Self if not masked, *NEVER* NULL. */
 	char	by[NICKLEN+1];
+	char	byuid[UIDLEN + 1];
 	char	tok[7];		/* This is the prepared token we'll be
 				** sending to 2.10 servers.
 				** Note: The size of this depends on the 
