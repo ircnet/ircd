@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.17 1997/07/02 15:49:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.18 1997/07/16 19:27:16 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -2214,7 +2214,9 @@ char	*parv[];
 {
 	Reg	aClient	*acptr;
 	Reg	int	i;
+	char	killer[HOSTLEN * 2 + USERLEN + 5];
 
+	strcpy(killer, get_client_name(sptr, TRUE));
 	for (i = 0; i <= highest_fd; i++)
 	    {
 		if (!(acptr = local[i]))
@@ -2223,14 +2225,13 @@ char	*parv[];
 		    {
 			sendto_one(acptr,
 				   ":%s NOTICE %s :Server Terminating. %s",
-				   ME, acptr->name,
-				   get_client_name(sptr, TRUE));
+				   ME, acptr->name, killer);
 			acptr->exitc = EXITC_DIE;
 			(void)exit_client(acptr, acptr, &me, "Server died");
 		    }
 		else if (IsServer(acptr))
 			sendto_one(acptr, ":%s ERROR :Terminated by %s",
-				   ME, get_client_name(sptr, TRUE));
+				   ME, killer);
 	    }
 	(void)s_die();
 	return 0;
