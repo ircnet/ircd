@@ -1,8 +1,19 @@
+2004-03-18  Piotr Kucharski
+
+	* s_conf.c/initconf(): update flags of I:lines in use to the new ones.
+
 2004-03-17  Piotr Kucharski
 
 	* channel.c/m_join(), m_njoin(): send "Fake" notice to &CHANNEL, when
 	  member of channel joins it again; when NJOIN, do it when not bursting
 	  otherwise keep sending NJOIN protocol error.
+	* s_bsd.c/check_init(): don't set fake hostp for localhost clients.
+	* ircd.s/setup_me(): no need for me.hostp
+	* s_bsd.c/check_client(): no more fake me.hostp, no need to check.
+	* s_bsd.c/unixport(): do not unlink unix socket, only report error
+	  (other ircd may be using it).
+	* send.c, s_bsd.c, s_misc.c, s_user.c, struct_def.h: guard all unix
+	  socket uses by #ifdef UNIXPORT
 
 2004-03-16  Piotr Kucharski
 
