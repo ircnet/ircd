@@ -1,3 +1,10 @@
+Wed Sep 24 18:25:45 1997  Christophe Kalt
+
+	* acconfig.h, configure.in, setup.h.in, resolv_def.h, res_init.c:
+	added --resconf=FILE option to configure (Alain Nissen).
+
+	* s_conf.c: fixed bug with Y limits.
+
 Tue Sep 23 11:36:30 1997  Christophe Kalt
 
 	* common_def.h: added CHKCONF_COMPILE statement.
