@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info26055tmp2.
+input file /tmp/sgml2info1278tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.6 1997/06/02 13:22:50 kalt Exp $
+     $Id: INSTALL.info,v 1.7 1997/06/09 15:24:53 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.3.
 
@@ -467,7 +467,7 @@ Port connections
           The incoming isn't matched against the mask, rather the ip#
           string is decoded and compared segment by segment. Thus
 
-          P:128.2*.1.2:::6664:
+          P:::128.2*.1.2:6664:
 
           will not match 128.20.1.2.
 
@@ -1396,39 +1396,39 @@ Related resources
 
 
 Tag Table:
-Node: Top123
-Node: Installing IRC-609
-Node: The config-h file1167
-Node: Define what type of UNIX your machine uses-1833
-Node: DEBUGMODE2233
-Node: SPATH CPATH MPATH LPATH PPATH TPATH2891
-Node: CACHED_MOTD4089
-Node: CHROOTDIR4559
-Node: ENABLE_SUMMON ENABLE_USERS4883
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE5419
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY6102
-Node: ZIP_LINKS ZIP_LEVEL6734
-Node: SLOW_ACCEPT7745
-Node: CLONE_CHECK8363
-Node: Other #define's8703
-Node: Editing the Makefile and compiling9028
-Node: The ircd-conf file9757
-Node: Machine information11439
-Node: Administrative info13535
-Node: Port connections15570
-Node: Connection Classes17780
-Node: Client connections21703
-Node: Operator priviliges24988
-Node: Restrict connections27108
-Node: Excluded accounts28423
-Node: Server connections31723
-Node: Hub connections40156
-Node: Leaf connections41369
-Node: Version limitations43452
-Node: Excluded machines44685
-Node: Service connections45992
-Node: Bounce server48365
-Node: Default local server (for local clients) `*OBSOLETED*'49989
-Node: Related resources50872
+Node: Top122
+Node: Installing IRC-608
+Node: The config-h file1166
+Node: Define what type of UNIX your machine uses-1832
+Node: DEBUGMODE2232
+Node: SPATH CPATH MPATH LPATH PPATH TPATH2890
+Node: CACHED_MOTD4088
+Node: CHROOTDIR4558
+Node: ENABLE_SUMMON ENABLE_USERS4882
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE5418
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY6101
+Node: ZIP_LINKS ZIP_LEVEL6733
+Node: SLOW_ACCEPT7744
+Node: CLONE_CHECK8362
+Node: Other #define's8702
+Node: Editing the Makefile and compiling9027
+Node: The ircd-conf file9756
+Node: Machine information11438
+Node: Administrative info13534
+Node: Port connections15569
+Node: Connection Classes17779
+Node: Client connections21702
+Node: Operator priviliges24987
+Node: Restrict connections27107
+Node: Excluded accounts28422
+Node: Server connections31722
+Node: Hub connections40155
+Node: Leaf connections41368
+Node: Version limitations43451
+Node: Excluded machines44684
+Node: Service connections45991
+Node: Bounce server48364
+Node: Default local server (for local clients) `*OBSOLETED*'49988
+Node: Related resources50871
 
 End Tag Table

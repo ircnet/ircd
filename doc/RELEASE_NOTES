@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.6 1997/06/02 13:22:52 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.7 1997/06/09 15:24:09 kalt Exp $
 
 This is a development version of the package,
 
@@ -14,9 +14,10 @@ and 2.7 servers on the same network.
 New features:
 
 	* compression of server links.
-	* B lines created.
-	* k lines created.
-	* V lines created.
+	* virtual IP support.
+	* B lines created. (client redirection)
+	* k lines created. (OTHER ident)
+	* V lines created. (restrict peers' compile time options)
 	* whois reply uses ! instead of + for the +v(oice) mode.
 	* new type of client: services.
 

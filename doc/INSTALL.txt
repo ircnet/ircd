@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.6 1997/06/02 13:22:52 kalt Exp $
+  $Id: INSTALL.txt,v 1.7 1997/06/09 15:24:54 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.3.
 
@@ -379,14 +379,18 @@
         The IP mask uses either *'s or 0's as wildcards. The following
         two lines are the same:
 
-        P:::128.2.*:6664: P:::128.2.0.0:6664:
 
-        The incoming isn't matched against the mask, rather the ip#
-        string is decoded and compared segment by segment. Thus
+        P:::128.2.*:6664:
+        P:::128.2.0.0:6664:
 
-        P:128.2*.1.2:::6664:
 
-        will not match 128.20.1.2.
+
+     The incoming isn't matched against the mask, rather the ip# string
+     is decoded and compared segment by segment. Thus
+
+     P:::128.2*.1.2:6664:
+
+     will not match 128.20.1.2.
 
      PPoorrtt
         The port number field tells the server which port number it
@@ -455,10 +459,10 @@
         is still alive.  Unless you are sure of what you are doing, use
         the default value which is in your config.h file.
 
+
      CCoonnnneecctt FFrreeqquueennccyy||MMaaxx IIPP
         This field has a different meaning depending on the use of the Y
         line:
-
 
      +o  For servers: By changing this number, you change how often your
         server checks to see if it can connect to this server. If you
@@ -653,6 +657,7 @@
         determines the maximum number of simultaneous uses of the O-line
         allowable through the max. links field in the Y-line.
 
+
      EExxaammppllee
         O:orion.cair.du.edu:pyunxc:Jeff::1
 
@@ -722,6 +727,7 @@
      FFoorrmmaatt
 
         k:<Host Name>:<time interval(s)|comment>:<Auth>:<port>:
+
 
 
      KK  ``K'' tells the IRCD that you are making a KILL USER command
@@ -850,7 +856,6 @@
      C:root@nic.funet.fi:passwd:nic.funet.fi:6667:1
 
      Each field is separated with a ":" charcter:
-
      CC  This field tells the IRC program which option is being
         configured. "C" corresponds to a server Connect option.
 
@@ -922,6 +927,7 @@
   C:garfield.mit.edu::garfield.mit.edu:6667:1
   C:irc.nada.kth.se::irc.nada.kth.se:6667:1
   C:nic.funet.fi::nic.funet.fi:6667:1
+
   Ircd will attempt to connect to nic.funet.fi first, then to irc.nada
   and finally to garfield.
 
@@ -988,6 +994,7 @@
         we take an example of such:
 
         *.de  - a domain name matching all machines in Germany.
+
         Wildcard domains are useful in that ALL SERVERS in Germany (or
         any other domain area) can be shown as one to the rest of the
         world. Imagine 100 servers in Germany, it would be incredible
@@ -1047,22 +1054,28 @@
 
         Allows a server named ``*.bu.edu'' to introduce only servers
         that match the ``*.edu'' name mask.
-
         H:*::eff.org::
 
         Allows ``eff.org'' to introduce (and act as a hub for) any
         server.
 
-
      NNoottee
         It is possible to have and use multiple H-lines (or L-lines) for
         the one server.  eg:
 
-        H:*.edu:*:*.bu.edu:: H:*.au:*:*.bu.edu::
 
-        is allowed as is
+        H:*.edu:*:*.bu.edu::
+        H:*.au:*:*.bu.edu::
 
-        L:*.edu:*:*.au:: L:*.com:*:*.au::
+
+
+     is allowed as is
+
+
+     L:*.edu:*:*.au::
+     L:*.com:*:*.au::
+
+
 
 
   44..1111..  LLeeaaff ccoonnnneeccttiioonnss
@@ -1118,7 +1131,6 @@
      IInnttrroodduuccttiioonn
         V-lines are used to restrict server connecting to you based on
         their version and on compile time options.
-
 
      FFoorrmmaatt
 
@@ -1186,6 +1198,8 @@
         This command excludes a server named ``foo.bar.baz'', the reason
         is given to be security holes (you should give a reason, it is
         polite). The first field is unused, so leave it empty.
+
+
   44..1144..  SSeerrvviiccee ccoonnnneeccttiioonnss
 
 
@@ -1249,7 +1263,6 @@
         unallowed command. Services however, are not affected by flood
         control and can be granted special privileges. It is therefore
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
-
 
 
   44..1155..  BBoouunnccee sseerrvveerr
@@ -1317,7 +1330,6 @@
 
      FFoorrmmaatt
 
-
         U:<TARGET Host addr>:<Password>:<TARGET Host NAME>:<Internet Port>
 
 
@@ -1351,18 +1363,6 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

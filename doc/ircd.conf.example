@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.3 1997/05/21 20:26:17 kalt Exp $
+# $Id: ircd.conf.example,v 1.4 1997/06/09 15:24:10 kalt Exp $
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@
 # M: [MANDATORY]. This line sets your server's name, description.
 # Fields, in order, are: 
 #
-# M:hostname:*:Description Of Your Server:port
+# M:<Server NAME>:<YOUR Internet IP#>:<Geographic Location>:<Port>
 #
 M:csa.bu.edu:*:Boston University Computer Science Department:6667:
 #
@@ -79,10 +79,15 @@ A:Boston University CS Department:Main Client Server:Helen Rose <hrose@cs.bu.edu
 # UNIX domain you must compile with UNIXPORT defined in include/config.h.
 #
 # The fields are as follows::
-# P:UNIX socket file:*:*:port number
+# P:<Internet IP#>:<*>:<Internet IP Mask>:<Port>:
+# P:<Directory>:<*>:<*>:<Port>:
 # for example, an internet domain socket on port 6667:
 P::::6667:
-#
+# an internet domain socket listening on port 6668, for address 206.252.192.20
+P:206.252.192.20:::6667:
+# an internet domain socket listening on port 6669 for connections from
+# the addresses matching 147.210.18.* :
+P:::147.210.18.*:6667:
 # This line is an example of a UNIX domain socket in /tmp
 P:/tmp/.ircd:*:*:6666:
 #
@@ -101,21 +106,22 @@ P:/tmp/.ircd:*:*:6666:
 # line (see below) the higher the number the higher the priority in
 # auto-connecting.
 #
-# The fields in order are: class number, ping frequency (in seconds),
-# connect frequency (in seconds), maximum number of links (used for
-# auto-connecting, and for limiting the number of clients in that class),
-# and sendq (this overrides any value set in include/config.h for #define
-# MAXSENDQLENGTH).
+# For server classes, the fields in order are: class number, ping frequency
+# (in seconds), connect frequency (in seconds), maximum number of links
+# (used for auto-connecting and sendq (this overrides any value set in
+# include/config.h for #define MAXSENDQLENGTH).
 #
 # Note that it is a good idea to have ping frequency the same at both ends
 # of the link.
-# 
-# in this case, connect-frequency is 0 indicating that this is a client
-# class (servers never connect to clients, it is the other way around).
-Y:1:90:0:20:100000
 #
 # this is a normal server connection (normal as of March, 1994)
 Y:2:90:300:1:600000
+#
+# For client classes, the fields in order are: class number, ping frequency
+# (in seconds), maximum number of links from this [user@]host on the server,
+# maximum number of links in this class, and sendq.
+# 
+Y:1:90:0:20:100000
 #
 Y:10:90:0:3:100000
 #
@@ -125,7 +131,8 @@ Y:10:90:0:3:100000
 # be configured to send passwords).
 # 
 # Fields are as follows:
-# I:IP-address-mask:optional password:domain-mask:port:connection class (opt)
+# I:<TARGET Host Addr>:<Password>:<TARGET Hosts NAME>:<Port>:<Class>
+# i:<TARGET Host Addr>:<Password>:<TARGET Hosts NAME>:<Port>:<Class>
 #
 # With a password..... This will allow anyone from anywhere to connect
 # as long as they know the password ("foobar"). Note listing this I: line
@@ -141,8 +148,7 @@ I:*@*:foobar:*@*::1
 # show up on irc as hrose@csa.bu.edu since that is the first match it
 # found. (Even though the second match is valid).
 I:128.197.*::*.bu.edu::1
-# 
-# using ident
+# or (equivalent):
 I:*@128.197.*::*@*.bu.edu::1
 # and you can even specify just certain usernames running ident (as long
 # as the client's site is running the ident daemon):
@@ -203,10 +209,10 @@ U:csa.bu.edu:foobar:csa.bu.edu
 # C/N lines MUST be used in pairs. You cannot have one without the other. 
 #
 # C: lines contain the following fields:
-# C:remote server's hostname:passwd:remote server's name:port:conn class
+# C:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<TARGET PORT>:<Class>
 # (connection class)
 # N: lines contain the following fields:
-# N:remote server's hostname:passwd:remote server's name:host mask:conn class
+# N:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<Domain Mask>:<Class>
 # (connection class)
 # "host mask" is the number of parts in *your* hostname to mask to. For
 # instance, with my servername being "csa.bu.edu", if I wanted to present
@@ -226,13 +232,19 @@ N:hrose@cs-ftp.bu.edu:bigalpha:cs-ftp.bu.edu::2
 C:irc-2.mit.edu:camelsrk00l:irc-2.mit.edu::2
 N:irc-2.mit.edu:andsoarellamas:irc-2.mit.edu:1:2
 #
+# If you have defined ZIP_LINKS and wish the connection to irc-2.mit.edu to
+# be compressed, you need to use a lowercase c.
+c:irc-2.mit.edu:camelsrk00l:irc-2.mit.edu::2
+N:irc-2.mit.edu:andsoarellamas:irc-2.mit.edu:1:2
+#
 # K: [OPTIONAL]. These lines define user@host patterns to be banned from
 # this particular server (with an optional time field). Note that K: lines
 # are *not* global, and if you ban a user they can still use any other IRC
 # server (unless they have specifically been banned there as well).
 # 
 # the fields are defined as:
-# K:hostmask:time field:username:port
+# K:<Host Name>:<time interval(s)|comment>:<User>:<port>:
+#
 # wildcards are permitted in any one of the fields, in other words, you can
 # K:*::* if you wanted (but your server wouldn't be used much ;-)
 #
@@ -250,6 +262,10 @@ K:acs*.bu.edu:0800-1200,1300-1700:*:0
 # "Use server irc.bar" instead of the default notice
 # "You are not welcome to this server"
 K:*foo.edu:Use server irc.bar:*:0
+#
+# This K: line bans any users from *toto.fr from using the port 6667,
+# and tells them to use port 6666 instead.
+K:toto.fr:Use port 6666:*:6667:
 #
 # R: [DISCOURAGED]. These lines restrict user access based on a more
 # stringent checking system than is available in the K: line. It looks for
@@ -321,3 +337,46 @@ H:*::cs-ftp.bu.edu::
 # Example, permit irc-2.mit.edu to allow any MIT servers behind it to
 # connect: 
 H:*.mit.edu::irc-2.mit.edu::
+#
+# V: [OPTIONAL]. These lines define restrictions on servers connecting to
+# you.
+#
+# The first and third fields accept wildcards.  The fields are as follow:
+# V:<Version Mask>:<Flags>:<Server Mask>::
+#
+# Example, you believe 2.9.1 is a really old version, and you want your
+# peers to upgrade:
+V:020901*::*::
+#
+# If you are running a production network, you most likely don't want to
+# allow servers compiled in DEBUGMODE which is a threat for the net
+# as well as for the privacy of the users:
+V:*:D:*::
+#
+# Finally, you don't want *.edu servers to be version 2.9.2 *OR* to be
+# compiled with remote oper kills enabled:
+V:020902*:K:*.edu::
+#
+# B: [SUGGESTED]. These lines define the alternate servers that the users
+# will be redirected to if your server is full.
+#
+# The fiels are as follow:
+# B:<Class|Host Mask>::<Server Name>:<Port>:
+#
+# For example, if you want to redirect your users to irc.stealth.net on port
+# 6667 when your server is full, use:
+B:-1::irc.stealth.net:6667:
+#
+# To redirect *.fi users when your server cannot accept any new user with
+# a hostname matching *.fi, use:
+B:*.fi::irc.funet.fi:6667:
+#
+# S: [OPTIONAL]. These lines define services allowed to connect to your
+# server.  Each service needs a separate line which only allows him to
+# connect once.
+#
+# The fields are as follow:
+# S:<TARGET Host Mask>:<Password>:<Service Name>:<Service Type>:<Class>
+#
+# Example, you want to allow a local information service:
+S:eep.local.net:thisisapassword:EepInfo:0:1

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.6 1997/06/02 13:19:19 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.7 1997/06/09 15:24:09 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.3.
 </abstract>
@@ -329,18 +329,19 @@ will bind to all interfaces (INADDR_ANY).  See also MACHINE
 CONFIGURATION section to properly configure outgoing
 connections.
 <p>
-		P:192.168.1.194:::6664:
+P:192.168.1.194:::6664:
 <tag/Internet IP&num; Mask/ This defines where connections may
 come from and be accepted. The IP mask uses either *'s or
 0's as wildcards. The following two lines are the same:
 <p>
-P:::128.2.*:6664:
+<verb>P:::128.2.*:6664:
 P:::128.2.0.0:6664:
+</verb>
 <p>
 The incoming isn't matched against the mask, rather the ip&num;
 string is decoded and compared segment by segment. Thus
 <p>
-P:128.2*.1.2:::6664:
+P:::128.2*.1.2:6664:
 <p>
 will not match 128.20.1.2.
 <tag/Port/ The port number field tells the server which port
@@ -903,13 +904,15 @@ server.
 <tag/Note/ It is possible to have and use multiple H-lines
 (or L-lines) for the one server.  eg:
 <p>
-H:*.edu:*:*.bu.edu::
+<verb>H:*.edu:*:*.bu.edu::
 H:*.au:*:*.bu.edu::
+</verb>
 <p>
 is allowed as is
 <p>
-L:*.edu:*:*.au::
+<verb>L:*.edu:*:*.au::
 L:*.com:*:*.au::
+</verb>
 </descrip>
 
 <sect1>Leaf connections

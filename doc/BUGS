@@ -1,4 +1,4 @@
-# @(#)$Id: BUGS,v 1.4 1997/06/02 14:49:54 kalt Exp $
+# @(#)$Id: BUGS,v 1.5 1997/06/09 15:24:09 kalt Exp $
 
 The list is probably not as scary as it once was.
 Anyone with some free time is welcome to fix those =)
@@ -6,6 +6,8 @@ Anyone with some free time is welcome to fix those =)
 * The server still occasionnally crashes because of some bug
   in the hash tables. (Vesa already fixed this bug several
   times but it keeps crashing :^)
+
+* inetd support isn't functional.
 
 * RECONNECT is still in some unknown state. (and deactivated
   for various reasons)
