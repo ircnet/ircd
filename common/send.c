@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.94 2004/11/19 15:10:07 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.95 2004/11/29 22:34:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -151,7 +151,7 @@ int	send_message(aClient *to, char *msg, int len)
 			 * exceed their maxsendq. --B. */
 			sendto_flag(SCH_NOTICE,
 				"Max SendQ limit exceeded for %s: %d > %d",
-				get_client_name(to, FALSE),
+				to->name,
 				DBufLength(&to->sendQ), get_sendq(to));
 		}
 		else
