@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.112 2004/06/29 23:33:59 chopin Exp $
+ *   $Id: struct_def.h,v 1.113 2004/06/29 23:52:00 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -990,4 +990,13 @@ typedef struct
 
 #define ACL_ALL_REMOTE		(ACL_KILLREMOTE|ACL_SQUITREMOTE|ACL_CONNECTREMOTE)
 #define ACL_ALL			0xFFFFF
+
+#ifdef CLIENTS_CHANNEL
+/* information scope of &CLIENTS channel. */
+#define CCL_CONN     0x01	/* connections */
+#define CCL_CONNINFO 0x02	/* if connections, then with realname */
+#define CCL_QUIT     0x04	/* quits */
+#define CCL_QUITINFO 0x08	/* if quits, then with quit message */
+#define CCL_NICK     0x10	/* nick changes */
+#endif
 

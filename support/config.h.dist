@@ -398,6 +398,18 @@
  */
 #define DELAY_CLOSE     15       /* Recommended value: 15 */
 
+/*
+** Define this to get oper-only &CLIENTS channel with clients connects,
+** quits and nick changes.
+*/
+#undef CLIENTS_CHANNEL
+
+/*
+** Bitmask defining type of information sent to &CLIENTS, combine from
+** CCL_CONN, CCL_CONNINFO, CCL_QUIT, CCL_QUITINFO, CCL_NICK
+*/
+#define CLIENTS_CHANNEL_LEVEL (CCL_CONN|CCL_QUIT)
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
