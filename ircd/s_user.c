@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.69 1999/03/07 23:46:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.70 1999/03/08 19:25:17 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -356,7 +356,7 @@ char	*nick, *username;
 		char *reason = NULL;
 
 #if defined(USE_IAUTH)
-		if (adfd < 0 && iauth_required)
+		if (!DoneXAuth(sptr) && iauth_required)
 		    {
 			time_t last = 0;
 
