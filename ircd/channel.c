@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.139 2003/02/10 19:18:41 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.140 2003/02/10 23:32:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -291,8 +291,9 @@ aChannel *chptr;
 				   pattern will never match anyone */
 				continue;
 			}
-			if (match(mode_nick, cptr->name)
-				|| match(mode_user, cptr->username))
+			if (match(mode_user, cptr->username) != 0 &&
+				(match(mode_nick, cptr->name) != 0 ||
+				match(mode_user, cptr->uid) != 0))
 			{
 				/* client doesn't match them, no point
 				   checking hostname */
