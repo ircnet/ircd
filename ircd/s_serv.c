@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.23 1997/09/12 18:00:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.24 1997/10/11 03:48:10 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1893,6 +1893,32 @@ aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
 {
+	Reg	aClient	*acptr;
+	Reg	int	i;
+	char	killer[HOSTLEN * 2 + USERLEN + 5];
+
+	strcpy(killer, get_client_name(sptr, TRUE));
+	for (i = 0; i <= highest_fd; i++)
+	    {
+		if (!(acptr = local[i]))
+			continue;
+		if (IsClient(acptr) || IsService(acptr))
+		    {
+			sendto_one(acptr,
+				   ":%s NOTICE %s :Server Restarting. %s",
+				   ME, acptr->name, killer);
+			acptr->exitc = EXITC_DIE;
+			if (IsClient(acptr))
+				exit_client(acptr, acptr, &me,
+					    "Server Restarting");
+			/* services are kept for logging purposes */
+		    }
+		else if (IsServer(acptr))
+			sendto_one(acptr, ":%s ERROR :Restarted by %s",
+				   ME, killer);
+	    }
+	flush_connections(me.fd);
+
 	SPRINTF(buf, "RESTART by %s", get_client_name(sptr, TRUE));
 	restart(buf);
 	/*NOT REACHED*/
@@ -2207,12 +2233,15 @@ char	*parv[];
 				   ":%s NOTICE %s :Server Terminating. %s",
 				   ME, acptr->name, killer);
 			acptr->exitc = EXITC_DIE;
-			(void)exit_client(acptr, acptr, &me, "Server died");
+			if (IsClient(acptr))
+				exit_client(acptr, acptr, &me, "Server died");
+			/* services are kept for logging purposes */
 		    }
 		else if (IsServer(acptr))
 			sendto_one(acptr, ":%s ERROR :Terminated by %s",
 				   ME, killer);
 	    }
+	flush_connections(me.fd);
 	(void)s_die(0);
 	return 0;
 }
