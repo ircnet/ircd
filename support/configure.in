@@ -807,7 +807,9 @@ if test "x$enable_dsm" != x; then
   AC_DEFINE(USE_DSM)
 dnl  AC_CONFIG_HEADER(dl.h)
   AC_CHECK_HEADERS(dlfcn.h)
-  AC_TRY_LINK(-ldl, [dlclose()], IRC_DLIB="-ldl")
+  irc_save_LIBS="$LIBS"
+  AC_CHECK_LIB(dl, dlclose, IRC_DLIB="-ldl")
+  LIBS="$irc_save_LIBS"
   AC_SUBST(IRC_DLIB)
 fi
 ])
@@ -1420,7 +1422,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.32 1999/03/10 00:30:17 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.33 1999/03/11 17:06:28 kalt Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
