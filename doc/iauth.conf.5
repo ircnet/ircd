@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.20 2004/09/13 01:47:15 chopin Exp $
-.TH IAUTH.CONF 5 "$Date: 2004/09/13 01:47:15 $"
+.\" @(#)$Id: iauth.conf.5,v 1.21 2004/09/21 14:10:27 chopin Exp $
+.TH IAUTH.CONF 5 "$Date: 2004/09/21 14:10:27 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -21,6 +21,7 @@ module\ \fImodule-name\fP
 [TAB]host = \fIhost-name\fP
 [TAB]ip = \fIip-address\fP
 [TAB]timeout = \fIvalue\fP
+[TAB]port = \fIvalue\fP
 
 .fi
 .RE
@@ -34,6 +35,9 @@ If \fIhost-name\fP and \fIip-address\fP fields are specified, then the
 module will only be used for connections matching one of the fields given
 in the configuration.  An entry prefixed with the character ! indicates a
 negative match.  IP addresses are checked first.
+
+Port is mandatory for socks and webproxy modules and not used in others.
+It tells module what port it should connect to to do its work.
 
 If no host nor ip entry is specified, then the module will always be used.
 
@@ -54,7 +58,8 @@ the \fInotimeout\fP option.
 .TP
 .B notimeout
 By specifying this keyword, the IRC server is told not to accept new user
-connections if \fIiauth\fP hasn't finished its work in time.
+connections if \fIiauth\fP hasn't finished its work in time. Note that
+modules specified after \fIdelayed\fP keyword are not considered.
 .TP
 .B extinfo
 This keyword allows extra information (user supplied username, and
@@ -89,10 +94,11 @@ This module requires the following option:
 .B socks
 This module performs a basic check to verify that the host where the
 connection originated from doesn't run a SOCKS v4 or v5 proxy server on
-port 1080 that is open to the world.  It is useful to reject abusive
-clients using a relay to evade kill lines and bans.
+a given in configuration port that is open to the world. 
+It is useful to reject abusive clients using a relay to evade kill lines and bans.
+Multiple instances (with different ports) are allowed.
 
-This module understands nine options:
+This module understands ten options:
 .B reject
 to reject connections originating from a host where an open proxy
 was detected,
@@ -137,9 +143,7 @@ connection originated from doesn't run an open WWW proxy.
 It is useful to reject abusive clients using a relay to evade kill lines and bans.
 Multiple instances (with different ports) are allowed.
 
-This module understands nine options:
-.B port
-what port to connect to; there is no default (though most common are 8080, 3128, 80).
+This module understands five options:
 .B reject
 to reject connections originating from a host where an open proxy was detected.
 .B log
@@ -150,7 +154,7 @@ to set the cache lifetime in minutes.  By default, caching is enabled for
 .B careful
 to make sure that we connected to our own ircd; without
 this parameter, module will accept any "HTTP/1.? 200" with an exception
-of servers that send "Date:" header along (which is common with some
+of servers sending "Date:" header along (which is common with some
 Apache+PHP configurations).
 .B reason
 text to send to rejected clients
@@ -163,8 +167,8 @@ originating from a system where an open proxy is running for hosts within
 performed as well as checking for WWW proxy on port 8080 and 3128.
 In addition, every connection is authenticated with the LHEx
 server at IP-address 127.0.0.1. Client will be let in after ident and
-lhex are done and if socks or webproxy finds an open proxy, client will
-be removed afterwards.
+lhex are done but if socks or webproxy finds an open proxy, client will
+be removed asap.
 
 .RS
 .nf
@@ -180,11 +184,15 @@ module socks
         host = *.enserb.u-bordeaux.fr
         host = !*.u-bordeaux.fr 
         host = *.fr            
+        port = 1080
 
 module webproxy
-        option = reject,port=8080
+        option = reject
+        port = 8080
+
 module webproxy
-        option = reject,port=3128
+        option = reject,careful
+        port = 3128
 
 .fi
 .RE
