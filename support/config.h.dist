@@ -358,8 +358,9 @@
  * Because it takes a while for IANA to delegate reverse mappings,
  * this option allows you to resolve 2001 block using ip6.arpa.
  * and the rest via ip6.int.
+ * Note that ip6.int is officially discontinued.
  */
-#define SIXBONE_HACK
+#undef SIXBONE_HACK
 
 /*
 ** Servers with many clients and lots of K:lines are having noticable
@@ -750,4 +751,8 @@
 
 #ifndef IRCDCONF_DELIMITER
 #error IRCDCONF_DELIMITER must be defined
+#endif
+
+#if !defined(HELLO_MSG)
+#error HELLO_MSG must be defined
 #endif
