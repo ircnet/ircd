@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.84 2004/10/26 20:12:22 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.85 2004/10/26 23:21:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -91,7 +91,7 @@ struct Message msgtab[] = {
 { "SERVICE",  4, MPAR, { _m(m_service), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_service) } },
 { "EOB",      0, MPAR, { _m(m_eob), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
 { "EOBACK",   0, MPAR, { _m(m_eoback), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
-{ "ENCAP",    1, MPAR, { _m(m_encap), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_nop) } },
+{ "ENCAP",    2, MPAR, { _m(m_encap), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_nop) } },
 { "SDIE",     0, MPAR, { _m(m_sdie), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
 #ifdef	USE_SERVICES
 { "SERVSET",  1, MPAR, { _m(m_nop), _m(m_nop), _m(m_nop), _m(m_servset), _m(m_nop) } },
