@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: swear.c,v 1.2 1997/09/03 17:45:43 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: swear.c,v 1.3 1997/10/18 13:41:12 kalt Exp $";
 #endif
  
 /* Curses replacement routines. Uses termcap */
@@ -37,12 +37,12 @@ static struct sgttyb oldtty, newtty;
 static char termcapentry[1024];
 static char codes[1024], *cls;
 
-static char *termname;
+static char *irc_termname;
 
 static int currow = 0;
 int irc_lines, irc_columns, scroll_ok = 0, scroll_status = 0;
 
-tcap_putch(row, col, ch)
+void tcap_putch(row, col, ch)
 int row, col;
 char ch;
 {
@@ -51,7 +51,7 @@ char ch;
   fflush(stdout);
 }
 
-tcap_move(row, col)
+void tcap_move(row, col)
 int row, col;
 {
   cls = codes;
@@ -63,7 +63,7 @@ int row, col;
   fflush(stdout);
 }
 
-clear_to_eol(row, col)
+void clear_to_eol(row, col)
 int row, col;
 {
   tcap_move(row, col);
@@ -73,7 +73,7 @@ int row, col;
   fflush(stdout);
 }
 
-clearscreen()
+void clearscreen()
 {
   cls = codes;
   tgetstr("cl",&cls);
@@ -95,7 +95,7 @@ int flag;
   newtty.sg_flags |= CBREAK;
   ioctl(0, TIOCSETP, &newtty); */
   system("stty -echo cbreak");
-  if (tgetent(termcapentry,termname=getenv("TERM")) != 1) {
+  if (tgetent(termcapentry,irc_termname=getenv("TERM")) != 1) {
     printf("Cannot find termcap entry !\n");
     fflush(stdout);
   }
@@ -115,7 +115,7 @@ io_off()
   return(0);
 }
 
-scroll_ok_off()
+void scroll_ok_off()
 {
   cls = codes;
   tgetstr("cs",&cls);
@@ -124,7 +124,7 @@ scroll_ok_off()
   scroll_ok = 0;
 }
 
-scroll_ok_on()
+void scroll_ok_on()
 {
   cls = codes;
   tgetstr("cm",&cls);
@@ -138,7 +138,7 @@ scroll_ok_on()
   scroll_ok = scroll_status = 1;
 }
 
-put_insflag(flag)
+void put_insflag(flag)
 int flag;
 {
   flag = insert;
@@ -153,7 +153,7 @@ int flag;
   fflush(stdout);
 }
   
-put_statusline()
+void put_statusline()
 {
   tcap_move (-2, 0);
     cls = codes;
@@ -166,7 +166,7 @@ put_statusline()
   fflush(stdout);
 }
 
-tcap_putline(line)
+void tcap_putline(line)
 char *line;
 {
   char *ptr = line, *ptr2, *newl;
