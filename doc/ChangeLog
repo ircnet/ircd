@@ -1,3 +1,15 @@
+2004-07-31  Jakub Vlasek
+
+	* ircd.c/setup_me(), main(): Call register_server.
+	* list.c/free_server(): Don't change svrtop and take only one
+	  argument.
+	* list.c/free_user(): Take only one argument.
+	* s_serv.c, s_serv_ext.h: Added register_server(), unregister_server()
+	  and use it in m_server(), m_smask().
+	* s_bsd.c, whowas.c, list_ext.h: free_user() and free_server() take
+	  only one parameter from now on.
+	* s_bsd.c/close_listeners(): Use ListenerLL.
+
 2004-07-26  Jakub Vlasek
 	
 	* list.c/free_user(): Call free_server() with the cptr of the server
