@@ -415,9 +415,11 @@
 
 /*
 ** Bitmask defining type of information sent to &CLIENTS, combine from
-** CCL_CONN, CCL_CONNINFO, CCL_QUIT, CCL_QUITINFO, CCL_NICK
+** CCL_CONN (client uid, nick, username, host and IP), CCL_CONNINFO
+** (also user info), CCL_QUIT (client uid, nick, username, host and IP),
+** CCL_QUITINFO (also quit reason), CCL_NICK (all nick changes).
 */
-#define CLIENTS_CHANNEL_LEVEL (CCL_CONN|CCL_QUIT)
+/* #define CLIENTS_CHANNEL_LEVEL (CCL_CONN|CCL_QUIT) */
 
 /*
 ** This adds ability to ban users with specified realnames from
