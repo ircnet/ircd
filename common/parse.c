@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.33 2001/12/23 14:50:49 q Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.34 2001/12/23 14:52:19 q Exp $";
 #endif
 
 #include "os.h"
@@ -461,7 +461,7 @@ int	find_sender(aClient *cptr, aClient **sptr, char *sender, char *buffer)
 	}
 #endif
 
-	para[0] = sender;
+	para[0] = from->name;
 
 	/* Hmm! If the client corresponding to the
 	** prefix is not found--what is the correct
