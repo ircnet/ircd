@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.54 1999/02/05 20:34:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.55 1999/02/12 04:06:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1084,8 +1084,6 @@ char	*parv[];
 
 	if (parc > 2)
 	    {
-		int	qlen = strlen(parv[2]);
-
 		if (IsServer(cptr) && check_link(cptr) && !IsOper(sptr))
 		    {
 			sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
