@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.76 2004/02/13 01:43:00 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.77 2004/03/04 11:39:34 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -259,8 +259,13 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 			continue;
 		if (aconf->port && aconf->port != cptr->acpt->port)
 			continue;
+		/* That's weird. I managed to get aconf->name NULL by putting
+		** wrong I:line in the config (without all required fields).
+		** Don't know how to make aconf->host NULL. Anyway, this is an
+		** error! It should've been caught earlier. */
 		if (!aconf->host || !aconf->name)
-			goto attach_iline;
+			continue;	/* Try another I:line. */
+
 		if (hp)
 			for (i = 0, hname = hp->h_name; hname;
 			     hname = hp->h_aliases[i++])
