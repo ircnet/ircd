@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.28 1998/03/21 19:22:22 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.29 1998/04/15 18:51:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -98,7 +98,7 @@ aClient *cptr;
                sendto_flag(SCH_LOCAL, "Ignoring bad mask: %s", mask);
                 return -1;
         }
-        lmask = htonl(0xfffffffful << (32 - m)); /* /24 -> 0xffffff00ul */
+        lmask = htonl((u_long)0xffffff00L << (32 - m)); /* /24->0xffffff00ul */
         baseip = htonl(i1 * 0x1000000 + i2 * 0x10000 + i3 * 0x100 + i4);
         return ((cptr->ip.s_addr & lmask) == baseip) ? 0 : 1;
 }
