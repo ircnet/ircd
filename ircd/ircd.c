@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.10 1997/09/14 23:49:46 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.11 1997/09/22 12:18:39 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -712,8 +712,8 @@ char	*argv[];
 		(void)fprintf(stderr,"WARNING: running ircd with uid = %d\n",
 			IRC_UID);
 		(void)fprintf(stderr,"         changing to gid %d.\n",IRC_GID);
-		(void)setuid(IRC_UID);
 		(void)setgid(IRC_GID);
+		(void)setuid(IRC_UID);
 	    } 
 # endif
 #endif /*CHROOTDIR/UID/GID*/
