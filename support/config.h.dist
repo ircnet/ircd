@@ -559,6 +559,12 @@
 */
 #define AWAY_MOREINFO
 
+/*
+** If you do not wish your clients to use "nick 0" during registration,
+** define this.
+*/
+#undef DISABLE_NICK0_REGISTRATION
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 

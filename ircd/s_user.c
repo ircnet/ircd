@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.238 2004/11/19 15:10:08 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.239 2004/11/29 22:38:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -926,7 +926,13 @@ badparamcountkills:
 	{
 		/* Allow registering with nick "0", this will be
 		** overwritten in register_user() */
+#ifdef DISABLE_NICK0_REGISTRATION
+		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME,
+			BadTo(parv[0]), nick);
+		return 2;
+#else
 		goto nickkilldone;
+#endif
 	}
 
 	/* do_nick_name() can change "nick" (like: drop scandinavian
