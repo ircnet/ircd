@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.24 2002/07/29 21:36:07 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.25 2003/10/14 20:40:09 q Exp $";
 #endif
 
 #include "os.h"
@@ -205,7 +205,7 @@ parse_ircd()
 	int cl = -1, ncl;
 
 	iobuf[iob_len] = '\0';
-	while (ch = index(buf, '\n'))
+	while ((ch = index(buf, '\n')))
 	    {
 		*ch = '\0';
 		DebugLog((ALOG_DSPY, 0, "parse_ircd(): got [%s]", buf));
@@ -593,15 +593,19 @@ loop_io()
 	pfd = poll_fdarray;
 #endif
 	if (nfds == -1)
+	{
 		if (errno == EINTR)
+		{
 			return;
+		}
 		else
-		    {
+		{
 			sendto_log(ALOG_IRCD, LOG_CRIT,
 				   "fatal select/poll error: %s",
 				   strerror(errno));
 			exit(1);
-		    }
+		}
+	}
 	if (nfds == 0)	/* end of timeout */
 		return;
 
