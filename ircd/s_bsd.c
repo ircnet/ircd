@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.113 2004/02/13 03:58:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.114 2004/02/15 20:21:39 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -99,6 +99,12 @@ static	char	readbuf[READBUF_SIZE];
 void	add_local_domain(char *hname, size_t size)
 {
 #ifdef RES_INIT
+	/* some return plain hostname with ending dot, whoops. */
+	if (hname[strlen(hname)-1] == '.')
+	{
+		hname[strlen(hname)-1] = '\0';
+		size++;
+	}
 	/* try to fix up unqualified names */
 	if (!index(hname, '.'))
 	{
@@ -2756,9 +2762,7 @@ void	get_my_name(aClient *cptr, char *name, int len)
 		return;
 	name[len] = '\0';
 
-	/* assume that a name containing '.' is a FQDN */
-	if (!index(name,'.'))
-		add_local_domain(name, len - strlen(name));
+	add_local_domain(name, len - strlen(name));
 
 	/*
 	** If hostname gives another name than cname, then check if there is
