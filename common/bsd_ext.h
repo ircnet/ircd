@@ -25,7 +25,7 @@
  */
 #ifndef BSD_C
 #ifdef  DEBUGMODE
-extern int writecalls, writeb;
+extern int writecalls, writeb[];
 #endif /* DEBUGMODE */
 #endif /* BSD_C */
 
