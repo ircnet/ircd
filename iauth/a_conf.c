@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.33 2004/09/21 23:23:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.34 2004/09/28 22:39:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -421,10 +421,23 @@ char	*conf_read(char *cfile)
 		(*last)->in = icount;
 		(*last)->popt = NULL;
 		(*last)->address = NULL;
-		(*last)->delayed = 0;
+		(*last)->delayed = o_del;
 		(*last)->port = 0;
 	    }
-	ident->timeout = MAX(DEFAULT_TIMEOUT, ident->timeout);
+	if (ident->timeout < DEFAULT_TIMEOUT)
+	{
+		if (cfile)
+		{
+			printf("Warning: rfc913 is less than %d.\n",
+				DEFAULT_TIMEOUT);
+		}
+		else
+		{
+			sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
+				"Warning: rfc913 is less than %d.",
+				DEFAULT_TIMEOUT);
+		}
+	}
 	if (ident->delayed)
 	{
 		if (cfile)
