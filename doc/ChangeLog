@@ -1,12 +1,26 @@
+Wed Jul 16 21:35:50 1997  Christophe Kalt
+
+	* s_serv.c: m_die() referenced data after freeing it.
+
+	* support.c, res.c: silly changes to make purify happier.
+
+	* s_bsd.c: fixed memory corruption problem.
+
+	* s_user.c: m_whois() voice flag changed back to + (from !).
+
+	* h.h, support.c, configure.in: reverted back: use inet_* if
+	present, use our own inet* if not.  Our functions must be
+	different to avoid some crazy clash when bind 8.x is on installed
+	the system.  Should we teach configure.in about -lbind?
+
 Tue Jul 15 00:18:01 1997  Christophe Kalt
 
 	* inet_addr.c moved to support.c, renamed functions (inet_addr,
 	inet_aton, inet_ntoa, inet_netof) to avoid clashes; always used
-	even if the system has it. (easy way to sort the total mess
-	related to bind 4.x, 8.x ...)
+	even if the system has it.
 
 	* New configure and Makefile from Alain Nissen. (many many files
-	changed, removed, created, rewrote)
+	changed, removed, created, rewritten)
 
 	* buildm4: update (Mario Holbe).
 

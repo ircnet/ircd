@@ -697,6 +697,10 @@ error ZIP_MINIMUM needs redefining.
  * this one is used later in sys/types.h (or so i believe). -avalon
  */
 # define BSD_INCLUDES
+/*
+ * AIX cc(1) seems to need this badly. -krys
+ */
+# define _BSD
 #endif
 
 #define Reg register
