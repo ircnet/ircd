@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.116 2004/02/27 15:35:56 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.117 2004/02/27 15:43:48 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1679,6 +1679,9 @@ static	void	read_listener(aClient *cptr)
 		}
 		nextping = timeofday; /* isn't this abusive? -kalt */
 		istat.is_unknown++;
+
+		/* Notice on connect. */
+		sendto_one(acptr, replies[RPL_HELLO], ME, HELLO_MSG);
 	    }
 }
 

@@ -392,6 +392,12 @@
 */
 #define MAXDELAYEDKILLS 200
 
+/*
+** This defines the message that is sent to clients upon connect.
+** Keep it short.
+*/
+#define HELLO_MSG "Please wait while we process your connection."
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
