@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.93 2003/02/15 17:55:22 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.94 2003/02/15 18:46:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3028,9 +3028,9 @@ static	void	polludp()
 
 			sprintf(buf, "udp port recvfrom() from %s to %%s: %%s",
 #ifdef INET6
-				from.sin6_addr
+				from.sin6_addr.s_addr
 #else
-				from.sin_addr
+				from.sin_addr.s_addr
 #endif
 				== 0 ? "unknown" :
 #ifdef INET6
