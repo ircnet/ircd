@@ -28,7 +28,7 @@
 #undef TKSERV_DEBUG
 
 /* The name of the ircd config file backup (suffix after CPATH) */
-#define TKSERV_IRCD_CONFIG_BAK 	CPATH".tkserv"
+#define TKSERV_IRCD_CONFIG_BAK 	CPATH".bak"
 
 /* The name of the ircd temp config file (suffix after CPATH) */
 #define TKSERV_IRCD_CONFIG_TMP	CPATH".tmp"
