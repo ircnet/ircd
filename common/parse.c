@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.74 2004/06/19 18:03:20 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.75 2004/06/21 14:37:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -752,7 +752,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	if (mptr->handler[status] != m_nop && mptr->handler[status] != m_nopriv
 		&& mptr->handler[status] != m_unreg &&
 		mptr->minparams > 0 && 
-		(i <= mptr->minparams || para[i-1][0] == '\0'))
+		(i <= mptr->minparams || para[mptr->minparams][0] == '\0'))
 	{
 		if (status == STAT_SERVER)
 		{
