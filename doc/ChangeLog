@@ -1,3 +1,7 @@
+2001-06-09  Kurt Roeckx
+
+	* s_err.c: Change RPL_BOUNCE to use a %d instead of %s
+
 2001-02-26  Kurt Roeckx
 
 	* struct_def.h, ircd.c, s_id.c, s_id_ext.h, s_misc.c, s_user.c, 
