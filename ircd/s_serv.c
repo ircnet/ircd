@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.175 2004/03/20 21:14:33 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.176 2004/03/21 20:26:20 jv Exp $";
 #endif
 
 #include "os.h"
@@ -3774,7 +3774,8 @@ static void report_listeners(aClient *sptr, char *to)
 		if (!(acptr = listeners[i]))
 			continue;
 		tmp = acptr->confs->value.aconf;
-		sendto_one(sptr, ":%s %d %s %d %s %s %u %lu %llu %lu %llu %u %u",
+		sendto_one(sptr, ":%s %d %s %d %s %s %u %lu %llu %lu %llu %u"
+				 " %u %s",
 			ME, RPL_STATSLINKINFO, to,
 			tmp->port, BadTo(tmp->host),
 			pline_flags_to_string(tmp->flags),
@@ -3782,6 +3783,7 @@ static void report_listeners(aClient *sptr, char *to)
 			acptr->sendM, acptr->sendB,
 			acptr->receiveM, acptr->receiveB,
 			timeofday - acptr->firsttime,
-			acptr->confs->value.aconf->clients);
+			acptr->confs->value.aconf->clients,
+			IsListeningInactive(acptr) ? "inactive" : "active" );
 	}
 }

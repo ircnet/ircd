@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.94 2004/03/20 21:14:32 jv Exp $
+ *   $Id: struct_def.h,v 1.95 2004/03/21 20:26:20 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -171,7 +171,8 @@ typedef struct        LineItem aExtData;
 				  ** server, so we know we have to send
 				  ** a SQUIT. */
 #define	FLAGS_EOB	0x4000000 /* EOB received */
-
+#define FLAGS_LISTENINACTIVE 0x8000000 /* Listener does not listen() */
+	
 #define	FLAGS_OPER	0x0001 /* operator */
 #define	FLAGS_LOCOP	0x0002 /* local operator -- SRB */
 #define	FLAGS_WALLOP	0x0004 /* send wallops to them */
@@ -200,6 +201,7 @@ typedef struct        LineItem aExtData;
 #define	IsUnixSocket(x)		((x)->flags & FLAGS_UNIX)
 #endif
 #define	IsListening(x)		((x)->flags & FLAGS_LISTEN)
+#define IsListeningInactive(x)	((x)->flags & FLAGS_LISTENINACTIVE)
 #define	IsLocal(x)		(MyConnect(x) && (x)->flags & FLAGS_LOCAL)
 #define	IsDead(x)		((x)->flags & FLAGS_DEADSOCK)
 #define	IsBursting(x)		(!((x)->flags & FLAGS_EOB))
@@ -218,6 +220,7 @@ typedef struct        LineItem aExtData;
 #define	SetDNS(x)		((x)->flags |= FLAGS_DOINGDNS)
 #define	SetDoneXAuth(x)		((x)->flags |= FLAGS_XAUTHDONE)
 #define	SetEOB(x)		((x)->flags |= FLAGS_EOB)
+#define SetListeningInactive(x)	((x)->flags |= FLAGS_LISTENINACTIVE)
 #define SetKlineExempt(x)	((x)->user->flags |= FLAGS_EXEMPT)
 
 #define	DoingDNS(x)		((x)->flags & FLAGS_DOINGDNS)
@@ -235,6 +238,7 @@ typedef struct        LineItem aExtData;
 #define	ClearAuth(x)		((x)->flags &= ~FLAGS_AUTH)
 #define	ClearXAuth(x)		((x)->flags &= ~FLAGS_XAUTH)
 #define	ClearWXAuth(x)		((x)->flags &= ~FLAGS_WXAUTH)
+#define ClearListenerInactive(x) ((x)->flags &= ~FLAGS_LISTENINACTIVE)
 
 /*
  * defined debugging levels
