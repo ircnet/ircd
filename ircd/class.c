@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: class.c,v 1.5 1997/09/23 20:47:56 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: class.c,v 1.6 1997/12/19 13:35:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -121,7 +121,7 @@ int	get_con_freq(clptr)
 aClass	*clptr;
 {
 	if (clptr)
-		return (ConFreq(clptr));
+		return (MAX(60, ConFreq(clptr)));
 	else
 		return (CONNECTFREQUENCY);
 }
