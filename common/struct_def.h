@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.101 2004/06/12 12:36:18 chopin Exp $
+ *   $Id: struct_def.h,v 1.102 2004/06/12 22:06:55 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -956,3 +956,18 @@ typedef struct
 	int split_minservers;
 	int split_minusers;
 } iconf_t;
+
+/* functions being subject to access checking */
+typedef enum ACL {
+	ACL_KILL,
+	ACL_SQUIT,
+	ACL_CONNECT,
+	ACL_CLOSE,
+	ACL_HAZH,
+	ACL_DNS,
+	ACL_REHASH,
+	ACL_RESTART,
+	ACL_DIE,
+	ACL_SET,
+	ACL_MAX
+} ACL; 
