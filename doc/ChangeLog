@@ -1,3 +1,7 @@
+2003-04-13  Piotr Kucharski
+
+	* channel.c/set_mode(): 'break' misplaced (reported by BitKoenig).
+
 2003-02-22  Kurt Roeckx
 
 	* os.h: Always include resolv.h when found.
