@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.123 2002/04/16 21:02:56 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.124 2002/05/18 23:53:22 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1652,7 +1652,7 @@ static	void	who_find(aClient *sptr, char *mask, int oper)
 	int	member;
 	int	showperson;
 	aClient	*acptr;
-	int	myoper = 1;
+	int	myoper = 0;
 
 	if (MyConnect(sptr) && IsAnOper(sptr))
 	{
@@ -1710,8 +1710,9 @@ static	void	who_find(aClient *sptr, char *mask, int oper)
 		}
 		
 		/* allow local opers to see matching clients
-		 * on _LOCAL_ server */
-		if (IsInvisible(acptr) && !(MyConnect(acptr) && myoper))
+		 * on _LOCAL_ server and show the user himself */
+		if (IsInvisible(acptr) && (acptr != sptr)
+		    && !(MyConnect(acptr) && myoper))
 		{
 			continue;
 		}
