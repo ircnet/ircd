@@ -45,6 +45,7 @@ struct Instance
     aTarget	*address;
     aTarget	*hostname;
     u_int	timeout;
+    char	*reason;		/* reject reason */
 };
 
 struct Target
