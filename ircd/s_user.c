@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.180 2004/02/28 01:09:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.181 2004/02/28 01:12:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -779,7 +779,8 @@ int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    }
 	if (MyConnect(sptr) && (s = (char *)index(parv[1], '~')))
 		*s = '\0';
-	strncpyzt(nick, parv[1], NICKLEN+1);
+	/* local clients' nick size can be ONICKLEN max */
+	strncpyzt(nick, parv[1], (MyConnect(sptr) ? ONICKLEN : NICKLEN)+1);
 
 	if (cptr->serv)	/* we later use 'IsServer(sptr), why not here? --B. */
 	{
