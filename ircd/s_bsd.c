@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.22 1998/02/18 18:42:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.23 1998/03/22 19:01:15 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -498,7 +498,7 @@ void	init_sys()
 	if (((bootopt & BOOT_CONSOLE) || isatty(0)) &&
 	    !(bootopt & (BOOT_INETD|BOOT_OPER)))
 	    {
-#ifndef _WIN32
+#ifndef __CYGWIN32__
 		if (fork())
 			exit(0);
 #endif
