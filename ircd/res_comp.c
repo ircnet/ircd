@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_comp.c	8.1 (Berkeley) 6/4/93";
-static char rcsid[] = "$Id: res_comp.c,v 1.5 1999/01/20 01:33:08 kalt Exp $";
+static char rcsid[] = "$Id: res_comp.c,v 1.6 1999/03/08 20:51:58 kalt Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -333,11 +333,11 @@ static char		digits[] = "0123456789";
 
 /* Forward. */
 
-static int		special(int);
-static int		printable(int);
-static int		dn_find(const u_char *, const u_char *,
-				const u_char * const *,
-				const u_char * const *);
+static int		special __P((int));
+static int		printable __P((int));
+static int		dn_find __P((const u_char *, const u_char *,
+				     const u_char * const *,
+				     const u_char * const *));
 
 /* Public. */
 
