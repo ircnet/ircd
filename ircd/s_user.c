@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.26 1997/09/12 18:36:03 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.27 1997/09/22 15:34:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -361,7 +361,8 @@ char	*nick, *username;
 			if (!(sptr->flags & FLAGS_GOTID))
 				prefix = '-';
 			else
-				if (*sptr->username == '-')
+				if (*sptr->username == '-' ||
+				    index(sptr->username, '@'))
 					prefix = '=';
 				else
 					prefix = '+';
@@ -369,14 +370,17 @@ char	*nick, *username;
 			if (!(sptr->flags & FLAGS_GOTID))
 				prefix = '~';
 			else
-				if (*sptr->username == '-')
+				if (*sptr->username == '-' ||
+                                    index(sptr->username, '@'))
 					prefix = '^';
 				else
 					prefix = '\0';
 
 		/* OTHER type idents have '-' prefix (from s_auth.c),       */
 		/* and they are not supposed to be used as userid (rfc1413) */
-		if (sptr->flags & FLAGS_GOTID && *sptr->username != '-')
+		/* @ isn't valid in usernames (m_user()) */
+		if (sptr->flags & FLAGS_GOTID && *sptr->username != '-' &&
+		    index(sptr->username, '@') == NULL)
 			strncpyzt(buf2, sptr->username, USERLEN+1);
 		else /* No ident, or unusable ident string */
 		     /* because username may point to user->username */
@@ -1597,9 +1601,21 @@ char	*parv[];
 	    {
 		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]), "USER");
 		if (IsServer(cptr))
+		    {
+			/* send error */
 			sendto_flag(SCH_NOTICE,
 				    "bad USER param count for %s from %s",
 				    parv[0], get_client_name(cptr, FALSE));
+			/*
+			** and kill it, as there's no reason to expect more
+			** USER messages about it, or we'll create a ghost.
+			*/
+			sendto_one(cptr,
+				   ":%s KILL %s :%s (bad USER param count)",
+				   ME, parv[0], ME);
+			sptr->flags |= FLAGS_KILLED;
+			exit_client(NULL, sptr, &me, "bad USER param count");
+		    }
 		return 1;
 	    }
 
