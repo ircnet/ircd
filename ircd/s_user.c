@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.92 2001/10/20 17:57:30 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.93 2001/12/24 14:38:12 q Exp $";
 #endif
 
 #include "os.h"
@@ -1411,7 +1411,8 @@ int	parc, notice;
 		/*
 		** nickname addressed?
 		*/
-		if ((acptr = find_person(nick, NULL)))
+		if ((IsServer(cptr) && (acptr = find_uid(nick, NULL))) || 
+			(acptr = find_person(nick, NULL)))
 		    {
 			if (!notice && MyConnect(sptr) &&
 			    acptr->user && (acptr->user->flags & FLAGS_AWAY))
@@ -1420,7 +1421,7 @@ int	parc, notice;
 					   (acptr->user->away) ? 
 					   acptr->user->away : "Gone");
 			sendto_prefix_one(acptr, sptr, ":%s %s %s :%s",
-					  parv[0], cmd, nick, parv[2]);
+					  parv[0], cmd, acptr->name, parv[2]);
 			continue;
 		    }
 		/*
