@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.5 1997/06/02 13:17:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.6 1997/07/28 01:14:16 kalt Exp $";
 #endif
 
 #include "sys.h"
@@ -215,13 +215,13 @@ static	Numeric	numeric_replies[] = {
 #endif
 		0, (char *)NULL, 0, (char *)NULL, 0, (char *)NULL,
 		0, (char *)NULL,
-/* 200 */	RPL_TRACELINK, "Link %s%s %s %s V%d%s %d %d %d",
+/* 200 */	RPL_TRACELINK, "Link %s%s %s %s V%X%s %d %d %d",
 /* 201 */	RPL_TRACECONNECTING, "Try. %d %s",
 /* 202 */	RPL_TRACEHANDSHAKE, "H.S. %d %s",
 /* 203 */	RPL_TRACEUNKNOWN, "???? %d %s",
 /* 204 */	RPL_TRACEOPERATOR, "Oper %d %s",
 /* 205 */	RPL_TRACEUSER, "User %d %s",
-/* 206 */	RPL_TRACESERVER, "Serv %d %dS %dC %s %s!%s@%s V%d%s",
+/* 206 */	RPL_TRACESERVER, "Serv %d %dS %dC %s %s!%s@%s V%X%s",
 /* 207 */	RPL_TRACESERVICE, "Service %d %s %d %d",
 /* 208 */	RPL_TRACENEWTYPE, "<newtype> 0 %s",
 /* 209 */	RPL_TRACECLASS, "Class %d %d",

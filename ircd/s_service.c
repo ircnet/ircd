@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.12 1997/06/27 13:46:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.13 1997/07/28 01:14:17 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -352,17 +352,7 @@ char	*parv[];
 		strncpyzt(sptr->name, parv[1], sizeof(sptr->name));
 		server = parv[2];
 		metric = atoi(parv[5]);
-		if (cptr->serv->version != SV_OLD)
-			sp = find_tokserver(atoi(server), cptr, NULL);
-		/* The following is to plug a hole in 2.9.1 & 2.9.2 */
-		if (!sp && (acptr = find_server(server, NULL)))
-		    {
-			sendto_flag(SCH_DEBUG,
-				    "%s uses wrong syntax for SERVICE (%s)",
-				    get_client_name(cptr, TRUE), sptr->name);
-                        sp = acptr->serv;
-		    }
-		/* it should be removed sometime in the future.. */
+		sp = find_tokserver(atoi(server), cptr, NULL);
 		if (!sp)
 		    {
 			sendto_flag(SCH_ERROR,
@@ -482,8 +472,6 @@ char	*parv[];
 		    acptr == cptr)
 			continue;
 		if (match(dist, acptr->name))
-			continue;
-		if (acptr->serv->version == SV_OLD)
 			continue;
 		mlname = my_name_for_link(ME, acptr->serv->nline->port);
 		if (*mlname == '*' && match(mlname, sptr->service->server)== 0)

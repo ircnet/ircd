@@ -527,7 +527,6 @@ struct	stats {
 	u_int	is_udperr;	/* packets recvfrom errors on udp port */
 	u_int	is_udpdrop;	/* packets recv'd but dropped on udp port */
 	u_int	is_loc;	/* local connections made */
-	u_int	is_ghost; /* ghost dropped */
 	u_int	is_nosrv; /* user without server */
 	u_long	is_wwcnt; /* number of nicks overwritten in whowas[] */
 	u_long	is_wwt;	  /* sum of elapsed time on when overwriting whowas[]*/
@@ -747,8 +746,9 @@ typedef	struct	{
 
 /* used for sendto_serv */
 
-#define	SV_OLD	0
-#define	SV_29	1
+/* semi-obsolete, bitmasks should now be used!!! */
+#define	SV_OLD	0x0000
+#define	SV_29	0x0001	/* useless, but preserved for coherence */
 
 /* used for sendto_flag */
 

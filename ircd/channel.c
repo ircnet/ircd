@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.9 1997/07/25 20:26:46 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.10 1997/07/28 01:14:14 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -594,9 +594,6 @@ aChannel *chptr;
 	*modebuf = *parabuf = '\0';
 	channel_modes(cptr, modebuf, parabuf, chptr);
 
-	if (cptr->serv->version == SV_OLD)
-		send_mode_list(cptr, chptr->chname, chptr->members,
-				CHFL_CHANOP, 'o');
 	if (modebuf[1] || *parabuf)
 		sendto_one(cptr, ":%s MODE %s %s %s",
 			   ME, chptr->chname, modebuf, parabuf);
@@ -608,18 +605,6 @@ aChannel *chptr;
 	if (modebuf[1] || *parabuf)
 		sendto_one(cptr, ":%s MODE %s %s %s",
 			   ME, chptr->chname, modebuf, parabuf);
-
-	if (cptr->serv->version == SV_OLD)
-	    {
-		*parabuf = '\0';
-		*modebuf = '+';
-		modebuf[1] = '\0';
-		send_mode_list(cptr, chptr->chname, chptr->members,
-				CHFL_VOICE, 'v');
-		if (modebuf[1] || *parabuf)
-			sendto_one(cptr, ":%s MODE %s %s %s",
-				   ME, chptr->chname, modebuf, parabuf);
-	    }
 }
 
 /*
@@ -1526,8 +1511,7 @@ char	*parv[];
 			continue;
 		    }
 
-		if (cptr->serv && cptr->serv->version != SV_OLD &&
-		    (s = index(name, '\007')))
+		if (cptr->serv && (s = index(name, '\007')))
 			*s++ = '\0';
 		else
 			clean_channelname(name), s = NULL;
@@ -1611,15 +1595,6 @@ char	*parv[];
 			parv[1] = name;
 			(void)m_names(cptr, sptr, 2, parv);
 		    }
-#ifndef NoV28Links
-		else if (s && flags & (CHFL_VOICE|CHFL_CHANOP))
-		    {
-			*s++ = '\0';
-			sendto_serv_v(cptr, SV_OLD, ":%s MODE %s +%c%c %s %s",
-				      ME, name, *s, *(s+1) == 'v' ? 'v' : '+',
-				      parv[0], *(s+1) == 'v' ? parv[0] : "");
-		    }
-#endif
 	    }
 	return 2;
 }
@@ -1675,17 +1650,11 @@ char	*parv[];
 		*/
 		if (!index(name, ':')) {	/* channel:*.mask */
 			if (*name != '&')
-# ifndef NoV28Links
-				if (*name == '+')	/* 2.8 has no +chan */
-					sendto_serv_v(cptr, SV_29, PartFmt,
-						      parv[0], name, comment);
-				else
-# endif /* NoV28Links */
-				{
-					if (*buf)
-						(void)strcat(buf, ",");
-					(void)strcat(buf, name);
-				}
+			    {
+				if (*buf)
+					(void)strcat(buf, ",");
+				(void)strcat(buf, name);
+			    }
 		} else
 			sendto_match_servs(chptr, cptr, PartFmt,
 				   	   parv[0], name, comment);
@@ -2255,10 +2224,6 @@ aClient	*cptr, *user;
 		chptr = lp->value.chptr;
 		if (*chptr->chname == '&')
 			continue;
-#ifndef NoV28Links
-		if (*chptr->chname == '+' && cptr->serv->version == SV_OLD)
-			continue;
-#endif
 		if ((mask = index(chptr->chname, ':')))
 			if (match(++mask, cptr->name))
 				continue;
@@ -2280,8 +2245,7 @@ aClient	*cptr, *user;
 		    }
 		(void)strcpy(buf + len, chptr->chname);
 		len += clen;
-		if (cptr->serv->version != SV_OLD &&
-		    lp->flags & (CHFL_CHANOP|CHFL_VOICE))
+		if (lp->flags & (CHFL_CHANOP|CHFL_VOICE))
 		    {
 			buf[len++] = '\007';
 			if (lp->flags & CHFL_CHANOP)

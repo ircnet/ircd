@@ -502,13 +502,6 @@
  */
 #define	SENDQ_ALWAYS
 
-/*
- * Defining this will save some CPU cycles but will make the server unable
- * to understand the old protocol. If you define the following, you can only
- * link to servers with a version 2.9 or higher.
- */
-#define NoV28Links
-
 #ifdef ZIP_LINKS
 /*
  * the compression level used. (Suggested values: 3, 4, 5)

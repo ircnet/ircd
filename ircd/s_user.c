@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.16 1997/07/25 20:26:49 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.17 1997/07/28 01:14:17 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -202,14 +202,9 @@ int	server, parc;
 			return HUNTED_ISME;
 		if (match(acptr->name, parv[server]))
 			parv[server] = acptr->name;
-		/*
-	        ** Stop services to talk to 'OLD' servers and
-		** to servers which don't know them..
-		*/
 		if (IsService(sptr)
 		    && (IsServer(acptr->from)
-			&& (acptr->from->serv->version == SV_OLD
-			    || match(sptr->service->dist,acptr->name) != 0)))
+			&& match(sptr->service->dist,acptr->name) != 0))
 		    {
 			sendto_one(sptr, err_str(ERR_NOSUCHSERVER, parv[0]), 
 				   parv[server]);
@@ -534,36 +529,20 @@ char	*nick, *username;
 	    {	/* Find my leaf servers and feed the new client to them */
 		if ((acptr = local[fdas.fd[i]]) == cptr || IsMe(acptr))
 			continue;
-		if (acptr->serv->version != SV_OLD)
-			if ((aconf = acptr->serv->nline) &&
-			    !match(my_name_for_link(ME, aconf->port),
-				     user->server))
-				sendto_one(acptr, "NICK %s %d %s %s %s %s :%s",
-					   nick, sptr->hopcount+1, 
-					   user->username, user->host, 
-					   me.serv->tok, (*buf) ? buf : "+",
-					   sptr->info);
-			else
-				sendto_one(acptr, "NICK %s %d %s %s %s %s :%s",
-					   nick, sptr->hopcount+1, 
-					   user->username, user->host, 
-					   user->servp->tok, 
-					   (*buf) ? buf : "+", sptr->info);
+		if ((aconf = acptr->serv->nline) &&
+		    !match(my_name_for_link(ME, aconf->port),
+			   user->server))
+			sendto_one(acptr, "NICK %s %d %s %s %s %s :%s",
+				   nick, sptr->hopcount+1, 
+				   user->username, user->host, 
+				   me.serv->tok, (*buf) ? buf : "+",
+				   sptr->info);
 		else
-		    {
-			sendto_one(acptr, "NICK %s :%d",
-				   nick, sptr->hopcount+1);
-			sendto_one(acptr, ":%s USER %s %s %s :%s",
-				   nick, user->username, user->host,
-				   user->server, sptr->info);
-			/*
-			** send umodes: can happen for local clients and
-			** if umode came along with 2.9 NICK line
-			*/
-			if (*buf)
-				sendto_one(acptr, ":%s MODE %s :%s",
-					   nick, nick, buf);
-		    }
+			sendto_one(acptr, "NICK %s %d %s %s %s %s :%s",
+				   nick, sptr->hopcount+1, 
+				   user->username, user->host, 
+				   user->servp->tok, 
+				   (*buf) ? buf : "+", sptr->info);
 	    }	/* for(my-leaf-servers) */
 	if (MyConnect(sptr))
 	    {
@@ -870,7 +849,7 @@ nickkilldone:
 		if (parc > 2)
 			sptr->hopcount = atoi(parv[2]);
 		(void)strcpy(sptr->name, nick);
-		if (parc == 8 && cptr->serv && cptr->serv->version != SV_OLD)
+		if (parc == 8 && cptr->serv)
 		    {
 			char	*pv[7];
 
@@ -1605,24 +1584,19 @@ char	*parv[];
 		aClient	*acptr = NULL;
 		aServer	*sp = NULL;
 
-		if (cptr->serv->version == SV_OLD)
-			acptr = find_server(server, NULL);
-		else
+		if (!(sp = find_tokserver(atoi(server), cptr, NULL)))
 		    {
-			if (!(sp = find_tokserver(atoi(server), cptr, NULL)))
-			    {
-				/*
-				** Why? Why do we keep doing this?
-				** s_service.c had the same kind of kludge.
-				** Can't we get rid of this? - krys
-				*/
-				acptr = find_server(server, NULL);
-				if (acptr)
-					sendto_flag(SCH_ERROR,
+			/*
+			** Why? Why do we keep doing this?
+			** s_service.c had the same kind of kludge.
+			** Can't we get rid of this? - krys
+			*/
+			acptr = find_server(server, NULL);
+			if (acptr)
+				sendto_flag(SCH_ERROR,
 			    "ERROR: SERVER:%s uses wrong syntax for NICK (%s)",
 					    get_client_name(cptr, FALSE),
-						    parv[0]);
-			    }
+					    parv[0]);
 		    }
 		if (acptr)
 			sp = acptr->serv;

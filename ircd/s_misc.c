@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.8 1997/07/25 20:26:49 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.9 1997/07/28 01:14:16 kalt Exp $";
 #endif
 
 #include <sys/time.h>
@@ -601,21 +601,7 @@ char	*comment;	/* Reason for the exit */
  		{
  			acptr = sptr->serv->userlist->bcptr;
  			acptr->flags |= flags;
-#ifndef NoV28Links
- 			if (cptr->from == acptr->from 
- 			    && cptr->serv->version == SV_OLD)
- 			{
- 				sendto_flag(SCH_LOCAL,
- 					    "Dropping ghost %s (%s) from %s.",
- 					    acptr->name, acptr->user->server,
- 					    acptr->from->name);
- 				exit_one_client(cptr, acptr, &me,
- 						"No Such User");
-				ircstp->is_ghost++;
- 			}
- 			else
-#endif
- 				exit_one_client(cptr, acptr, &me, comment1);
+			exit_one_client(cptr, acptr, &me, comment1);
  		}
  		while (sptr->serv->userlist);
  	}
@@ -750,10 +736,6 @@ char	*comment;
 			    }
 			else
 			    {
-#ifndef NoV28Links
-				sendto_serv_v(cptr, SV_OLD, ":%s QUIT :%s",
-					   sptr->name, comment);
-#endif
 				if (sptr->flags & FLAGS_HIDDEN)
 					/* joys of hostmasking */
 					for (i = fdas.highest; i >= 0; i--)
@@ -975,8 +957,8 @@ char	*name;
 		   ME, RPL_STATSDEBUG, name, sp->is_kill, sp->is_ni);
 	sendto_one(cptr, ":%s %d %s :wrong direction %u empty %u",
 		   ME, RPL_STATSDEBUG, name, sp->is_wrdi, sp->is_empt);
-	sendto_one(cptr, ":%s %d %s :users without servers %u ghosts %u",
-		   ME, RPL_STATSDEBUG, name, sp->is_nosrv, sp->is_ghost);
+	sendto_one(cptr, ":%s %d %s :users without servers %u ghosts N/A",
+		   ME, RPL_STATSDEBUG, name, sp->is_nosrv);
 	sendto_one(cptr, ":%s %d %s :numerics seen %u mode fakes %u",
 		   ME, RPL_STATSDEBUG, name, sp->is_num, sp->is_fake);
 	sendto_one(cptr, ":%s %d %s :auth: successes %u fails %u",

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.18 1997/07/16 19:27:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.19 1997/07/28 01:14:16 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -539,8 +539,7 @@ char	*parv[];
 			if (match(my_name_for_link(ME, aconf->port),
 				    acptr->name) == 0)
 				continue;
-			stok = (bcptr->serv->version != SV_OLD) 
-				? acptr->serv->tok : "";
+			stok = acptr->serv->tok;
 			sendto_one(bcptr, ":%s SERVER %s %d %s :%s", parv[0],
 				   acptr->name, hop+1, stok, acptr->info);
 		    }
@@ -619,15 +618,12 @@ Reg	aClient	*cptr;
 		return exit_client(cptr, cptr, &me, "No C line for server");
 	    }
 
-#ifdef NoV28Links
-	if (cptr->hopcount == SV_OLD)
+	if (cptr->hopcount == SV_OLD) /* lame test, should be == 0 */
 	    {
 		sendto_one(cptr, "ERROR :Server version is too old.");
-		sendto_flag(SCH_ERROR, "Old version (%d) for %s",
-			    cptr->hopcount, inpath);
+		sendto_flag(SCH_ERROR, "Old version for %s", inpath);
 		return exit_client(cptr, cptr, &me, "Old version");
 	    }
-#endif
 
 #ifdef CRYPT_LINK_PASSWORD
 	/* use first two chars of the password they send in as salt */
@@ -763,7 +759,7 @@ Reg	aClient	*cptr;
 	istat.is_serv++;
 	istat.is_myserv++;
 	nextping = timeofday;
-	sendto_flag(SCH_NOTICE, "Link with %s established. (%d%s)", inpath,
+	sendto_flag(SCH_NOTICE, "Link with %s established. (%X%s)", inpath,
 		    cptr->hopcount, (cptr->flags & FLAGS_ZIP) ? "z" : "");
 	(void)add_to_client_hash_table(cptr->name, cptr);
 	/* doesnt duplicate cptr->serv if allocted this struct already */
@@ -776,7 +772,7 @@ Reg	aClient	*cptr;
 	cptr->serv->stok = 1;
 	cptr->flags |= FLAGS_CBURST;
 	(void) add_to_server_hash_table(cptr->serv, cptr);
-	Debug((DEBUG_NOTICE, "Server link established with %s V%d %d",
+	Debug((DEBUG_NOTICE, "Server link established with %s V%X %d",
 		cptr->name, cptr->serv->version, cptr->serv->stok));
 	add_fd(cptr->fd, &fdas);
 #ifdef	USE_SERVICES
@@ -799,7 +795,7 @@ Reg	aClient	*cptr;
 		if ((aconf = acptr->serv->nline) &&
 		    !match(my_name_for_link(ME, aconf->port), cptr->name))
 			continue;
-		stok = (acptr->serv->version != SV_OLD) ? cptr->serv->tok : "";
+		stok = cptr->serv->tok;
 		if (split)
 			sendto_one(acptr,":%s SERVER %s 2 %s :[%s] %s",
 				   ME, cptr->name, stok,
@@ -827,7 +823,6 @@ Reg	aClient	*cptr;
 	**	see previous *WARNING*!!! (Also, original inpath
 	**	is destroyed...)
 	*/
-	i = cptr->serv->version;
 	aconf = cptr->serv->nline;
 	for (acptr = &me; acptr; acptr = acptr->prev)
 	    {
@@ -838,7 +833,7 @@ Reg	aClient	*cptr;
 			continue;
 		split = (MyConnect(acptr) &&
 			 mycmp(acptr->name, acptr->sockhost));
-		stok = (i != SV_OLD) ? acptr->serv->tok : "";
+		stok = acptr->serv->tok;
 		if (split)
 			sendto_one(cptr, ":%s SERVER %s %d %s :[%s] %s",
 				   acptr->serv->up,
@@ -868,35 +863,21 @@ Reg	aClient	*cptr;
 					    acptr->name, acptr->user->server,
 					    acptr->user->servp->tok,
 					    cptr->name);
-			if (i != SV_OLD)
-			    {
-				if (*mlname == '*' &&
-				    match(mlname, acptr->user->server) == 0)
-					stok = me.serv->tok;
-				else
-					stok = acptr->user->servp->tok;
-				send_umode(NULL, acptr, 0, SEND_UMODES, buf);
-				sendto_one(cptr,"NICK %s %d %s %s %s %s :%s",
-					   acptr->name, acptr->hopcount + 1,
-					   acptr->user->username,
-					   acptr->user->host, stok,
-					   (*buf) ? buf : "+", acptr->info);
-			    }
+			if (*mlname == '*' &&
+			    match(mlname, acptr->user->server) == 0)
+				stok = me.serv->tok;
 			else
-			    {
-				sendto_one(cptr,"NICK %s :%d",acptr->name,
-					   acptr->hopcount + 1);
-				sendto_one(cptr,":%s USER %s %s %s :%s",
-					   acptr->name, acptr->user->username,
-					   acptr->user->host,
-					   acptr->user->server, acptr->info);
-				send_umode(cptr, acptr, 0, SEND_UMODES, buf);
-			    }
+				stok = acptr->user->servp->tok;
+			send_umode(NULL, acptr, 0, SEND_UMODES, buf);
+			sendto_one(cptr,"NICK %s %d %s %s %s %s :%s",
+				   acptr->name, acptr->hopcount + 1,
+				   acptr->user->username,
+				   acptr->user->host, stok,
+				   (*buf) ? buf : "+", acptr->info);
 			send_user_joins(cptr, acptr);
 		    }
 		else if (IsService(acptr) &&
-			 (match(acptr->service->dist, cptr->name) == 0
-			  && cptr->serv->version != SV_OLD))
+			 match(acptr->service->dist, cptr->name) == 0)
 		    {
 			if (*mlname == '*' &&
 			    match(mlname, acptr->service->server) == 0)

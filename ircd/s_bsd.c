@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.14 1997/07/25 20:26:48 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.15 1997/07/28 01:14:15 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1000,9 +1000,6 @@ aClient	*cptr;
 		return -1;
 
 	if (!aconf->port)
-		return -1;
-
-	if (cptr->serv->version == SV_OLD)
 		return -1;
 
 	fd = socket(AF_INET, SOCK_STREAM, 0);

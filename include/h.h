@@ -198,9 +198,7 @@ extern	int	sendto_one(aClient *, char *, ...);
 extern	int	vsendto_one(aClient *, char *, va_list);
 extern	void	sendto_channel_butone(aClient *, aClient *, aChannel *, char *, ...);
 extern	void	sendto_serv_butone(aClient *, char *, ...);
-#ifndef NoV28Links
 extern	void	sendto_serv_v(aClient *, int, char *, ...);
-#endif
 extern	void	sendto_common_channels(aClient *, char *, ...);
 extern	void	sendto_channel_butserv(aChannel *, aClient *, char *, ...);
 extern	void	sendto_match_servs(aChannel *, aClient	*, char *, ...);

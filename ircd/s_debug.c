@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.9 1997/07/25 20:26:48 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.10 1997/07/28 01:14:15 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -140,12 +140,6 @@ char	serveropts[] = {
 #ifdef MIRC_KLUDGE
 '$',
 #endif
-'_',
-'V',
-#ifndef NoV28Links
-'0',
-#endif
-'1',
 '\0'};
 
 #include "common.h"

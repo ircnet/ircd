@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.16 1997/07/18 03:04:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.17 1997/07/28 01:14:13 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -760,9 +760,7 @@ void	sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr, char *p
 			if (acptr != from)
 				(void)send_message(acptr, psendbuf, len2);
 		    }
-		else if (!IsAnonymous(chptr) || /* Anonymous channel msgs */
-			 !IsServer(acptr) ||    /* are not sent to old    */
-			 !(acptr->serv->version == SV_OLD))/* server versions*/
+		else
 			(void)send_message(acptr, sendbuf, len1);
 	    }
 	return;
@@ -805,7 +803,6 @@ void	sendto_serv_butone(aClient *one, char *pattern, ...)
 	return;
 }
 
-#ifndef NoV28Links
 #ifndef USE_STDARG
 void	sendto_serv_v(one, ver, pattern, p1, p2, p3, p4,p5,p6,p7,p8,p9,p10,p11)
 aClient *one;
@@ -821,7 +818,7 @@ void	sendto_serv_v(aClient *one, int ver, char *pattern, ...)
 	for (i = fdas.highest; i >= 0; i--)
 		if ((cptr = local[fdas.fd[i]]) &&
 		    (!one || cptr != one->from) && !IsMe(cptr) &&
-		    cptr->serv->version == ver) {
+		    (cptr->serv->version & ver)) {
 			if (!len)
 			    {
 #ifndef USE_STDARG
@@ -838,7 +835,6 @@ void	sendto_serv_v(aClient *one, int ver, char *pattern, ...)
 	}
 	return;
 }
-#endif
 
 /*
  * sendto_common_channels()
@@ -1101,11 +1097,6 @@ void	sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
 			continue;
-#ifndef NoV28Links
-		if (chptr && *chptr->chname == '+' &&
-		    cptr->serv->version == SV_OLD)
-			continue;
-#endif
 		if (!len)
 		    {
 #ifndef USE_STDARG
