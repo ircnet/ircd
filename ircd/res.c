@@ -31,7 +31,7 @@
 #include "res.h"
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.5 1997/05/15 20:31:39 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.6 1997/06/19 15:06:44 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -569,6 +569,16 @@ HEADER	*hptr;
 		switch(type)
 		{
 		case T_A :
+			if (dlen != sizeof(dr))
+			    {
+				sendto_flag(SCH_ERROR,
+				    "Bad IP length (%d) returned for %s", dlen,
+					    hostbuf);
+				Debug((DEBUG_DNS,
+				       "Bad IP length (%d) returned for %s",
+				       dlen, hostbuf));
+				return -2;
+			    }
 			hp->h_length = dlen;
 			if (ans == 1)
 				hp->h_addrtype =  (class == C_IN) ?
@@ -624,7 +634,7 @@ HEADER	*hptr;
 			cp += dlen;
 			Debug((DEBUG_INFO,"got cname %s",hostbuf));
 			if (bad_hostname(hostbuf, len))
-				return -1;
+				return -1; /* a break would be enough here */
 			if (alias >= &(hp->h_aliases[MAXALIASES-1]))
 				break;
 			*alias = (char *)MyMalloc(len + 1);
@@ -747,7 +757,7 @@ char	*lp;
 #ifdef DEBUG
 	Debug((DEBUG_INFO,"get_res:Proc answer = %d",a));
 #endif
-	if (a && rptr->type == T_PTR)
+	if (a > 0 && rptr->type == T_PTR)
 	    {
 		struct	hostent	*hp2 = NULL;
 
