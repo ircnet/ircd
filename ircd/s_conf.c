@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.5 1997/05/02 14:28:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.6 1997/05/05 18:27:02 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -1123,12 +1123,15 @@ badlookup:
 	return -1;
 }
 
-int	find_kill(cptr, doall)
+int	find_kill(cptr, doall, comment)
 aClient	*cptr;
 int	doall;
+char	**comment;
 {
-	char	reply[256], *host, *name;
+	static char	reply[256];
+	char *host, *name;
 	aConfItem *tmp;
+	int	now;
 
 	if (!cptr->user)
 		return 0;
@@ -1151,21 +1154,26 @@ int	doall;
  		    (!name || match(tmp->name, name) == 0) &&
 		    (!tmp->port || (tmp->port == cptr->acpt->port)))
 		    {
+			now = 0;
 			if (!BadPtr(tmp->passwd) && isdigit(*tmp->passwd) &&
-			    !check_time_interval(tmp->passwd, reply))
+			    !(now = check_time_interval(tmp->passwd, reply)))
 				continue;
+			if (now == ERR_YOUWILLBEBANNED)
+				tmp = NULL;
 			break;
 		    }
 	    }
 
 	if (*reply)
-		sendto_one(cptr, reply,
-			   ME, ERR_YOUREBANNEDCREEP, cptr->name);
+		sendto_one(cptr, reply, ME, now, cptr->name);
 	else if (tmp)
 		sendto_one(cptr, ":%s %d %s :%s", ME,
 			   ERR_YOUREBANNEDCREEP, cptr->name,
 			   BadPtr(tmp->passwd) ?
 			   "You are not welcome to this server" : tmp->passwd);
+
+	if (tmp && !BadPtr(tmp->passwd))
+		*comment = tmp->passwd;
 
  	return (tmp ? -1 : 0);
 }

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.2 1997/04/14 15:04:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.3 1997/05/05 18:27:02 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -321,6 +321,7 @@ time_t	currenttime;
 	Reg	int	kflag = 0;
 	int	ping = 0, i, rflag = 0;
 	time_t	oldest = 0, timeout;
+	char	*reason;
 
 	for (i = highest_fd; i >= 0; i--)
 	    {
@@ -336,13 +337,16 @@ time_t	currenttime;
 		    {
 			if (IsPerson(cptr))
 			    {
-				kflag = find_kill(cptr, rehashed);
+				kflag = find_kill(cptr, rehashed, &reason);
 #ifdef R_LINES_OFTEN
 				rflag = find_restrict(cptr);
 #endif
 			    }
 			else
+			    {
 				kflag = rflag = 0;
+				reason = NULL;
+			    }
 		    }
 		ping = IsRegistered(cptr) ? get_client_ping(cptr) :
 					    CONNECTTIMEOUT;
@@ -408,12 +412,17 @@ time_t	currenttime;
 			 */
 			if (kflag && IsPerson(cptr))
 			    {
+				char buf[100];
+
 				sendto_flag(SCH_NOTICE,
 					    "Kill line active for %s",
 					    get_client_name(cptr, FALSE));
 				cptr->exitc = EXITC_KLINE;
-				(void)exit_client(cptr, cptr, &me,
-						  "Kill line active");
+				if (reason)
+					sprintf(buf, "Kill line active: %.80s",
+						reason);
+				(void)exit_client(cptr, cptr, &me, (reason) ?
+						  buf : "Kill line active");
 			    }
 
 #if defined(R_LINES) && defined(R_LINES_OFTEN)

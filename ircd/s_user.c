@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.6 1997/05/05 15:09:23 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.7 1997/05/05 18:27:03 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -349,6 +349,8 @@ char	*nick, *username;
 
 	if (MyConnect(sptr))
 	    {
+		char *reason = NULL;
+
 		if ((i = check_client(sptr)))
 		    {
 			ircstp->is_ref++;
@@ -448,8 +450,10 @@ char	*nick, *username;
 		/*
 		 * following block for the benefit of time-dependent K:-lines
 		 */
-		if (find_kill(sptr, 1))
+		if (find_kill(sptr, 1, &reason))
 		    {
+			char buf[100];
+
 			sendto_flag(SCH_LOCAL, "K-lined %s@%s.",
 				    sptr->user->username, sptr->sockhost);
 			ircstp->is_ref++;
@@ -463,7 +467,10 @@ char	*nick, *username;
 			sendto_flog(sptr, " K lined ", 0, sptr->user->username,
 				    sptr->user->host);
 #endif
-			return exit_client(cptr, sptr, &me, "K-lined");
+			if (reason)
+				sprintf(buf, "K-lined: %.80s", reason);
+			return exit_client(cptr, sptr, &me, (reason) ? buf :
+					   "K-lined");
 		    }
 #ifdef R_LINES
 		if (find_restrict(sptr))
