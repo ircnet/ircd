@@ -24,6 +24,7 @@
 #define MSG_WHOWAS   "WHOWAS"	/* WHOW */
 #define MSG_USER     "USER"	/* USER */
 #define MSG_NICK     "NICK"	/* NICK */
+#define MSG_UNICK    "UNICK"	/* UNICK */
 #define MSG_SERVER   "SERVER"	/* SERV */
 #define MSG_LIST     "LIST"	/* LIST */
 #define MSG_TOPIC    "TOPIC"	/* TOPI */
@@ -32,6 +33,7 @@
 #define MSG_QUIT     "QUIT"	/* QUIT */
 #define MSG_SQUIT    "SQUIT"	/* SQUI */
 #define MSG_KILL     "KILL"	/* KILL */
+#define MSG_SAVE     "SAVE"	/* SAVE */
 #define MSG_INFO     "INFO"	/* INFO */
 #define MSG_LINKS    "LINKS"	/* LINK */
 #define MSG_SUMMON   "SUMMON"	/* SUMM */

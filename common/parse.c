@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.25 1999/04/14 17:29:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.26 1999/08/15 20:54:49 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -43,6 +43,9 @@ struct Message msgtab[] = {
 #endif
   { MSG_JOIN,    m_join,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_MODE,    m_mode,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+#ifndef CLIENT_COMPILE
+  { MSG_UNICK,   m_unick,    MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+#endif
   { MSG_NICK,    m_nick,     MAXPARA, MSG_LAG, 0, 0, 0L},
   { MSG_PART,    m_part,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_QUIT,    m_quit,     MAXPARA, MSG_LAG, 0, 0, 0L},
@@ -64,6 +67,7 @@ struct Message msgtab[] = {
   { MSG_KILL,    m_kill,     MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
 #endif
 #ifndef CLIENT_COMPILE
+  { MSG_SAVE,    m_save,     MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_USER,    m_user,     MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_AWAY,    m_away,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_UMODE,   m_umode,    MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
@@ -157,6 +161,18 @@ Reg	aClient *cptr;
 
 	if (name && *name)
 		acptr = hash_find_client(name, cptr);
+
+	return acptr;
+    }
+
+aClient *find_uid(uid, cptr)
+char	*uid;
+Reg	aClient *cptr;
+    {
+	aClient *acptr = cptr;
+
+	if (uid && isdigit(*uid))
+		acptr = hash_find_uid(uid, cptr);
 
 	return acptr;
     }
