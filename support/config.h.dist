@@ -429,8 +429,8 @@
  * (HANGONRETRYDELAY). This latter has to be long enough that the
  * other end of the connection has time to notice it broke too.
  */
-#define HANGONRETRYDELAY 10	/* Recommended value: 10 seconds */
-#define HANGONGOODLINK 300	/* Recommended value: 5 minutes */
+#define HANGONRETRYDELAY 30	/* Recommended value: 30 seconds */
+#define HANGONGOODLINK 900	/* Recommended value: 15 minutes */
 
 /*
  * Number of seconds to wait for write to complete if stuck.
