@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.21 1999/07/04 22:09:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.22 1999/07/04 22:35:16 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -542,9 +542,6 @@ u_int cl;
 	}
 
     cldata[cl].wfd = fd; /*so that socks_work() is called when connected*/
-
-    if (mydata->options & (OPT_V4ONLY|OPT_V5ONLY) == 0)
-	    cldata[cl].timeout -= cldata[cl]->instance->timeout % 2;
 
     return 0;
 }
