@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.28 1997/09/22 20:22:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.29 1997/09/23 19:12:44 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1381,9 +1381,9 @@ char	*parv[];
 			else
 				penalty += 5;
 		    }
+		sendto_one(sptr, rpl_str(RPL_ENDOFWHO, parv[0]),
+			   BadPtr(mask) ?  "*" : mask);
 	    }
-	sendto_one(sptr, rpl_str(RPL_ENDOFWHO, parv[0]),
-		   BadPtr(mask) ?  "*" : mask);
 	return penalty;
 }
 
