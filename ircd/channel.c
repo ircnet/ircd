@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.29 1998/01/27 13:22:54 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.30 1998/03/22 19:17:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1677,13 +1677,15 @@ char	*parv[];
 #else
 		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
 						parv[0], name);
-		if (s) {
+		if (s && chptr->users == 1)
+		    {
+			/* no need if user is creating the channel */
 			sendto_channel_butserv(chptr, sptr,
 					       ":%s MODE %s +%s %s %s",
 					       cptr->name, name, s, parv[0],
 					       *(s+1) == 'v' ? parv[0] : "");
 			*--s = '\007';
-		}
+		    }
 #endif
 		/*
 		** If s wasn't set to chop+1 above, name is now #chname^Gov
