@@ -1,3 +1,11 @@
+2002-05-20  Jakub Vlasek
+
+	* s_conf.c/delist_conf(): remove config entry from conf linked list
+	  while freeing it (reported by BitKoenig).
+	* buildm4: added EXTRAPORT, SERVICE macros, fixed RESTRICTED and ME
+	  macros (from W.Campbell.
+	* m4macros: updated (from W. Campbell).
+	
 2002-05-19  Jakub Vlasek
 	
 	* s_user.c/who_find(): Initialise myoper to 0, show +i user
