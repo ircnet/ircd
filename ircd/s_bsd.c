@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.37 1998/08/24 17:40:38 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.38 1998/09/12 23:01:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1991,7 +1991,7 @@ FdAry	*fdp;
 	    {
 		read_iauth();
 		nfds--;
-		CLR_READ_EVENT(udpfd);
+		CLR_READ_EVENT(adfd);
 	    }
 #endif
 
