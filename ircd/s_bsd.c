@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.57 1999/03/05 02:05:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.58 1999/03/07 00:26:14 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -3194,6 +3194,8 @@ static	void	do_dns_async()
 						sendto_iauth("%d N %s",
 							cptr->fd, hp->h_name);
 				    }
+				else
+					sendto_iauth("%d d", cptr->fd);
 #endif
 			    }
 			break;
