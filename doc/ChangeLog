@@ -1,3 +1,12 @@
+2004-07-03  Piotr Kucharski
+
+	* channel.c/match_modeid(): introducing ACL_CONNECTREMOTE surfaced year
+	  old bug! (noticed by ZZyZZ).
+	* struct_def.h: new ACL_NOPENALTY (P), ACL_CANFLOOD (p).
+	* s_conf.c/oline_flags_parse(), oline_flags_to_string(): new flags.
+	* parse.c/parse(): don't add penalty if ACL_NOPENALTY.
+	* s_bsd.c/read_packet(): don't disconnect if ACL_CANFLOOD.
+
 2004-07-02  Piotr Kucharski
 
 	* s_user.c/find_denied(): added reverse D: (disable AC when given server

@@ -1,5 +1,5 @@
 This is stats.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-6639/sgmltmp.stats.info.2.
+/tmp/linuxdoc-dir-8244/sgmltmp.stats.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ STATS unleashed
 ***************
 
      Piotr Kucharski
-     $Id: stats.info,v 1.3 2004/06/29 00:44:57 chopin Exp $
+     $Id: stats.info,v 1.4 2004/07/03 16:12:26 chopin Exp $
 
    This document describes all STATS for ircd server 2.11.
 
@@ -213,7 +213,9 @@ Also ending 219 numeric is omitted in whole.
      Deny autoconnect to servers that names match 4th field or that are
      in a class specified by 5th field if any of the servers matching
      2nd field or defined to be in class specified in 3rd field are
-     currently present on the network.
+     currently present on the network or, if 2nd field prefixed with
+     "!", denies autoconnect if none of the servers matching 2nd field
+     is present on the network.
 
 `i, I - allowed user connections'
           I 127.0.0.1 <NULL> <NULL> 0 10 -
@@ -225,13 +227,20 @@ Also ending 219 numeric is omitted in whole.
      explained in the INSTALL file). 2nd and 4th fields can be prefixed
      by "user@", which means ident must match as well.
 
-`k, K - disallowed user connections (aka kill lines)'
+`K - disallowed user connections (aka kill lines)'
           K pc*.example.org sorry,no,entrance * 0 -1
 
      The hostname or IP to match (CIDR allowed), kill line comment or
      (very rarely used) time interval when kill line is effective,
      username or auth to match, port on which kill line is effective.
      Lowercase "k" matches on auth, read the INSTALL file for more info.
+
+`k - disallowed user connections (aka temporary kill lines)'
+          K pc*.example.org sorry,no,entrance * 1200 -1
+
+     The same as for "stats K" with one exception: field last but one
+     shows time to live of a temporary kill line (and it always matches
+     on all ports).
 
 `l, L - link info'
           clientname[username@host.name] 0 181 11431 37 318 :6442
@@ -366,6 +375,12 @@ Also ending 219 numeric is omitted in whole.
      name mask.  (If all match, server is rejected; this one rejects
      all 2.10 servers compiled with 'D' (debugmode).)
 
+`X - denied connections'
+          X * . . *
+
+     Denies client connection based on what client sends in USER
+     command. Fields of X line correspond one by one to those of USER.
+
 `y, Y - class lines'
           Y 0 300 0 16000 3000000 12.2 24.2 13
 
@@ -433,6 +448,6 @@ Tag Table:
 Node: Top123
 Node: Introduction427
 Node: STATS unleashed886
-Node: Enhancements16027
+Node: Enhancements16621
 
 End Tag Table

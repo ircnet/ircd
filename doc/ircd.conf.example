@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.20 2004/07/02 15:22:59 chopin Exp $
+# $Id: ircd.conf.example,v 1.21 2004/07/03 16:12:26 chopin Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -273,8 +273,9 @@ O:*.bu.edu:ITBites:jhs::10
 #
 o:rocker@csa.bu.edu:T0eiVgHrqeKTQ:Rocker::10
 #
-# New for 2.11 as flags for O:line that specify permissions for operator.
-# The simplest is flag 'A' -- all possible permissions. 
+# New for 2.11 are flags for O:line. They specify permissions for various
+# activities (kill, connect, squit etc.) of an operator.
+# The simplest form is flag 'A' -- all possible permissions. 
 # Note that lower case o:line (which will be removed in next vesion) and
 # O:line with 'L' flag have exactly the same meaning.
 #

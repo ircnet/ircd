@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.66 2004/07/02 15:22:58 chopin Exp $
+  $Id: INSTALL.txt,v 1.67 2004/07/03 16:12:26 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -875,6 +875,10 @@
 
         +o  & - allows joining &CLIENTS
 
+        +o  P - removes penalty
+
+        +o  T - allows flooding
+
         ``L'' flag cannot be overridden by other flags.  If <Flags>
         field is left empty, no privileges will be granted.
 
@@ -987,6 +991,7 @@
         requires ircd to be compiled with proper #define!
 
         K:192.11.35.0/24::*:0:
+
         This line disallows all hosts whose IP address is from network
         ``192.11.35.0/24'' to login to the ircd.
 
@@ -1185,6 +1190,7 @@
   format as the ``C'' entries.
 
 
+
      FFoorrmmaatt
         The format for the NOCONNECT entry in the ``ircd.conf'' is:
 
@@ -1317,6 +1323,7 @@
         present on the network matches ``*.edu''.
 
         D::2:eff.org:3:
+
         Do not auto-connect to ``eff.org'', or any server in class ``3''
         if a server defined to be in class ``2'' is currently present on
         the network.
@@ -1447,6 +1454,7 @@
      FFllaaggss
         If any flag specified in this field is found in the peer's flags
         string, it will be rejected.
+
      SSeerrvveerr MMaasskk
         This field is used to match server names.  The V line will be
         used for servers matching the mask given in this field.
@@ -1513,6 +1521,7 @@
 
      EExxaammppllee
         Q::of the security holes:foo.bar.baz::
+
         This command excludes a server named ``foo.bar.baz'', the reason
         is given to be security holes (you should give a reason, it is
         polite). The first field is unused, so leave it empty.
@@ -1579,6 +1588,7 @@
         B:<Class|Host Mask>::<Server Name>:<Port>:
 
 
+
      BB  This specifies a Bounce record.
 
      CCllaassss||HHoosstt MMaasskk
@@ -1636,7 +1646,6 @@
         trouble running ircd, or wish to discuss the future, you can
         subscribe by sending an email to majordomo@irc.org, with
         ``ssuubbssccrriibbee iirrccdd--uusseerrss'' in the body.
-
         If you just have a question and don't want to subscribe to the
         list, mail to ircd-users@irc.org.  Be sure to indicate which
         version you are using.

@@ -1,6 +1,6 @@
   STATS unleashed
   Piotr Kucharski
-  $Id: stats.txt,v 1.3 2004/06/29 00:44:57 chopin Exp $
+  $Id: stats.txt,v 1.4 2004/07/03 16:12:26 chopin Exp $
 
   This document describes all STATS for ircd server 2.11.
 
@@ -232,7 +232,9 @@
      Deny autoconnect to servers that names match 4th field or that are
      in a class specified by 5th field if any of the servers matching
      2nd field or defined to be in class specified in 3rd field are cur-
-     rently present on the network.
+     rently present on the network or, if 2nd field prefixed with ``!'',
+     denies autoconnect if none of the servers matching 2nd field is
+     present on the network.
 
 
      ii,, II -- aalllloowweedd uusseerr ccoonnnneeccttiioonnss
@@ -250,9 +252,10 @@
      which means ident must match as well.
 
 
-     kk,, KK -- ddiissaalllloowweedd uusseerr ccoonnnneeccttiioonnss ((aakkaa kkiillll lliinneess))
+     KK -- ddiissaalllloowweedd uusseerr ccoonnnneeccttiioonnss ((aakkaa kkiillll lliinneess))
 
-     K pc*.example.org sorry,no,entrance * 0 -1
+
+          K pc*.example.org sorry,no,entrance * 0 -1
 
 
 
@@ -260,6 +263,18 @@
      (very rarely used) time interval when kill line is effective, user-
      name or auth to match, port on which kill line is effective. Lower-
      case ``k'' matches on auth, read the INSTALL file for more info.
+
+
+     kk -- ddiissaalllloowweedd uusseerr ccoonnnneeccttiioonnss ((aakkaa tteemmppoorraarryy kkiillll lliinneess))
+
+
+          K pc*.example.org sorry,no,entrance * 1200 -1
+
+
+
+     The same as for ``stats K'' with one exception: field last but one
+     shows time to live of a temporary kill line (and it always matches
+     on all ports).
 
 
      ll,, LL -- lliinnkk iinnffoo
@@ -312,9 +327,9 @@
 
 
      1st is servername (and its socketname), 2nd is sequence number of
-     last udp ping sent, 3rd is number of received answers, 4th is
-     average response time in miliseconds, 5th is preference used in
-     autoconnecting. Only last 20 minutes are remembered.
+     last udp ping sent, 3rd is number of received answers, 4th is aver-
+     age response time in miliseconds, 5th is preference used in auto-
+     connecting. Only last 20 minutes are remembered.
 
 
      PP -- ppoorrttss lliisstteenniinngg
@@ -360,8 +375,7 @@
 
      ss,, SS -- sseerrvviiccee lliinneess
 
-
-          S *@192.168.1.13 * ServiceName 0x3F00FFFF 0
+     S *@192.168.1.13 * ServiceName 0x3F00FFFF 0
 
 
 
@@ -374,6 +388,8 @@
 
 
           accepts 1269601 refused 1173948
+
+
 
      Clients accepted and refused.
 
@@ -416,8 +432,6 @@
      ago, but little sendQ), accepted (more than 30s ago), dropped
      because of too high sendQ (64kB), too young link (less than 60
      sec), simply refused.
-
-
           whowas turnover 490/13570/34247 [90]
           ndelay turnover 8001/46556/195114 [1800]
           abuse protections 1 strict 1
@@ -428,12 +442,11 @@
      Current number of delayed fds and total.
 
 
-
-     Client - Server
-     connected 58205 1
-     bytes sent 4566999994 30687304
-     bytes recv 376478537 500907236
-     time connected 844868798 367786
+          Client - Server
+          connected 58205 1
+          bytes sent 4566999994 30687304
+          bytes recv 376478537 500907236
+          time connected 844868798 367786
 
 
 
@@ -478,6 +491,17 @@
      2nd field is version to match, 3rd is server flags, 4th is server
      name mask.  (If all match, server is rejected; this one rejects all
      2.10 servers compiled with 'D' (debugmode).)
+
+
+     XX -- ddeenniieedd ccoonnnneeccttiioonnss
+
+
+          X * . . *
+
+
+
+     Denies client connection based on what client sends in USER com-
+     mand. Fields of X line correspond one by one to those of USER.
 
 
      yy,, YY -- ccllaassss lliinneess
@@ -548,7 +572,6 @@
 
 
      Total amount of memory used from sbrk() call.
-
 
 
      ?? -- ccoonnnneecctteedd sseerrvveerrss iinnffoo
