@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.172 2004/03/14 17:46:00 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.173 2004/03/16 22:09:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1173,8 +1173,8 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		** Remove existing link only if it has been linked for longer
 		** and has sendq higher than a threshold. -Vesa
 		*/
-		if ((acptr = find_name(host, NULL))
-		    || (acptr = find_mask(host, NULL)))
+		if (((acptr = find_name(host, NULL))
+		    || (acptr = find_mask(host, NULL))) && IsServer(acptr))
 		    {
 			if (MyConnect(acptr) &&
 			    DBufLength(&acptr->sendQ) > CHREPLLEN &&
