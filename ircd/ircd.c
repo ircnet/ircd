@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.105 2003/10/19 17:27:33 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.106 2003/11/03 21:30:42 jv Exp $";
 #endif
 
 #include "os.h"
@@ -675,11 +675,6 @@ int	main(int argc, char *argv[])
 	sbrk0 = (char *)sbrk((size_t)0);
 	uid = getuid();
 	euid = geteuid();
-#ifdef	PROFIL
-	(void)monstartup(0, etext);
-	(void)moncontrol(1);
-	(void)signal(SIGUSR1, s_monitor);
-#endif
 
 #ifdef	CHROOTDIR
 	ircd_res_init();
