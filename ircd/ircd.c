@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.67 2001/12/20 22:42:25 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.68 2001/12/25 20:44:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -568,6 +568,7 @@ aClient	*mp;
 	(void)add_to_client_hash_table(mp->name, mp);
 
 	setup_server_channels(mp);
+	strcpy(me.serv->sid, SERVER_ID);
 }
 
 /*
@@ -881,8 +882,7 @@ char	*argv[];
 
 	dbuf_init();
 	setup_me(&me);
-	init_sid(SERVER_ID);
-	add_to_sid_hash_table(SERVER_ID,&me);
+	add_to_sid_hash_table(me.serv->sid,&me);
 	check_class();
 	ircd_writetune(tunefile);
 	if (bootopt & BOOT_INETD)
