@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.70 2003/02/16 03:45:09 jv Exp $
+ *   $Id: struct_def.h,v 1.71 2003/02/17 01:55:42 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -166,7 +166,9 @@ typedef struct        LineItem aExtData;
 #define	FLAGS_RILINE	0x0020000 /* Restricted i-line [unused?] */
 #define	FLAGS_QUIT	0x0040000 /* QUIT :comment shows it's not a split */
 #define	FLAGS_SPLIT	0x0080000 /* client QUITting because of a netsplit */
-#define	FLAGS_HIDDEN	0x0100000 /* netsplit is behind a hostmask */
+#define	FLAGS_HIDDEN	0x0100000 /* netsplit is behind a hostmask,
+				     also used for marking clients in who_find
+				   */
 #define	FLAGS_UNKCMD	0x0200000 /* has sent an unknown command */
 #define	FLAGS_ZIP	0x0400000 /* link is zipped */
 #define	FLAGS_ZIPRQ	0x0800000 /* zip requested */
