@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.4 1997/04/15 13:50:47 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.5 1997/04/15 19:46:49 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -2817,9 +2817,6 @@ static	void	polludp()
 		    }
 	    }
 
-	sendto_flag(SCH_DEBUG, "udp packet from: %d bytes from %s.%d",
-		    n,inetntoa((char *)&from.sin_addr),
-		    ntohs(from.sin_port));
 	if (timeofday == last)
 	    {
 		if (timeofday > lasterr + 30)
