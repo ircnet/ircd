@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.203 2004/05/18 22:04:58 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.204 2004/05/24 22:48:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1262,7 +1262,9 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				if (*mode->key && (ischop || IsServer(cptr)))
 				    {
 					lp = &chops[opcnt++];
-					lp->value.cp = mode->key;
+					lp->value.cp = *parv;
+					if (strlen(lp->value.cp) > KEYLEN)
+						lp->value.cp[KEYLEN] = '\0';
 					lp->flags = MODE_KEY|MODE_DEL;
 					keychange = 1;
 				    }
