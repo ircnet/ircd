@@ -1,3 +1,10 @@
+2002-04-07  Jakub Vlasek
+	* bsd.c/deliver_it(): Removed call to hold_server() (which has been
+	  removed).
+	* s_serv.c/m_eob(): Fix notices about received EOBs, warn about
+	  multiple local EOBs.
+	* support.c/inetntop(): Use the_size for bcopy() properly.
+
 2002-04-06  Jakub Vlasek
 	* s_user.c/save_user(): Send ME as source of RPL_SAVENICK if collision
 	  is generated locally.
