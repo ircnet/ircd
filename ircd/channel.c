@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.175 2004/02/13 02:41:16 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.176 2004/02/13 02:45:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2328,10 +2328,14 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		else
 			clean_channelname(name), s = NULL;
 
+		/* Get chptr for given name. Do not create channel yet.
+		** Can return NULL. */
 		chptr = get_channel(sptr, name, !CREATE);
 
 		if (chptr && IsMember(sptr, chptr))
+		{
 			continue;
+		}
 
 		if (MyConnect(sptr) && !(chptr && IsQuiet(chptr)) &&
 			sptr->user->joined >= MAXCHANNELSPERUSER)
@@ -2345,20 +2349,31 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (MyConnect(sptr) &&
 		    !strncmp(name, "\x23\x1f\x02\xb6\x03\x34\x63\x68\x02\x1f",
 			     10))
-		    {
+		{
 			sptr->exitc = EXITC_VIRUS;
 			return exit_client(sptr, sptr, &me, "Virus Carrier");
-		    }
+		}
 
 		if (!chptr)
+		{
+			/* Oh well, create the channel. */
 			chptr = get_channel(sptr, name, CREATE);
+		}
 
-		if (!chptr ||
-		    (MyConnect(sptr) && (i = can_join(sptr, chptr, key))))
-		    {
+		if (!chptr)
+		{
+			/* Should NEVER happen. */
+			sendto_flag(SCH_ERROR, "Could not create channel!");
+			sendto_one(sptr, "%s *** %s :Could not create channel!",
+				ME, BadTo(parv[0]));
+			continue;
+		}
+
+		if (MyConnect(sptr) && (i = can_join(sptr, chptr, key)))
+		{
 			sendto_one(sptr, replies[i], ME, BadTo(parv[0]), name);
 			continue;
-		    }
+		}
 
 		/*
 		** local client is first to enter previously nonexistant
