@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.183 2004/03/30 13:27:45 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.184 2004/03/30 13:59:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1996,6 +1996,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* Although I have no idea, why only for opers. --B. */
 		case 'o': case 'O':	/* O:lines */
 		case 'c': 		/* C:/N: lines */
+		case 'C': 		/* class usage */
 		case 'h': case 'H':	/* H:/D: lines */
 		case 'a': case 'A':	/* iauth conf */
 		case 'b': case 'B':	/* B:lines */
