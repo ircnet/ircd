@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.21 2002/01/05 04:15:46 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.22 2002/01/06 02:22:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -707,12 +707,12 @@ aClient	*cptr;
 /*
 ** del_from_sid_hash_table
 */
-int	del_from_sid_hash_table(aServer *sptr, aClient *cptr)
+int	del_from_sid_hash_table(aServer *sptr)
 {
 	Reg	aServer	*tmp, *prev = NULL;
 	Reg	u_int	hashv;
 
-	hashv = cptr->serv->sidhashv;
+	hashv = sptr->sidhashv;
 	hashv %= _SIDSIZE;
 	for (tmp = (aServer *)sidTable[hashv].list; tmp; tmp = tmp->sidhnext)
 	{
