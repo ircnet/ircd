@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.35 1999/03/10 00:30:16 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.36 1999/04/12 19:28:36 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.10.2.
 </abstract>
@@ -1160,7 +1160,8 @@ connecting to you based on their version and on compile time
 options.
 <tag/Format/<verb>V:&lt;Version Mask&gt;:&lt;Flags&gt;:&lt;Server Mask&gt;::</verb>
 <tag/Version Mask/ The matching version number strings will be rejected.
-<tag/Flags/ The matching version flags strings will be rejected.
+<tag/Flags/ If any flag specified in this field is found in
+the peer's flags string, it will be rejected.
 <tag/Server Mask/ This field is used to match server names.
 The V line will be used for servers matching the mask given
 in this field.
@@ -1172,20 +1173,20 @@ identification.  This implementation uses the id
 <p>
 Disallows any ``IRC'' server which version is 2.10.1* to connect.
 <p>
-V:IRC/021001*:IRC/*D*:*::
+V:IRC/021001*:IRC/D:*::
 <p>
 Disallows any ``IRC'' server which version is 2.10.1* or
 which has been compiled with DEBUGMODE defined to connect.
 <p>
-V:*/0209*::*::
+V:*/0209*::::
 <p>
 Disallows any server using the 2.9 protocol to connect.
 <tag/Note/  It is possible to have and use multiple V-lines
 for the one server mask.
 <p>
-V:IRC/021001*:*:*::
+V:IRC/021001*::*::
 <p>
-V:IRC/021002*:*:*::
+V:IRC/021002*::*::
 <p>
 is allowed.
 <tag/Protocol Version/ Only the 4 first digit of the
