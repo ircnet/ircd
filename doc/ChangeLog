@@ -6,6 +6,26 @@
 	* s_misc.c/exit_client(): Send SQUIT to remote server when closing
 	  link.
 
+2004-02-13  Piotr Kucharski
+
+	* INSTALL.sgml: update.
+
+2004-02-12  Piotr Kucharski
+
+	* s_user.c, s_debug.c, config.h.dist: removed OPER_REMOTE 
+	  (now default), though left possibility to define NO_OPER_REMOTE,
+	  for those who need it.
+	* channel.c/remove_user_from_channel(): record reop time for all
+	  channels, not only !chans.
+	* s_misc.c, s_misc_ext.h: myrand() and mysrand() added.
+	* channel.c/collect_channel_garbage(): a bit rewritten, and made
+	  aware of IsSplit not to call reop_channel during split.
+	* channel.c/reop_channel(): got rid of "small +r !channels get
+	  all clients reopped", unified reop mechanism for both !channels
+	  (+R and +r) and #channels (+R), made it more random and of course
+	  matching +R.
+	* ircd.c/main(), s_conf.c/rehash(): init srand.
+
 2004-02-11  Piotr Kucharski
 
 	* parse.c: unick requires registered connection (msgtab).
