@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.19 1997/09/03 17:46:05 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.20 1997/09/03 18:05:59 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -119,12 +119,8 @@ Reg	char	*ch;	/* search string (may include wilds) */
 	if (next != tmp)
 		return next;
 	for ( ; next; next = next->next)
-	    {
-		if (IsService(next))
-			continue;
 		if (!match(ch,next->name) || !match(next->name,ch))
 			break;
-	    }
 	return next;
 }
 
@@ -196,7 +192,7 @@ int	server, parc;
 		    }
 	 if (acptr)
 	    {
-		if (IsMe(acptr) || MyClient(acptr))
+		if (IsMe(acptr) || MyClient(acptr) || MyService(acptr))
 			return HUNTED_ISME;
 		if (match(acptr->name, parv[server]))
 			parv[server] = acptr->name;
@@ -1416,7 +1412,7 @@ char	*parv[];
 		for (acptr = client; (acptr = next_client(acptr, nick));
 		     acptr = acptr->next)
 		    {
-			if (IsServer(acptr))
+			if (IsServer(acptr) || IsService(acptr))
 				continue;
 			/*
 			 * I'm always last :-) and acptr->next == NULL!!
@@ -1693,7 +1689,7 @@ char	*parv[];
 	static	char	quitc[] = "I Quit";
 	register char *comment = (parc > 1 && parv[1]) ? parv[1] : quitc;
 
-	if (MyClient(sptr))
+	if (MyClient(sptr) || MyService(sptr))
 		if (!strncmp("Local Kill", comment, 10) ||
 		    !strncmp(comment, "Killed", 6))
 			comment = quitc;
