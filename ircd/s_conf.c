@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.106 2004/04/15 12:52:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.107 2004/04/17 02:33:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -226,11 +226,13 @@ int    match_ipmask(char *mask, aClient *cptr, int maskwithusername)
 	char	*p;
 	struct  IN_ADDR addr;
 	char	dummy[128];
+	char	*omask;
 	u_long	lmask;
 #ifdef	INET6
 	int	j;
 #endif
  
+	omask = mask;
 	strncpyzt(dummy, mask, sizeof(dummy));
 	mask = dummy;
 	if (maskwithusername && (p = index(mask, '@')))
@@ -290,7 +292,7 @@ int    match_ipmask(char *mask, aClient *cptr, int maskwithusername)
 #endif
 badmask:
 	if (maskwithusername)
-	sendto_flag(SCH_ERROR, "Ignoring bad mask: %s", mask);
+	sendto_flag(SCH_ERROR, "Ignoring bad mask: %s", omask);
 	return -1;
 }
 
