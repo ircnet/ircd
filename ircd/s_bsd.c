@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.153 2004/08/10 14:11:36 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.154 2004/08/10 14:12:56 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1346,7 +1346,7 @@ void	close_connection(aClient *cptr)
 	if (cptr->fd >= 0)
 	{
 #if defined(USE_IAUTH)
-		if (!IsListener(cptr))
+		if (!IsListener(cptr) && !IsConnecting(cptr))
 		{
 			/* iauth doesn't know about listening FD nor
 			 * cancelled outgoing connections.
