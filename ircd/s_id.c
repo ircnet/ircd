@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.1 1998/05/05 23:30:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.2 1998/10/08 08:35:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -167,7 +167,7 @@ collect_chid()
 	    if (close_chid((*chptr)->chname) == 0)
 		{
 		    del = *chptr;
-		    chptr = &(del->nextch);
+		    *chptr = del->nextch;
 		    istat.is_cchan--;
 		    istat.is_cchanmem -= sizeof(aChannel) +strlen(del->chname);
 		    MyFree((char *)del);
