@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.45 2002/06/01 22:11:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.46 2002/06/02 00:47:07 jv Exp $";
 #endif
 
 #include "os.h"
@@ -821,6 +821,8 @@ char	*comment;
 			add_history(sptr, (sptr == cptr) ? &me : NULL);
 #endif
 			off_history(sptr);
+			del_from_hostname_hash_table(sptr->user->host,
+						     sptr->user);
 		    }
 	    }
 	else if (sptr->name[0] && IsService(sptr))
