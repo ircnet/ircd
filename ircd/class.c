@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: class.c,v 1.12 2004/05/12 16:34:50 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: class.c,v 1.13 2004/06/21 18:10:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -210,6 +210,10 @@ void	initclass()
 	MaxSendq(FirstClass()) = QUEUELEN;
 	Links(FirstClass()) = 0;
 	NextClass(FirstClass()) = NULL;
+	MaxHLocal(FirstClass()) = 1;
+	MaxUHLocal(FirstClass()) = 1;
+	MaxHGlobal(FirstClass()) = 1;
+	MaxUHGlobal(FirstClass()) = 1;
 }
 
 void	report_classes(aClient *sptr, char *to)
