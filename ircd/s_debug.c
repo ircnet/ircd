@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.42 2004/06/15 16:34:00 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.43 2004/06/24 17:34:25 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -48,9 +48,6 @@ char	serveropts[] = {
 #ifdef	RANDOM_NDELAY
 'd',
 #endif
-#if defined(LOCOP_REHASH) && defined(OPER_REHASH)
-'e',
-#endif
 #ifdef	OPER_REHASH
 'E',
 #endif
@@ -68,9 +65,6 @@ char	serveropts[] = {
 #endif
 #ifndef	NO_DEFAULT_INVISIBLE
 'I',
-#endif
-#if defined(LOCOP_DIE) && defined(OPER_DIE)
-'j',
 #endif
 #ifdef	OPER_DIE
 'J',
@@ -102,9 +96,6 @@ char	serveropts[] = {
 #endif
 #ifdef	CRYPT_LINK_PASSWORD
 'P',
-#endif
-#if defined(LOCOP_RESTART) && defined(OPER_RESTART)
-'r',
 #endif
 #ifdef	OPER_RESTART
 'R',
