@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info3232tmp2.
+input file /tmp/sgml2info21206tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.30 1998/09/24 17:45:16 kalt Exp $
+     $Id: INSTALL.info,v 1.31 1998/11/09 20:04:31 kalt Exp $
 
    This document describes how to install, and configure IRC 2.10.
 
@@ -1616,9 +1616,9 @@ Related resources
 
 `Development'
      Technical discussions and development are carried on
-     ircd-dev@stealth.net.  People interested in very early testing,
-     and/or working on the source code are welcome.  This is done by
-     sending an email to , with "`subscribe ircd-dev"' in the body.
+     ircd-dev@irc.org.  People interested in very early testing, and/or
+     working on the source code are welcome.  This is done by sending
+     an email to , with "`subscribe ircd-dev"' in the body.
 
 `FAQ'
      It can be found on the WWW, at .
@@ -1684,45 +1684,45 @@ forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top122
-Node: Installing IRC-628
-Node: The configure script819
-Node: Notes for Cygwin32 users2819
-Node: The config-h file3711
-Node: Define what type of UNIX your machine uses-4383
-Node: DEBUGMODE4783
-Node: CPATH MPATH LPATH PPATH TPATH QPATH OPATH5447
-Node: CACHED_MOTD6675
-Node: CHROOTDIR7151
-Node: ENABLE_SUMMON ENABLE_USERS7475
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE8011
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY8694
-Node: ZIP_LINKS ZIP_LEVEL9326
-Node: SLOW_ACCEPT10337
-Node: CLONE_CHECK10955
-Node: Other #define's11295
-Node: Editing the Makefile and compiling11620
-Node: The ircd-conf file12260
-Node: Machine information14292
-Node: Administrative info16388
-Node: Port connections18423
-Node: Connection Classes20633
-Node: Client connections26084
-Node: Operator priviliges31597
-Node: Restrict connections33717
-Node: Excluded accounts35032
-Node: Server connections38998
-Node: Deny auto-connections47437
-Node: Hub connections48810
-Node: Leaf connections50026
-Node: Version limitations52109
-Node: Excluded machines53825
-Node: Service connections55132
-Node: Bounce server56725
-Node: Default local server (for local clients) `*OBSOLETED*'58427
-Node: Related resources59310
-Node: Reporting a bug60252
-Node: How to report a bug60512
-Node: Where to send a bug report61525
+Node: Top123
+Node: Installing IRC-629
+Node: The configure script820
+Node: Notes for Cygwin32 users2820
+Node: The config-h file3712
+Node: Define what type of UNIX your machine uses-4384
+Node: DEBUGMODE4784
+Node: CPATH MPATH LPATH PPATH TPATH QPATH OPATH5448
+Node: CACHED_MOTD6676
+Node: CHROOTDIR7152
+Node: ENABLE_SUMMON ENABLE_USERS7476
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE8012
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY8695
+Node: ZIP_LINKS ZIP_LEVEL9327
+Node: SLOW_ACCEPT10338
+Node: CLONE_CHECK10956
+Node: Other #define's11296
+Node: Editing the Makefile and compiling11621
+Node: The ircd-conf file12261
+Node: Machine information14293
+Node: Administrative info16389
+Node: Port connections18424
+Node: Connection Classes20634
+Node: Client connections26085
+Node: Operator priviliges31598
+Node: Restrict connections33718
+Node: Excluded accounts35033
+Node: Server connections38999
+Node: Deny auto-connections47438
+Node: Hub connections48811
+Node: Leaf connections50027
+Node: Version limitations52110
+Node: Excluded machines53826
+Node: Service connections55133
+Node: Bounce server56726
+Node: Default local server (for local clients) `*OBSOLETED*'58428
+Node: Related resources59311
+Node: Reporting a bug60249
+Node: How to report a bug60509
+Node: Where to send a bug report61522
 
 End Tag Table

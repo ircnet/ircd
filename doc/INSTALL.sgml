@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.30 1998/09/24 17:45:17 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.31 1998/11/09 20:04:32 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.10.
 </abstract>
@@ -1305,20 +1305,20 @@ If the port number is omitted, irc will default to using 6667.
 <tag/Mailing list/ A list is dedicated to the people using
 ircd. If you have trouble running ircd, or wish to discuss
 the future, you can subscribe by sending an email to
-<htmlurl url="mailto:majordomo@stealth.net"
-name="majordomo@stealth.net">, with ``<bf>subscribe
+<htmlurl url="mailto:majordomo@irc.org"
+name="majordomo@irc.org">, with ``<bf>subscribe
 ircd-users</bf>'' in the body.
 <p>
 If you just have a question and don't want to subscribe to
-the list, mail to <htmlurl url="mailto:ircd-users@stealth.net"
-name="ircd-users@stealth.net">.  Be sure to indicate which
+the list, mail to <htmlurl url="mailto:ircd-users@irc.org"
+name="ircd-users@irc.org">.  Be sure to indicate which
 version you are using.
 <tag/Development/ Technical discussions and development are
-carried on ircd-dev@stealth.net.  People interested in very
+carried on ircd-dev@irc.org.  People interested in very
 early testing, and/or working on the source code are
 welcome.  This is done by sending an email to <htmlurl
-url="mailto:majordomo@stealth.net"
-name="majordomo@stealth.net">, with ``<bf>subscribe
+url="mailto:majordomo@irc.org"
+name="majordomo@irc.org">, with ``<bf>subscribe
 ircd-dev</bf>'' in the body.
 <tag/FAQ/ It can be found on the WWW, at <url
 url="http://www.stealth.net/~kalt/irc/faq.html">.
@@ -1360,8 +1360,8 @@ If you have a fix, don't forget to include it.
 
 <sect1>Where to send a bug report
 <p>
-Reports should be sent to <htmlurl url="mailto:ircd-bugs@stealth.net"
-name="ircd-bugs@stealth.net">.  Your report will be reviewed
+Reports should be sent to <htmlurl url="mailto:ircd-bugs@irc.org"
+name="ircd-bugs@irc.org">.  Your report will be reviewed
 and forwarded to the appropriate mailing list.
 
 </article>

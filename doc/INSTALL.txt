@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.30 1998/09/24 17:45:17 kalt Exp $
+  $Id: INSTALL.txt,v 1.31 1998/11/09 20:04:32 kalt Exp $
 
   This document describes how to install, and configure IRC 2.10.
 
@@ -1578,19 +1578,19 @@
      MMaaiilliinngg lliisstt
         A list is dedicated to the people using ircd. If you have
         trouble running ircd, or wish to discuss the future, you can
-        subscribe by sending an email to majordomo@stealth.net, with
+        subscribe by sending an email to majordomo@irc.org, with
         ``ssuubbssccrriibbee iirrccdd--uusseerrss'' in the body.
 
         If you just have a question and don't want to subscribe to the
-        list, mail to ircd-users@stealth.net.  Be sure to indicate which
+        list, mail to ircd-users@irc.org.  Be sure to indicate which
         version you are using.
 
      DDeevveellooppmmeenntt
         Technical discussions and development are carried on ircd-
-        dev@stealth.net.  People interested in very early testing,
-        and/or working on the source code are welcome.  This is done by
-        sending an email to majordomo@stealth.net, with ``ssuubbssccrriibbee
-        iirrccdd--ddeevv'' in the body.
+        dev@irc.org.  People interested in very early testing, and/or
+        working on the source code are welcome.  This is done by sending
+        an email to majordomo@irc.org, with ``ssuubbssccrriibbee iirrccdd--ddeevv'' in
+        the body.
 
      FFAAQQ
         It can be found on the WWW, at
@@ -1637,7 +1637,7 @@
 
   66..22..  WWhheerree ttoo sseenndd aa bbuugg rreeppoorrtt
 
-  Reports should be sent to ircd-bugs@stealth.net.  Your report will be
+  Reports should be sent to ircd-bugs@irc.org.  Your report will be
   reviewed and forwarded to the appropriate mailing list.
 
 

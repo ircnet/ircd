@@ -1,4 +1,4 @@
-$Id: RULES,v 1.1 1998/04/30 12:47:59 kalt Exp $
+$Id: RULES,v 1.2 1998/11/09 20:07:12 kalt Exp $
 
 This file describes how to prepare a package for inclusion
 in the contrib/ directory.  The goal is to have a consistent
@@ -21,4 +21,4 @@ of them.
 	  directory as irc/ircd, using the same Makefile
 
 
-* questions, submissions should be sent to ircd-dev@stealth.net
+* questions, submissions should be sent to ircd-dev@irc.org
