@@ -1,3 +1,8 @@
+2003-01-01  Jakub Vlasek
+
+	* s_serv.c/do_emulated_eob(): The value of istat.is_eobservers should
+	  have been incremented before  SetEOB().
+	
 2003-01-01  Kurt Roeckx
 
 	* support.c/make_isupport(): Replace MAXCHANNEL by CHANLIMIT.
