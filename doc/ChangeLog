@@ -1,3 +1,15 @@
+2004-02-29  Piotr Kucharski
+
+	* s_serv.c/m_squit(): squit without comment bug (noted by Marcin Krol).
+
+2004-02-27  Piotr Kucharski
+
+	* s_bsd.c/add_unixconnection(): return value.
+	* s_bsd.c/read_listener(): send notice on client connect.
+	* s_user.c/m_unick(): check return value of do_nick_name().
+	* s_user.c/m_nick(): don't copy more than ONICKLEN to nick for local
+	  clients.
+
 2004-02-24  Piotr Kucharski
 
 	* parse.c, msg_def.h: add "POST" command being alias for "QUIT"
