@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.72 2004/02/23 19:56:11 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.73 2004/02/23 22:28:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -517,33 +517,22 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 			 * the squit reason for rebroadcast on the other side
 			 * - jv
 			 */
-			if (IsServer(sptr) && ST_UID(sptr))
+			if (ST_UID(sptr))
 			{
-				char buf2[BUFSIZE];
-				buf2[0] = '\0';
-				if (cptr != NULL)
+				if (sptr->serv->sid[0] != '$')
 				{
-					if (IsServer(from))
-					{
-						sprintf(buf2, "(by %s(%s))",
-							from->name,
-							from->serv->sid);
-					}
-					else
-					{
-						sprintf(buf2, "(by %s)",
-							from->name);
-					}
+					sendto_one(sptr, ":%s SQUIT %s :%s",
+						me.serv->sid, sptr->serv->sid,
+						comment);
 				}
 				else
 				{
-					strcpy(buf2, ME);
+					sendto_flag(SCH_DEBUG,
+						"ST_UID(sptr) && fake SID");
+					sendto_one(sptr, ":%s SQUIT %s :%s",
+						me.serv->sid, sptr->name,
+						comment);
 				}
-				sendto_one(sptr, ":%s SQUIT %s :Remote: %s %s",
-					me.serv->sid, 
-					ST_UID(sptr) ? sptr->serv->sid
-					: sptr->name,
-					comment, buf2);
 			}
 
 			if (cptr != NULL && sptr != cptr)
