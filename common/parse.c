@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.85 2004/10/26 23:21:41 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.86 2004/10/26 23:26:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -576,9 +576,9 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	Reg	int	len, i, numeric = 0, paramcount;
 	Reg	struct	Message *mptr = NULL;
 	int	ret;
-	int	status;
+	int	status = STAT_UNREG;
 	struct Cmd	*handler;
-	CmdHandler	fhandler;
+	CmdHandler	fhandler = m_nop;
 
 	Debug((DEBUG_DEBUG, "Parsing %s: %s",
 		get_client_name(cptr, FALSE), buffer));
