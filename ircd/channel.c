@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.59 1998/08/24 16:54:44 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.60 1998/09/07 23:51:47 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2282,7 +2282,7 @@ char	*parv[];
 						       sptr->name, parv[1], 
 						       modebuf, mbuf[1],
 						       parabuf, name);
-				if (mbuf[1])
+				if (mbuf[2])
 				    {
 					strcpy(modebuf, mbuf+2);
 					strcpy(parabuf, name);
