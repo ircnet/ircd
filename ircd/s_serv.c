@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.153 2004/02/16 18:31:11 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.154 2004/02/17 16:25:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1950,18 +1950,42 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	int	wilds, doall;
 	char	*name, *cm;
 
-	if (IsServer(cptr) &&
-	    (stat != 'd' && stat != 'p' && stat != 'q' && stat != 's' &&
-	     stat != 'u' && stat != 'v' && stat != 'l' && stat != 'L') &&
-	    !((stat == 'o' || stat == 'c') && IsOper(sptr)))
-	    {
-		if (check_link(cptr))
-		    {
-			sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]),
-				   "STATS");
-			return 5;
-		    }
-	    }
+	/* If request from remote client, let's tame it a little. */
+	if (IsServer(cptr))
+	{
+		switch(stat)
+		{
+		/* These stats are available with no penalty for all. */
+		case 'd': case 'D':	/* defines */
+		case 'p': 		/* ping stats */
+		case 'q': case 'Q':	/* Q:lines */
+		case 's': case 'S':	/* services */
+		case 'u': case 'U':	/* uptime */
+		case 'v': case 'V':	/* V:lines */
+		case 'l': case 'L':	/* links (wildcard is dropped later) */
+			break;
+		/* These are available with no penalty for opers. */
+		/* Although I have no idea, why only for opers. --B. */
+		case 'o': case 'O':	/* O:lines */
+		case 'c': case 'C':	/* C:/N: lines */
+		case 'h': case 'H':	/* H:/D: lines */
+		case 'a': case 'A':	/* iauth conf */
+		case 'b': case 'B':	/* B:lines */
+		case '?': 		/* connected servers */
+			if (IsOper(sptr))
+			{
+				break;
+			}
+			/* else fallthrough */
+		default:
+			if (check_link(cptr))
+			{
+				sendto_one(sptr, replies[RPL_TRYAGAIN], ME,
+					BadTo(parv[0]), "STATS");
+				return 5;
+			}
+		}
+	}
 	if (parc == 3)
 	    {
 		if (hunt_server(cptr, sptr, ":%s STATS %s %s",
