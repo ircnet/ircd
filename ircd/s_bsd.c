@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.69 1999/06/17 19:13:52 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.70 1999/07/05 17:33:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2031,10 +2031,14 @@ int	ro;
 			** if any of these is true, data won't be parsed
 			** so no need to check for anything!
 			*/
+#if defined(USE_IAUTH)
 			if (DoingDNS(cptr) || DoingAuth(cptr) ||
 			    WaitingXAuth(cptr) ||
 			    (DoingXAuth(cptr) &&
 			     !(iauth_options & XOPT_EARLYPARSE)))
+#else
+			if (DoingDNS(cptr) || DoingAuth(cptr))
+#endif
 				continue;
 #if ! USE_POLL
 			if (fd > highfd)
