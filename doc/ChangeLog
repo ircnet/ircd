@@ -5,6 +5,13 @@
 	  to ascii.
 	* s_serv.c/m_squit(): fixed core (introduced 2004-02-13) when squit
 	  issued by oper. ;)
+	* s_bsd.c/add_local_domain(): remove ending dot from hname (so it
+	  won't assume later it already is fqdn).
+	* s_bsd.c/get_my_name(): dot check not needed, add_local_domain does it.
+	* channel.c/m_njoin(): revive difference between netjoin and plain join.
+	* channel.c/reop_channel(): use ->reop, not ->history, for checking if
+	  channel reop is overdue.
+	* s_serv.c/report_ping(): comment out debug message.
 
 2004-02-13  Jakub Vlasek
 
