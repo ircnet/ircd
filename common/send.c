@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.57 2002/07/30 00:14:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.58 2003/02/15 19:10:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -965,6 +965,8 @@ sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
  *
  * Send to all clients which match the mask in a way defined on 'what';
  * either by user hostname or user servername.
+ * NOTE: we send it only to new servers and local clients. Old servers
+ * are covered by sendto_match_butone_old()
  */
 void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char *pattern, ...)
 {
@@ -978,8 +980,12 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
 			continue;       /* that clients are not mine */
  		if (cptr == one)	/* must skip the origin !! */
 			continue;
-		if (IsServer(cptr))
-		    {
+		/* This used to be IsServer(cptr), but we have to use
+		** another (however looking very similar) function to
+		** send $#/$$-mask messages to old servers, which does
+		** not understand new syntax. --Beeth */
+		if (ST_UID(cptr))
+		{
 			/*
 			** we can save some CPU here by not searching the
 			** entire list of users since it is ordered!
@@ -999,11 +1005,15 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
 			}
 			if (srch == NULL)
 				continue;
-		    }
+		}
 		/* my client, does he match ? */
 		else if (!(IsRegisteredUser(cptr) && 
 			   match_it(cptr, mask, what)))
+		{
 			continue;
+		}
+		/* this frame have tricked me many times ;) and it's only
+		** frame for having va declared ;) --Beeth */
 		{
 			va_list	va;
 			va_start(va, pattern);
@@ -1015,6 +1025,59 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
 	return;
 }
 
+/*
+ * sendto_match_butone_old
+ *
+ * Send to all clients which match the mask in a way defined on 'what';
+ * either by user hostname or user servername.
+ * NOTE: we send it only to new servers and local clients. Old servers
+ * are covered by sendto_match_butone_old()
+ */
+void	sendto_match_butone_old(aClient *one, aClient *from, char *mask, int what, char *pattern, ...)
+{
+	int	i;
+	aClient *cptr,
+		*srch;
+  
+	for (i = fdas.highest; i >= 0; i--)
+	{
+		if (!(cptr = local[fdas.fd[i]]))
+			continue;	/* not a server */
+ 		if (cptr == one)	/* must skip the origin !! */
+			continue;
+		if (IsMe(cptr))
+			continue;
+		/* we want to pick only old servers to perhaps send them
+		** $/#-mask message, if it's old, check if clients match */
+		if (!ST_UID(cptr))
+		{
+			/* see comment in sendto_match_butone() */
+			for (srch = cptr->prev; srch; srch = srch->prev)
+			{
+				if (!IsRegisteredUser(srch))
+					continue;
+				if (srch->from == cptr &&
+				    match_it(srch, mask, what))
+					break;
+			}
+			if (srch == NULL)
+				continue;
+		}
+		else
+		{
+			continue;
+		}
+		/* this frame have tricked me many times ;) and it's only
+		** frame for having va declared ;) --Beeth */
+		{
+			va_list	va;
+			va_start(va, pattern);
+			vsendto_prefix_one(cptr, from, pattern, va);
+			va_end(va);
+		}
+	}
+	return;
+}
 /*
 ** sendto_ops_butone
 **	Send message to all operators.

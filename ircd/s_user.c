@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.144 2003/02/13 21:17:09 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.145 2003/02/15 19:10:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1473,6 +1473,12 @@ int	parc, notice;
 							     MATCH_SERVER,
 					    ":%s %s %s :%s", parv[0],
 					    cmd, nick, parv[2]);
+			sendto_match_butone_old(IsServer(cptr) ? cptr : NULL, 
+					    sptr, nick + 2,
+					    (*(nick+1) == '#') ? MATCH_HOST :
+							     MATCH_SERVER,
+					    ":%s %s %s :%s", parv[0],
+					    cmd, ++nick, parv[2]);
 			continue;
 		    }
 		
