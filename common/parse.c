@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.6 1997/09/03 17:45:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.7 1997/09/03 18:05:23 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -759,6 +759,9 @@ char	*sender;
 	 * user on the other server which needs to be removed. -avalon
 	 * it can simply be caused by lag (among other things), so just
 	 * drop it if it is not a server. -krys
+	 * services aren't prone to collisions, so lag shouldn't be responsible
+	 * if we get here and sender is a service, we should probably issue
+	 * a kill in this case! -krys
 	 */
 		sendto_flag(SCH_LOCAL, "Dropping unknown %s brought by %s.",
 			    sender, get_client_name(cptr, FALSE));

@@ -631,6 +631,7 @@ struct Channel	{
 #define	MyClient(x)			(MyConnect(x) && IsClient(x))
 #define	MyPerson(x)			(MyConnect(x) && IsPerson(x))
 #define	MyOper(x)			(MyConnect(x) && IsOper(x))
+#define	MyService(x)			(MyConnect(x) && IsService(x))
 #define	ME	me.name
 
 typedef	struct	{
