@@ -543,9 +543,11 @@ extern struct hostent *_switch_gethostbyname_r __P((const char *name,
 # define HAVE_GETRUSAGE 1
 #endif
 
+/* linux 2.0.x has poll(), compiling works, but things don't run well
 #if defined(HAVE_POLL)
 # define USE_POLL 1
 #endif
+*/
 
 /*  select portability problems - some systems do not define FD_... macros; on
  *  some systems (for example HPUX), select uses an int * instead of an

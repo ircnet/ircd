@@ -1,4 +1,4 @@
-/* $Id: acconfig.h,v 1.6 1997/10/13 17:42:28 kalt Exp $ */
+/* $Id: acconfig.h,v 1.7 1998/09/24 17:34:47 kalt Exp $ */
 
 /* Define if zlib package must be used for compilation/linking. */
 #undef USE_ZLIB
@@ -63,6 +63,7 @@
 #undef H_ERRNO_DECLARED
 
 /* Define if poll(2) must be used instead of select(2). */
+/* Note: some systems (e.g. linux 2.0.x) have a non-working poll() */
 #undef USE_POLL
 
 /* Define if the system provides POSIX sigaction. */

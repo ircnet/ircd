@@ -407,6 +407,9 @@ if test $irc_cv_select_poll = poll; then
   AC_DEFINE(USE_POLL)
 else
   AC_MSG_RESULT(select)
+  if test $ac_cv_func_poll = yes; then
+    AC_MSG_WARN([poll() seems to exist on your system, edit setup.h to use it.])
+  fi
 fi
 ])
 
@@ -1314,7 +1317,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.24 1998/09/20 19:36:16 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.25 1998/09/24 17:34:48 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1382,8 +1385,7 @@ dnl       for the following functions:
 dnl       gethostname gettimeofday lrand48 mkdir socket
 dnl ---
 IRC_FUNC_MEMCMP
-dnl following now done using AC_CHECK_FUNCS
-dnl IRC_SELECT_POLL
+IRC_SELECT_POLL
 
 IRC_SIGNAL_IMPLEMENTATION
 IRC_NON_BLOCKING_SYSTEM
