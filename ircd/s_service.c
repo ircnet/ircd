@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.21 1998/05/25 19:37:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.22 1998/08/24 02:26:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -447,7 +447,10 @@ char	*parv[];
 	sp->refcnt++;
 	svc->server = mystrdup(sp->bcptr->name);
 	strncpyzt(svc->dist, dist, HOSTLEN);
-	strncpyzt(sptr->info, info, REALLEN);
+	if (sptr->info != DefInfo)
+		MyFree(sptr->info);
+	if (strlen(info) > REALLEN) info[REALLEN] = '\0';
+	sptr->info = mystrdup(info);
 	svc->wants = 0;
 	svc->type = type;
 	sptr->hopcount = metric;

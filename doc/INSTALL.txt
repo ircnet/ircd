@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.25 1998/04/06 13:18:33 kalt Exp $
+  $Id: INSTALL.txt,v 1.26 1998/08/24 02:26:43 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.5.
 
@@ -229,8 +229,8 @@
   information, such as ``prefix'', ``irc_mode'', ``ircd_mode'' and
   ``ircd_dir''.
 
-  Now to build the package, type ``make''.  If everything goes will, you
-  can then install it by typing ``make install''.
+  Now to build the package, type ``make all''.  If everything goes will,
+  you can then install it by typing ``make install''.
 
   If you have trouble compiling ircd, copy Makefile.in to Makefile and
   edit Makefile as appropriate.
@@ -1361,40 +1361,52 @@
 
 
      VVeerrssiioonn MMaasskk
-        The matching version strings will be rejected.
+        The matching version number strings will be rejected.
 
      FFllaaggss
-        This field should contained flags as defined in ircd/s_debug.c
-
-        These flags show up in RPL_VERSION.
-
-        If any of the flags present in this field are found in the
-        RPL_VERSION of a server, this server will be denied connection.
-        This must be used with care.
+        The matching version flags strings will be rejected.
 
      SSeerrvveerr MMaasskk
         This field is used to match server names.  The V line will be
         used for servers matching the mask given in this field.
 
+     SSeerrvveerr TTyyppee
+        Both the VVeerrssiioonn MMaasskk and the FFllaaggss should be prefixed with the
+        server type identification.  This implementation uses the id
+        ``IIRRCC''.
+
      EExxaammpplleess
-        V:020901*::*::
+        V:IRC/020901*::*::
 
-        Disallows any server which version is 2.9.1* to connect.
+        Disallows any ``IRC'' server which version is 2.9.1* to connect.
 
-        V:020901*:D:*::
+        V:IRC/020901*:IRC/*D*:*::
 
-        Disallows any server which version is 2.9.1* or which has been
-        compiled with DEBUGMODE defined to connect.
+        Disallows any ``IRC'' server which version is 2.9.1* or which
+        has been compiled with DEBUGMODE defined to connect.
+        V:*/0209*::*::
+
+        Disallows any server using the 2.9 protocol to connect.
 
      NNoottee
         It is possible to have and use multiple V-lines for the one
         server mask.
 
-        V:020901:*:*::
+        V:IRC/020901*:*:*::
 
-        V:020902:*:*::
+        V:IRC/020902*:*:*::
 
         is allowed.
+
+     PPrroottooccooll VVeerrssiioonn
+        Only the 4 first digit of the VVeerrssiioonn NNuummbbeerr are standard: they
+        define the protocol version.  The remaining of the string is
+        implementation dependant; matches on this part should be used
+        with particular identification.
+
+     FFllaaggss
+        are not standard.  Therefore, this field sshhoouulldd aallwwaayyss contain a
+        specific identification.
 
 
   44..1144..  EExxcclluuddeedd mmaacchhiinneess
@@ -1436,6 +1448,7 @@
         suited for automated clients.
 
      FFoorrmmaatt
+
 
         S:<TARGET Host Mask>:<Password>:<Service Name>:<Service Type>:<Class>
 
@@ -1516,6 +1529,7 @@
         ``irc.stealth.net'' on port 6660.
 
         B:*.fi::irc.funet.fi:6667:
+
         Finnish client should use irc.funet.fi when they cannot be taken
         anymore.
 
@@ -1567,9 +1581,61 @@
         It can be found on the WWW, at
         <http://www.stealth.net/~kalt/irc/faq.html>.
 
+
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

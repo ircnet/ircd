@@ -415,7 +415,7 @@ struct Client	{
 	short	status;		/* Client type */
 	char	name[HOSTLEN+1]; /* Unique name of the client, nick or host */
 	char	username[USERLEN+1]; /* username here now for auth stuff */
-	char	info[REALLEN+1]; /* Free form additional client information */
+	char	*info;		/* Free form additional client information */
 	/*
 	** The following fields are allocated only for local clients
 	** (directly connected to *this* server with a socket.
@@ -739,6 +739,7 @@ typedef	struct	{
 #define	SV_NMODE	0x0004	/* server knows new MODEs (+e/+I) */
 #define	SV_NCHAN	0x0008	/* server knows new channels -????name */
 				/* ! SV_NJOIN implies ! SV_NCHAN */
+#define	SV_2_10		(SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN)
 
 /* used for sendto_flag */
 

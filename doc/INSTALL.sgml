@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.25 1998/04/06 13:18:32 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.26 1998/08/24 02:26:42 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.5.
 </abstract>
@@ -221,7 +221,7 @@ generate the correct Makefile.  However you need to edit it
 to specify specific information, such as ``prefix'',
 ``irc_mode'', ``ircd_mode'' and ``ircd_dir''.
 <p>
-Now to build the package, type ``make''.  If everything
+Now to build the package, type ``make all''.  If everything
 goes will, you can then install it by typing ``make install''.
 <p>
 If you have trouble compiling ircd, copy Makefile.in to
@@ -1139,34 +1139,41 @@ server.
 connecting to you based on their version and on compile time
 options.
 <tag/Format/<verb>V:&lt;Version Mask&gt;:&lt;Flags&gt;:&lt;Server Mask&gt;::</verb>
-<tag/Version Mask/ The matching version strings will be rejected.
-<tag/Flags/ This field should contained flags as defined in
-ircd/s_debug.c
-<p>
-These flags show up in RPL_VERSION.
-<p>
-If any of the flags present in this field are found in the
-RPL_VERSION of a server, this server will be denied
-connection.  This must be used with care.
+<tag/Version Mask/ The matching version number strings will be rejected.
+<tag/Flags/ The matching version flags strings will be rejected.
 <tag/Server Mask/ This field is used to match server names.
 The V line will be used for servers matching the mask given
 in this field.
-<tag/Examples/V:020901*::*::
+<tag/Server Type/ Both the <bf>Version Mask</bf> and the
+<bf>Flags</bf> should be prefixed with the server type
+identification.  This implementation uses the id ``<bf>IRC</bf>''.
+<tag/Examples/V:IRC/020901*::*::
 <p>
-Disallows any server which version is 2.9.1* to connect.
+Disallows any ``IRC'' server which version is 2.9.1* to connect.
 <p>
-V:020901*:D:*::
+V:IRC/020901*:IRC/*D*:*::
 <p>
-Disallows any server which version is 2.9.1* or which has
-been compiled with DEBUGMODE defined to connect.
+Disallows any ``IRC'' server which version is 2.9.1* or
+which has been compiled with DEBUGMODE defined to connect.
+<p>
+V:*/0209*::*::
+<p>
+Disallows any server using the 2.9 protocol to connect.
 <tag/Note/  It is possible to have and use multiple V-lines
 for the one server mask.
 <p>
-V:020901:*:*::
+V:IRC/020901*:*:*::
 <p>
-V:020902:*:*::
+V:IRC/020902*:*:*::
 <p>
 is allowed.
+<tag/Protocol Version/ Only the 4 first digit of the
+<bf>Version Number</bf> are standard: they define the
+protocol version.  The remaining of the string is
+implementation dependant; matches on this part should be
+used with particular identification.
+<tag/Flags/ are not standard.  Therefore, this field
+<bf>should always</bf> contain a specific identification.
 </descrip>
 
 <sect1>Excluded machines

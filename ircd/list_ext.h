@@ -27,6 +27,7 @@
 extern anUser *usrtop;
 extern aServer *svrtop;
 extern int numclients;
+extern const char *DefInfo;
 #endif /* LIST_C */
 
 /*  External definitions for global functions.

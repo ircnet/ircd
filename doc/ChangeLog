@@ -1,3 +1,9 @@
+Sun Aug 23 22:16:40 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* struct_def.h, ircd.c, list.c, list_ext.h, s_conf.c, s_serv.c,
+	s_service.c, s_user.c: aClient's info is now dynamically allocated
+	to overcome server handshake limitations.
+
 Sat Aug 22 15:20:10 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* channel.c: fixed ^G bug (only triggered in channel creation)

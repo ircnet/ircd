@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info16398tmp2.
+input file /tmp/sgml2info20993tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.25 1998/04/06 13:18:32 kalt Exp $
+     $Id: INSTALL.info,v 1.26 1998/08/24 02:26:42 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.5.
 
@@ -313,8 +313,8 @@ Editing the Makefile and compiling
 the correct Makefile.  However you need to edit it to specify specific
 information, such as "prefix", "irc_mode", "ircd_mode" and "ircd_dir".
 
-   Now to build the package, type "make".  If everything goes will, you
-can then install it by typing "make install".
+   Now to build the package, type "make all".  If everything goes will,
+you can then install it by typing "make install".
 
    If you have trouble compiling ircd, copy Makefile.in to Makefile and
 edit Makefile as appropriate.
@@ -1395,40 +1395,53 @@ Version limitations
      V:<Version Mask>:<Flags>:<Server Mask>::
 
 `Version Mask'
-     The matching version strings will be rejected.
+     The matching version number strings will be rejected.
 
 `Flags'
-     This field should contained flags as defined in ircd/s_debug.c
-
-     These flags show up in RPL_VERSION.
-
-     If any of the flags present in this field are found in the
-     RPL_VERSION of a server, this server will be denied connection.
-     This must be used with care.
+     The matching version flags strings will be rejected.
 
 `Server Mask'
      This field is used to match server names.  The V line will be used
      for servers matching the mask given in this field.
 
+`Server Type'
+     Both the `Version Mask' and the `Flags' should be prefixed with
+     the server type identification.  This implementation uses the id
+     "`IRC"'.
+
 `Examples'
-     V:020901*::*::
+     V:IRC/020901*::*::
 
-     Disallows any server which version is 2.9.1* to connect.
+     Disallows any "IRC" server which version is 2.9.1* to connect.
 
-     V:020901*:D:*::
+     V:IRC/020901*:IRC/*D*:*::
 
-     Disallows any server which version is 2.9.1* or which has been
-     compiled with DEBUGMODE defined to connect.
+     Disallows any "IRC" server which version is 2.9.1* or which has
+     been compiled with DEBUGMODE defined to connect.
+
+     V:*/0209*::*::
+
+     Disallows any server using the 2.9 protocol to connect.
 
 `Note'
      It is possible to have and use multiple V-lines for the one server
      mask.
 
-     V:020901:*:*::
+     V:IRC/020901*:*:*::
 
-     V:020902:*:*::
+     V:IRC/020902*:*:*::
 
      is allowed.
+
+`Protocol Version'
+     Only the 4 first digit of the `Version Number' are standard: they
+     define the protocol version.  The remaining of the string is
+     implementation dependant; matches on this part should be used with
+     particular identification.
+
+`Flags'
+     are not standard.  Therefore, this field `should always' contain a
+     specific identification.
 
 
 File: INSTALL.info,  Node: Excluded machines,  Next: Service connections,  Prev: Version limitations,  Up: The ircd-conf file
@@ -1624,24 +1637,24 @@ Node: SLOW_ACCEPT10108
 Node: CLONE_CHECK10726
 Node: Other #define's11066
 Node: Editing the Makefile and compiling11391
-Node: The ircd-conf file12027
-Node: Machine information14059
-Node: Administrative info16155
-Node: Port connections18190
-Node: Connection Classes20400
-Node: Client connections25851
-Node: Operator priviliges31364
-Node: Restrict connections33484
-Node: Excluded accounts34799
-Node: Server connections38765
-Node: Deny auto-connections47204
-Node: Hub connections48577
-Node: Leaf connections49793
-Node: Version limitations51876
-Node: Excluded machines53115
-Node: Service connections54422
-Node: Bounce server56015
-Node: Default local server (for local clients) `*OBSOLETED*'57717
-Node: Related resources58600
+Node: The ircd-conf file12031
+Node: Machine information14063
+Node: Administrative info16159
+Node: Port connections18194
+Node: Connection Classes20404
+Node: Client connections25855
+Node: Operator priviliges31368
+Node: Restrict connections33488
+Node: Excluded accounts34803
+Node: Server connections38769
+Node: Deny auto-connections47208
+Node: Hub connections48581
+Node: Leaf connections49797
+Node: Version limitations51880
+Node: Excluded machines53565
+Node: Service connections54872
+Node: Bounce server56465
+Node: Default local server (for local clients) `*OBSOLETED*'58167
+Node: Related resources59050
 
 End Tag Table

@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.31 1998/07/19 21:10:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.32 1998/08/24 02:26:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1126,7 +1126,10 @@ int	opt;
 		*/
 		if (aconf->status == CONF_ME)
 		    {
-			strncpyzt(me.info, aconf->name, sizeof(me.info));
+			if (me.info != DefInfo)
+				MyFree(me.info);
+			me.info = MyMalloc(REALLEN+1);
+			strncpyzt(me.info, aconf->name, REALLEN+1);
 			if (ME[0] == '\0' && aconf->host[0])
 				strncpyzt(ME, aconf->host,
 					  sizeof(ME));
@@ -1335,7 +1338,7 @@ int	stat;
 	for (tmp = conf; tmp; tmp = tmp->next)
  		if ((tmp->status == stat) && tmp->passwd && tmp->name &&
  		    (match(tmp->name, name) == 0) &&
-		    strpbrk(key, tmp->passwd))
+		    (match(tmp->passwd, key) == 0))
 			break;
  	return (tmp ? -1 : 0);
 }

@@ -37,7 +37,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.5 1997/12/16 22:10:49 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.6 1998/08/24 02:26:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -45,6 +45,8 @@ static  char rcsid[] = "@(#)$Id: list.c,v 1.5 1997/12/16 22:10:49 kalt Exp $";
 #define LIST_C
 #include "s_externs.h"
 #undef LIST_C
+
+char *DefInfo = "*Not On This Net*"; /* constant */
 
 #ifdef	DEBUGMODE
 static	struct	liststats {
@@ -140,6 +142,7 @@ aClient	*from;
 	cptr->status = STAT_UNKNOWN;
 	cptr->fd = -1;
 	(void)strcpy(cptr->username, "unknown");
+	cptr->info = DefInfo;
 	if (size == CLIENT_LOCAL_SIZE)
 	    {
 		cptr->since = cptr->lasttime = cptr->firsttime = timeofday;
@@ -159,6 +162,8 @@ aClient	*from;
 void	free_client(cptr)
 aClient	*cptr;
 {
+	if (cptr->info != DefInfo)
+		MyFree(cptr->info);
 	MyFree((char *)cptr);
 }
 

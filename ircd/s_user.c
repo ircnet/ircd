@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.50 1998/08/22 19:22:28 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.51 1998/08/24 02:26:36 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1778,7 +1778,11 @@ user_finish:
 	    }
 	user->servp->userlist = user;
 	
-	strncpyzt(sptr->info, realname, sizeof(sptr->info));
+	if (sptr->info != DefInfo)
+		MyFree(sptr->info);
+	if (strlen(realname) > REALLEN)
+		realname[REALLEN] = '\0';
+	sptr->info = mystrdup(realname);
 #if defined(USE_IAUTH)
 	if (MyConnect(sptr))
 		sendto_iauth("%d U %.*s", sptr->fd, USERLEN+1, username);
@@ -2361,8 +2365,8 @@ char	*parv[];
 ** m_pass
 **	parv[0] = sender prefix
 **	parv[1] = password
-**	parv[2] = version (server only)
-**	parv[3] = server options (server only)                              
+**	parv[2] = protocol & server versions (server only)
+**	parv[3] = server id & options (server only)
 **	parv[4] = (optional) link options (server only)                  
 */
 int	m_pass(cptr, sptr, parc, parv)
@@ -2378,17 +2382,23 @@ char	*parv[];
 		return 1;
 	    }
 	/* Temporarily store PASS pwd *parameters* into info field */
-	if (parc > 2 && parv[2]) {
-		strncpyzt(cptr->info, parv[2], 11); 
-		if (parc > 3 && parv[3]) {
-			strncpy(cptr->info+12, parv[3], 30);
-			cptr->info[42] = '\0';
-			if (parc > 4 && parv[4]) {
-				strncpy(cptr->info+44, parv[4], 5);
-				cptr->info[49] = '\0';
-			}
-		}
-	}
+	if (parc > 2 && parv[2])
+	    {
+		strncpyzt(buf, parv[2], 15); 
+		if (parc > 3 && parv[3])
+		    {
+			strcat(buf, " ");
+			strncat(buf, parv[3], 100);
+			if (parc > 4 && parv[4])
+			    {
+				strcat(buf, " ");
+				strncat(buf, parv[4], 5);
+			    }
+		    }
+		if (cptr->info != DefInfo)
+			MyFree(cptr->info);
+		cptr->info = mystrdup(buf);
+	    }
 	strncpyzt(cptr->passwd, password, sizeof(cptr->passwd));
 	return 1;
     }

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.43 1998/08/12 19:28:26 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.44 1998/08/24 02:26:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -249,9 +249,27 @@ char	*parv[];
 int	check_version(cptr)
 aClient	*cptr;
 {
-	Debug((DEBUG_INFO,"check_version: %s, %s, %s", cptr->info,
-	       cptr->info+12, cptr->info+44));
+	char *id, *misc = NULL, *link = NULL;
 
+	Debug((DEBUG_INFO,"check_version: %s", cptr->info));
+
+	if (cptr->info == DefInfo)
+		return 1; /* no version checked */
+	if (id = index(cptr->info, ' '))
+	    {
+		*id++ = '\0';
+		if (link = index(id, ' '))
+			*link++ = '\0';
+		if (misc = index(id, ':'))
+			*misc++ = '\0';
+		else
+		    {
+			misc = id;
+			id = "IRC";
+		    }
+	    }
+	else
+		id = "IRC";
 	/* hop = 1 really for local client, return it in m_server_estab() */
 	if (!strncmp(cptr->info, "0209", 4))
 	    {
@@ -270,40 +288,44 @@ aClient	*cptr;
 	    }
 	else if (!strncmp(cptr->info, "021", 3) ||
 		 !strncmp(cptr->info, "020999", 6))
-		cptr->hopcount = SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN;
+		cptr->hopcount = SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN; /* SV_2_10*/
 	else
 		cptr->hopcount = SV_OLD;
 
-	if (*cptr->info) {	/* Check version number/mask from conf */
-		if (find_two_masks(cptr->name, cptr->info, CONF_VER)) {
-			sendto_flag(SCH_ERROR, "Bad version %s from %s",
-				    cptr->info, get_client_name(cptr, TRUE));
-			return exit_client(cptr, cptr, &me, "Bad version");
-		}
-	} else
-		return 1;	/* No version checked */
+	/* Check version number/mask from conf */
+	sprintf(buf, "%s/%s", id, cptr->info);
+	if (find_two_masks(cptr->name, buf, CONF_VER))
+	    {
+		sendto_flag(SCH_ERROR, "Bad version %s %s from %s", id,
+			    cptr->info, get_client_name(cptr, TRUE));
+		return exit_client(cptr, cptr, &me, "Bad version");
+	    }
 
-	strncpyzt(buf, cptr->info+12, 30);
-	if (*buf) {	/* Check version flags from conf */
-		if (find_conf_flags(cptr->name, buf, CONF_VER)) {
-			sendto_flag(SCH_ERROR, "Bad flags %s from %s",
-				    buf, get_client_name(cptr, TRUE));
+	if (misc)
+	    {
+		sprintf(buf, "%s/%s", id, misc);
+		/* Check version flags from conf */
+		if (find_conf_flags(cptr->name, buf, CONF_VER))
+		    {
+			sendto_flag(SCH_ERROR, "Bad flags %s (%s) from %s",
+				    misc, id, get_client_name(cptr, TRUE));
 			return exit_client(cptr, cptr, &me, "Bad flags");
-		}
-	} else
+		    }
+	    }
+	else
 		return 2;	/* No flags checked */
 
 	/* right now, I can't code anything good for this */
 	/* Stop whining, and do it! ;) */
-	if (strchr(cptr->info+44, 'Z'))	/* Compression requested */
+	if (link && strchr(link, 'Z'))	/* Compression requested */
                 cptr->flags |= FLAGS_ZIPRQ;
 	/*
 	 * If server was started with -p strict, be careful about the
 	 * other server mode.
 	 */
-	if (strncmp(cptr->info, "020", 3) && (bootopt & BOOT_STRICTPROT) &&
-	    !strchr(cptr->info+44, 'P'))
-			return exit_client(cptr, cptr, &me, "Unsafe mode");
+	if (link && strncmp(cptr->info, "020", 3) &&
+	    (bootopt & BOOT_STRICTPROT) && !strchr(link, 'P'))
+		return exit_client(cptr, cptr, &me, "Unsafe mode");
 
 	return 3;
 }
@@ -528,7 +550,9 @@ char	*parv[];
 		(void)make_server(acptr);
 		acptr->hopcount = hop;
 		strncpyzt(acptr->name, host, sizeof(acptr->name));
-		strncpyzt(acptr->info, info, sizeof(acptr->info));
+		if (acptr->info != DefInfo)
+			MyFree(acptr->info);
+		acptr->info = mystrdup(info);
 		acptr->serv->up = sptr->name;
 		acptr->serv->stok = token;
 		acptr->serv->snum = find_server_num(acptr->name);
@@ -586,7 +610,9 @@ char	*parv[];
 	 * may not be filled before check_version(). */
 	if ((hop = check_version(cptr)) < 1)
 		return hop;	/* from exit_client() */
-	strncpyzt(cptr->info, info[0] ? info:ME, sizeof(cptr->info));
+	if (cptr->info != DefInfo)
+		MyFree(cptr->info);
+	cptr->info = mystrdup(info[0] ? info : ME);
 
 	switch (check_server_init(cptr))
 	{
@@ -698,20 +724,18 @@ Reg	aClient	*cptr;
 	    {
 		if (bconf->passwd[0])
 #ifndef	ZIP_LINKS
-			sendto_one(cptr, "PASS %s %s %s %s", bconf->passwd,
-				   pass_version, serveropts,
-				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
+			sendto_one(cptr, "PASS %s %s IRC:%s %s", bconf->passwd,
+				   pass_version, serveropts,				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
 #else
-			sendto_one(cptr, "PASS %s %s %s %s%s", bconf->passwd,
-				   pass_version, serveropts,
+			sendto_one(cptr, "PASS %s %s IRC:%s %s%s",
+				   bconf->passwd, pass_version, serveropts,
 			   (bconf->status == CONF_ZCONNECT_SERVER) ? "Z" : "",
 				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
 #endif
 		/*
 		** Pass my info to the new server
 		*/
-		sendto_one(cptr, "SERVER %s 1 :%s", mlname,
-			   (me.info[0]) ? (me.info) : "IRCers United");
+		sendto_one(cptr, "SERVER %s 1 :%s", mlname, me.info);
 
 		/*
 		** If we get a connection which has been authorized to be
