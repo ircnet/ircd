@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.17 1999/03/11 23:35:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.18 1999/03/13 21:40:10 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -196,6 +196,8 @@ AnInstance *last;
 	    if (r != 1)
 		    /* started, or nothing to do or failed: don't try again */
 		    SetBit(cldata[cl].idone, cldata[cl].instance->in);
+	    if (r == 1)
+		    cldata[cl].ileft += 1;
 	    if (r != 0)
 		    /* start() didn't start something */
 		    next_io(cl, cldata[cl].instance);
