@@ -3,6 +3,13 @@
 	* struct_def.h et al: change ONICKLEN to LOCALNICKLEN, which is allowed
 	  from local clients.
 	* config.h.dist: default LOCALNICKLEN 12.
+	* common_def.h: removed isscandinavian() macro.
+	* s_user.c/do_nick_name(): removed isscandinavian() checks, []{}\|
+	  are again in use for nicks.
+	* channel.c: removed convert_scandinavian(), []{}\| are again in
+	  use for channel names.
+	* match.c: ~ (tilde) is valid for nicks now.
+	* s_user.c/do_nick_name(): no need for special case of ~ from servers.
 
 2005-01-30  Piotr Kucharski
 
