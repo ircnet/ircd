@@ -67,11 +67,8 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 	if ((address = mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0))
 		== MAP_FAILED)
 	{
-#ifdef CHKCONF_COMPILE
-		(void)fprintf(stderr, "mmap failed reading config");
-#else
-		sendto_flag(SCH_ERROR, "mmap failed reading config");
-#endif
+		config_error(CF_ERR, curfile, 0, 
+			"mmap failed reading config");
 		return NULL;
 	}
 
@@ -116,15 +113,10 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 				*filep = '\0';
 				if (depth >= MAXDEPTH)
 				{
-#ifdef CHKCONF_COMPILE
-					(void)fprintf(stderr,
+					config_error(CF_ERR, curfile, linenum,
 						"config: too nested (%d)",
 						depth);
-#else
-					sendto_flag(SCH_ERROR,
-						"config: too nested (%d)",
-						depth);
-#endif
+
 					goto eatline;
 				}
 				if (*(start+1) != '/')
@@ -135,13 +127,9 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 				}
 				if (end - start + filep - file >= FILEMAX)
 				{
-#ifdef CHKCONF_COMPILE
-					(void)fprintf(stderr, "config: too "
-						"long filename to process");
-#else
-					sendto_flag(SCH_ERROR, "config: too "
-						"long filename to process");
-#endif
+					config_error(CF_ERR, curfile, linenum,
+						"too long filename (max %d with "
+						"path)", FILEMAX);
 					goto eatline;
 				}
 				start++;
@@ -150,15 +138,8 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 				*filep = '\0';
 				if ((fd = open(file, O_RDONLY)) < 0)
 				{
-#ifdef CHKCONF_COMPILE
-					(void)fprintf(stderr,
-						"config: error opening %s "
-						"(depth=%d)", file, depth);
-#else
-					sendto_flag(SCH_ERROR,
-						"config: error opening %s "
-						"(depth=%d)", file, depth);
-#endif
+					config_error(CF_ERR, curfile, linenum,
+						"cannot open \"%s\"", file);
 					goto eatline;
 				}
 				ret = config_read(fd, depth + 1,
