@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info20282tmp2.
+input file /tmp/sgml2info9852tmp2.
 
    \input texinfo
 
@@ -10,9 +10,9 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.11 1997/09/09 18:41:03 kalt Exp $
+     $Id: INSTALL.info,v 1.12 1997/09/09 19:14:59 kalt Exp $
 
-   This document describes how to install, and configure IRC 2.9.3.
+   This document describes how to install, and configure IRC 2.9.4.
 
 * Menu:
 
@@ -49,7 +49,12 @@ default behaviour:
      located.
 
 `--zlib-library=DIR'
-     specifies in which directory the zlib library is locate.
+     specifies in which directory the zlib library is located.
+
+`--zlib-prefix=DIR'
+     specifies the prefix for zlib location.  It overrides the 2
+     previous options.  (The include directory is supposed to be in
+     prefix/include, and the library in prefix/lib).
 
 `--with-zlib'
      is the default.  "configure" looks on your system to find the
@@ -1221,7 +1226,9 @@ Version limitations
      It is possible to have and use multiple V-lines for the one server
      mask.
 
-     V:020901:*:*:: V:020902:*:*::
+     V:020901:*:*::
+
+     V:020902:*:*::
 
      is allowed.
 
@@ -1280,8 +1287,8 @@ Service connections
      This is the password which must be passed in the SERVICE command.
 
 `Service Name'
-     : The name used by the service. Services don't have nicknames, but
-     a static name defined by the S line.
+     The name used by the service. Services don't have nicknames, but a
+     static name defined by the S line.
 
 `Service Type'
      The type of service. It defines the priviledges given to the
@@ -1292,24 +1299,6 @@ Service connections
      The class field should refer to an existing class.
 
 `Notes'
-     To connect a service to your server, you must first create an
-     S-line entry in your ircd.conf file and get your server to read
-     this in (ie rehash or reboot). Once your server has updated
-     itself, you can then attempt to register your connection as a
-     service.  Registering as a service is done by sending a SERVICE
-     command to the server:
-
-     SERVICE servicename servername distribution servicetype 0
-     :Information
-
-     A successfull registering of a service at the server will result
-     in a RPL_YOURESERVICE (383) being sent back to you. Any other
-     reply as a result of sending service indicates an error has
-     occured.
-
-     Services can be listed using the SERVLIST command, and can be sent
-     messages using the SQUERY command.
-
      A service is not a very useful sort of client, it cannot join
      channels or issue certain commands although most are available to
      it. Services are rejected upon sending an unknown or unallowed
@@ -1325,9 +1314,9 @@ Bounce server
 
 `Introduction'
      This provides you a way to bounce clients to another server.  This
-     information is provided to clients which are denied connection
-     because a limit is reached.  It is NOT used when client is not
-     normally authorized to connect to server.
+     information is provided to clients which are denied connection,
+     either because their connection class is full, or the server is
+     full, or they are not authorized to connect.
 
 `Format'
      B:<Class|Host Mask>::<Server Name>:<Port>:
@@ -1344,7 +1333,7 @@ Bounce server
      "All connections in use" message.  In this case, the server
      doesn't process the connections at all, and has no knowledge of
      the client's host name, or class number.  For these cases, this
-     must field contain "-1".
+     field must be empty.
 
 `Server Name'
      This specifies the IRC server hostname that the client should use.
@@ -1364,7 +1353,7 @@ Bounce server
      Finnish client should use irc.funet.fi when they cannot be taken
      anymore.
 
-     B:-1::irc2.stealth.net:6667:
+     B:::irc2.stealth.net:6667:
 
      When the server is completely full, clients should use the
      secondary server.
@@ -1418,41 +1407,39 @@ Related resources
 
 
 Tag Table:
-Node: Top123
+Node: Top122
 Node: Installing IRC-609
-Node: The config-h file1965
-Node: Define what type of UNIX your machine uses-2631
-Node: DEBUGMODE3031
-Node: SPATH CPATH MPATH LPATH PPATH TPATH3689
-Node: CACHED_MOTD4898
-Node: CHROOTDIR5368
-Node: ENABLE_SUMMON ENABLE_USERS5692
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6228
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY6911
-Node: ZIP_LINKS ZIP_LEVEL7543
-Node: SLOW_ACCEPT8554
-Node: CLONE_CHECK9172
-Node: Other #define's9512
-Node: Editing the Makefile and compiling9837
-Node: The ircd-conf file10473
-Node: Machine information12157
-Node: Administrative info14253
-Node: Port connections16288
-Node: Connection Classes18498
-Node: Client connections22421
-Node: Operator priviliges25706
-Node: Restrict connections27826
-Node: Excluded accounts29141
-Node: Server connections32441
-Node: Hub connections40874
-Node: Leaf connections42087
-Node: Version limitations44170
-Node: Excluded machines45403
-Node: Service connections46710
-Node: Bounce server49083
-Node: Default local server (for local clients) `*OBSOLETED*'50707
-Node: Related resources51590
+Node: The config-h file2173
+Node: Define what type of UNIX your machine uses-2839
+Node: DEBUGMODE3239
+Node: SPATH CPATH MPATH LPATH PPATH TPATH3897
+Node: CACHED_MOTD5106
+Node: CHROOTDIR5576
+Node: ENABLE_SUMMON ENABLE_USERS5900
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6436
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY7119
+Node: ZIP_LINKS ZIP_LEVEL7751
+Node: SLOW_ACCEPT8762
+Node: CLONE_CHECK9380
+Node: Other #define's9720
+Node: Editing the Makefile and compiling10045
+Node: The ircd-conf file10681
+Node: Machine information12365
+Node: Administrative info14461
+Node: Port connections16496
+Node: Connection Classes18706
+Node: Client connections22629
+Node: Operator priviliges25914
+Node: Restrict connections28034
+Node: Excluded accounts29349
+Node: Server connections32649
+Node: Hub connections41082
+Node: Leaf connections42295
+Node: Version limitations44378
+Node: Excluded machines45617
+Node: Service connections46924
+Node: Bounce server48517
+Node: Default local server (for local clients) `*OBSOLETED*'50140
+Node: Related resources51023
 
 End Tag Table
-
-

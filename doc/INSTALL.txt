@@ -1,8 +1,8 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.11 1997/09/09 18:41:04 kalt Exp $
+  $Id: INSTALL.txt,v 1.12 1997/09/09 19:15:00 kalt Exp $
 
-  This document describes how to install, and configure IRC 2.9.3.
+  This document describes how to install, and configure IRC 2.9.4.
 
   11..  IInnssttaalllliinngg IIRRCC..
 
@@ -28,7 +28,12 @@
         located.
 
      ----zzlliibb--lliibbrraarryy==DDIIRR
-        specifies in which directory the zlib library is locate.
+        specifies in which directory the zlib library is located.
+
+     ----zzlliibb--pprreeffiixx==DDIIRR
+        specifies the prefix for zlib location.  It overrides the 2
+        previous options.  (The include directory is supposed to be in
+        prefix/include, and the library in prefix/lib).
 
      ----wwiitthh--zzlliibb
         is the default.  ``configure'' looks on your system to find the
@@ -122,6 +127,9 @@
   writing a message similar to that from talk(1) to a user's tty.
 
 
+
+
+
   22..77..  SSHHOOWW__IINNVVIISSIIBBLLEE__LLUUSSEERRSS,, NNOO__DDEEFFAAUULLTT__IINNVVIISSIIBBLLEE
 
   On large IRC networks, the number of invisible users is likely to be
@@ -130,6 +138,8 @@
   report the number of invisible users to all people and not just
   operators.  The NO_DEFAULT_INVISIBLE define is used to toggle whether
   clients are automatically made invisible when they register.
+
+
   22..88..  OOPPEERR__KKIILLLL,, OOPPEERR__RREEHHAASSHH,, OOPPEERR__RREESSTTAARRTT,, LLOOCCAALL__KKIILLLL__OONNLLYY
 
   The three operator only commands, KILL, REHASH and RESTART, may all be
@@ -185,6 +195,7 @@
   the file undef the line with "STOP STOP" in it be changed.
 
 
+
   33..  EEddiittiinngg tthhee MMaakkeeffiillee,, aanndd ccoommppiilliinngg
 
   This package now uses GNU autoconf to probe your system and generate
@@ -194,7 +205,6 @@
 
   Now to build the package, type ``make''.  If everything goes will, you
   can then install it by typing ``make install''.
-
 
   If you have trouble compiling ircd, copy Makefile.in to Makefile and
   edit Makefile as appropriate.
@@ -252,8 +262,6 @@
 
   16.
      Default local server    (U)
-
-
   44..11..  MMaacchhiinnee iinnffoorrmmaattiioonn
 
 
@@ -320,11 +328,9 @@
         The ``A'' line is used for administrative information about a
         site. The e-mail address of the person running the server should
         be included here in case problems arise.
-
      FFoorrmmaatt
 
         A:<Your Name/Location>:<Your Electronic Mailing Addr>:<other>::
-
 
 
 
@@ -394,6 +400,7 @@
         accepted. If no is defined here, server will bind to all
         interfaces (INADDR_ANY).  See also MACHINE CONFIGURATION section
         to properly configure outgoing connections.
+
         P:192.168.1.194:::6664:
 
      IInntteerrnneett IIPP## MMaasskk
@@ -453,7 +460,6 @@
         Each line for a server should have the same number as the sixth
         field.  If it is absent, the server deaults it to 0, using the
         defaults from the config.h file.
-
         To define a connection class, you need to include a Y: line in
         the ircd.conf file.  This enables you to define the ping
         frequency, connection frequency (for servers) and maximum number
@@ -520,7 +526,6 @@
         ``unknown'' and thus the effective limit will be per host, not
         per user@host. Also, some ident servers return encrypted data
         which changes for every connection making the limit void.
-
      EExxaammppllee
         Y:23:120:300:5:
 
@@ -587,11 +592,11 @@
 
         Allow clients from a machine with that IP number to connect.
         Numeric match is enough, name is not required anymore.
-
         I:x:secret:*.tut.fi::1
 
         Allow clients from machines matching *.tut.fi to connect with
         the password ``secret''.
+
         I:*::*::1
 
         Allow anyone from anywhere to connect your server.
@@ -790,6 +795,7 @@
      EExxaammpplleess
         K:orion.cair.du.edu::jtrim:0:
 
+
         If user ``jtrim'' connects to IRC from host
         ``orion.cair.du.edu'' then IMMEDIATELY REMOVE HIM from my IRCD.
 
@@ -853,7 +859,6 @@
   2. to save internet from extra network traffic (remember the old rwho
      program with traffic problems when the number of machines
      increased).
-
 
 
      FFoorrmmaatt
@@ -982,6 +987,7 @@
      don't expect login password.  The connecting host should identify
      itself as ``garfield.mit.edu''.
 
+
      NN  ``N'' corresponds to a server Noconnect option.
 
      TTAARRGGEETT HHoosstt AAddddrr
@@ -1045,6 +1051,9 @@
 
 
 
+
+
+
   44..1100..  HHuubb ccoonnnneeccttiioonnss
 
 
@@ -1054,6 +1063,7 @@
         may ``hub for''.  If a server is only going to supply its own
         name (ie act as a solitary leaf) then no H-line is required for,
         else a H-line must be added.
+
      FFoorrmmaatt
 
         H:<Server Mask>:*:<Server Name>::
@@ -1120,6 +1130,8 @@
 
         L:<Server Mask>:*:<Server Name>:<Max Depth>:
 
+
+
      SSeerrvveerr MMaasskk
         Mask of which servers the leaf-like attributes are used on when
         the server receives SERVER messages.  The wildcards * and ? may
@@ -1174,7 +1186,6 @@
 
      EExxaammpplleess
         V:020901*::*::
-
         Disallows any server which version is 2.9.1* to connect.
 
         V:020901*:D:*::
@@ -1186,7 +1197,9 @@
         It is possible to have and use multiple V-lines for the one
         server mask.
 
-        V:020901:*:*:: V:020902:*:*::
+        V:020901:*:*::
+
+        V:020902:*:*::
 
         is allowed.
 
@@ -1239,41 +1252,23 @@
         The host mask should be set to match the host(s) from which the
         service will be connecting from. This may be either an IP# or
         full name (prefered).
-
      PPaasssswwoorrdd
         This is the password which must be passed in the SERVICE
         command.
 
      SSeerrvviiccee NNaammee
-        : The name used by the service. Services don't have nicknames,
-        but a static name defined by the S line.
+        The name used by the service. Services don't have nicknames, but
+        a static name defined by the S line.
 
      SSeerrvviiccee TTyyppee
         The type of service. It defines the priviledges given to the
         service. Be very careful in the types you allow.  The types can
         be found in include/service.h
+
      CCllaassss
         The class field should refer to an existing class.
 
      NNootteess
-        To connect a service to your server, you must first create an S-
-        line entry in your ircd.conf file and get your server to read
-        this in (ie rehash or reboot). Once your server has updated
-        itself, you can then attempt to register your connection as a
-        service.  Registering as a service is done by sending a SERVICE
-        command to the server:
-
-        SERVICE servicename servername distribution servicetype 0
-        :Information
-
-        A successfull registering of a service at the server will result
-        in a RPL_YOURESERVICE (383) being sent back to you. Any other
-        reply as a result of sending service indicates an error has
-        occured.
-
-        Services can be listed using the SERVLIST command, and can be
-        sent messages using the SQUERY command.
-
         A service is not a very useful sort of client, it cannot join
         channels or issue certain commands although most are available
         to it. Services are rejected upon sending an unknown or
@@ -1288,8 +1283,8 @@
      IInnttrroodduuccttiioonn
         This provides you a way to bounce clients to another server.
         This information is provided to clients which are denied
-        connection because a limit is reached.  It is NOT used when
-        client is not normally authorized to connect to server.
+        connection, either because their connection class is full, or
+        the server is full, or they are not authorized to connect.
 
      FFoorrmmaatt
 
@@ -1308,7 +1303,7 @@
         ``All connections in use'' message.  In this case, the server
         doesn't process the connections at all, and has no knowledge of
         the client's host name, or class number.  For these cases, this
-        must field contain ``-1''.
+        field must be empty.
 
      SSeerrvveerr NNaammee
         This specifies the IRC server hostname that the client should
@@ -1323,13 +1318,12 @@
 
         Rejected clients in class 2 are advised to use
         ``irc.stealth.net'' on port 6660.
-
         B:*.fi::irc.funet.fi:6667:
 
         Finnish client should use irc.funet.fi when they cannot be taken
         anymore.
 
-        B:-1::irc2.stealth.net:6667:
+        B:::irc2.stealth.net:6667:
 
         When the server is completely full, clients should use the
         secondary server.
@@ -1380,6 +1374,10 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
+
+
+
+
 
 
 

@@ -1,6 +1,6 @@
   IRC Services
   Christophe Kalt
-  $Id: SERVICE.txt,v 1.4 1997/09/09 19:13:13 kalt Exp $
+  $Id: SERVICE.txt,v 1.5 1997/09/09 19:15:00 kalt Exp $
 
   The IRC protocol described in RFC 1459 defines two types of connec-
   tions (client, and server).  A third type was introduced with version
@@ -92,7 +92,7 @@
   22..33..  SSQQUUEERRYY
 
   This new command stands for ``Service Query''.  The first argument is
-  the serice name, and the second the text to be sent to the service.
+  the service name, and the second the text to be sent to the service.
 
 
   33..  HHooww ttoo sseett uupp aa sseerrvviiccee
@@ -317,7 +317,6 @@
 
   Services should implement their own flood control (for outgoing
   traffic) to be safe.
-
 
 
 
