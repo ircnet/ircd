@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.54 1998/09/18 21:46:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.55 1998/09/23 12:56:13 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -409,8 +409,38 @@ char	*nick, *username;
 
 		if (sptr->exitc == EXITC_AREF)
 		    {
-			sendto_flag(SCH_LOCAL, "K-lined %s@%s.",
-				    user->username, sptr->sockhost);
+			char *masked = NULL, *format;
+
+			/*
+			** All this masking is rather ugly but prompted by
+			** the fact that the hostnames should not be made
+			** available in realtime. (first iauth module using
+			** this detects open proxies)
+			** Then again, if detailed information is needed,
+			** the admin should check logs and/or the module
+			** should be changed to send details to &AUTH.
+			*/
+			if (sptr->hostp)
+			    {
+				masked = index(sptr->hostp->h_name, '.');
+				format = "Denied connection from ???%s.";
+			    }
+			else
+			    {
+				char *dot;
+
+				masked = inetntoa((char *)&sptr->ip);
+				dot = rindex(masked, '.');
+				if (dot)
+					*(dot+1) = '\0';
+				else
+					masked = NULL;
+				format = "Denied connection from %s???.";
+			    }
+			if (masked) /* just to be safe */
+				sendto_flag(SCH_LOCAL, format, masked);
+			else
+				sendto_flag(SCH_LOCAL, "Denied connection.");
 #if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
 			syslog(LOG_NOTICE, "%s ( %s ): <none>@%s [%s] %c\n",
 			       myctime(sptr->firsttime), " Denied  ",
