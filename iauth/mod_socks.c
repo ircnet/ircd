@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.30 2002/08/25 01:11:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.31 2002/09/28 21:02:21 jv Exp $";
 #endif
 
 #include "os.h"
@@ -83,13 +83,18 @@ struct socks_private
 static void socks_open_proxy(int cl, char *strver)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
+	char *reason = cldata[cl].instance->reason;
 
+	if (!reason)
+	{
+		reason = "Denied access (open SOCKS proxy found)";
+	}
 	/* open proxy */
 	if (mydata->options & OPT_DENY)
 	{
 		cldata[cl].state |= A_DENY;
-		sendto_ircd("k %d %s %u ", cl, cldata[cl].itsip,
-			cldata[cl].itsport);
+		sendto_ircd("k %d %s %u :%s", cl, cldata[cl].itsip,
+			cldata[cl].itsport, reason);
 	}
 	if (mydata->options & OPT_LOG)
 	{
