@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.27 1998/08/08 18:22:53 kalt Exp $
+#*   $Id: Makefile.in,v 1.28 1998/08/08 19:59:39 kalt Exp $
 #*
 #*/
 
@@ -100,18 +100,18 @@ CHKCONF = chkconf
 
 help:
 	@echo "Choose one of the following:"
-	@echo "\tall            : build everything"
-	@echo "\tserver         : build server programs"
-	@echo "\t\tircd          : build the irc daemon"
-	@echo "\t\tiauth         : build the authentication slave"
-	@echo "\t\tchkconf       : build the configuration file checker"
-	@echo "\t\tircd-mkpasswd : build ircd-mkpasswd"
-	@echo "\t\tircdwatch     : build ircdwatch"
-	@echo "\tclient         : build the client"
+	@echo "        all            : build everything"
+	@echo "        server         : build server programs"
+	@echo "                ircd          : build the irc daemon"
+	@echo "                iauth         : build the authentication slave"
+	@echo "                chkconf       : build the configuration file checker"
+	@echo "                ircd-mkpasswd : build ircd-mkpasswd"
+	@echo "                ircdwatch     : build ircdwatch"
+	@echo "        client         : build the client"
 	@echo
-	@echo "\tinstall        : build and install server and client programs"
-	@echo "\tinstall-server : build and install server programs"
-	@echo "\tinstall-client : build and install client program"
+	@echo "        install        : build and install server and client programs"
+	@echo "        install-server : build and install server programs"
+	@echo "        install-client : build and install client program"
 
 all: server client
 
