@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.47 2001/10/20 17:57:30 q Exp $
+#*   $Id: Makefile.in,v 1.48 2003/02/10 02:45:22 chopin Exp $
 #*
 #*/
 
@@ -232,10 +232,13 @@ install-client: client
 	(cd ../doc; $(INSTALL_DATA) irc.1 $(client_man_dir))
 	@echo "installation of client done."
 
-install-server: server
+install-ircd: ircd
 	-@if [ ! -d $(server_bin_dir) ]; then \
 		$(MKDIRHIER) $(server_bin_dir); \
 	fi
+	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
+
+install-server: install-ircd server
 	-@if [ ! -d $(server_man_dir) ]; then \
 		$(MKDIRHIER) $(server_man_dir); \
 	fi
@@ -251,7 +254,6 @@ install-server: server
 	-@if [ ! -d $(ircd_log_dir) ]; then \
 		$(MKDIRHIER) $(ircd_log_dir); \
 	fi
-	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(IAUTH) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(CHKCONF) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) ircd-mkpasswd $(server_bin_dir)
