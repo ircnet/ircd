@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.169 2004/01/20 19:16:17 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.170 2004/02/08 04:02:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2365,6 +2365,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		flags = 0;
 		chop[0] = '\0';
 		if (MyConnect(sptr) && UseModes(name) &&
+			(*name != '#' || !IsSplit()) &&
 		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users &&
 		    !(chptr->history && *chptr->chname == '!'))
 		    {
