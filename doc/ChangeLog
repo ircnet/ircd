@@ -1,3 +1,26 @@
+Tue Sep 23 11:36:30 1997  Christophe Kalt
+
+	* common_def.h: added CHKCONF_COMPILE statement.
+
+	* bsd_ext.h: incorrect declaration for writeb.
+
+	* support_ext.h, support.c: dumpcore() was broken.
+
+	* class_def.h, class_ext.h, class.c, s_conf.c, s_err.c: it's now
+	possible to combine a limit per host and per user@host for the
+	same class.
+
+	* s_user.c:
+		* RPL_ENDOFWHO wasn't correct.
+		* who_find() / m_whois() didn't always respect +a mode.
+		* @ restriction in username could be bypassed.
+		* unlikely but nonetheless possible ghost generation.
+
+	* ircd.c: setgid() was called after setuid() (reported by Nicole
+	Haywood <kole@mail.usyd.edu.au>)
+
+	* parse.c: avoid a match() call if possible.
+
 Sun Sep 14 19:44:27 1997  Christophe Kalt
 
 	* ircd.c: redundant/useless code commented out.
