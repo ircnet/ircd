@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.61 2003/07/28 17:15:26 jv Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.62 2003/08/04 20:24:39 jv Exp $";
 #endif
 
 #include "os.h"
@@ -342,6 +342,7 @@ aClient *to;
 					/* Returns always len > 0 */
 		if ((rlen = deliver_it(to, msg, len)) < 0)
 		{
+#ifndef CLIENT_COMPILE
 			if ( (IsConnecting(to) || IsHandshake(to))
 			     && to->serv && to->serv->byuid[0])
 			{
@@ -353,6 +354,7 @@ aClient *to;
 					ME, bysptr->name, to->name);
 				}
 			}
+#endif
 			return dead_link(to,"Write error to %s, closing link");
 		}
 		(void)dbuf_delete(&to->sendQ, rlen);
