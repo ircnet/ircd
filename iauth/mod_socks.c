@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.10 1999/01/15 15:55:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.11 1999/01/18 21:38:59 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -37,7 +37,7 @@ struct proxylog
 {
 	struct proxylog *next;
 	char ip[HOSTLEN+1];
-	u_char open; /* 1 = open proxy */
+	u_char open; /* 0 = no proxy, 1 = open proxy, 2 = closed proxy */
 	time_t expire;
 };
 
@@ -51,8 +51,8 @@ struct socks_private
 	u_int lifetime;
 	u_char options;
 	/* stats */
-	u_int chit, chit2, cmiss, cnow, cmax;
-	u_int closed, open;
+	u_int chitc, chito, chitn, cmiss, cnow, cmax;
+	u_int closed, open, noprox;
 };
 
 /*
@@ -90,8 +90,10 @@ int cl, open;
     struct socks_private *mydata = cldata[cl].instance->data;
     struct proxylog *next;
 
-    if (open)
+    if (open == 1)
 	    mydata->open += 1;
+    else if (open == 0)
+	    mydata->noprox += 1;
     else
 	    mydata->closed += 1;
 
@@ -151,13 +153,15 @@ socks_check_cache(cl)
 			      "socks_check_cache(%d): match (%u)",
 			      cl, pl->open));
 		    pl->expire = now + mydata->lifetime; /* dubious */
-		    if (pl->open)
+		    if (pl->open == 1)
 			{
 			    socks_open_proxy(cl);
-			    mydata->chit += 1;
+			    mydata->chito += 1;
 			}
+		    else if (pl->open == 0)
+			    mydata->chitn += 1;
 		    else
-			    mydata->chit2 += 1;
+			    mydata->chitc += 1;
 		    return -1;
 		}
 	    last = &(pl->next);
@@ -260,8 +264,10 @@ AnInstance *self;
 {
 	struct socks_private *mydata = self->data;
 
-	sendto_ircd("S socks open[%u/%u] closed[%u/%u] cache miss %u (%u < %u)",
-		    mydata->open, mydata->chit, mydata->closed, mydata->chit2,
+	sendto_ircd("S socks open %u closed %u noproxy %u",
+		    mydata->open, mydata->closed, mydata->noprox);
+	sendto_ircd("S socks cache open %u closed %u noproxy %u miss %u (%u <= %u)",
+		    mydata->chito, mydata->chitc, mydata->chitn,
 		    mydata->cmiss, mydata->cnow, mydata->cmax);
 }
 
@@ -378,7 +384,7 @@ u_int cl;
 			if (cldata[cl].inbuffer[0] == 0)
 			    {
 				struct socks_private *mydata;
-				u_char open = 0;
+				u_char open = 2;
 
 				mydata = cldata[cl].instance->data;
 				if (cldata[cl].inbuffer[1] == 90)
