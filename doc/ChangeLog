@@ -1,3 +1,10 @@
+2002-04-11  Piotr Kucharski
+
+	* s_user.c/register_user(): validusername() was checking also OTHER
+	  type ident, which could have been encrypted.
+	* s_id_ext.h: remove unused, add new extern declariations.
+	* example.conf: update.
+
 2002-04-06  Piotr Kucharski
 
 	* s_serv.c/m_server_estab(),m_eob(): send empty EOB if we have no
