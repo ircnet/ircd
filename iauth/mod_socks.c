@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.28 2002/08/24 21:15:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.29 2002/08/24 21:19:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -34,7 +34,6 @@ static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.28 2002/08/24 21:15:59 chopin E
 /* 
    A lot of socks v4 proxies return 4,91 instead of 0,91 otherwise
    working perfectly -- this will deal with them.
-   If undefined, it will work only with 'megaparanoid' option.
 */
 #define BROKEN_PROXIES 1
 

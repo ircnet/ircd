@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.16 1999/07/04 22:09:09 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1999/07/04 22:09:09 $"
+.\" @(#)$Id: iauth.conf.5,v 1.17 2002/08/24 21:19:15 chopin Exp $
+.TH IAUTH.CONF 5 "$Date: 2002/08/24 21:19:15 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -86,15 +86,21 @@ connection originated from doesn't run a SOCKS v4 or v5 proxy server on
 port 1080 that is open to the world.  It is useful to reject abusive
 clients using a relay to evade kill lines and bans.
 
-This module understands seven options:
+This module understands nine options:
 .B reject
 to reject connections originating from a host where an open proxy
 was detected,
 .B log
 to log hostnames where an open proxy is detected.
+.B protocol
+to log protocol errors
 .B paranoid
 to consider proxies which deny the request because of a userid/ident
 mismatch to be OPEN proxies.
+.B megaparanoid
+which is paranoid plus it considers all proxies not explicitly stating they
+are closed to be OPEN proxies -- that includes all protocol errors, unexpected
+results etc.
 .B cache[=value]
 to set the cache lifetime in minutes.  By default, caching is enabled for
 30 minutes.  A value of 0 disables caching.
