@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info19441tmp2.
+input file /tmp/sgml2info23680tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.17 1997/10/01 17:50:46 kalt Exp $
+     $Id: INSTALL.info,v 1.18 1997/10/13 19:09:38 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.4.
 
@@ -683,6 +683,45 @@ Client connections
      I:<TARGET Host Addr>:<Password>:<TARGET Hosts NAME>:<Port>:<Class>
      i:<TARGET Host Addr>:<Password>:<TARGET Hosts NAME>:<Port>:<Class>
 
+`TARGET Host Addr'
+     Specifies the IP address(es) of the machine(s) that are allowed to
+     connect.  If "user@" prefixes the actual IP address the server
+     will require that the remote username returned by the ident server
+     be the same as the one given before the "@".  Wildcards are
+     permitted.
+
+`Password'
+     The password that must be given by the client to be allowed on the
+     server.
+
+`TARGET Host NAME'
+     Specifies the host name(s) of the machines allowed to connect to
+     the server.  If "user@" prefixes the actual IP address the server
+     will require that the remote username returned by the ident server
+     be the same as the one given before the "@".  Wildcards are
+     permitted.
+
+     This field can be empty, it then has a special meaning.  See Below.
+
+`Port'
+     Specifies the port number for which this configuration line is
+     valid.  An empty field, or "0" matches all ports.
+
+`Class'
+     This field should refer to an existing class.  Connections classes
+     are usefull to limit the number of users allowed on the server.
+
+`Note'
+     The server first checks if the client hostname (or any aliases)
+     matches the `TARGET Host NAME' field.  If a match is found, the
+     client is accepted.  If not, the server checks if the IP address
+     of the client matches the `TARGET Host Addr' field.  The matching
+     field is used to set the name of the client: for example, if the
+     client matches the `TARGET Host Addr' field, it will show on IRC
+     with a numerical address (even if this address is resolvable).  If
+     the `TARGET Host NAME' field is empty, then the host name is
+     always used (when available).
+
 `Examples'
      For example, if you were installing IRC on tolsun.oulu.fi and you
      wanted to allow examples sake let us assume you were making this
@@ -696,7 +735,7 @@ Client connections
 
      I:x::*.du.edu::1
 
-     Allow any clients from machines whose names end in "du.edu" to
+     Allow any clients from machines whose names end in ".du.edu" to
      connect with no password.
 
      I:128.214.6.100::nic.funet.fi::1
@@ -706,8 +745,8 @@ Client connections
 
      I:x:secret:*.tut.fi::1
 
-     Allow clients from machines matching *.tut.fi to connect with the
-     password "secret".
+     Allow clients from machines matching "*.tut.fi" to connect with
+     the password "secret".
 
      I:*::*::1
 
@@ -721,8 +760,21 @@ Client connections
 
      I:x::*.fi:6667:1
 
-     Allow clients from machines matching *.fi to connect on the port
+     Allow clients from machines matching "*.fi" to connect on the port
      6667.
+
+     I:135.11.35.*::*.net::1
+
+     Allows clients from machines which host name matches "*.net" or
+     which IP address matches "135.11.35.*" to connect to the server.
+     If the host name does not match "*.net" then the IP address is
+     used for these clients, even if the host name is known.
+
+     I:135.11.35.*::::1
+
+     Allows clients from machines which IP address matches
+     "135.11.35.*" to connect to the server.  If the host name is
+     known, is it used as address for these clients.
 
 `NEW!!!'
      As of the 2.7.2d version of the server, the server is able to
@@ -1486,17 +1538,17 @@ Node: Administrative info14584
 Node: Port connections16619
 Node: Connection Classes18829
 Node: Client connections24265
-Node: Operator priviliges27550
-Node: Restrict connections29670
-Node: Excluded accounts30985
-Node: Server connections34843
-Node: Hub connections43276
-Node: Leaf connections44489
-Node: Version limitations46572
-Node: Excluded machines47811
-Node: Service connections49118
-Node: Bounce server50711
-Node: Default local server (for local clients) `*OBSOLETED*'52334
-Node: Related resources53217
+Node: Operator priviliges29737
+Node: Restrict connections31857
+Node: Excluded accounts33172
+Node: Server connections37030
+Node: Hub connections45463
+Node: Leaf connections46676
+Node: Version limitations48759
+Node: Excluded machines49998
+Node: Service connections51305
+Node: Bounce server52898
+Node: Default local server (for local clients) `*OBSOLETED*'54521
+Node: Related resources55404
 
 End Tag Table

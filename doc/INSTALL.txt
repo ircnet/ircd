@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.17 1997/10/01 17:50:48 kalt Exp $
+  $Id: INSTALL.txt,v 1.18 1997/10/13 19:09:39 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.4.
 
@@ -609,6 +609,47 @@
 
 
 
+     TTAARRGGEETT HHoosstt AAddddrr
+        Specifies the IP address(es) of the machine(s) that are allowed
+        to connect.  If ``user@'' prefixes the actual IP address the
+        server will require that the remote username returned by the
+        ident server be the same as the one given before the ``@''.
+        Wildcards are permitted.
+
+     PPaasssswwoorrdd
+        The password that must be given by the client to be allowed on
+        the server.
+
+     TTAARRGGEETT HHoosstt NNAAMMEE
+        Specifies the host name(s) of the machines allowed to connect to
+        the server.  If ``user@'' prefixes the actual IP address the
+        server will require that the remote username returned by the
+        ident server be the same as the one given before the ``@''.
+        Wildcards are permitted.
+
+        This field can be empty, it then has a special meaning.  See
+        Below.
+
+     PPoorrtt
+        Specifies the port number for which this configuration line is
+        valid.  An empty field, or ``0'' matches all ports.
+
+     CCllaassss
+        This field should refer to an existing class.  Connections
+        classes are usefull to limit the number of users allowed on the
+        server.
+
+     NNoottee
+        The server first checks if the client hostname (or any aliases)
+        matches the TTAARRGGEETT HHoosstt NNAAMMEE field.  If a match is found, the
+        client is accepted.  If not, the server checks if the IP address
+        of the client matches the TTAARRGGEETT HHoosstt AAddddrr field.  The matching
+        field is used to set the name of the client: for example, if the
+        client matches the TTAARRGGEETT HHoosstt AAddddrr field, it will show on IRC
+        with a numerical address (even if this address is resolvable).
+        If the TTAARRGGEETT HHoosstt NNAAMMEE field is empty, then the host name is
+        always used (when available).
+
      EExxaammpplleess
         For example, if you were installing IRC on tolsun.oulu.fi and
         you wanted to allow examples sake let us assume you were making
@@ -622,8 +663,8 @@
 
         I:x::*.du.edu::1
 
-        Allow any clients from machines whose names end in ``du.edu'' to
-        connect with no password.
+        Allow any clients from machines whose names end in ``.du.edu''
+        to connect with no password.
 
         I:128.214.6.100::nic.funet.fi::1
 
@@ -632,8 +673,8 @@
 
         I:x:secret:*.tut.fi::1
 
-        Allow clients from machines matching *.tut.fi to connect with
-        the password ``secret''.
+        Allow clients from machines matching ``*.tut.fi'' to connect
+        with the password ``secret''.
 
         I:*::*::1
 
@@ -648,8 +689,22 @@
 
         I:x::*.fi:6667:1
 
-        Allow clients from machines matching *.fi to connect on the port
-        6667.
+        Allow clients from machines matching ``*.fi'' to connect on the
+        port 6667.
+
+        I:135.11.35.*::*.net::1
+
+        Allows clients from machines which host name matches ``*.net''
+        or which IP address matches ``135.11.35.*'' to connect to the
+        server.  If the host name does not match ``*.net'' then the IP
+        address is used for these clients, even if the host name is
+        known.
+
+        I:135.11.35.*::::1
+
+        Allows clients from machines which IP address matches
+        ``135.11.35.*'' to connect to the server.  If the host name is
+        known, is it used as address for these clients.
 
      NNEEWW!!!!!!
         As of the 2.7.2d version of the server, the server is able to
@@ -668,7 +723,6 @@
         line will have a restricted connection. (no nick/mode change, no
         kick). Such users will have their username prefixed by +, = or -
         depending on the ident reply.
-
 
   44..66..  OOppeerraattoorr pprriivviilliiggeess
 
@@ -789,6 +843,8 @@
      FFoorrmmaatt
 
         k:<Host Name>:<time interval(s)|comment>:<Auth>:<port>:
+
+
 
      KK  ``K'' tells the IRCD that you are making a KILL USER command
         entry.
@@ -1053,7 +1109,6 @@
         present for the line to be recognized. If CRYPT_LINK_PASSWORD is
         defined in config.h, this password must be crypted.
 
-
      TTAARRGGEETT HHoosstt NNAAMMEE
         The full hostname of the target machine. This is the name that
         the TARGET server will identify itself with when you connect to
@@ -1063,6 +1118,7 @@
 
      DDoommaaiinn MMaasskk
         Domain masking, see below.
+
 
      CCllaassss
         The class field should refer to an existing class.
@@ -1130,7 +1186,6 @@
 
      EExxaammpplleess
         H:*.edu::*.bu.edu::
-
         Allows a server named ``*.bu.edu'' to introduce only servers
         that match the ``*.edu'' name mask.
 
@@ -1317,7 +1372,6 @@
         service. Be very careful in the types you allow.  The types can
         be found in include/service.h
 
-
      CCllaassss
         The class field should refer to an existing class.
 
@@ -1383,7 +1437,6 @@
         secondary server.
 
 
-
   44..1166..  DDeeffaauulltt llooccaall sseerrvveerr ((ffoorr llooccaall cclliieennttss)) **OOBBSSOOLLEETTEEDD**
 
 
@@ -1395,6 +1448,7 @@
         TARGET host's connection information and password (if any).
 
      FFoorrmmaatt
+
 
         U:<TARGET Host addr>:<Password>:<TARGET Host NAME>:<Internet Port>
 
@@ -1429,6 +1483,18 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.17 1997/10/01 17:50:47 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.18 1997/10/13 19:09:39 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.4.
 </abstract>
@@ -513,6 +513,37 @@ pass through your machine.
 <tag/Format/
 <verb>I:&lt;TARGET Host Addr&gt;:&lt;Password&gt;:&lt;TARGET Hosts NAME&gt;:&lt;Port&gt;:&lt;Class&gt;
 i:&lt;TARGET Host Addr&gt;:&lt;Password&gt;:&lt;TARGET Hosts NAME&gt;:&lt;Port&gt;:&lt;Class&gt;</verb>
+<tag/TARGET Host Addr/Specifies the IP address(es) of the
+machine(s) that are allowed to connect.  If ``user@''
+prefixes the actual IP address the server will require that
+the remote username returned by the ident server be the same
+as the one given before the ``@''.  Wildcards are permitted.
+<tag/Password/The password that must be given by the client
+to be allowed on the server.
+<tag/TARGET Host NAME/Specifies the host name(s) of the
+machines allowed to connect to the server.  If ``user@''
+prefixes the actual IP address the server will require that
+the remote username returned by the ident server be the same
+as the one given before the ``@''.  Wildcards are permitted.
+<p>
+This field can be empty, it then has a special meaning.  See
+Below.
+<tag/Port/Specifies the port number for which this
+configuration line is valid.  An empty field, or ``0''
+matches all ports.
+<tag/Class/This field should refer to an existing class.
+Connections classes are usefull to limit the number of users
+allowed on the server.
+<tag/Note/The server first checks if the client hostname (or
+any aliases) matches the <bf>TARGET Host NAME</bf> field.
+If a match is found, the client is accepted.  If not, the
+server checks if the IP address of the client matches the
+<bf>TARGET Host Addr</bf> field.  The matching field is used
+to set the name of the client: for example, if the client
+matches the <bf>TARGET Host Addr</bf> field, it will show on
+IRC with a numerical address (even if this address is
+resolvable).  If the <bf>TARGET Host NAME</bf> field is
+empty, then the host name is always used (when available).
 <tag/Examples/
 For example, if you were installing IRC on tolsun.oulu.fi
 and you wanted to allow examples sake let us assume you were
@@ -528,7 +559,7 @@ the following lines:
 I:x::*.du.edu::1
 <p>
 Allow any clients from machines whose names end in
-``du.edu'' to connect with no password.
+``.du.edu'' to connect with no password.
 <p>
 I:128.214.6.100::nic.funet.fi::1
 <p>
@@ -538,7 +569,7 @@ anymore.
 <p>
 I:x:secret:*.tut.fi::1
 <p>
-Allow clients from machines matching *.tut.fi to connect
+Allow clients from machines matching ``*.tut.fi'' to connect
 with the password ``secret''.
 <p>
 I:*::*::1
@@ -554,8 +585,22 @@ SMTP port (for example).
 <p>
 I:x::*.fi:6667:1
 <p>
-Allow clients from machines matching *.fi to connect on the
-port 6667.
+Allow clients from machines matching ``*.fi'' to connect on
+the port 6667.
+<p>
+I:135.11.35.*::*.net::1
+<p>
+Allows clients from machines which host name matches
+``*.net'' or which IP address matches ``135.11.35.*'' to
+connect to the server.  If the host name does not match
+``*.net'' then the IP address is used for these clients,
+even if the host name is known.
+<p>
+I:135.11.35.*::::1
+<p>
+Allows clients from machines which IP address matches
+``135.11.35.*'' to connect to the server.  If the host name
+is known, is it used as address for these clients.
 <tag/NEW!!!/ As of the 2.7.2d version of the server, the
 server is able to accept connections on multiple
 ports. I-lines are required for each P-line to allow

@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.21 1997/10/08 23:44:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.22 1997/10/13 19:09:40 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -136,6 +136,11 @@ char	*sockhost;
 		(void)strncat(uhost, sockhost, sizeof(uhost) - strlen(uhost));
 		if (match(aconf->host, uhost))
 			continue;
+		if (*aconf->name == '\0' && hp)
+		    {
+			strncpyzt(uhost, hp->h_name, sizeof(uhost));
+			add_local_domain(uhost, sizeof(uhost) - strlen(uhost));
+		    }
 attach_iline:
 		if (index(uhost, '@'))
 			cptr->flags |= FLAGS_DOID;
@@ -249,11 +254,13 @@ aClient *cptr;
 	if ((aconf->status & (CONF_LOCOP | CONF_OPERATOR | CONF_CLIENT |
 			      CONF_RCLIENT)))
 	    {
-		int	hcnt = 0, ucnt = 0;
-
 		if (aconf->clients >= ConfMaxLinks(aconf) &&
 		    ConfMaxLinks(aconf) > 0)
 			return -3;    /* Use this for printing error message */
+	    }
+	if ((aconf->status & (CONF_CLIENT | CONF_RCLIENT)))
+	    {
+		int	hcnt = 0, ucnt = 0;
 
 		/* check on local/global limits per host and per user@host */
 
