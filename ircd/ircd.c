@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.50 1999/03/08 21:59:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.51 1999/03/11 15:46:04 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -749,8 +749,6 @@ char	*argv[];
 	if (argc > 0)
 		bad_command(); /* This exits out */
 
-	setup_signals();
-
 #ifndef IRC_UID
 	if ((uid != euid) && !euid)
 	    {
@@ -802,6 +800,8 @@ char	*argv[];
 		    }
 		    }
 #endif
+
+	setup_signals();
 
 	/* didn't set debuglevel */
 	/* but asked for debugging output to tty */
