@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.205 2004/06/06 15:26:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.206 2004/06/11 17:07:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1329,13 +1329,6 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aClient *acptr;
 	char	*uid, nick[NICKLEN+2], *user, *host, *realname;
 
-	if (parc < 8)
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
-			   "UNICK");
-		return 1;
-	    }
-
 	strncpyzt(nick, parv[1], NICKLEN+1);
 	uid = parv[2];
 	user = parv[3];
@@ -2363,6 +2356,8 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (parc < 5 || *parv[1] == '\0' || *parv[2] == '\0' ||
 	    *parv[3] == '\0' || *parv[4] == '\0')
 	    {
+		/* this may come from internal m_user call (from m_nick), so we
+		** have to deal with it here; will be gone in next version --B. */
 		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "USER");
 		if (IsServer(cptr))
 		    {
@@ -2587,13 +2582,8 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	*user, *path, *killer;
 	int	chasing = 0;
 
-	if (parc < 2 || *parv[1] == '\0')
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "KILL");
-		return 1;
-	    }
-
 	user = parv[1];
+	/* one day we'll require path, remember to change in msgtab[] --B. */
 	path = parv[2]; /* Either defined or NULL (parc >= 2!!) */
 
 	if (IsAnOper(cptr))
@@ -2964,32 +2954,10 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	*name, *password, *encr;
 	char	*logstring = NULL;
 
-	name = parc > 1 ? parv[1] : NULL;
-	password = parc > 2 ? parv[2] : NULL;
+	name = parv[1];
+	password = parv[2];
 
-	if (!IsServer(cptr) && (BadPtr(name) || BadPtr(password)))
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "OPER");
-		return 1;
-	    }
-	
-	/* if message arrived from server, trust it, and set to oper */
-	    
-	if ((IsServer(cptr) || IsMe(cptr)) && !IsOper(sptr))
-	    {
-		/* we never get here, do we?? (counters!) -krys */
-		sptr->user->flags |= FLAGS_OPER;
-		sendto_serv_butone(cptr, ":%s MODE %s :+o", parv[0], parv[0]);
-		if (IsMe(cptr))
-			sendto_one(sptr, replies[RPL_YOUREOPER], ME, BadTo(parv[0]));
-#ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_OPER, sptr->user->server, 
-				      sptr, ":%s MODE %s :+o", parv[0], 
-				      parv[0]);
-#endif
-		return 1;
-	    }
-	else if (IsAnOper(sptr))
+	if (IsAnOper(sptr))
 	    {
 		if (MyConnect(sptr))
 			sendto_one(sptr, replies[RPL_YOUREOPER], ME, BadTo(parv[0]));
@@ -3149,13 +3117,8 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int	m_pass(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	char *password = parc > 1 ? parv[1] : NULL;
+	char *password = parv[1];
 
-	if (BadPtr(password))
-	    {
-		sendto_one(cptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "PASS");
-		return 1;
-	    }
 	strncpyzt(cptr->passwd, password, sizeof(cptr->passwd));
 	if (cptr->user || cptr->service)
 	{
@@ -3199,13 +3162,6 @@ int	m_userhost(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	char	*s;
 	Reg	int	i, len;
 	int	idx = 1;
-
-	if (parc < 2)
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
-			   "USERHOST");
-		return 1;
-	    }
 
 	(void)sprintf(buf, replies[RPL_USERHOST], ME, BadTo(parv[0]));
 	len = strlen(buf);
@@ -3260,12 +3216,6 @@ int	m_ison(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	int	len = 0, i;
 	char	*p = NULL;
 
-	if (parc < 2)
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "ISON");
-		return 1;
-	    }
-
 	(void)sprintf(buf, replies[RPL_ISON], ME, BadTo(*parv));
 	len = strlen(buf);
 
@@ -3301,12 +3251,6 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	int	what, setflags, penalty = 0;
 
 	what = MODE_ADD;
-
-	if (parc < 2)
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "MODE");
-		return 1;
-	    }
 
 	if (cptr && !(acptr = find_person(parv[1], NULL)))
 	    {

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.192 2004/05/19 14:39:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.193 2004/06/11 17:07:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2465,13 +2465,6 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		       3,parc,parv) != HUNTED_ISME)
 		return 1;
 
-	if (parc < 2 || *parv[1] == '\0')
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
-			   "CONNECT");
-		return 0;
-	    }
-
 	if ((acptr = find_name(parv[1], NULL))
 	    || (acptr = find_mask(parv[1], NULL)))
 	    {
@@ -2586,26 +2579,15 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int	m_wallops(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	char	*message, *pv[4];
-
-	message = parc > 1 ? parv[1] : NULL;
-
-	if (BadPtr(message))
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
-			   "WALLOPS");
-		return 1;
-	    }
-
 	if (!IsServer(sptr))
 	    {
 		sendto_flag(SCH_ERROR, "User WALLOP from %s", sptr->name);
 		return 2;
 	    }
-	sendto_ops_butone(IsServer(cptr) ? cptr : NULL, parv[0], "%s", message);
+	sendto_ops_butone(IsServer(cptr) ? cptr : NULL, parv[0], "%s", parv[1]);
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_WALLOP, NULL, sptr,
-			      ":%s WALLOP :%s", parv[0], message);
+			      ":%s WALLOP :%s", parv[0], parv[1]);
 #endif
 	return 2;
 }

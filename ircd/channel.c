@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.213 2004/06/08 21:29:48 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.214 2004/06/11 17:07:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -935,12 +935,6 @@ int	m_mode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	int	penalty = 0;
 	aChannel *chptr;
 	char	*name, *p = NULL;
-
-	if (parc < 1)
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "MODE");
- 	 	return 1;
-	    }
 
 	parv[1] = canonize(parv[1]);
 
@@ -2183,12 +2177,6 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	int	i, tmplen, flags = 0;
 	char	*p = NULL, *p2 = NULL, *s, chop[5];
 
-	if (parc < 2 || *parv[1] == '\0')
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "JOIN");
-		return 1;
-	    }
-
 	*jbuf = '\0';
 	/*
 	** Rebuild list of channels joined to be the actual result of the
@@ -2585,12 +2573,6 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aClient *acptr;
 	int maxlen;
 
-	if (parc < 3 || *parv[2] == '\0')
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME,
-			BadTo(parv[0]), "NJOIN");
-		return 1;
-	    }
 	*nbuf = '\0'; q = nbuf;
 	*uidbuf = '\0'; u = uidbuf;
  	/* 17 comes from syntax ": NJOIN  :,@@+\r\n\0" */ 
@@ -2831,12 +2813,6 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	*p = NULL, *name, *comment = "";
 	int	size;
 
-	if (parc < 2 || parv[1][0] == '\0')
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "PART");
-		return 1;
-	    }
-
 	*buf = '\0';
 
 	parv[1] = canonize(parv[1]);
@@ -2928,11 +2904,6 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	obuf[BUFSIZE+1];
 	int	clen, maxlen;
 
-	if (parc < 3 || *parv[1] == '\0')
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "KICK");
-		return 1;
-	    }
 	if (IsServer(sptr))
 		sendto_flag(SCH_NOTICE, "KICK from %s for %s %s",
 			    parv[0], parv[1], parv[2]);
@@ -3100,13 +3071,6 @@ int	m_topic(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	*topic = NULL, *name, *p = NULL;
 	int	penalty = 1;
 	
-	if (parc < 2)
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
-			   "TOPIC");
-		return 1;
-	    }
-
 	parv[1] = canonize(parv[1]);
 
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
@@ -3199,13 +3163,6 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	aChannel *chptr;
-
-	if (parc < 3 || *parv[1] == '\0')
-	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
-			   "INVITE");
-		return 1;
-	    }
 
 	if (!(acptr = find_person(parv[1], (aClient *)NULL)))
 	    {
