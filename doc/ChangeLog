@@ -1,90 +1,363 @@
-/************************************************************************
- *   IRC - Internet Relay Chat, doc/ChangeLog
- *   Copyright (C) 1990, Mike Bolotski
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 1, or (at your option)
- *   any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- */
+Tue Apr 15 19:41:32 1997  Christophe Kalt
+
+	* sock.h: added a check to make sure FD_SETSIZE is big enough.
+
+	* s_bsd.c, struct.h, s_misc.c: added more UDP stats.
+
+	* s_bsd.c: fixed udp_pfd/res_pfd mess, and cleaned the code. (whee)
+
+	* h.h, struct.h, numeric.h, s_err.c, s_conf.c, s_bsd.c: added B lines.
+
+	* channel.c: defining USE_SERVICE would cause buffer corruption
+	when propagating channel modes to servers. (Found by Michael Neumayer)
+
+Wed Apr  2 15:25:54 1997  Christophe Kalt
+
+	* list.c, s_serv.c: added some error notices for users without server.
+
+	* s_bsd.c: fixed UDP port binding when no IP is given.
+
+	* configure.in: add -cckr to CFLAGS on SGI when using cc(1)
+
+Thu Mar 27 19:03:09 1997  Christophe Kalt
+
+	* h.h, send.c, s_bsd.c, s_user.c, s_serv.c: amount of transferred
+	data added to file logs.
+
+	* config.h.dist: define SVR4 if __svr4__ is there.
+
+	* packet.c: drop server sending an unknown command.
+
+	* s_user.c: changed m_who() for better performance (from Chris
+	Behrens), also put a limit on its number of arguments.
+
+	* h.h, struct.h, list.c: better IsMember (from Chris Behrens).
+
+	* s_serv.c: don't let a user introduce a new server.
+
+Fri Mar 21 19:53:36 1997  Christophe Kalt
+
+	* h.h, struct.h, ircd.c, s_conf.c, s_misc.c, s_serv.c,
+	config.h.dist: server can now cache the MOTD in memory (from Chris
+	Behrens).  See CACHED_MOTD #define.
+
+	* service.h, channel.c, s_serv.c, s_service.c, s_user.c: additions
+	for services.
+
+	* s_misc.c: added missing parameter for check_service_butone().
+
+	* INSTALL completed and converted to sgml
+
+	* s_serv.c: MyRealloc(NULL, size) isn't portable.
+
+Tue Mar 18 17:59:26 1997  Christophe Kalt
+
+	* 2.9.3b10
+	
+	* channel.c, hash.c, res.c, s_serv.c, s_service.c, s_user.c,
+	whowas.c: penalties tuned again. (added Volker Paulsen's anti SPAM
+	hack).
+	
+	* s_err.c, s_serv.c: minor changes to RPL_STATS*
+
+	* s_bsd.c: authclnts[] was not always initialized.
+	
+	* ircd.c: buffer in ircd_readtune() lacked initialization.
+	
+	* s_service.c: fixed buffer overflow.
+
+	* send.c, support.c: # of arguments cleanup.
+	
+	* list.c, res.c, s_service.c: casts to suppress warnings.
+
+	* h.h, dbuf.c: bufalloc, dbufblocks, poolsize now
+	unsigned. (some checks might be needed, poolsize can really get
+	big).
+
+	* s_misc.c: removed duplicate code in exit_client().
+
+	* parse.c:
+ 	
+		* Added more notices when generating SQUITs for unknown
+		servers.
+		* removed bogus else.
+
+Fri Feb 28 09:34:36 1997  Christophe Kalt
+
+	* s_err.c, s_serv.c: Added 2 more fields to RPL_TRACELINK.
+
+Thu Feb 27 14:50:37 1997  Christophe Kalt
+
+	* s_serv.c: /connect by servername didn't work for c lines (from Eumel)
+
+Wed Feb 26 16:48:36 1997  Christophe Kalt
+
+	* s_bsd.c: removed (old) redundant code concerning VIF.
+
+	* config.h.dist: CLONE_MAX and CLONE_PERIOD could be undefined.
+
+	* common.c: match() cleanup.
+
+Thu Feb 13 17:27:53 1997  Christophe Kalt
+
+	* res.c, res_init.c, res_mkquery.c, ircd.c, s_bsd.c: renamed
+	res_init() to ircd_res_init() to avoid conflict (ULTRIX).
+
+	* hash.c, struct.c: cleanup of hashing functions.
+
+	* match.c, parse.c, send.c, common.h, channel.c, hash.c, s_bsd.c,
+	s_misc.c, s_serv.c, s_service.c, s_user.c, note.c, ignore.c:
+
+		*  _match() changed to match() and the check for maximum
+		"recursion" slightly changed.
+		*  match() and matches() removed (stubs from when match
+		was recursive?).
+		* All occurrences of matches() changed to match().
+		* this saves one function call per match.
+
+	* send.c: Added 2 parameters to sendto_serv_butone().
+
+	* s_err.c, s_serv.c: Added one field to RPL_TRACELINK.
+
+Sun Jan 26 20:02:34 EET 1997  Vesa Ruokonen  (ruokonen@aapo.it.lut.fi)
+
+	* 2.9.3b8
+
+	* support.c, h.h, list.c: gcc -Wall cleanups.
+	* h.h, struct.h, chkconf.c, s_conf.c, s_serv.c:
+		created V:lines for checking connecting client parameters.
+		passed as PASS command parameters. A matching V:line.
+		refuses the connection (version number & compile flags).
+	* struct.h, channel.c, s_debug.c:
+		penalty threshold used for limiting KICK params.
+	* struct.h: initial QUEUELEN calculation tuned. (->BUFFERPOOL).
+	* c_msg.c: more verbose m_pong().
+	* channel.c, s_serv.c, s_user.c, whowas.c:
+		penalties tuned for commands generating global bcast.
+	* hash.c: converted multiplication to hashtable lookup to speed.
+		up function calls. (from Core)
+	* ircd.c, s_bsd.c: added truncation for non-appended writes. (_root_)
+	* s_user.c: prefix for voice capability in channel list of WHOIS reply
+		changed from '+' to '!'.
+	* s_user.c: drop PONGs with bad origin.
+		store connection parameters from PASS temporarily to info
+		field in contstant locations.
+	* s_user.c: m_umode() fixed (from Core).
+
+Wed Jan 15 14:42:43 1997  Christophe Kalt
+
+	* s_bsd.c:
+
+		* mysk was initialized by empty password in M line.
+
+Tue Jan 14 24:62:34 EET 1997  Vesa Ruokonen  (ruokonen@aapo.it.lut.fi)
+
+	* parse.c, channel.c, s_user.c: cleanup of find_functions(),
+		_nickserv replaced by _service.
+	* h.h, : setup_ping() takes aConfItem pointer as parameter now.
+	* sys.h: #elif expanded to #else #if for compability
+	* s_bsd.c: inetport(P:line) changed to support VIFs better.
+		More info about listening ports into /stats l.
+		UDP ping is initialized from M:line, not anymore from P:line.
+	* s_numeric.c: cleanups in numeric processing.
+	* Makefile.in, Makefile.irc, Makefile.ircd: makedepend fix
+	* configure.in: zlib check moved to end, as it can interfere
+		other checks when libs aren't in default paths.
+
+Mon Jan 13 09:11:04 1997  Christophe Kalt
+
+	* ircd.c:
+
+		* made the display of version (flag -v) more verbose.
+
+	* regenerated configure (with autoconf 2.12; thanks digital).
+
+	* s_user.c:
+
+		* fixed, and extended KILL reasons for `standard'
+		collisions. (both victims u@h are now shown).
+
+	* send.c:
+
+		* fixed the logic when sending mass message/notice to a
+		server mask.
+
+	* configure.in, Makefile.in:
+
+		* fixed detection & use of zlib using the environment
+		variable ZLIB_HOME (from Vesa).
+
+Thu Jan  9 13:09:36 1997  Christophe Kalt
+
+	* struct.h, ircd.c:
+
+		* added -b command line switch to let the server start
+		even if the ircd.tune file is corrupted (mostly from
+		Magnus Tjernstrom).		
+
+	* s_conf.c:
+
+		* udp listen was setup even if port was defined to be 0.
+
+Wed Jan  8 12:35:03 1997  Christophe Kalt
+
+	* h.h, s_bsd.c, s_conf.c:
+
+		* port field in M configuration line is used again, now to
+		define on which port the server will listen for UDP pings.
+
+	* hash.c:
+
+		* restricted commands to opers (from Vesa).
+
+	* send.c:
+
+		* sendto_match_butone() had a broken behaviour, 
+		brought back the old (2.8.21) behaviour.	
+	
+	* s_bsd.c:
+
+		* fixed negociation of compression for outgoing
+		connections.
+
+		* moved the "rejected connection" notice to &LOCAL.
+
+		* SLOW_ACCEPT #ifdef's changed to #ifndef's to get what
+		one should expect from the define name !
+
+		* made inetport() more readable, and added check on empty
+		string parameter (from Vesa).
+
+		* highfd isn't defined when _DO_POLL_ is defined, so don't
+		use it in debug notices (from Vesa).
+
+		* break changed to continue because ??? (from Vesa).
+
+	* s_user.c:
+
+		* fixed KILL notice sent on nick collision (was using
+		ident reply for remote clients).
+
+		* allowed oper!user@host.foo to send global message/notice
+		to #*.foo
+
+	* s_serv.c, s_user.c, s_bsd.c, s_debug.c:
+	
+		* changed the PASS command semantic (from Vesa).
+
+Fri Jan  3 14:47:52 1997  Christophe Kalt
+
+	* s_bsd.c:
+
+		* completed virtual hosts support (M line).
+
+	* config.h.dist:
+
+		* AIX has poll(), use it.
+
+Mon Dec 30 15:08:20 1996  Christophe Kalt
+
+	* s_bsd.c, h.h:
+
+		* added support for virtual hosts (P line).
+
+Wed Dec 18 12:08:29 1996  Christophe Kalt
+
+	* bsd.c:
+
+		* fixed read_message() bugs resulting from the merge.
+
+	* channel.c:
+
+		* limited the number of possible kicks to MAXMODEPARAMS.
+
+Mon Dec 16 09:36:54 1996  Christophe Kalt
+	
+	* list.c:
+
+		* don't free serv->user too early.
+
+		* removed duplicated(?) away memory count.
+	
+Fri Dec 13 10:28:43 1996  Christophe Kalt - Hmm, Friday the 13th!
+
+	* config.h.dist, s_auth.c, s_user.c, s_debug.c:
+
+		* minor tuning.
+
+Thu Dec 12 10:34:47 1996  Christophe Kalt
+
+	* struct.h, s_auth.c, s_debug.c:
+
+		* added memory usage stats for ident replies.
+
+	* send.c, s_auth.c, s_misc.c:
+
+		* fixed boundaries problems with long ident replies.
+
+Wed Dec 11 17:42:29 1996  Christophe Kalt
+
+	* struct.h, send.c, s_auth.c, s_bsd.c, list.c, s_conf.c, s_misc.c,
+	s_user.c:
+
+		* added auth field to struct Client to eventually store
+		long `OTHER' ident replies.  It is only used in logs, and
+		notices (not in matches against configuration lines).
+	
+	* config.h.dist:
+
+		* added #define SLOW_ACCEPT (default).
+
+		* added #define CLONE_CHECK (default).
+	
+	* s_bsd.c:
+
+		* fixed config line reference counter.
+	
+		* added CLONE_CHECK code (check_clones() from
+		pgoncalves@mail.telepac.pt (Pedro Goncalves)).
+		
+		* added SLOW_ACCEPT (previous behaviour) code.
+
+		* merged the 2 versions of read_message(), fixing some
+		(buggy) difference between them.
+
+		* merged two for() in read_message().
 
 
-Tue Mar 22 17:32:33 1994  Helen T. Rose Davis  (hrose@rocza.kei.com)
+Mon Dec  2 11:02:54 1996  Christophe Kalt
 
-	* Re-rewrite of documentation to coincide with 2.8.17 release.
+	* s_user.c:
 
-Mon Mar 29 01:26:16 1993
+		* changed error notice
+	
+	* send.c:
 
-	* INTSALL	updated.
-	* m4macros	added.
+		* #*.mask messages now propagated to other servers.
+	
+	* s_service.c:
 
-Fri Jan 22 22:49:20 1993
+		* added missing else.
 
-	* INTSALL	updated.
+	* config.h.dist, s_debug.c, channel.c:
 
-Thu Dec 17 19:41:19 1992  Darren Reed <avalon@coombs.anu.edu.au>
+		* removed all references to V28PlusOnly
+		* made NoV28Link defined by default
 
-	* general	Well, these docs were updated for 2.7, nobody
-			documented it - must be a general distaste for
-			documentation I'd say :)
+Wed Nov 27 18:09:42 1996  Christophe Kalt
 
-			Work on 2.8 documentation slowly creaping along.
+	* struct.h, class.c, ircd.c, s_bsd.c, s_conf.c, s_serv.c:
 
-Mon Sep 02 17:12:41 1991  Darren Reed <avalon@coombs.anu.edu.au>
+		* added lowercase c config line
 
-	* Documentation brought upto date with new features to 2.6.2
+Tue Oct  1 22:29:31 1996  Christophe Kalt
 
+	* added config.h to dependancies in Makefile.ircd
 
-Mon Aug 26 16:51:01 1991  Helen Trillian Rose  (hrose@eff.org)
+	* config.h.dist, h.h, struct.h, packet.c, send.c, ircd.c, s_bsd.c,
+	s_debug.c, s_serv.c, s_user.c, s_err.c, list.c,	Makefile.ircd,
+	configure.in:
 
-	* Rewrite of documentation (again) to coincide with the 2.6.2
-	release. 
-
-Wed Oct 31 18:05:12 1990  Jarkko Oikarinen
-
-	* Added hrose@cs.bu.edu's patches to irc2.6
-	  - Documentation rewrites...
-	  - patches
-
-Fri Jun 29 18:54:40 1990  Armin Gruner (gruner@informatik.tu-muenchen.de)
-
-       * NETWORKING
-
-       Added some sites in Germany
-
-Sat Dec 16 15:56:41 1989  Mike Bolotski  (mikeb at coho.ee.ubc.ca)
-
-	* INSTALL
-
-	Modified the installation document as per Valdis's nitpicking.
-	Improved the grammer and speling of a lot of dokumentation.
-	Removed lots and lots of informal wording, eh? and especially
-	the long run on sentences that try to say a lot but really don't
-	and are present only to show the author's superiority, especially
-	when quoting from a prestigious work like Webster's New Collegiate
-	Dictionary, gosh, specifically the 1979 version (ISBN
-	0-87779-3580-1), which I guess I should run out and purchase
-	immediately, for otherwise I might be considered ignorant by
-	wise men who have written a great deal of code in VS/Pascal and
-	even IBM Assembler and still can't manage not to avoid including
-	.QUIT in every goddam mail message.
-
-
-	* HISTORY
-
-	Added a recent history of the version numbers and the new
-	patchlevel mechanism.
-
-
-	* BugList
-
-	Added a BugList file including the notation of bug numbers.
+		* added #define ZIP_LINKS and s_zip.c.
+		* made configure look for the zlib (-lgz).
+		* implemented server-server zlib compression.
