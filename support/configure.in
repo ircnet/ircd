@@ -7,16 +7,16 @@ dnl new tests
 dnl ---------
 
 AC_DEFUN(IRC_MATHLIB, [
-	AC_MSG_CHECKING(library containing pow)
-	AC_CACHE_VAL(irc_cv_mathlib, [
+	AC_MSG_CHECKING([library containing pow])
+	AC_CACHE_VAL([irc_cv_mathlib], [
 		irc_cv_mathlib=""
-		AC_TRY_LINK(,pow(1.0, 1.0), MATHLIBS=, 
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[pow(1.0, 1.0)]])],[MATHLIBS=],[
 			irc_save_LIBS="$LIBS"
 			irc_cv_mathlib="-lm"
 			LIBS="-lm $LIBS"
-			AC_TRY_LINK(, pow(1.0, 1.0), MATHLIBS=-lm)
+			AC_LINK_IFELSE([AC_LANG_PROGRAM([[[]]], [[[pow(1.0, 1.0)]]])],[MATHLIBS=-lm],[])
 			LIBS=$irc_save_LIBS
-		)
+		])
 	])
 	MATHLIBS=$irc_cv_mathlib
 	AC_SUBST(MATHLIBS)
@@ -34,10 +34,8 @@ AC_CACHE_VAL(irc_cv_path_zlib,
 [no_zlib=yes
 no_zlib_include=yes
 no_zlib_library=yes
-AC_TRY_CPP([#include <zlib.h>],
-[no_zlib_include=
-irc_zlib_include=],
-[for irc_dir in "$irc_zlib_include" \
+AC_PREPROC_IFELSE([AC_LANG_SOURCE([[#include <zlib.h>]])],[no_zlib_include=
+irc_zlib_include=],[for irc_dir in "$irc_zlib_include" \
                      `test -z "$irc_zlib_prefix" || echo "$irc_zlib_prefix/include"` \
                      `echo "$irc_zlib_library" | sed s/lib/include/` \
                      /usr/include /usr/local/include /usr/unsupported/include \
@@ -57,12 +55,9 @@ irc_zlib_include=],
 ])
 irc_save_LIBS="$LIBS"
 LIBS="-lz $LIBS"
-AC_TRY_LINK(,
-[inflate()],
-[no_zlib_library=
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[inflate()]])],[no_zlib_library=
 irc_zlib_library=
-LIBS="$irc_save_LIBS"],
-[LIBS="$irc_save_LIBS"
+LIBS="$irc_save_LIBS"],[LIBS="$irc_save_LIBS"
 for irc_dir in "$irc_zlib_library" \
                     `test -z "$irc_zlib_prefix" || echo "$irc_zlib_prefix/lib"` \
                     `echo "$irc_zlib_include" | sed s/include/lib/` \
@@ -134,30 +129,15 @@ AC_ARG_WITH(termcap, [  --without-termcap       does not look for termcap librar
 AC_CACHE_VAL(irc_cv_curses_termcap,
 [irc_save_LIBS="$LIBS"
 LIBS="-lncurses $irc_save_LIBS"
-AC_TRY_LINK(,
-[initscr()],
-irc_ncurses=yes,
-irc_ncurses=no)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[initscr()]])],[irc_ncurses=yes],[irc_ncurses=no])
 LIBS="-lcursesX $irc_save_LIBS"
-AC_TRY_LINK(,
-[initscr()],
-irc_cursesX=yes,
-irc_cursesX=no)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[initscr()]])],[irc_cursesX=yes],[irc_cursesX=no])
 LIBS="-lcurses $irc_save_LIBS"
-AC_TRY_LINK(,
-[initscr()],
-irc_curses=yes,
-irc_curses=no)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[initscr()]])],[irc_curses=yes],[irc_curses=no])
 LIBS="-lcurses -ltermcap $irc_save_LIBS"
-AC_TRY_LINK(,
-[initscr()],
-irc_curses_termcap=yes,
-irc_curses_termcap=no)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[initscr()]])],[irc_curses_termcap=yes],[irc_curses_termcap=no])
 LIBS="-ltermcap $irc_save_LIBS"
-AC_TRY_LINK(,
-[tgetent()],
-irc_termcap=yes,
-irc_termcap=no)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[tgetent()]])],[irc_termcap=yes],[irc_termcap=no])
 LIBS="$irc_save_LIBS"
 irc_cv_curses_termcap="irc_ncurses=$irc_ncurses irc_curses=$irc_curses irc_cursesX=$irc_cursesX irc_curses_termcap=$irc_curses_termcap irc_termcap=$irc_termcap"
 ])
@@ -267,7 +247,7 @@ fi
 AC_DEFUN(IRC_DECL_SYS_ERRLIST,
 [AC_CACHE_CHECK([for sys_errlist declaration in stdio.h, errno.h or sys/errno.h],
   irc_cv_decl_sys_errlist,
-[AC_TRY_COMPILE([
+[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -279,9 +259,7 @@ AC_DEFUN(IRC_DECL_SYS_ERRLIST,
 #endif
 #if HAVE_SYS_ERRNO_H
 #include <sys/errno.h>
-#endif],
-[char *msg = sys_errlist[0];],
-  irc_cv_decl_sys_errlist=yes, irc_cv_decl_sys_errlist=no)])
+#endif]], [[char *msg = sys_errlist[0];]])],[irc_cv_decl_sys_errlist=yes],[irc_cv_decl_sys_errlist=no])])
 if test $irc_cv_decl_sys_errlist = yes; then
   AC_DEFINE(SYS_ERRLIST_DECLARED)
 elif test $ac_cv_func_strerror != yes; then
@@ -293,7 +271,7 @@ fi
 AC_DEFUN(IRC_DECL_SYS_NERR,
 [AC_CACHE_CHECK([for sys_nerr declaration in stdio.h, errno.h or sys/errno.h],
   irc_cv_decl_sys_nerr,
-[AC_TRY_COMPILE([
+[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -305,9 +283,7 @@ AC_DEFUN(IRC_DECL_SYS_NERR,
 #endif
 #if HAVE_SYS_ERRNO_H
 #include <sys/errno.h>
-#endif],
-[int num = sys_nerr;],
-  irc_cv_decl_sys_nerr=yes, irc_cv_decl_sys_nerr=no)])
+#endif]], [[int num = sys_nerr;]])],[irc_cv_decl_sys_nerr=yes],[irc_cv_decl_sys_nerr=no])])
 if test $irc_cv_decl_sys_nerr = yes; then
   AC_DEFINE(SYS_NERR_DECLARED)
 fi
@@ -317,7 +293,7 @@ fi
 AC_DEFUN(IRC_DECL_ERRNO,
 [AC_CACHE_CHECK([for errno declaration in errno.h or sys/errno.h],
   irc_cv_decl_errno,
-[AC_TRY_COMPILE([
+[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -326,9 +302,7 @@ AC_DEFUN(IRC_DECL_ERRNO,
 #endif
 #if HAVE_SYS_ERRNO_H
 #include <sys/errno.h>
-#endif],
-[int num = errno;],
-  irc_cv_decl_errno=yes, irc_cv_decl_errno=no)])
+#endif]], [[int num = errno;]])],[irc_cv_decl_errno=yes],[irc_cv_decl_errno=no])])
 if test $irc_cv_decl_errno = yes; then
   AC_DEFINE(ERRNO_DECLARED)
 fi
@@ -338,7 +312,7 @@ fi
 AC_DEFUN(IRC_DECL_H_ERRNO,
 [AC_CACHE_CHECK([for h_errno declaration in errno.h, sys/errno.h or netdb.h],
   irc_cv_decl_h_errno,
-[AC_TRY_COMPILE([
+[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -350,9 +324,7 @@ AC_DEFUN(IRC_DECL_H_ERRNO,
 #endif
 #if HAVE_NETDB_H
 #include <netdb.h>
-#endif],
-[int num = h_errno;],
-  irc_cv_decl_h_errno=yes, irc_cv_decl_h_errno=no)])
+#endif]], [[int num = h_errno;]])],[irc_cv_decl_h_errno=yes],[irc_cv_decl_h_errno=no])])
 if test $irc_cv_decl_h_errno = yes; then
   AC_DEFINE(H_ERRNO_DECLARED)
 fi
@@ -411,22 +383,8 @@ if test x$irc_cv_alpha_beta = xyes; then
 This is a development version of the package,
 it is not intended to be used in a production environment.
 ])
-#  if test ! "$ac_test_CFLAGS" = set; then
-#    if test x$ac_cv_prog_cc_g = xyes -o x$GCC = x; then
-#      CFLAGS="$CFLAGS -g"
-#    fi
-#  fi
 else
   AC_MSG_RESULT(no)
-#  if test ! "${LDFLAGS+set}" = set; then
-#    LDFLAGS="-s"
-#  fi
-fi
-
-if test ! "$ac_test_CFLAGS" = set; then
-  if test x$ac_cv_prog_cc_g = xyes -o x$GCC = x; then
-    CFLAGS="$CFLAGS -g"
-  fi
 fi
 ])
 
@@ -462,7 +420,7 @@ AC_CACHE_VAL(irc_cv_signal_implementation,
 elif test x$ac_cv_func_sigset = xyes; then
   irc_cv_signal_implementation=bsd_sigset
 else
-  AC_TRY_RUN([
+  AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -489,9 +447,7 @@ main()
     exit(1);
   exit(0);
 }
-],
-    irc_cv_signal_implementation=bsd_signal,
-    irc_cv_signal_implementation=sysv_signal)
+]])],[irc_cv_signal_implementation=bsd_signal],[irc_cv_signal_implementation=sysv_signal],[])
 fi
 ])
 if test $irc_cv_signal_implementation = posix_sigaction; then
@@ -591,8 +547,7 @@ fi
 AC_DEFUN(IRC_STDARG,
 [AC_MSG_CHECKING([for working stdarg])
 AC_CACHE_VAL(irc_cv_stdarg,
-AC_TRY_RUN(
-[
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
 changequote(<<, >>)dnl
 #if HAVE_STDIO_H
 #include <stdio.h>
@@ -672,9 +627,7 @@ int main(void)
   exit(res ? 0 : 1);
 }
 changequote([, ])dnl
-],
-irc_cv_stdarg=yes,
-irc_cv_stdarg=no)
+]])],[irc_cv_stdarg=yes],[irc_cv_stdarg=no],[])
 )
 if test $irc_cv_stdarg = yes; then
   AC_MSG_RESULT(yes)
@@ -709,7 +662,7 @@ AC_DEFUN(IRC_EGREP_RMLF_CPP,
 #include "confdefs.h"
 [$2]
 EOF
-if (eval "$ac_cpp conftest.$ac_ext") 2>&AC_FD_CC |
+if (eval "$ac_cpp conftest.$ac_ext") 2>&AS_MESSAGE_LOG_FD() |
   $AWK "{if (NR > 1) printf(\" \"); printf(\[$]0)}" |
 changequote(, )dnl
   egrep "$1" >/dev/null 2>&1; then
@@ -756,14 +709,14 @@ if test "x$enable_ip6" != x; then
   dnl be smart about it
   AC_MSG_CHECKING([IPv6 system type])
   AC_CACHE_VAL(irc_cv_v6type, [
-    AC_TRY_COMPILE([
+    AC_TRY_COMPILE([[
 #include <unistd.h>
-#include <netinet/in.h>], [struct in6_addr addr],
-        irc_cv_v6type=native)
+#include <netinet/in.h>]], [[struct in6_addr addr]],
+	[irc_cv_v6type=native])
 
     if test "x$irc_cv_v6type" = x; then
       if test -d /usr/inet6; then
-        AC_EGREP_CPP(yes, [dnl
+        AC_EGREP_CPP(yes, [
 #include "/usr/inet6/include/netinet/in.h"
 #ifdef _INET6APPS_NETINET_IN_H
 yes
@@ -779,7 +732,7 @@ yes
   AC_MSG_RESULT($irc_cv_v6type)
 
   if test "x$irc_cv_v6type" = x; then
-     AC_MSG_WARN([You have an unknown IPv6 system. You will probably need to change the Makefile manually, or #undef INET6 in setup.h])
+     AC_MSG_WARN([[You have an unknown IPv6 system. You will probably need to change the Makefile manually, or #undef INET6 in setup.h]])
   fi
 
   dnl eventually update LIBS
@@ -821,7 +774,7 @@ dnl -------------------------------------------------------------------
 dnl modified Autoconf tests; their names begin with IRC_ instead of AC_
 dnl -------------------------------------------------------------------
 
-AC_DEFUN(IRC_INIT_PARSE_ARGS,
+AC_DEFUN([IRC_INIT_PARSE_ARGS],
 [
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -1246,16 +1199,16 @@ AC_SUBST(logdir)
 ])
 
 
-AC_DEFUN(IRC_INIT,
-[sinclude(acsite.m4)dnl
-sinclude(./aclocal.m4)dnl
-AC_REQUIRE([AC_INIT_BINSH])dnl
-AC_INIT_NOTICE
-AC_DIVERT_POP()dnl to NORMAL
-AC_DIVERT_PUSH(AC_DIVERSION_INIT)dnl
-IRC_INIT_PARSE_ARGS
-AC_INIT_PREPARE($1)dnl
-AC_DIVERT_POP()dnl to NORMAL
+AC_DEFUN([IRC_INIT],
+[#sinclude(acsite.m4)dnl
+#sinclude(./aclocal.m4)dnl
+#AC_REQUIRE([AC_INIT_BINSH])dnl
+#AC_INIT_NOTICE
+#AC_DIVERT_POP()dnl to NORMAL
+#AC_DIVERT_PUSH([AC_DIVERSION_INIT])dnl
+#IRC_INIT_PARSE_ARGS
+#AC_INIT_PREPARE($1)dnl
+#AC_DIVERT_POP()dnl to NORMAL
 ])
 
 
@@ -1327,16 +1280,6 @@ test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 AC_SUBST(INSTALL_DATA)dnl
 ])
 
-AC_DEFUN(IRC_CYGWIN,
-[AC_CYGWIN
-if test ! -z "$CYGWIN"; then
-  if test ! -x /bin/mv || test ! -x /bin/rm || test ! -x /bin/sh; then
-    AC_MSG_ERROR([mv, rm and/or sh is missing from /bin])
-  fi
-  AC_MSG_WARN([The IRC client and the iauth program do not work under the CYGWIN environment.])
-fi
-])
-
 AC_DEFUN(IRC_PROG_CC,
 [define(AC_PROVIDE_AC_PROG_CC)
 AC_BEFORE([$0], [AC_PROG_CPP])dnl
@@ -1345,14 +1288,11 @@ if test -z "$CC"; then
   AC_CHECK_PROG(CC, cc, cc, , , /usr/ucb/cc)
   test -z "$CC" && AC_MSG_ERROR([no acceptable cc found in \$PATH])
 fi
-AC_PROG_CC_WORKS
-AC_PROG_CC_GNU
 ac_test_CFLAGS="${CFLAGS+set}"
-if test $ac_cv_prog_gcc = yes; then
+if test x$ac_cv_c_compiler_gnu = xyes; then
   GCC=yes
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
-  AC_PROG_CC_G
   if test "$ac_test_CFLAGS" = set; then
     CFLAGS="$ac_save_CFLAGS"
   else
@@ -1415,14 +1355,13 @@ fi
 
 AC_DEFUN(IRC_FUNC_MEMCMP,
 [AC_CACHE_CHECK(for 8-bit clean memcmp, irc_cv_func_memcmp_clean,
-[AC_TRY_RUN([
+[AC_RUN_IFELSE([AC_LANG_SOURCE([[
 main()
 {
   char c0 = 0x40, c1 = 0x80, c2 = 0x81;
   exit(memcmp(&c0, &c2, 1) < 0 && memcmp(&c1, &c2, 1) < 0 ? 0 : 1);
 }
-], irc_cv_func_memcmp_clean=yes, irc_cv_func_memcmp_clean=no,
-irc_cv_func_memcmp_clean=no)])
+]])],[irc_cv_func_memcmp_clean=yes],[irc_cv_func_memcmp_clean=no],[irc_cv_func_memcmp_clean=no])])
 if test $irc_cv_func_memcmp_clean = no; then
   AC_DEFINE(MEMCMP_BROKEN)
 fi
@@ -1433,19 +1372,20 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.52 2004/03/07 01:45:36 chopin Exp $])
-AC_PREREQ(2.13)
-IRC_INIT(../ircd/ircd.c)
+AC_INIT([irc], [2.11], [ircd-bugs@irc.org])
+AC_REVISION([$Id: configure.in,v 1.53 2004/05/07 19:19:26 chopin Exp $])
+AC_PREREQ([2.57])
+#IRC_INIT([../ircd/ircd.c])
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
 AC_CONFIG_AUX_DIR(../support)
-AC_VALIDATE_CACHED_SYSTEM_TUPLE()
+
 
 IRC_PROG_CC
 AC_PROG_CPP
 AC_PROG_AWK
 IRC_PROG_INSTALL
 AC_PATH_PROGS(SUM, md5sum md5 sum cksum, true)
-AC_PATH_PROGS(M4_PATH, gm4 m4, m4)
+AC_PATH_PROGS(M4_PATH, gm4 gnum4 m4, m4)
 AC_PROG_GCC_TRADITIONAL
 
 IRC_AIX
@@ -1455,11 +1395,21 @@ IRC_SGI_CC
 IRC_HPUX_CC
 IRC_SUN
 IRC_LINUX
-IRC_CYGWIN
 
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(stdio.h stdlib.h sys/types.h sys/bitypes.h stddef.h stdarg.h unistd.h ctype.h memory.h ncurses.h ncurses/ncurses.h curses.h cursesX.h term.h sgtty.h errno.h sys/errno.h sys/syscall.h pwd.h math.h utmp.h fcntl.h signal.h sys/ioctl.h sys/file.h sys/filio.h sys/socket.h sys/stat.h sys/resource.h sys/select.h sys/poll.h stropts.h netdb.h netinet/in.h sys/un.h arpa/inet.h sys/param.h syslog.h sys/syslog.h string.h strings.h sys/time.h time.h sys/times.h netinet/in_systm.h netinfo/ni.h resolv.h arpa/nameser.h)
+AC_CHECK_HEADERS(stdio.h stdlib.h sys/types.h sys/bitypes.h stddef.h stdarg.h unistd.h ctype.h memory.h ncurses.h ncurses/ncurses.h curses.h cursesX.h term.h sgtty.h errno.h sys/errno.h sys/syscall.h pwd.h math.h utmp.h fcntl.h signal.h sys/ioctl.h sys/file.h sys/filio.h sys/socket.h sys/stat.h sys/resource.h sys/select.h sys/poll.h stropts.h netdb.h netinet/in.h arpa/inet.h sys/param.h syslog.h sys/syslog.h string.h strings.h sys/time.h time.h sys/times.h netinet/in_systm.h netinfo/ni.h resolv.h arpa/nameser.h)
+
+# Some systems need <sys/socket.h> (and <sys/types.h>?) before <sys/un.h>
+AC_CHECK_HEADERS([sys/un.h], [], [],
+[#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+])
+
 IRC_DECL_SYS_NERR
 IRC_DECL_ERRNO
 IRC_DECL_H_ERRNO
@@ -1497,8 +1447,8 @@ IRC_CURSES_TERMCAP
 
 AC_FUNC_SETPGRP
 AC_FUNC_SETVBUF_REVERSED
-AC_FUNC_VFORK
-AC_CHECK_FUNCS(setpgrp strchr strrchr memcmp memset memmove memcpy index rindex bcmp bcopy bzero select inet_ntoa inet_aton inet_addr inet_netof getrusage times strerror strtoken strtok sigaction sigset truncate poll vsyslog)
+AC_FUNC_FORK([])
+AC_CHECK_FUNCS(setpgrp strchr strrchr memcmp memset memmove memcpy index rindex bcmp bcopy bzero select inet_ntoa inet_aton inet_addr inet_netof getrusage times strerror strtoken strtok sigaction sigset truncate poll vsyslog mmap)
 dnl ---
 dnl Note: additional tests should be performed and used inside the source code
 dnl       for the following functions:
@@ -1516,5 +1466,6 @@ IRC_IP6
 IRC_SHAREDMODULES
 IRC_ALPHA_BETA
 
-AC_OUTPUT(Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../support/sums.in tkconf.h:../support/tkconf.h.dist)
-AC_OUTPUT_COMMANDS(chmod a+x version.c.SH)
+AC_CONFIG_FILES([Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../support/sums.in tkconf.h:../support/tkconf.h.dist])
+AC_CONFIG_COMMANDS([default],[[chmod a+x version.c.SH]])
+AC_OUTPUT
