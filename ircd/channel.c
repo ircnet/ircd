@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.77 1998/10/29 07:55:13 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.78 1998/12/12 23:40:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -478,7 +478,7 @@ aChannel *chptr;
 		return 0;
 	if (chptr)
 		if ((lp = find_user_link(chptr->members, cptr)))
-			chanop = (lp->flags & CHFL_CHANOP);
+			chanop = (lp->flags & (CHFL_CHANOP|CHFL_UNIQOP));
 	if (chanop)
 		chptr->reop = 0;
 	return chanop;
@@ -1327,15 +1327,19 @@ char	*parv[], *mbuf, *pbuf;
 				else if ((*ip == MODE_REOP ||
 					  *ip == MODE_ANONYMOUS) &&
 					 !IsServer(sptr) &&
-					 !(is_chan_op(sptr,chptr)&CHFL_UNIQOP))
+					 !(ischop & CHFL_UNIQOP))
 					/* 2 modes restricted to UNIQOP */
 					sendto_one(sptr,
 					   err_str(ERR_CHANOPRIVSNEEDED,
 						   parv[0]), chptr->chname);
-				else if (!(*ip == MODE_ANONYMOUS &&
-					   whatt == MODE_ADD &&
-					   !IsServer(sptr) &&
-					   *chptr->chname == '#'))
+				else if (*ip == MODE_ANONYMOUS &&
+					 whatt == MODE_ADD &&
+					 !IsServer(sptr) &&
+					 *chptr->chname == '#')
+					sendto_one(cptr,
+						   err_str(ERR_UNKNOWNMODE,
+						   parv[0]), *curr);
+				else
 				    {
 					/*
 				        ** If the channel is +s, ignore +p
@@ -1360,10 +1364,6 @@ char	*parv[], *mbuf, *pbuf;
 					count++;
 					*penalty += 2;
 				    }
-				else
-					sendto_one(sptr,
-					   err_str(ERR_CHANOPRIVSNEEDED,
-						   parv[0]), chptr->chname);
 			    }
 			else if (!IsServer(cptr))
 				sendto_one(cptr, err_str(ERR_UNKNOWNMODE,
