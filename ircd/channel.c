@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.57 1998/08/22 19:38:12 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.58 1998/08/24 02:21:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2040,10 +2040,7 @@ char	*parv[];
 		if (cptr->serv && (s = index(name, '\007')))
 			*s++ = '\0';
 		else
-		    {
-			s = NULL;
 			clean_channelname(name), s = NULL;
-		    }
 
 		if (MyConnect(sptr) &&
 		    sptr->user->joined >= MAXCHANNELSPERUSER) {
