@@ -58,6 +58,7 @@ typedef struct        LineItem aExtData;
 #define	BANLEN		(USERLEN + NICKLEN + HOSTLEN + 3)
 #define MAXPENALTY	10
 #define	CHIDLEN		5		/* WARNING: *DONT* CHANGE THIS!!!! */
+#define	SIDLEN		3		/* WARNING: *DONT* CHANGE THIS!!!! */
 
 #define	READBUF_SIZE	16384	/* used in s_bsd.c *AND* s_zip.c ! */
  
@@ -364,8 +365,11 @@ struct	User	{
 				** not yet be in links while USER is
 				** introduced... --msa
 				*/
+	u_int	hashv;
+	aClient	*uhnext;
 	aClient	*bcptr;
 	char	username[USERLEN+1];
+	char	uid[NICKLEN+1];
 	char	host[HOSTLEN+1];
 	char	*server;
 };
@@ -671,6 +675,8 @@ struct Channel	{
 				  (IsService(x->prev) &&		\
 				  x->prev->service->servp == x->serv)))
 
+#define	UniqueUser(x)		(x->user && x->user->uid[0])
+
 typedef	struct	{
 	u_long	is_user[2];	/* users, non[0] invis and invis[1] */
 	u_long	is_serv;	/* servers */
@@ -748,6 +754,9 @@ typedef	struct	{
 #define	SV_NCHAN	0x0008	/* server knows new channels -????name */
 				/* ! SV_NJOIN implies ! SV_NCHAN */
 #define	SV_2_10		(SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN)
+#define	SV_UID		0x0010	/* unique IDs for users = SID + CID */
+#define	SV_2_11		(SV_2_10|SV_UID)
+
 #define	SV_OLDSQUIT	0x1000	/* server uses OLD SQUIT logic */
 
 /* used for sendto_flag */
@@ -769,7 +778,8 @@ typedef	struct	{
 #define	SCH_SERVICE	9
 #define	SCH_DEBUG	10
 #define	SCH_AUTH	11
-#define	SCH_MAX		11
+#define	SCH_SAVE	12
+#define	SCH_MAX		12
 
 /* used for async dns values */
 
