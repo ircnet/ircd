@@ -69,7 +69,7 @@
 #define isvalidnick(c) (char_atribs[(u_char)(c)]&NVALID)
 #define isvaliduser(c) (char_atribs[(u_char)(c)]&UVALID)
 #define isscandinavian(c) (((u_char)(c) > (u_char)0x5a && \
-				(u_char)(c) < (u_char)0x5f) || \
+				(u_char)(c) < (u_char)0x5e) || \
 				((u_char)(c) > (u_char)0x7a && \
 				(u_char)(c) < (u_char)0x7f))
 				
