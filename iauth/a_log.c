@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_log.c,v 1.4 1998/08/07 03:28:28 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_log.c,v 1.5 1998/08/08 18:22:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -79,8 +79,8 @@ vsendto_log(int flags, int slflag, char *pattern, va_list va)
 #endif
 
 #if defined(USE_SYSLOG)
-	if (slflags)
-		syslog(slflags, logbuf+1);
+	if (slflag)
+		syslog(slflag, logbuf+1);
 #endif
 
 	strcat(logbuf, "\n");
@@ -112,11 +112,11 @@ vsendto_log(int flags, int slflag, char *pattern, va_list va)
 
 #if USE_STDARG
 void
-sendto_log(int flags, int slflags, char *pattern, ...)
+sendto_log(int flags, int slflag, char *pattern, ...)
 {
         va_list va;
         va_start(va, pattern);
-        vsendto_log(flags, slflags, pattern, va);
+        vsendto_log(flags, slflag, pattern, va);
         va_end(va);
 }
 #endif
