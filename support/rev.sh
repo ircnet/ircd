@@ -1,12 +1,11 @@
 #! /bin/sh
 #
-# $Id: rev.sh,v 1.2 1997/06/18 17:14:51 kalt Exp $
+# $Id: rev.sh,v 1.3 1997/06/27 18:44:28 kalt Exp $
 # 
 
 if test "`uname -s`" = AIX
 then
-  revdir="AIX-`oslevel 2>/dev/null|sed -e \"s/<//g\" -e \"s/>//g\" -e
-\"s@/@-@g\"`"
+  revdir="AIX-`oslevel 2>/dev/null|sed -e \"s/<//g\" -e \"s/>//g\" -e \"s@/@-@g\"`"
 else
   uname -p >/dev/null 2>&1
   if test "$?" != 0
