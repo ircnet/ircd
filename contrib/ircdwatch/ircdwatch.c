@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.2 1998/08/05 01:47:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.3 1999/02/21 00:33:44 kalt Exp $";
 #endif
 
 #include <stdio.h>
@@ -107,7 +107,6 @@ int daemonize(void)
   }
 
   setsid();
-  chdir(DPATH);
   umask(0);
 
   /* close file descriptors */
@@ -188,19 +187,6 @@ int file_modified(char *s)
 }
 
 
-/*
- * the only thing that needs to be in our path is the directory
- * containing the ircd binary -- if MYNAME is not fully qualified
- */
-void set_path ()
-{
-  char newpath[FILENAME_MAX+6];
-
-  sprintf(newpath, "PATH=%s", SERVER_BIN_DIR);
-  putenv(newpath);
-}
-
-
 int spawn (char *cmd) 
 {
   pid_t pid;
@@ -273,12 +259,7 @@ int file_writable (char *s)
 int file_executable (char *s)
 {
   int rc;
-
-  if (*s != '/')
-    chdir(SERVER_BIN_DIR);
-  rc = (access(s, X_OK) == 0);
-  if (*s != '/')
-    chdir(DPATH);
+  rc = (access(IRCD_PATH, X_OK) == 0);
   return rc;
 }
 
@@ -312,8 +293,8 @@ int ircdwatch_running () {
 int ircd_running () {
   int pid;
 
-  if (file_exists(PPATH)) {
-    pid = read_pid(PPATH);
+  if (file_exists(IRCDPID_PATH)) {
+    pid = read_pid(IRCDPID_PATH);
     if (pid > 0) {
       return(verify_pid(pid) == 1);
     } else {
@@ -328,8 +309,8 @@ void hup_ircd ()
   int pid;
   int res;
   
-  if (file_exists(PPATH)) {
-    pid = read_pid(PPATH);
+  if (file_exists(IRCDPID_PATH)) {
+    pid = read_pid(IRCDPID_PATH);
     if (pid > 0) {
       res = kill(pid, SIGHUP);
       if (res < 0 && errno == EPERM) {
@@ -367,15 +348,15 @@ void daemon_run ()
     exit(1);
   } else  if (!i) {
     fprintf(stderr, "ircd not running. attempting to start ircd...\n");
-    if (file_exists(MYNAME)) {
-      if (file_executable(MYNAME)) {
-	spawn(MYNAME);
+    if (file_exists(IRCD_PATH)) {
+      if (file_executable(IRCD_PATH)) {
+	spawn(IRCD_PATH);
       } else {
-	fprintf(stderr, "%s not executable\n", MYNAME);
+	fprintf(stderr, "%s not executable\n", IRCD_PATH);
 	exit(1);
       }
     } else {
-      fprintf(stderr, "%s does not exist in %s\n", MYNAME, DPATH);
+      fprintf(stderr, "%s does not exist\n", IRCD_PATH);
       exit(1);      
     }
   }
@@ -399,14 +380,14 @@ void daemon_run ()
     if (! ircd_running() ) {
 
 #ifdef IRCDWATCH_USE_SYSLOG
-      syslog(LOG_ERR, "spawning %s", MYNAME);
+      syslog(LOG_ERR, "spawning %s", IRCD_PATH);
 #endif
 
-      spawn(MYNAME);
+      spawn(IRCD_PATH);
     }
 
 #ifdef IRCDWATCH_HUP_ON_CONFIG_CHANGE
-    i = file_modified(CONFIGFILE);
+    i = file_modified(IRCDCONF_PATH);
     if (i != -1) {
 
       if (last_config_time == 0) {
@@ -436,8 +417,8 @@ void kill_ircd ()
   int pid;
   int res;
   
-  if (file_exists(PPATH)) {
-    pid = read_pid(PPATH);
+  if (file_exists(IRCDPID_PATH)) {
+    pid = read_pid(IRCDPID_PATH);
     if (pid > 0) {
       res = kill(pid, SIGTERM);
       if (res < 0) {
@@ -448,7 +429,7 @@ void kill_ircd ()
       }
     }
   } else {
-    fprintf(stderr, "File %s does not exist\n", PPATH);
+    fprintf(stderr, "File %s does not exist\n", IRCDPID_PATH);
   }
 }
 
@@ -490,9 +471,6 @@ Usage:\n\
 int
 main (int argc, char **argv) {
   int i;
-
-  chdir(DPATH);
-  set_path();
 
 #ifdef IRCDWATCH_USE_SYSLOG
   openlog(IRCDWATCH_SYSLOG_IDENT, 

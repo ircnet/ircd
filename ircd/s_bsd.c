@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.55 1999/02/19 20:46:38 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.56 1999/02/21 00:33:45 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -479,7 +479,7 @@ int rcvdsig;
 			(void)dup2(sp[1], 0);
 			close(sp[1]);
 		    }
-		if (execl(APATH, APATH, NULL) < 0)
+		if (execl(IAUTH_PATH, IAUTH, NULL) < 0)
 			_exit(-1); /* should really not happen.. */
 	default:
 		close(sp[1]);
@@ -615,26 +615,24 @@ init_dgram:
 
 void	write_pidfile()
 {
-#ifdef IRCD_PIDFILE
 	int fd;
 	char buff[20];
-	(void)truncate(IRCD_PIDFILE, 0);
-	if ((fd = open(IRCD_PIDFILE, O_CREAT|O_WRONLY, 0600))>=0)
+	(void)truncate(IRCDPID_PATH, 0);
+	if ((fd = open(IRCDPID_PATH, O_CREAT|O_WRONLY, 0600))>=0)
 	    {
 		bzero(buff, sizeof(buff));
 		(void)sprintf(buff,"%5d\n", (int)getpid());
 		if (write(fd, buff, strlen(buff)) == -1)
 			Debug((DEBUG_NOTICE,"Error writing to pid file %s",
-			      IRCD_PIDFILE));
+			      IRCDPID_PATH));
 		(void)close(fd);
 		return;
 	    }
 # ifdef	DEBUGMODE
 	else
 		Debug((DEBUG_NOTICE,"Error opening pid file %s",
-			IRCD_PIDFILE));
+			IRCDPID_PATH));
 # endif
-#endif
 }
 		
 /*

@@ -168,8 +168,7 @@ void process_server_output(char *line)
     {
         chmod(TKSERV_ACCESSFILE, S_IRUSR | S_IWRITE);
         chmod(TKSERV_LOGFILE, S_IRUSR | S_IWRITE);
-        exec_cmd("cp %s/ircd.conf %s/ircd.conf.tkserv", 
-                 IRCDPATH, IRCDPATH);
+        exec_cmd("cp "CPATH" "TKSERV_IRCD_CONFIG_BAK);
         tks_log("Registration successful.");
     }
         
@@ -430,13 +429,9 @@ int is_authorized(char *pwd, char *host)
 /* Appends new tklines to the ircd.conf file */
 int add_tkline(char *host, char *user, char *reason, int lifetime)
 {
-    char path[TKS_MAXPATH];
     FILE *iconf;
 
-    strcpy(path, IRCDPATH);
-    strncat(path, "/ircd.conf", TKS_MAXPATH - strlen(IRCDPATH) - 1);
-
-    if (iconf = fopen(path, "a"))
+    if (iconf = fopen(CPATH, "a"))
     {
         time_t now;
 
@@ -451,7 +446,7 @@ int add_tkline(char *host, char *user, char *reason, int lifetime)
         return(1);
     }
     else
-        tks_log("Couldn't write to %s", path);
+        tks_log("Couldn't write to "CPATH);
 
     return(0);
 }
@@ -460,14 +455,8 @@ int add_tkline(char *host, char *user, char *reason, int lifetime)
 int check_tklines(char *host, char *user, int lifetime)
 {
     FILE *iconf, *iconf_tmp;
-    char path[TKS_MAXPATH], path_tmp[TKS_MAXPATH];
-
-    strcpy(path, IRCDPATH);
-    strcpy(path_tmp, IRCDPATH);
-    strncat(path, "/ircd.conf", TKS_MAXPATH - strlen(path) - 1);
-    strncat(path_tmp, "/ircd.tmp", TKS_MAXPATH - strlen(path) - 1);
     
-    if ((iconf = fopen(path, "r")) && (iconf_tmp = fopen(path_tmp, "w")))
+    if ((iconf = fopen(CPATH, "r")) && (iconf_tmp = fopen(TKSERV_IRCD_CONFIG_TMP, "w")))
     {
         int count = 0, found = 0;
         time_t now;
@@ -475,7 +464,7 @@ int check_tklines(char *host, char *user, int lifetime)
         char buf_tmp[TKS_MAXBUFFER];
         
         /* just in case... */
-        chmod(path_tmp, S_IRUSR | S_IWRITE);
+        chmod(TKSERV_IRCD_CONFIG_TMP, S_IRUSR | S_IWRITE);
 
         now = time(NULL);
 
@@ -539,8 +528,8 @@ int check_tklines(char *host, char *user, int lifetime)
         
         fclose(iconf);
         fclose(iconf_tmp);
-        exec_cmd("cp %s %s", path_tmp, path);
-        unlink(path_tmp);
+        exec_cmd("cp %s %s", TKSERV_IRCD_CONFIG_TMP,CPATH);
+        unlink(TKSERV_IRCD_CONFIG_TMP);
         
         if (found)
             rehash(-1);
@@ -554,7 +543,7 @@ int check_tklines(char *host, char *user, int lifetime)
 /* reloads the ircd.conf file  -- the easy way */
 void rehash(int what)
 {
-    exec_cmd("kill -HUP `cat %s/ircd.pid`", IRCDPATH);
+    exec_cmd("kill -HUP `cat "PPATH"`");
  
     if (what != -1)
         tklined = what;
@@ -577,7 +566,7 @@ void service_pong(void)
 */
 void service_notice(char **args)
 {
-    if ((!strcmp(args[4], "reloading") && (!strcmp(args[5], "ircd.conf"))) ||
+    if ((!strcmp(args[4], "reloading") && (!strcmp(args[5], TKSERV_IRCD_CONF))) ||
         (!strcmp(args[3], "rehashing") && (!strcmp(args[4], "Server"))))
     {
         if (tklined)
@@ -846,7 +835,7 @@ void squery_tkline(char **args)
     }
     else
         if (!add_tkline(host, user, reason, lifetime))
-            sendto_user("Error while trying to edit the ircd.conf file.");
+            sendto_user("Error while trying to edit the "CPATH" file.");
 }
 
 /* SQUERY QUIT 
@@ -909,14 +898,6 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    strcpy(tmp, IRCDPATH);
-
-    if (tmp[strlen(IRCDPATH) - 1] == '/')
-    {
-        fprintf(stderr, "No trailing slash in IRCDPATH please -- RTFM! ;->\n");
-        exit(1);
-    }
-    
     if (!strcmp(TKSERV_DIST, "*"))
     {
         printf("Your service has a global distribution. Please make sure that\n");

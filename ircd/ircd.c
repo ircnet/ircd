@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.43 1999/02/12 04:00:47 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.44 1999/02/21 00:33:45 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -37,17 +37,15 @@ istat_t	istat;
 char	**myargv;
 int	rehashed = 0;
 int	portnum = -1;		    /* Server port number, listening this */
-char	*configfile = CONFIGFILE;	/* Server configuration file */
+char	*configfile = IRCDCONF_PATH;	/* Server configuration file */
 int	debuglevel = -1;		/* Server debug level */
 int	bootopt = BOOT_PROT|BOOT_STRICTPROT;	/* Server boot option flags */
 char	*debugmode = "";		/*  -"-    -"-   -"-   -"- */
 char	*sbrk0;				/* initial sbrk(0) */
-char	*tunefile = TPATH;
+char	*tunefile = IRCDTUNE_PATH;
 static	int	dorehash = 0,
 		dorestart = 0,
 		restart_iauth = 0;
-
-static	char	*dpath = DPATH;
 
 time_t	nextconnect = 1;	/* time for next try_connections call */
 time_t	nextgarbage = 1;        /* time for next collect_channel_garbage call*/
@@ -182,12 +180,12 @@ void	server_reboot()
 	ircd_writetune(tunefile);
 	if (!(bootopt & (BOOT_INETD|BOOT_OPER)))
 	    {
-		(void)execv(SPATH, myargv);
+		(void)execv(IRCD_PATH, myargv);
 #ifdef USE_SYSLOG
 		/* Have to reopen since it has been closed above */
 		
 		openlog(myargv[0], LOG_PID|LOG_NDELAY, LOG_FACILITY);
-		syslog(LOG_CRIT, "execv(%s,%s) failed: %m\n", SPATH,
+		syslog(LOG_CRIT, "execv(%s,%s) failed: %m\n", IRCD_PATH,
 		       myargv[0]);
 		closelog();
 #endif
@@ -588,18 +586,12 @@ char	*argv[];
 #endif
 
 #ifdef	CHROOTDIR
-	if (chdir(dpath))
-	    {
-		perror("chdir");
-		(void)fprintf(stderr, "%s: Error in daemon path: %s.\n",
-			      SPATH, dpath);
-		exit(-1);
-	    }
 	ircd_res_init();
-	if (chroot(DPATH))
+	if (chroot(ROOT_PATH))
 	    {
 		perror("chroot");
-		(void)fprintf(stderr,"%s: Cannot chroot: %s.\n", SPATH, DPATH);
+		(void)fprintf(stderr,"%s: Cannot chroot: %s.\n", IRCD_PATH,
+			      ROOT_PATH);
 		exit(5);
 	    }
 #endif /*CHROOTDIR*/
@@ -661,10 +653,6 @@ char	*argv[];
 		    case 'q':
 			bootopt |= BOOT_QUICK;
 			break;
-		    case 'd' :
-                        (void)setuid((uid_t)uid);
-			dpath = p;
-			break;
 		    case 'o': /* Per user local daemon... */
                         (void)setuid((uid_t)uid);
 			bootopt |= BOOT_OPER;
@@ -706,13 +694,14 @@ char	*argv[];
 			tunefile = p;
 			break;
 		    case 'v':
-			(void)printf("ircd %s %s\n\tzlib %s\n\tircd_dir: %s \n\t%s #%s\n", version, serveropts,
+			(void)printf("ircd %s %s\n\tzlib %s\n\t%s #%s\n",
+				     version, serveropts,
 #ifndef	ZIP_LINKS
 				     "not used",
 #else
 				     zlib_version,
 #endif
-				     dpath, creation, generation);
+				     creation, generation);
 			  exit(0);
 		    case 'x':
 #ifdef	DEBUGMODE
@@ -735,15 +724,6 @@ char	*argv[];
 	if (argc > 0)
 		bad_command(); /* This exits out */
 
-#ifndef	CHROOTDIR
-	if (chdir(dpath))
-	    {
-		perror("chdir");
-		(void)fprintf(stderr, "%s: Error in daemon path: %s.\n",
-                              SPATH, dpath);
-		exit(-1);
-	    }
-#endif
 #if defined(USE_IAUTH)
 	if ((bootopt & BOOT_NOIAUTH) == 0)
 		switch (vfork())
@@ -753,7 +733,7 @@ char	*argv[];
 			exit(-1);
 		case 0:
 			close(0); close(1); close(3);
-			if (execl(APATH, APATH, "-X", NULL) < 0)
+			if (execl(IAUTH_PATH, IAUTH, "-X", NULL) < 0)
 				_exit(-1);
 		default:
 		    {
@@ -764,7 +744,7 @@ char	*argv[];
 			    {
 				fprintf(stderr,
 					"%s: error: unable to find \"%s\".\n",
-					myargv[0], APATH);
+					myargv[0], IAUTH_PATH);
 				exit(-1);
 			    }
 		    }
@@ -812,7 +792,7 @@ char	*argv[];
 	timeofday = time(NULL);
 #ifdef	CACHED_MOTD
 	motd = NULL;
-	read_motd(MPATH);
+	read_motd(IRCDMOTD_PATH);
 #endif
 	inithashtables();
 	initlists();
@@ -1043,7 +1023,7 @@ void	io_loop()
  * open_debugfile
  *
  * If the -t option is not given on the command line when the server is
- * started, all debugging output is sent to the file set by LPATH in config.h
+ * started, all debugging output is sent to the file set by IRCDDBG_PATH.
  * Here we just open that file and make sure it is opened to fd 2 so that
  * any fprintf's to stderr also goto the logfile.  If the debuglevel is not
  * set from the command line by -x, use /dev/null as the dummy logfile as long
@@ -1070,8 +1050,8 @@ static	void	open_debugfile()
 			isatty(2), (u_int)ttyname(2));
 		if (!(bootopt & BOOT_TTY)) /* leave debugging output on fd 2 */
 		    {
-			(void)truncate(LOGFILE, 0);
-			if ((fd = open(LOGFILE, O_WRONLY | O_CREAT, 0600)) < 0) 
+			(void)truncate(IRCDDBG_PATH, 0);
+			if ((fd = open(IRCDDBG_PATH,O_WRONLY|O_CREAT,0600))<0)
 				if ((fd = open("/dev/null", O_WRONLY)) < 0)
 					exit(-1);
 			if (fd != 2)
@@ -1079,7 +1059,7 @@ static	void	open_debugfile()
 				(void)dup2(fd, 2);
 				(void)close(fd); 
 			    }
-			strncpyzt(cptr->name, LOGFILE, sizeof(cptr->name));
+			strncpyzt(cptr->name, IRCDDBG_PATH,sizeof(cptr->name));
 		    }
 		else if (isatty(2) && ttyname(2))
 			strncpyzt(cptr->name, ttyname(2), sizeof(cptr->name));

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.10 1998/12/13 00:02:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.11 1999/02/21 00:33:45 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -38,7 +38,7 @@ static	aClass	*get_class();
 static	aConfItem	*initconf();
 
 static	int	numclasses = 0, *classarr = (int *)NULL, debugflag = 0;
-static	char	*configfile = CONFIGFILE;
+static	char	*configfile = IRCDCONF_PATH;
 static	char	nullfield[] = "";
 static	char	maxsendq[12];
 
@@ -50,7 +50,7 @@ char	*argv[];
 {
 	if (argc > 1 && !strncmp(argv[1], "-h", 2)) {
 		(void)fprintf(stderr, "Usage: %s [-h] [-d[#]] [%s]\n",
-			      argv[0], CPATH);
+			      argv[0], IRCDCONF_PATH);
 		exit(0);
 	}
 	new_class(0);
@@ -64,12 +64,6 @@ char	*argv[];
 	    }
 	if (argc > 1)
 		configfile = argv[1];
-	else if (chdir(DPATH)) {
-		perror("chdir");
-                (void)fprintf(stderr, "%s: Error in daemon path: %s.\n",
-                              argv[0], DPATH);
-		exit(-1);
-	}
 	return validate(initconf());
 }
 
@@ -85,9 +79,10 @@ static	int	openconf()
 #ifdef	M4_PREPROC
 	int	pi[2];
 
-	if (access("ircd.m4", R_OK) == -1)
+	/* ircd.m4 with full path now! Kratz */
+	if (access(IRCDM4_PATH, R_OK) == -1)
 	    {
-		(void)fprintf(stderr, "ircd.m4 missing in %s\n", DPATH);
+		(void)fprintf(stderr, "%s missing.\n", IRCDM4_PATH);
 		return -1;
 	    }
 	if (pipe(pi) == -1)
@@ -109,7 +104,7 @@ static	int	openconf()
 		 * goes out with report_error.  Could be dangerous,
 		 * two servers running with the same fd's >:-) -avalon
 		 */
-		(void)execlp("m4", "m4", "ircd.m4", configfile, 0);
+		(void)execlp("m4", "m4", IRCDM4_PATH, configfile, 0);
 		perror("m4");
 		exit(-1);
 	default :
@@ -138,7 +133,6 @@ int	opt;
 	aConfItem *aconf = NULL, *ctop = NULL;
 
 	(void)fprintf(stderr, "initconf(): ircd.conf = %s\n", configfile);
-	(void)fprintf(stderr, "initconf(): ircd dir  = %s\n", DPATH);
 	if ((fd = openconf()) == -1)
 	    {
 #ifdef	M4_PREPROC

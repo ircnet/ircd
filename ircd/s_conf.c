@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.37 1999/02/12 04:05:23 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.38 1999/02/21 00:33:45 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -737,7 +737,7 @@ int	sig;
 				free_conf(tmp2);
 		    }
 #ifdef CACHED_MOTD
-	read_motd(MPATH);
+	read_motd(IRCDMOTD_PATH);
 #endif
 	rehashed = 1;
 	return ret;
@@ -777,7 +777,7 @@ int	openconf()
 		 * goes out with report_error.  Could be dangerous,
 		 * two servers running with the same fd's >:-) -avalon
 		 */
-		(void)execlp("m4", "m4", "ircd.m4", configfile, 0);
+		(void)execlp("m4", "m4", IRCDM4_PATH, configfile, 0);
 		report_error("Error executing m4 %s:%s", &me);
 		_exit(-1);
 	default :

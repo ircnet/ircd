@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.56 1999/02/19 01:01:39 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.57 1999/02/21 00:33:46 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2244,7 +2244,7 @@ char	*parv[];
 	 * 3 seconds. -avalon (curtesy of wumpus)
 	 */
 	(void)alarm(3);
-	fd = open(MPATH, O_RDONLY);
+	fd = open(IRCDMOTD_PATH, O_RDONLY);
 	(void)alarm(0);
 	if (fd == -1)
 	    {

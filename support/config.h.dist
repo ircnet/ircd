@@ -19,15 +19,7 @@
 
 /*
  *  ircdwatch configuration options.
- *
- *  make sure SPATH has a fully qualified path or that the IRC server binary
- *  is within the directory specified in server_bin_dir (see Makefile) if
- *  you plan to let ircdwatch find the server binary. 
- *
  */
-
-/* file within DPATH that holds the pid of ircdwatch */
-#define IRCDWATCH_PID_FILENAME      "ircdwatch.pid"
 
 /* how often (in seconds) should we check that ircd runs? */
 #define IRCDWATCH_POLLING_INTERVAL  30
@@ -60,51 +52,27 @@
  */
 
 /*
- * Pathnames and defaults of irc system's support files. Please note that
- * these are only the recommened names and paths. Change as needed.
- * You must define these to something, even if you don't really want them.
- */
-#define	CPATH	"ircd.conf"	/* configuration file */
-#define	MPATH	"ircd.motd"	/* motd file */
-#define	LPATH	"ircd.log"	/* debugging log */
-#define	PPATH	"ircd.pid"	/* PID file */
-#define	TPATH	"ircd.tune"	/* tuning file */
-#define	QPATH	"iauth.conf"	/* authentication slave configuration file */
-#define	OPATH	"iauth.log"	/* authentication slave debugging log */
-
-/*
  * If you don't want the server to keep reading the MOTD file from the disk,
  * define CACHED_MOTD.  The server will store the MOTD in memory, and only
  * read it again from the disk when rehashing if the file has changed.
  */
 #define	CACHED_MOTD
 
-/*
- * Define these filenames to maintain a list of persons who log
- * into this server. Logging will stop when the file does not exist.
- * Logging will be disabled also if you do not define this.
- *	FNAME_USERLOG just logs user connections,
- *	FNAME_OPERLOG logs every successful use of /oper.
- *	FNAME_CONNLOG logs every user rejected or uncomplete connection
- *	FNAME_AUTHLOG logs authentication information retrieved by iauth
- *		      (file must exist on startup, see man page)
- * These are either full paths or files within "ircd_dir" (see Makefile).
- */
-#define FNAME_USERLOG "@logdir@users" /* */
-#define FNAME_OPERLOG "@logdir@opers" /* */
-#define FNAME_CONNLOG "@logdir@rejects" /* */
-#define FNAME_AUTHLOG "@logdir@auth" /* */
-
 /* CHROOTDIR
  *
  * Define for value added security if you are a rooter.
  *
- * All files you access must be in the directory you define as IRCDDIR.
- * (This may effect the PATH locations above, though you can symlink it)
+ * CPATH, MPATH, LPATH, PPATH, TPATH, QPATH, OPATH, 
+ * FNAME_USERLOG, FNAME_OPERLOG, FNAME_CONNLOG, FNAME_AUTHLOG
+ * must have RPATH as root directory! Set them in Makefile
  *
  * You may want to define IRC_UID and IRC_GID
  */
 #undef CHROOTDIR
+
+#if defined(CHROOTDIR)
+  #define ROOT_PATH	"/where/to/change/root/dir"
+#endif
 
 /* ENABLE_SUMMON
  *
@@ -537,13 +505,6 @@
 /* #undef	NO_PREFIX */
 
 /* ------------------------- END CONFIGURATION SECTION -------------------- */
-#define	CONFIGFILE CPATH
-#define	IRCD_PIDFILE PPATH
-
-#ifdef DEBUGMODE
-# define LOGFILE LPATH
-#endif
-
 #ifndef ENABLE_SUMMON
 #  undef LEAST_IDLE
 #endif

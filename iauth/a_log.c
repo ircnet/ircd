@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_log.c,v 1.5 1998/08/08 18:22:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_log.c,v 1.6 1999/02/21 00:33:45 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -35,10 +35,11 @@ init_filelogs()
 #if defined(IAUTH_DEBUG)
 	if (debug)
 		fclose(debug);
-	debug = fopen(OPATH, "w");
+	debug = fopen(IAUTHDBG_PATH, "w");
 # if defined(USE_SYSLOG)
 	if (!debug)
-		syslog(LOG_ERR, "Failed to open \"%s\" for writing", OPATH);
+		syslog(LOG_ERR, "Failed to open \"%s\" for writing",
+		       IAUTHDBG_PATH);
 # endif
 #endif /* IAUTH_DEBUG */
 	if (authlog)

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_conf.c,v 1.2 1997/09/03 17:45:32 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: c_conf.c,v 1.3 1999/02/21 00:33:45 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -35,7 +35,7 @@ int	*port;
 	FILE	*fd;
 	char	line[256], *tmp;
 
-	if ((fd = fopen(CONFIGFILE,"r")) == NULL)
+	if ((fd = fopen(IRCDCONF_PATH, "r")) == NULL)
 		return /* (-1) */ ;
 	while (fgets(line,255,fd)) {
 		if (line[0] == '#' || line[0] == '\n' ||

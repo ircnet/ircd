@@ -21,14 +21,15 @@
 /* The distribution of the server */
 #define TKSERV_DIST "*"
 
-/* The absolute path to the log file */
-#define TKSERV_LOGFILE "@logdir@/tkserv.log"
-
-/* The absolute path to the access file */
-#define TKSERV_ACCESSFILE "@libdir@/tkserv.access"
-
 /* The password for the service (must match the one in the S: line) */
 #define TKSERV_PASSWORD "blah"
 
 /* Debugging (displays service<->server traffic to standard output) */
 #undef TKSERV_DEBUG
+
+/* The name of the ircd config file backup (suffix after CPATH) */
+#define TKSERV_IRCD_CONFIG_BAK 	CPATH".tkserv"
+
+/* The name of the ircd temp config file (suffix after CPATH) */
+#define TKSERV_IRCD_CONFIG_TMP	CPATH".tmp"
+

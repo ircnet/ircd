@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.35 1998/11/17 22:10:26 kalt Exp $
+#*   $Id: Makefile.in,v 1.36 1999/02/21 00:33:46 kalt Exp $
 #*
 #*/
 
@@ -26,18 +26,19 @@
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 
+# compiler program
 CC = @CC@
-# for the server
+# compiler flags used for the server
 S_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common @IRC_ZLIB_INCLUDE@
-# for the authentication daemon
+# compiler flags used for the authentication slave
 A_CFLAGS = @CFLAGS@ -I. -I../iauth -I../common @IRC_ZLIB_INCLUDE@
-# for chkconfig
+# compiler flags used for chkconfig
 CC_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common
-# for the client
+# compiler flags used for the client
 C_CFLAGS = @CFLAGS@ -I. -I../irc -I../common
-# other things (in contrib/)
+# compiler flags used for other things (in contrib/)
 O_CFLAGS = @CFLAGS@ -I. -I../common -DCONTRIB_COMPILE
-# 
+# linker flags
 LDFLAGS = @LDFLAGS@
 # required libraries, except zlib and curses/termcap
 LIBS = @LIBS@
@@ -52,31 +53,87 @@ INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 MKDIRHIER = ../support/mkdirhier
 
+#
+# Binary names
+#
+CLIENT = irc
+SERVER = ircd
+IAUTH = iauth
+IRCDWATCH = ircdwatch
+
+#
+# Directories definitions
+#
 # Directory in which to install irc.
 client_bin_dir = @bindir@
-
 # Directory in which to install ircd, iauth, ircdwatch, mkpasswd and chkconf.
 server_bin_dir = @sbindir@
-
-# Directory in which to install the client manual page file.
+# Directory in which to install the client manual page.
 client_man_dir = @mandir@/man1
-
-# Directory in which to install the configration manual page file.
+# Directory in which to install the configuration manual page.
 conf_man_dir = @mandir@/man5
-
-# Directory in which to install the server manual page file.
+# Directory in which to install the server manual page.
 server_man_dir = @mandir@/man8
+# Directory where config files (ircd.conf, ircd.motd and iauth.conf) live.
+ircd_conf_dir = @sysconfdir@
+# Directory where state files (ircd.pid, ircd.tune) live.
+ircd_var_dir = @localstatedir@
+# Directory where log files (users, opers, rejects and auth) live.
+ircd_log_dir = @logdir@
 
-# Directory where most files will be.
-# This path is important as it is hardcoded into the server,
-# it should exist and contain at least the configuration file.
-ircd_dir = @libdir@
+#
+# Most of these PATHs are hardcoded in the binaries.
+# They should all be absolute.
+#
+# Path to server binary
+IRCD_PATH = $(server_bin_dir)/$(SERVER)
+# Path to authentification slave binary
+IAUTH_PATH = $(server_bin_dir)/$(IAUTH)
+# Path to the m4 configuration file
+IRCDM4_PATH = $(ircd_conf_dir)/ircd.m4
+
+# server configuration file
+IRCDCONF_PATH = $(ircd_conf_dir)/ircd.conf
+# server Message Of The Day
+IRCDMOTD_PATH = $(ircd_conf_dir)/ircd.motd
+# authentication slave configuration file
+IAUTHCONF_PATH = $(ircd_conf_dir)/iauth.conf
+# server PID file
+IRCDPID_PATH = $(ircd_var_dir)/ircd.pid
+# server state file
+IRCDTUNE_PATH = $(ircd_var_dir)/ircd.tune
+# ircdwatch PID file
+IRCDWATCHPID_PATH = $(ircd_var_dir)/ircdwatch.pid
+
+# Define these filenames to maintain a list of persons who log
+# into this server. Logging will stop when the file does not exist.
+# Logging will be disabled also if you do not define this.
+FNAME_USERLOG = $(ircd_log_dir)/users
+FNAME_OPERLOG = $(ircd_log_dir)/opers
+FNAME_CONNLOG = $(ircd_log_dir)/rejects
+FNAME_AUTHLOG = $(ircd_log_dir)/auth
+
+# files used for debugging purposes
+IRCDDBG_PATH = $(ircd_log_dir)/ircd.log
+IAUTHDBG_PATH = $(ircd_log_dir)/iauth.log
 
 # Access mode for irc.
 irc_mode = 755
 
 # Access mode for ircd.
 ircd_mode = 711
+
+#
+# TK line service configuration
+#
+# TK line service binary
+TKSERV = tkserv
+# TK line service logfile
+TKSERV_LOGFILE = $(ircd_log_dir)/tkserv.log
+# TK line service access file 
+TKSERV_ACCESSFILE = $(ircd_conf_dir)/tkserv.access
+# IRCD config file without path (from CPATH)
+TKSERV_IRCD_CONF = ircd.conf
 
 # End of system configuration section.
 # ------------------------------------------------------------------------
@@ -88,7 +145,6 @@ CLIENT_COMMON_OBJS = clbsd.o cldbuf.o clpacket.o clsend.o clmatch.o \
                      clparse.o clsupport.o
 CLIENT_OBJS = c_bsd.o c_msg.o c_numeric.o c_version.o edit.o help.o \
               ignore.o irc.o screen.o str.o swear.o c_debug.o ctcp.o
-CLIENT = irc
 
 SERVER_COMMON_OBJS = bsd.o dbuf.o packet.o send.o match.o parse.o \
                      support.o
@@ -96,12 +152,10 @@ SERVER_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
               s_bsd.o s_conf.o s_debug.o s_err.o s_id.o s_misc.o s_numeric.o \
               s_serv.o s_service.o s_user.o s_zip.o whowas.o \
               res_init.o res_comp.o res_mkquery.o
-SERVER = ircd
 
 IAUTH_COMMON_OBJS = clsupport.o clmatch.o # This is a little evil
 IAUTH_OBJS = iauth.o a_conf.o a_io.o a_log.o \
              mod_pipe.o mod_rfc931.o mod_socks.o
-IAUTH = iauth
 
 CHKCONF_COMMON_OBJS = match.o
 CHKCONF_OBJS = chkconf.o
@@ -116,8 +170,8 @@ help:
 	@echo "                chkconf       : build the configuration file checker"
 	@echo "                ircd-mkpasswd : build ircd-mkpasswd"
 	@echo "                ircdwatch     : build ircdwatch"
-	@echo "        client         : build the client"
-	@echo "        tkserv         : build tkserv"
+	@echo "        client        	: build the client"
+	@echo "        $(TKSERV)	: build tkserv"
 	@echo
 	@echo "        install        : build and install server and client programs"
 	@echo "        install-server : build and install server programs"
@@ -126,7 +180,7 @@ help:
 
 all: server client
 
-server: $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd ircdwatch
+server: $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH)
 
 client: $(CLIENT)
 
@@ -150,26 +204,26 @@ $(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 
 # stuff in contrib/
 
-ircdwatch: ircdwatch.o
-	$(RM) ircdwatch
-	$(CC) -o $@ ircdwatch.o
+$(IRCDWATCH): ircdwatch.o
+	$(RM) $(IRCDWATCH)
+	$(CC) -o $(IRCDWATCH) ircdwatch.o
 
 ircd-mkpasswd: mkpasswd.o
 	$(RM) ircd-mkpasswd
 	$(CC) $(LDFLAGS) -o ircd-mkpasswd mkpasswd.o $(LIBS)
 
-tkserv: tkserv.o
-	$(RM) tkserv
-	$(CC) $(LDFLAGS) -o $@ $< $(LIBS)
+$(TKSERV): tkserv.o
+	$(RM) $(TKSERV)
+	$(CC) $(LDFLAGS) -o $(TKSERV) tkserv.o $(LIBS)
 
 install: install-server install-client
 
 install-client: client
 	-@if [ ! -d $(client_bin_dir) ]; then \
-	$(MKDIRHIER) $(client_bin_dir); \
+		$(MKDIRHIER) $(client_bin_dir); \
 	fi
 	-@if [ ! -d $(client_man_dir) ]; then \
-	$(MKDIRHIER) $(client_man_dir); \
+		$(MKDIRHIER) $(client_man_dir); \
 	fi
 	$(INSTALL_PROGRAM) -m $(irc_mode) $(CLIENT) $(client_bin_dir)
 	(cd ../doc; $(INSTALL_DATA) irc.1 $(client_man_dir))
@@ -177,39 +231,45 @@ install-client: client
 
 install-server: server
 	-@if [ ! -d $(server_bin_dir) ]; then \
-	$(MKDIRHIER) $(server_bin_dir); \
+		$(MKDIRHIER) $(server_bin_dir); \
 	fi
 	-@if [ ! -d $(server_man_dir) ]; then \
-	$(MKDIRHIER) $(server_man_dir); \
+		$(MKDIRHIER) $(server_man_dir); \
 	fi
 	-@if [ ! -d $(conf_man_dir) ]; then \
-	$(MKDIRHIER) $(conf_man_dir); \
+		$(MKDIRHIER) $(conf_man_dir); \
 	fi
-	-@if [ ! -d $(ircd_dir) ]; then \
-	$(MKDIRHIER) $(ircd_dir); \
+	-@if [ ! -d $(ircd_conf_dir) ]; then \
+		$(MKDIRHIER) $(ircd_conf_dir); \
+	fi
+	-@if [ ! -d $(ircd_var_dir) ]; then \
+		$(MKDIRHIER) $(ircd_var_dir); \
+	fi
+	-@if [ ! -d $(ircd_log_dir) ]; then \
+		$(MKDIRHIER) $(ircd_log_dir); \
 	fi
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(IAUTH) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(CHKCONF) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) ircd-mkpasswd $(server_bin_dir)
-	$(INSTALL_PROGRAM) -m $(ircd_mode) ircdwatch $(server_bin_dir)
-	$(RM) $(ircd_dir)/ircd.m4
-	../ircd/buildm4 $(ircd_dir)
+	$(INSTALL_PROGRAM) -m $(ircd_mode) $(IRCDWATCH) $(server_bin_dir)
+	$(RM) $(PATH4)
+	../ircd/buildm4 $(PATH4)
 	$(INSTALL_DATA) ../doc/ircd.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/iauth.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/iauth.conf.5 $(conf_man_dir)
 	$(INSTALL_DATA) ../contrib/ircdwatch/ircdwatch.8 $(server_man_dir)
-	$(INSTALL_DATA) ../doc/example.conf $(ircd_dir)
+	$(INSTALL_DATA) ../doc/example.conf $(ircd_conf_dir)
 	@echo "installation of server done."
 
-install-tkserv: tkserv
+install-tkserv: $(TKSERV)
 	-@if [ ! -d $(server_bin_dir) ]; then \
 	$(MKDIRHIER) $(server_bin_dir); \
 	fi
-	-@if [ ! -d $(ircd_dir) ]; then \
-	$(MKDIRHIER) $(ircd_dir); \
+	-@if [ ! -d $(ircd_conf_dir) ]; then \
+	$(MKDIRHIER) $(ircd_conf_dir); \
 	fi
-	$(INSTALL_PROGRAM) -m $(ircd_mode) tkserv $(server_bin_dir)
+	$(INSTALL_PROGRAM) -m $(ircd_mode) $(TKSERV) $(server_bin_dir)
 	@echo "installation of client done."
 
 clbsd.o: ../common/bsd.c setup.h config.h
@@ -282,7 +342,7 @@ packet.o: ../common/packet.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../common/packet.c
 
 send.o: ../common/send.c setup.h config.h
-	$(CC) $(S_CFLAGS) -c -o $@ ../common/send.c
+	$(CC) $(S_CFLAGS) -DFNAME_USERLOG="\"$(FNAME_USERLOG)\"" -DFNAME_CONNLOG="\"$(FNAME_CONNLOG)\"" -c -o $@ ../common/send.c
 
 match.o: ../common/match.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../common/match.c
@@ -310,7 +370,7 @@ hash.o: ../common/struct_def.h ../common/os.h ../ircd/hash_def.h \
 	@touch hash.o
 
 ircd.o: ../ircd/ircd.c setup.h config.h
-	$(CC) $(S_CFLAGS) -DDPATH="\"$(ircd_dir)\"" -DSPATH="\"$(server_bin_dir)/ircd\"" -DAPATH="\"$(server_bin_dir)/iauth\"" -c -o $@ ../ircd/ircd.c
+	$(CC) $(S_CFLAGS) -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" -DIRCDTUNE_PATH="\"$(IRCDTUNE_PATH)\"" -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" -DIRCD_PATH="\"$(IRCD_PATH)\"" -DIAUTH_PATH="\"$(IAUTH_PATH)\"" -DIAUTH="\"$(IAUTH)\"" -DIRCDDBG_PATH="\"$(IRCDDBG_PATH)\"" -c -o $@ ../ircd/ircd.c
 
 list.o: ../ircd/list.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/list.c
@@ -322,10 +382,10 @@ s_auth.o: ../ircd/s_auth.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_auth.c
 
 s_bsd.o: ../ircd/s_bsd.c setup.h config.h
-	$(CC) $(S_CFLAGS) -DAPATH="\"$(server_bin_dir)/iauth\"" -c -o $@ ../ircd/s_bsd.c
+	$(CC) $(S_CFLAGS) -DIRCDPID_PATH="\"$(IRCDPID_PATH)\"" -DIAUTH_PATH="\"$(IAUTH_PATH)\"" -DIAUTH="\"$(IAUTH)\"" -c -o $@ ../ircd/s_bsd.c
 
 s_conf.o: ../ircd/s_conf.c setup.h config.h
-	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_conf.c
+	$(CC) $(S_CFLAGS) -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" -DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" -c -o $@ ../ircd/s_conf.c
 
 s_debug.o: ../ircd/s_debug.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_debug.c
@@ -337,19 +397,19 @@ s_id.o: ../ircd/s_id.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_id.c
 
 s_misc.o: ../ircd/s_misc.c setup.h config.h
-	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_misc.c
+	$(CC) $(S_CFLAGS) -DFNAME_USERLOG="\"$(FNAME_USERLOG)\"" -DFNAME_CONNLOG="\"$(FNAME_CONNLOG)\"" -c -o $@ ../ircd/s_misc.c
 
 s_numeric.o: ../ircd/s_numeric.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_numeric.c
 
 s_serv.o: ../ircd/s_serv.c setup.h config.h
-	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_serv.c
+	$(CC) $(S_CFLAGS) -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" -c -o $@ ../ircd/s_serv.c
 
 s_service.o: ../ircd/s_service.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_service.c
 
 s_user.o: ../ircd/s_user.c setup.h config.h
-	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_user.c
+	$(CC) $(S_CFLAGS) -DFNAME_USERLOG="\"$(FNAME_USERLOG)\"" -DFNAME_CONNLOG="\"$(FNAME_CONNLOG)\"" -DFNAME_OPERLOG="\"$(FNAME_OPERLOG)\"" -c -o $@ ../ircd/s_user.c
 
 s_zip.o: ../ircd/s_zip.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_zip.c
@@ -370,13 +430,13 @@ iauth.o: ../iauth/iauth.c config.h setup.h
 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/iauth.c
 
 a_conf.o: ../iauth/a_conf.c config.h setup.h
-	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/a_conf.c
+	$(CC) $(A_CFLAGS) -DIAUTHCONF_PATH="\"$(IAUTHCONF_PATH)\"" -c -o $@ ../iauth/a_conf.c
 
 a_io.o: ../iauth/a_io.c config.h setup.h
 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/a_io.c
 
 a_log.o: ../iauth/a_log.c config.h setup.h
-	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/a_log.c
+	$(CC) $(A_CFLAGS) -DIAUTHDBG_PATH="\"$(IAUTHDBG_PATH)\"" -DFNAME_AUTHLOG="\"$(FNAME_AUTHLOG)\"" -c -o $@ ../iauth/a_log.c
 
 mod_pipe.o: ../iauth/mod_pipe.c config.h setup.h
 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_pipe.c
@@ -388,21 +448,21 @@ mod_socks.o: ../iauth/mod_socks.c config.h setup.h
 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_socks.c
 
 chkconf.o: ../ircd/chkconf.c setup.h config.h
-	$(CC) $(CC_CFLAGS) -DCHKCONF_COMPILE -DDPATH="\"$(ircd_dir)\"" -c -o $@ ../ircd/chkconf.c
+	$(CC) $(CC_CFLAGS) -DCHKCONF_COMPILE -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" -DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" -c -o $@ ../ircd/chkconf.c
 
 # stuff in contrib/
 
 ircdwatch.o: ../contrib/ircdwatch/ircdwatch.c
-	$(CC) $(O_CFLAGS) -DSERVER_BIN_DIR="\"$(server_bin_dir)\"" -DDPATH="\"$(ircd_dir)\"" -DMYNAME="\"ircd\"" -c -o $@ ../contrib/ircdwatch/ircdwatch.c
+	$(CC) $(O_CFLAGS) $(IRCD_FILES) -DIRCDWATCH_PID_FILENAME="\"$(IRCDWATCHPID_PATH)\"" -DIRCD_PATH="\"$(IRCD_PATH)\"" -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" -DIRCDPID_PATH="\"$(IRCDPID_PATH)\"" -c -o $@ ../contrib/ircdwatch/ircdwatch.c
 
 mkpasswd.o: ../contrib/mkpasswd/mkpasswd.c
 	$(CC) $(O_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c
 
 tkserv.o: ../contrib/tkserv/tkserv.c tkconf.h
-	$(CC) $(O_CFLAGS) -DIRCDPATH="\"$(server_bin_dir)\"" -c -o $@ $<
+	$(CC) $(O_CFLAGS)  $(IRCD_FILES) -DTKSERV_LOGFILE="\"$(TKSERV_LOGFILE)\"" -DTKSERV_ACCESSFILE="\"$(TKSERV_ACCESSFILE)\"" -DTKSERV_IRCD_CONF="\"$(TKSERV_IRCD_CONF)\"" -c -o $@ $<
 
 clean:
-	$(RM) $(CLIENT) $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd ircdwatch *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
+	$(RM) $(CLIENT) $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH) $(TKSERV) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
 
 distclean:
 	@echo "To make distclean, just delete the current directory."

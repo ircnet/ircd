@@ -839,13 +839,12 @@ libexecdir='${exec_prefix}/libexec'
 datadir='${prefix}/share'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
-localstatedir='${prefix}/var'
-libdir='${exec_prefix}/lib/ircd'
+localstatedir='${prefix}/var/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 infodir='${prefix}/info'
 mandir='${prefix}/man'
-logdir=''
+logdir='${prefix}/var/log/ircd'
 
 # Initialize some other variables.
 subdirs=
@@ -963,11 +962,10 @@ Directory and file names:
   --sysconfdir=DIR        read-only single-machine data in DIR [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data in DIR
                           [PREFIX/com]
-  --localstatedir=DIR     modifiable single-machine data in DIR [PREFIX/var]
-  --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
+  --localstatedir=DIR     modifiable single-machine data in DIR[PREFIX/var/run]
   --includedir=DIR        C header files in DIR [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc in DIR [/usr/include]
-  --logdir=DIR            log files in DIR [PREFIX/logs]
+  --logdir=DIR            log files in DIR [PREFIX/var/log/ircd]
   --infodir=DIR           info documentation in DIR [PREFIX/info]
   --mandir=DIR            man documentation in DIR [PREFIX/man]
   --srcdir=DIR            find the sources in DIR [configure dir or ..]
@@ -1410,7 +1408,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.30 1999/01/18 00:54:20 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.31 1999/02/21 00:33:46 kalt Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1488,5 +1486,5 @@ IRC_PATH_RESCONF
 IRC_IP6
 IRC_ALPHA_BETA
 
-AC_OUTPUT(Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../support/sums.in config.h:../support/config.h.dist tkconf.h:../support/tkconf.h.dist)
+AC_OUTPUT(Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../support/sums.in tkconf.h:../support/tkconf.h.dist)
 AC_OUTPUT_COMMANDS(chmod a+x version.c.SH)

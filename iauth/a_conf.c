@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.7 1999/01/13 02:32:41 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.8 1999/02/21 00:33:45 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -57,7 +57,7 @@ char *cfile;
 	AnInstance **last = &instances, *itmp;
 	FILE *cfh;
 
-	cfh = fopen((cfile) ? cfile : QPATH, "r");
+	cfh = fopen((cfile) ? cfile : IAUTHCONF_PATH, "r");
 	if (cfh)
 	    {
 		while (fgets(buffer, 160, cfh))
