@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.226 2004/06/30 17:50:19 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.227 2004/06/30 19:06:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -604,7 +604,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 					   "K-lined");
 		    }
 #ifdef XLINE
-		if (!IsKlineExempt(sptr) && IsXlined(sptr))
+		if (IsXlined(sptr))
 		{
 			sptr->exitc = EXITC_XLINE;
 			return exit_client(cptr, sptr, &me,
