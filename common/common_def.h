@@ -72,7 +72,7 @@
 #define isascii(c) (/*((u_char)(c) >= (u_char)'\0') &&*/ \
 		    ((u_char)(c) <= (u_char)0x7f))
 #define isgraph(c) ((char_atribs[(u_char)(c)]&PRINT) && \
-		    ((u_char)(c) != (u_char)0x32))
+		    ((u_char)(c) != (u_char)0x20))
 #define ispunct(c) (!(char_atribs[(u_char)(c)]&(CNTRL|ALPHA|DIGIT)))
 
 #ifdef DEBUGMODE
