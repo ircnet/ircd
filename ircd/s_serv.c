@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.150 2004/02/16 11:05:05 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.151 2004/02/16 11:52:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3607,21 +3607,12 @@ static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf)
 	}
 
         *pbuf= '\0';
-	if (IsMasked(root))
-	{
-		sprintf(pbuf, "%s %d %s%s", root->serv->sid,
-			 root->serv->usercnt[0] + root->serv->usercnt[1],
-			 root->serv->verstr,
-			 IsBursting(root) ? " BURST" : "");
-	}
-	else
-	{
-		sprintf(pbuf, "%s %s %d %s%s%s", root->name, root->serv->sid,
-			  root->serv->usercnt[0] + root->serv->usercnt[1],
-			  root->serv->verstr[0] ? " " : "",
-			  root->serv->verstr,
-			  IsBursting(root) ? " BURST" : "");
-	}
+	sprintf(pbuf, "%s %s %d %s%s",
+		IsMasked(root) ? root->serv->maskedby->name : root->name,
+		root->serv->sid,
+		root->serv->usercnt[0] + root->serv->usercnt[1],
+		BadTo(root->serv->verstr),
+		IsBursting(root) ? " BURST" : "");
 
 	sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
 	
