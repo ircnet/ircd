@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.11 1997/09/23 20:47:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.12 1997/11/13 02:14:43 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -322,7 +322,7 @@ static	Numeric	numeric_replies[] = {
 /* 247 */	{ RPL_STATSBLINE, "%c %s %s %s %d %d" },
 		{ 0, (char *)NULL },
 		{ 0, (char *)NULL },
-		{ 0, (char *)NULL },
+/* 250 */	{ RPL_STATSDLINE, "%c %s %s %s %d %d" },
 /* 251 */	{ RPL_LUSERCLIENT,
 		":There are %d users and %d services on %d servers" },
 /* 252 */	{ RPL_LUSEROP, "%d :operators online" },

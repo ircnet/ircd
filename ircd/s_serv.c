@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.24 1997/10/11 03:48:10 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.25 1997/11/13 02:14:44 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1183,6 +1183,7 @@ static int report_array[16][3] = {
 		{ CONF_SERVICE,		  RPL_STATSSLINE, 'S'},
 		{ CONF_VER,		  RPL_STATSVLINE, 'V'},
 		{ CONF_BOUNCE,		  RPL_STATSBLINE, 'B'},
+		{ CONF_DENY,		  RPL_STATSDLINE, 'D'},
 		{ 0, 0, 0}
 	};
 
@@ -1344,8 +1345,9 @@ char	*parv[];
 	case 'd' : case 'D' : /* defines */
 		send_defines(cptr, parv[0]);
 		break;
-	case 'H' : case 'h' : /* H and L conf lines */
-		report_configured_links(cptr, parv[0], CONF_HUB|CONF_LEAF);
+	case 'H' : case 'h' : /* H, L and D conf lines */
+		report_configured_links(cptr, parv[0],
+					CONF_HUB|CONF_LEAF|CONF_DENY);
 		break;
 	case 'I' : case 'i' : /* I (and i) conf lines */
 		report_configured_links(cptr, parv[0],
