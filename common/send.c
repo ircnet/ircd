@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.69 2004/03/18 00:54:45 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.70 2004/05/18 22:04:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1181,6 +1181,7 @@ static	SChan	svchans[SCH_MAX] = {
 	{ SCH_DEBUG,	"&DEBUG",	NULL },
 	{ SCH_AUTH,	"&AUTH",	NULL },
 	{ SCH_SAVE,	"&SAVE",	NULL },
+	{ SCH_WALLOP,	"&WALLOPS",	NULL },
 };
 
 

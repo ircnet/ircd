@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.97 2004/04/07 17:02:37 chopin Exp $
+ *   $Id: struct_def.h,v 1.98 2004/05/18 22:04:58 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -879,7 +879,8 @@ typedef	struct	{
 #define	SCH_DEBUG	10
 #define	SCH_AUTH	11
 #define	SCH_SAVE	12
-#define	SCH_MAX		12
+#define	SCH_WALLOP	13
+#define	SCH_MAX		13
 
 /* used for async dns values */
 
