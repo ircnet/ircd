@@ -164,16 +164,26 @@ u_int cl;
 		** We haven't sent the query yet, the connection was just
 		** established.
 		*/
-		char query[3+7+5+USERLEN+HOSTLEN+8+1]; /* strlen(atoi(cl))<=8 */
+		char query[3+7+6+4+USERLEN+2*HOSTLEN+8+3];/*strlen(atoi(cl))<=8*/
 		char *ident = cldata[cl].authuser;
 
+		/* This is part of every request */
+		sprintf(query, "id:%u ip:%s", cl, cldata[cl].itsip);
+
+		/* These bits are optional, depending on what's known */
 		if (ident)
-			sprintf(query, "id:%u ident:%s host:%s\r\n",
-				cl, ident, cldata[cl].host);
-		else
-			sprintf(query, "id:%u host:%s\r\n",
-				cl, cldata[cl].host);
-		
+		    {
+		    	strcat(query, " ident:");
+			strcat(query, ident);
+		    }
+		if (cldata[cl].state & A_GOTH)
+		    {
+		    	strcat(query, " host:");
+			strcat(query, cldata[cl].host);
+		    }
+		/* Terminate the request */
+		strcat(query, "\r\n");
+
 		DebugLog((ALOG_DLHEX, 0, "lhex_work(%u): Sending query [%s]",
 			  cl, query));
 		if (write(cldata[cl].wfd, query, strlen(query)) < 0)
