@@ -390,11 +390,11 @@
  * he should know better. Else you must pick it yourself wisely.
  * Remember, the key is: unique network-wide.
  *
- * Note: This must be a string.  It should contain 3 chars.
+ * Note: This must be a string.  It must be SIDLEN (default 3) chars long.
  * The first char must be in the range of [0-9], the rest must be in
  * [0-9A-Z] (case insensitive).
  */
-/* #define SERVER_ID "123" */
+/* #define SERVER_ID "think" */
 
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
