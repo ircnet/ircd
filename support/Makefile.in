@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.22 1998/07/19 19:37:35 kalt Exp $
+#*   $Id: Makefile.in,v 1.23 1998/07/26 23:20:18 kalt Exp $
 #*
 #*/
 
@@ -160,10 +160,10 @@ install-server: server
 	$(INSTALL_PROGRAM) -m $(ircd_mode) ircdwatch $(server_bin_dir)
 	$(RM) $(ircd_dir)/ircd.m4
 	../ircd/buildm4 $(ircd_dir)
-	(cd ../doc; $(INSTALL_DATA) ircd.8 $(server_man_dir))
-	(cd ../doc; $(INSTALL_DATA) iauth.8 $(server_man_dir))
-	(cd ../contrib/ircdwatch; $(INSTALL_DATA) ircdwatch.8 $(server_man_dir)) 
-	(cd ../../doc; $(INSTALL_DATA) example.conf $(ircd_dir))
+	$(INSTALL_DATA) ../doc/ircd.8 $(server_man_dir)
+	$(INSTALL_DATA) ../doc/iauth.8 $(server_man_dir)
+	$(INSTALL_DATA) ../contrib/ircdwatch/ircdwatch.8 $(server_man_dir)
+	$(INSTALL_DATA) ../doc/example.conf $(ircd_dir)
 	@echo "installation of server done."
 
 clbsd.o: ../common/bsd.c setup.h config.h
