@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.139 2002/09/06 23:49:19 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.140 2002/09/11 19:53:26 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2645,9 +2645,10 @@ int	m_oper(cptr, sptr, parc, parv)
 aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
-    {
+{
 	aConfItem *aconf;
 	char	*name, *password, *encr;
+	char	*logstring = NULL;
 
 	name = parc > 1 ? parv[1] : NULL;
 	password = parc > 2 ? parv[2] : NULL;
@@ -2708,7 +2709,7 @@ char	*parv[];
 
 	if ((aconf->status & CONF_OPS) &&
 	    StrEq(encr, aconf->passwd) && !attach_conf(sptr, aconf))
-	    {
+	{
 		int old = (sptr->user->flags & ALL_UMODES);
 		char *s;
 
@@ -2729,21 +2730,45 @@ char	*parv[];
 			   IsOper(sptr) ? 'o' : 'O');
 		send_umode_out(cptr, sptr, old);
  		sendto_one(sptr, replies[RPL_YOUREOPER], ME, BadTo(parv[0]));
-#if !defined(CRYPT_OPER_PASSWORD) && (defined(FNAME_OPERLOG) ||\
-    (defined(USE_SYSLOG) && defined(SYSLOG_OPER)))
-		encr = "";
+#ifdef	USE_SERVICES
+		check_services_butone(SERVICE_WANT_OPER, sptr->user->server, 
+				      sptr, ":%s MODE %s :+%c", parv[0],
+				      parv[0], IsOper(sptr) ? 'o' : 'O');
 #endif
+		if (IsAnOper(sptr))
+		{
+			istat.is_oper++;
+			sptr->user->servp->usercnt[2]++;
+		}
+		logstring = "";
+	}	
+	else /* Wrong password */
+	{
+		(void)detach_conf(sptr, aconf);
+		sendto_one(sptr,replies[ERR_PASSWDMISMATCH], ME, BadTo(parv[0]));
+#ifdef FAILED_OPERLOG
+		sendto_flag(SCH_NOTICE, "FAILED OPER attempt by %s!%s@%s",
+			parv[0], sptr->user->username, sptr->user->host);
+		logstring = "FAILED ";
+#endif
+	}
+
+	if (logstring)
+	{
 #if defined(USE_SYSLOG) && defined(SYSLOG_OPER)
-		syslog(LOG_INFO, "OPER (%s) (%s) by (%s!%s@%s) [%s@%s]",
-			name, encr,
-		       parv[0], sptr->user->username, sptr->user->host,
+		syslog(LOG_INFO, "%sOPER (%s) by (%s!%s@%s) [%s@%s]",
+			logstring,
+			name, parv[0], sptr->user->username, sptr->user->host,
 		       sptr->auth, IsUnixSocket(sptr) ? sptr->sockhost :
 #ifdef INET6
-                       inet_ntop(AF_INET6, (char *)&sptr->ip, mydummy, MYDUMMY_SIZE));
+                       inet_ntop(AF_INET6, (char *)&sptr->ip, mydummy,
+			       MYDUMMY_SIZE)
 #else
-                       inetntoa((char *)&sptr->ip));
+                       inetntoa((char *)&sptr->ip)
 #endif
-#endif
+		       );
+#endif /* defined(USE_SYSLOG) && defined(SYSLOG_OPER) */
+
 #ifdef FNAME_OPERLOG
 	      {
 		int     logfile;
@@ -2760,42 +2785,34 @@ char	*parv[];
 		if (IsPerson(sptr) &&
 		    (logfile = open(FNAME_OPERLOG, O_WRONLY|O_APPEND)) != -1)
 		{
-		  (void)alarm(0);
-		  sprintf(buf, "%s OPER (%s) (%s) by (%s!%s@%s) [%s@%s]\n",
-			  myctime(timeofday), name, encr,
-			  parv[0], sptr->user->username, sptr->user->host,
-			  sptr->auth, IsUnixSocket(sptr) ? sptr->sockhost :
+			(void)alarm(0);
+		  	sprintf(buf, "%s %sOPER (%s) by (%s!%s@%s)"
+				     " [%s@%s]\n",
+			 	myctime(timeofday),
+				logstring,
+				name, parv[0],
+				sptr->user->username, sptr->user->host,
+				sptr->auth,
+				IsUnixSocket(sptr) ? sptr->sockhost :
 #ifdef INET6
-			  inetntop(AF_INET6, (char *)&sptr->ip, mydummy,
-				   MYDUMMY_SIZE));
+				inetntop(AF_INET6, (char *)&sptr->ip,
+					mydummy, MYDUMMY_SIZE)
 #else
-			  inetntoa((char *)&sptr->ip));
+				inetntoa((char *)&sptr->ip)
 #endif
-		  (void)alarm(3);
-		  (void)write(logfile, buf, strlen(buf));
-		  (void)alarm(0);
-		  (void)close(logfile);
+				);
+			(void)alarm(3);
+		  	(void)write(logfile, buf, strlen(buf));
+		  	(void)alarm(0);
+		  	(void)close(logfile);
 		}
 		(void)alarm(0);
 		/* Modification by pjg */
 	      }
-#endif
-#ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_OPER, sptr->user->server, 
-				      sptr, ":%s MODE %s :+%c", parv[0],
-				      parv[0], IsOper(sptr) ? 'o' : 'O');
-#endif
-		if (IsAnOper(sptr))
-		{
-			istat.is_oper++;
-			sptr->user->servp->usercnt[2]++;
-		}
-	    }
-	else
-	    {
-		(void)detach_conf(sptr, aconf);
-		sendto_one(sptr,replies[ERR_PASSWDMISMATCH], ME, BadTo(parv[0]));
-	    }
+#endif /* FNAME_OPERLOG */
+	
+	} /* logstring != NULL */
+	
 	return 3;
     }
 

@@ -256,7 +256,12 @@
 #undef	LOG_OLDFORMAT
 
 /*
- * define this if you want to use crypted passwords for operators in your
+ * Define this if you want to log failed /oper attempts.
+ */
+#undef FAILED_OPERLOG
+
+/*
+ * Define this if you want to use crypted passwords for operators in your
  * ircd.conf file. See contrib/mkpasswd/README for more details on this.
  */
 #undef	CRYPT_OPER_PASSWORD
