@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.11 2001/10/20 17:57:28 q Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.12 2002/01/05 02:49:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -185,8 +185,9 @@ aClient *cptr;
 	return user;
 }
 
-aServer	*make_server(cptr)
+aServer	*make_server(cptr, add)
 aClient	*cptr;
+int add;
 {
 	Reg	aServer	*serv = cptr->serv, *sp, *spp = NULL;
 
@@ -205,29 +206,31 @@ aClient	*cptr;
 		serv->refcnt = 1;
 		serv->nexts = NULL;
 		cptr->serv = serv;
+		if (add)
+		{
+			for (sp = svrtop; sp; spp = sp, sp = sp->nexts)
+				if (spp && ((spp->ltok) + 1 < sp->ltok))
+					break;
+			serv->prevs = spp;
+			if (spp)
+			    {
+				serv->ltok = spp->ltok + 1;
+				spp->nexts = serv;
+			    }
+			else
+			    {	/* Me, myself and I alone */
+				svrtop = serv;
+				serv->ltok = 1;
+			    }
 
-		for (sp = svrtop; sp; spp = sp, sp = sp->nexts)
-			if (spp && ((spp->ltok) + 1 < sp->ltok))
-				break;
-		serv->prevs = spp;
-		if (spp)
-		    {
-			serv->ltok = spp->ltok + 1;
-			spp->nexts = serv;
-		    }
-		else
-		    {	/* Me, myself and I alone */
-			svrtop = serv;
-			serv->ltok = 1;
-		    }
-
-		if (sp)
-		    {
-			serv->nexts = sp;
-			sp->prevs = serv;
-		    }
+			if (sp)
+			    {
+				serv->nexts = sp;
+				sp->prevs = serv;
+			    }
+			SPRINTF(serv->tok, "%d", serv->ltok);
+		}
 		serv->bcptr = cptr;
-		SPRINTF(serv->tok, "%d", serv->ltok);
 		serv->lastload = 0;
 	    }
 	return cptr->serv;
