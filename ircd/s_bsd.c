@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.42 1998/10/27 10:01:28 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.43 1998/11/03 17:50:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2414,7 +2414,8 @@ int	*lenp;
 		sizeof(struct in_addr));
 	bcopy((char *)&aconf->ipnum, (char *)&cptr->ip,
 		sizeof(struct in_addr));
-	server.sin_port = htons((aconf->port > 0) ? aconf->port : portnum);
+	cptr->port = (aconf->port > 0) ? aconf->port : portnum;
+	server.sin_port = htons(cptr->port);
 	/*
 	 * Look for a duplicate IP#,port pair among already open connections
 	 * (This caters for unestablished connections).
