@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.128 2004/11/19 15:12:59 chopin Exp $
+ *   $Id: struct_def.h,v 1.129 2005/01/30 13:40:06 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -467,8 +467,6 @@ struct	Server	{
 	aConfItem *nline;	/* N-line pointer for this server */
 	int	version;        /* version id for local client */
 	int	snum;
-	int	stok,		/* The token a 2.10 sends us. */
-		ltok;		/* Are we still using this one? */
 	int	refcnt;		/* Number of times this block is referenced
 				** from anUser (field servp), aService (field
 				** servp) and aClient (field serv) */
@@ -479,11 +477,6 @@ struct	Server	{
 				** Self if not masked, *NEVER* NULL. */
 	char	by[NICKLEN+1];
 	char	byuid[UIDLEN + 1];
-	char	tok[7];		/* This is the prepared token we'll be
-				** sending to 2.10 servers.
-				** Note: The size of this depends on the 
-				** on idtol(), with n set to SIDLEN.
-				** To be exact: strlen(CHIDNB^(SIDLEN-1))+1 */
 	char	sid[SIDLEN + 1];/* The Server ID. */
 	char	verstr[11];	/* server version, PATCHLEVEL format */
 	u_int	sidhashv;	/* Raw hash value. */
