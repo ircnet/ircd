@@ -1,3 +1,8 @@
+2003-10-14  Kurt Roeckx
+
+	* send.c, a_conf.c, c_conf_ext.h, s_serv.c: More warning fixes (from
+	 Robbert Muller)
+
 2003-10-13  Piotr Kucharski
 
 	* res.c/proc_answer(): possible buffer overflow.

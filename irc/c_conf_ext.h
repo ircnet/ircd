@@ -34,5 +34,5 @@ extern char conf_id[];
 #else /* C_CONF_C */
 #define EXTERN
 #endif /* C_CONF_C */
-EXTERN initconf __P((char *host, char *passwd, char *myname, int *port));
+EXTERN void initconf __P((char *host, char *passwd, char *myname, int *port));
 #undef EXTERN

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.126 2003/10/13 21:48:53 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.127 2003/10/14 20:19:55 q Exp $";
 #endif
 
 #include "os.h"
@@ -960,6 +960,9 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 {
 	Reg	aClient	*acptr;
 	aClient *bysptr = NULL;
+#ifndef	HUB
+	int	i;
+#endif
 	
 	Reg	aConfItem	*aconf, *bconf;
 	char	mlname[HOSTLEN+1], *inpath, *host, *s, *encr, *stok;

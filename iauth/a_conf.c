@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.24 2002/09/28 21:00:55 jv Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.25 2003/10/14 20:19:54 q Exp $";
 #endif
 
 #include "os.h"
@@ -104,23 +104,31 @@ char *cfile;
 	    {
 		while (fgets(buffer, 160, cfh))
 		    {
-			if (ch = index(buffer, '\n'))
+			if ((ch = index(buffer, '\n')))
+			{
 				lnnb += 1;
+			}
 			else
-			    {
+			{
 				conf_err(lnnb, "line too long, ignoring.",
 					 cfile);
 				/* now skip what's left */
 				while (fgets(buffer, 160, cfh))
+				{
 					if (index(buffer, '\n'))
+					{
 						break;
+					}
+				}
 				continue;
-			    }
+			}
 			if (buffer[0] == '#' || buffer[0] == '\n')
 				continue;
 			*ch = '\0';
-			if (ch = index(buffer, '#'))
+			if ((ch = index(buffer, '#')))
+			{
 				*ch = '\0';
+			}
 			if (!strncmp("required", buffer, 8))
 			  {
 				o_req = 1;
@@ -257,10 +265,12 @@ char *cfile;
 				aTarget **ttmp;
 				u_long baseip = 0, lmask = 0;
 
-				if (ch = index(buffer, '\n'))
+				if ((ch = index(buffer, '\n')))
+				{
 					lnnb += 1;
+				}
 				else
-				    {
+				{
 					conf_err(lnnb,
 						 "line too long, ignoring.",
 						 cfile);
@@ -269,7 +279,7 @@ char *cfile;
 						if (index(buffer,'\n'))
 							break;
 					continue;
-				    }
+				}
 				if (buffer[0] == '#')
 					continue;
 				if (buffer[0] == '\n')
@@ -406,16 +416,28 @@ char *cfile;
 	if (totto > ACCEPTTIMEOUT)
 	    {
 		if (cfile)
-			printf("Warning: sum of timeouts exceeds ACCEPTTIMEOUT!\n");
+		{
+			printf("Warning: sum of timeouts exceeds "
+				"ACCEPTTIMEOUT!\n");
+		}
 		else
+		{
 			sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
-			   "Warning: sum of timeouts exceeds ACCEPTTIMEOUT!");
+				"Warning: sum of timeouts exceeds "
+				"ACCEPTTIMEOUT!");
+		}
 		if (o_dto)
+		{
 			if (cfile)
+			{
 				printf("Error: \"notimeout\" is set!\n");
+			}
 			else
+			{
 				sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
 					   "Error: \"notimeout\" is set!");
+			}
+		}
 	    }
 
 	itmp = instances;
@@ -429,26 +451,28 @@ char *cfile;
 		    {
 			printf("\t%s\t%s\n", itmp->mod->name,
 			       (itmp->opt) ? itmp->opt : "");
-			if (ttmp = itmp->hostname)
+			if ((ttmp = itmp->hostname))
 			    {
 				printf("\t\tHost = %s%s",
 				       (ttmp->yes == 0) ? "" : "!",
 				       ttmp->value);
-				while (ttmp = ttmp->nextt)
+				while ((ttmp = ttmp->nextt))
 					printf(",%s%s",
 					       (ttmp->yes == 0) ? "" : "!",
 					       ttmp->value);
 				printf("\n");
 			    }
-			if (ttmp = itmp->address)
+			if ((ttmp = itmp->address))
 			    {
-				printf("\t\tIP   = %s",
-				       (ttmp->yes == 0) ? "" : "!",
+				printf("\t\tIP   = %s%s",
+				       ((ttmp->yes == 0) ? "" : "!"),
 				       ttmp->value);
-				while (ttmp = ttmp->nextt)
+				while ((ttmp = ttmp->nextt))
+				{
 					printf(",%s%s",
-					       (ttmp->yes == 0) ? "" : "!",
+					       ((ttmp->yes == 0) ? "" : "!"),
 					       ttmp->value);
+				}
 				printf("\n");
 			    }
 			if (itmp->timeout != DEFAULT_TIMEOUT)
@@ -464,12 +488,16 @@ char *cfile;
 		    }
 	    }
 	else
+	{
 		while (itmp)
-		    {
+		{
 			if (itmp->mod->init)
+			{
 				itmp->mod->init(itmp);
+			}
 			itmp = itmp->nexti;
-		    }
+		}
+	}
 
 	ch = o_all;
 	if (o_req) *ch++ = 'R';
@@ -499,21 +527,29 @@ AnInstance *inst;
 	    !strcmp(inst->hostname->value, "*"))
 		return 0;
 	/* check matches on IP addresses */
-	if (ttmp = inst->address)
+	if ((ttmp = inst->address))
+	{
 		while (ttmp)
-		    {
+		{
 			if (ttmp->baseip)
-			    {
+			{
 				if (match_ipmask(ttmp, cldata[cl].itsip) == 0)
+				{
 					return ttmp->yes;
-			    }
+				}
+			}
 			else
+			{
 				if (match(ttmp->value, cldata[cl].itsip) == 0)
+				{
 					return ttmp->yes;
+				}
+			}
 			ttmp = ttmp->nextt;
-		    }
+		}
+	}
 	/* check matches on hostnames */
-	if (ttmp = inst->hostname)
+	if ((ttmp = inst->hostname))
 	    {
 		if (cldata[cl].state & A_GOTH)
 		    {

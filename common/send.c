@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.62 2003/08/04 20:24:39 jv Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.63 2003/10/14 20:19:53 q Exp $";
 #endif
 
 #include "os.h"
@@ -1313,7 +1313,7 @@ char	msg, *username, *hostname;
 	** EXITC_REG == 0 means registered client quitting, so it goes to
 	** userlog; otherwise it's rejection and goes to connlog --Beeth.
 	*/
-	logfile = msg == EXITC_REG ? userlog : connlog;
+	logfile = (msg == EXITC_REG ? userlog : connlog);
 
 #if !defined(USE_SERVICES) && !( defined(USE_SYSLOG) && \
 	(defined(SYSLOG_USERS) || defined(SYSLOG_CONN)) )
