@@ -254,6 +254,30 @@
 #endif /* USE_SYSLOG */
 
 /*
+** If you want your server channels logged to a file, define this and
+** any of LOG_SCH_* you want. Logfile names are taken from channel names
+** (like: ircd.ERRORS) and they must exist to be used.
+*/
+#undef LOG_SERVER_CHANNELS
+#ifdef LOG_SERVER_CHANNELS
+#undef LOG_SCH_ERROR	/* &ERRORS */
+#undef LOG_SCH_NOTICE	/* &NOTICES */
+#undef LOG_SCH_KILL	/* &KILLS */
+#undef LOG_SCH_CHAN	/* &CHANNELS */
+#undef LOG_SCH_NUM	/* &NUMERICS */
+#undef LOG_SCH_SERVER	/* &SERVERS */
+#undef LOG_SCH_HASH	/* &HASH */
+#undef LOG_SCH_LOCAL	/* &LOCAL */
+#undef LOG_SCH_SERVICE	/* &SERVICES */
+#undef LOG_SCH_DEBUG	/* &DEBUG */
+#undef LOG_SCH_AUTH	/* &AUTH */
+#undef LOG_SCH_SAVE	/* &SAVE */
+#undef LOG_SCH_WALLOP	/* &WALLOPS */
+#undef LOG_SCH_CLIENT	/* &CLIENTS (if defined to exist) */
+#undef LOG_SCH_OPER	/* &OPER */
+#endif /* LOG_SERVER_CHANNELS */
+
+/*
  * LOG_OLDFORMAT
  *
  * Define this if you want old format of logs. (Mind, you will lose
@@ -713,6 +737,7 @@
  */
 #define	MAXCLIENTS	(MAXCONNECTIONS-5)
 
+/* In fact, if using server channels logs, it would be even more. */
 #if (MAXCONNECTIONS < 13)
 # error Sorry, MAXCONNECTIONS minimum 13 for ircd to start.
 #endif

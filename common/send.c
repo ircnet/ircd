@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.103 2005/02/20 23:10:57 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.104 2005/02/22 16:34:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1011,23 +1011,23 @@ static	void	vsendto_prefix_one(aClient *to, aClient *from, char *pattern,
  * sends a message to a server-owned channel
  */
 static	SChan	svchans[SCH_MAX] = {
-	{ SCH_ERROR,	"&ERRORS",	NULL },
-	{ SCH_NOTICE,	"&NOTICES",	NULL },
-	{ SCH_KILL,	"&KILLS",	NULL },
-	{ SCH_CHAN,	"&CHANNEL",	NULL },
-	{ SCH_NUM,	"&NUMERICS",	NULL },
-	{ SCH_SERVER,	"&SERVERS",	NULL },
-	{ SCH_HASH,	"&HASH",	NULL },
-	{ SCH_LOCAL,	"&LOCAL",	NULL },
-	{ SCH_SERVICE,	"&SERVICES",	NULL },
-	{ SCH_DEBUG,	"&DEBUG",	NULL },
-	{ SCH_AUTH,	"&AUTH",	NULL },
-	{ SCH_SAVE,	"&SAVE",	NULL },
-	{ SCH_WALLOP,	"&WALLOPS",	NULL },
+	{ SCH_ERROR,	"&ERRORS",	NULL, -2},
+	{ SCH_NOTICE,	"&NOTICES",	NULL, -2},
+	{ SCH_KILL,	"&KILLS",	NULL, -2},
+	{ SCH_CHAN,	"&CHANNEL",	NULL, -2},
+	{ SCH_NUM,	"&NUMERICS",	NULL, -2},
+	{ SCH_SERVER,	"&SERVERS",	NULL, -2},
+	{ SCH_HASH,	"&HASH",	NULL, -2},
+	{ SCH_LOCAL,	"&LOCAL",	NULL, -2},
+	{ SCH_SERVICE,	"&SERVICES",	NULL, -2},
+	{ SCH_DEBUG,	"&DEBUG",	NULL, -2},
+	{ SCH_AUTH,	"&AUTH",	NULL, -2},
+	{ SCH_SAVE,	"&SAVE",	NULL, -2},
+	{ SCH_WALLOP,	"&WALLOPS",	NULL, -2},
 #ifdef CLIENTS_CHANNEL
-	{ SCH_CLIENT,	"&CLIENTS",	NULL },
+	{ SCH_CLIENT,	"&CLIENTS",	NULL, -2},
 #endif
-	{ SCH_OPER,	"&OPER",	NULL },
+	{ SCH_OPER,	"&OPER",	NULL, -2},
 };
 
 
@@ -1036,6 +1036,57 @@ void	setup_svchans(void)
 	int	i;
 	SChan	*shptr;
 
+#ifdef LOG_SERVER_CHANNELS
+	/* They're here, as they need to be done only once per server run,
+	** to determine if we want given channel logged. --B. */
+# ifdef LOG_SCH_ERROR
+	(svchans+SCH_ERROR)->fd = -1;
+# endif
+# ifdef LOG_SCH_NOTICE
+ 	(svchans+SCH_NOTICE)->fd = -1;
+# endif
+# ifdef LOG_SCH_KILL
+	(svchans+SCH_KILL)->fd = -1;
+# endif
+# ifdef LOG_SCH_CHAN
+	(svchans+SCH_CHAN)->fd = -1;
+# endif
+# ifdef LOG_SCH_NUM
+	(svchans+SCH_NUM)->fd = -1;
+# endif
+# ifdef LOG_SCH_SERVER
+	(svchans+SCH_SERVER)->fd = -1;
+# endif
+# ifdef LOG_SCH_HASH
+	(svchans+SCH_HASH)->fd = -1;
+# endif
+# ifdef LOG_SCH_LOCAL
+	(svchans+SCH_LOCAL)->fd = -1;
+# endif
+# ifdef LOG_SCH_SERVICE
+	(svchans+SCH_SERVICE)->fd = -1;
+# endif
+# ifdef LOG_SCH_DEBUG
+	(svchans+SCH_DEBUG)->fd = -1;
+# endif
+# ifdef LOG_SCH_AUTH
+	(svchans+SCH_AUTH)->fd = -1;
+# endif
+# ifdef LOG_SCH_SAVE
+	(svchans+SCH_SAVE)->fd = -1;
+# endif
+# ifdef LOG_SCH_WALLOP
+	(svchans+SCH_WALLOP)->fd = -1;
+# endif
+# ifdef CLIENTS_CHANNEL
+#  ifdef LOG_SCH_CLIENT
+	(svchans+SCH_CLIENT)->fd = -1;
+#  endif
+# endif
+# ifdef LOG_SCH_OPER
+	(svchans+SCH_OPER)->fd = -1;
+# endif
+#endif
 	for (i = SCH_MAX - 1, shptr = svchans + i; i >= 0; i--, shptr--)
 		shptr->svc_ptr = find_channel(shptr->svc_chname, NULL);
 }
@@ -1082,7 +1133,16 @@ void	sendto_flag(u_int chan, char *pattern, ...)
 		    }
 #endif
 	    }
+#ifdef LOG_SERVER_CHANNELS
+	if ((svchans+chan)->fd >= 0)
+	{
+		char	lbuf[1024];
+		int	len;
 
+		len = sprintf(lbuf, "%u %s\n", (u_int)timeofday, nbuf);
+		(void)write((svchans+chan)->fd, lbuf, len);
+	}
+#endif
 	return;
 }
 
@@ -1091,6 +1151,32 @@ static int connlog = -1;
 
 void	logfiles_open(void)
 {
+#ifdef LOG_SERVER_CHANNELS
+	int	i;
+	SChan	*shptr;
+	char	fname[BUFSIZE];
+
+	for (i = SCH_MAX - 1, shptr = svchans + i; i >= 0; i--, shptr--)
+	{
+		if (shptr->fd == -2)
+		{
+			/* We don't want this channel logged. */
+			continue;
+		}
+
+		sprintf(fname, "%s.%s", FNAME_SCH_PREFIX, shptr->svc_chname+1);
+		shptr->fd = open(fname, O_WRONLY|O_APPEND|O_NDELAY
+#ifdef LOGFILES_ALWAYS_CREATE
+			|O_CREAT, S_IRUSR|S_IWUSR
+#endif
+			);
+		/* Better safe than sorry. */
+		if (shptr->fd >= 0)
+		{
+			local[shptr->fd] = NULL;
+		}
+	}
+#endif
 #ifdef  FNAME_USERLOG
 	userlog = open(FNAME_USERLOG, O_WRONLY|O_APPEND|O_NDELAY
 # ifdef	LOGFILES_ALWAYS_CREATE
@@ -1122,6 +1208,18 @@ void	logfiles_open(void)
 
 void	logfiles_close(void)
 {
+#ifdef LOG_SERVER_CHANNELS
+	int	i;
+	SChan	*shptr;
+	
+	for (i = SCH_MAX - 1, shptr = svchans + i; i >= 0; i--, shptr--)
+	{
+		if (shptr->fd >= 0)
+		{
+			(void)close(shptr->fd);
+		}
+	}
+#endif
 #ifdef FNAME_USERLOG
 	if (userlog != -1)
 	{

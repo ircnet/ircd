@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.66 2004/11/01 14:38:51 chopin Exp $
+#*   $Id: Makefile.in,v 1.67 2005/02/22 16:34:03 chopin Exp $
 #*
 #*/
 
@@ -117,6 +117,11 @@ FNAME_USERLOG = $(ircd_log_dir)/$(IRCD).users
 FNAME_OPERLOG = $(ircd_log_dir)/$(IRCD).opers
 FNAME_CONNLOG = $(ircd_log_dir)/$(IRCD).rejects
 FNAME_AUTHLOG = $(ircd_log_dir)/$(IRCD).auth
+
+# If defined in config.h, server channels will be logged at this
+# location with name of server channel (without '&') appended to
+# this prefix.
+FNAME_SCH_PREFIX = $(ircd_log_dir)/$(IRCD)
 
 # files used for debugging purposes
 IRCDDBG_PATH = $(ircd_log_dir)/$(IRCD).debug
@@ -294,7 +299,10 @@ packet.o: ../common/packet.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../common/packet.c
 
 send.o: ../common/send.c setup.h config.h ../common/struct_def.h
-	$(CC) $(S_CFLAGS) -DFNAME_USERLOG="\"$(FNAME_USERLOG)\"" -DFNAME_CONNLOG="\"$(FNAME_CONNLOG)\"" -c -o $@ ../common/send.c
+	$(CC) $(S_CFLAGS) -DFNAME_USERLOG="\"$(FNAME_USERLOG)\"" \
+	-DFNAME_CONNLOG="\"$(FNAME_CONNLOG)\"" \
+	-DFNAME_SCH_PREFIX="\"$(FNAME_SCH_PREFIX)\"" \
+	-c -o $@ ../common/send.c
 
 match.o: ../common/match.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../common/match.c

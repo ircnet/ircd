@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.133 2005/02/09 18:44:55 chopin Exp $
+ *   $Id: struct_def.h,v 1.134 2005/02/22 16:34:02 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -868,6 +868,7 @@ typedef	struct	{
 	int	svc_chan;
 	char	*svc_chname;
 	struct	Channel	*svc_ptr;
+	int	fd;
 }	SChan;
 
 typedef enum ServerChannels {
