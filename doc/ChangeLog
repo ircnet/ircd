@@ -1,3 +1,8 @@
+2004-06-08  Piotr Kucharski
+
+	* channel.c/del_modeid(): do not free modeid.
+	* channel.c/set_mode(): free modeid after del_modeid(), after using it.
+
 2004-06-06  Piotr Kucharski
 
 	* channel.c/set_mode(): allow +k even if there already is a key set.
