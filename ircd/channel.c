@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.144 2003/02/14 23:36:34 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.145 2003/02/16 00:52:40 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -42,6 +42,7 @@ static	char rcsid[] = "@(#)$Id: channel.c,v 1.144 2003/02/14 23:36:34 chopin Exp
 #undef CHANNEL_C
 
 static	char	asterix[2]="*";
+
 #define	BanLen(x)	((strlen(x->nick)+strlen(x->user)+strlen(x->host)))
 #define BanMatch(x,y)	((!match(x->nick,y->nick)&&!match(x->user,y->user)&&!match(x->host,y->host)))
 #define BanExact(x,y)	((!mycmp(x->nick,y->nick)&&!mycmp(x->user,y->user)&&!mycmp(x->host,y->host)))
