@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.34 2003/10/18 15:31:29 q Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.35 2003/10/18 16:26:39 q Exp $";
 #endif
 
 #include "os.h"
@@ -29,7 +29,7 @@ static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.34 2003/10/18 15:31:29 q Exp $"
 
 /****************************** PRIVATE *************************************/
 
-int	socks_start(u_int cl);
+static	int	socks_start(u_int cl);
 
 #define CACHETIME 30
 #define SOCKSPORT 1080

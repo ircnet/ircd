@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.24 2003/10/18 15:31:26 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.25 2003/10/18 16:26:39 q Exp $";
 #endif
 
 #include "os.h"
@@ -208,7 +208,7 @@ int	cid_ok(char *name, int n)
 
 	for (i = 1; i <= n; i++)
 	{
-		if (alphabet_id[name[i]] == -1)
+		if (alphabet_id[(unsigned char)name[i]] == -1)
 		{
 			return 0;
 		}

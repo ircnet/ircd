@@ -33,10 +33,10 @@ EXTERN int vsendto_one (aClient *to, char *pattern, va_list va);
 EXTERN int sendto_one (aClient *to, char *pattern, ...);
 EXTERN void logfiles_open(void);
 EXTERN void logfiles_close(void);
+EXTERN int send_message (aClient *, char *, int);
 #ifndef CLIENT_COMPILE
 EXTERN void flush_connections (int fd);
 EXTERN void flush_fdary (FdAry *);
-EXTERN int send_message (aClient *, char *, int);
 EXTERN void setup_svchans(void);
 EXTERN void sendto_flog (aClient *cptr, char msg,
 			     char *username, char *hostname);

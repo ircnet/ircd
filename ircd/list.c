@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.27 2003/10/18 15:31:24 q Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.28 2003/10/18 16:26:39 q Exp $";
 #endif
 
 #include "os.h"
@@ -305,11 +305,11 @@ void	free_user(anUser *user, aClient *cptr)
 		    {
 			char buf[512];
 			/*too many arguments for dumpcore() and sendto_flag()*/
-			sprintf(buf, "%p %p %p %p %d %d %#x (%s)",
+			sprintf(buf, "%p %p %p %p %d %d %p (%s)",
 				(void *)user, (void *)user->invited,
 				(void *)user->channel, (void *)user->uwas,
 				user->joined, user->refcnt,
-				user->bcptr,
+				(void *)user->bcptr,
 				(user->bcptr) ? user->bcptr->name :"none");
 #ifdef DEBUGMODE
 			dumpcore("%p user (%s!%s@%s) %s",
@@ -337,9 +337,10 @@ void	free_server(aServer *serv, aClient *cptr)
 		    serv->bcptr || serv->user)
 		    {
 			char buf[512];
-			sprintf(buf, "%d %#x %#x %#x %#x (%s)",
-				serv->refcnt, serv->prevs, serv->nexts,
-				serv->user, serv->bcptr,
+			sprintf(buf, "%d %p %p %p %p (%s)",
+				serv->refcnt, (void *)serv->prevs,
+				(void *)serv->nexts, (void *)serv->user,
+				(void *)serv->bcptr,
 				(serv->bcptr) ? serv->bcptr->name : "none");
 #ifdef DEBUGMODE
 			dumpcore("%#x server %s %s",
