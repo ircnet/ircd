@@ -1,0 +1,91 @@
+/************************************************************************
+ *   IRC - Internet Relay Chat, lib/ircd/ChangeLog
+ *   Copyright (C) 1990 Mike Bolotski
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 1, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+Mon Sep 02 17:08:43 1991  Darren Reed  <avalon@coombs.anu.edu.au>
+
+	* general comments:
+
+	various files now have dependencies depending on whether it is the
+	client or server the files are being compiled for.
+
+	* parse.c
+
+	find_*() routines changed to use hash table lookup.
+
+	* send.c
+
+	changed to maximize presence of the local client array.
+	sendto_ops_butone() fixed back to not broadcast wallops.
+
+Sun Jun 30 23:21:50 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* parse.c
+	Changed from->name to sender; Maybe double search can be removed
+
+	* send.c
+	LOOP detected!!
+	Fixed sendto_channel_butone() as suggested by msa.
+	send.c needs TOTAL cleanup.
+
+	* bsd.c
+	Final fixes of inet_netof() and inet_nota()
+
+	* send.c
+	Changed some SendMessage() into sendto_one() (code duplication ;))
+
+Wed Jun 20 11:25:54 1990  Jarkko Oikarinen (jto@tolsun.oulu.fi)
+
+	Added gruner's patches.
+        Patches to make string channels work done as well to some files.
+
+Sun Jun 17 21:29:04 1990  Armin Gruner (gruner@informatik.tu-muenchen.de)
+
+        * parse.c
+        In case that a server sends an unknown command to a client (!!),
+        debug() is called, as client handles debug outputs now.
+
+Thu May 10 17:15:12 1990  Jarkko Oikarinen (jto@tolsun.oulu.fi)
+
+        * dbuf.c
+        Fixed memcpy and bcopy problems in different machines
+
+Sat Jan  6 15:14:14 1990  Mike Bolotski  (mikeb at coho.ee.ubc.ca)
+
+	* config.h
+	Added Poohbear's cleanup changes. 
+	Added #undef SYSV if mips is defined (as per jlp@hamblin.byu.edu)
+
+
+Sat Dec 16 16:06:17 1989  Mike Bolotski  (mikeb at coho.ee.ubc.ca)
+
+	* config.h
+
+	Changed NOTTY to TTYON, and reversed the logic everywhere.
+	Now TTYON has to be explicitly defined in order to produce
+	tty output.
+
+
+Thu Dec 14 12:50:36 1989  Mike Bolotski  (mikeb at coho.ee.ubc.ca)
+
+	* version.c
+	Added a version.c file to contain the version numbers and
+	prompt strings.  Removed the old #ifdef MAIN style definition
+
+
+

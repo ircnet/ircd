@@ -1,0 +1,70 @@
+Written by Per Persson <pp@pfawww.pp.se>, last update: 1996-06-18
+
+1) Europe should always be a separate net from the other parts of
+   (what was formerly known as) "EFNet".  For example; Netherlands
+   with leafs and Sweden/Finland (with leafs) should always be
+   connected to eachother. There are a few times when that wont work
+   though... NORDUnet might have fuckups from time to time and in
+   those few cases we have to use more then one link to USA.
+
+2) Europe "should" be connected this way; 
+
+	* irc.nada.kth.se is the primary HUB for northern Europe as well
+	as some southern European servers (.at). irc.nada.kth.se is
+	also the primary European HUB for connections to US.
+	* warszawa.irc.pl is the primary .pl HUB, primary uplink for .pl 
+	is .se with .fi/.at as secondary
+	(.pl is almost never connected to "EFNet" right now)
+	* ircd.funet.fi is the primary .fi HUB and irc.cs.hut.fi is the 
+	backup.
+	* irc.pvv.unit.no is the primary .no HUB and irc.ifi.uio.no is
+	the backup, primary uplink for .no is .se with .fi as secondary.
+	* irc.ru is the primary .ru HUB, primary uplink is .fi with .se as
+	secondary.
+	* irc.isnet.is's primary uplink is .fi, irc.ludd.luth.se is secondary
+	* sunsite.auc.dk's primary uplink is irc.nada.kth.se
+	* irc.ccii.unipi.it is the primary HUB for Italy, primary uplink is
+	.se with .nl/.uk as secondary.
+	* irc.felk.cvut.cz is the primary .cz HUB, primary uplink is .se.
+	* irc.sanet.sk's primary uplink is .cz.
+
+	* irc.nijnerode.nl is the primary HUB for sourthern Europe and .uk. 
+	Primary uplink is irc.ludd.luth.se(irc.nada.kth.se) with .fi as
+	secondary
+	* irc.univ-lyon1.fr is the primary .fr HUB and
+	sil.polytechnique.fr is the backup. primary uplink for .fr is
+	irc.ludd.luth.se and secondary uplink for .fr is irc.cerf.net.
+	* stork.doc.ic.ac.uk is the primary .uk HUB and serv.eng.abdn.ac.uk
+	is the backup. Primary uplink is .nl with .se/.fi as secondary.
+	(.uk also has a .net server, as well as a netcom.net.uk server which
+	uses a bit different uplinks--the rest of the .uk servers are 
+	connected to those on occasions as well)
+	* irc.belnet.be is the primary .be HUB, primary uplink for .be is
+	.uk with .fr/.nl as secondary.
+	* irc.wu-wien.ac.at is the primary .at HUB, primary uplink for
+	.at is .fr with .se as secondary.
+	* irc.uni-paderborn.de is the primary .de HUB, primary uplink for 
+	.de is .nl with .fi as secondary.
+	(.de isn't often connected, as they have sloooow links)
+	* irc.arnes.si's primary uplink is .nl, secondary uplink is .se.
+
+	* The primary link for Europe to USA is; .se - USA 
+	backups are; .fi/.nl - USA
+	(USA can be one of the following; cs-pub.bu.edu, ircd.stealth.net
+	eff.org, bazooka.rutgers.edu or irc.cerf.net.  irc.cerf.net
+	is the prefered one nowadays with ircd.stealth.net as secondary)
+
+3) The ASCII map of all this, to make things "easier to comprehend".
+
+                         
+    (.no .dk .pl .it) __ .se __ .fi __ (.is .ru)
+                         /|\        
+           .uk __ .nl __/ | \__ .cz __ (.sk)
+            |      |      |
+          (.be)    |     .fr __ (.at)
+                   |
+             (.si .ch .de)
+
+   ()'s marks leafs
+\ _ /'s marks links
+

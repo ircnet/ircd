@@ -1,0 +1,156 @@
+/************************************************************************
+ *   IRC - Internet Relay Chat, doc/NETWORKING
+ *   Copyright (C) 1994, Helen Rose  <hrose@kei.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 1, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+							Author: Helen Rose
+								hrose@kei.com
+							Date: 3 March, 1994
+
+*** Please read this before doing any connecting or writing to ask for
+connections. The information contained in this section is crucial to the
+way IRC is run.
+
+Note that any old documentation referring to ANet vs EFnet is out of date
+and no longer applies. ANet died so long ago that nobody can remember
+*when* it died.
+
+
+To qualify for a link on the irc network, several criteria must be
+met. These criteria include (but are not limited to):
+
+* A well established local irc userbase. A total of 100-150 local irc
+  users. An average of 15-20 irc users over a 24 hour period is also
+  acceptable. Note, these user counts are *unique, local* users. So
+  one person running fifteen clients doesn't count, and one local
+  person plus fifteen offsite people doesn't count. These are not 
+  arbitrary numbers, it takes at least this many users to equate the
+  traffic of adding another server to the irc network. 
+
+* A userbase that uses irc *all the time* (15 users on at once but
+  just for a 3 hour period per day is not sufficient).
+
+* A good, fast, internet link. Absolutely *NO* SLIP lines. 56k lines
+  are marginal, they usually cause more trouble than they are worth,
+  so we recommend a T1 or better.
+
+It is well established that having a local irc server does not attract
+local irc users. Often, your best bet is to set up a local client that is
+accessible by everyone at your site, connect it to a nearby offsite
+server, and then see if the usage level goes up. (See appendix for list of
+open-client servers). 
+
+To see how many users you have, on irc do /m x@monitor.us show site.name
+where site.name is your two-part domain name (eg "kei.com" or "bu.edu" or
+"mit.edu"). monitor will tell you how many users you have. Once this
+number gets over 125 or so, put the level it has reached in your note to
+operlist-request@kei.com. 
+
+If you are in the United States and need a link, please mail to
+"operlist-request@kei.com" supplying the information listed below.
+
+(1) Find out if your system has /etc/ping (sometimes /usr/etc/ping) and
+    ping the following hosts:
+
+    server/machine name		IP address	Geographical Location
+    csa.bu.edu			129.197.10.3	Boston, MA
+    irc-2.mit.edu		18.180.0.2	Cambridge, MA
+    polaris.ctr.columbia.edu	128.59.68.10	New York, NY
+    poe.acc.virginia.edu	128.143.83.132	Charlottesville, VA
+    irc.iastate.edu		129.186.150.1	Ames, IA
+    dewey.cc.utexas.edu		128.83.135.3	Austin, TX
+    irc.netsys.com		198.175.9.8	Palo Alto, CA
+    w6yx.stanford.edu		36.55.0.50	Stanford, CA
+    goren.u.washington.edu	140.142.63.1	Seattle, WA
+
+These are results of the typical /etc/ping command:
+
+(note that the machine I am running this from runs SunOS so I have to use
+ping -s ):
+
+3:59pm hrose@csa : ~ % ping -s polaris.ctr.columbia.edu
+PING polaris.ctr.columbia.edu: 56 data bytes
+64 bytes from polaris.ctr.columbia.edu (128.59.68.10): icmp_seq=0. time=137. ms
+64 bytes from polaris.ctr.columbia.edu (128.59.68.10): icmp_seq=1. time=163. ms
+64 bytes from polaris.ctr.columbia.edu (128.59.68.10): icmp_seq=2. time=110. ms
+64 bytes from polaris.ctr.columbia.edu (128.59.68.10): icmp_seq=3. time=111. ms
+64 bytes from polaris.ctr.columbia.edu (128.59.68.10): icmp_seq=4. time=78. ms
+64 bytes from polaris.ctr.columbia.edu (128.59.68.10): icmp_seq=5. time=82. ms
+64 bytes from polaris.ctr.columbia.edu (128.59.68.10): icmp_seq=7. time=83. ms
+64 bytes from polaris.ctr.columbia.edu (128.59.68.10): icmp_seq=8. time=91. ms
+64 bytes from polaris.ctr.columbia.edu (128.59.68.10): icmp_seq=9. time=159. ms
+[...]
+^^            ^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^            ^^       ^^^^^^^
+Size of packet   hostname             IP address      packet number  trip time
+
+
+----polaris.ctr.columbia.edu PING Statistics----
+25 packets transmitted, 25 packets received, 0% packet loss
+round-trip (ms)  min/avg/max = 78/136/327
+
+
+When you send pings to operlist-request, please only send the results
+(the above three lines)--we *don't* need each packet's time.
+
+
+Guidelines:
+
+Avg Time	Connection is
+========	=============
+0-20ms		Optimal
+20-40ms		Excellent
+40-70ms		Very Good
+70-90ms		Average
+90-110ms	Acceptable
+110ms-150ms	Below Average
+150ms-200ms	Bad
+200ms-300ms	You're on a very slow link and it is unlikely you will be
+		able to support a server successfully.
+
+
+** *** WHERE TO FIND HELP!!! ***
+** 
+** If you have any other questions about connecting to an irc server, please
+** mail to operlist-request@kei.com.  If you have problems mailing there,
+** try mailing hrose@kei.com.
+** 
+** *** WHERE TO FIND HELP!!! ***
+
+Appendix
+========
+
+Open client servers.
+
+USA:
+                csa.bu.edu
+                irc.colorado.edu
+                irc.uiuc.edu
+
+Canada:
+                ug.cs.dal.ca
+
+Europe:
+                irc.funet.fi
+                cismhp.univ-lyon1.fr
+                disuns2.epfl.ch
+                irc.nada.kth.se
+                sokrates.informatik.uni-kl.de
+                bim.itc.univie.ac.at
+
+Australia:
+                jello.qabc.uq.oz.au
+

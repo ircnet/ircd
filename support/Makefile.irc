@@ -1,0 +1,142 @@
+#************************************************************************
+#*   IRC - Internet Relay Chat, irc/Makefile
+#*   Copyright (C) 1990 Jarkko Oikarinen
+#*
+#*   This program is free software; you can redistribute it and/or modify
+#*   it under the terms of the GNU General Public License as published by
+#*   the Free Software Foundation; either version 1, or (at your option)
+#*   any later version.
+#*
+#*   This program is distributed in the hope that it will be useful,
+#*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#*   GNU General Public License for more details.
+#*
+#*   You should have received a copy of the GNU General Public License
+#*   along with this program; if not, write to the Free Software
+#*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#*/
+
+# 17 Jun 1990 - Armin
+# Now, common/debug.c has changed to irc/c_debug.c, for the benefit of
+# displaying wrong server stuff
+
+# 30 May 1990 - Jto
+# swear.o isn't needed when compiling irc.
+# Removed it (as suggested by Kim).
+
+# Check the curses libraries if your systems wants them differently...
+
+#INCLUDEDIR=-I.
+DFLAGS=-DCLIENT_COMPILE
+#INSTALL=/usr/bin/install
+#CFLAGS = -g ${INCLUDEDIR}
+
+#For MIPS, use this:
+#CFLAGS =-O -systype bsd43 -DSYSTYPE_BSD43 -I${INCLUDEDIR} ${DFLAGS}
+
+#Libs...default is
+#IRCLIBS=-lcurses -ltermcap
+
+# For AIX, use the following:
+#IRCLIBS=-lcurses -lcur
+#
+# Solaris 2
+#IRCLIBS=-lcurses -ltermcap -lsocket -lnsl
+#
+# Sequent Dynix 1.4/2.0
+#IRCLIBS=-lcurses -ltermcap -lsocket -linet -lnsl -lseq
+
+#CC=cc
+#RM=/bin/rm
+OBJS=c_bsd.o c_msg.o c_numeric.o c_version.o edit.o help.o ignore.o\
+     irc.o screen.o str.o c_debug.o ctcp.o
+
+COMMONOBJS=clbsd.o cldbuf.o clpacket.o clsend.o clmatch.o clparse.o clsupport.o
+COMMONSRC=../common/bsd.c ../common/dbuf.c ../common/packet.c \
+	 ../common/send.c ../common/match.c ../common/parse.c \
+	 ../common/support.c
+SRC=$(OBJS:%.o=../irc/%.c) $(COMMONSRC)
+
+MAKE = make 'CFLAGS=${CFLAGS}' 'CC=${CC}'
+
+all: build
+
+build: irc
+
+install: all
+	${INSTALL} -c -s -m 711 irc $(BINDIR)
+
+irc: $(OBJS) $(COMMONOBJS)
+	$(CC) $(OBJS) $(COMMONOBJS) -o irc $(IRCLIBS) $(IRCDLIBS)
+
+clparse.o: ../common/parse.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../common/parse.c -o $@
+
+clbsd.o: ../common/bsd.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../common/bsd.c -o $@
+
+cldbuf.o: ../common/dbuf.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../common/dbuf.c -o $@
+
+clpacket.o: ../common/packet.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../common/packet.c -o $@
+
+clsend.o: ../common/send.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../common/send.c -o $@
+
+clmatch.o: ../common/match.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../common/match.c -o $@
+
+clsupport.o: ../common/support.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../common/support.c -o $@
+
+c_bsd.o: ../irc/c_bsd.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/c_bsd.c
+
+c_conf.o: ../irc/c_conf.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/c_conf.c
+
+c_msg.o: ../irc/c_msg.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/c_msg.c
+
+ctcp.o: ../irc/c_msg.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/ctcp.c
+
+c_numeric.o: ../irc/c_numeric.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/c_numeric.c
+
+c_version.o: ../irc/c_version.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/c_version.c
+
+edit.o: ../irc/edit.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/edit.c
+
+help.o: ../irc/help.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/help.c
+
+ignore.o: ../irc/ignore.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/ignore.c
+
+irc.o: ../irc/irc.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/irc.c
+
+screen.o: ../irc/screen.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/screen.c
+
+str.o: ../irc/str.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/str.c
+
+swear.o: ../irc/swear.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/swear.c
+
+c_debug.o: ../irc/c_debug.c
+	${CC} ${CFLAGS} ${DFLAGS} -c ../irc/c_debug.c
+
+clean:
+	${RM} -f ${COMMONOBJS} ${OBJS} irc
+
+depend:
+	makedepend -fMakefile.irc -- ${INCLUDEDIR} -- ${SRC}
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.

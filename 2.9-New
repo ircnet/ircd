@@ -1,0 +1,60 @@
+	* +a (anonymous) channel mode
+
+          This channel mode is only allowed on &local channels.
+
+	* +s user mode removed;
+	* &KILLS, &NOTICES, &ERRORS, &CHANNEL, &HASH, &NUMERICS, &SERVERS
+ 	  channels created and used by the server for server notices
+	  (comments on what goes where please) and dividing notices up this
+	  way was better than using more user modes (they default to the
+	  server being on them and +amnt);
+
+	  &KILLS    : server and oper KILLS
+	  &NOTICES  : warnings and notices
+	  &ERRORS   : server errors
+	  &LOCAL    : notices concerning local clients.
+	  &CHANNEL  : fake modes
+	  &HASH     : hash tables growth
+	  &NUMERICS : numerics received by the server
+	  &SERVERS  : servers joining and leaving the net
+
+	* + channels reintroduced (can't have modes);
+	* Config doesn't prompt for cc/includes/libs;
+	* M-line doesn't define port, PORTNUM removed from config.h (must use
+	  P-lines or use inetd);
+	* BIND 4.9.2 libresolv stuff included;
+	* USERHOST will return as many id's as requested. 
+	* RECONNECT to pickup error'd sserver-server links (not activated)
+	* chooses next bigger prime for hash table sizes rather than
+	  needing exact primes
+	* hash tables grow to suit rather than being static in size
+	* adaptive growth of sendq (suggested by msa)
+	* Server parameter in USER message tokenised betweem 2.9 servers
+	* whowas tables grow to suit rather than being static in size
+	* NICK+USER+UMODE combined into NICK for 2.9 <-> 2.9 communication
+	* MODE +ov and JOIN combined into JOIN for 2.9 <-> 2.9 communication
+	  on connect bursts
+	* QUIT removed when possible for 2.9 <-> 2.9 communication on split
+	* autoconf'iscated ircd.
+	* userlog has single character appended to show cause of quit.
+	* i lines (user mode +r)
+
+          i lined users have a restricted access: They are forbidden
+          MODE, KICK and TOPIC on #channels.  They don't get channel
+          operator status when creating a #channel, and cannot
+          change their nickname once connected.
+
+	* enhanced nick delay to prevent collisions
+
+          The nickname of users splitting away is locked for 15 minutes,
+          and cannot be used by local clients.
+
+	* channel history to prevent op riding
+
+          A user with channel operator status on #foo splitting away
+          means that no local user can re-create the channel #foo during
+          the next 15 minutes.  It doesn't stop users from using #foo as
+          as the channel is not empty.
+
+Some transition documentation from 2.8 to 2.9 version can be found in
+	http://www.irc.org/~irc/server/

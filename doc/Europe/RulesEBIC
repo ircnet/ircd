@@ -1,0 +1,90 @@
+    ########################################################################
+    #####    RULES FOR ESTABLISHING NEW IRC SERVERS IN EUROPE (v1.1)   #####
+    ########################################################################
+
+
+	1.)	Establishing a new server and inner domain linking should be
+		a local toplevel domain (country) decision.
+
+		    Guidelines:
+
+		    + New servers should be leafed until their admin(s) 
+		      have sufficient experience to handle their server 
+		      responsibly. (This avoids routing disasters).
+
+		    + Only a link for ONE server should be given to the new
+		      server site, that means the new site shouldn't be able to
+		      connect test-servers to other than its own server.
+		      (This avoids confusion about linking hierarchy).
+
+		    + Be sure that if a toplevel domain hostmask link is given,
+		      all hubs of that domain can connect the masked server!
+		      (this should avoid disagreement between serveral hub
+		      admins in one domain).
+
+
+	2.)	All other links between toplevel domains (countries) should be
+		dicussed between the major link coordinators of each toplevel
+		domain (country). These coordinators are called European Board
+		of IRC Coordinators (EBIC).
+
+		    Guidelines:
+
+		    + Major link coordinators of each toplevel domain (country)
+		      should be published with the server sourcecode in
+		      directory ./doc/Europe
+
+                    + Each toplevel domain (country) participating in the
+		      European IRC net must have a coordinator, who is
+		      responsible for country-internal connections AND
+		      represents the country in contacts with the rest of the
+		      world. This person(s) is (are) chosen by their domain,
+		      but must be approved by the EBIC.
+
+                    + The EBIC is the only executive in charge of European 
+		      interconnections and of connections from Europe to the 
+		      rest of the world. They will decide linking issues
+		      WITH the affected local admins.
+
+		    + For establishing new links between several toplevel
+		      domains the affected EBIC coordinators should be
+		      consulted. If further coordination is needed it should
+		      be discussed within the EBIC.
+
+		    + Additional note: International links should also take
+		      care of the network topology, so even if several national
+		      opers agree on a same international link, they might be
+		      wrong and use unecessary network ressources. The EBIC
+		      should avoid such linking.
+
+		    + Any major linking change should be announced in the
+		      european mailing list:
+			IRC-Operators Europe <irc-eu@grasp.insa-lyon.fr>
+
+
+	3.)	Cracked servers are the concern of EBIC, overiding all local
+		interests.
+
+		    Guidelines:
+
+		    + In a server with non-standard source code which breaks
+		      the current irc protocol (especially the incorrect
+		      manipulation of channel modes and user/hostname authen-
+		      tication) EBIC will take action.
+
+		    + The recommended action is permanent withdrawl of the
+		      server from the IRC-net by removal from all its uplinks
+		      configuration files.
+
+
+	4.)	A prerequisite for getting a NEW server connection within
+		Europe is an understanding of and compliance to the above
+		rules.
+
+		    Guideline:
+
+		    + All new admins should get a copy of these rules.
+
+
+############################################################################
+

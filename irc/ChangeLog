@@ -1,0 +1,77 @@
+/************************************************************************
+ *   IRC - Internet Relay Chat, irc/ChangeLog
+ *   Copyright (C) 1990 Mike Bolotski
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 1, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+Mon Dec  9 06:38:57 1991  Darren Reed <avalon@coombs.anu.edu.au>
+      * All files
+	Updated to work properly with 2.7. Its early and I'm cold.
+
+Sun Jun 30 14:45:59 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+      * irc.c
+	Removed MSG protocol command. Kludge to get channel msgs working.
+      * msg.c
+	Reformatted WHOERPLY output :)
+
+Wed Nov 28 20:45:42 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+      * c_msg.c
+	Fixed abuf[123] overflow. (by using mybuf and removing the buffers)
+
+Sat Nov 10 17:59:29 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+      * Added #include "common.h" into all source files, moved "common"
+	and regularly used declarations to include/common.h
+
+Wed Jun 20 11:45:30 1990  Jarkko Oikarinen (jto@tolsun.oulu.fi)
+
+	String channel fixes to files, added some numerics.
+
+Sun Jun 17 17:12:14 1990  Armin Gruner (gruner@informatik.tu-muenchen.de)
+
+      * c_debug.c
+        New created file, for the benefit of wrong server stuff output
+        if client does not recognize it. common/debug.c has been removed.
+
+      * c_numeric.c
+        Changed output of YOUWILLBEBANNED and YOUREBANNEDCREEP, now only
+        the first digits (== minutes) of the msg will be inserted.
+
+      * irc.c
+        Defined debuglevel to DEBUG_ERROR, now more error
+        conditions are displayed.
+
+
+Sat Jan  6 14:48:34 1990  Mike Bolotski  (mikeb at coho.ee.ubc.ca)
+
+	* screen.c
+
+	Changed insert = ~insert to be insert = !insert.
+	Gotta be careful about those bitwise operators, WiZ.
+
+	* swear.c
+	
+	Changed scroll to scroll_ok.  Changed extern/static definitions
+	of tgoto, getenv to work with ANSI C compilers.
+
+	* edit.c
+
+	Changed #if HPUX to #if HPUX || defined(mips)
+
+
+

@@ -1,0 +1,158 @@
+dnl @(#) configure.in,v 1.2 1995/01/07 01:50:18 mrg Exp
+dnl
+dnl configure.in for ircd 2.9.
+dnl written by matthew green (mrg@mame.mu.oz.au), with portions
+dnl from avalon's Config.
+dnl copyright (c) 1995.
+
+AC_REVISION(1.2)dnl
+AC_INIT(ircd/ircd.c)
+AC_CONFIG_HEADER(setup.h:include/setup.h.in)
+
+AC_PROG_CC
+AC_PROG_CPP
+AC_ISC_POSIX
+AC_AIX
+AC_PROG_GCC_TRADITIONAL
+
+AC_PATH_PROGS(SUM, sum cksum, true)
+
+AC_CHECK_LIB(crypt, crypt)
+AC_CHECK_LIB(socket, socket)
+AC_CHECK_LIB(nsl, socket)
+dnl AC_CHECK_LIB(resolv, res_init)
+
+AC_CHECK_HEADERS(sys/syslog.h stdlib.h stddef.h sys/malloc.h sys/param.h unistd.h string.h strings.h sys/cdefs.h arpa/inet.h arpa/nameser.h resolv.h sys/bitypes.h netdb.h)
+
+AC_CHECK_FUNC(index, , AC_DEFINE(NOINDEX))
+AC_CHECK_FUNC(strerror, , AC_DEFINE(NEED_STRERROR))
+AC_CHECK_FUNC(strtoken, , AC_DEFINE(NEED_STRTOKEN))
+AC_CHECK_FUNC(strtok, , AC_DEFINE(NEED_STRTOK))
+AC_CHECK_FUNC(inet_addr, , AC_DEFINE(NEED_INET_ADDR))
+AC_CHECK_FUNC(inet_aton, , AC_DEFINE(NEED_INET_ATON))
+AC_CHECK_FUNC(inet_ntoa, , AC_DEFINE(NEED_INET_NTOA))
+AC_CHECK_FUNC(inet_netof, , AC_DEFINE(NEED_INET_NETOF))
+AC_CHECK_FUNC(bcopy, , 
+  AC_FUNC_CHECK(memmove, AC_DEFINE(HAVE_MEMMOVE), AC_DEFINE(NEED_BCOPY)))
+AC_CHECK_FUNC(bzero, , AC_DEFINE(NEED_BZERO))
+AC_CHECK_FUNC(bcmp, , AC_DEFINE(NEED_BCMP))
+AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY),
+  AC_CHECK_FUNC(lrand48, AC_DEFINE(HAVE_LRAND48), ))
+AC_CHECK_FUNC(getrusage, AC_DEFINE(GETRURSASGE_2),
+  AC_CHECK_FUNC(times, AC_DEFINE(TIMES_2), ))
+
+echo checking signal implimentation
+AC_CHECK_FUNC(sigaction, AC_DEFINE(POSIX_SIGNALS),
+  AC_CHECK_FUNC(sigset,
+    AC_DEFINE(BSD_RELIABLE_SIGNALS)
+    AC_DEFINE(signal, sigset),
+
+AC_CHECKING(for reliable signals)
+AC_TRY_RUN([
+#include <sys/types.h>
+#include <signal.h>
+
+#ifndef SIGCHLD
+# define SIGCHLD SIGCLD
+#endif
+
+int got;
+
+#ifdef SIGVOID
+void
+#endif
+hand()
+{
+  got++;
+}
+
+main()
+{
+  (void)signal(SIGCHLD, hand);
+  kill(getpid(), SIGCHLD);
+  kill(getpid(), SIGCHLD);
+  if (got < 2)
+    exit(1);
+  exit(0);
+}
+],AC_DEFINE(BSD_RELIABLE_SIGNALS) AC_MSG_RESULT(yes), AC_DEFINE(SYSV_UNRELIABLE_SIGNALS) AC_MSG_RESULT(no), :)
+))
+
+dnl
+dnl check for non-blocking fd style available..
+dnl
+AC_MSG_CHECKING(for non-blocking)
+changequote(<<, >>)dnl
+<<
+precode='#include <sys/types.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/file.h>
+#include <signal.h>
+
+alarmed()
+{
+	exit(1);
+}
+
+main()
+{
+	char b[12], x[32];
+	int f, l = sizeof(x);
+	f = socket(AF_INET, SOCK_DGRAM, 0);
+	if (f >= 0 && !(fcntl(f, F_SETFL,'
+postcode='))) {
+		signal(SIGALRM, alarmed);
+		alarm(3);
+		recvfrom(f, b, 12, 0, x, &l);
+		alarm(0);
+		exit(0);
+	}
+	exit(1);
+}'
+>>
+changequote([, ])dnl
+
+code="$precode O_NONBLOCK $postcode"
+
+AC_TRY_RUN($code,
+  AC_DEFINE(NBLOCK_POSIX)
+  AC_MSG_RESULT(posix),
+  code="$precode O_NDELAY $postcode"
+  AC_TRY_RUN($code,
+    AC_DEFINE(NBLOCK_BSD)
+    AC_MSG_RESULT(bsd),
+    code="$precode FIONBIO $postcode"
+    AC_TRY_RUN($code,
+      AC_DEFINE(NBLOCK_SYSV)
+      AC_MSG_RESULT(system v),
+      AC_MSG_WARN(i can't find a working non blocking system),
+      :),
+    :),
+  :)
+
+dnl Uh, what is this? Other than broken..
+dnl if test x$ac_cv_headers_sys_malloc_h != xno
+dnl then
+dnl 	AC_DEFINE_UNQUOTED(MALLOCH, <sys/malloc.h>)
+dnl fi
+
+dnl
+dnl check for sys_errlist declaration
+dnl
+
+AC_MSG_CHECKING(for sys_errlist declaration)
+AC_TRY_RUN([
+#include <sys/types.h>
+#include <stdio.h>
+#include <errno.h>
+main()
+{
+  char *s = sys_errlist[0];
+  exit(0);
+}
+],AC_DEFINE(SYS_ERRLIST_DECLARED) AC_MSG_RESULT(yes), AC_MSG_RESULT(no), :)
+
+
+AC_OUTPUT(Makefile:support/Makefile.in version.c.SH:ircd/version.c.SH.in sums:ircd/crypt/sums.in)

@@ -1,0 +1,458 @@
+/************************************************************************
+ *   IRC - Internet Relay Chat, ircd/ChangeLog
+ *   Copyright (C) 1990 Mike Bolotski
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 1, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ */
+
+Tue Sep  1 20:16:42 1992
+	* s_bsd.c, s_bsd.c, s_serv.c
+		      * TRACE/STATS now show logfiles if logging is enabled.
+
+Tue Sep  1 03:56:21 1992
+	* channel.c   * bug found in set_mode() - length of strings when
+			setting/clearing chanop was possibly incorrect.
+		      * a few optimizations have hopefully been added as
+			well.
+
+	* s_bsd.c, s_auth.c
+		      * RFC913 (authd) / TAP code separated from s_bsd,c to
+			s_auth.c
+
+	* s_misc.c, s_debug.c
+		      * various code/routines removed from s_misc.c and put
+			in s_debug.c where it truely belongs.
+
+Tue Aug 25 16:07:01 1992
+	* ircd.c      * chroot(2) option from Seth added to work along
+			with SET_UID & SET_GID for servers running as
+			root. (seth@ctr.columbia.edu)
+
+Thu Aug 13 18:46:53 1992
+	* channel.c   * Bug in send_channel_modes() fixed which causes
+			trashed +b's to be sent on server rejoins.
+
+Thu Aug 13 17:40:47 1992
+	* channel.c   * Added channel passwords (keys).
+
+Tue Aug 11 14:05:12 1992
+	* channel.c   * JOIN bug giving chanop on wrong channels fixed.
+			Reported by Rogue_F.
+
+Tue Aug  4 04:38:23 1992
+	* s_bsd.c, s_serv.c, s_conf.c
+		      * Username authentication for servers completed.
+			Username now required in host portion of the
+			C/N lines for a connection to be completed.
+
+Tue Aug  4 03:45:54 1992
+		      * IDENT changes finally debugged.
+
+Tue Aug  4 02:16:42 1992
+	* s_bsd.c, s_user.c, s_serv.c, ircd.c
+		      * IDENT code now written such that it works in a
+			similar manner to the DNS async code and thus should
+			stop the server hanging (if at all).
+
+	* authuser.c  * Removed. (redundant).
+
+Fri Jul 31 01:05:57 1992
+	* s_user.c    * m_whois() changes to stop people abusing /whois *
+			and kiling other links to/from that server.
+
+Sat Jul 25 07:33:20 1992
+	* s_user.c    * m_oper() fixed so it doesnt core dump when it
+			calls send_umode(). send_umode_toservs() added.
+
+Sat Jul 25 05:51:01 1992
+	* s_bsd.c     * Patches for little endian systems (ie sequents :)
+			completed. (Fixing of RPL_MYPORTIS)
+
+Fri Jul 24 18:43:35 1992
+	* s_bsd.c, s_conf.c, ircd.c, s_misc.c
+		      * Applied patches from Adrian Hall for compiling on
+			Dynix/PTX (email: csc260@central1.lancaster.ac.uk).
+
+Fri Jul 24 00:07:41 1992
+			Its been busy with other things so these comments
+			apply over a few days.
+
+	* general	Compiles cleanly under ultrix 4.2 and AIX 3.1
+
+	* s_user.c	O-lines host field changed to user@host.
+			This change could sweep across to other lines yet.
+
+	* s_serv.c	L-lines host field made functional.
+
+	* s_bsd.c	I-lines also take user@host as the host now :)
+
+Tue Jul 14 03:51:04 1992
+	* s_msg.c, s_serv.c, s_user.c
+		      - THE BIG SPLIT occured! s_msg.c split into two files:
+			s_serv.c and s_user.c
+
+Mon Jul 13 03:08:03 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* s_conf.c, class.c
+		      - added MAXSENDQ. field for classes.
+
+Sun Jul 12 10:41:48 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* s_msg.c     - added m_close
+
+Sat Jul 11 01:01:09 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* s_err.c     - Created, debuged and Added.
+	* general     - Generic creation of ERR and RPL numerics from routines
+			in s_err.c. The use of these is optional.
+	* channel.c   - Changed NAMES, LIST to be able to query remote
+			servers.
+		      - NAMES, LIST, TOPIC all understand channel name lists
+			using a comma (,) as a name separator.
+
+Sat Jul  4 22:40:35 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* s_bsd.c, ircd.c, s_conf.c, s_msg.c
+		      - Changed DIE/RESTART/REHASH to be signal activated or
+			optionally allow operators to issue REHASH/RESTART.
+
+Sat Jul  4 04:12:43 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* s_bsd.c, res.c
+		      - fixed automatic lookup of hostnames returned by a
+			lookup of the IP#.
+
+Fri Jul  3 16:15:39 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* channel.c   - added comments to the KICK command.
+	* s_msg.c     - rewrote WHOIS, optimized sending of JOIN channels at
+			net splits.
+	* general     - checked to make sure all replies had a ':' in the
+			reply to mark the last parameter being sent.
+
+Thu Jul  2 07:56:46 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* channel.c   - imposed 256 character limit on channel names for
+			clients local to the server.
+
+Thu Jul  2 03:41:15 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* s_msg.c     - changed numeric reply 200 from TRACE. Now shows next
+			server in the reply line (extra arg).
+
+Tue Jun 30 04:53:11 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* s_bsd.c     - split up check_server() to accomodate the name lookup
+			in the middle of it for access checking.
+	* s_msg.c     - split up m_server to work with the splitup of
+			check_server().
+
+Mon Jun 29 23:46:32 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* whowas.c    - added RPL_ENDOFWHOWAS to the whowas reply chain.
+
+Sun Jun 28 21:31:20 1992  Darren Reed <avalon@coombs.anu.edu.au>
+	* channel.c, send.c
+		      - channel name masks using ":mask" completed along with
+			removal of # significance. '%' channel prefix is
+			local to server.
+
+		      + The removal of the # significance was temporary due to
+			too many problems with the nickname/channelname space
+			problems.
+
+	* s_bsd.c, res.c, s_conf.c
+		      - hostname and ip number lookup working asynchronously.
+	* s_bsd.c     - udp port created. echo's any data sent to it.
+
+Sun Dec 1 Greg Lindahl <gl8f@virginia.edu>
+	* general     - gee, avalon, you could at least try. as of pre16
+			numerics restored to old values. MSG_NOTE code
+			removed, because it does not pass Saber C.
+	* support.c   - ctype macros now give values for EOF.
+	* dbuf.c      - test for bozo compilers
+	* example.conf- more documentation
+	* s_msg.c     - pjg's patch to fix m_server
+	* ircd.c      - print message when debugging off and debugtty set
+	* config.h    - remove many dead crufty options.
+
+Sun Dec  1 13:41:11 1991  Darren Reed <avalon@coombs.anu.edu.au>
+	* all files   - There have been so many changes and bug fixes going
+			into 2.7 that it would be impossible to list them all.
+
+Mon Nov  4 14:35:07 1991  Darren Reed <avalon@coombs.anu.edu.au>
+	* s_msg.c     - installed msa's patch to m_nick
+
+Mon Nov 4  01:03:45 1991  Darren Reed <avalon@coombs.anu.edu.au>
+	* all files   - changed all functions to have "function_name" style
+		        names. All macros now MacroName.
+	* general     - lots of various different work in preparation for 2.7
+
+Thu Sep 19 14:55:24 1991  Darren Reed <avalon@coombs.anu.edu.au>
+	* s_msg.c, channel.c
+		      - moved m_topic() and m_invite() from s_msg.c to
+			channel.c
+		      - changed m_topic() to now process # channel topics
+
+Mon Sep 02 16:27:53 1991  Darren Reed <avalon@coombs.anu.edu.au>
+	  (lost previous ChangeLog which had accurate dates of additions
+	   for 2.6.2. Following is changes from 2.6.1 to 2.6.2).
+
+	* s_conf.c    - added L-line handling for Leaf Enforcement.
+			(Courtesy Wumpus (Greg Lindhal))
+		      - added det_I_lines_butfirst to make sure each client
+			connection only ever has (at most) 1 I-line attached
+			to it.
+
+	* channel.c   - fixed ghost ChanOp problem from earlier versions.
+		      - painful ^G mode bug fixed for 2.6.1
+
+	* ircd.c      - some problems with TryConnections fixed.
+
+	* s_bsd.c, ircd.c, s_msg.c
+		      - local clients are now stored and referenced with an
+			array of pointers. This has a fixed size :/
+
+	* s_msg.c, list.c
+		      - client list is now a double linked list.
+		      - moved some code to list.c to create addition/deletion
+			routines to add/delete client records from the list.
+
+	* list.c      - added NICKNAMEHISTORYLENGTH to replace the 'magic' 200.
+
+	* s_msg.c     - Added following commands:
+			USERHOST <nickname> [n.[n.[n.[n.]]]]
+			ISON <nickname> [nickname...]
+
+	* hash.c, s_msg.c, channel.c
+		      - (finally) added hash tables for nickname, server and
+			channel name lookup. Nicknames and servers share the
+			same table.
+
+Thu Jul 04 20:31:10 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* s_numeric.c
+	  Changed sptr->name to parv[0]; use strtoken() for loop.
+
+Tue Jul 02 11:11:15 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* ircd.c, channel.c, s_msg.c
+	  changed MSG_MAIL to MSG_NOTE as requested by the author
+	  Fixed m_links(); remote LINKS should work now.
+	* mail.c
+	  Removed mail.c, replaced by new version 1.3pre8, now note.c
+
+Mon Jul 01 20:35:40 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* s_msg.c
+	  m_notice(), m_text(), m_privmsg() merged to one function.
+	  m_wall() changed. Default is WALL. Should be eliminated
+	  anyways in next version.
+
+	* channel.c
+	  Changed error msgs when parameters from 'l' are missing.
+
+Sun Jun 30 14:53:42 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* s_msg.c
+	  Major cleanups; Server/host mask msgs moved to NOTICEs.
+	  m_whois changed. For nonexistent nickname an error is created now.
+
+Sat Jun 29 15:46:35 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* s_msg.c
+	  Fixed m_summon error bug
+	  Applied msa'a patches. Fixes ExitOneClient().
+
+	* channel.c
+	  Fixed join ctrl-g bug
+
+Sat Apr 6  19:47:00 1991  Jarkko Oikarinen <jto@tolsun.oulu.fi>
+
+	* Added destination parameter to /links (a'la /whois)
+
+Thu Apr 4  16:01:16 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+      * ircd.c, s_bsd.c
+        Fix SIGHUP - SIGHUP to ircd causes a rehash() finally.
+
+      * c_msg.c
+        Fix KILL from an OPER - pre19 with wildcard match didn't pro-
+        pagate the correct sender. Server kills behind *-domains are
+        still unsolved.
+
+Sun Mar 31 08:57:12 1991  Jarkko Oikarinen <jto@tolsun.oulu.fi>
+
+        * WALL placed under #ifdef. Default is no WALL
+        * Fixed JOIN mode option to accept more parameters
+          like userlimit.
+
+Sun Mar 24 07:43:00 1991  Jarkko Oikarinen <jto@tolsun.oulu.fi>
+
+        * A couple minor bug fixes.
+        * Channel name to ERR_CHANOPRIVSNEEDED and ERR_NOTONCHANNEL.
+
+Sun Mar 17 09:50:12 1991  Jarkko Oikarinen <jto@tolsun.oulu.fi>
+
+        * m_who() numeric RPL_ENDOFWHO (315) for all queries
+        * RPL_ENDOFWHOIS (316) reply added
+        * RPL_ENDOFWHO (315) and RPL_ENDOFWHOIS (316) return
+          the query parameter now as well.
+        * RPL_WHOISIDLE (317) returns the idle time of a particular user.
+        * RPL_NOTOPIC (331), RPL_TOPIC (332) return channel name as a
+          paramater (this has been already added to RPL_CHANNELMODEIS (324))
+        * Limited trace (won't show users on a server) available now for
+          all users
+        * Fix to HuntServer() to make sure loops do not happen.
+        * Added new numeric, ERR_CHANOPRIVSNEEDED (482) which replaces
+          *all* ERR_NOPRIVILEGES (481) messages where the missing privileges
+          were channel operator privileges.
+        * KICK to user not existant on irc now generates
+          ERR_NOTONCHANNEL (442) error reply.
+        * ERR_NOSUCHSERVER (402) returns the server name as a parameter.
+        * ERR_CANNOTSENDTOCHAN (404) now returns the channel name you couldn't
+          send to.
+
+Mon Feb 25 16:08:51 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* s_msg.c
+	  'Fixed' K:-line behaviour of m_user(). Now, the connection
+	  is not closed; USER-msg is distributed with K:-line remark, and
+	  user isn't introduced locally, so user gets 'You have not registered
+	  as a user'.
+
+	* ircd.c
+	  SIGHUP generates rehash() now.
+
+Mon Feb 11 18:57:56 1991  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+ 	* s_msg.c
+	  Fixed m_server(). The domain matching was done against the
+	  return value of GetClientName(), but this never matches
+	  if the servername differs from the host name, because
+	  [real socketname] is added to 'inpath'.
+
+Fri Jan 12 12:34:21 1991  Jarkko Oikarinen (jto@tolsun.oulu.fi)
+
+        * more ircd options at startup...
+
+Mon Dec 03 13:54:25 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* class.c, s_msg.c, s_bsd.c
+	  Fixes from Avalon. Sigh.
+
+Wed Nov 28 14:07:11 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* class.c, s_bsd.c (CloseConnection)
+	  Fixes from avalon (DEBUG stuff)
+
+Tue Nov 27 11:24:56 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* s_msg.c, s_bsd.c, ircd.c, class.c
+	  Isolated the implementation of 'classes' to class.c (by using
+	  macros for accessing the structure members) -- we should start
+	  using this everywhere -- especially with this linear list of
+	  clients!!
+
+	* channel.h (new file)
+	  prototyping, 'channel'-misc, try to isolate channel implemen-
+	  tation to channel.h and channel.c
+
+Sun Nov 25 16:13:42 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* class.c, class.h
+	  New files for class-handling. Applied Avalon's patches.
+	  Change some code into more readable one (MIN).
+
+Tue Nov 13 11:44:28 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* s_msg.c
+	  Fixed Invite bug.
+
+	* s_bsd.c
+	  Fixed overhead of check_access.
+	  New function to get qualified (local) domain name: AddLocalDomain()
+
+Mon Nov 12 20:42:44 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* channel.c
+	  Fixed 2.6 MODE_NOPRIVMSG bug
+
+	* Added mkversion.sh into self configuration extraction,
+	  now version.c.SH
+
+Sat Nov 10 19:10:33 1990  Armin Gruner <gruner@informatik.tu-muenchen.de>
+
+	* Removed getlongtime() everywhere.
+
+	* s_bsd.c
+	  Removed some ULTRIX sidesteps.
+
+	* s_conf.c
+	  Changed the return values of find_kill().
+
+	* ircd.c
+	  Avalon's cleanup's.
+	  Change close() to shutdown() (restart()). 
+
+Wed Oct 31 18:20:00 1990  Jarkko Oikarinen (jto@tolsun.oulu.fi)
+
+	* 2.6:
+	  - multichannels
+	  - wildcard servers
+	  - more fun stuff I don't remember anymore but which should
+	    be in documentation...
+
+Sun Oct 21 18:53:02 1990  Christopher Davis (ckd at bucsd)
+
+        * Makefile
+          - Added IRCDLIBS and IRCDMODE variables
+
+Wed Jun 20 11:53:00 1990  Jarkko Oikarinen (jto@tolsun.oulu.fi)
+
+	numerous files changed and functions moved around to make
+	string channels work...
+
+Sun Jun 17 16:52:39 1990  Armin Gruner (gruner@informatik.tu-muenchen.de)
+
+      * s_debug.c
+        New created file, common/debug.c has been moved to it because
+        now we handle also debug outputs in client code
+
+      * s_conf.c
+        Added the prefix character into all reply-strings.
+        MSGs never appeared on client site because parse() didn't
+        recognize it as a prefix (numeric) message
+        Changed the test of time-interval, now a specified interval
+        that begins before midnight and ends after should also work
+
+      * s_bsd.c
+        Added setdtablesize() for sequents OS Dynix,
+        default was 20; allows more socket connections.
+
+Sat May 12 22:50:13 1990  Jarkko Oikarinen (jto@tolsun.oulu.fi)
+
+	* s_msg.c
+	  Added newline removal from the end of string ctime()
+	  returns (m_info() and m_stats())
+	* s_whowas.c
+	  Added newline removal from the end of string ctime()
+	  returns (m_whowas())
+	* s_conf.f
+	  Added close() into init_conf()
+	  Was obviously forgotten from there
+
+Thu May 10 17:17:13 1990  Jarkko Oikarinen (jto@tolsun.oulu.fi)
+
+        * whowas.c
+          Fixed memcpy and bcopy problems
+ 
+Sat Jan  6 17:36:28 1990  Mike Bolotski  (mikeb at coho.ee.ubc.ca)
+
+	* date.c
+
+	Added HPUX-specific code since it lacks the timezone() function.
+
+

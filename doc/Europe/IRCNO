@@ -1,0 +1,171 @@
+              European Board of IRC Coordinators - Norway
+
+Email:    op-no@nvg.unit.no
+Versjon:  1.01-001
+Dokument: IRCNO-ORRO 06.07.93 - 03:51
+File:     flode.nvg.unit.no:/pub/irc/ircno/english
+
+--------------------------------------------------------------------------------
+
+                      IRCNO in English.
+
+IRCNO is the Norwegian name for EBIC - Norway.
+
+Introduction
+~~~~~~~~~~~
+The purpose of IRCNO is to make IRC in Norway as effective as 
+possible. To achieve this, it has to seperate components, an
+administrative and a techincal.
+
+The administrative component enforces compliance with the IRC rules in 
+Norway. The purpose of the rules is not to make operators net-police,
+but action must nonetheless be taken when rules are not complied with.
+Furthermore,  we create national statistics on servers and users 
+connection time. (This info is however only available to the operators).
+We also document IRC in Norway, and keep information files updated. 
+Finally, we give heavy user-support. All documentation, information 
+files, and user-support files are in the Norwegian language.
+The technical component consist mainly of ensuring the proper and
+reliable functioning of Norwegian servers and links, so that IRC in
+Norway is compatible with the rest of the EBIC IRC Net.
+
+IRCNO also has its own email adress for any inquiries:  op-no@nvg.unit.no
+
+IRCNO has official support from the Norwegian academic network provider
+- UNINETT.
+
+
+IRCNO tasks 
+~~~~~~~~~~
+Here is a list that defines IRCNO's tasks.
+
+1) Take care of the Norwegian IRC servers.
+2) Enforce the rules for IRC use in Norway.
+3) Be responsible toward UNINETT.
+4) Make statistics.
+5) Document IRC in Norway.
+6) User support.
+
+
+Rules of IRC use in Norway
+~~~~~~~~~~~~~~~~~~~~~~~~~
+We have 3 kinds of rules, user-bot, operator and server-admin.
+Here is a short translation of the rules
+
+USER-RULES - The following is not allowed:
+  1) Fake userids, or trying to hide the real user-id.
+  2) Being intentionally offensive to another user.
+  3) Dumping a lot of text to a public channel.
+  4) Constant beeping on a channel.
+  5) Anything that will reduce the techincal functionality of IRC.
+  6) Harrasement defined by Norwegian Civil Law.
+  7) Using offencive words in channel topics on public channels.
+  8) Destroys the integrity of information.
+  9) Compromise private communication.
+
+
+BOT-RULES - The following guidelines must be followed:
+  1) Bots must not have fake userid unless given permission.
+  2) Bots must not send a message to a user not activating it.
+  3) Bots must be invisible unless they perform a good "irc-deed".
+  4) Bots must only answer to PRIVMSG by using NOTICE.
+
+Dispensation from some of the bot-rules may be given under certain
+circumstances.
+
+
+OPERATOR RULES
+  This guide gives guidelines on what is not good and what is good.
+
+  Stuff that is not allowed:
+    - Using SQUIT / CONNECT to gain channel-operator-status.
+    - Mindless use of KILL.
+    - Using TRACE to find invisible users.
+
+ Stuff that is allowed:
+    - Using SQUIT / CONNECT to "fix" the net. This is normally not 
+      allowed and should be used with care. The IRCNO tries to make
+      efficient use of automatic routing.
+    - KILL should only be used when a user ask to be killed. KILL can
+      also be used if it's based in a certain paragraph of the USER 
+      rule file.
+
+
+SERVER RULES
+  Following is the EBIC-Rules conserning linking. For domestic
+  linking we have our own rules.
+
+  1) To get a server connect to the Norwegian IRC-net:
+       a. New servers must only be leafs.
+       b. New servers must have one primary- and one secondary link.
+       c. New servers should only have one active link at a time.
+       d. The new server must have enough users.
+  2) New server connections should be discussed among the existing oper/admins.
+  3) Any link should follow the physical net-topology.
+  4) A server that is not close to a regional UNINETT net center should not 
+     perform as a HUB server.
+  5) Every server in Norway takes part in the national user-staistic.
+  6) If hostmasking is to be used, every server behind a mask must be able 
+     to connect to the up-host.
+
+
+ADMIN RULES
+  1) An irc-admin must be available by email, unless he/she notifies IRCNO 
+     about any longer planned absence.
+  2) A server-admin's duty is to have his/her server perform well for
+     the end-users and other servers on the irc-net.
+  3) An irc-admin must upgrade his/her server and tune it according to
+     something suitable as soon as a server-release is known to be
+     relatively stable.
+  4) An irc-admin that is not following these rules can loose his/her links 
+     if 100% of IRCNO agrees.
+
+
+
+Persons in IRCNO 
+~~~~~~~~~~~~~~~
+We do not have any leader or jobs, but we do preform certain tasks.
+Every decision is taken by discussion and voting. We do not have any
+problem with this, and no nasty disagreements occur. This we belive
+is because of our Norwegian Nature :-)
+Who is Who is documentet in the file called irc-no. Norwegian titles
+in paranthesis.
+
+IRCNO secretary (IRCNO sekret{r)
+  Keeps track and system of all docs that are produced within IRCNO.
+  The updating of the various documents is left to the one who has
+  the administrative job with the document.
+
+Filearchive (Filarkiv)
+  Keeps the anonymous FTP archie at flode.nvg.unit.no up-to date. 
+  The archive is also accessible by FSP. The archive consist of
+  IRCNO docs, IRC docs in general, and IRC software.
+  This person also administrate the two mailinglists that exist (IRCNO
+  and a IRC-user list)
+
+Statistics: (Statistikk)
+  Does the monthly stats of IRC-use in Norway.
+
+EBIC contact (EBIC kontakt)
+  This task is defined in the EBIC-rules.
+
+Link master (Link ansvarlig)
+  Job is to find the best links for Norwegian servers, and how they
+  should connect to each other. In link-matters this person often 
+  has the last word. The link master write a link-report from time 
+  to time (found on the archive as "links"). This report is the only 
+  english document beside this one. This person must have good 
+  knowlege on net-structure in Norway and how the server-linking works.
+
+UNINETT contact (UNINETT kontakt)
+  UNINETT want one contact person. This person will likely aslo be
+  known as the one who is "responsible for IRC in Norway".
+
+
+Other stuff
+~~~~~~~~~~~
+For a list of servers and their associated persons, see the file irc-no
+under "servere in IRCNO".
+
+This document is proof-read by Espen Anneling (anneling@uiowa.edu)
+

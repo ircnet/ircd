@@ -1,0 +1,91 @@
+/* include/setup.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define if on AIX 3.
+   System headers sometimes define this.
+   We just want to avoid a redefinition error message.  */
+#ifndef _ALL_SOURCE
+#undef _ALL_SOURCE
+#endif
+
+/* Define if system calls automatically restart after interruption
+   by a signal.  */
+#undef HAVE_RESTARTABLE_SYSCALLS
+
+/* Define if you need to in order for stat and other things to work.  */
+#undef _POSIX_SOURCE
+
+/* Define as the return type of signal handlers (int or void).  */
+#undef RETSIGTYPE
+
+#undef BSD_RELIABLE_SIGNALS
+#undef GETRURSASGE_2
+#undef HAVE_GETTIMEOFDAY
+#undef HAVE_LRAND48
+#undef HAVE_MEMMOVE
+/* #undef MALLOCH */	/* Removed, broken.. */
+#undef NBLOCK_BSD
+#undef NBLOCK_POSIX
+#undef NBLOCK_SYSV
+#undef NEED_BCMP
+#undef NEED_BCOPY
+#undef NEED_BZERO
+#undef NEED_INET_ADDR
+#undef NEED_INET_ATON
+#undef NEED_INET_NETOF
+#undef NEED_INET_NTOA
+#undef NEED_STRERROR
+#undef NEED_STRTOK
+#undef NEED_STRTOKEN
+#undef NOINDEX
+#undef POSIX_SIGNALS
+#undef SYSV_UNRELIABLE_SIGNALS
+#undef TIMES_2
+#undef SYS_ERRLIST_DECLARED
+
+/* Define if you have the <stddef.h> header file.  */
+#undef HAVE_STDDEF_H
+
+/* Define if you have the <stdlib.h> header file.  */
+#undef HAVE_STDLIB_H
+
+/* Define if you have the <string.h> header file.  */
+#undef HAVE_STRING_H
+
+/* Define if you have the <strings.h> header file.  */
+#undef HAVE_STRINGS_H
+
+/* Define if you have the <sys/cdefs.h> header file.  */
+#undef HAVE_SYS_CDEFS_H
+
+/* Define if you have the <sys/malloc.h> header file.  */
+#undef HAVE_SYS_MALLOC_H
+
+/* Define if you have the <sys/param.h> header file.  */
+#undef HAVE_SYS_PARAM_H
+
+/* Define if you have the <sys/syslog.h> header file.  */
+#undef HAVE_SYS_SYSLOG_H
+
+/* Define if you have the <unistd.h> header file.  */
+#undef HAVE_UNISTD_H
+
+/* Define if you have the <arpa/inet.h> header file.  */
+#undef HAVE_ARPA_INET_H
+
+/* Define if you have the <arpa/nameser.h> header file.  */
+#undef HAVE_ARPA_NAMESER_H
+
+/* Define if you have the <resolv.h> header file.  */
+#undef HAVE_RESOLV_H
+
+/* Define if you have the <sys/bitypes.h> header file.  */
+#undef HAVE_SYS_BITYPES_H
+
+/* Define if you have the <netdb.h> header file.  */
+#undef HAVE_NETDB_H
+
+/* Define if you have the crypt library (-lcrypt).  */
+#undef HAVE_LIBCRYPT
+
+/* Define if you have bit types defined in system include files */
+#undef HAVE_BIT_TYPES   
