@@ -283,7 +283,7 @@
 
 /*
  * define this if you want to use crypted passwords for operators in your
- * ircd.conf file. See ircd/crypt/README for more details on this.
+ * ircd.conf file. See contrib/mkpasswd/README for more details on this.
  */
 #undef	CRYPT_OPER_PASSWORD
 
