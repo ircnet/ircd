@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.32 2004/07/15 13:08:46 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.33 2004/07/15 13:34:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -99,7 +99,7 @@ int	main(int argc, char *argv[])
 		argc--;
 		argv++;
 	}
-	else if (argc > 1 && !strncmp(argv[1], "-s", 2))
+	if (argc > 1 && !strncmp(argv[1], "-s", 2))
    	{
 		showflag = 1;
 		argc--;
@@ -184,6 +184,7 @@ static	void	showconf()
 {
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
 	aConfig *p, *p2;
+	int etclen;
 #else
 	int dh;
 	char	line[512], c[80], *tmp;
@@ -199,9 +200,23 @@ static	void	showconf()
 		return;
 	    }
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
+	if (debugflag)
+	{
+		char *etc = IRCDCONF_PATH;
+		char *fp;
+
+		fp = strrchr(IRCDCONF_PATH, '/') + 1;
+		etclen = fp - etc;
+	}
 	p2 = config_read(fd, 0, new_config_file(configfile, NULL, 0));
 	for(p = p2; p; p = p->next)
+	{
+		if (debugflag)
+			printf("%s:%d:", p->file->filename +
+				(strncmp(p->file->filename, IRCDCONF_PATH,
+				etclen) == 0 ? etclen : 0), p->linenum);
 		printf("%s\n", p->line);
+	}
 	config_free(p2);
 #else
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
