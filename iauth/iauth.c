@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: iauth.c,v 1.8 1999/03/07 23:46:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: iauth.c,v 1.9 1999/03/08 21:59:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -140,6 +140,7 @@ int	argc;
 char	*argv[];
 {
 	time_t	nextst = time(NULL) + 90;
+	char *xopt;
 
 	if (argc == 2 && !strcmp(argv[1], "-X"))
 		exit(0);
@@ -179,7 +180,8 @@ char	*argv[];
 #endif
 		   );
 	init_io();
-	conf_read(NULL);
+	xopt = conf_read(NULL);
+	sendto_ircd("O %s", xopt);
 	conf_ircd();
 
 #if defined(IAUTH_DEBUG)
@@ -188,8 +190,6 @@ char	*argv[];
 	else
 #endif
 		sendto_ircd("G 0");
-	if (iauth_required)
-		sendto_ircd("O R");
 
 	while (1)
 	    {

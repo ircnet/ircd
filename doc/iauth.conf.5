@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.6 1999/03/07 23:46:55 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1999/03/07 23:46:55 $"
+.\" @(#)$Id: iauth.conf.5,v 1.7 1999/03/08 21:59:07 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1999/03/08 21:59:07 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -40,7 +40,10 @@ syntax using the \fIiauth\fP program to avoid later problems.
 .TP
 .B required
 By specifying this keyword, the IRC server is told not to accept new user
-connections if iauth is not running.
+connections unless the authentication is handled by iauth.
+.B notimeout
+By specifying this keyword, the IRC server is told not to accept new user
+connections if iauth hasn't finished its work in time.
 .SH MODULES
 .TP
 .B pipe

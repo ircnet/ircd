@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.70 1999/03/08 19:25:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.71 1999/03/08 21:59:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -308,6 +308,30 @@ char	*buffer;
 	return cbuf;
 }
 
+/*
+** ereject_user
+**	extracted from register_user for clarity
+**	early rejection of a user connection, with logging.
+*/
+int
+ereject_user(cptr, shortm, longm)
+aClient *cptr;
+char *shortm, *longm;
+{
+#if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
+	syslog(LOG_NOTICE, "%s ( %s ): <none>@%s [%s] %c\n",
+	       myctime(cptr->firsttime), shortm, longm,
+	       (IsUnixSocket(cptr)) ? me.sockhost :
+	       ((cptr->hostp) ? cptr->hostp->h_name : cptr->sockhost),
+	       cptr->auth, cptr->exitc);
+#endif		    
+#if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
+	sendto_flog(cptr, shortm, 0, "<none>",
+		    (IsUnixSocket(cptr)) ? me.sockhost :
+		    ((cptr->hostp) ? cptr->hostp->h_name : cptr->sockhost));
+#endif
+	return exit_client(cptr, cptr, &me, longm);
+}
 
 /*
 ** register_user
@@ -356,28 +380,16 @@ char	*nick, *username;
 		char *reason = NULL;
 
 #if defined(USE_IAUTH)
-		if (!DoneXAuth(sptr) && iauth_required)
+		if (!DoneXAuth(sptr) && (iauth_options & XOPT_REQUIRED))
 		    {
 			time_t last = 0;
 
 			if (timeofday - last > 300)
 				sendto_flag(SCH_AUTH, 
 			    "iauth not running! (refusing new connections)");
-			return exit_client(cptr, sptr, &me,
-					   "Authentication Failure!");
-#if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
-			syslog(LOG_NOTICE, "%s ( %s ): <none>@%s [%s] %c\n",
-			       myctime(sptr->firsttime), "No iauth!",
-			       (IsUnixSocket(sptr)) ? me.sockhost :
-			       ((sptr->hostp) ? sptr->hostp->h_name :
-				sptr->sockhost), sptr->auth, EXITC_AUTHFAIL);
-#endif		    
-#if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
-			sendto_flog(sptr, "No iauth!", 0, "<none>",
-				    (IsUnixSocket(sptr)) ? me.sockhost :
-				    ((sptr->hostp) ? sptr->hostp->h_name :
-				    sptr->sockhost));
-#endif
+			sptr->exitc = EXITC_AUTHFAIL;
+			return ereject_user(cptr, "No iauth!",
+					    "Authentication failure!");
 		    }
 
 		/* this should not be needed, but there's a bug.. -kalt */
@@ -452,20 +464,7 @@ char	*nick, *username;
 				sendto_flag(SCH_LOCAL,
 					    "Denied connection from %s.",
 					    get_client_host(sptr));
-#if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
-			syslog(LOG_NOTICE, "%s ( %s ): <none>@%s [%s] %c\n",
-			       myctime(sptr->firsttime), " Denied  ",
-			       (IsUnixSocket(sptr)) ? me.sockhost :
-			       ((sptr->hostp) ? sptr->hostp->h_name :
-				sptr->sockhost), sptr->auth, sptr->exitc);
-#endif		    
-#if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
-			sendto_flog(sptr, " Denied  ", 0, "<none>",
-				    (IsUnixSocket(sptr)) ? me.sockhost :
-				    ((sptr->hostp) ? sptr->hostp->h_name :
-				    sptr->sockhost));
-#endif
-			return exit_client(cptr, sptr, &me, "Denied Access");
+			return ereject_user(cptr, " Denied  ","Denied access");
 		    }
 		if ((i = check_client(sptr)))
 		    {
@@ -488,20 +487,8 @@ char	*nick, *username;
 			sptr->exitc = EXITC_REF;
 			sendto_flag(SCH_LOCAL, "%s from %s.",
 				    exit_msg[i].longm, get_client_host(sptr));
-#if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
-			syslog(LOG_NOTICE, "%s ( %s ): <none>@%s [%s] %c\n",
-			       myctime(sptr->firsttime), exit_msg[i].shortm,
-			       (IsUnixSocket(sptr)) ? me.sockhost :
-			       ((sptr->hostp) ? sptr->hostp->h_name :
-				sptr->sockhost), sptr->auth, sptr->exitc);
-#endif		    
-#if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
-			sendto_flog(sptr, exit_msg[i].shortm, 0, "<none>",
-				    (IsUnixSocket(sptr)) ? me.sockhost :
-				    ((sptr->hostp) ? sptr->hostp->h_name :
-				    sptr->sockhost));
-#endif
-			return exit_client(cptr, sptr, &me, exit_msg[i].longm);
+			return ereject_user(cptr, exit_msg[i].shortm,
+					    exit_msg[i].longm);
 		    }
 
 #ifndef	NO_PREFIX

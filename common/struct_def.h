@@ -781,7 +781,13 @@ typedef	struct	{
 #define EXITC_REF	'R'	/* Refused */
 #define EXITC_AREF	'U'	/* Unauthorized by iauth */
 #define EXITC_AREFQ	'u'	/* Unauthorized by iauth, be quiet */
-#define	EXITC_AUTHFAIL	'A'	/* Authentication failure (iauth problem) */
+#define EXITC_AUTHFAIL	'A'	/* Authentication failure (iauth problem) */
+#define EXITC_AUTHTOUT	'a'	/* Authentication time out */
+
+/* eXternal authentication slave OPTions */
+#define	XOPT_REQUIRED	0x01	/* require authentication be done by iauth */
+#define	XOPT_NOTIMEOUT	0x02	/* disallow iauth time outs */
+#define XOPT_EXTWAIT	0x10	/* extend registration ping timeout */
 
 /* misc defines */
 

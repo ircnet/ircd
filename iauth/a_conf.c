@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.9 1999/03/07 23:46:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.10 1999/03/08 21:59:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -48,11 +48,14 @@ char *msg, *chk;
 }
 
 /* conf_read: read the configuration file, instanciate modules */
-void
+char *
 conf_read(cfile)
 char *cfile;
 {
 	u_char ident = 0; /* make sure this module is used */
+	u_char needh = 0; /* do we need hostname information for any host? */
+	u_char o_req = 0, o_dto = 0;
+	static char o_all[5];
 	u_int lnnb = 0, i;
 	char buffer[160], *ch;
 	AnInstance **last = &instances, *itmp;
@@ -81,7 +84,9 @@ char *cfile;
 			if (ch = index(buffer, '#'))
 				*ch = '\0';
 			if (!strncmp("required", buffer, 8))
-				iauth_required = 1;
+				o_req = 1;
+			if (!strncmp("notimeout", buffer, 9))
+				o_dto = 1;
 			/* debugmode setting */
 			if (!strncmp("debuglvl = 0x", buffer, 13))
 			    {
@@ -176,6 +181,7 @@ char *cfile;
 				    }
 				if (!strncasecmp(buffer+1, "host = ", 7))
 				    {
+					needh = 1;
 					ttmp = &((*last)->hostname);
 					ch = buffer + 8;
 				    }
@@ -258,6 +264,11 @@ char *cfile;
 				itmp->mod->init(itmp);
 			itmp = itmp->nexti;
 		    }
+	ch = o_all;
+	if (o_req) *ch++ = 'R';
+	if (o_dto) *ch++ = 'T';
+	if (needh) *ch++ = 'W';
+	*ch++ = '\0';
 }
 
 /* conf_match: check if an instance is to be applied to a connection */

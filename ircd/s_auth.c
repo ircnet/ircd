@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.30 1999/03/08 19:25:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.31 1999/03/08 21:59:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -29,7 +29,8 @@ static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.30 1999/03/08 19:25:17 kalt Exp $"
 
 #if defined(USE_IAUTH)
 
-u_char		iauth_required = 0;
+u_char		iauth_options = 0;
+u_int		iauth_spawn = 0;
 
 static aExtCf	*iauth_conf = NULL;
 static aExtData	*iauth_stats = NULL;
@@ -135,18 +136,24 @@ read_iauth()
 		    if (*start == 'G')
 			{
 			    ia_dbg = atoi(start+2);
-			    sendto_flag(SCH_AUTH, "ia_dbg = %d", ia_dbg);
+			    if (ia_dbg)
+				    sendto_flag(SCH_AUTH,"ia_dbg = %d",ia_dbg);
 			    start = end;
 			    continue;
 			}
 		    if (*start == 'O') /* options */
 			{
+			    iauth_options = 0;
 			    if (strchr(start+2, 'R'))
-				    iauth_required = 1;
-			    else
-				    iauth_required = 0;
-			    if (ia_dbg)
-				    sendto_flag(SCH_AUTH,"ia_dbg = %d",ia_dbg);
+				    iauth_options |= XOPT_REQUIRED;
+			    if (strchr(start+2, 'T'))
+				    iauth_options |= XOPT_NOTIMEOUT;
+			    if (strchr(start+2, 'W'))
+				    iauth_options |= XOPT_EXTWAIT;
+
+			    if (iauth_options)
+				    sendto_flag(SCH_AUTH, "iauth options: %x",
+						iauth_options);
 			    start = end;
 			    continue;
 			}
@@ -193,7 +200,13 @@ read_iauth()
 			    sprintf(iauth_stats->line,
 				    "iauth modules statistics (%s)",
 				    myctime(timeofday));
-			    iauth_stats->next = NULL;
+			    iauth_stats->next = (aExtData *)
+				    MyMalloc(sizeof(aExtData));
+			    iauth_stats->next->line = MyMalloc(40);
+			    sprintf(iauth_stats->next->line,
+				    "spawned: %d, current options: %X",
+				    iauth_spawn, iauth_options);
+			    iauth_stats->next->next = NULL;
 			    start = end;
 			    continue;
 			}
@@ -401,7 +414,7 @@ Reg	aClient	*cptr;
 	SOCK_LEN_TYPE ulen, tlen;
 
 # if defined(USE_IAUTH)
-	if (iauth_required && adfd < 0)
+	if ((iauth_options & XOPT_REQUIRED) && adfd < 0)
 		return;
 # endif
 	Debug((DEBUG_NOTICE,"start_auth(%x) fd %d status %d",

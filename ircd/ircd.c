@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.49 1999/03/07 23:01:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.50 1999/03/08 21:59:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -415,15 +415,37 @@ time_t	currenttime;
 					cptr->count = 0;
 					*cptr->buffer = '\0';
 				    }
-				Debug((DEBUG_NOTICE, "%s/%s timeout %s",
+				Debug((DEBUG_NOTICE, "%s/%c%s timeout %s",
 				       (DoingDNS(cptr)) ? "DNS" : "dns",
-				       (DoingXAuth(cptr)) ? "AUTH" : "auth",
+				       (DoingXAuth(cptr)) ? "X" : "x",
+				       (DoingAuth(cptr)) ? "AUTH" : "auth",
 				       get_client_name(cptr,TRUE)));
 				del_queries((char *)cptr);
 				ClearAuth(cptr);
 #if defined(USE_IAUTH)
 				if (DoingDNS(cptr) || DoingXAuth(cptr))
+				    {
+					if (DoingDNS(cptr) &&
+					    (iauth_options & XOPT_EXTWAIT))
+					    {
+						/* iauth wants more time */
+						sendto_iauth("%d d", cptr->fd);
+						ClearDNS(cptr);
+						cptr->lasttime = currenttime;
+						continue;
+					    }
+					if (DoingXAuth(cptr) &&
+					    (iauth_options & XOPT_NOTIMEOUT))
+					    {
+						cptr->exitc = EXITC_AUTHTOUT;
+						sendto_iauth("%d T", cptr->fd);
+						ereject_user(cptr, " Timeout ",
+						     "Authentication Timeout");
+						continue;
+					    }
 					sendto_iauth("%d T", cptr->fd);
+					SetDoneXAuth(cptr);
+				    }
 #endif
 				ClearDNS(cptr);
 				ClearXAuth(cptr);

@@ -25,7 +25,6 @@
  */
 #ifndef A_CONF_C
 extern u_int	debuglevel;
-extern u_char	iauth_required;
 extern AnInstance *instances;
 #endif /* A_CONF_C */
 
@@ -37,7 +36,7 @@ extern AnInstance *instances;
 # define EXTERN
 #endif /* A_CONF_C */
 
-EXTERN void conf_read __P((char *));
+EXTERN char *conf_read __P((char *));
 EXTERN int conf_match __P((u_int, AnInstance *, int));
 EXTERN void conf_ircd();
 

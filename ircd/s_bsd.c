@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.61 1999/03/08 17:06:45 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.62 1999/03/08 21:59:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -449,6 +449,7 @@ int rcvdsig;
 		sendto_flag(SCH_AUTH, "Starting iauth...");
 		last = time(NULL);
 		read_iauth(); /* to reset olen */
+		iauth_spawn += 1;
 	    }
 	else
 		return;
