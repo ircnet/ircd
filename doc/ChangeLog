@@ -1,3 +1,8 @@
+2003-10-18  Kurt Roeckx
+
+	* support.c/make_isupport(): Limit to sending 12 tokens in
+	  005 numeric.
+
 2003-10-18  Piotr Kucharski
 
 	* ircd.c: new function delayed_kills() for checking kill-lines.
@@ -9,6 +14,16 @@
 	* s_user.c/register_user(): find_kill param fix 
 	* s_misc.c: removed old version of DK.
 	* config.h.dist: added MAXDELAYEDKILLS define, removed DELAYED_KILLS.
+
+2003-10-18  Kurt Roeckx
+
+	* os.h: Removed the defenition of in6addr_any.
+	* *.c: Remove all K&R syntax.
+	* channel.c, str.c, mod_socks.c, list.c, s_id.c, send_ext.h, hash.c,
+	  ircd.c, s_misc.c, s_serv.c, irc.c, s_bsd.c, parse.c, iauth.c
+	  ircdwatch.c, mkpasswd.c, s_service.c, s_misc_ext.hi, nameser_def.h,
+	  res_mkquery.c, s_auth.c, os.h, send.c, support.c:
+	  Fix warnings.
 
 2003-10-18  Jakub Vlasek
 	
