@@ -1,3 +1,11 @@
+2003-08-07  Piotr Kucharski
+
+	* s_user.c/m_nick(): move around some code and add checking for
+	  "NICK 0" or "NICK UID" from client already having UID nick and
+	  discard it.
+	* s_user.c/do_nick_name(): disallow {}\ in nicks, so we can later
+	  drop scandinavian origin in match().
+
 2003-08-06  Piotr Kucharski
 
 	* numeric_def.h, struct_def.h, support.c/make_isupport(),
