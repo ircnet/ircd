@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.4 1997/05/05 14:51:21 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.5 1997/05/21 20:29:29 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -53,7 +53,7 @@ aChannel *channel = NullChn;
 static	void	add_invite __P((aClient *, aChannel *));
 static	int	add_banid __P((aClient *, aChannel *, char *));
 static	int	can_join __P((aClient *, aChannel *, char *));
-static	void	channel_modes __P((aClient *, char *, char *, aChannel *));
+void	channel_modes __P((aClient *, char *, char *, aChannel *));
 static	int	check_channelmask __P((aClient *, aClient *, char *));
 static	int	del_banid __P((aChannel *, char *));
 static	aChannel *get_channel __P((aClient *, char *, int));
@@ -499,7 +499,7 @@ aClient	*mp;
  * write the "simple" list of channel modes for channel chptr onto buffer mbuf
  * with the parameters in pbuf.
  */
-static	void	channel_modes(cptr, mbuf, pbuf, chptr)
+void	channel_modes(cptr, mbuf, pbuf, chptr)
 aClient	*cptr;
 Reg	char	*mbuf, *pbuf;
 aChannel *chptr;
@@ -596,8 +596,8 @@ void	send_channel_modes(cptr, chptr)
 aClient *cptr;
 aChannel *chptr;
 {
-  if (*chptr->chname != '#'
-      || chptr->users == 0) /* channel is empty (locked), thus no mode */
+	if (*chptr->chname != '#'
+	    || chptr->users == 0) /* channel is empty (locked), thus no mode */
 		return;
 
 	*modebuf = *parabuf = '\0';
