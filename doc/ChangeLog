@@ -24,6 +24,10 @@
 	* list.c/remove_client_from_list(): negative remote client count bug,
 	  as directly connected servers have hopcount of 1, not 0.
 
+2004-04-10  Jakub Vlasek
+
+	* config.h.dist: Made OPER_SET #define'd by default.
+
 2004-04-10  Piotr Kucharski
 
 	* channel.c/del_modeid(): memleak, it should've freed modeid.
