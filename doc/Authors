@@ -159,9 +159,9 @@ Magnus Tjernstrom <d92-mtm@oook.campus.luth.se>
 Olivier Galibert <Olivier.Galibert@mines.u-nancy.fr>: service code testing
 Alain Nissen <Alain.Nissen@ulg.ac.be>: source tree restructuration, many
 portability issues, new configure.in
-Roar Thronæs <roart@nvg.ntnu.no> added IPv6 support.
+Roar Thronæs <roart@nvg.ntnu.no> added IPv6 support
 
-The version 2.10 release was coordinated by Christophe Kalt.
+The versions 2.10 releases were coordinated by Christophe Kalt.
 
 Christophe Kalt <kalt@stealth.net>: added channel modes e and I, designed and
 implemented !channels, brought away status back to life, added NJOIN message,
@@ -172,7 +172,8 @@ Various modifications, bugreports, cleanups and testing by:
 Helmut Springer <delta@RUS.Uni-Stuttgart.DE>
 Michael 'Eumel' Neumayer <eumel@42.org>
 Kurt Roeckx <Q@ping.be>
-Roar Thronæs <roart@nvg.ntnu.no> for IPv6 changes.
+Roar Thronæs <roart@nvg.ntnu.no> for more IPv6 work
+Piotr Kucharski <chopin@sgh.waw.pl> for his work on the anti socks module
 
 Thanks go to those persons not mentioned here who have added their advice,
 opinions, and code to IRC.
