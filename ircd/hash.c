@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.4 1997/09/03 17:45:49 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.5 1998/01/23 13:30:26 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -571,10 +571,10 @@ aClient *cptr;
 	for (;;)
 	    {
 		t--;
-		for (; t > server; t--)
+		for (; t >= server; t--)
 			if (*(t+1) == '.')
 				break;
-		if (*t == '*' || t == server)
+		if (t < server || *t == '*')
 			break;
 		ch = *t;
 		*t = '*';
