@@ -565,12 +565,6 @@
 */
 #undef DISABLE_NICK0_REGISTRATION
 
-/*
-** Undefine this if you do not want to see notices about exceeded maxsendq
-** during burst.
-*/
-#define MAXSENDQ_NOTICES
-
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 
@@ -820,4 +814,8 @@
 
 #if !defined(SCH_TKILL)
 #define SCH_TKILL SCH_NOTICE
+#endif
+
+#if defined(CLIENTS_CHANNEL) && !defined(CLIENTS_CHANNEL_LEVEL)
+#error define CLIENTS_CHANNEL_LEVEL
 #endif
