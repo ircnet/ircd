@@ -1,10 +1,13 @@
-# @(#)$Id: RELEASE_NOTES,v 1.19 1998/04/30 12:50:19 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.20 1998/08/05 03:37:08 kalt Exp $
 
 This is a development version of the IRC software.
 
 ===============================================================================
 
 New features in 2.10:
+	* slave process handles identd lookups.. (modular design).
+	* creation of a collision proof type of channels (prefix !).
+	* opless !channels may be reoped by the server (mode +r).
 	* added channel mode +e (EFnet's exceptions to bans).
 	* added channel mode +I (invitations).
 	* /invite can now be used to override channel bans & limit.

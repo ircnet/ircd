@@ -1,3 +1,48 @@
+Tue Aug  4 21:43:53 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* a_io.c: numerous bug fixes..
+
+	* mod_rfc931.c: fix to prevent crash when receiving data from
+	broken ident servers.
+
+	* a_conf.c, a_conf_def.h, a_externs.h, a_log_def.h: added module
+	`socks'.  (Based on a 2.9.5 diff from Jonathan Chapman)
+
+	* a_log.c: added timestamps to `auth' log.
+
+	* s_misc.c: EXITC_AREF is a special case like EXITC_REF.
+
+	* parse.c: penalty bugfix.
+
+	* ircd.c, s_auth.c, s_bsd.c, s_bsd_ext.h:
+ 		* cleaned up slave startup procedure, added start_iauth()
+		which is called upon SIGUSR1.
+		* various fixes in read_iauth().
+
+Sun Aug  2 18:34:20 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* s_mist_ext.h, s_misc.c, support_ext.h, support.c: moved
+	myctime() from s_misc.c to support.c.
+	
+	* s_bsd.c, a_io.c: added `R' message from ircd to slave.
+
+	* s_serv.c: updated check_version() not to use NJOIN with 2.9.5 links.
+
+	* parse.c: restricted SQUERY to users.
+	
+	* channel.c: 
+		* m_njoin(): conversion bugfix (Reported by Q).
+		* added FULLV2_10 #if's.
+	
+	* struct_def.h, channel.c, s_err.c, s_misc.c: added channel mode `r'.
+	
+	* send.c: reference to NULL pointer in sendto_match_servs()
+	(Reported by Core).
+
+	* sys_def.c, chkconf.c: MyFree() redefinitions (from Core).
+
+	* Makefile.in: "make install-server" path problems.
+
 Sun Jul 19 15:32:48 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* s_conf.c, ircd.c: unitialized K line comment in check_pings().
