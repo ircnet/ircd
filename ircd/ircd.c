@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.136 2004/06/17 14:14:22 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.137 2004/06/19 18:05:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -65,6 +65,9 @@ time_t	nextdnscheck = 0;	/* next time to poll dns to force timeouts */
 time_t	nextexpire = 1;		/* next expire run on the dns cache */
 time_t	nextiarestart = 1;	/* next time to check if iauth is alive */
 time_t	nextpreference = 1;	/* time for next calculate_preference call */
+#ifdef TKLINE
+time_t	nexttkexpire = 0;	/* time for next tkline_expire call */
+#endif
 
 RETSIGTYPE s_die(int s)
 {
@@ -1088,6 +1091,11 @@ static	void	io_loop(void)
 	/* close all overdue delayed fds */
 	if (nextdelayclose && timeofday >= nextdelayclose)
 		nextdelayclose = delay_close(-1);
+#endif
+#ifdef TKLINE
+	/* expire tklines */
+	if (nexttkexpire && timeofday >= nexttkexpire)
+		nexttkexpire = tkline_expire(0);
 #endif
 	/*
 	** Every once in a while, hunt channel structures that

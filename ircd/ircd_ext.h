@@ -47,6 +47,9 @@ extern time_t nextgarbage;
 extern time_t nextping;
 extern time_t nextdnscheck;
 extern time_t nextexpire;
+#ifdef TKLINE
+extern time_t nexttkexpire;
+#endif
 #endif /* IRCD_C */
 
 /*  External definitions for global functions.
