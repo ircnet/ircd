@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.128 2002/08/01 01:56:52 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.129 2002/08/24 00:28:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -777,6 +777,7 @@ uncommented may just lead to desynchs..
 	*modebuf = '+';
 	modebuf[1] = '\0';
 	send_mode_list(cptr, chptr->chname, chptr->mlist, CHFL_BAN, 'b');
+#ifdef COMPAT29
 	if (modebuf[1] || *parabuf)
 	    {
 		/* only needed to help compatibility */
@@ -786,6 +787,7 @@ uncommented may just lead to desynchs..
 		*modebuf = '+';
 		modebuf[1] = '\0';
 	    }
+#endif
 	send_mode_list(cptr, chptr->chname, chptr->mlist,
 		       CHFL_EXCEPTION, 'e');
 	send_mode_list(cptr, chptr->chname, chptr->mlist,
@@ -954,7 +956,9 @@ char	*parv[];
 	aClient *who;
 	Mode	*mode, oldm;
 	Link	*plp = NULL;
+#ifdef COMPAT29
 	int	compat = -1; /* to prevent mixing old/new modes */
+#endif
 	char	*mbuf = modebuf, *pbuf = parabuf, *upbuf = uparabuf;
 
 	*mbuf = *pbuf = *upbuf = '\0';
@@ -968,6 +972,7 @@ char	*parv[];
 
 	while (curr && *curr && count >= 0)
 	    {
+#ifdef COMPAT29
 		if (compat == -1 && *curr != '-' && *curr != '+')
 		{
 			if (*curr == 'e' || *curr == 'I')
@@ -979,6 +984,7 @@ char	*parv[];
 				compat = 0;
 			}
 		}
+#endif
 		switch (*curr)
 		{
 		case '+':
@@ -1437,6 +1443,7 @@ char	*parv[];
 			curr = *++parv;
 			parc--;
 		    }
+#ifdef COMPAT29
 		/*
 		 * Make sure old and new (+e/+I) modes won't get mixed
 		 * together on the same line
@@ -1455,6 +1462,7 @@ char	*parv[];
 				*curr = '\0';
 			}
 		}
+#endif
 	    } /* end of while loop for MODE processing */
 
 	whatt = 0;
@@ -2394,6 +2402,8 @@ char	*parv[];
 		    }
 		/*
 	        ** notify other servers
+		*/
+		/* Here also could be some #ifdef COMPAT29 --B.
 		*/
 		if (index(name, ':') || *chptr->chname == '!') /* compat */
 			sendto_match_servs(chptr, cptr, ":%s JOIN :%s%s",
