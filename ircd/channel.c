@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.241 2004/12/15 01:23:45 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.242 2005/01/30 16:59:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3378,7 +3378,7 @@ int	m_list(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		 * behaviour is changed, MyConnect() check needs to be added
 		 * here and within following loops as well. - jv
 		 */
-		maxsendq = (int) ((float) get_sendq(sptr) * (float) 0.9);
+		maxsendq = (int) ((float) get_sendq(sptr, 0) * (float) 0.9);
 		
 		/* First, show all +s/+p channels user is on */
 		for (lp = sptr->user->channel; lp; lp = lp->next)
