@@ -1,3 +1,13 @@
+2002-08-01  Piotr Kucharski
+
+	* struct_def.h: added invLink struct, similar to Link, but keeps
+	  also 'char *who'.
+	* list.c, list_ext.h: make_invlink() and free_invlink() added.
+	* channel.c/add_invite(): added sptr param for remembering who
+	  invited us to every channel.
+	* channel.c/del_invite(): also free memory allocated in add_invite().
+	* channel.c/can_join(): announce to channel who invited banned user.
+
 2002-07-31  Piotr Kucharski
 
 	* hash.c/m_hash(): was '%Full', should've been '%%Full'.
