@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.40 1999/06/17 12:34:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.41 1999/06/17 12:39:46 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -277,9 +277,9 @@ read_iauth()
 				    myctime(timeofday));
 			    iauth_stats->next = (aExtData *)
 				    MyMalloc(sizeof(aExtData));
-			    iauth_stats->next->line = MyMalloc(40);
+			    iauth_stats->next->line = MyMalloc(60);
 			    sprintf(iauth_stats->next->line,
-				    "spawned: %d, current options: %X (%s)",
+				    "spawned: %d, current options: %X (%.11s)",
 				    iauth_spawn, iauth_options,
 				    (iauth_version) ? iauth_version : "???");
 			    iauth_stats->next->next = NULL;
