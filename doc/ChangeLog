@@ -1,3 +1,7 @@
+2002-09-08  Jakub Vlasek
+
+	* channel.c/m_list(), config.h.dist: Added LIST_ALIS_NOTE.
+
 2002-09-06  Piotr Kucharski
 
 	* s_user.c/m_nick(): when checking for correct number of params
