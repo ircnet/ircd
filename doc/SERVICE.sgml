@@ -4,7 +4,7 @@
 
 <title>IRC Services
 <author>Christophe Kalt
-<date>$Id: SERVICE.sgml,v 1.4 1997/09/03 20:33:25 kalt Exp $
+<date>$Id: SERVICE.sgml,v 1.5 1997/09/09 19:13:56 kalt Exp $
 <abstract>
 The IRC protocol described in RFC 1459 defines two types of
 connections (client, and server).  A third type was
@@ -80,7 +80,7 @@ net.
 <sect1>SQUERY
 <p>
 This new command stands for ``Service Query''.  The first
-argument is the serice name, and the second the text to be
+argument is the service name, and the second the text to be
 sent to the service.
 
 <sect>How to set up a service
