@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: mod_webproxy.c,v 1.3 2004/10/03 17:13:42 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: mod_webproxy.c,v 1.4 2005/01/27 19:17:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -360,7 +360,7 @@ static	char	*proxy_init(AnInstance *self)
 
 	if ((ch = strstr(self->opt, "cache=")))
 	{
-		mydata->lifetime = atoi(ch+7);
+		mydata->lifetime = atoi(ch+6);
 	}
 	sprintf(cbuf, ",cache=%d", mydata->lifetime);
 	strcat(tmpbuf, cbuf);
