@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.3 1998/08/05 02:51:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.4 1998/08/05 03:16:27 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -266,6 +266,8 @@ parse_ircd()
 				free(cldata[cl].authuser);
 				cldata[cl].authuser = NULL;
 			    }
+			cldata[cl].user[0] = '\0';
+			cldata[cl].host[0] = '\0';
 			cldata[cl].best = cldata[cl].tried = NULL;
 			cldata[cl].buflen = 0;
 			if (chp[0] == 'C')
