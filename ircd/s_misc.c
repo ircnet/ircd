@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.97 2004/10/01 20:22:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.98 2004/11/04 21:04:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -196,14 +196,15 @@ char	*get_client_name(aClient *sptr, int showip)
 				(void)sprintf(nbuf, "%s[%.*s@%s]",
 					sptr->name, USERLEN,
 					(!(sptr->flags & FLAGS_GOTID)) ? "" :
-					sptr->auth,
+					sptr->auth, sptr->user ? sptr->user->sip :
 #ifdef INET6 
 					      inetntop(AF_INET6,
 						       (char *)&sptr->ip,
-						       mydummy, MYDUMMY_SIZE));
+						       mydummy, MYDUMMY_SIZE)
 #else
-					      inetntoa((char *)&sptr->ip));
+					      inetntoa((char *)&sptr->ip)
 #endif
+					);
 			else
 			    {
 				if (mycmp(sptr->name, sptr->sockhost))
@@ -215,6 +216,7 @@ char	*get_client_name(aClient *sptr, int showip)
 						IsPerson(sptr) ?
 							sptr->user->username :
 							sptr->auth,
+						IsPerson(sptr) ? sptr->user->host :
 						sptr->sockhost);
 				else
 					return sptr->name;
