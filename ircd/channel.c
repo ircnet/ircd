@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.150 2003/08/05 14:53:28 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.151 2003/08/06 18:47:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -263,6 +263,8 @@ aListItem	*modeid;
 					rpl = RPL_BANLIST;
 				else if (type == CHFL_EXCEPTION)
 					rpl = RPL_EXCEPTLIST;
+				else if (type == CHFL_REOPLIST)
+					rpl = RPL_REOPLIST;
 				else
 					rpl = RPL_INVITELIST;
 
@@ -764,7 +766,7 @@ char	flag, *chname;
 		if (!(lp->flags & mask))
 			continue;
 		if (mask == CHFL_BAN || mask == CHFL_EXCEPTION ||
-		    mask == CHFL_INVITE)
+		    mask == CHFL_INVITE || mask == CHFL_REOPLIST)
 		{
 			/* XXX: rewrite latter to simply use alist, DO NOT copy it --B. */
 			sprintf(tmpbei, "%s!%s@%s", lp->value.alist->nick,
@@ -835,13 +837,6 @@ void	send_channel_modes(cptr, chptr)
 aClient *cptr;
 aChannel *chptr;
 {
-#if 0
-this is probably going to be very annoying, but leaving the following code
-uncommented may just lead to desynchs..
-	if ((*chptr->chname != '#' && *chptr->chname != '!')
-	    || chptr->users == 0) /* channel is empty (locked), thus no mode */
-		return;
-#endif
 
 	if (check_channelmask(&me, cptr, chptr->chname))
 		return;
@@ -850,31 +845,41 @@ uncommented may just lead to desynchs..
 	channel_modes(cptr, modebuf, parabuf, chptr);
 
 	if (modebuf[1] || *parabuf)
+	{
 		sendto_one(cptr, ":%s MODE %s %s %s",
-			   ME, chptr->chname, modebuf, parabuf);
+			ME, chptr->chname, modebuf, parabuf);
+	}
 
 	*parabuf = '\0';
 	*modebuf = '+';
 	modebuf[1] = '\0';
 	send_mode_list(cptr, chptr->chname, chptr->mlist, CHFL_BAN, 'b');
-#ifdef COMPAT29
-	if (modebuf[1] || *parabuf)
-	    {
-		/* only needed to help compatibility */
-		sendto_one(cptr, ":%s MODE %s %s %s",
-			   ME, chptr->chname, modebuf, parabuf);
-		*parabuf = '\0';
-		*modebuf = '+';
-		modebuf[1] = '\0';
-	    }
-#endif
 	send_mode_list(cptr, chptr->chname, chptr->mlist,
-		       CHFL_EXCEPTION, 'e');
+		CHFL_EXCEPTION, 'e');
 	send_mode_list(cptr, chptr->chname, chptr->mlist,
-		       CHFL_INVITE, 'I');
+		CHFL_INVITE, 'I');
+	if (ST_UID(cptr))	/* knows UID == new server */
+	{
+		if (modebuf[1] || *parabuf)
+		{
+			/* sending beI left in modebuf or parabuf and
+			** clearing these buffers before using them
+			** for R lists, so new/old modes don't mix */
+			sendto_one(cptr, ":%s MODE %s %s %s",
+				ME, chptr->chname, modebuf, parabuf);
+			*parabuf = '\0';
+			*modebuf = '+';
+			modebuf[1] = '\0';
+		}
+		send_mode_list(cptr, chptr->chname, chptr->mlist,
+			CHFL_REOPLIST, 'R');
+	}
 	if (modebuf[1] || *parabuf)
+	{
+		/* complete sending, if anything left in buffers */
 		sendto_one(cptr, ":%s MODE %s %s %s",
-			   ME, chptr->chname, modebuf, parabuf);
+			ME, chptr->chname, modebuf, parabuf);
+	}
 }
 
 /*
@@ -1036,9 +1041,7 @@ char	*parv[];
 	aClient *who;
 	Mode	*mode, oldm;
 	Link	*plp = NULL;
-#ifdef COMPAT29
 	int	compat = -1; /* to prevent mixing old/new modes */
-#endif
 	char	*mbuf = modebuf, *pbuf = parabuf, *upbuf = uparabuf;
 	int tmp_chfl, tmp_rpl, tmp_rpl2, tmp_mode;
 
@@ -1053,10 +1056,9 @@ char	*parv[];
 
 	while (curr && *curr && count >= 0)
 	    {
-#ifdef COMPAT29
 		if (compat == -1 && *curr != '-' && *curr != '+')
 		{
-			if (*curr == 'e' || *curr == 'I')
+			if (*curr == 'R')
 			{
 				compat = 1;
 			}
@@ -1065,7 +1067,6 @@ char	*parv[];
 				compat = 0;
 			}
 		}
-#endif
 		switch (*curr)
 		{
 		case '+':
@@ -1280,6 +1281,7 @@ char	*parv[];
 		case 'b':
 		case 'e':
 		case 'I':
+		case 'R':
 			switch (*curr)
 			{
 			case 'b':
@@ -1300,23 +1302,34 @@ char	*parv[];
 				tmp_rpl2 = RPL_ENDOFINVITELIST;
 				tmp_mode = MODE_INVITE;
 				break;
+			case 'R':
+				tmp_chfl = CHFL_REOPLIST;
+				tmp_rpl = RPL_REOPLIST;
+				tmp_rpl2 = RPL_ENDOFREOPLIST;
+				tmp_mode = MODE_REOPLIST;
+				break;
 			}
 			*penalty += 1;
-			if (--parc <= 0)	/* beI list query */
+			if (--parc <= 0)	/* beIR list query */
 			{
 				/* Feature: no other modes after query */
 				*(curr+1) = '\0';	/* Stop MODE # bb.. */
 				for (lp = chptr->mlist; lp; lp = lp->next)
+				{
 					if (lp->flags == tmp_chfl)
+					{
 						sendto_one(cptr,
-							   replies[tmp_rpl],
-							   ME, BadTo(cptr->name),
-							   chptr->chname,
-							   lp->value.alist->nick,
-							   lp->value.alist->user,
-							   lp->value.alist->host);
+							replies[tmp_rpl],
+							ME, BadTo(cptr->name),
+							chptr->chname,
+							lp->value.alist->nick,
+							lp->value.alist->user,
+							lp->value.alist->host);
+					}
+				}
 				sendto_one(cptr, replies[tmp_rpl2],
-					   ME, BadTo(cptr->name), chptr->chname);
+					ME, BadTo(cptr->name),
+					chptr->chname);
 				break;
 			}
 			parv++;
@@ -1466,14 +1479,13 @@ char	*parv[];
 			curr = *++parv;
 			parc--;
 		    }
-#ifdef COMPAT29
 		/*
-		 * Make sure old and new (+e/+I) modes won't get mixed
-		 * together on the same line
+		 * Make sure new (+R) mode won't get mixed with old modes
+		 * together on the same line. OTOH: why not? --B.
 		 */
 		if (MyClient(sptr) && curr && *curr != '-' && *curr != '+')
 		{
-			if (*curr == 'e' || *curr == 'I')
+			if (*curr == 'R')
 			{
 				if (compat == 0)
 				{
@@ -1485,7 +1497,6 @@ char	*parv[];
 				*curr = '\0';
 			}
 		}
-#endif
 	    } /* end of while loop for MODE processing */
 
 	whatt = 0;
@@ -1536,7 +1547,7 @@ char	*parv[];
 	    }
 
 	/*
-	 * Reconstruct "+beIkOov" chain.
+	 * Reconstruct "+beIRkOov" chain.
 	 */
 	if (opcnt)
 	    {
@@ -1595,6 +1606,7 @@ char	*parv[];
 			case MODE_BAN :
 			case MODE_EXCEPTION :
 			case MODE_INVITE :
+			case MODE_REOPLIST :
 				switch(lp->flags & MODE_WPARAS)
 				{
 				case MODE_BAN :
@@ -1603,6 +1615,8 @@ char	*parv[];
 					c = 'e'; break;
 				case MODE_INVITE :
 					c = 'I'; break;
+				case MODE_REOPLIST :
+					c = 'R'; break;
 				}
 				/* parseNUH: */
 				cp = lp->value.alist;	/* see? we get it back */
@@ -1698,6 +1712,7 @@ char	*parv[];
 			case MODE_BAN :
 			case MODE_EXCEPTION :
 			case MODE_INVITE :
+			case MODE_REOPLIST :
 				switch(lp->flags & MODE_WPARAS)
 				{
 				case MODE_BAN :
@@ -1706,6 +1721,8 @@ char	*parv[];
 					tmp_chfl = CHFL_EXCEPTION; break;
 				case MODE_INVITE :
 					tmp_chfl = CHFL_INVITE; break;
+				case MODE_REOPLIST :
+					tmp_chfl = CHFL_REOPLIST; break;
 				}
 				if (ischop &&
 					(((whatt & MODE_ADD) &&
@@ -1766,9 +1783,12 @@ char	*parv[];
 
 		sendto_match_servs_v(chptr, cptr, SV_UID,
 			":%s MODE %s %s %s", s, chptr->chname, mbuf, upbuf);
-		sendto_match_servs_notv(chptr, cptr, SV_UID, 
-			":%s MODE %s %s %s", sptr->name, chptr->chname, mbuf,
-			pbuf);
+		if (modebuf[1] != 'R') /* don't send +R list to old servers */
+		{
+			sendto_match_servs_notv(chptr, cptr, SV_UID, 
+				":%s MODE %s %s %s", sptr->name, chptr->chname,
+				mbuf, pbuf);
+		}
 
 		if ((IsServer(cptr) && !IsServer(sptr) && !ischop))
 		{
@@ -1816,7 +1836,7 @@ char	*key;
 		{
 			banned = NULL;
 		}
-		else if (lp == NULL)
+		else if (lp == NULL) /* not invited */
 		{
 			return (ERR_BANNEDFROMCHAN);
 		}
@@ -2418,8 +2438,6 @@ char	*parv[];
 		    }
 		/*
 	        ** notify other servers
-		*/
-		/* Here also could be some #ifdef COMPAT29 --B.
 		*/
 		if (index(name, ':') || *chptr->chname == '!') /* compat */
 		{

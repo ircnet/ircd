@@ -1,3 +1,13 @@
+2003-08-06  Piotr Kucharski
+
+	* numeric_def.h, struct_def.h, support.c/make_isupport(),
+	  channel.c/send_channel_modes(),add_modeid(),send_mode_list(), 
+          set_mode(), s_err.c: introduced R (reop) list (no reop yet).
+
+2003-08-05  Piotr Kucharski
+
+	* channel.c/can_join(): send a notice also when overriding limit.
+
 2003-07-29  Piotr Kucharski
 
 	* s_service.c/m_service(): removed metric variable; moved filling

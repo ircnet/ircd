@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.40 2003/02/14 00:27:15 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.41 2003/08/06 18:47:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -32,7 +32,7 @@ char *	replies[] = {
 /* 001 RPL_WELCOME  */	":%s 001 %s :Welcome to the Internet Relay Network %s",
 /* 002 RPL_YOURHOST */	":%s 002 %s :Your host is %s, running version %s",
 /* 003 RPL_CREATED */	":%s 003 %s :This server was created %s",
-/* 004 RPL_MYINFO */	":%s 004 %s %s %s aoOirw abeiIklmnoOpqrstv",
+/* 004 RPL_MYINFO */	":%s 004 %s %s %s aoOirw abeiIklmnoOpqrRstv",
 /* 005 RPL_ISUPPORT */  ":%s 005 %s %s :are supported by this server",
 /* 006 */ (char *)NULL,
 /* 007 */ (char *)NULL,
@@ -386,8 +386,8 @@ char *	replies[] = {
 /* 341 RPL_INVITING */	":%s 341 %s %s %s",
 /* 342 RPL_SUMMONING */	":%s 342 %s %s :User summoned to irc",
 /* 343 */ (char *)NULL,
-/* 344 */ (char *)NULL,
-/* 345 */ (char *)NULL,
+/* 344 RPL_REOPLIST */	":%s 344 %s %s %s!%s@%s",
+/* 345 RPL_ENDOFREOPLIST */	":%s 345 %s %s :End of Channel Reop List",
 /* 346 RPL_INVITELIST */	":%s 346 %s %s %s!%s@%s",
 /* 347 RPL_ENDOFINVITELIST */	":%s 347 %s %s :End of Channel Invite List",
 /* 348 RPL_EXCEPTLIST */	":%s 348 %s %s %s!%s@%s",

@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.75 2003/07/28 17:16:00 jv Exp $
+ *   $Id: struct_def.h,v 1.76 2003/08/06 18:47:45 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -663,6 +663,7 @@ struct Channel	{
 #define	CHFL_BAN	0x0008 /* ban channel flag */
 #define	CHFL_EXCEPTION	0x0010 /* exception channel flag */
 #define	CHFL_INVITE	0x0020 /* invite channel flag */
+#define	CHFL_REOPLIST	0x0040 /* reoplist channel flag */
 #ifdef OPER_KLUDGE
 #define	CHFL_OPERS	0x1000 /* oper mode flag */
 #endif
@@ -686,12 +687,13 @@ struct Channel	{
 #define	MODE_EXCEPTION	0x4000
 #define	MODE_INVITE	0x8000
 #define	MODE_REOP	0x10000
+#define	MODE_REOPLIST	0x20000
 #define	MODE_FLAGS	0x1ffff
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */
 #define	MODE_WPARAS	(MODE_UNIQOP|MODE_CHANOP|MODE_VOICE|MODE_BAN|MODE_KEY\
-			 |MODE_LIMIT|MODE_INVITE|MODE_EXCEPTION)
+			 |MODE_LIMIT|MODE_INVITE|MODE_EXCEPTION|MODE_REOPLIST)
 /*
  * Undefined here, these are used in conjunction with the above modes in
  * the source.
