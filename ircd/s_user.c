@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.202 2004/05/12 16:33:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.203 2004/05/18 22:53:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1367,9 +1367,9 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (!check_uid(uid, sptr->serv->sid))
 	{
 		/* This is so bad, that I really don't want to deal with it! */
-		sendto_ops_butone(NULL, &me,
-			":%s WALLOPS :Bad UID (%s) from %s",
-			ME, uid, get_client_name(cptr, FALSE));
+		sendto_ops_butone(NULL, ME,
+			"Bad UID (%s) from %s",
+			uid, get_client_name(cptr, FALSE));
 		return exit_client(cptr, cptr, &me, "Bad UID");
 	}
 
@@ -1381,9 +1381,9 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (acptr)
 	{
 		/* This is so bad, that I really don't want to deal with it! */
-		sendto_ops_butone(NULL, &me,
-			":%s WALLOPS :UID collision for %s from %s",
-			ME, uid, get_client_name(cptr, FALSE));
+		sendto_ops_butone(NULL, ME,
+			"UID collision for %s from %s",
+			uid, get_client_name(cptr, FALSE));
 		return exit_client(cptr, cptr, &me, "UID collision");
 	}
 
@@ -3318,9 +3318,8 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    ((IsServer(sptr) || sptr != acptr || acptr->from != sptr->from)))
 	    {
 		if (IsServer(cptr))
-			sendto_ops_butone(NULL, &me,
-				  ":%s WALLOPS :MODE for User %s From %s!%s",
-				  ME, parv[1],
+			sendto_ops_butone(NULL, ME,
+				  "MODE for User %s From %s!%s", parv[1],
 				  get_client_name(cptr, FALSE), sptr->name);
 		else
 			sendto_one(sptr, replies[ERR_USERSDONTMATCH], ME, BadTo(parv[0]));

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.189 2004/05/14 22:58:13 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.190 2004/05/18 22:53:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -308,9 +308,9 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	*/
 	if (MyConnect(acptr) && !IsAnOper(cptr) && !rsquit)
 	    {
-		sendto_ops_butone(NULL, &me,
-			":%s WALLOPS :Received SQUIT %s from %s (%s)",
-			ME, server, parv[0], comment);
+		sendto_ops_butone(NULL, ME,
+			"Received SQUIT %s from %s (%s)",
+			server, parv[0], comment);
 #if defined(USE_SYSLOG) && defined(SYSLOG_SQUIT)
 		syslog(LOG_DEBUG,"SQUIT From %s : %s (%s)",
 		       parv[0], server, comment);
@@ -844,9 +844,9 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		*/
 		if ((aconf = find_conf_name(host, CONF_QUARANTINED_SERVER)))
 		    {
-			sendto_ops_butone(NULL, &me,
-				":%s WALLOPS * :%s brought in %s, %s %s",
-				ME, get_client_name(cptr, TRUE),
+			sendto_ops_butone(NULL, ME,
+				"%s brought in %s, %s %s",
+				get_client_name(cptr, TRUE),
 				host, "closing link because",
 				BadPtr(aconf->passwd) ? "reason unspecified" :
 				aconf->passwd);
@@ -2536,9 +2536,9 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	*/
 	if (!IsAnOper(cptr))
 	    {
-		sendto_ops_butone(NULL, &me,
-				  ":%s WALLOPS :Remote CONNECT %s %d from %s",
-				   ME, parv[1], port,
+		sendto_ops_butone(NULL, ME,
+				  "Remote CONNECT %s %d from %s",
+				   parv[1], port,
 				   get_client_name(sptr,FALSE));
 #if defined(USE_SYSLOG) && defined(SYSLOG_CONNECT)
 		syslog(LOG_DEBUG, "CONNECT From %s : %s %s", parv[0],
@@ -2605,8 +2605,7 @@ int	m_wallops(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		pv[3] = NULL;
 		return m_private(cptr, sptr, 3, pv);
 	    }
-	sendto_ops_butone(IsServer(cptr) ? cptr : NULL, sptr,
-			":%s WALLOPS :%s", parv[0], message);
+	sendto_ops_butone(IsServer(cptr) ? cptr : NULL, parv[0], "%s", message);
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_WALLOP, NULL, sptr,
 			      ":%s WALLOP :%s", parv[0], message);
