@@ -43,11 +43,14 @@ EXTERN void setup_server_channels __P((aClient *mp));
 EXTERN void channel_modes __P((aClient *cptr, Reg char *mbuf, Reg char *pbuf,
 			       aChannel *chptr));
 EXTERN void send_channel_modes __P((aClient *cptr, aChannel *chptr));
+EXTERN void send_channel_members __P((aClient *cptr, aChannel *chptr));
 EXTERN int m_mode __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN void clean_channelname __P((Reg char *cn));
 EXTERN void del_invite __P((aClient *cptr, aChannel *chptr));
 EXTERN int m_join __P((Reg aClient *cptr, Reg aClient *sptr, int parc,
 		       char *parv[]));
+EXTERN int m_njoin __P((Reg aClient *cptr, Reg aClient *sptr, int parc,
+		        char *parv[]));
 EXTERN int m_part __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_kick __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int count_channels __P((aClient *sptr));

@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.21 1997/12/19 13:42:24 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.22 1998/01/23 13:28:12 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -643,6 +643,58 @@ aChannel *chptr;
 	if (modebuf[1] || *parabuf)
 		sendto_one(cptr, ":%s MODE %s %s %s",
 			   ME, chptr->chname, modebuf, parabuf);
+}
+
+/*
+ * send "cptr" a full list of the channel "chptr" members and their
+ * +ov status, using NJOIN
+ */
+void	send_channel_members(cptr, chptr)
+aClient *cptr;
+aChannel *chptr;
+{
+	Reg	Link	*lp;
+	Reg	aClient *c2ptr;
+	Reg	int	cnt = 0, len = 0, nlen;
+
+	if (check_channelmask(&me, cptr, chptr->chname))
+		return;
+
+	sprintf(buf, ":%s NJOIN %s :", ME, chptr->chname);
+	len = strlen(buf);
+
+	for (lp = chptr->members; lp; lp = lp->next)
+	    {
+		c2ptr = lp->value.cptr;
+		nlen = strlen(c2ptr->name);
+		if ((len + nlen) > (size_t) (BUFSIZE - 9)) /* ,@+ \r\n\0 */
+		    {
+			sendto_one(cptr, "%s", buf);
+			sprintf(buf, ":%s NJOIN %s :", ME, chptr->chname);
+			len = strlen(buf);
+			cnt = 0;
+		    }
+		if (cnt)
+		    {
+			buf[len++] = ',';
+			buf[len] = '\0';
+		    }
+		if (lp->flags & (CHFL_CHANOP|CHFL_VOICE))
+		    {
+			if (lp->flags & CHFL_CHANOP)
+				buf[len++] = '@';
+			if (lp->flags & CHFL_VOICE)
+				buf[len++] = '+';
+			buf[len] = '\0';
+		    }
+		(void)strcpy(buf + len, c2ptr->name);
+		len += nlen;
+		cnt++;
+	    }
+	if (*buf && cnt)
+		sendto_one(cptr, "%s", buf);
+
+	return;
 }
 
 /*
@@ -1656,6 +1708,143 @@ char	*parv[];
 }
 
 /*
+** m_njoin
+**	parv[0] = sender prefix
+**	parv[1] = channel
+**	parv[2] = channel members and modes
+*/
+int	m_njoin(cptr, sptr, parc, parv)
+Reg	aClient *cptr, *sptr;
+int	parc;
+char	*parv[];
+{
+	char nbuf[BUFSIZE], *name, *target, *p, mbuf[4];
+	int chop, cnt = 0;
+	aChannel *chptr = NULL;
+	aClient *acptr;
+
+	if (parc < 3 || *parv[2] == '\0')
+	    {
+		sendto_one(sptr, err_str(ERR_NEEDMOREPARAMS, parv[0]),"NJOIN");
+		return 1;
+	    }
+	*nbuf = '\0';
+	for (target = strtoken(&p, parv[2], ","); target;
+	     target = strtoken(&p, NULL, ","))
+	    {
+		/* check for modes */
+		chop = 0;
+		mbuf[0] = '\0';
+		if (*target == '@')
+		    {
+			strcpy(mbuf, "\007o");
+			chop = CHFL_CHANOP;
+			if (*(target+1) == '+')
+			    {
+				strcat(mbuf, "v");
+				chop |= CHFL_VOICE;
+				name = target+2;
+			    }
+			else
+				name = target+1;
+		    }
+		else if (*target == '+')
+		    {
+			strcpy(mbuf, "\007v");
+			chop = CHFL_VOICE;
+			name = target+1;
+		    }
+		else
+			name = target;
+		/* find user */
+		if (!(acptr = find_person(name, (aClient *)NULL)))
+			continue;
+		/* is user who we think? */
+		if (acptr->from != cptr)
+			continue;
+		/* get channel pointer */
+		if (!chptr)
+		    {
+			chptr = get_channel(acptr, parv[1], CREATE);
+			if (chptr == NULL)
+			    {
+				sendto_one(sptr, err_str(ERR_NOSUCHCHANNEL,
+							 parv[0]), parv[1]);
+				return;
+			    }
+		    }
+		/* add user to channel */
+		add_user_to_channel(chptr, acptr, chop);
+		/* build buffer for NJOIN capable servers */
+		if (*nbuf)
+			*(--target) = ',';
+		strcat(nbuf, target);
+		/* send 2.9 style join to other servers */
+		sendto_serv_notv(cptr, SV_NJOIN, ":%s JOIN %s%s", name,
+				 parv[1], mbuf);
+		/* send join to local users on channel */
+		sendto_channel_butserv(chptr, &me, ":%s JOIN %s", name,
+				       parv[1]);
+		/* build MODE for local users on channel, eventually send it */
+		if (*mbuf)
+		    {
+			switch (cnt)
+			    {
+			case 0:
+				*parabuf = '\0'; *modebuf = '\0';
+				/* fall through */
+			case 1:
+				strcat(modebuf, mbuf+1);
+				cnt += strlen(mbuf+1);
+				if (*parabuf)
+				    {
+					strcat(parabuf, " ");
+				    }
+				strcat(parabuf, name);
+				if (mbuf[2])
+				    {
+					strcat(parabuf, " ");
+					strcat(parabuf, name);
+				    }
+				break;
+			case 2:
+				sendto_channel_butserv(chptr, &me,
+					       ":%s MODE %s +%s%c %s %s",
+						       sptr->name, parv[1], 
+						       modebuf, mbuf[1],
+						       parabuf, name);
+				if (mbuf[1])
+				    {
+					strcpy(modebuf, mbuf+2);
+					strcpy(parabuf, name);
+					cnt = 1;
+				    }
+				else
+					cnt = 0;
+				break;
+			    }
+			if (cnt == 3)
+			    {
+				sendto_channel_butserv(chptr, &me,
+						       ":%s MODE %s +%s %s",
+						       sptr->name, parv[1],
+						       modebuf, parabuf);
+				cnt = 0;
+			    }
+		    }
+	    }
+	/* send eventual MODE leftover */
+	if (cnt)
+		sendto_channel_butserv(chptr, &me, ":%s MODE %s +%s %s",
+				       sptr->name, parv[1], modebuf, parabuf);
+
+	/* send NJOIN to capable servers */
+	sendto_serv_v(cptr, SV_NJOIN, ":%s NJOIN %s :%s", parv[0], parv[1],
+		      nbuf);
+	return 0;
+}
+
+/*
 ** m_part
 **	parv[0] = sender prefix
 **	parv[1] = channel
@@ -2264,7 +2453,6 @@ char	*parv[];
 	sendto_one(sptr, rpl_str(RPL_ENDOFNAMES, parv[0]), "*");
 	return 2;
 }
-
 
 void	send_user_joins(cptr, user)
 aClient	*cptr, *user;

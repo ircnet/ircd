@@ -714,8 +714,9 @@ typedef	struct	{
 /* used for sendto_serv */
 
 /* semi-obsolete, bitmasks should now be used!!! */
-#define	SV_OLD	0x0000
-#define	SV_29	0x0001	/* useless, but preserved for coherence */
+#define	SV_OLD		0x0000
+#define	SV_29		0x0001	/* useless, but preserved for coherence */
+#define	SV_NJOIN	0x0002	/* server understands the NJOIN command */
 
 /* used for sendto_flag */
 

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.30 1998/01/07 19:13:45 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.31 1998/01/23 13:28:13 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -253,8 +253,18 @@ aClient	*cptr;
 	       cptr->info+12, cptr->info+44));
 
 	/* hop = 1 really for local client, return it in m_server_estab() */
-	if (!strncmp(cptr->info, "0209", 4) || !strncmp(cptr->info, "021", 3))
+	if (!strncmp(cptr->info, "0209", 4))
+	    {
 		cptr->hopcount = SV_29;	/* 2.9+ protocol */
+		if (!(cptr->info[4] == '0' &&
+		      (cptr->info[5] == '0' || cptr->info[5] == '1' ||
+		       cptr->info[5] == '2' || cptr->info[5] == '3' ||
+		       cptr->info[5] == '4')))
+			/* the NJOIN command appeared on 2.9.5 */
+			cptr->hopcount |= SV_NJOIN;
+	    }
+	else if (!strncmp(cptr->info, "021", 3))
+		cptr->hopcount = SV_29|SV_NJOIN;
 	else
 		cptr->hopcount = SV_OLD;
 
@@ -874,7 +884,10 @@ Reg	aClient	*cptr;
 				   acptr->user->username,
 				   acptr->user->host, stok,
 				   (*buf) ? buf : "+", acptr->info);
-			send_user_joins(cptr, acptr);
+#ifdef	USE_NJOIN
+			if ((cptr->serv->version & SV_NJOIN) == 0)
+#endif
+				send_user_joins(cptr, acptr);
 		    }
 		else if (IsService(acptr) &&
 			 match(acptr->service->dist, cptr->name) == 0)
@@ -895,12 +908,18 @@ Reg	aClient	*cptr;
 	** Last, pass all channels modes
 	** only sending modes for LIVE channels.
 	*/
-	{
+	    {
 		Reg	aChannel *chptr;
 		for (chptr = channel; chptr; chptr = chptr->nextch)
 			if (chptr->users)
+			    {
+#ifdef	USE_NJOIN
+				if (cptr->serv->version & SV_NJOIN)
+					send_channel_members(cptr, chptr);
+#endif
 				send_channel_modes(cptr, chptr);
-	}
+			    }
+	    }
 	cptr->flags &= ~FLAGS_CBURST;
 #ifdef	ZIP_LINKS
  	/*
