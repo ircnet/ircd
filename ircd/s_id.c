@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.25 2003/10/18 16:26:39 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.26 2004/03/07 18:28:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -291,17 +291,19 @@ static	int	needfinduid = 0;
  *	various sanity checks to ensure that a UID is valid.
  * returns 1 when it's valid, 0 when not.
  */
-int	check_uid(char *uid)
+int	check_uid(char *uid, char *sid)
 {
+	int retval = 0;
+
 	if (isdigit(uid[0]) && strlen(uid) == UIDLEN)
 	{
-		return cid_ok(uid, UIDLEN - 1);
+		retval = cid_ok(uid, UIDLEN - 1);
 	}
-	/*
-	 * need to check for sid collisions.. ick, how?
-	 * another function? -syrk
-	 * rather compare SID part of UID with source of message? --Beeth
-	 */
-	return 0;
+	if (retval == 1)
+	{
+		/* compare SID part of UID with source of message --B. */
+		retval = (strncasecmp(uid, sid, SIDLEN) == 0);
+	}
+	return retval;
 }
 

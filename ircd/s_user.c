@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.189 2004/03/07 03:09:35 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.190 2004/03/07 18:28:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1312,7 +1312,7 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	/*
 	** Check validity of UID.
 	*/
-	if (!check_uid(uid))
+	if (!check_uid(uid, sptr->serv->sid))
 	{
 		/* This is so bad, that I really don't want to deal with it! */
 		sendto_ops_butone(NULL, &me,

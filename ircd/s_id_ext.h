@@ -42,7 +42,7 @@ EXTERN void collect_chid (void);
 
 EXTERN void init_sid (char *);
 EXTERN char *next_uid (void);
-EXTERN int check_uid (char *);
+EXTERN int check_uid (char *, char *);
 EXTERN char *ltoid (long l, int n);
 EXTERN long idtol (char *id, int n);
 EXTERN int sid_valid (char *sid);
