@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.57 1999/07/11 22:11:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.58 1999/07/18 01:26:02 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -539,6 +539,30 @@ aClient	*mp;
 	strncpyzt(mp->username, (p) ? p->pw_name : "unknown",
 		  sizeof(mp->username));
 	(void)get_my_name(mp, mp->sockhost, sizeof(mp->sockhost)-1);
+
+	/* Setup hostp - fake record to resolve localhost. -Toor */
+	mp->hostp = (struct hostent *)MyMalloc(sizeof(struct hostent));
+	mp->hostp->h_name = MyMalloc(strlen(me.sockhost)+1);
+	strcpy(mp->hostp->h_name, mp->sockhost);
+	mp->hostp->h_aliases = (char **)MyMalloc(sizeof(char *));
+	*mp->hostp->h_aliases = NULL;
+	mp->hostp->h_addrtype = AFINET;
+	mp->hostp->h_length = 
+#ifdef	INET6
+				IN6ADDRSZ;
+#else
+				sizeof(long);
+#endif                          
+	mp->hostp->h_addr_list = (char **)MyMalloc(2*sizeof(char *));
+	mp->hostp->h_addr_list[0] = MyMalloc(mp->hostp->h_length);
+#ifdef	INET6
+	bcopy(IN6ADDR_LOOPBACK_INIT, mp->hostp->h_addr_list[0], 
+					mp->hostp->h_length);
+#else
+	*(long *)(mp->hostp->h_addr_list[0]) = IN_LOOPBACKNET;
+#endif
+	mp->hostp->h_addr_list[1] = NULL ;
+
 	if (mp->name[0] == '\0')
 		strncpyzt(mp->name, mp->sockhost, sizeof(mp->name));
 	if (me.info == DefInfo)
