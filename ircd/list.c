@@ -37,7 +37,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.2 1997/04/14 15:04:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.3 1997/06/09 14:50:14 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -216,9 +216,7 @@ aClient	*cptr;
 #endif
 		serv->user = NULL;
 		serv->userlist = NULL;
-#ifdef KRYS
 		serv->snum = -1;
-#endif
 		*serv->by = '\0';
 		*serv->tok = '\0';
 		serv->stok = 0;

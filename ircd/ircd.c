@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.4 1997/06/08 02:33:48 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.5 1997/06/09 14:50:13 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -498,19 +498,13 @@ aClient	*mp;
 	mp->fd = -1;
 	SetMe(mp);
 	(void) make_server(mp);
-#ifdef KRYS
 	mp->serv->snum = find_server_num (ME);
-#endif
 	(void) make_user(mp);
 	istat.is_users++;	/* here, cptr->next is NULL, see make_user() */
 	usrtop = mp->user;
 	mp->user->flags |= FLAGS_OPER;
 	mp->serv->up = mp->name;
-#ifdef KRYS
 	mp->user->server = find_server_string(mp->serv->snum);
-#else
-	(void) strcpy(mp->user->server, mp->name);
-#endif
 	strncpyzt(mp->user->username, p->pw_name, sizeof(mp->user->username));
 	(void) strcpy(mp->user->host, mp->name);
 

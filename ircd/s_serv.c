@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.14 1997/06/05 19:27:31 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.15 1997/06/09 14:50:16 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -512,9 +512,7 @@ char	*parv[];
 		strncpyzt(acptr->info, info, sizeof(acptr->info));
 		acptr->serv->up = sptr->name;
 		acptr->serv->stok = token;
-#ifdef KRYS
 		acptr->serv->snum = find_server_num(acptr->name);
-#endif
 		SetServer(acptr);
 		istat.is_serv++;
 		add_client_to_list(acptr);
@@ -774,9 +772,7 @@ Reg	aClient	*cptr;
 	cptr->serv->nline = aconf;
 	cptr->serv->version = cptr->hopcount;   /* temporary location */
 	cptr->hopcount = 1;			/* local server connection */
-#ifdef KRYS
 	cptr->serv->snum = find_server_num(cptr->name);
-#endif
 	cptr->serv->stok = 1;
 	cptr->flags |= FLAGS_CBURST;
 	(void) add_to_server_hash_table(cptr->serv, cptr);
@@ -2241,7 +2237,6 @@ char	*parv[];
 }
 #endif
 
-#ifdef KRYS
 /*
 ** storing server names in User structures is a real waste,
 ** the following functions change it to only store a pointer.
@@ -2302,4 +2297,3 @@ char *sname;
 	server_name[server_num] = mystrdup(sname);
 	return server_num++;
 }
-#endif

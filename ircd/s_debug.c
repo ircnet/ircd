@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.3 1997/06/09 14:43:01 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.4 1997/06/09 14:50:15 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -94,9 +94,6 @@ char	serveropts[] = {
 #endif
 #ifdef	BETTER_NDELAY
 'n',
-#endif
-#ifdef	KRYS
-'o',
 #endif
 #ifdef	CRYPT_OPER_PASSWORD
 'p',

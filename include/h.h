@@ -309,10 +309,8 @@ extern	void	count_memory __P((aClient *, char *, int));
 extern	void	send_defines __P((aClient *, char *));
 #endif
 
-#ifdef	KRYS
 extern	char	*find_server_string __P((int));
 extern	int	find_server_num __P((char *));
-#endif
 
 extern	char	*make_version();
 

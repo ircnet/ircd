@@ -554,12 +554,6 @@
 /* #undef	NO_IDENT */
 /* #undef	NO_PREFIX */
 
-/*
- * This define activates some old memory optimization code which appeared
- * in 2.9.1 but was never made default.
- */
-#define KRYS
-
 /* ------------------------- END CONFIGURATION SECTION -------------------- */
 #define	MYNAME SPATH
 #define	CONFIGFILE CPATH

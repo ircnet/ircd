@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.10 1997/06/08 23:06:12 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.11 1997/06/09 14:50:11 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -420,27 +420,12 @@ aClient *to;
 static	anUser	ausr = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, NULL, NULL,
 			 NULL, "anonymous", "anonymous.", "anonymous."};
 
-#ifndef KRYS
-static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0, 0, 0,
-			 0,/*flags*/
-			 &anon, -2, 0, STAT_CLIENT, "anonymous", "anonymous",
-			 "anonymous identity hider", 0, "",
-# ifdef	ZIP_LINKS
-			 NULL,
-# endif
-			 0, {0, 0, NULL }, {0, 0, NULL },
-			 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, NULL, 0, 0, 0
-#if defined(__STDC__)	/* hack around union{} initialization	-Vesa */
-			 ,{0}, NULL, "", ""
-#endif
-			};
-#else
 static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 			 &anon, -2, 0, STAT_CLIENT, "anonymous", "anonymous",
 			 "anonymous identity hider", 0, "",
-# ifdef	ZIP_LINKS
+#ifdef	ZIP_LINKS
 			 NULL,
-# endif
+#endif
 			 0, {0, 0, NULL }, {0, 0, NULL },
 			 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, NULL,
 			 0, 0, 0
@@ -448,8 +433,6 @@ static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 			 ,{0}, NULL, "", ""
 #endif
 			};
-#endif
-
 
 /*
  *

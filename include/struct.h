@@ -399,11 +399,7 @@ struct	User	{
 	aClient	*bcptr;
 	char	username[USERLEN+1];
 	char	host[HOSTLEN+1];
-#ifdef KRYS
 	char	*server;
-#else
-	char	server[HOSTLEN+1];
-#endif
 };
 
 struct	Server	{
@@ -412,9 +408,7 @@ struct	Server	{
 	char	*up;	/* uplink for this server */
 	aConfItem *nline;	/* N-line pointer for this server */
 	int	version;        /* version id for local client */
-#ifdef KRYS
 	int	snum;
-#endif
 	int	stok,
 		ltok;
 	int	refcnt;		/* Number of times this block is referenced
@@ -443,11 +437,6 @@ struct Client	{
 	aServer	*serv;		/* ...defined, if this is a server */
 	aService *service;
 	u_int	hashv;		/* raw hash value */
-#ifndef KRYS
-	time_t	lasttime;	/* ...should be only LOCAL clients? --msa */
-	time_t	firsttime;	/* time client was created */
-	time_t	since;		/* last time we parsed something */
-#endif
 	long	flags;		/* client flags */
 	aClient	*from;		/* == self, if Local Client, *NEVER* NULL! */
 	int	fd;		/* >= 0, for local clients */
@@ -477,11 +466,9 @@ struct Client	{
 	long	receiveK;	/* Statistics: total k-bytes received */
 	u_short	sendB;		/* counters to count upto 1-k lots of bytes */
 	u_short	receiveB;	/* sent and received. */
-#ifdef KRYS
 	time_t	lasttime;
 	time_t	firsttime;	/* time client was created */
 	time_t	since;		/* last time we parsed something */
-#endif
 	u_int	sact;		/* could conceivably grow large...*/
 	aClient	*acpt;		/* listening client which we accepted from */
 	Link	*confs;		/* Configuration record associated */
