@@ -9,7 +9,7 @@ XXX: group them into 3: servers, admins, clients changes.
 		E - client is exempted from K: lines
 		N - do not show resolved hostname (but bans still match)
 		
-	* Channels now keep information who set the topic.
+	* Channels now keep information who and when set the topic.
 	* LIST does not disconnect if client's sendQ fills.
 	* Reject reason sent to client can be specified in iauth.conf.
 	* Client's username and hostname are checked for valid chars.
