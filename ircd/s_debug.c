@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.4 1997/06/09 14:50:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.5 1997/06/18 17:15:38 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -196,21 +196,23 @@ void	debug(level, form, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
 int	level;
 char	*form, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10;
 #else
-void	vdebug(level, form, va)
-int	level;
-char	*form;
-va_list	va;
+void	debug(int level, char *form, ...)
 #endif
 {
 	int	err = errno;
 
 #ifdef	USE_SYSLOG
 	if (level == DEBUG_ERROR)
+	    {
 #ifndef	USE_STDARG
 		syslog(LOG_ERR, form, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 #else
+		va_list va;
+		va_start(va, form);
 		vsyslog(LOG_ERR, form, va);
+		va_end(va);
 #endif
+	    }
 #endif
 	if ((debuglevel >= 0) && (level <= debuglevel))
 	    {
@@ -218,7 +220,10 @@ va_list	va;
 		(void)sprintf(debugbuf, form,
 				p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 #else
+		va_list va;
+		va_start(va, form);
 		(void)vsprintf(debugbuf, form, va);
+		va_end(va);
 #endif
 		if (local[2])
 		    {
@@ -230,18 +235,6 @@ va_list	va;
 	    }
 	errno = err;
 }
-
-#ifdef USE_STDARG
-void	debug(level, form, ...)
-int     level;
-char    *form;
-{
-	va_list va;
-        va_start(va, form);
-	vdebug(level, form, va);
-        va_end(va);
-}
-#endif
 
 /*
  * This is part of the STATS replies. There is no offical numeric for this

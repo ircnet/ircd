@@ -294,8 +294,12 @@ extern	int	dopacket __P((aClient *, char *, int));
 extern	char	*mycncmp __P((char *, char *));
 #endif
 
+#ifndef USE_STDARG
 /*VARARGS2*/
 extern	void	debug();
+#else
+extern	void	debug(int, char *, ...);
+#endif
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE)
 extern	void	send_usage __P((aClient *, char *));
 extern	void	send_listinfo __P((aClient *, char *));
