@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.58 2002/11/23 13:40:15 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.59 2002/11/24 15:30:31 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1429,6 +1429,10 @@ int	opt;
 				MyFree(tmp2);
 				tmp2 = NULL;
 			    }
+			if (tmp3)
+			{
+				DupString(aconf->source_ip, tmp3);
+			}
 				
 		    }
 		/*
