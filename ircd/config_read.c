@@ -93,8 +93,7 @@ aConfig *config_read(int fd, int depth)
 						"config: too nested (%d)",
 						depth);
 #endif
-					i = p + 1;
-					continue;
+					goto eatline;
 				}
 				if (*(start+1) != '/')
 				{
@@ -111,8 +110,7 @@ aConfig *config_read(int fd, int depth)
 					sendto_flag(SCH_ERROR, "config: too "
 						"long filename to process");
 #endif
-					i = p + 1;
-					continue;
+					goto eatline;
 				}
 				start++;
 				memcpy(filep, start, end - start);
@@ -129,8 +127,7 @@ aConfig *config_read(int fd, int depth)
 						"config: error opening %s "
 						"(depth=%d)", file, depth);
 #endif
-					i = p + 1;
-					continue;
+					goto eatline;
 				}
 				ret = config_read(fd, depth + 1);
 				close(fd);
@@ -147,12 +144,12 @@ aConfig *config_read(int fd, int depth)
 				{
 					ConfigCur = ConfigCur->next;
 				}
+				/* good #include is replaced by its content */
 				i = p + 1;
 				continue;
 			}
-			/* comments and unknown #directives are not discarded,
-			** bad #include directives are --B. */
 		}
+eatline:
 		linelen = p - i;
 		if (*(p - 1) == '\r')
 			linelen--;
