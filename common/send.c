@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.95 2004/11/29 22:34:09 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.96 2004/12/10 14:39:04 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -149,10 +149,21 @@ int	send_message(aClient *to, char *msg, int len)
 		{
 			/* Allow bursting clients (servers or services) to
 			 * exceed their maxsendq. --B. */
-			sendto_flag(SCH_NOTICE,
-				"Max SendQ limit exceeded for %s: %d > %d",
-				to->name,
-				DBufLength(&to->sendQ), get_sendq(to));
+#  ifdef MAXSENDQ_NOTICES
+			static	time_t	lastnotice = 0;
+
+			/* It's total, not per destination, so it can
+			 * happen some notices escape us. Better this
+			 * than getting 50Hz notices. --B. */
+			if (timeofday - lastnotice >= 60)
+			{
+				sendto_flag(SCH_NOTICE, "Max SendQ limit "
+					"exceeded for %s: %d > %d",
+					to->name,
+					DBufLength(&to->sendQ), get_sendq(to));
+				lastnotice = timeofday;
+			}
+#  endif
 		}
 		else
 # endif
