@@ -1,3 +1,17 @@
+2.11.0b20
+
+2004-12-06  Piotr Kucharski
+
+	* config_read.c/config_read(): changed interface from mmap to fgets.
+	* chkconf.c/showconf(), initconf(), s_conf.c/initconf(): adjustments
+	  to config_read() change.
+	* config.h.dist, configure.in, setup.h.in, os.h: removed mmap().
+	* config_read.c/config_read(): more safety caps (snprintf and fdn).
+
+2004-11-30  Piotr Kucharski
+
+	* config_read.c/config_read(): add some guardians for border cases.
+
 2.11.0b19
 
 2004-11-29  Piotr Kucharski
