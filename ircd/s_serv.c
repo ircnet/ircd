@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.4 1997/04/21 00:24:06 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.5 1997/04/21 20:46:01 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -369,7 +369,6 @@ char	*parv[];
 		** Rather than KILL the link which introduced it, KILL the
 		** youngest of the two links. -avalon
 		*/
-		acptr = acptr->from;
 		bcptr = (cptr->firsttime > acptr->from->firsttime) ? cptr :
 			acptr->from;
 		sendto_one(bcptr, "ERROR :Server %s already exists", host);
