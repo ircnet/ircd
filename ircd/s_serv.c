@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.232 2004/08/22 20:46:17 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.233 2004/08/31 08:35:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2123,7 +2123,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				if (!(acptr = local[i]))
 					continue;
 				if (IsPerson(acptr) && (!MyConnect(sptr)
-				    || is_allowed(sptr, ACL_TRACE)) && acptr != sptr)
+				    || !is_allowed(sptr, ACL_TRACE)) && acptr != sptr)
 					continue;
 				if (wilds && match(cm, acptr->name))
 					continue;
