@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.16 1997/10/06 15:00:35 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.17 1997/10/13 17:39:58 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -241,7 +241,7 @@ aChannel *chptr;
 
 	if (!tmp)
 	    {
-		char *ip = inetntoa((char *)&cptr->ip);
+		char *ip = (char *) inetntoa((char *)&cptr->ip);
 
 		if (strcmp(ip, cptr->user->host))
 		    {
@@ -1472,10 +1472,10 @@ Reg	aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	static	char	jbuf[BUFSIZE];
+	static	char	jbuf[BUFSIZE], cbuf[BUFSIZE];
 	Reg	Link	*lp;
 	Reg	aChannel *chptr;
-	Reg	char	*name, *key = NULL;
+	Reg	char	*name, *chop, *key = NULL;
 	int	i, flags = 0;
 	char	*p = NULL, *p2 = NULL, *s;
 
@@ -1486,7 +1486,7 @@ char	*parv[];
 	    }
 
 	*jbuf = '\0';
-	*buf = '\0';
+	*cbuf = '\0';
 	/*
 	** Rebuild list of channels joined to be the actual result of the
 	** JOIN.  Note that "JOIN 0" is the destructive problem.
@@ -1554,8 +1554,6 @@ char	*parv[];
 		else
 			clean_channelname(name), s = NULL;
 
-		flags = 0;
-
 		if (MyConnect(sptr) &&
 		    sptr->user->joined >= MAXCHANNELSPERUSER) {
 			/* Feature: Cannot join &flagchannels either
@@ -1582,9 +1580,13 @@ char	*parv[];
 		** Operator.
 		*/
 		flags = 0;
+		chop = "";
 		if (MyConnect(sptr) && UseModes(name) &&
 		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users)
+		    {
 			flags = CHFL_CHANOP;
+			chop = "\007o";
+		    }
 		/*
 		**  Complete user entry to the new channel (if any)
 		*/
@@ -1601,49 +1603,52 @@ char	*parv[];
 		    }
 		add_user_to_channel(chptr, sptr, flags);
 		/*
-		** notify all other users on the new channel
+		** notify all users on the channel
 		*/
 #ifndef MIRC_KLUDGE
 		if (s)
 			*--s = '\007';
-		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
-						parv[0], name);
+		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s%s",
+						parv[0], name, chop);
 #else
 		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
 						parv[0], name);
 		if (s) {
 			sendto_channel_butserv(chptr, sptr,
-						":%s MODE %s +%s %s",
-						cptr->name, name, s, parv[0]);
+					       ":%s MODE %s +%c%c %s %s",
+					       cptr->name, name, *s,
+					       *(s+1) == 'v' ? 'v' : '+',
+					       parv[0],
+					       *(s+1) == 'v' ? parv[0] : "");
 			*--s = '\007';
 		}
 #endif
-		if (index(name, ':'))
-			sendto_match_servs(chptr, cptr, ":%s JOIN :%s",
-					   parv[0], name);
-		else
-		    {
-			if (*buf)
-				strcat(buf, ",");
-			strcat(buf, name);
-		    }
-
 		if (MyClient(sptr))
 		    {
 			del_invite(sptr, chptr);
-			if (flags == CHFL_CHANOP)
-				sendto_match_servs(chptr, cptr,
-						   ":%s MODE %s +o %s",
-						   ME, name, parv[0]);
 			if (chptr->topic[0] != '\0')
 				sendto_one(sptr, rpl_str(RPL_TOPIC, parv[0]),
 					   name, chptr->topic);
 			parv[1] = name;
 			(void)m_names(cptr, sptr, 2, parv);
 		    }
+		/*
+	        ** notify other servers
+		*/
+		if (index(name, ':'))
+			sendto_match_servs(chptr, cptr, ":%s JOIN :%s%s",
+					   parv[0], name, chop);
+		else
+		    {
+			if (*cbuf)
+				strcat(cbuf, ",");
+			strcat(cbuf, name);
+			if (chop)
+				strcat(cbuf, chop);
+		    }
 	    }
-	if (*buf)
-		sendto_serv_butone(cptr, ":%s JOIN :%s", parv[0], buf);
+	if (*cbuf)
+		sendto_serv_butone(cptr, ":%s JOIN :%s", parv[0], cbuf);
 	return 2;
 }
 
