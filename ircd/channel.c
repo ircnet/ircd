@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.218 2004/06/30 13:04:21 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.219 2004/07/03 08:51:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -348,7 +348,22 @@ static	Link	*match_modeid(int type, aClient *cptr, aChannel *chptr)
 			/* perhaps we could relax it and check remotes too? */
 			if (MyConnect(cptr))
 			{
-				if (IsConfNoResolveMatch(cptr->confs->value.aconf))
+				Link *acf = cptr->confs;
+
+				/* scroll acf to I:line */
+				if (IsAnOper(cptr))
+				{
+					acf = acf->next;
+				/* above is faster but will fail if we introduce
+				** something that will attach another conf for
+				** client -- the following will have to be used:
+					for (; acf; acf = acf->next)
+					if (acf->value.aconf->status & CONF_CLIENT)
+					break;
+				*/
+				}
+
+				if (IsConfNoResolveMatch(acf->value.aconf))
 				{
 					/* user->host contains IP and was just
 					 * checked; try sockhost, it may have
