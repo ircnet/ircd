@@ -1,3 +1,17 @@
+2004-03-14  Piotr Kucharski
+
+	* s_bsd.c/get_my_name(): mysk.s_addr was not initialized when M: ip
+	  address field was empty.
+	* s_bsd.c/check_client(): narrowed the scope of "local" (used in stats
+	  t "local connections" and with NO_OPER_REMOTE); now this covers only
+	  clients from 127/8, unixsocket or the same IP as in M-line; it works
+	  now only when NO_OPER_REMOTE is defined.
+	* s_misc.c/read_motd(): correctly parse motd file without ending \n.
+	* c_numeric.c: removed RPL_TRACELOG from client.
+	* config.h.dist, struct_def.h, ircd.c, s_conf.c, s_misc.c, s_misc_ext.h,
+	  s_serv.c: removed CACHE_MOTD, it's default and not possible to turn
+	  off; also fixed tiny bug of always reloading motd, not when changed.
+
 2004-03-10  Piotr Kucharski
 
 	* s_bsd.c, s_bsd_ext.h: added delay_close() function.
@@ -58,6 +72,8 @@
 	  listeners[] table (preparation for better handling).
 	* s_serv.c/report_listeners(): as stats l/L is not returning
 	  listeners anymore, show them detailed in stats P.
+	* ircd.c, s_bsd.c, s_debug.c, s_err.c, s_serv.c, numeric_def.h,
+	  struct_def.h: removed ancient STAT_LOG (and RPL_TRACELOG).
 
 2004-03-05  Piotr Kucharski
 

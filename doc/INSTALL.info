@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-2462/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-27725/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.52 2004/03/06 02:04:49 chopin Exp $
+     $Id: INSTALL.info,v 1.53 2004/03/14 18:46:02 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0.
 
@@ -150,7 +150,6 @@ This is done by editing the "config.h" file and changing the various
 * Menu:
 
 * DEBUGMODE::
-* CACHED_MOTD::
 * CHROOTDIR::
 * ENABLE_SUMMON ENABLE_USERS::
 * SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE::
@@ -161,7 +160,7 @@ This is done by editing the "config.h" file and changing the various
 * Other #define's::
 
 
-File: INSTALL.info,  Node: DEBUGMODE,  Next: CACHED_MOTD,  Up: The config-h file
+File: INSTALL.info,  Node: DEBUGMODE,  Next: CHROOTDIR,  Up: The config-h file
 
 DEBUGMODE
 =========
@@ -177,21 +176,7 @@ this induces a large overhead for the server as it does a large amount
 of self diagnostics whilst running.
 
 
-File: INSTALL.info,  Node: CACHED_MOTD,  Next: CHROOTDIR,  Prev: DEBUGMODE,  Up: The config-h file
-
-CACHED_MOTD
-===========
-
-The server sends the "motd" to every client connecting.  Every time, it
-reads it from the disk.  This is quite intensive and can be undesirable
-for busy servers.
-
-   Defining CACHED_MOTD will make the server store the "motd" in
-memory, and only read it again from the disk when rehashing if the file
-has changed.
-
-
-File: INSTALL.info,  Node: CHROOTDIR,  Next: ENABLE_SUMMON ENABLE_USERS,  Prev: CACHED_MOTD,  Up: The config-h file
+File: INSTALL.info,  Node: CHROOTDIR,  Next: ENABLE_SUMMON ENABLE_USERS,  Prev: DEBUGMODE,  Up: The config-h file
 
 CHROOTDIR
 =========
@@ -451,6 +436,11 @@ Machine information
 
      This line reads: My Hosts name is "orion.cair.du.edu", my site is
      located in "Denver Colorado, USA" and my SID is "00PS".
+
+`Note'
+     Using "*" as <Your Internet IP> allows OS to choose best outgoing
+     source IP. See also `Server Connections' section for configuring
+     source IP of outgoing connections.
 
 
 
@@ -1113,11 +1103,10 @@ to 3. This is because of two main reasons:
 `Source IP'
      This field specifies source IP to use for connects to this server.
 
-`NEW!!!'
-     As of the 2.9.3 version of the server, server connections can be
-     compressed with the zlib library.  To define a compressed
-     connection, you must have compiled the server with ZIP_LINKS
-     defined, and use a _lowercase_ C line.
+`Compressed links'
+     Server connections can be compressed with the zlib library.  To
+     define a compressed connection, you must have compiled the server
+     with ZIP_LINKS defined, and use a _lowercase_ C line.
 
 `NEW!!!'
      As of the 2.11.0 version of the server, `Source IP' field has been
@@ -1668,42 +1657,41 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top127
-Node: Installing IRC-651
-Node: The configure script876
-Node: Notes for Cygwin32 users3162
-Node: Notes concerning IPv6 support3895
-Node: The config-h file4498
-Node: DEBUGMODE5082
-Node: CACHED_MOTD5661
-Node: CHROOTDIR6102
-Node: ENABLE_SUMMON ENABLE_USERS6473
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7006
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7695
-Node: ZIP_LINKS ZIP_LEVEL8356
-Node: SLOW_ACCEPT9384
-Node: CLONE_CHECK10014
-Node: Other #define's10377
-Node: Editing the Makefile and compiling10699
-Node: The ircd-conf file11684
-Node: Machine information13533
-Node: Administrative info15959
-Node: Port connections18110
-Node: Connection Classes19941
-Node: Client connections25068
-Node: Operator priviliges30802
-Node: Excluded accounts32975
-Node: Server connections36887
-Node: Deny auto-connections45549
-Node: Hub connections46923
-Node: Leaf connections48411
-Node: Version limitations50495
-Node: Excluded machines52253
-Node: Service connections53558
-Node: Bounce server55152
-Node: Related resources56792
-Node: Reporting a bug57831
-Node: How to report a bug58088
-Node: Where to send a bug report59099
+Node: Top128
+Node: Installing IRC-652
+Node: The configure script877
+Node: Notes for Cygwin32 users3163
+Node: Notes concerning IPv6 support3896
+Node: The config-h file4499
+Node: DEBUGMODE5067
+Node: CHROOTDIR5644
+Node: ENABLE_SUMMON ENABLE_USERS6013
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6546
+Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7235
+Node: ZIP_LINKS ZIP_LEVEL7896
+Node: SLOW_ACCEPT8924
+Node: CLONE_CHECK9554
+Node: Other #define's9917
+Node: Editing the Makefile and compiling10239
+Node: The ircd-conf file11224
+Node: Machine information13073
+Node: Administrative info15688
+Node: Port connections17839
+Node: Connection Classes19670
+Node: Client connections24797
+Node: Operator priviliges30531
+Node: Excluded accounts32704
+Node: Server connections36616
+Node: Deny auto-connections45244
+Node: Hub connections46618
+Node: Leaf connections48106
+Node: Version limitations50190
+Node: Excluded machines51948
+Node: Service connections53253
+Node: Bounce server54847
+Node: Related resources56487
+Node: Reporting a bug57526
+Node: How to report a bug57783
+Node: Where to send a bug report58794
 
 End Tag Table
