@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.17 2004/06/17 18:29:08 chopin Exp $
+# $Id: ircd.conf.example,v 1.18 2004/06/21 23:06:18 chopin Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -24,8 +24,8 @@
 # your uplinks if linking to an already existent IRC network.
 # 
 # You only need an ircd.conf (IRC server configuration file) if you are
-# running an IRC server. If you are running a standalone client this file
-# is not necessary.
+# running an IRC server. iauth.conf (IRC authentication daemon configuration
+# file) may also be needed.
 #
 # This file will explain the various lines in the IRC server
 # configuration file. Not all lines are mandatory. You can check to make
@@ -186,37 +186,27 @@ Y:13:90::100:512000:1.1:1.1
 #
 #
 ############################
-# i/I: [MANDATORY]. The I: lines are client-authorization lines. Without
+# I: [MANDATORY]. The I: lines are client-authorization lines. Without
 # these lines, no clients will be able to connect to your server.
 # Wildcards ("*") are permitted. Passwords are also possible (clients can
-# be configured to send passwords) but optional.  'I' allows full access,
+# be configured to send passwords) but optional. 'I' allows full access,
 # 'i' sets restricted mode which forbids nick changes and channel op status.
+# Note that 'i' is deprecated and you should use <Flags> for that.
 # <TARGET Host Addr> accepts CIDR format.
 # 
-# I:<TARGET Host Addr>:<Password>:<TARGET Hosts NAME>:<Port>:<Class>
-# i:<TARGET Host Addr>:<Password>:<TARGET Hosts NAME>:<Port>:<Class>
+# I:<TARGET Host Addr>:<Password>:<TARGET Hosts NAME>:<Port>:<Class>:<Flags>
 #
-# NOTE that ircd matches on the *right-most* match and doesn't stop matching 
-# after the <TARGET Hosts NAME> didn't match (see also examples below).
-#
-# Note that if <TARGET Hosts NAME> is empty ircd will show clients matching
-# the <TARGET Host Addr> and do resolve as user@host.  if an I:-line has both
-# NAME and Addr defined and a client matches only the Addr part it will be
-# shown as user@ip-address regardless if it does resolv or not.
+# NOTE that ircd matches on both fields and if <TARGET Hosts NAME>
+# is not empty, the client is required to have DNS.
 #
 # This would allow access for any client reaching this line which doesn't
 # already have at least one connection to the net.  if you run an open server
 # in a net this might be the right choice, talk to your uplinks first anyway.
-# resolving clients matching this line would be shown as user@host since 
-# the field <TARGET Hosts NAME> is empty.
 # Note listing this i: line first, it will be checked *last*, meaning it is 
 # the "fall-through". 
 #i:*@*::::13
 # With the password 'foobar'
 #i:*@*:foobar:::13
-# Note that I:*::*.bu.edu:10 would also allow _all_ clients regardless
-# if they're from *.bu.edu or not since ircd doesn't stop matching after the
-# <TARGET Hosts NAME> didn't match.
 #
 # this would allow access for any client coming from *.net, *.org, *.com or
 # other 3 char TLD
@@ -229,19 +219,15 @@ Y:13:90::100:512000:1.1:1.1
 I:*@192.168.0.0/16::::12
 #
 # This is a standard vanilla I: line which will permit anyone with an IP
-# address within ip block 127.0.0.0/8 OR with a hostname ending in
+# address within ip block 127.0.0.0/8 AND with a hostname ending in
 # .irc.org to connect to the server. 
-# NOTE, the ircd matches on the *right-most* match, so if you connect as
-# anyuser@example.irc.org (which is anyuser@127.0.0.1) you will show up on
-# irc as anyuser@example.irc.org since that is the first match it found.
-# (Even though the second match is valid). 
 I:*@127.0.0.0/8::*@*.irc.org::10
 #
 # and you can even specify just certain usernames as long as the client's 
 # site is running a trustworthy ident daemon:
 I:::gooduser@example.irc.org::10
 # 
-# this will limit access for indials to one client per host
+# this will limit access for indials to one client per host (as defined in Y:12)
 I:::*@ppp*.irc.org::12
 I:::*@indial*.irc.org::12
 #
@@ -297,12 +283,14 @@ o:rocker@csa.bu.edu:T0eiVgHrqeKTQ:Rocker::10
 #
 # c/N lines MUST be used in pairs. You cannot have one without the other. 
 #
-# C:<TARGET Host Addr>:<Password>:<TARGET Server NAME>:<TARGET PORT>:<Class>
-# c:<TARGET Host Addr>:<Password>:<TARGET Server NAME>:<TARGET PORT>:<Class>
+# C:<TARGET Host Addr>:<Password>:<TARGET Server NAME>:<TARGET PORT>:<Class>:<Source IP>
+# c:<TARGET Host Addr>:<Password>:<TARGET Server NAME>:<TARGET PORT>:<Class>:<Source IP>
 #
 # if the target server listens on different ports you can use for <TARGET PORT>
 # <port_to_connect_to>.<port_target_server_listens_for_udp_pings>.
 # <TARGET Host Addr> can be also an ip address or CNAME.
+# With <Source IP> you can specify source ip ircd will try to connect with
+# to a given server.
 #
 # N:<TARGET Host Addr>:<Password>:<TARGET Server NAME>:<Domain Mask>:<Class>
 #
@@ -427,6 +415,7 @@ H:*.mit.edu::irc-2.mit.edu::
 # Example, permit irc-2.mit.edu to allow any MIT servers behind it to
 # connect, but only if they have SID begining with "000":
 H:*.mit.edu:000*:irc-2.mit.edu::
+# Note that requiring SID makes it impossible for 2.10 server to connect.
 #
 ############################
 # D: [OPTIONAL]. Control how auto connections are done. This will be mostly 
@@ -455,9 +444,9 @@ D::2:*.fi:3:
 # The first and third fields accept wildcards.  The fields are as follow:
 # V:<Version Mask>:<Flags>:<Server Mask>::
 #
-# Example, you believe 2.9.1 is a really old version, and you want your
+# Example, you believe 2.10.3 is a really old version, and you want your
 # peers to upgrade:
-V:020901*::*::
+V:021003*::*::
 #
 # If you are running a production network, you most likely don't want to
 # allow servers compiled in DEBUGMODE which is a threat for the net
@@ -497,9 +486,8 @@ B:*.fi::irc.funet.fi:6667:
 # Example, you want to allow a local information service:
 S:eep.local.net:thisisapassword:EepInfo:0:1
 #
-# Another example, ircd versions since 04/10/1999 support also a hex
-# mask. This is a temporary kline service (tkserv) as you can find it in
-# contrib/tkserv :
+# Another example, with hex mask. This is a temporary kline service (tkserv) 
+# as you can find it in contrib/tkserv :
 S:eep.local.net:thisisapassword:TkEep:0x2000000:1
 #
 #
