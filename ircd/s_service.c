@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.43 2003/07/29 23:36:37 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.44 2003/10/17 17:58:07 q Exp $";
 #endif
 
 #include "os.h"
@@ -106,29 +106,32 @@ aClient *cptr;
 **	action	type on notice
 **	server	origin
 */
-void	check_services_butone(long action, char *server, aClient *cptr, char *fmt, ...)
+void	check_services_butone(long action, char *server, aClient *cptr,
+		char *fmt, ...)
 /* shouldn't cptr be named sptr? */
 {
-	char nbuf[NICKLEN + USERLEN + HOSTLEN + 3];
-	Reg	aClient	*acptr;
+	char	nbuf[NICKLEN + USERLEN + HOSTLEN + 3];
 	Reg	aService *sp;
 
 	*nbuf = '\0';
 	for (sp = svctop; sp; sp = sp->nexts)
-	    {
+	{
 		if (!MyConnect(sp->bcptr) ||
 		    (cptr && sp->bcptr == cptr->from))
+		{
 			continue;
+		}
 		/*
 		** found a (local) service, check if action matches what's
 		** wanted AND if it comes from a server matching the dist
 		*/
 		if ((sp->wants & action)
 		    && (!server || !match(sp->dist, server)))
+		{
 			if ((sp->wants & SERVICE_WANT_PREFIX) && 
 			    cptr && IsRegisteredUser(cptr) &&
 			    (action & SERVICE_MASK_PREFIX))
-			    {
+			{
 				char	buf[2048];
 				va_list	va;
 				va_start(va, fmt);
@@ -138,15 +141,16 @@ void	check_services_butone(long action, char *server, aClient *cptr, char *fmt, 
 				sprintf(nbuf, "%s!%s@%s", cptr->name,
 					cptr->user->username,cptr->user->host);
 				sendto_one(sp->bcptr, ":%s%s", nbuf, buf);
-			    }
+			}
 			else
-			    {
+			{
 				va_list	va;
 				va_start(va, fmt);
 				vsendto_one(sp->bcptr, fmt, va);
 				va_end(va);
-			    }
-	    }
+			}
+		}
+	}
 	return;
 }
 
@@ -174,7 +178,7 @@ int	wants;
 			   (wants & SERVICE_WANT_USER) ?
 			   ((wants & SERVICE_WANT_TOKEN) ?
 			    sptr->user->servp->tok : sptr->user->server) : ".",
-			   (wants & SERVICE_WANT_UMODE | SERVICE_WANT_OPER) ? umode : "+",
+			   (wants & (SERVICE_WANT_UMODE|SERVICE_WANT_OPER)) ? umode : "+",
 			   (wants & SERVICE_WANT_USER) ? sptr->info : "");
 	else
 		/* old style NICK + USER + UMODE */
@@ -200,7 +204,7 @@ int	wants;
 				   (wants & SERVICE_WANT_TOKEN)?
 				   sptr->user->servp->tok : sptr->user->server,
 				   sptr->info);
-		if (wants & SERVICE_WANT_UMODE|SERVICE_WANT_OPER)
+		if (wants & (SERVICE_WANT_UMODE|SERVICE_WANT_OPER))
 			sendto_one(cptr, ":%s MODE %s %s", prefix, sptr->name,
 				   umode);
 	    }
@@ -211,26 +215,27 @@ int	wants;
 **	check all local services to eventually send NICK + USER + UMODE
 **	for new client sptr
 */
-void	check_services_num(sptr, umode)
-aClient *sptr;
-char   *umode;
+void	check_services_num(aClient *sptr, char *umode)
 {
-	Reg	aClient	*acptr;
 	Reg	aService *sp;
 
 	for (sp = svctop; sp; sp = sp->nexts)
-	    {
+	{
 		if (!MyConnect(sp->bcptr))
+		{
 			continue;
+		}
 		/*
 		** found a (local) service, check if action matches what's
 		** wanted AND if it comes from a server matching the dist
 		*/
 		if ((sp->wants & SERVICE_MASK_NUM)
 		    && !match(sp->dist, sptr->user->server))
+		{
 			sendnum_toone(sp->bcptr, sp->wants, sptr,
 				      umode);
-	    }
+		}
+	}
 }
 
 

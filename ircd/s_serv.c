@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.127 2003/10/14 20:19:55 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.128 2003/10/17 17:58:07 q Exp $";
 #endif
 
 #include "os.h"
@@ -1733,7 +1733,9 @@ static void report_myservers(aClient *sptr, char *to)
 	int i;
 	int timeconnected;
 	aClient *acptr;
+#ifdef	HUB
 	aServer *asptr;
+#endif
 	int users = 0, servers = 0;
 
 	for (i = fdas.highest; i >= 0; i--)
@@ -2515,7 +2517,7 @@ char	*parv[];
 				   ME, parv[1], parv[2] ? parv[2] : "",
 				   get_client_name(sptr,FALSE));
 #if defined(USE_SYSLOG) && defined(SYSLOG_CONNECT)
-		syslog(LOG_DEBUG, "CONNECT From %s : %s %d", parv[0],
+		syslog(LOG_DEBUG, "CONNECT From %s : %s %s", parv[0],
 		       parv[1], parv[2] ? parv[2] : "");
 #endif
 	    }

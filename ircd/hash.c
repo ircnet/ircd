@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.29 2003/10/13 21:48:52 q Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.30 2003/10/17 17:58:06 q Exp $";
 #endif
 
 #include "os.h"
@@ -1219,7 +1219,6 @@ static void show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables, int 
 			     int bucket)
 {
 	int j = 1;
-	char *hnext, *vdata, *tmpp;
 	aHashEntry *htab, *tab;
 	aClient *acptr;
 	anUser *auptr;

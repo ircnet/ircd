@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.25 2003/10/15 19:55:49 q Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.26 2003/10/17 17:58:06 q Exp $";
 #endif
 
 #include "os.h"
@@ -90,7 +90,6 @@ void	outofmemory()
 void	checklists()
 {
 	aServer	*sp;
-	anUser	*up;
 
 	for (sp = svrtop; sp; sp = sp->nexts)
 		if (sp->bcptr->serv != sp)
