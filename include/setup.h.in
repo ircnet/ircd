@@ -137,6 +137,18 @@
 /* Define if the strtok function must be provided by the source code. */
 #undef NEED_STRTOK
 
+/* Define if the inet_addr function must be provided by the source code. */
+#undef NEED_INET_ADDR
+
+/* Define if the inet_aton function must be provided by the source code. */
+#undef NEED_INET_ATON
+
+/* Define if the inet_netof function must be provided by the source code. */
+#undef NEED_INET_NETOF
+
+/* Define if the inet_ntoa function must be provided by the source code. */
+#undef NEED_INET_NTOA
+
 /* Define if you have the memmove. */
 #undef HAVE_MEMMOVE
 

@@ -102,7 +102,28 @@ extern	void	get_sockhost __P((aClient *, char *));
 extern	char	*rpl_str __P((int, char *)), *err_str __P((int, char *));
 extern	char	*strerror __P((int));
 extern	int	dgets __P((int, char *, int));
-extern	char	*inetntoa __P((char *)), *mystrdup __P((char *));
+extern	char	*mystrdup __P((char *));
+
+#ifdef	NEED_INET_NTOA
+extern	char	*inetntoa __P((char *));
+#else
+# define inetntoa inet_ntoa
+#endif
+#ifdef	NEED_INET_ADDR
+extern	u_long	inetaddr __P((const char *));
+#else
+# define inetaddr inet_addr
+#endif
+#ifdef	NEED_INET_ATON
+extern	int	inetaton __P((const char *, struct in_addr *));
+#else
+# define inetaton inet_aton
+#endif
+#ifdef	NEED_INET_NETOF
+extern	int	inetnetof __P((struct in_addr));
+#else
+# define inetnetof inet_netof
+#endif
 
 extern	u_int	poolsize;
 extern	int	debuglevel, errno, h_errno;

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.5 1997/07/15 04:35:41 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.6 1997/07/15 20:22:10 kalt Exp $";
 #endif
 
 #include "setup.h"
@@ -53,7 +53,7 @@ char	*s;
 **			of separators
 **			argv 9/90
 **
-**	$Id: support.c,v 1.5 1997/07/15 04:35:41 kalt Exp $
+**	$Id: support.c,v 1.6 1997/07/15 20:22:10 kalt Exp $
 */
 
 char *strtoken(save, str, fs)
@@ -107,7 +107,7 @@ char *str, *fs;
 **	strerror - return an appropriate system error string to a given errno
 **
 **		   argv 11/90
-**	$Id: support.c,v 1.5 1997/07/15 04:35:41 kalt Exp $
+**	$Id: support.c,v 1.6 1997/07/15 20:22:10 kalt Exp $
 */
 
 char *strerror(err_no)
@@ -133,6 +133,7 @@ int err_no;
 
 #endif /* NEED_STRERROR */
 
+#ifdef	NEED_INET_NTOA
 /*
 **	inetntoa  --	changed name to remove collision possibility and
 **			so behaviour is gaurunteed to take a pointer arg.
@@ -141,7 +142,7 @@ int err_no;
 **			internet number (some ULTRIX don't have this)
 **			argv 11/90).
 **	inet_ntoa --	its broken on some Ultrix/Dynix too. -avalon
-**	$Id: support.c,v 1.5 1997/07/15 04:35:41 kalt Exp $
+**	$Id: support.c,v 1.6 1997/07/15 20:22:10 kalt Exp $
 */
 
 char	*inetntoa(in)
@@ -159,31 +160,31 @@ char	*in;
 
 	return buf;
 }
+#endif
 
+#ifdef	NEED_INET_NETOF
 /*
 **	inet_netof --	return the net portion of an internet number
 **			argv 11/90
-**	$Id: support.c,v 1.5 1997/07/15 04:35:41 kalt Exp $
-**
 */
-
 int inetnetof(in)
 struct in_addr in;
 {
-    int addr = in.s_net;
-
-    if (addr & 0x80 == 0)
-	return ((int) in.s_net);
-
-    if (addr & 0x40 == 0)
-	return ((int) in.s_net * 256 + in.s_host);
-
-    return ((int) in.s_net * 256 + in.s_host * 256 + in.s_lh);
+    register u_long i = ntohl(in.s_addr);
+    
+    if (IN_CLASSA(i))
+	    return (((i)&IN_CLASSA_NET) >> IN_CLASSA_NSHIFT);
+    else if (IN_CLASSB(i))
+	    return (((i)&IN_CLASSB_NET) >> IN_CLASSB_NSHIFT);
+    else
+	    return (((i)&IN_CLASSC_NET) >> IN_CLASSC_NSHIFT);
 }
-
-#ifndef INADDR_NONE
-# define INADDR_NONE   0xffffffff
 #endif
+
+#ifdef NEED_INET_ADDR
+# ifndef INADDR_NONE
+#  define INADDR_NONE   0xffffffff
+# endif
 /*
  * Ascii internet address interpretation routine.
  * The value returned is in network order.
@@ -198,7 +199,9 @@ inetaddr(cp)
 		return (val.s_addr);
 	return (INADDR_NONE);
 }
+#endif
 
+#ifdef	NEED_INET_ATON
 /* 
  * Check whether "cp" is a valid ascii representation
  * of an Internet address and convert to a binary address.
@@ -299,6 +302,7 @@ inetaton(cp, addr)
 		addr->s_addr = htonl(val);
 	return (1);
 }
+#endif
 
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE)
 void	dumpcore(msg, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)
