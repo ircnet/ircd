@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-29421/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-20267/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.40 2004/02/13 19:08:47 chopin Exp $
+     $Id: INSTALL.info,v 1.41 2004/02/22 20:28:12 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0.
 
@@ -110,23 +110,16 @@ Notes for Cygwin32 users
 ========================
 
 The daemon of 2.11.0 release compiles properly on W32 systems which
-have the GNU-Win32 environment (
-(http://www.cygnus.com/misc/gnu-win32/)) setup.  At the time of the
-release, tests were made using the version b20.1 of the Cygwin32
-library.
+have the GNU-Win32 environment (  (http://www.cygwin.com/)) setup.  At
+the time of the release, tests were made using the version b20.1 of the
+Cygwin32 library.
 
    When compiling on such system, you want to make sure that you have
-carefully followed the Cygwin32 installation notes.  In particular, you
-will need to make sure that the following files exist: `/bin/cp.exe',
-`/bin/mv.exe', `/bin/rm.exe' and `/bin/sh.exe'.
+carefully followed the Cygwin32 installation notes.
 
    Also, the IRC server needs a `resolv.conf' file in order to
 initialize the resolver.  This file can be anywhere (see configure
 options), and is typically in `/etc' on UNIX systems.
-
-   Finally, iauth is automatically disabled.  Even though the iauth
-program compiles properly, extra work is required to have a working
-communication channel between the IRC server and the iauth program.
 
 
 File: INSTALL.info,  Node: Notes concerning IPv6 support,  Prev: Notes for Cygwin32 users,  Up: Installing IRC-
@@ -260,13 +253,11 @@ file for each server-server link.  ZIP_LEVEL allows you to control the
 compression level that will be used.  Values above 5 will noticeably
 increase the CPU used by the server.
 
-   The zlib package may be found at
-(http://www.cdrom.com/pub/infozip/zlib/). The data format used by the
-zlib library is described by RFCs (Request for Comments) 1950 to 1952
-in the files   (ftp://ds.internic.net/rfc/rfc1950.txt) (zlib format),
-rfc1951.txt (deflate format) and rfc1952.txt (gzip format). These
-documents are also available in other formats from
-(ftp://ftp.uu.net/graphics/png/documents/zlib/zdoc-index.html)
+   The zlib package may be found at   (http://www.gzip.org/zlib/). The
+data format used by the zlib library is described by RFCs (Request for
+Comments) 1950 to 1952 in the files
+(ftp://ds.internic.net/rfc/rfc1950.txt) (zlib format), rfc1951.txt
+(deflate format) and rfc1952.txt (gzip format).
 
 
 File: INSTALL.info,  Node: SLOW_ACCEPT,  Next: CLONE_CHECK,  Prev: ZIP_LINKS ZIP_LEVEL,  Up: The config-h file
@@ -302,7 +293,7 @@ Other #define's
 
 The rest of the user changable #define's should be pretty much self
 explanatory in the config.h file.  It is *NOT* recommended that any of
-the file undef the line with "STOP STOP" in it be changed.
+the file under the line with "STOP STOP" in it be changed.
 
 
 File: INSTALL.info,  Node: Editing the Makefile and compiling,  Next: The ircd-conf file,  Prev: The config-h file,  Up: Top
@@ -1669,38 +1660,38 @@ Node: Top128
 Node: Installing IRC-652
 Node: The configure script877
 Node: Notes for Cygwin32 users3163
-Node: Notes concerning IPv6 support4253
-Node: The config-h file4856
-Node: DEBUGMODE5440
-Node: CACHED_MOTD6019
-Node: CHROOTDIR6460
-Node: ENABLE_SUMMON ENABLE_USERS6831
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7364
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY8053
-Node: ZIP_LINKS ZIP_LEVEL8714
-Node: SLOW_ACCEPT9875
-Node: CLONE_CHECK10505
-Node: Other #define's10868
-Node: Editing the Makefile and compiling11190
-Node: The ircd-conf file12175
-Node: Machine information14024
-Node: Administrative info16450
-Node: Port connections18601
-Node: Connection Classes20432
-Node: Client connections25559
-Node: Operator priviliges31273
-Node: Excluded accounts33446
-Node: Server connections37358
-Node: Deny auto-connections46020
-Node: Hub connections47394
-Node: Leaf connections48882
-Node: Version limitations50966
-Node: Excluded machines52724
-Node: Service connections54029
-Node: Bounce server55623
-Node: Related resources57263
-Node: Reporting a bug58302
-Node: How to report a bug58559
-Node: Where to send a bug report59570
+Node: Notes concerning IPv6 support3896
+Node: The config-h file4499
+Node: DEBUGMODE5083
+Node: CACHED_MOTD5662
+Node: CHROOTDIR6103
+Node: ENABLE_SUMMON ENABLE_USERS6474
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7007
+Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY7696
+Node: ZIP_LINKS ZIP_LEVEL8357
+Node: SLOW_ACCEPT9385
+Node: CLONE_CHECK10015
+Node: Other #define's10378
+Node: Editing the Makefile and compiling10700
+Node: The ircd-conf file11685
+Node: Machine information13534
+Node: Administrative info15960
+Node: Port connections18111
+Node: Connection Classes19942
+Node: Client connections25069
+Node: Operator priviliges30783
+Node: Excluded accounts32956
+Node: Server connections36868
+Node: Deny auto-connections45530
+Node: Hub connections46904
+Node: Leaf connections48392
+Node: Version limitations50476
+Node: Excluded machines52234
+Node: Service connections53539
+Node: Bounce server55133
+Node: Related resources56773
+Node: Reporting a bug57812
+Node: How to report a bug58069
+Node: Where to send a bug report59080
 
 End Tag Table
