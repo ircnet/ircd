@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.8 1997/09/03 17:45:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.9 2003/10/18 13:02:25 jv Exp $";
 #endif
 
 /*
@@ -41,12 +41,6 @@ static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.8 1997/09/03 17:45:13 kalt Exp $";
 #endif
 #undef DBUF_C
 
-#undef VALLOC
-
-#if !defined(VALLOC) && !defined(valloc)
-#define	valloc malloc
-#endif
-
 #ifdef	CLIENT_COMPILE
 /* kind of ugly, eh? */
 u_int	dbufalloc = 0;
@@ -68,7 +62,7 @@ void dbuf_init()
 	int i = 0, nb;
 
 	nb = poolsize / sizeof(dbufbuf);
-	freelist = (dbufbuf *)valloc(nb * sizeof(dbufbuf));
+	freelist = (dbufbuf *)malloc(nb * sizeof(dbufbuf));
 	if (!freelist)
 		return; /* screw this if it doesn't work */
 	dbp = freelist;
@@ -93,11 +87,6 @@ void dbuf_init()
 static int dbuf_alloc(dbptr)
 dbufbuf **dbptr;
 {
-#if defined(VALLOC) && !defined(DEBUGMODE)
-	Reg	dbufbuf	*db2ptr;
-	Reg	int	num;
-#endif
-
 #ifndef	CLIENT_COMPILE
 	if (istat.is_dbufuse++ == istat.is_dbufmax)
 		istat.is_dbufmax = istat.is_dbufuse;
@@ -123,42 +112,12 @@ dbufbuf **dbptr;
 		return -2;	/* Not fatal, go back and increase poolsize */
 	    }
 
-#if defined(_SC_PAGE_SIZE) && !defined(_SC_PAGESIZE)
-#define	_SC_PAGESIZE	_SC_PAGE_SIZE
-#endif
-#if defined(VALLOC) && !defined(DEBUGMODE)
-# if defined(SOL20) || defined(_SC_PAGESIZE)
-	num = sysconf(_SC_PAGESIZE)/sizeof(dbufbuf);
-# else
-	num = getpagesize()/sizeof(dbufbuf);
-# endif
-	if (num < 0)
-		num = 1;
-
-#ifndef	CLIENT_COMPILE
-	istat.is_dbufnow += num;
-#endif
-
-	*dbptr = (dbufbuf *)valloc(num*sizeof(dbufbuf));
-	if (!*dbptr)
-		return -1;
-
-	num--;
-	for (db2ptr = *dbptr; num; num--)
-	    {
-		db2ptr = (dbufbuf *)((char *)db2ptr + sizeof(dbufbuf));
-		db2ptr->next = freelist;
-		freelist = db2ptr;
-	    }
-	return 0;
-#else
 #ifndef	CLIENT_COMPILE
 	istat.is_dbufnow++;
 #endif
 	if (!(*dbptr = (dbufbuf *)MyMalloc(sizeof(dbufbuf))))
 		return -1;
 	return 0;
-#endif
 }
 /*
 ** dbuf_free - return a dbufbuf structure to the freelist
