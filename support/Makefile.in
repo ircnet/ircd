@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.18 1998/04/07 21:22:32 kalt Exp $
+#*   $Id: Makefile.in,v 1.19 1998/04/30 12:40:48 kalt Exp $
 #*
 #*/
 
@@ -111,7 +111,7 @@ $(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 # stuff in contrib/
 
 mkpasswd: mkpasswd.o
-	$(RM) $@
+	$(RM) ircd-mkpasswd
 	$(CC) $(LDFLAGS) -o ircd-mkpasswd mkpasswd.o $(LIBS)
 
 install: install-server install-client
