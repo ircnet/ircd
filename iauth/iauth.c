@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: iauth.c,v 1.15 2003/10/18 17:26:35 q Exp $";
+static  char rcsid[] = "@(#)$Id: iauth.c,v 1.16 2004/02/07 23:41:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -132,6 +132,30 @@ static	void	init_signals(void)
 #endif
 }
 
+void	write_pidfile()
+{
+	int fd;
+	char pidbuf[32];
+	(void) truncate(IAUTHPID_PATH, 0);
+	if (( fd = open(IAUTHPID_PATH, O_CREAT|O_WRONLY, 0600)) >= 0)
+	{
+		memset(pidbuf, '0', sizeof(pidbuf));
+		(void) sprintf(pidbuf, "%d\n", (int)getpid());
+		if (write(fd, pidbuf, strlen(pidbuf)) == -1)
+		{
+			(void) printf("Error writing pidfile %s\n",
+				IAUTHPID_PATH);
+		}
+		(void) close(fd);
+	}
+	else
+	{
+		(void) printf("Error opening pidfile %s\n",
+			IAUTHPID_PATH);
+	}
+	return;
+}
+
 int	main(int argc, char *argv[])
 {
 	time_t	nextst = time(NULL) + 90;
@@ -192,6 +216,7 @@ int	main(int argc, char *argv[])
 #endif
 		sendto_ircd("G 0");
 
+	write_pidfile();
 	while (1)
 	    {
 		loop_io();

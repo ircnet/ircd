@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.50 2003/10/18 19:45:13 chopin Exp $
+#*   $Id: Makefile.in,v 1.51 2004/02/07 23:41:27 chopin Exp $
 #*
 #*/
 
@@ -89,7 +89,7 @@ ircd_log_dir = @logdir@
 #
 # Path to server binary
 IRCD_PATH = $(server_bin_dir)/$(SERVER)
-# Path to authentification slave binary
+# Path to authentication slave binary
 IAUTH_PATH = $(server_bin_dir)/$(IAUTH)
 # Path to the m4 configuration file
 IRCDM4_PATH = $(ircd_conf_dir)/ircd.m4
@@ -102,6 +102,8 @@ IRCDMOTD_PATH = $(ircd_conf_dir)/ircd.motd
 IAUTHCONF_PATH = $(ircd_conf_dir)/iauth.conf
 # server PID file
 IRCDPID_PATH = $(ircd_var_dir)/ircd.pid
+# authentication slave PID file
+IAUTHPID_PATH = $(ircd_var_dir)/iauth.pid
 # server state file
 IRCDTUNE_PATH = $(ircd_var_dir)/ircd.tune
 # ircdwatch PID file

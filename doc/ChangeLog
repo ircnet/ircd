@@ -1,3 +1,12 @@
+2004-02-08  Piotr Kucharski
+
+	* iauth.c: new function write_pidfile().
+	* Makefile.in: added IAUTHPID_PATH.
+
+2004-01-20  Piotr Kucharski
+
+	* channel.c/set_mode(): disallow +R from clients.
+
 2004-01-02  Piotr Kucharski
 
 	* reverting Kurt's changes #2 and #3 from 2004-01-01 (too much
