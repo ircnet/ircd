@@ -506,11 +506,12 @@ struct	SMode	{
 struct	Message	{
 	char	*cmd;
 	int	(* func)();
-	u_int	count;
 	int	parameters;
 	u_int	flags;
 		/* bit 0 set means that this command is allowed to be used
 		 * only on the average of once per 2 seconds -SRB */
+	u_int	count;	/* total count */
+	u_int	rcount;	/* remote count */
 	u_long	bytes;
 };
 

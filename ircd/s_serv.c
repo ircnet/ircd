@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.22 1997/09/03 18:26:49 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.23 1997/09/12 18:00:15 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1360,7 +1360,8 @@ char	*parv[];
 			if (mptr->count)
 				sendto_one(cptr, rpl_str(RPL_STATSCOMMANDS,
 					   parv[0]), mptr->cmd,
-					   mptr->count, mptr->bytes);
+					   mptr->count, mptr->bytes,
+					   mptr->rcount);
 		break;
 	case 'o' : case 'O' : /* O (and o) lines */
 		report_configured_links(cptr, parv[0], CONF_OPS);
