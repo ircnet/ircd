@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.32 2002/09/11 20:24:31 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.33 2003/02/16 03:47:27 jv Exp $";
 #endif
 
 #include "os.h"
@@ -346,6 +346,9 @@ char	*nick;
 		   -1, -1
 #endif
 		   );
+	sendto_one(cptr, ":%s %d %s :AC:%s SS:%d SU:%d", ME, RPL_STATSDEFINE,
+		   nick, (iconf.aconnect == 1) ? "ON" : "OFF",
+		   iconf.split_minservers, iconf.split_minusers);
 }
 
 void	count_memory(cptr, nick, debug)
