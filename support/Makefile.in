@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.63 2004/09/21 15:32:49 chopin Exp $
+#*   $Id: Makefile.in,v 1.64 2004/10/04 19:55:34 chopin Exp $
 #*
 #*/
 
@@ -242,10 +242,10 @@ install-server: install-ircd server
 	$(INSTALL_DATA) ../doc/iauth.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/iauth.conf.5 $(conf_man_dir)
 	$(INSTALL_DATA) ../contrib/ircdwatch/ircdwatch.8 $(server_man_dir)
-	$(INSTALL_DATA) ../doc/example.conf $(ircd_conf_dir)/ircd.conf.example
-	$(INSTALL_DATA) ../support/iauth.conf $(ircd_conf_dir)/iauth.conf.example
+	$(INSTALL_DATA) ../doc/ircd.conf.example $(ircd_conf_dir)
+	$(INSTALL_DATA) ../doc/iauth.conf.example $(ircd_conf_dir)
 	-@if [ ! -f $(IAUTHCONF_PATH) ]; then \
-		$(INSTALL_DATA) ../support/iauth.conf $(IAUTHCONF_PATH); \
+		$(INSTALL_DATA) ../doc/iauth.conf.example $(IAUTHCONF_PATH); \
 	fi
 	-@if [ ! -f $(IRCDMOTD_PATH) ]; then \
 		$(INSTALL_DATA) ../support/ircd.motd $(IRCDMOTD_PATH); \
