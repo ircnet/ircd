@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.69 2004/06/12 12:37:23 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.70 2004/06/12 22:36:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -53,11 +53,7 @@ struct Message msgtab[] = {
 { "PING",     1, MPAR, 0, 0, 0L, { m_ping, m_ping, m_ping, m_ping, m_unreg } },
 { "PONG",     1, MPAR, 0, 0, 0L, { m_pong, m_pong, m_pong, m_pong, m_unreg } },
 { "ERROR",    1, MPAR, 0, 0, 0L, { m_error, m_nop, m_nop, m_nop, m_unreg } },
-#ifdef	OPER_KILL
 { "KILL",     1, MPAR, 0, 0, 0L, { m_kill, m_nopriv, m_kill, m_nop, m_unreg } },
-#else
-{ "KILL",     2, MPAR, 0, 0, 0L, { m_kill, m_nop, m_nop, m_nop, m_unreg } },
-#endif
 { "SAVE",     1, MPAR, 0, 0, 0L, { m_save, m_nop, m_nop, m_nop, m_unreg } },
 { "USER",     4, MPAR, 0, 0, 0L, { m_nop, m_reg, m_reg, m_nop, m_user } },
 { "AWAY",     0, MPAR, 0, 0, 0L, { m_nop, m_away, m_away, m_nop, m_unreg } },
@@ -97,18 +93,10 @@ struct Message msgtab[] = {
 { "SERVLIST", 0, MPAR, 0, 0, 0L, { m_servlist, m_servlist, m_servlist, m_nop, m_unreg } },
 { "HAZH",     1, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_hash, m_nop, m_nop } },
 { "DNS",      0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_dns, m_nop, m_nop } },
-#ifdef	OPER_REHASH
 { "REHASH",   0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_rehash, m_nop, m_unreg } },
-#endif
-#ifdef	OPER_RESTART
 { "RESTART",  0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_restart, m_nop, m_unreg } },
-#endif
-#ifdef	OPER_DIE
 { "DIE",      0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_die, m_nop, m_unreg } },
-#endif
-#ifdef OPER_SET
 { "SET",      0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_set, m_nop, m_unreg } },
-#endif /* OPER_SET */
 { "MAP",      0, MPAR, 0, 0, 0L, { m_map, m_map, m_map, m_nop, m_unreg } },
 { "POST",     0, MPAR, 0, 0, 0L, { m_nop, m_nop, m_nop, m_nop, m_post } },
 { NULL,       0,    0, 0, 0, 0L,   NULL, NULL, NULL, NULL, NULL }
