@@ -15,6 +15,8 @@
 	  instead of ereject_user(), get rid of duplicating sendto_flog()s.
 	* s_misc.c/exit_client(): log everything from here, use sptr->exitc.
 	* config.h.dist: add LOG_OLDFORMAT define.
+	* s_id_ext.h: readded cid_ok() declaration, we use it (via macro) in
+	  other files.
 
 2002-05-26  Piotr Kucharski
 
