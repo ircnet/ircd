@@ -184,11 +184,13 @@
 #define	ERR_BADCHANNELKEY    475
 #define	ERR_BADCHANMASK      476
 #define	ERR_NOCHANMODES      477
+#define ERR_BANLISTFULL      478
 
 #define ERR_NOPRIVILEGES     481
 #define ERR_CHANOPRIVSNEEDED 482
-#define	ERR_CANTKILLSERVER   483
+#define ERR_CANTKILLSERVER   483
 #define ERR_RESTRICTED       484
+#define ERR_UNIQOPRIVSNEEDED 485
 
 #define ERR_NOOPERHOST       491
 #define ERR_NOSERVICEHOST    492
@@ -226,6 +228,7 @@
 #define RPL_LIST             322
 #define RPL_LISTEND          323
 #define RPL_CHANNELMODEIS    324
+#define RPL_UNIQOPIS         325
 
 #define RPL_NOTOPIC          331
 #define RPL_TOPIC            332

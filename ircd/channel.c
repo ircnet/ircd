@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.90 1999/01/18 15:22:44 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.91 1999/01/20 01:28:46 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -179,7 +179,12 @@ char	*modeid;
 		if (MyClient(cptr))
 		    {
 			if ((len > MAXBANLENGTH) || (++cnt >= MAXBANS))
+			    {
+				sendto_one(cptr, err_str(ERR_BANLISTFULL,
+							 cptr->name),
+					   chptr->chname, modeid);
 				return -1;
+			    }
 			if (type == mode->flags &&
 			    (!match(mode->value.cp, modeid) ||
 			    !match(modeid, mode->value.cp)))
@@ -888,8 +893,11 @@ char	*parv[];
 				continue;	/* no valid mode change */
 			if ((mcount < 0) && MyConnect(sptr) && !IsServer(sptr))
 			    {	/* rejected mode change */
-				sendto_one(sptr, err_str(ERR_CHANOPRIVSNEEDED,
-							 parv[0]), name);
+				int num = ERR_CHANOPRIVSNEEDED;
+
+				if (IsClient(sptr) && IsRestricted(sptr))
+					num = ERR_RESTRICTED;
+				sendto_one(sptr, err_str(num, parv[0]), name);
 				continue;
 			    }
 			if (strlen(modebuf) > (size_t)1)
@@ -1004,13 +1012,16 @@ char	*parv[], *mbuf, *pbuf;
 					if (lp->flags & CHFL_UNIQOP)
 					    {
 						sendto_one(sptr,
-							   ":%s MODE %s +O %s",
-							   ME, chptr->chname,
+						   rpl_str(RPL_UNIQOPIS,
+							   sptr->name),
+							   chptr->chname,
 						   lp->value.cptr->name);
 						break;
 					    }
 				if (!lp)
-					sendto_one(sptr, ":%s MODE %s -O", ME,
+					sendto_one(sptr,
+						   err_str(ERR_NOSUCHNICK,
+							   sptr->name),
 						   chptr->chname);
 				break;
 			    }
@@ -1344,7 +1355,7 @@ char	*parv[], *mbuf, *pbuf;
 				if (*ip == MODE_ANONYMOUS &&
 				    whatt == MODE_DEL && *chptr->chname == '!')
 					sendto_one(sptr,
-					   err_str(ERR_CHANOPRIVSNEEDED,
+					   err_str(ERR_UNIQOPRIVSNEEDED,
 						   parv[0]), chptr->chname);
 				else if (((*ip == MODE_ANONYMOUS &&
 					   whatt == MODE_ADD &&
@@ -1354,7 +1365,8 @@ char	*parv[], *mbuf, *pbuf;
 					 !IsServer(sptr))
 					sendto_one(cptr,
 						   err_str(ERR_UNKNOWNMODE,
-						   parv[0]), *curr);
+						   parv[0]), *curr,
+						   chptr->chname);
 				else if ((*ip == MODE_REOP ||
 					  *ip == MODE_ANONYMOUS) &&
 					 !IsServer(sptr) &&
@@ -1362,7 +1374,7 @@ char	*parv[], *mbuf, *pbuf;
 					 && *chptr->chname == '!')
 					/* 2 modes restricted to UNIQOP */
 					sendto_one(sptr,
-					   err_str(ERR_CHANOPRIVSNEEDED,
+					   err_str(ERR_UNIQOPRIVSNEEDED,
 						   parv[0]), chptr->chname);
 				else
 				    {
@@ -1392,7 +1404,7 @@ char	*parv[], *mbuf, *pbuf;
 			    }
 			else if (!IsServer(cptr))
 				sendto_one(cptr, err_str(ERR_UNKNOWNMODE,
-					   cptr->name), *curr);
+					   cptr->name), *curr, chptr->chname);
 			break;
 		}
 		curr++;
