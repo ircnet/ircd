@@ -1,3 +1,8 @@
+2004-08-27  Piotr Kucharski
+
+	* channel.c/reop_channel(): do not abort reop mechanism if restricted
+	  client is channel operator.
+
 2004-08-21  Piotr Kucharski
 
 	* s_serv.c/m_server(): register_server() must be called before
