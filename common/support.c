@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.28 2003/08/06 18:47:46 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.29 2003/08/08 21:56:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -799,7 +799,7 @@ char **make_isupport()
 		"NICKLEN=%d TOPICLEN=%d KICKLEN=%d MAXLIST=beI:%d "
 		"CHANNELLEN=%d CHIDLEN=%d CHANMODES=beIR,k,l,imnpstaqr",
 		MAXMODEPARAMS, MAXCHANNELSPERUSER,
-		NICKLEN, TOPICLEN, TOPICLEN, MAXBANS, CHANNELLEN, CHIDLEN);
+		ONICKLEN, TOPICLEN, TOPICLEN, MAXBANS, CHANNELLEN, CHIDLEN);
 
 	if (networkname)
 	{
