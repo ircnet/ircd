@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.46 2002/08/24 01:33:33 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.47 2002/08/25 04:25:49 jv Exp $";
 #endif
 
 #include "os.h"
@@ -933,14 +933,48 @@ char	*irc_newline;
 		return(NULL);
 
 	field = line;
-	if ((end = (char *)index(line, IRCDCONF_DELIMITER)) == NULL)
-	    {
-		line = NULL;
-		if ((end = (char *)index(field,'\n')) == NULL)
-			end = field + strlen(field);
-	    }
+
+	end = index(line, IRCDCONF_DELIMITER);
+	if (end == line)
+	{ /* empty */
+		line++;
+	}
 	else
-		line = end + 1;
+	{
+		for (;;)
+		{
+			if (!end)
+			{
+				/* we can't find delimiter at the end of
+				 * this field. (probably last one)
+				 */
+				break;
+			}
+			if (*(end - 1) != '\\')
+			{ /* not escaped delimiter */
+				break;
+			}
+			else
+			{ /* escaped one, dequote */
+				char *s;
+				if (*(end+1) == '\0')
+					break;
+				for (s = (end - 1); (*s = *(s+1)) ;s++);
+				end++;
+				end = index(end, IRCDCONF_DELIMITER);
+			}
+		}
+		if (!end)
+		{
+			line = NULL;
+			if ((end = (char *)index(field, '\n')) == NULL)
+				end = field + strlen(field);
+		}
+		else
+		{
+			line = end + 1;
+		}
+	}
 	*end = '\0';
 	return(field);
 }
