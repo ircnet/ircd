@@ -1,5 +1,11 @@
 2004-07-15  Piotr Kucharski
 
+	* chkconf.c/main(): missing declaration when in debug mode.
+	* s_conf.c/do_tkline(): always send notice about new tkline.
+	* s_conf.c/initconf(): fix core on empty ircd.conf.
+
+2004-07-15  Piotr Kucharski
+
 	* chkconf.c: use config_error() instead of fprintf(stderr... and adjust
 	  wherever needed for changed filelist (different definition depending
 	  on compile-time options).
