@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.26 1999/09/20 22:39:56 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.27 2001/02/10 19:16:52 q Exp $";
 #endif
 
 #include "os.h"
@@ -33,12 +33,12 @@ char *	replies[] = {
 /* 002 RPL_YOURHOST */	":%s 002 %s :Your host is %s, running version %s",
 /* 003 RPL_CREATED */	":%s 003 %s :This server was created %s",
 /* 004 RPL_MYINFO */	":%s 004 %s %s %s aoOirw abeiIklmnoOpqrstv",
-/* 005 RPL_BOUNCE */	":%s 005 %s :Try server %s, port %d",
+/* 005 */ (char *)NULL,
 /* 006 */ (char *)NULL,
 /* 007 */ (char *)NULL,
 /* 008 */ (char *)NULL,
 /* 009 */ (char *)NULL,
-/* 010 */ (char *)NULL,
+/* 010 RPL_BOUNCE */	":%s 010 %s %s %s :Please use this Server/Port instead",
 /* 011 */ (char *)NULL,
 /* 012 */ (char *)NULL,
 /* 013 */ (char *)NULL,

@@ -123,7 +123,7 @@
 #define	RPL_YOURHOST         002
 #define	RPL_CREATED          003
 #define	RPL_MYINFO           004
-#define	RPL_BOUNCE           005
+#define	RPL_BOUNCE            10
 #define	RPL_YOURID            42
 
 /*
