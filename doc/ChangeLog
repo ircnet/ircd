@@ -7,6 +7,8 @@
 	* s_misc.c/exit_client(): take advantage of double quotes enclosing.
 	* s_misc.c/exit_client(): do not call check_split() every client
 	  quitting (leave it only every server quitting).
+	* s_misc.c/check_split(): tiny unsigned bug.
+	* channel.c/m_join(): no-op-on-split.
 
 2004-01-20  Piotr Kucharski
 
