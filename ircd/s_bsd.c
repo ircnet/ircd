@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.11 1997/07/15 04:35:47 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.12 1997/07/16 19:28:14 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1460,6 +1460,7 @@ add_con_refuse:
 		sendto_flog(acptr, " ?Clone? ", 0, "<none>",
 			    (acptr->hostp) ? acptr->hostp->h_name :
 			    acptr->sockhost);
+		del_queries((char *)acptr);
 		goto add_con_refuse;
 	    }
 #endif
