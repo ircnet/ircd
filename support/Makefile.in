@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.31 1998/09/07 21:54:53 kalt Exp $
+#*   $Id: Makefile.in,v 1.32 1998/09/10 13:14:40 kalt Exp $
 #*
 #*/
 
@@ -35,12 +35,18 @@ A_CFLAGS = @CFLAGS@ -I. -I../iauth -I../common @IRC_ZLIB_INCLUDE@
 CC_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common
 # for the client
 C_CFLAGS = @CFLAGS@ -I. -I../irc -I../common
-U_CFLAGS = @CFLAGS@ -I.
+# other things (in contrib/)
+O_CFLAGS = @CFLAGS@ -I. -I../common -DCONTRIB_COMPILE
+# 
 LDFLAGS = @LDFLAGS@
+# required libraries, except zlib and curses/termcap
 LIBS = @LIBS@
 MATHLIBS = -lm
+# zlib, eventually
 ZLIBS = @IRC_ZLIB_LIBRARY@
+# curses library
 CURSESLIBS = @IRC_CURSES_TERMCAP_LIBRARY@
+# install and related programs
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
@@ -387,13 +393,13 @@ chkconf.o: ../ircd/chkconf.c setup.h config.h
 # stuff in contrib/
 
 ircdwatch.o: ../contrib/ircdwatch/ircdwatch.c
-	$(CC) $(CC_CFLAGS) -DSERVER_BIN_DIR="\"$(server_bin_dir)\"" -DDPATH="\"$(ircd_dir)\"" -c -o $@ $<
+	$(CC) $(O_CFLAGS) -DSERVER_BIN_DIR="\"$(server_bin_dir)\"" -DDPATH="\"$(ircd_dir)\"" -c -o $@ $<
 
 mkpasswd.o: ../contrib/mkpasswd/mkpasswd.c
-	$(CC) $(CC_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c
+	$(CC) $(O_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c
 
 tkserv.o: ../contrib/tkserv/tkserv.c
-	$(CC) $(CC_CFLAGS) -DIRCDPATH="\"$(server_bin_dir)\"" -c -o $@ $<
+	$(CC) $(O_CFLAGS) -DIRCDPATH="\"$(server_bin_dir)\"" -c -o $@ $<
 
 clean:
 	$(RM) $(CLIENT) $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd ircdwatch *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
