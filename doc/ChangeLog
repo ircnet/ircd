@@ -1,6 +1,7 @@
 2004-02-10  Piotr Kucharski
 
 	* s_service.c/m_service(): lacking parameter added.
+	* channel.c/match_modeid(): bug in matching username part.
 
 2004-02-09  Piotr Kucharski
 
