@@ -17,7 +17,8 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#if defined(DEBUGMODE) && !defined(CLIENT_COMPILE) && defined(DO_DEBUG_MALLOC)
+#if defined(DEBUGMODE) && !defined(CLIENT_COMPILE) && \
+    !defined(CHKCONF_COMPILE) && defined(DO_DEBUG_MALLOC)
 # define	free(x)		MyFree(x)
 #else
 # define	MyFree(x)       if ((x) != NULL) free(x)
