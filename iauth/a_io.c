@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.6 1998/08/06 02:06:11 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.7 1998/08/06 02:55:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -359,6 +359,15 @@ parse_ircd()
 					   "Unreleased data [%d]!", ncl);
 				free(cldata[ncl].authuser);
 				cldata[ncl].authuser = NULL;
+			    }
+			if (cldata[ncl].inbuffer)
+			    {
+				/* shouldn't be here - hmmpf */
+				sendto_log(ALOG_IRCD|ALOG_DIO, LOG_WARNING,
+					   "Unreleased buffer [%c %d]!",
+					   chp[0], ncl);
+				free(cldata[ncl].inbuffer);
+				cldata[ncl].inbuffer = NULL;
 			    }
 			bcopy(cldata+cl, cldata+ncl, sizeof(anAuthData));
 
