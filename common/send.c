@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.15 1997/06/30 20:21:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.16 1997/07/18 03:04:09 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -1308,7 +1308,7 @@ void	sendto_flag(u_int chan, char *pattern, ...)
 {
 	Reg	aChannel *chptr = NULL;
 	SChan	*shptr;
-	char	nbuf[512];
+	char	nbuf[1024];
 
 	if (chan < 1 || chan > SCH_MAX)
 		chan = SCH_NOTICE;
