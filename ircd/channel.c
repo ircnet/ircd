@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.27 1998/01/23 22:37:52 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.28 1998/01/27 12:59:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1648,8 +1648,8 @@ char	*parv[];
 		if (MyConnect(sptr) && UseModes(name) &&
 		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users)
 		    {
-			flags = CHFL_CHANOP;
 			chop = "\007o";
+			s = chop+1; /* tricky */
 		    }
 		/*
 		**  Complete user entry to the new channel (if any)
@@ -1679,14 +1679,19 @@ char	*parv[];
 						parv[0], name);
 		if (s) {
 			sendto_channel_butserv(chptr, sptr,
-					       ":%s MODE %s +%c%c %s %s",
-					       cptr->name, name, *s,
-					       *(s+1) == 'v' ? 'v' : ' ',
-					       parv[0],
+					       ":%s MODE %s +%s %s %s",
+					       cptr->name, name, s, parv[0],
 					       *(s+1) == 'v' ? parv[0] : "");
 			*--s = '\007';
 		}
 #endif
+		/*
+		** If s wasn't set to chop+1 above, name is now #chname^Gov
+		** again (if coming from a server, and user is +o and/or +v
+		** of course ;-)
+		** This explains the weird use of name and chop..
+		** Is this insane or subtle? -krys
+		*/
 		if (MyClient(sptr))
 		    {
 			del_invite(sptr, chptr);
