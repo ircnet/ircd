@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.87 1999/01/17 01:13:54 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.88 1999/01/18 00:15:38 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2023,7 +2023,7 @@ char	*parv[];
 					/*
 					 * This is a bit wrong: if a channel
 					 * rightfully ceases to exist, it
-v					 * can still be *locked* for up to
+ 					 * can still be *locked* for up to
 					 * 2*CHIDNB^3 seconds (~24h)
 					 * Is it a reasonnable price to pay to
 					 * ensure shortname uniqueness? -kalt
