@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.73 2004/02/10 00:35:23 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.74 2004/02/10 14:04:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -778,8 +778,11 @@ aConfItem	*find_conf_host_sid(Link *lp, char *host, char *sid, int statmask)
 		if (tmp->status & statmask &&
 		    (!(tmp->status & CONF_SERVER_MASK || tmp->host) ||
 	 	     (tmp->host && !match(tmp->host, host))) &&
-			(!tmp->passwd || !match(tmp->passwd, sid)))
+			(!tmp->passwd || !tmp->passwd[0] ||
+				!match(tmp->passwd, sid)) )
+		{
 			return tmp;
+		}
 	    }
 	return NULL;
 }
