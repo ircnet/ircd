@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.231 2004/08/21 21:36:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.232 2004/08/22 20:46:17 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1141,23 +1141,6 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 
 	if (IsUnknown(cptr))
 	    {
-		if (bconf->passwd[0])
-#ifndef	ZIP_LINKS
-			sendto_one(cptr, "PASS %s %s IRC|%s %s", bconf->passwd,
-				   pass_version, serveropts,
-				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
-#else
-			sendto_one(cptr, "PASS %s %s IRC|%s %s%s",
-				   bconf->passwd, pass_version, serveropts,
-			   (bconf->status == CONF_ZCONNECT_SERVER) ? "Z" : "",
-				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
-#endif
-		/*
-		** Pass my info to the new server
-		*/
-		sendto_one(cptr, "SERVER %s 1 %s :%s",
-			mlname, me.serv->sid, me.info);
-
 		/*
 		** If we get a connection which has been authorized to be
 		** an already existing connection, remove the already
@@ -1178,6 +1161,24 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 				return exit_client(cptr, cptr, &me,
 						   "Server Exists");
 		    }
+
+		if (bconf->passwd[0])
+#ifndef	ZIP_LINKS
+			sendto_one(cptr, "PASS %s %s IRC|%s %s", bconf->passwd,
+				   pass_version, serveropts,
+				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
+#else
+			sendto_one(cptr, "PASS %s %s IRC|%s %s%s",
+				   bconf->passwd, pass_version, serveropts,
+			   (bconf->status == CONF_ZCONNECT_SERVER) ? "Z" : "",
+				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
+#endif
+		/*
+		** Pass my info to the new server
+		*/
+		sendto_one(cptr, "SERVER %s 1 %s :%s",
+			mlname, me.serv->sid, me.info);
+
 	    }
 	else
 	    {
