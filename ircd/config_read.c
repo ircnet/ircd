@@ -30,7 +30,7 @@ struct Config
 static aConfig	*config_read(int, int, aFile *);
 static void	config_free(aConfig *);
 #ifdef CONFIG_DIRECTIVE_INCLUDE
-#define STACKTYPE char
+#define STACKTYPE aFile
 #else
 #define STACKTYPE char
 #endif
@@ -270,7 +270,12 @@ void config_error(int level, STACKTYPE *stack, int line, char *pattern, ...)
 	va_list va;
 	char vbuf[BUFSIZE];
 	char *filep;
+#ifdef CONFIG_DIRECTIVE_INCLUDE
+	aFile *curF = stack;
+	char *filename = stack->filename;
+#else
 	char *filename = stack;
+#endif
 
 	if (!etclen)
 	{
@@ -292,6 +297,17 @@ void config_error(int level, STACKTYPE *stack, int line, char *pattern, ...)
 #ifdef CHKCONF_COMPILE
 	fprintf(stderr, "%s:%d %s%s\n", filep, line,
 		((level == CF_ERR) ? "ERROR: " : "WARNING: "), vbuf);
+# ifdef CONFIG_DIRECTIVE_INCLUDE
+	while ((curF && curF->parent))
+	{
+		filep = curF->parent->filename;
+		if (0 == strncmp(filep, IRCDCONF_PATH, etclen))
+			filep += etclen;
+		fprintf(stderr, "\tincluded in %s:%d\n",
+			filep, curF->includeline);
+		curF = curF->parent;
+	}
+# endif
 #else
 	if (level != CF_ERR)
 		return;
