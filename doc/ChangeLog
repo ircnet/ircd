@@ -1,6 +1,20 @@
-Fri Jan 23 09:47:37 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+Fri Jan 23 17:39:17 1998  Christophe Kalt
+
+	* os.h: linux 2.1 implements poll() but the header files are a
+	mess (what did you expect?), kludge to get it work (from Vesa).
+	
+	* channel.c: fixes related to MIRC_KLUDGE.
+
+	* s_conf.c:
+		* find_kill() fix and cleanup (mostly from Vesa).
+		* find_bounce() stricter check and fix (from Vesa).
+	
+	* parse.c: m_njoin() is only used by the server.
+
+Fri Jan 23 17:38:36 1998  Christophe Kalt
 
 	* channel.c:
+		* buffer overflow fix.
 		* bugfix from Avalon.
 		* join/invite were propagated for &channels. (reported by DLR)
 		* invite/kick were propagated beyond masks. (reported by DLR)
