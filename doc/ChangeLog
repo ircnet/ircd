@@ -1,3 +1,9 @@
+2001-12-31  Piotr Kucharski
+
+	* s_user.c/m_unick(): while creating client we messed with server
+	  pointer, adding ->user struct to it, which later made m_server
+	  reject servers (from jv).
+
 2001-12-30  Piotr Kucharski
 
 	* s_user.c/m_nick(): allow restricted users change nick from saved uid.
