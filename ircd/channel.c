@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.31 1998/03/30 13:30:44 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.32 1998/03/30 14:55:32 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1301,27 +1301,49 @@ aClient	*sptr;
 Reg	aChannel *chptr;
 char	*key;
 {
-	Reg	Link	*lp;
+	Link	*lp, *banned;
+	int	ckinvite = 0;
 
 	if (chptr->users == 0 && chptr->history != 0)
 		return (timeofday > chptr->history) ? 0 : ERR_UNAVAILRESOURCE;
-	if (is_banned(sptr, chptr))
-		return (ERR_BANNEDFROMCHAN);
-	if (chptr->mode.mode & MODE_INVITEONLY)
+	if (banned = is_banned(sptr, chptr))
 	    {
 		for (lp = sptr->user->invited; lp; lp = lp->next)
 			if (lp->value.chptr == chptr)
 				break;
 		if (!lp)
+			return (ERR_BANNEDFROMCHAN);
+		ckinvite = 1;
+	    }
+	if (chptr->mode.mode & MODE_INVITEONLY)
+	    {
+		if (!ckinvite)
+			for (lp = sptr->user->invited; lp; lp = lp->next)
+				if (lp->value.chptr == chptr)
+					break;
+		if (!lp)
 			return (ERR_INVITEONLYCHAN);
+		ckinvite = 1;
 	    }
 
 	if (*chptr->mode.key && (BadPtr(key) || mycmp(chptr->mode.key, key)))
 		return (ERR_BADCHANNELKEY);
 
 	if (chptr->mode.limit && chptr->users >= chptr->mode.limit)
-		return (ERR_CHANNELISFULL);
+	    {
+		if (!ckinvite)
+			for (lp = sptr->user->invited; lp; lp = lp->next)
+				if (lp->value.chptr == chptr)
+					break;
+		if (!lp)
+			return (ERR_CHANNELISFULL);
+	    }
 
+	if (banned)
+		sendto_channel_butserv(chptr, &me,
+       ":%s NOTICE %s :%s carries an invitation (overriding ban on %s).",
+				       ME, chptr->chname, sptr->name,
+				       banned->value.cp);
 	return 0;
 }
 
@@ -2222,7 +2244,7 @@ char	*parv[];
 				   acptr->name, acptr->user->away);
 	    }
 	if (MyConnect(acptr))
-		if (chptr && (chptr->mode.mode & MODE_INVITEONLY) &&
+		if (chptr && /* (chptr->mode.mode & MODE_INVITEONLY) && */
 		    sptr->user && is_chan_op(sptr, chptr))
 			add_invite(acptr, chptr);
 	sendto_prefix_one(acptr, sptr, ":%s INVITE %s :%s",parv[0],
