@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_zip.c,v 1.3 1997/09/03 17:46:06 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_zip.c,v 1.4 1998/05/12 16:55:48 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -112,11 +112,11 @@ aClient	*cptr;
 	    {
 		if (cptr->zip->in)
 			inflateEnd(cptr->zip->in);
-		MyFree(cptr->zip->in);
+		MyFree((char *)cptr->zip->in);
 		if (cptr->zip->out)
 			deflateEnd(cptr->zip->out);
-		MyFree(cptr->zip->out);
-		MyFree(cptr->zip);
+		MyFree((char *)cptr->zip->out);
+		MyFree((char *)cptr->zip);
 		cptr->zip = NULL;
 	    }
 }

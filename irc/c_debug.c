@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_debug.c,v 1.2 1997/09/03 17:45:32 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: c_debug.c,v 1.3 1998/05/12 16:55:49 kalt Exp $";
 #endif
  
 #include "os.h"
@@ -31,14 +31,26 @@ static  char rcsid[] = "@(#)$Id: c_debug.c,v 1.2 1997/09/03 17:45:32 kalt Exp $"
 struct	stats	ircst, *ircstp = &ircst;
 
 #ifdef DEBUGMODE
+#if ! USE_STDARG
 void debug(level, form, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
 int level;
 char *form, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10;
+#else
+void	debug(int level, char *form, ...)
+#endif
 {
   if (debuglevel >= 0)
     if (level <= debuglevel) {
       char buf[512];
-      sprintf(buf, form, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+#if ! USE_STDARG
+      (void)sprintf(buf, form,
+		    p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+#else
+      va_list va;
+      va_start(va, form);
+      (void)vsprintf(buf, form, va);
+      va_end(va);
+#endif
       putline(buf);
     }
 }

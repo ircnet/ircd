@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.19 1998/05/05 23:30:23 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.20 1998/05/12 16:55:48 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1050,7 +1050,7 @@ char *filename;
 	    {
 		last = motd->next;
 		MyFree(motd->line);
-		MyFree(motd);
+		MyFree((char *)motd);
 	    }
 	motd_tm = *localtime(&Sb.st_mtime);
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
