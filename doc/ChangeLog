@@ -1,3 +1,8 @@
+2002-05-26  Piotr Kucharski
+
+	* send.c/sendto_flog(): ircd was not honouring SYSLOG_CONN and
+	  SYSLOG_USERS being undefined (reported by Francesco).
+
 2002-05-22  Jakub Vlasek
 
 	* s_serv.c/m_server(): Show the name of the server which caused
