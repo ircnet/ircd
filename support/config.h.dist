@@ -158,10 +158,13 @@
  * Left undefined they increase the security of your server from wayward
  * operators and accidents.  Defining OPER_REMOTE removes the restriction
  * that O-lines only become fully effective for people on the 'same network'
- * as the server.  Undefined, it increases the secrity of the server by
+ * as the server.  Undefined, it increases the security of the server by
  * placing restrictions on where people can use operator powers from.
  * The 'LOCOP_' #defines are for making the respective commands available
- * to 'local' operators.
+ * to 'local' operators. Note that the 'OPER_' #defines affect both global
+ * (big O) and local (little o) operators.  Defining 'LOCOP_x' has no effect
+ * if 'OPER_x' is undefined so you can't give local operators more rights
+ * than global ones.
  */
 #undef	OPER_KILL
 #define	OPER_REHASH

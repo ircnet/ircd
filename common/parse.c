@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.15 1998/05/25 19:59:19 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.16 1998/06/12 23:28:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -96,21 +96,21 @@ struct Message msgtab[] = {
   { MSG_SERVLIST,m_servlist, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_HASH,    m_hash,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_DNS,     m_dns,      MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-#if defined(OPER_REHASH) || defined(LOCOP_REHASH)
+#ifdef	OPER_REHASH
   { MSG_REHASH,  m_rehash,   MAXPARA, MSG_REGU|MSG_OP
 # ifdef	LOCOP_REHASH
 					 |MSG_LOP
 # endif
 					, 0, 0, 0L},
 #endif
-#if defined(OPER_RESTART) || defined(LOCOP_RESTART)
+#ifdef	OPER_RESTART
   { MSG_RESTART,  m_restart,   MAXPARA, MSG_REGU|MSG_OP
 # ifdef	LOCOP_RESTART
 					 |MSG_LOP
 # endif
 					, 0, 0, 0L},
 #endif
-#if defined(OPER_DIE) || defined(LOCOP_DIE)
+#ifdef	OPER_DIE
   { MSG_DIE,  m_die,   MAXPARA, MSG_REGU|MSG_OP
 # ifdef	LOCOP_DIE
 					 |MSG_LOP
@@ -641,9 +641,10 @@ char	*buffer, *bufend;
 		sendto_one(from, err_str(ERR_ALREADYREGISTRED, para[0]));
 		return-1;
 	    }
-	if (MyConnect(from) && !IsPrivileged(from) &&
-	    (mptr->flags & (MSG_LOP|MSG_OP)))
-		if (!((mptr->flags & MSG_LOP) && IsLocOp(from)))
+	if (MyConnect(from) && !IsServer(from) &&
+		(mptr->flags & (MSG_LOP|MSG_OP)))
+		if (!IsOper(from) &&
+		    !((mptr->flags & MSG_LOP) && IsLocOp(from)))
 		    {
 			sendto_one(from, err_str(ERR_NOPRIVILEGES, para[0]));
 			return -1;
