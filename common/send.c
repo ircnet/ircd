@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.91 2004/11/16 16:34:33 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.92 2004/11/16 16:39:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -304,12 +304,13 @@ int	send_queued(aClient *to)
 				if (bysptr && !MyConnect(bysptr))
 				{
 					sendto_one(bysptr, ":%s NOTICE %s :"
-					"Write error to %s, closing link",
-					ME, bysptr->name, to->name);
+					"Write error (%d) to %s, closing link",
+					ME, bysptr->name, -rlen, to->name);
 				}
 			}
-			return dead_link(to, "Write error to %s, closing link",
-				get_client_name(to, FALSE));
+			return dead_link(to,
+				"Write error (%d) to %s, closing link",
+				-rlen, get_client_name(to, FALSE));
 		}
 		(void)dbuf_delete(&to->sendQ, rlen);
 		to->lastsq = DBufLength(&to->sendQ)/1024;
@@ -395,7 +396,7 @@ static	int	vsendprep(char *pattern, va_list va)
  */
 static	int	vsendpreprep(aClient *to, aClient *from, char *pattern, va_list va)
 {
-	int	flag = 0, len;
+	int	len;
 
 	Debug((DEBUG_L10, "sendpreprep(%#x(%s),%#x(%s),%s)",
 		to, to->name, from, from->name, pattern));

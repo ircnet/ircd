@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: bsd.c,v 1.10 2004/10/01 20:22:11 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: bsd.c,v 1.11 2004/11/16 16:39:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -113,6 +113,7 @@ int	deliver_it(aClient *cptr, char *str, int len)
 
 #ifdef DEBUGMODE
 	if (retval < 0) {
+		retval = -errno;
 		writeb[0]++;
 		Debug((DEBUG_ERROR,"write error (%s) to %s",
 			strerror(errno), cptr->name));
