@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.8 1998/08/06 04:21:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.9 1998/08/07 03:39:49 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -93,6 +93,7 @@ AnInstance *last;
 {
     DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): last=%s state=0x%X", cl, last,
 	      (last) ? last->mod->name : "", cldata[cl].state));
+    /* first, make sure the last instance which ran cleaned up */
     if (cldata[cl].rfd > 0 || cldata[cl].wfd > 0)
 	{
 	    /* last is defined here */
@@ -111,10 +112,12 @@ AnInstance *last;
     cldata[cl].instance = NULL;
     cldata[cl].timeout = 0;
 
+    /* second, if A_START is set, a new pass has to be started */
     if (cldata[cl].state & A_START)
 	{
 	    cldata[cl].state ^= A_START;
 	    if (cldata[cl].tried)
+		    /* A_GOTH is set */
 		    DebugLog((ALOG_DIO, 0,
 			      "next_io(#%d, %x): Starting 2nd pass",
 			      cl, last));
@@ -126,6 +129,7 @@ AnInstance *last;
 	    return;
 	}
 
+    /* third, did the last module obtain an authentication? */
     if (cldata[cl].authuser && cldata[cl].best == last)
 	{
 	    /* we got an authentication from the last module, stop here */
@@ -134,8 +138,9 @@ AnInstance *last;
 		{
 		    /*
 		    ** we have the hostname info, so this is already the
-		    ** 2nd pass we made
-		    ** or we won't get the info, so we're done.
+		    ** 2nd pass we made,
+		    ** or we won't get the info,
+		    ** ---> we're done.
 		    */
 		    sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip,
 				cldata[cl].itsport);
@@ -146,6 +151,7 @@ AnInstance *last;
 	    return;
 	}
 
+    /* fourth, find next instance to be ran */
     if (last == NULL)
 	    cldata[cl].instance = instances;
     else
@@ -155,21 +161,23 @@ AnInstance *last;
 	{
 	    int noipchk = 1;
 
-	    if (cldata[cl].state & A_CHKALL)
+	    if (!(cldata[cl].state & A_GOTH))
+		    /* still 1st pass */
+		    noipchk = 0;
+	    else if (cldata[cl].state & A_CHKALL)
+		    /*
+		    ** 2nd pass, trying an instance which wasn't reached
+		    ** during the 1st pass.
+		    */
 		    noipchk = 0;
 	    else
-		{
+		    /* 2nd pass */
 		    if (cldata[cl].instance == cldata[cl].tried)
 			    /*
 			    ** we've reached the last module
-			    ** tried in the 1st pass
+			    ** tried in the 1st pass, remember it.
 			    */
 			    cldata[cl].state |= A_CHKALL;
-		    if (cldata[cl].tried == NULL &&
-			!(cldata[cl].state & A_COMPLETE))
-			    /* first pass */
-			    noipchk = 0;
-		}
 
 	    if (conf_match(cl, cldata[cl].instance, noipchk) == 0)
 		    break;
@@ -179,6 +187,7 @@ AnInstance *last;
 	    cldata[cl].instance = cldata[cl].instance->nexti;
 	}
 
+    /* fifth, when there's no instance to try.. */
     if (cldata[cl].instance == NULL)
 	{
 	    DebugLog((ALOG_DIO, 0,
@@ -187,9 +196,9 @@ AnInstance *last;
 	    if (cldata[cl].state & (A_GOTH|A_NOH))
 		{
 		    /*
-		    ** this is either the 2nd pass,
-		    ** or the 1st but we already know that have no hostname
-		    ** conclusion: we're done.
+		    ** either this is the 2nd pass,
+		    ** or the 1st but we already know that have no hostname,
+		    ** ---> we're done.
 		    */
 		    sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip,
 				cldata[cl].itsport);
@@ -197,27 +206,27 @@ AnInstance *last;
 		    free(cldata[cl].inbuffer);
 		    cldata[cl].inbuffer = NULL;
 		}
-	    else
-		    cldata[cl].state |= A_COMPLETE;
 	    return;
 	}
 
-    cldata[cl].timeout = time(NULL) + 120; /* hmmpf */
-
-    /* record progress of the first pass */
+    /* sixth, we've got an instance to try */
     if ((cldata[cl].state & A_GOTH) == 0)
 	{
-	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): 1st pass: %x",
-		      cl, last, cldata[cl].instance));
+	    /* record progress of the 1st pass */
+	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): 1st pass: %x (%s)",
+		      cl, last, cldata[cl].instance,
+		      cldata[cl].instance->mod->name));
 	    cldata[cl].tried = cldata[cl].instance;
 	}
     else
 	{
-	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): 2nd pass: %x",
-		      cl, last, cldata[cl].instance));
+	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): 2nd pass: %x (%s)",
+		      cl, last, cldata[cl].instance,
+		      cldata[cl].instance->mod->name));
 	}
 
     /* run the module */
+    cldata[cl].timeout = time(NULL) + 120; /* hmmpf */
     if (cldata[cl].instance->mod->start(cl) != 0)
 	    /* start() failed, or had nothing to do */
 	    next_io(cl, cldata[cl].instance);

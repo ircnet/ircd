@@ -51,8 +51,7 @@ struct AuthData
 
 #define	A_ACTIVE	0x0001	/* entry is active */
 #define	A_START		0x0002	/* go through modules from beginning */
-#define	A_COMPLETE	0x0004	/* did at least one complete pass */
-#define	A_DONE		0x0008	/* nothing left to be done */
+#define	A_DONE		0x0004	/* nothing left to be done */
 #define	A_CHKALL	0x0010	/* CPU saver */
 #define	A_IGNORE	0x0020	/* ignore subsequent messages from ircd */
 
