@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.10 1997/09/03 17:45:21 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.11 1997/09/03 17:49:39 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.4.
 </abstract>
@@ -1002,6 +1002,7 @@ been compiled with DEBUGMODE defined to connect.
 for the one server mask.
 <p>
 V:020901:*:*::
+<p>
 V:020902:*:*::
 <p>
 is allowed.
@@ -1050,7 +1051,7 @@ the host(s) from which the service will be connecting
 from. This may be either an IP&num; or full name (prefered).
 <tag/Password/ This is the password which must be passed in
 the SERVICE command.
-<tag/Service Name/: The name used by the service. Services
+<tag/Service Name/ The name used by the service. Services
 don't have nicknames, but a static name defined by the S
 line.
 <tag/Service Type/ The type of service. It defines the
@@ -1058,27 +1059,10 @@ priviledges given to the service. Be very careful in the
 types you allow.  The types can be found in
 include/service.h
 <tag/Class/ The class field should refer to an existing class.
-<tag/Notes/ To connect a service to your server, you must
-first create an S-line entry in your ircd.conf file and get
-your server to read this in (ie rehash or reboot). Once your
-server has updated itself, you can then attempt to register
-your connection as a service.  Registering as a service is
-done by sending a SERVICE command to the server:
-<p>
-SERVICE servicename servername distribution servicetype 0 :Information
-<p>
-A successfull registering of a service at the server will
-result in a RPL_YOURESERVICE (383) being sent back to
-you. Any other reply as a result of sending service
-indicates an error has occured.
-<p>
-Services can be listed using the SERVLIST command, and can
-be sent messages using the SQUERY command.
-<p>
-A service is not a very useful sort of client, it cannot
-join channels or issue certain commands although most are
-available to it. Services are rejected upon sending an
-unknown or unallowed command. Services however, are not
+<tag/Notes/ A service is not a very useful sort of client,
+it cannot join channels or issue certain commands although
+most are available to it. Services are rejected upon sending
+an unknown or unallowed command. Services however, are not
 affected by flood control and can be granted special
 privileges. It is therefore <bf>wise to oversee the use of
 S-lines with much care.</bf>
