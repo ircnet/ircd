@@ -1,3 +1,16 @@
+2004-05-12  Piotr Kucharski
+
+	* s_user.c/m_kill(): show target user@host[server/sid].
+	* class.c/report_classes(): show usage count in Y:lines.
+	* s_err.c: add param for RPL_STATSYLINE, removed RPL_TRACECLASS.
+	* s_serv.c: removed report_class_usage().
+	* s_serv.c/m_stats(): change 'C' (removed) to 'Y'.
+
+2004-05-09  Piotr Kucharski
+
+	* configure, configure.in: more fixes.
+	* config.h.dist: check for empty TIMEDKLINES define.
+
 2004-05-07  Piotr Kucharski
 
 	* configure, configure.in: update to work with autoconf 2.57.
@@ -11,7 +24,7 @@
 
 	* s_bsd.c/read_message(): Do not check cptrs of delayed listeners.
 	* list.c/free_client(): hopcount=1 of directly connected servers.
-	* s_misc.c/exit_cone_client(): incorrect SQUITs were sent to 2.10 which
+	* s_misc.c/exit_one_client(): incorrect SQUITs were sent to 2.10 which
 	  resulted in strange remote client quits (looking as if whole net was
 	  breaking apart).
 	* s_misc.c/exit_server(): use from, not &me or else -- otherwise squits
@@ -238,7 +251,7 @@
 2004-03-05  Piotr Kucharski
 
 	* res.c/proc_answer(), get_res(): fix CNAMEs resolving; now we use the
-	  the name that client IP has "IN PTR" to, not the name that "IN A" 
+	  name that client IP has "IN PTR" to, not the name that "IN A" 
 	  points to client IP (patch from BitKoenig).
 	* list.c/make_conf(): initialize flags to 0L.
 	* struct_def.h, chkconf.c, s_conf.c, s_serv.c: got rid of CONF_RCLIENT
