@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.113 2001/12/08 01:49:02 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.114 2001/12/21 20:10:27 q Exp $";
 #endif
 
 #include "os.h"
@@ -48,8 +48,8 @@ static	int	can_join __P((aClient *, aChannel *, char *));
 void	channel_modes __P((aClient *, char *, char *, aChannel *));
 static	int	check_channelmask __P((aClient *, aClient *, char *));
 static	aChannel *get_channel __P((aClient *, char *, int));
-static	int	set_mode __P((aClient *, aClient *, aChannel *, int *, int,\
-				char **, char *,char *));
+static	int	set_mode __P((aClient *, aClient *, aChannel *, int *, 
+			int, char **));
 static	void	free_channel __P((aChannel *));
 
 static	int	add_modeid __P((int, aClient *, aChannel *, char *));
@@ -62,7 +62,7 @@ static	char	*PartFmt = ":%s PART %s :%s";
  * some buffers for rebuilding channel/nick lists with ,'s
  */
 static	char	nickbuf[BUFSIZE], buf[BUFSIZE];
-static	char	modebuf[MODEBUFLEN], parabuf[MODEBUFLEN];
+static	char	modebuf[MODEBUFLEN], parabuf[MODEBUFLEN], uparabuf[MODEBUFLEN];
 
 /*
  * return the length (>=0) of a chain of links.
@@ -925,60 +925,9 @@ char	*parv[];
 		    }
 		else	/* Check parameters for the channel */
 		    {
-			if(!(mcount = set_mode(cptr, sptr, chptr, &penalty,
-					       parc - 2, parv + 2,
-					       modebuf, parabuf)))
+			if(!(mcount = set_mode(cptr, sptr, chptr,
+				&penalty, parc - 2, parv + 2)))
 				continue;	/* no valid mode change */
-			if ((mcount < 0) && MyConnect(sptr) && !IsServer(sptr))
-			    {	/* rejected mode change */
-				int num = ERR_CHANOPRIVSNEEDED;
-
-				if (IsClient(sptr) && IsRestricted(sptr))
-					num = ERR_RESTRICTED;
-				sendto_one(sptr, replies[num], ME, BadTo(parv[0]), name);
-				continue;
-			    }
-			if (strlen(modebuf) > (size_t)1)
-			    {	/* got new mode to pass on */
-				if (modebuf[1] == 'e' || modebuf[1] == 'I')
-					/* 2.9.x compatibility */
-					sendto_match_servs_v(chptr, cptr,
-							     SV_NMODE,
-							   ":%s MODE %s %s %s",
-							     parv[0], name,
-							     modebuf, parabuf);
-				else
-					sendto_match_servs(chptr, cptr,
-							   ":%s MODE %s %s %s",
-							   parv[0], name,
-							   modebuf, parabuf);
-				if ((IsServer(cptr) && !IsServer(sptr) &&
-				     !chanop) || mcount < 0)
-				    {
-					sendto_flag(SCH_CHAN,
-						    "Fake: %s MODE %s %s %s",
-						    parv[0], name, modebuf,
-						    parabuf);
-					ircstp->is_fake++;
-				    }
-				else
-				    {
-					sendto_channel_butserv(chptr, sptr,
-						        ":%s MODE %s %s %s",
-							parv[0], name,
-							modebuf, parabuf);
-#ifdef USE_SERVICES
-					*modebuf = *parabuf = '\0';
-					modebuf[1] = '\0';
-					channel_modes(&me, modebuf, parabuf,
-						      chptr);
-					check_services_butone(SERVICE_WANT_MODE,
-						      NULL, sptr,
-						      "MODE %s %s",
-						      name, modebuf);
-#endif
-				    }
-			   } /* if(modebuf) */
 		    } /* else(parc>2) */
 	    } /* for (parv1) */
 	return penalty;
@@ -986,14 +935,14 @@ char	*parv[];
 
 /*
  * Check and try to apply the channel modes passed in the parv array for
- * the client cptr to channel chptr.  The resultant changes are printed
- * into mbuf and pbuf (if any) and applied to the channel.
+ * the client cptr to channel chptr.
+ * Also sends it to everybody that should get it.
  */
-static	int	set_mode(cptr, sptr, chptr, penalty, parc, parv, mbuf, pbuf)
+static	int	set_mode(cptr, sptr, chptr, penalty, parc, parv)
 Reg	aClient *cptr, *sptr;
 aChannel *chptr;
 int	parc, *penalty;
-char	*parv[], *mbuf, *pbuf;
+char	*parv[];
 {
 	static	Link	chops[MAXMODEPARAMS+3];
 	static	int	flags[] = {
@@ -1004,17 +953,18 @@ char	*parv[], *mbuf, *pbuf;
 				0x0, 0x0 };
 
 	Reg	Link	*lp = NULL;
-	Reg	char	*curr = parv[0], *cp = NULL;
+	Reg	char	*curr = parv[0], *cp = NULL, *ucp;
 	Reg	int	*ip;
 	u_int	whatt = MODE_ADD;
 	int	limitset = 0, count = 0, chasing = 0;
-	int	nusers = 0, ischop, new, len, keychange = 0, opcnt = 0;
+	int	nusers = 0, ischop, new, len, ulen, keychange = 0, opcnt = 0;
 	aClient *who;
 	Mode	*mode, oldm;
 	Link	*plp = NULL;
 	int	compat = -1; /* to prevent mixing old/new modes */
+	char	*mbuf = modebuf, *pbuf = parabuf, *upbuf = uparabuf;
 
-	*mbuf = *pbuf = '\0';
+	*mbuf = *pbuf = *upbuf = '\0';
 	if (parc < 1)
 		return 0;
 
@@ -1119,13 +1069,14 @@ char	*parv[], *mbuf, *pbuf;
 			 * to make sure the right client is affected by the
 			 * mode change.
 			 */
-			if (!(who = find_chasing(sptr, parv[0], &chasing)))
+			if (!(who = find_uid(parv[0], NULL)) &&
+				!(who = find_chasing(sptr, parv[0], &chasing)))
 				break;
 	  		if (!IsMember(who, chptr))
 			    {
 				sendto_one(sptr, replies[ERR_USERNOTINCHANNEL],
 							 ME, BadTo(sptr->name),
-					   parv[0], chptr->chname);
+					   who->name, chptr->chname);
 				break;
 			    }
 			if (who == cptr && whatt == MODE_ADD && *curr == 'o')
@@ -1577,6 +1528,7 @@ char	*parv[], *mbuf, *pbuf;
 					whatt = MODE_DEL;
 				    }
 			len = strlen(pbuf);
+			ulen = strlen(upbuf);
 			/*
 			 * get c as the mode char and tmp as a pointer to
 			 * the paramter for this mode change.
@@ -1586,14 +1538,17 @@ char	*parv[], *mbuf, *pbuf;
 			case MODE_CHANOP :
 				c = 'o';
 				cp = lp->value.cptr->name;
+				ucp = lp->value.cptr->user->uid;
 				break;
 			case MODE_UNIQOP :
 				c = 'O';
 				cp = lp->value.cptr->name;
+				ucp = lp->value.cptr->user->uid;
 				break;
 			case MODE_VOICE :
 				c = 'v';
 				cp = lp->value.cptr->name;
+				ucp = lp->value.cptr->user->uid;
 				break;
 			case MODE_BAN :
 				c = 'b';
@@ -1659,9 +1614,13 @@ char	*parv[], *mbuf, *pbuf;
 			case MODE_KEY :
 				*mbuf++ = c;
 				(void)strcat(pbuf, cp);
+				(void)strcat(upbuf, cp);
 				len += strlen(cp);
+				ulen += strlen(cp);
 				(void)strcat(pbuf, " ");
+				(void)strcat(upbuf, " ");
 				len++;
+				ulen++;
 				if (!ischop)
 					break;
 				if (strlen(cp) > (size_t) KEYLEN)
@@ -1675,9 +1634,13 @@ char	*parv[], *mbuf, *pbuf;
 			case MODE_LIMIT :
 				*mbuf++ = c;
 				(void)strcat(pbuf, cp);
+				(void)strcat(upbuf, cp);
 				len += strlen(cp);
+				ulen += strlen(cp);
 				(void)strcat(pbuf, " ");
+				(void)strcat(upbuf, " ");
 				len++;
+				ulen++;
 				if (!ischop)
 					break;
 				mode->limit = nusers;
@@ -1691,9 +1654,13 @@ char	*parv[], *mbuf, *pbuf;
 			case MODE_VOICE :
 				*mbuf++ = c;
 				(void)strcat(pbuf, cp);
+				(void)strcat(upbuf, ucp);
 				len += strlen(cp);
+				ulen += strlen(ucp);
 				(void)strcat(pbuf, " ");
+				(void)strcat(upbuf, " ");
 				len++;
+				ulen++;
 				if (ischop)
 					change_chan_flag(lp, chptr);
 				break;
@@ -1706,9 +1673,13 @@ char	*parv[], *mbuf, *pbuf;
 				    {
 					*mbuf++ = c;
 					(void)strcat(pbuf, cp);
+					(void)strcat(upbuf, cp);
 					len += strlen(cp);
+					ulen += strlen(cp);
 					(void)strcat(pbuf, " ");
+					(void)strcat(upbuf, " ");
 					len++;
+					ulen++;
 				    }
 				break;
 			case MODE_EXCEPTION :
@@ -1720,9 +1691,13 @@ char	*parv[], *mbuf, *pbuf;
 				    {
 					*mbuf++ = c;
 					(void)strcat(pbuf, cp);
+					(void)strcat(upbuf, cp);
 					len += strlen(cp);
+					ulen += strlen(cp);
 					(void)strcat(pbuf, " ");
+					(void)strcat(upbuf, " ");
 					len++;
+					ulen++;
 				    }
 				break;
 			case MODE_INVITE :
@@ -1734,16 +1709,78 @@ char	*parv[], *mbuf, *pbuf;
 				    {
 					*mbuf++ = c;
 					(void)strcat(pbuf, cp);
+					(void)strcat(upbuf, cp);
 					len += strlen(cp);
+					ulen += strlen(cp);
 					(void)strcat(pbuf, " ");
+					(void)strcat(upbuf, " ");
 					len++;
+					ulen++;
 				    }
 				break;
 			}
 		    } /* for (; i < opcnt; i++) */
 	    } /* if (opcnt) */
 
-	*mbuf++ = '\0';
+	*mbuf = '\0';
+	mbuf = modebuf;
+
+	if ((!ischop) && MyConnect(sptr) && !IsServer(sptr))
+	{
+		/* rejected mode change */
+		int num = ERR_CHANOPRIVSNEEDED;
+
+		if (IsClient(sptr) && IsRestricted(sptr))
+		{
+			num = ERR_RESTRICTED;
+		}
+		sendto_one(sptr, replies[num], ME, sptr->name, chptr->chname);
+		return -count;
+	}
+
+	/* Send the mode changes out. */
+	if (strlen(modebuf) > 1)
+	{
+		char	*s; /* Sender for messages to 2.11s. */
+
+		if (IsServer(sptr))
+		{
+			s = sptr->serv->sid;
+		}
+		else if (HasUID(sptr))
+		{
+			s = sptr->user->uid;
+		}
+		else
+		{
+			s = sptr->name;
+		}
+
+		sendto_match_servs_v(chptr, cptr, SV_UID,
+			":%s MODE %s %s %s", s, chptr->chname, mbuf, upbuf);
+		sendto_match_servs_notv(chptr, cptr, SV_UID, 
+			":%s MODE %s %s %s", sptr->name, chptr->chname, mbuf,
+			pbuf);
+
+		if ((IsServer(cptr) && !IsServer(sptr) && !ischop))
+		{
+			sendto_flag(SCH_CHAN, "Fake: %s MODE %s %s %s",
+				    sptr->name, chptr->chname, mbuf, pbuf);
+			ircstp->is_fake++;
+		}
+		else
+		{
+			sendto_channel_butserv(chptr, sptr, ":%s MODE %s %s %s",
+				sptr->name, chptr->chname, mbuf, pbuf);
+#ifdef USE_SERVICES
+			*modebuf = *parabuf = '\0';
+			modebuf[1] = '\0';
+			channel_modes(&me, modebuf, parabuf, chptr);
+			check_services_butone(SERVICE_WANT_MODE, NULL, sptr,
+				"MODE %s %s", chptr->chname, modebuf);
+#endif
+		}
+	}
 
 	return ischop ? count : -count;
 }
