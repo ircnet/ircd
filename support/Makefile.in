@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.7 1997/07/25 20:26:46 kalt Exp $
+#*   $Id: Makefile.in,v 1.8 1997/07/28 01:25:39 kalt Exp $
 #*
 #*/
 
@@ -50,7 +50,9 @@ client_man_dir = @mandir@/man1
 # Directory in which to install the server manual page file.
 server_man_dir = @mandir@/man8
 
-# Directory where most files will be
+# Directory where most files will be.
+# This path is important as it is hardcoded into the server,
+# it should exist and contain at least the configuration file.
 ircd_dir = @libdir@
 
 # Access mode for irc.
