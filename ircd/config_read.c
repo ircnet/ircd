@@ -1,4 +1,4 @@
-/* "@(#)$Id: config_read.c,v 1.30 2004/12/12 19:10:07 chopin Exp $"; */
+/* "@(#)$Id: config_read.c,v 1.31 2005/02/15 19:16:54 chopin Exp $"; */
 
 /* used in config_error() */
 #define CF_NONE 0
@@ -10,6 +10,18 @@
 
 /* max nesting depth. ircd.conf itself is depth = 0 */
 #define MAXDEPTH 13
+
+#if defined(__sun) || defined(__sun__) || defined(sun)
+/* Sun has a buggy implementation of FILE functions 
+** (they do not work when fds 0-255 are already used).
+** ircd-ratbox 1.5-3 had a nice reimplementation, so I took it. --B. */
+#define FILE FBFILE
+#define fclose fbclose
+#define fdopen fdbopen
+#define fgets fbgets
+#define fopen fbopen
+#include "fileio.c"
+#endif
 
 typedef struct File aFile;
 struct File
