@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.10 1997/09/03 17:46:12 kalt Exp $
+#*   $Id: Makefile.in,v 1.11 1997/09/08 00:23:19 kalt Exp $
 #*
 #*/
 
@@ -80,7 +80,7 @@ SERVER_COMMON_OBJS = bsd.o dbuf.o packet.o send.o match.o parse.o \
 SERVER_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
               s_bsd.o s_conf.o s_debug.o s_err.o s_misc.o s_numeric.o \
               s_serv.o s_service.o s_user.o s_zip.o whowas.o \
-              res_init.o res_comp.o res_mkquery.o version.o
+              res_init.o res_comp.o res_mkquery.o
 SERVER = ircd
 
 CHKCONF_COMMON_OBJS = match.o
@@ -99,7 +99,9 @@ $(CLIENT): $(CLIENT_COMMON_OBJS) $(CLIENT_OBJS)
 
 $(SERVER): $(SERVER_COMMON_OBJS) $(SERVER_OBJS)
 	$(RM) $@
-	$(CC) $(LDFLAGS) -o $@ $(SERVER_COMMON_OBJS) $(SERVER_OBJS) $(ZLIBS) $(MATHLIBS) $(LIBS)
+	./version.c.SH
+	$(CC) $(S_CFLAGS) -c -o version.o version.c
+	$(CC) $(LDFLAGS) -o $@ $(SERVER_COMMON_OBJS) version.o $(SERVER_OBJS) $(ZLIBS) $(MATHLIBS) $(LIBS)
 
 $(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 	$(RM) $@
@@ -223,8 +225,15 @@ channel.o: ../ircd/channel.c setup.h config.h
 class.o: ../ircd/class.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/class.c
 
-hash.o: ../ircd/hash.c setup.h config.h
-	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/hash.c
+hash.o: ../common/struct_def.h ../common/os.h ../ircd/hash_def.h \
+	../ircd/hash_ext.h ../common/common_def.h ../ircd/s_bsd.c \
+	../ircd/s_serv.c ../ircd/s_user.c ../ircd/channel.c ../ircd/s_misc.c \
+	../ircd/ircd.c Makefile setup.h config.h
+	@cp ../ircd/hash.c .
+	@/bin/sh ./sums
+	$(CC) $(S_CFLAGS) -c -o $@ hash.c
+	@$(RM) hash.c hash.c.old
+	@touch hash.o
 
 ircd.o: ../ircd/ircd.c setup.h config.h
 	$(CC) $(S_CFLAGS) -DDPATH="\"$(ircd_dir)\"" -c -o $@ ../ircd/ircd.c
@@ -283,14 +292,8 @@ res_mkquery.o: ../ircd/res_mkquery.c setup.h config.h
 chkconf.o: ../ircd/chkconf.c setup.h config.h
 	$(CC) $(CC_CFLAGS) -DDPATH="\"$(ircd_dir)\"" -c -o $@ ../ircd/chkconf.c
 
-version.o: version.c setup.h config.h
-	$(CC) $(S_CFLAGS) -c -o $@ version.c
-
-version.c: version.c.SH
-	./version.c.SH
-
 clean:
-	$(RM) $(CLIENT) $(SERVER) $(CHKCONF) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"*
+	$(RM) $(CLIENT) $(SERVER) $(CHKCONF) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
 
 distclean:
 	@echo "To make distclean, just delete the current directory."
