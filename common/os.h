@@ -128,6 +128,10 @@
 #endif
 
 #if HAVE_SYS_POLL_H
+# if linux
+/* Linux is just soooo broken */
+#  define _GNU_SOURCE 1
+# endif
 # include <sys/poll.h>
 # if linux && !defined(POLLRDNORM)
 /* Linux 2.1.xx supports poll(), header files are not upto date yet */
