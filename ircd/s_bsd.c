@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.144 2004/04/17 17:27:22 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.145 2004/04/18 04:31:50 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2245,7 +2245,8 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 		/*
 		 * accept connections
 		 */
-		if (TST_READ_EVENT(fd) && IsListener(cptr))
+		if (TST_READ_EVENT(fd) && IsListener(cptr) &&
+			!IsListenerInactive(cptr))
 		    {
 			CLR_READ_EVENT(fd);
 			cptr->lasttime = timeofday;
