@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.116 2002/03/13 00:56:19 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.117 2002/03/24 19:58:37 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2739,7 +2739,7 @@ char	*parv[];
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_OPER, sptr->user->server, 
 				      sptr, ":%s MODE %s :+%c", parv[0],
-				      parv[0], IsOper(sptr) ? 'O' : 'o');
+				      parv[0], IsOper(sptr) ? 'o' : 'O');
 #endif
 		if (IsAnOper(sptr))
 			istat.is_oper++;
@@ -3182,8 +3182,8 @@ int	old;
 #ifdef USE_SERVICES
 	/* buf contains all modes for local users, and iow only for remotes */
 	if (*buf)
-		check_services_butone(SERVICE_WANT_UMODE, NULL, sptr,
-				      ":%s MODE %s :%s", sptr->name,
+		check_services_butone(SERVICE_WANT_UMODE, sptr->user->server,
+				      sptr, ":%s MODE %s :%s", sptr->name,
 				      sptr->name, buf);
 #endif
 }
