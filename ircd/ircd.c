@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.28 1998/09/09 12:23:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.29 1998/09/11 18:27:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -513,7 +513,8 @@ aClient	*mp;
 	(void)get_my_name(mp, mp->sockhost, sizeof(mp->sockhost)-1);
 	if (mp->name[0] == '\0')
 		strncpyzt(mp->name, mp->sockhost, sizeof(mp->name));
-	me.info = strdup("IRCers United");
+	if (me.info == DefInfo)
+		me.info = strdup("IRCers United");
 	mp->lasttime = mp->since = mp->firsttime = time(NULL);
 	mp->hopcount = 0;
 	mp->authfd = -1;
