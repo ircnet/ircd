@@ -39,11 +39,11 @@ EXTERN int get_client_class (aClient *acptr);
 EXTERN int get_client_ping (aClient *acptr);
 EXTERN int get_con_freq (aClass *clptr);
 EXTERN void add_class (int class, int ping, int confreq, int maxli,
-			   int sendq, int hlocal, int uhlocal,
+			   int sendq, int bsendq, int hlocal, int uhlocal,
 			   int hglobal, int uhglobal);
 EXTERN aClass *find_class (int cclass);
 EXTERN void check_class(void);
 EXTERN void initclass(void);
 EXTERN void report_classes (aClient *sptr, char *to);
-EXTERN int get_sendq (aClient *cptr);
+EXTERN int get_sendq (aClient *cptr, int);
 #undef EXTERN
