@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.21 1997/09/03 18:05:11 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.22 1997/09/03 18:26:49 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -623,9 +623,18 @@ Reg	aClient	*cptr;
 		char    salt[3];
 		extern  char *crypt();
 
-		salt[0]=aconf->passwd[0];
-		salt[1]=aconf->passwd[1];
-		salt[2]='\0';
+		/* Determine if MD5 or DES */
+                if (strncmp(aconf->passwd, "$1$", 3))
+		    {
+			salt[0] = aconf->passwd[0];
+			salt[1] = aconf->passwd[1];
+		    }
+		else
+		    {
+			salt[0] = aconf->passwd[3];
+			salt[1] = aconf->passwd[4];
+		    }
+		salt[2] = '\0';
 		encr = crypt(cptr->passwd, salt);
 	    }
 	else
