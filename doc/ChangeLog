@@ -1,3 +1,8 @@
+2004-07-26  Jakub Vlasek
+	
+	* list.c/free_user(): Call free_server() with the cptr of the server
+	  itself, not the user we're currently freeing.
+
 2004-07-15  Piotr Kucharski
 
 	* chkconf.c/main(): missing declaration when in debug mode.
