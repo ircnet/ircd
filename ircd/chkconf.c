@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.3 1997/09/03 17:45:48 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.4 1997/10/01 19:57:04 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -236,6 +236,10 @@ int	opt;
 			case 'A': /* Name, e-mail address of administrator */
 			case 'a': /* of this server. */
 				aconf->status = CONF_ADMIN;
+				break;
+			case 'B': /* bounce line */
+			case 'b':
+				aconf->status = CONF_BOUNCE;
 				break;
 			case 'C': /* Server where I should try to connect */
 			case 'c': /* in case of lp failures             */
