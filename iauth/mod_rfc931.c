@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.18 2003/10/14 20:35:16 q Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.19 2003/10/15 19:55:49 q Exp $";
 #endif
 
 #include "os.h"
@@ -49,9 +49,7 @@ struct _instance_data
  *	Returns NULL if everything went fine,
  *	an error message otherwise.
  */
-char *
-rfc931_init(self)
-AnInstance *self;
+static	char	*rfc931_init(AnInstance *self)
 {
 	struct _instance_data *dt;
 
@@ -81,9 +79,7 @@ AnInstance *self;
  *
  *	This procedure is called when a particular module is unloaded.
  */
-void
-rfc931_release(self)
-AnInstance *self;
+static	void	rfc931_release(AnInstance *self)
 {
 	struct _instance_data *st = self->data;
 	free(st);
@@ -94,9 +90,7 @@ AnInstance *self;
  *
  *	This procedure is called regularly to update statistics sent to ircd.
  */
-void
-rfc931_stats(self)
-AnInstance *self;
+static	void	rfc931_stats(AnInstance *self)
 {
 	struct _instance_data *st = self->data;
 
@@ -117,9 +111,7 @@ AnInstance *self;
  *	In case of failure, it's responsible for cleaning up (e.g. rfc931_clean
  *	will NOT be called)
  */
-int
-rfc931_start(cl)
-u_int cl;
+static	int	rfc931_start(u_int cl)
 {
 	char *error;
 	int fd;
@@ -163,9 +155,7 @@ u_int cl;
  *
  *	It is responsible for sending error messages where appropriate.
  */
-int
-rfc931_work(cl)
-u_int cl;
+static	int	rfc931_work(u_int cl)
 {
 	struct _instance_data *st = cldata[cl].instance->data;
 
@@ -325,9 +315,7 @@ u_int cl;
  *	It is responsible for cleaning up any allocated data, and in particular
  *	closing file descriptors.
  */
-void
-rfc931_clean(cl)
-u_int cl;
+static	void	rfc931_clean(u_int cl)
 {
 	struct _instance_data *st = cldata[cl].instance->data;
 
@@ -352,9 +340,7 @@ u_int cl;
  *
  *	Returns 0 if things are okay, -1 if authentication was aborted.
  */
-int
-rfc931_timeout(cl)
-u_int cl;
+static	int	rfc931_timeout(u_int cl)
 {
 	struct _instance_data *st = cldata[cl].instance->data;
 
@@ -368,3 +354,4 @@ u_int cl;
 aModule Module_rfc931 =
 	{ "rfc931", rfc931_init, rfc931_release, rfc931_stats,
 	  rfc931_start, rfc931_work, rfc931_timeout, rfc931_clean };
+

@@ -17,7 +17,7 @@
  *
  */
 
-static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.6 2003/10/14 20:43:57 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.7 2003/10/15 19:55:48 q Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>     /* atol() */
@@ -56,7 +56,7 @@ static  char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.6 2003/10/14 20:43:57 q Exp $";
 
 static int want_to_quit = 0;
 
-void finalize(int i)
+static void finalize(int i)
 {
 #ifdef IRCDWATCH_USE_SYSLOG
   syslog(LOG_NOTICE, "ircdwatch daemon exiting");
@@ -65,7 +65,7 @@ void finalize(int i)
   exit(i);
 }
 
-int daemonize(void)
+static int daemonize(void)
 {
   pid_t pid;
   int   i;
@@ -133,7 +133,7 @@ static void sig_handler (int signo)
 }
 
 
-void set_up_signals(void) 
+static void set_up_signals(void) 
 {
 #ifdef POSIX_SIGNALS
   struct sigaction act;
@@ -158,7 +158,7 @@ void set_up_signals(void)
   signal(SIGCHLD, SIG_IGN);
 }
 
-int write_my_pid(void)
+static int write_my_pid(void)
 {
   FILE *f;
 
@@ -174,7 +174,7 @@ int write_my_pid(void)
 }
 
 
-int file_modified(char *s)
+static int file_modified(char *s)
 {
   struct stat st;
   
@@ -185,7 +185,7 @@ int file_modified(char *s)
 }
 
 
-int spawn (char *cmd) 
+static int spawn (char *cmd) 
 {
   pid_t pid;
 
@@ -205,7 +205,7 @@ int spawn (char *cmd)
   return(0);
 }
 
-int read_pid(char *pid_filename) 
+static int read_pid(char *pid_filename) 
 {
   FILE *f;
   char pidbuf[PID_LEN];
@@ -233,7 +233,7 @@ int read_pid(char *pid_filename)
   return(pid);
 }
 
-int file_exists (char *s)
+static int file_exists (char *s)
 {
   struct stat st;
   if ((stat(s, &st) < 0) && (errno == ENOENT)) {
@@ -244,24 +244,24 @@ int file_exists (char *s)
 
 /* yeah, I'll get around to these in some later version */
 
-int file_readable (char *s)
+static int file_readable (char *s)
 {
   return(access(s, R_OK) == 0);
 }
 
-int file_writable (char *s)
+static int file_writable (char *s)
 {
   return(access(s, W_OK) == 0);
 }
 
-int file_executable (char *s)
+static int file_executable (char *s)
 {
   int rc;
   rc = (access(IRCD_PATH, X_OK) == 0);
   return rc;
 }
 
-int verify_pid(int pid) 
+static int verify_pid(int pid) 
 {
   int res;
 
@@ -274,7 +274,7 @@ int verify_pid(int pid)
   return(res == 0);
 }
 
-int ircdwatch_running () {
+static int ircdwatch_running () {
   int pid;
 
   if (file_exists(IRCDWATCH_PID_FILENAME)) {
@@ -288,7 +288,7 @@ int ircdwatch_running () {
   return(0);
 }
 
-int ircd_running () {
+static int ircd_running () {
   int pid;
 
   if (file_exists(IRCDPID_PATH)) {
@@ -302,7 +302,7 @@ int ircd_running () {
   return(0);
 }
 
-void hup_ircd ()
+static void hup_ircd ()
 {
   int pid;
   int res;
@@ -322,7 +322,7 @@ void hup_ircd ()
 }
 
 
-void daemon_run () 
+static void daemon_run () 
 {
   int i;
 #ifdef IRCDWATCH_HUP_ON_CONFIG_CHANGE
@@ -412,7 +412,7 @@ void daemon_run ()
   return;
 }
 
-void kill_ircd ()
+static void kill_ircd ()
 {
   int pid;
   int res;
@@ -433,7 +433,7 @@ void kill_ircd ()
   }
 }
 
-void kill_ircdwatch ()
+static void kill_ircdwatch ()
 {
   int pid;
   int res;
@@ -455,7 +455,7 @@ void kill_ircdwatch ()
 }
 
 
-void usage (void)
+static void usage (void)
 {
   fprintf(stderr,"\n\
 Usage:\n\

@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.158 2003/10/13 22:17:44 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.159 2003/10/15 19:55:49 q Exp $";
 #endif
 
 #include "os.h"
@@ -63,6 +63,9 @@ static	int	del_modeid __P((int, aChannel *, aListItem *));
 static	Link	*match_modeid __P((int, aClient *, aChannel *));
 static  void    names_channel __P((aClient *,aClient *,char *,aChannel *,int));
 static	void	convert_scandinavian __P((Reg char *cn, aClient *));
+static	void	free_bei __P((aListItem *bei));
+static	aListItem	*make_bei __P((char *nick, char *user, char *host));
+
 
 static	char	*PartFmt = ":%s PART %s :%s";
 

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.32 2003/10/14 20:35:16 q Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.33 2003/10/15 19:55:49 q Exp $";
 #endif
 
 #include "os.h"
@@ -545,7 +545,7 @@ again:
  *	Returns NULL if everything went fine,
  *	an error message otherwise.
  */
-char *socks_init(AnInstance *self)
+static	char	*socks_init(AnInstance *self)
 {
 	struct socks_private *mydata;
 	char tmpbuf[80], cbuf[32];
@@ -641,7 +641,7 @@ char *socks_init(AnInstance *self)
  *
  *	This procedure is called when a particular module is unloaded.
  */
-void socks_release(AnInstance *self)
+static	void	socks_release(AnInstance *self)
 {
 	struct sock_private *mydata = self->data;
 
@@ -654,7 +654,7 @@ void socks_release(AnInstance *self)
  *
  *	This procedure is called regularly to update statistics sent to ircd.
  */
-void socks_stats(AnInstance *self)
+static	void	socks_stats(AnInstance *self)
 {
 	struct socks_private *mydata = self->data;
 
@@ -678,7 +678,7 @@ void socks_stats(AnInstance *self)
  *	In case of failure, it's responsible for cleaning up (e.g. socks_clean
  *	will NOT be called)
  */
-int socks_start(u_int cl)
+static	int	socks_start(u_int cl)
 {
 	char *error;
 	int fd;
@@ -724,7 +724,7 @@ int socks_start(u_int cl)
  *
  *	It is responsible for sending error messages where appropriate.
  */
-int socks_work(u_int cl)
+static	int	socks_work(u_int cl)
 {
 	char *strver = "4";
 	struct socks_private *mydata = cldata[cl].instance->data;
@@ -775,7 +775,7 @@ int socks_work(u_int cl)
  *	It is responsible for cleaning up any allocated data, and in particular
  *	closing file descriptors.
  */
-void socks_clean(u_int cl)
+static	void	socks_clean(u_int cl)
 {
 	DebugLog((ALOG_DSOCKS, 0, "socks_clean(%d): cleaning up", cl));
 	/*
@@ -801,7 +801,7 @@ void socks_clean(u_int cl)
  *
  *	Returns 0 if things are okay, -1 if check was aborted.
  */
-int socks_timeout(u_int cl)
+static	int	socks_timeout(u_int cl)
 {
 	DebugLog((ALOG_DSOCKS, 0,
 		"socks_timeout(%d): calling socks_clean ", cl));
@@ -812,3 +812,4 @@ int socks_timeout(u_int cl)
 aModule Module_socks =
 	{ "socks", socks_init, socks_release, socks_stats,
 	  socks_start, socks_work, socks_timeout, socks_clean };
+

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.58 2003/10/13 22:17:44 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.59 2003/10/15 19:55:49 q Exp $";
 #endif
 
 #include "os.h"
@@ -37,6 +37,9 @@ extern int dk_lastfd;
 #endif
 
 static	void	exit_one_client __P((aClient *,aClient *,aClient *,char *));
+static	void	exit_server(aClient *cptr, aClient *acptr, char *comment,
+			char *comment2);
+
 
 static	char	*months[] = {
 	"January",	"February",	"March",	"April",

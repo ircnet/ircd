@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.24 2003/07/18 19:40:23 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.25 2003/10/15 19:55:49 q Exp $";
 #endif
 
 #include "os.h"
@@ -312,20 +312,21 @@ aClient	*cptr;
 		    {
 			char buf[512];
 			/*too many arguments for dumpcore() and sendto_flag()*/
-			sprintf(buf, "%#x %#x %#x %#x %d %d %#x (%s)",
-				user, user->invited, user->channel, user->uwas,
+			sprintf(buf, "%p %p %p %p %d %d %#x (%s)",
+				(void *)user, (void *)user->invited,
+				(void *)user->channel, (void *)user->uwas,
 				user->joined, user->refcnt,
 				user->bcptr,
 				(user->bcptr) ? user->bcptr->name :"none");
 #ifdef DEBUGMODE
-			dumpcore("%#x user (%s!%s@%s) %s",
-				 cptr, cptr ? cptr->name : "<noname>",
-				 user->username, user->host, buf);
+			dumpcore("%p user (%s!%s@%s) %s",
+				(void *)cptr, cptr ? cptr->name : "<noname>",
+				user->username, user->host, buf);
 #else
 			sendto_flag(SCH_ERROR,
-				    "* %#x user (%s!%s@%s) %s *",
-				    cptr, cptr ? cptr->name : "<noname>",
-				    user->username, user->host, buf);
+				"* %p user (%s!%s@%s) %s *",
+				(void *)cptr, cptr ? cptr->name : "<noname>",
+				user->username, user->host, buf);
 #endif
 		    }
 		MyFree(user);

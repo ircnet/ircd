@@ -46,9 +46,7 @@ struct lhex_private
  *	Returns NULL if everything went fine,
  *	an error message otherwise.
  */
-char *
-lhex_init(self)
-AnInstance *self;
+static	char	*lhex_init(AnInstance *self)
 {
 	struct lhex_private *mydata;
 
@@ -74,9 +72,7 @@ AnInstance *self;
  *
  *	This procedure is called when a particular module is unloaded.
  */
-void
-lhex_release(self)
-AnInstance *self;
+static	void	lhex_release(AnInstance *self)
 {
 	struct lhex_private *mydata = self->data;
 	free(mydata);
@@ -88,9 +84,7 @@ AnInstance *self;
  *
  *	This procedure is called regularly to update statistics sent to ircd.
  */
-void
-lhex_stats(self)
-AnInstance *self;
+static	void	lhex_stats(AnInstance *self)
 {
 	struct lhex_private *mydata = self->data;
 
@@ -110,9 +104,7 @@ AnInstance *self;
  *	In case of failure, it's responsible for cleaning up (e.g. lhex_clean
  *	will NOT be called)
  */
-int
-lhex_start(cl)
-u_int cl;
+static	int	lhex_start(u_int cl)
 {
 	char *error;
 	int fd;
@@ -152,9 +144,7 @@ u_int cl;
  *
  *	It is responsible for sending error messages where appropriate.
  */
-int
-lhex_work(cl)
-u_int cl;
+static	int	lhex_work(u_int cl)
 {
     	DebugLog((ALOG_DLHEX, 0, "lhex_work(%d): %d %d buflen=%d", cl,
 		  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
@@ -274,9 +264,7 @@ u_int cl;
  *	It is responsible for cleaning up any allocated data, and in particular
  *	closing file descriptors.
  */
-void
-lhex_clean(cl)
-u_int cl;
+static	void	lhex_clean(u_int cl)
 {
 	struct lhex_private *mydata = cldata[cl].instance->data;
 
@@ -301,9 +289,7 @@ u_int cl;
  *
  *	Returns 0 if things are okay, -1 if check was aborted.
  */
-int
-lhex_timeout(cl)
-u_int cl;
+static	int	lhex_timeout(u_int cl)
 {
 	struct lhex_private *mydata = cldata[cl].instance->data;
 
@@ -316,3 +302,4 @@ u_int cl;
 aModule Module_lhex =
 	{ "lhex", lhex_init, lhex_release, lhex_stats,
 	  lhex_start, lhex_work, lhex_timeout, lhex_clean };
+

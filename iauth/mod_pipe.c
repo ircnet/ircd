@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.3 1999/03/11 19:53:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.4 2003/10/15 19:55:48 q Exp $";
 #endif
 
 #include "os.h"
@@ -34,9 +34,7 @@ static  char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.3 1999/03/11 19:53:20 kalt Exp $
  *	Returns NULL if everything went fine,
  *	an error message otherwise.
  */
-char *
-pipe_init(self)
-AnInstance *self;
+static	char	*pipe_init(AnInstance *self)
 {
 	if (self->opt == NULL)
 		return "Aie! no option(s): nothing to be done!";
@@ -50,9 +48,7 @@ AnInstance *self;
  * pipe_release
  *
  *	This procedure is called when a particular module is unloaded.
-void
-pipe_release(self)
-AnInstance *self;
+static	void	pipe_release(AnInstance *self)
 {
 }
  */
@@ -61,9 +57,7 @@ AnInstance *self;
  * pipe_stats
  *
  *	This procedure is called regularly to update statistics sent to ircd.
-void
-pipe_stats(self)
-AnInstance *self;
+static	void	pipe_stats(AnInstance *self)
 {
 }
  */
@@ -79,9 +73,7 @@ AnInstance *self;
  *	In case of failure, it's responsible for cleaning up (e.g. pipe_clean
  *	will NOT be called)
  */
-int
-pipe_start(cl)
-u_int cl;
+static	int	pipe_start(u_int cl)
 {
 	int pp[2], rc;
 	
@@ -135,9 +127,7 @@ u_int cl;
  *
  *	It is responsible for sending error messages where appropriate.
  */
-int
-pipe_work(cl)
-u_int cl;
+static	int	pipe_work(u_int cl)
 {
     	DebugLog((ALOG_DPIPE, 0, "pipe_work(%d): %d %d buflen=%d %c", cl,
 		  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen,
@@ -184,9 +174,7 @@ u_int cl;
  *	It is responsible for cleaning up any allocated data, and in particular
  *	closing file descriptors.
  */
-void
-pipe_clean(cl)
-u_int cl;
+static	void	pipe_clean(u_int cl)
 {
 	DebugLog((ALOG_DPIPE, 0, "pipe_clean(%d): cleaning up", cl));
 	if (cldata[cl].rfd)
@@ -202,9 +190,7 @@ u_int cl;
  *
  *	Returns 0 if things are okay, -1 if authentication was aborted.
  */
-int
-pipe_timeout(cl)
-u_int cl;
+static	int	pipe_timeout(u_int cl)
 {
 	DebugLog((ALOG_DPIPE, 0, "pipe_timeout(%d): calling pipe_clean ",
 		  cl));
@@ -215,3 +201,4 @@ u_int cl;
 aModule Module_pipe =
 	{ "pipe", pipe_init, NULL, NULL,
 	  pipe_start, pipe_work, pipe_timeout, pipe_clean };
+
