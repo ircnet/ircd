@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.145 2004/02/15 12:57:52 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.146 2004/02/15 19:41:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -253,8 +253,8 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    {
 			/* better server: just propagate upstream */
 			sendto_one(acptr->from, ":%s SQUIT %s :%s",
-				    ST_UID(acptr->from) ? sptr->serv->sid :
-				    sptr->name,
+				    IsServer(sptr) && ST_UID(acptr->from) ?
+				    sptr->serv->sid : sptr->name,
 				    ST_UID(acptr->from) ?
 				    acptr->serv->sid : acptr->name, comment);
 			
