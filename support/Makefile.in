@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.28 1998/08/08 19:59:39 kalt Exp $
+#*   $Id: Makefile.in,v 1.29 1998/08/08 20:40:37 kalt Exp $
 #*
 #*/
 
@@ -108,10 +108,12 @@ help:
 	@echo "                ircd-mkpasswd : build ircd-mkpasswd"
 	@echo "                ircdwatch     : build ircdwatch"
 	@echo "        client         : build the client"
+	@echo "        tkserv         : build tkserv"
 	@echo
 	@echo "        install        : build and install server and client programs"
 	@echo "        install-server : build and install server programs"
 	@echo "        install-client : build and install client program"
+	@echo "        install-tkserv : build and install tkserv"
 
 all: server client
 
@@ -147,6 +149,10 @@ ircd-mkpasswd: mkpasswd.o
 	$(RM) ircd-mkpasswd
 	$(CC) $(LDFLAGS) -o ircd-mkpasswd mkpasswd.o $(LIBS)
 
+tkserv: tkserv.o
+	$(RM) tkserv
+	$(CC) $(LDFLAGS) -o $@ $< $(LIBS)
+
 install: install-server install-client
 
 install-client: client
@@ -181,6 +187,16 @@ install-server: server
 	$(INSTALL_DATA) ../contrib/ircdwatch/ircdwatch.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/example.conf $(ircd_dir)
 	@echo "installation of server done."
+
+install-tkserv: tkserv
+	-@if [ ! -d $(server_bin_dir) ]; then \
+	$(MKDIRHIER) $(server_bin_dir); \
+	fi
+	-@if [ ! -d $(ircd_dir) ]; then \
+	$(MKDIRHIER) $(ircd_dir); \
+	fi
+	$(INSTALL_PROGRAM) -m $(ircd_mode) tkserv $(server_bin_dir)
+	@echo "installation of client done."
 
 clbsd.o: ../common/bsd.c setup.h config.h
 	$(CC) $(C_CFLAGS) -DCLIENT_COMPILE -c -o $@ ../common/bsd.c
@@ -367,6 +383,9 @@ ircdwatch.o: ../contrib/ircdwatch/ircdwatch.c
 
 mkpasswd.o: ../contrib/mkpasswd/mkpasswd.c
 	$(CC) $(CC_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c
+
+tkserv.o: ../contrib/tkserv/tkserv.c
+	$(CC) $(CC_CFLAGS) -DIRCDPATH="\"$(server_bin_dir)\"" -c -o $@ $<
 
 clean:
 	$(RM) $(CLIENT) $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd ircdwatch *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c

@@ -1314,7 +1314,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.22 1998/05/08 14:47:55 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.23 1998/08/08 20:40:41 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1390,5 +1390,5 @@ IRC_STDARG
 IRC_PATH_RESCONF
 IRC_ALPHA_BETA
 
-AC_OUTPUT(Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../support/sums.in config.h:../support/config.h.dist)
+AC_OUTPUT(Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../support/sums.in config.h:../support/config.h.dist tkconf.h:../support/tkconf.h.dist)
 AC_OUTPUT_COMMANDS(chmod a+x version.c.SH)

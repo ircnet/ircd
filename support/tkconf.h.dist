@@ -1,0 +1,31 @@
+/*
+ * TkServ configuration definitions
+ *
+ * Make sure the ircd conf files are located in the server_bin_dir
+ * (see Makefile) and that USE_SERVICES is #define'd if you intend
+ * to use this service.
+ *
+ */
+
+/* This will be shown on ADMIN requests */
+#define TKSERV_ADMIN_NAME    "Admin: Someone Somewhere"
+#define TKSERV_ADMIN_CONTACT "EMail: i.didnt@edit.my.ADMIN.info"
+#define TKSERV_ADMIN_OTHER   "SomeIRCer@IRCnet"
+
+/* This is the name of the service which appears on /servlist */
+#define TKSERV_NAME "TkServ"
+
+/* The description of the service (appears on /SERVLIST) */
+#define TKSERV_DESC "Temporary K-line Service"
+
+/* The distribution of the server */
+#define TKSERV_DIST "*"
+
+/* The absolute path to the log file */
+#define TKSERV_LOGFILE "@logdir@/tkserv.log"
+
+/* The absolute path to the access file */
+#define TKSERV_ACCESSFILE "@libdir@/tkserv.access"
+
+/* Debugging (displays service<->server traffic to standard output) */
+#undef TKSERV_DEBUGGING

@@ -1,0 +1,290 @@
+Welcome to TkServ !
+=+=+=+=+=+=+=+=+=+=
+
+I) Introduction
+---------------
+
+TkServ is a so-called temporary k-line service. 
+
+[If you don't know what a service is, consult the documentation which comes 
+along with the irc2.10.x package (if you don't know services, you shouldn't 
+be reading this anyway ;).]
+
+This is what TkServ does - roughly: On request, it adds a given k-line
+pattern to the server's k-line list and (sooner or later, see below) then
+removes it. The adding/removing is done via the ircd.conf file.
+
+The purpose/advantages of a temporary k-line service:
+
+  - it facilitates the process of k-lining users
+  - added k-lines disappear automatically (see below)
+  - it allows _also_ remote users (only if they are listed in the access
+    file of the service - see below) to temp k-line users on the respective
+    server
+  - it allows people to specify a duration for each tkline
+  - it is more effective than /kill but practically as easy to use
+  - it could therefore act as a replacement for the /kill command - which in
+    fact is more or less its longtime goal...
+
+
+II) Security concerns
+---------------------
+
+Of course, when allowing remote "access" to the ircd.conf file, the main
+concern of most admins is security. Therefore, here's a list of the 
+procedures used by TkServ to ensure that only authorized users may add
+temporary k-lines to the server's conf file [origin == the person who is
+sending a request]:
+
+- the origin's user@host has to match one of the u@h's in the tkserv.access
+  file (case sensitive!)
+- the origin has always to specify a password which has to match the
+  password that belongs to the corresponding user@host in the access file
+  (case sensitive!)
+- the origin has to be opered, if you want to
+- it is possible to allow an authorized user to only tkline given hostnames
+  or TLDs
+
+Especially the third point equals to strong security, because: Could you
+imagine any cracker who has gained O: on some server, wasting his time on
+trying to get access to a remote server's temp k-line list instead of
+playing around with his O: ? See, neither could i. ;-)
+
+
+III) Installation
+-----------------
+
+A) Precondition
+   
+   The only thing you need in order to run TkServ is an "ircd.conf" file,
+   an "ircd.pid" file and an IRC server which has been compiled with
+   USE_SERVICES #define'd in the config.h file (!).
+
+B) Editing the configuration file (config.h)
+
+   You have to change the following entries in the config file:
+
+   TKSERV_ADMIN_NAME (your real name)
+   TKSERV_ADMIN_CONTACT (mail address)
+   TKSERV_ADMIN_OTHER (your nick, for example)
+
+   TKSERV_NAME (the name of the service appearing on /SERVLIST)
+   TKSERV_DESC (a neato description :)
+   TKSERV_DIST (the distribution of the service)
+
+|  A few words to the distribution of the service: Don't make it a global
+|  service unless you think you really have to. If all TkServs had a global
+|  distribution, the /servlist would unnecessarily grow. And TkServ is
+|  really not a service which needs to be global. If you want remote
+|  opers/users to be able to access your local TkServ, just give them a
+|  special I: line for that so they can put a 'TkServ client' on your
+|  your server. This has also the advantage that it reduces the
+|  service<->client lag, which might be helpful if your server is lagged
+|  now and then.
+|  On the other side, if your service is global, then other opers may see
+|  that you are running one, ask for access to it and thus making it more
+|  useful.
+
+   TKSERV_PATH (the abs. path to your ircd.conf, no trailing slash please!)
+   TKSERV_LOGFILE (the abs. path to your tkserv logfile, no trailing slash)
+   TKSERV_ACCESSFILE (the abs. path to your tkserv access file, ditto)
+   
+   TKSERV_DEBUGGING (for debugging only, displayes traffic to standard output)
+   
+C) Compiling the source
+
+   "gcc -O3 -o tkserv tkserv.c" works fine for me under Linux. =)
+   "gcc -O3 -o tkserv tkserv.c" should also do it under Irix.
+   "gcc -O3 -o tkserv tkserv.c -lsocket -lnsl" should do it under Slowlaris.
+
+D) Setting up the access file: tkserv.access
+
+   If anyone should be authorized to use TkServ on your server, he/she has
+   to figure in the access file. The format of it is:
+
+|   [!]<user@host.domain.tld><SPACE><password><SPACE>[<FQDN || IP>]<RETURN>
+|
+|   Which means:
+|   [!]<user@host.domain.tld> <password> [<FQDN || IP>]
+|
+|   A '!' before the u@h means that the specified user doesn't need to be
+|   opered when accessing TkServ. Before the FQDN/IP, it means that the user
+|   is not allowed to tkline that given FQDN/IP. See below.
+|
+|   Examples:
+|   (1) foo@bar.com foo-pass
+|   (2) some@user.on.the.net some.passw1 *.net,207.128.*
+|       another@user.foo.com Akfdsv.df *netcom.com,*.ca
+|       you@get.the.picture.org ditto. *.org,dialup*.lamer.net,194.44.44.*
+|       oper@dialup*.dialup.net pwd1.2 *dialup.net,145.44.*,*.fr
+|   (3) !luser@doesnt.need.to.be.opered.org bleh !elite.org,*.org
+|   (4) !~luser@no.ident.no.oper.com yo *.com
+|
+|   (1) Any oper who is running identd and whose userhost equals to
+|       foo@bar.com can tkline everyone if supplied password equals
+|       foo-pass.
+|   (2) Any oper with identd whose u@h equals to some@user.on.the.net
+|       can tkline everyone whose TLD is ".net" or who is IRCing within
+|       the IP subnet 207.128.*, if correct password is given.
+|   (3) Any luser (no need to be opered) whose u@h/passwd equals can tkline
+|       everyone whose TLD is ".org" except the host "elite.org"
+|       ("*@elite.org").
+|
+|   Generally, you should be aware of the fact that if you put something
+|   in the FQDN/IP field, then you automatically restrict the access.
+|   Therefore, you must then also indicate all the allowed FQDNs/IPs.
+|
+|   The access routines are pretty flexible. So pay attention in what order
+|   you allow/disallow what. :)
+|
+|   Other examples:
+|   !foo@bar.com foo-pass !*.net,*.com,!*.com
+|   some@user.on.the.net some.passw1 *.net,207.128.*,!127.0.0.*
+|   another@user.foo.com Akfdsv.df *netcom.com,!*trends.ca,*.ca
+|
+|   Notice that if you allow "*.de" and after it you forbid "blah.de",
+|   this won't work. The oper will still be able to tkline blah.de since
+|   "*.de" appears before "!blah.de" in the access field.
+|
+|   Are we confused, yet? ;-)
+
+   For some other examples, refer to the tkserv.access.example file, which
+   is included in the package.
+
+   The u@h field for the user can also contain wildcards, as you can see.
+
+|   If you specify an FQDN (or several of them in a comma-separated 
+|   list), the concerned user will only be allowed to tkline users from 
+|   that FQDN(s). Everything is done via 'wildcard-matching' (if any).
+|   I.e. that "home.blah.de" matches only "*@home.blah.de". If you want
+|   to allow a whole TLD, you have to do this by putting "*.tld" in the
+|   access field.
+
+! An empty FQDN/IP field means that the concerned user can tkline everyone. !
+  [Except *@* that is.]
+
+E) Setting up the S: line in your ircd.conf file
+
+   If you're not yet familiar with S: lines, consult the documentation of
+   the ircd package.
+
+   S:<host>:<password>:<name>:33554432:<class>
+
+   <host> is the FQDN from which the service will connect to the server.
+
+   The service type 33554432 is mandatory! Currently, TkServ will refuse 
+   any other service type. [Actually, it won't, but it's good to think that
+   it will... ;-]
+
+   The service class should refer to an existing class (according to the
+   documentation :).
+
+F) Starting TkServ
+
+   The command line syntax of TkServ looks like this:
+   
+   tkserv <server> <port> <password>
+   or
+   tkserv <Unix domain socket> <password>
+
+   Example:
+
+   tkserv localhost 6667 my-serv.pass
+
+   Where <server> is the address of your IRC server, <port> the port to
+   which TkServ will connect and <password> the password for the service.
+
+G) Adding temp k-klines (TKLINE)
+
+   Provided that TkServ recognizes you, you can add temporary k-lines via
+   the TKLINE command, which has three different variants:
+
+   (1) :TKLINE <password> <lifetime in hours> <user@host> <reason>
+   (2) :TKLINE <password> <user@host> <reason>
+   (3) :TKLINE <password> -1 <user@host>
+
+   (1) adds a tkline for <u@h> with an expire time of <lifetime> hours and
+       with the reason <reason>.
+   (2) adds a tkline for <u@h> with the default expire time (2 hours) and
+       with the reason <reason>.
+   (3) removes any existing tklines found for <user@host>.   
+
+   Examples:
+
+   (1) :TKLINE my.pass 5 lamer@lamers.org dont flood
+   (2) :TKLINE blah. *@foo.com stop spamming
+   (3) :TKLINE my.pass -1 lamer@lamers.org
+
+   <lifetime> must be > 0 and < 168.
+
+|   [If your client doesn't support SQUERY, the entire cmd line has to be:
+|   "/quote squery <name of tkserv> :tkline ...". If it does support it,
+|   then "/squery <name of tkserv> tkline ..." should do it.]
+|
+|   [And yes, ircII-EPIC4 supports SQUERY and SERVLIST! ;-)]
+|
+|   If a non-opered user tries to use TKLINE without having a matching entry
+|   in the access file, he gets "Only IRC-Operators may use this command" as
+|   an error message. This is not correct anymore, but i didn't bother to
+|   change it (since it may prevent kids from playing around with TkServ :).
+
+H) Online help/info
+
+TkServ does also have a little online help which is accessible via
+"/squery <service name> help".
+
+I) Quitting the service
+
+To make TkServ quit IRC you have to send him the following SQUERY:
+
+QUIT <password>
+
+Where <password> corresponds to password that you indicated at startup. 
+Be aware that anyone who knows that password can make your TkServ quit.
+
+J) Debugging
+
+If you #define DEBUGGING in the config.h file, everything which is sent
+to the server from the service and from the server to the service will be
+displayed to the standard output.
+
+
+IV) Misc, or what goes where
+
+TkServ will create the following permanent files in your ircd directory: 
+
+ircd.conf.tkserv (backup of the ircd.conf file)
+tkserv.log (TkServ's log file)
+
+The latter will contain most of the error messages (in case something goes 
+wrong - what we all don't hope ;) as well as logs of successful TKLINE 
+requests.
+
+The tkserv.access file has to be in the directory specified in the config.h
+file. If no tkserv.access file is found, no one will be able to add temp 
+k-lines.
+
+Now and then you should zero your TkServ logfile because this won't happen
+by itself. =)
+
+
+V) Credits
+
+See the CREDITS file.
+
+
+VI) Bugs, comments, suggestions...
+
+Send everything to kl@berlin.Snafu.DE or to Kasi@IRC. :-)
+
+
+VII) The TkServ-mailinglist
+
+There's now a mailinglist for TkServ out there. It is used for general
+announcements (bugs, new releases, etc.) concerning TkServ. Since it's a
+read-only mailinglist, it doesn't have much traffic. You can subscribe to
+it by sending a mail to tkserv@kl.Snafu.DE with "subscribe" in the subject
+or in the body of the mail.
+
+
+Enjoy, -Kasi

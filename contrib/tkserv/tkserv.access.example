@@ -1,0 +1,10 @@
+foo@bar.com foo.pass *netcom.com,*.net
+someone@SomeOrg.org aldkf.23 eleet.org,165.55.45.*
+~blah@ppp*.blah.de igh.pass
+user@users.Online.net ukuk.ua1
+some@ip*.user.com blah 204.85.*,194.55.43.*
+you.get@the.picture.com pass ppp*.lame.com,*.org,dialin*.whitehouse.gov,*.net,*.uk
+disallow@something.com bleh !*.de,!*.fr,*.net,*.org,*.com,!195.144.45.*
+disallow@another.host.fr yo !hugo.fr,!admin.irc.fr,*.fr,*.ca,195.55.66.*
+!luser@who.doesnt.need.to.be.opered.de yeh *.de
+
