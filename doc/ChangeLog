@@ -1,8 +1,19 @@
+2004-06-30  Piotr Kucharski
+
+	* channel.c/match_modeid(): drop special case for '#' matching uids.
+	* s_conf.c/initconf(): simplify X-line parsing: just take first 4 fields
+	  from config, no flags.
+	* s_user.c/m_user(): match on each field separately and also break when
+	  all match.
+	* s_serv.c/report_x_lines(): show all 4 fields of X-lines.
+	* s_conf.c: remove xline_flags_to_string() and xline_flags_parse().
+	* struct_def.h: removed no longer needed defines.
+
 2004-06-30  Jakub Vlasek
 
 	* struct_def.h: Added FLAGS_XLINED, CONF_XLINE, IsConfXlineWhole(),
 	  IsXlined(), SetXlined() and EXITC_XLINE.
-	* chkconf.c: Ignore X-lines.
+	* chkconf.c: recognize X-lines.
 	* s_conf.c, s_conf_ext.h: Added xline_flags_to_string(),
 	  xline_flags_parse().
 	* s_conf.c/initconf(): Parse X-lines.
@@ -10,10 +21,6 @@
 	* s_user.c/register_user(): Exit X-lined clients.
 	* s_user.c/m_user(): Check for X-lines.
 	* config.h.dist: Added XLINE_EXIT_REASON and XLINE defines.
-
-2004-06-30  Piotr Kucharski
-
-	* channel.c/match_modeid(): drop special case for '#' matching uids.
 
 2004-06-29  Piotr Kucharski
 
