@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.24 1997/09/12 02:09:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.25 1997/09/12 17:01:18 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1369,7 +1369,7 @@ char	*parv[];
 		else 
 		    {
 			who_find(sptr, mask, oper);
-			if (strlen(mask) > 4)
+			if (mask && strlen(mask) > 4)
 				penalty += 3;
 			else
 				penalty += 5;
