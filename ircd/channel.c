@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.118 2001/12/26 14:22:30 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.119 2002/01/05 02:45:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2786,7 +2786,8 @@ Reg	aChannel	*chptr;
 /*
 ** m_topic
 **	parv[0] = sender prefix
-**	parv[1] = topic text
+**	parv[1] = channels list
+**	parv[2] = topic text
 */
 int	m_topic(cptr, sptr, parc, parv)
 aClient *cptr, *sptr;
