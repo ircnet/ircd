@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.12 1999/03/11 19:53:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.13 1999/03/11 20:22:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -260,6 +260,13 @@ char *cfile;
 				while (*ttmp)
 					ttmp = &((*ttmp)->nextt);
 				*ttmp = (aTarget *) malloc(sizeof(aTarget));
+				if (*ch == '!')
+				    {
+					(*ttmp)->yes = -1;
+					ch++;
+				    }
+				else
+					(*ttmp)->yes = 0;
 				(*ttmp)->value = mystrdup(ch);
 				(*ttmp)->nextt = NULL;
 			    }
@@ -295,16 +302,24 @@ char *cfile;
 			       (itmp->opt) ? itmp->opt : "");
 			if (ttmp = itmp->hostname)
 			    {
-				printf("\t\tHost = %s", ttmp->value);
+				printf("\t\tHost = %s%s",
+				       (ttmp->yes == 0) ? "" : "!",
+				       ttmp->value);
 				while (ttmp = ttmp->nextt)
-					printf(",%s", ttmp->value);
+					printf(",%s%s",
+					       (ttmp->yes == 0) ? "" : "!",
+					       ttmp->value);
 				printf("\n");
 			    }
 			if (ttmp = itmp->address)
 			    {
-				printf("\t\tIP   = %s", ttmp->value);
+				printf("\t\tIP   = %s",
+				       (ttmp->yes == 0) ? "" : "!",
+				       ttmp->value);
 				while (ttmp = ttmp->nextt)
-					printf(",%s", ttmp->value);
+					printf(",%s%s",
+					       (ttmp->yes == 0) ? "" : "!",
+					       ttmp->value);
 				printf("\n");
 			    }
 			if (itmp->mod->init)
@@ -350,7 +365,7 @@ AnInstance *inst;
 		while (ttmp)
 		    {
 			if (match(ttmp->value, cldata[cl].itsip) == 0)
-				return 0;
+				return ttmp->yes;
 			ttmp = ttmp->nextt;
 		    }
 	/* check matches on hostnames */
@@ -361,7 +376,7 @@ AnInstance *inst;
 			while (ttmp)
 			    {
 				if (match(ttmp->value, cldata[cl].host) == 0)
-					return 0;
+					return ttmp->yes;
 				ttmp = ttmp->nextt;
 			    }
 			/* no match, will never match */

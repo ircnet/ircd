@@ -49,5 +49,6 @@ struct Instance
 struct Target
 {
     char	*value;
+    char	yes;
     aTarget	*nextt;
 };

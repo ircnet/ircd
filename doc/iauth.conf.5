@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.9 1999/03/11 15:16:18 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1999/03/11 15:16:18 $"
+.\" @(#)$Id: iauth.conf.5,v 1.10 1999/03/11 20:22:07 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1999/03/11 20:22:07 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -31,8 +31,10 @@ to find out if a module accepts any option.
 
 If \fIhost-name\fP and \fIip-address\fP fields are specified, then the
 module will only be used for connections matching one of the fields given
-in the configuration.  If none are specified, then the module will always
-be used.
+in the configuration.  An entry prefixed with the character ! indicates a
+negative match.  IP addresses are checked first.
+
+If no host nor ip entry is specified, then the module will always be used.
 
 When writing a configuration file, one should \fBalways\fP verify the
 syntax using the \fIiauth\fP program to avoid later problems.
@@ -88,14 +90,19 @@ to set the cache lifetime in minutes.  By default, caching is enabled for
 This module is for authentication TCP connections using the protocol
 defined in RFC 1413 (which obsoletes RFC 931).
 .SH EXAMPLE
-The following file will cause the IRC daemon to reject and log all
-connections originating from a system where an open proxy is running.  For
-all connections, an ident lookup (RFC 1413) will be performed.
+The following file will cause the IRC daemon to reject all connections
+originating from a system where an open proxy is running for hosts within
+*.fr and *.enserb.u-bordeaux.fr but not for other hosts matching
+*.u-bordeaux.fr.  For all connections, an ident lookup (RFC 1413) will be
+performed.
 
 .RS
 .nf
 module socks
-        option = log,reject
+        option = reject,paranoid
+        host = *.enserb.u-bordeaux.fr
+        host = !*.u-bordeaux.fr 
+        host = *.fr            
 
 module rfc931
 .fi
