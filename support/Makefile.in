@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.48 2003/02/10 02:45:22 chopin Exp $
+#*   $Id: Makefile.in,v 1.49 2003/10/18 18:26:42 chopin Exp $
 #*
 #*/
 
@@ -267,6 +267,9 @@ install-server: install-ircd server
 	$(INSTALL_DATA) ../doc/example.conf $(ircd_conf_dir)
 	-@if [ ! -f $(IAUTHCONF_PATH) ]; then \
 		$(INSTALL_DATA) ../support/iauth.conf $(IAUTHCONF_PATH); \
+	fi
+	-@if [ ! -f $(IRCDMOTD_PATH) ]; then \
+		$(INSTALL_DATA) ../support/iauth.conf $(IRCDMOTD_PATH); \
 	fi
 	@echo "installation of server done."
 
