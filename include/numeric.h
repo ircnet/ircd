@@ -299,13 +299,15 @@
 #define RPL_SERVLIST         234
 #define RPL_SERVLISTEND      235
 
+#define	RPL_STATSVLINE       240
 #define	RPL_STATSLLINE       241
 #define	RPL_STATSUPTIME      242
 #define	RPL_STATSOLINE       243
 #define	RPL_STATSHLINE       244
 #define	RPL_STATSSLINE       245
 #define	RPL_STATSPING        246
-#define RPL_STATSDEFINE      248
+#define	RPL_STATSBLINE       247
+#define	RPL_STATSDEFINE      248
 #define	RPL_STATSDEBUG	     249
 
 #define	RPL_LUSERCLIENT      251
