@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.92 2004/03/05 16:10:28 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.93 2004/03/05 16:24:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -140,6 +140,10 @@ char	*iline_flags_to_string(long flags)
 	if (flags & CFLAG_FALL)
 	{
 		*s++ = 'F';
+	}
+	if (s == ifsbuf)
+	{
+		*s++ = '-';
 	}
 	*s++ = '\0';
 	
