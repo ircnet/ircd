@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.70 2004/09/09 17:20:18 chopin Exp $
+  $Id: INSTALL.txt,v 1.71 2004/09/12 21:23:33 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -139,14 +139,12 @@
   automatically made invisible when they register.
 
 
-  22..55..  OOPPEERR__KKIILLLL,, OOPPEERR__RREEHHAASSHH,, OOPPEERR__RREESSTTAARRTT,, OOPPEERR__SSEETT,, LLOOCCAALL__KKIILLLL__OONNLLYY
+  22..55..  OOPPEERR__KKIILLLL,, OOPPEERR__CCOONNNNEECCTT,, OOPPEERR__DDIIEE,, OOPPEERR__RREEHHAASSHH,, OOPPEERR__RREESSTTAARRTT,,
+  OOPPEERR__SSEETT......
 
-  The three operator only commands, KILL, REHASH, RESTART and SET, may
-  all be disabled to ensure that an operator who does not have the
-  correct privilidges does not have the power to cause untoward things
-  to occur. To further curb the actions of guest operators,
-  LOCAL_KILL_ONLY can be defined to only allow locally connected clients
-  to be KILLed.
+  Any operator priviledge can be precisely applied to a given user using
+  O:line flags. Some admins may prefer to feel more safe by undefining
+  some of above thus disabling access to corresponding command at all.
 
 
   22..66..  ZZIIPP__LLIINNKKSS,, ZZIIPP__LLEEVVEELL

@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.7 from
-/tmp/linuxdoc-dir-16586/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-13805/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.70 2004/09/09 17:20:18 chopin Exp $
+     $Id: INSTALL.info,v 1.71 2004/09/12 21:23:33 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -150,7 +150,7 @@ This is done by editing the "config.h" file and changing the various
 * CHROOTDIR::
 * ENABLE_SUMMON ENABLE_USERS::
 * NO_DEFAULT_INVISIBLE::
-* OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY::
+* OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---::
 * ZIP_LINKS ZIP_LEVEL::
 * SLOW_ACCEPT::
 * CLONE_CHECK::
@@ -196,7 +196,7 @@ whether the server will attempt to summon local users to irc by writing
 a message similar to that from talk(1) to a user's tty.
 
 
-File: INSTALL.info,  Node: NO_DEFAULT_INVISIBLE,  Next: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY,  Prev: ENABLE_SUMMON ENABLE_USERS,  Up: The config-h file
+File: INSTALL.info,  Node: NO_DEFAULT_INVISIBLE,  Next: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---,  Prev: ENABLE_SUMMON ENABLE_USERS,  Up: The config-h file
 
 2.4 NO_DEFAULT_INVISIBLE
 ========================
@@ -205,19 +205,17 @@ The NO_DEFAULT_INVISIBLE define is used to toggle whether clients are
 automatically made invisible when they register.
 
 
-File: INSTALL.info,  Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY,  Next: ZIP_LINKS ZIP_LEVEL,  Prev: NO_DEFAULT_INVISIBLE,  Up: The config-h file
+File: INSTALL.info,  Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---,  Next: ZIP_LINKS ZIP_LEVEL,  Prev: NO_DEFAULT_INVISIBLE,  Up: The config-h file
 
-2.5 OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY
-===============================================================
+2.5 OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET--
+=======================================================================
 
-The three operator only commands, KILL, REHASH, RESTART and SET, may
-all be disabled to ensure that an operator who does not have the
-correct privilidges does not have the power to cause untoward things to
-occur. To further curb the actions of guest operators, LOCAL_KILL_ONLY
-can be defined to only allow locally connected clients to be KILLed.
+Any operator priviledge can be precisely applied to a given user using
+O:line flags. Some admins may prefer to feel more safe by undefining
+some of above thus disabling access to corresponding command at all.
 
 
-File: INSTALL.info,  Node: ZIP_LINKS ZIP_LEVEL,  Next: SLOW_ACCEPT,  Prev: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY,  Up: The config-h file
+File: INSTALL.info,  Node: ZIP_LINKS ZIP_LEVEL,  Next: SLOW_ACCEPT,  Prev: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---,  Up: The config-h file
 
 2.6 ZIP_LINKS ZIP_LEVEL
 =======================
@@ -1799,36 +1797,36 @@ Node: The configure script880
 Node: Notes for Cygwin32 users3178
 Node: Notes concerning IPv6 support3919
 Node: The config-h file4408
-Node: DEBUGMODE4958
-Node: CHROOTDIR5543
-Node: ENABLE_SUMMON ENABLE_USERS5920
-Node: NO_DEFAULT_INVISIBLE6439
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY6788
-Node: ZIP_LINKS ZIP_LEVEL7435
-Node: SLOW_ACCEPT8471
-Node: CLONE_CHECK9109
-Node: Other #define's9480
-Node: Editing the Makefile and compiling9810
-Node: The ircd-conf file11536
-Node: Machine information14037
-Node: Administrative info16660
-Node: Port connections18819
-Node: Connection Classes20976
-Node: Client connections26111
-Node: Operator priviliges31901
-Node: Excluded accounts35211
-Node: X Excluded accounts39132
-Node: Server connections40430
-Node: Deny auto-connections49068
-Node: Hub connections50647
-Node: Leaf connections52145
-Node: Version limitations54239
-Node: Excluded machines56007
-Node: Service connections57322
-Node: Bounce server58926
-Node: Related resources60797
-Node: Reporting a bug61840
-Node: How to report a bug62101
-Node: Where to send a bug report63120
+Node: DEBUGMODE4967
+Node: CHROOTDIR5552
+Node: ENABLE_SUMMON ENABLE_USERS5929
+Node: NO_DEFAULT_INVISIBLE6448
+Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---6806
+Node: ZIP_LINKS ZIP_LEVEL7341
+Node: SLOW_ACCEPT8386
+Node: CLONE_CHECK9024
+Node: Other #define's9395
+Node: Editing the Makefile and compiling9725
+Node: The ircd-conf file11451
+Node: Machine information13952
+Node: Administrative info16575
+Node: Port connections18734
+Node: Connection Classes20891
+Node: Client connections26026
+Node: Operator priviliges31816
+Node: Excluded accounts35126
+Node: X Excluded accounts39047
+Node: Server connections40345
+Node: Deny auto-connections48983
+Node: Hub connections50562
+Node: Leaf connections52060
+Node: Version limitations54154
+Node: Excluded machines55922
+Node: Service connections57237
+Node: Bounce server58841
+Node: Related resources60712
+Node: Reporting a bug61755
+Node: How to report a bug62016
+Node: Where to send a bug report63035
 
 End Tag Table
