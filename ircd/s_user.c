@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.84 1999/07/04 19:07:42 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.85 1999/07/04 21:13:04 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -822,12 +822,13 @@ char	*parv[];
 		sptr->flags |= FLAGS_KILLED;
 		return exit_client(cptr, sptr, &me, "Nick/Server collision");
 	    }
-	if (!(acptr = find_client(nick, NULL))
+	if (!(acptr = find_client(nick, NULL)))
 	    {
 		aClient	*acptr2;
-		if ((IsServer(cptr) || !(bootopt & BOOT_PROT))
+
+		if (IsServer(cptr) || !(bootopt & BOOT_PROT))
 			goto nickkilldone;
-		if (acptr2 = get_history(nick, (long)(KILLCHASETIMELIMIT)) &&
+		if ((acptr2 = get_history(nick, (long)(KILLCHASETIMELIMIT))) &&
 		    !MyConnect(acptr2))
 			/*
 			** Lock nick for KCTL so one cannot nick collide
