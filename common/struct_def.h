@@ -640,9 +640,15 @@ struct Channel	{
 */
 #define       IsMember(u, c)          (u && (u)->user && \
 		       find_channel_link((u)->user->channel, c) ? 1 : 0)
-#define	IsChannelName(n)	((n) && (*(n) == '#' || *(n) == '&' || \
+#ifdef CLIENT_COMPILE
+# define	IsChannelName(n)	((n) && (*(n) == '#' || *(n) == '&' ||\
+					*(n) == '+' || *(n) == '!'))
+#else
+					(*(n) == '!' && cid_ok(n))))
+# define	IsChannelName(n)	((n) && (*(n) == '#' || *(n) == '&' ||\
 					*(n) == '+' || \
 					(*(n) == '!' && cid_ok(n))))
+#endif
 #define	IsQuiet(x)		((x)->mode.mode & MODE_QUIET)
 #define	UseModes(n)		((n) && (*(n) == '#' || *(n) == '&' || \
 					 *(n) == '!'))
