@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.196 2004/04/07 16:59:21 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.197 2004/04/10 11:33:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -290,7 +290,7 @@ static	int	add_modeid(int type, aClient *cptr, aChannel *chptr,
 
 /*
  * del_modeid - delete an id belonging to chptr
- * if modeid is null, delete all ids belonging to chptr.
+ * if modeid is null, delete all ids belonging to chptr. (seems to be unused)
  */
 static	int	del_modeid(int type, aChannel *chptr, aListItem *modeid)
 {
@@ -311,6 +311,10 @@ static	int	del_modeid(int type, aChannel *chptr, aListItem *modeid)
 			free_link(tmp);
 			break;
 		}
+	}
+	if (modeid)
+	{
+		free_bei(modeid);
 	}
 	return 0;
 }
