@@ -38,17 +38,18 @@
 #define	SERVICE_WANT_PREFIX	0x00010000 /* to receive n!u@h instead of n */
 #define	SERVICE_WANT_TOKEN	0x00020000 /* use serv token instead of name */
 #define	SERVICE_WANT_EXTNICK	0x00040000 /* user extended NICK syntax */
+#define	SERVICE_WANT_UID	0x00080000 /* user extended UID syntax */
 
 /* A couple example types of services */
-#define	SERVICE_ALL	SERVICE_MASK_ALL	/* 4095 */
+#define	SERVICE_ALL	SERVICE_MASK_ALL
 #define	SERVICE_NICK	SERVICE_WANT_NICK | \
 			SERVICE_WANT_QUIT | \
-			SERVICE_WANT_AWAY	/* 168 */
+			SERVICE_WANT_AWAY
 #define	SERVICE_USERS	SERVICE_WANT_NICK | \
 			SERVICE_WANT_USER | \
 			SERVICE_WANT_QUIT | \
 			SERVICE_WANT_AWAY | \
-			SERVICE_WANT_UMODE	/* 236 */
+			SERVICE_WANT_UMODE
 #define	SERVICE_LINKS	SERVICE_WANT_SERVER | \
 			SERVICE_WANT_SQUIT | \
-			SERVICE_WANT_WALLOP	/* 1792 */
+			SERVICE_WANT_WALLOP
