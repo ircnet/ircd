@@ -1,3 +1,23 @@
+2004-10-26  Piotr Kucharski
+
+	* ircd.c/main(): move logfiles_open() below daemonize(), this fixes
+	  bug of logs getting to a client (bug reported by dojo and Borys,
+	  found by BitKoenig).
+	* s_bsd.c/daemonize(): fclose(stderr), fclose(stdin) additionally;
+	  also remove second local[0] setting.
+	* send.c/logfiles_open(): clear local[] too, just to be safe.
+	* s_serv.c/m_motd(): make motd work for unregistered clients.
+	* s_serv.c/m_motd(): bigger penalty for unregistered clients.
+	* config.h.dist, parse.c: add MOTD_UNREG define.
+
+2004-10-23  Piotr Kucharski
+
+	* struct_def.h: moved count, rcount, bytes from Message to Cmd struct,
+	  also added rbytes.
+	* parse.c/msgtab[], parse(): make stats (count, bytes) per handler, not
+	  per command.
+	* s_serv.c/m_stats(), s_err.c/replies[]: show per handler stats.
+
 2004-10-21  Piotr Kucharski
 
 	* configure: remove own checks for stdarg.
