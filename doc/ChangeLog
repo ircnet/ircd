@@ -1,3 +1,14 @@
+2002-06-01  Jakub Vlasek
+
+	* struct_def.h: added hhashv,hhnext to struct User (used by hostname
+	  hash).
+	* hash.c, hash_def.h, hash_ext.h: added hostname hash.
+	* s_conf.c/attach_conf(): use hostname hash for userhost limits.
+	* s_user.c/register_user(): add user to hostname hash.
+	* s_misc.c/exit_one_client(): remove user from hostname hash.
+	* ircd.c/read_ircdtune(): initialise size of hostname hash to size
+	  of client hash.
+
 2002-06-01  Kurt Roeckx
 
 	* class.c, class_ext.h, class_def.h: Make maxSendq an int.
