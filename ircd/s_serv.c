@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.188 2004/05/14 22:31:48 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.189 2004/05/14 22:58:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3017,7 +3017,7 @@ int	m_close(aClient *cptr, aClient *sptr, int parc, char *parv[])
 }
 
 /* End Of Burst command
-** parv[0] - server sending the SQUIT
+** parv[0] - server sending the EOB
 ** parv[1] - optional comma separated list of servers for which this EOB
 **           is also valid.
 */
@@ -3058,6 +3058,11 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 		SetEOB(sptr);
 		istat.is_eobservers++;
+		if (atoi(sptr->serv->verstr) >= 210990800) /* XXX remove soon */
+		if (sptr->hopcount == 1)
+		{
+			sendto_one(sptr, ":%s EOBACK", me.serv->sid);
+		}
 		
 		if (parc < 2)
 		{
