@@ -18,62 +18,64 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#define MSG_PRIVATE  "PRIVMSG"	/* PRIV */
-#define MSG_WHO      "WHO"	/* WHO  -> WHOC */
-#define MSG_WHOIS    "WHOIS"	/* WHOI */
-#define MSG_WHOWAS   "WHOWAS"	/* WHOW */
-#define MSG_USER     "USER"	/* USER */
-#define MSG_NICK     "NICK"	/* NICK */
-#define MSG_UNICK    "UNICK"	/* UNICK */
-#define MSG_SERVER   "SERVER"	/* SERV */
-#define MSG_LIST     "LIST"	/* LIST */
-#define MSG_TOPIC    "TOPIC"	/* TOPI */
-#define MSG_INVITE   "INVITE"	/* INVI */
-#define MSG_VERSION  "VERSION"	/* VERS */
-#define MSG_QUIT     "QUIT"	/* QUIT */
-#define MSG_SQUIT    "SQUIT"	/* SQUI */
-#define MSG_KILL     "KILL"	/* KILL */
-#define MSG_SAVE     "SAVE"	/* SAVE */
-#define MSG_INFO     "INFO"	/* INFO */
-#define MSG_LINKS    "LINKS"	/* LINK */
-#define MSG_SUMMON   "SUMMON"	/* SUMM */
-#define MSG_STATS    "STATS"	/* STAT */
-#define MSG_USERS    "USERS"	/* USER -> USRS */
-#define MSG_HELP     "HELP"	/* HELP */
-#define MSG_ERROR    "ERROR"	/* ERRO */
-#define MSG_AWAY     "AWAY"	/* AWAY */
-#define MSG_CONNECT  "CONNECT"	/* CONN */
-#define MSG_PING     "PING"	/* PING */
-#define MSG_PONG     "PONG"	/* PONG */
-#define MSG_OPER     "OPER"	/* OPER */
-#define MSG_PASS     "PASS"	/* PASS */
-#define MSG_WALLOPS  "WALLOPS"	/* WALL */
-#define MSG_TIME     "TIME"	/* TIME */
-#define MSG_NAMES    "NAMES"	/* NAME */
-#define MSG_ADMIN    "ADMIN"	/* ADMI */
-#define MSG_TRACE    "TRACE"	/* TRAC */
-#define MSG_NOTICE   "NOTICE"	/* NOTI */
-#define MSG_JOIN     "JOIN"	/* JOIN */
-#define MSG_NJOIN    "NJOIN"	/* NJOIN */
-#define MSG_PART     "PART"	/* PART */
-#define MSG_LUSERS   "LUSERS"	/* LUSE */
-#define MSG_MOTD     "MOTD"	/* MOTD */
-#define MSG_MODE     "MODE"	/* MODE */
-#define MSG_UMODE    "UMODE"	/* UMOD */
-#define MSG_KICK     "KICK"	/* KICK */
-#define MSG_SERVICE  "SERVICE"	/* SERV -> SRVI */
-#define MSG_USERHOST "USERHOST"	/* USER -> USRH */
-#define MSG_ISON     "ISON"	/* ISON */
-#define MSG_NOTE     "NOTE"	/* NOTE */
-#define MSG_SQUERY   "SQUERY"	/* SQUE */
-#define MSG_SERVLIST "SERVLIST"	/* SERV -> SLIS */
-#define MSG_SERVSET  "SERVSET"	/* SERV -> SSET */
-#define	MSG_REHASH   "REHASH"	/* REHA */
-#define	MSG_RESTART  "RESTART"	/* REST */
-#define	MSG_CLOSE    "CLOSE"	/* CLOS */
+#define MSG_PRIVATE  "PRIVMSG"
+#define MSG_WHO      "WHO"
+#define MSG_WHOIS    "WHOIS"
+#define MSG_WHOWAS   "WHOWAS"
+#define MSG_USER     "USER"
+#define MSG_NICK     "NICK"
+#define MSG_UNICK    "UNICK"
+#define MSG_SERVER   "SERVER"
+#define MSG_LIST     "LIST"
+#define MSG_TOPIC    "TOPIC"
+#define MSG_INVITE   "INVITE"
+#define MSG_VERSION  "VERSION"
+#define MSG_QUIT     "QUIT"
+#define MSG_SQUIT    "SQUIT"
+#define MSG_KILL     "KILL"
+#define MSG_SAVE     "SAVE"
+#define MSG_INFO     "INFO"
+#define MSG_LINKS    "LINKS"
+#define MSG_SUMMON   "SUMMON"
+#define MSG_STATS    "STATS"
+#define MSG_USERS    "USERS"
+#define MSG_HELP     "HELP"
+#define MSG_ERROR    "ERROR"
+#define MSG_AWAY     "AWAY"
+#define MSG_CONNECT  "CONNECT"
+#define MSG_PING     "PING"
+#define MSG_PONG     "PONG"
+#define MSG_OPER     "OPER"
+#define MSG_PASS     "PASS"
+#define MSG_WALLOPS  "WALLOPS"
+#define MSG_TIME     "TIME"
+#define MSG_NAMES    "NAMES"
+#define MSG_ADMIN    "ADMIN"
+#define MSG_TRACE    "TRACE"
+#define MSG_NOTICE   "NOTICE"
+#define MSG_JOIN     "JOIN"
+#define MSG_NJOIN    "NJOIN"
+#define MSG_PART     "PART"
+#define MSG_LUSERS   "LUSERS"
+#define MSG_MOTD     "MOTD"
+#define MSG_MODE     "MODE"
+#define MSG_UMODE    "UMODE"
+#define MSG_KICK     "KICK"
+#define MSG_SERVICE  "SERVICE"
+#define MSG_USERHOST "USERHOST"
+#define MSG_ISON     "ISON"
+#define MSG_NOTE     "NOTE"
+#define MSG_SQUERY   "SQUERY"
+#define MSG_SERVLIST "SERVLIST"
+#define MSG_SERVSET  "SERVSET"
+#define	MSG_REHASH   "REHASH"
+#define	MSG_RESTART  "RESTART"
+#define	MSG_CLOSE    "CLOSE"
 #define	MSG_DIE	     "DIE"
-#define	MSG_HASH     "HAZH"	/* HASH */
-#define	MSG_DNS      "DNS"	/* DNS  -> DNSS */
-#define	MSG_SMASK    "SMASK"	/* SMSK */
+#define	MSG_HASH     "HAZH"
+#define	MSG_DNS      "DNS"
+#define	MSG_SMASK    "SMASK"
+#define MSG_EOB	     "EOB"
 
-#define MAXPARA    15 
+#define MAXPARA		15
+
