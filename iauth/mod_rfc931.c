@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.15 1999/06/17 00:25:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.16 1999/07/11 20:56:25 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -285,7 +285,7 @@ u_int cl;
 					ch = cldata[cl].inbuffer;
 					while (*ch)
 					    {
-						if (!(isalnum || 
+						if (!(isalnum(*ch) || 
 						      ispunct(*ch) ||
 						      isspace(*ch)))
 							break;
