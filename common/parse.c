@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.66 2004/06/11 23:44:33 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.67 2004/06/12 02:31:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -789,7 +789,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 			sendto_one(from, replies[ERR_NOPRIVILEGES], ME, BadTo(para[0]));
 			return -1;
 		    }
-	if (i <= mptr->minparams || (i > 0 && para[i-1][0] == '\0'))
+	if (mptr->minparams > 0 && (i <= mptr->minparams || para[i-1][0] == '\0'))
 	{
 		sendto_one(from, replies[ERR_NEEDMOREPARAMS], 
 			ME, BadTo(para[0]), mptr->cmd);
