@@ -1,3 +1,8 @@
+2003-02-13  Jakub Vlasek
+	
+	* s_user.c/m_user(): Parse user text modes sent in USER command
+	  during registration.
+
 2003-02-11  Piotr Kucharski
 
         * s_serv.c/m_stats(): stats l server client_not_on_this_server
