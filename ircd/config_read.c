@@ -95,85 +95,85 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 		}
 		linenum++;
 
-		if (*i == '#')
+		if (*i == '#' && strncasecmp(i+1, "include ", 8) == 0)
 		{
 			char	*start = i + 9, *end = p;
+			char	file[FILEMAX + 1];
+			char	*filep = file;
+			char	*savefilep;
+			aConfig	*ret;
+			aFile	*tcf;
 
 			end--;			/* eat last \n */
 			if (*end == '\r')
 				end--;		/* ... and \r, if is */
 
-			if (*start == '"' && *end == '"'
-				&& strncasecmp(i, "#include ", 9) == 0)
+			if (*start == '"' && *end == '"')
 			{
-				char	file[FILEMAX + 1];
-				char	*filep = file;
-				char	*savefilep;
-				aConfig	*ret;
-				aFile	*tcf;
-
-				*filep = '\0';
-				if (depth >= MAXDEPTH)
-				{
-					config_error(CF_ERR, curfile, linenum,
-						"config: too nested (max %d)",
-						depth);
-					goto eatline;
-				}
-				if (*(start+1) != '/')
-				{
-					strcat(file, IRCDCONF_PATH);
-					filep = strrchr(file, '/') + 1;
-					*filep = '\0';
-				}
-				if (end - start + filep - file >= FILEMAX)
-				{
-					config_error(CF_ERR, curfile, linenum,
-						"too long filename (max %d with "
-						"path)", FILEMAX);
-					goto eatline;
-				}
 				start++;
-				savefilep = filep;
-				memcpy(filep, start, end - start);
-				filep += end - start;
+				end--;
+			}
+
+			*filep = '\0';
+			if (depth >= MAXDEPTH)
+			{
+				config_error(CF_ERR, curfile, linenum,
+					"config: too nested (max %d)",
+					depth);
+				goto eatline;
+			}
+			if (*start != '/')
+			{
+				strcat(file, IRCDCONF_PATH);
+				filep = strrchr(file, '/') + 1;
 				*filep = '\0';
-				for (tcf = curfile; tcf; tcf = tcf->parent)
+			}
+			if (end - start + filep - file >= FILEMAX)
+			{
+				config_error(CF_ERR, curfile, linenum,
+					"too long filename (max %d with "
+					"path)", FILEMAX);
+				goto eatline;
+			}
+			savefilep = filep;
+			memcpy(filep, start, end - start + 1);
+			filep += end - start + 1;
+			*filep = '\0';
+			for (tcf = curfile; tcf; tcf = tcf->parent)
+			{
+				if (0 == strcmp(tcf->filename, file))
 				{
-					if (0 == strcmp(tcf->filename, file))
-					{
-						config_error(CF_ERR, curfile,
-							linenum,
-							"would loop include");
-						goto eatline;
-					}
-				}
-				if ((fd = open(file, O_RDONLY)) < 0)
-				{
-					config_error(CF_ERR, curfile, linenum,
-						"cannot open \"%s\"", savefilep);
+					config_error(CF_ERR, curfile,
+						linenum,
+						"would loop include");
 					goto eatline;
 				}
-				ret = config_read(fd, depth + 1,
-					new_config_file(file, curfile, linenum));
-				close(fd);
-				if (ConfigCur)
-				{
-					ConfigCur->next = ret;
-				}
-				else
-				{
-					ConfigTop = ret;
-					ConfigCur = ret;
-				}
-				while ((ConfigCur && ConfigCur->next))
-				{
-					ConfigCur = ConfigCur->next;
-				}
-				/* good #include is replaced by its content */
-				i = p + 1;
-				continue;
 			}
+			if ((fd = open(file, O_RDONLY)) < 0)
+			{
+				config_error(CF_ERR, curfile, linenum,
+					"cannot open \"%s\"", savefilep);
+				goto eatline;
+			}
+			ret = config_read(fd, depth + 1,
+				new_config_file(file, curfile, linenum));
+			close(fd);
+			if (ConfigCur)
+			{
+				ConfigCur->next = ret;
+			}
+			else
+			{
+				ConfigTop = ret;
+				ConfigCur = ret;
+			}
+			while ((ConfigCur && ConfigCur->next))
+			{
+				ConfigCur = ConfigCur->next;
+			}
+			/* good #include is replaced by its content */
+			i = p + 1;
+			continue;
 		}
 eatline:
 		linelen = p - i;
