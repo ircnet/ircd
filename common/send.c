@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.8 1997/04/28 02:18:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.9 1997/05/27 15:05:16 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -356,7 +356,8 @@ aClient *to;
 			msg = zip_buffer(to, NULL, &len, 1);
 			
 			if (len == -1)
-			       return dead_link("fatal error in zip_buffer()");
+			       return dead_link(to,
+						"fatal error in zip_buffer()");
 
 			if (dbuf_put(&to->sendQ, msg, len) < 0)
 			    {
@@ -389,7 +390,8 @@ aClient *to;
 			msg = zip_buffer(to, NULL, &len, 1);
 
 			if (len == -1)
-			       return dead_link("fatal error in zip_buffer()");
+			       return dead_link(to,
+						"fatal error in zip_buffer()");
 
 			if (dbuf_put(&to->sendQ, msg, len) < 0)
 			    {
