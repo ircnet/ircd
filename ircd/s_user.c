@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.257 2005/03/28 23:33:27 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.258 2005/03/29 22:30:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -881,6 +881,22 @@ badparamcountkills:
 				goto nickkilldone;
 			}
 		}
+	}
+	if (IsServer(cptr) && isdigit(nick[0]) 
+		&& !strncasecmp(me.serv->sid, nick, SIDLEN))
+	{
+		/* Remote server send us remote user changing his nick
+		** to uid-like with our! sid. Burn the bastard. --B. */
+		sendto_flag(SCH_KILL, "Bad SID Nick Prefix: %s From: %s %s",
+				   parv[1], parv[0],
+				   get_client_name(cptr, FALSE));
+                sendto_serv_butone(NULL, ":%s KILL %s :%s (%s[%s] != %s)",
+                                   me.name, sptr->name, me.name,
+                                   sptr->name, sptr->from->name,
+                                   get_client_name(cptr, TRUE));
+                sptr->flags |= FLAGS_KILLED;
+                (void) exit_client(NULL, sptr, &me, "Fake SID Nick Prefix");
+                return exit_client(NULL, cptr, &me, "Fake SID Nick Prefix");
 	}
 	/*
 	 * if do_nick_name() returns a null name OR if the server sent a nick
