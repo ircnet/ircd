@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.38 2004/03/05 23:38:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.39 2004/06/26 00:49:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1296,13 +1296,9 @@ int	m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			&_HOSTNAMEHASHSIZE, hash_host_name},
 		{0, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
 	};
-	
-	if (!IsAnOper(sptr))
-	{
-		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
 
-		return 2;
-	}
+	if (is_allowed(sptr, ACL_HAZH))
+		return m_nopriv(cptr, sptr, parc, parv);
 	
 	if (parc < 2)
 	{
