@@ -1,3 +1,11 @@
+2004-08-21  Piotr Kucharski
+
+	* s_serv.c/m_server(): register_server() must be called before
+	  add_to_sid/server_hash_table (in case of growing hash tables).
+	* s_user.c/m_nick(): silently cut longer nicks from clients (instead
+	  of rejecting).
+	* swap return values of is_allowed, 1 for ok, 0 for forbidden now.
+
 2004-08-18  Piotr Kucharski
 
 	* s_conf.c/initconf(): o:line (local oper) did not revoke remote rights

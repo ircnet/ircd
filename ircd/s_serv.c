@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.230 2004/08/21 10:13:47 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.231 2004/08/21 21:36:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -128,7 +128,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	*comment;
 	static char	comment2[TOPICLEN+1];
 
-	if (is_allowed(sptr, ACL_SQUIT))
+	if (!is_allowed(sptr, ACL_SQUIT))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	server = parv[1];
@@ -236,7 +236,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), server);
 		return 1;
 	    }
-	if (!MyConnect(acptr) && is_allowed(sptr, ACL_SQUITREMOTE))
+	if (!MyConnect(acptr) && !is_allowed(sptr, ACL_SQUITREMOTE))
 	    {
 		return m_nopriv(cptr, sptr, parc, parv);
 	    }
@@ -2682,7 +2682,7 @@ int	m_admin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int	m_rehash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	if (is_allowed(sptr, ACL_REHASH))
+	if (!is_allowed(sptr, ACL_REHASH))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	sendto_one(sptr, replies[RPL_REHASHING], ME, BadTo(parv[0]),
@@ -2705,7 +2705,7 @@ int	m_restart(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	int	i;
 	char	killer[HOSTLEN * 2 + USERLEN + 5];
 
-	if (is_allowed(sptr, ACL_RESTART))
+	if (!is_allowed(sptr, ACL_RESTART))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	strcpy(killer, get_client_name(sptr, TRUE));
@@ -2916,7 +2916,7 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			    && !(a2cptr == sptr)    /* but not user self */
 			    && !(IsAnOper(a2cptr))  /* nor some oper */
 			    && (!MyConnect(sptr) ||
-				is_allowed(sptr, ACL_TRACE))
+				!is_allowed(sptr, ACL_TRACE))
 						    /* nor it is my oper
 						     * doing trace */
 			   )
@@ -2986,7 +2986,7 @@ int	m_close(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	int	i;
 	int	closed = 0;
 
-	if (is_allowed(sptr, ACL_CLOSE))
+	if (!is_allowed(sptr, ACL_CLOSE))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	for (i = highest_fd; i; i--)
@@ -3197,7 +3197,7 @@ int	m_die(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	int	i;
 	char	killer[HOSTLEN * 2 + USERLEN + 5];
 
-	if (is_allowed(sptr, ACL_DIE))
+	if (!is_allowed(sptr, ACL_DIE))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	strcpy(killer, get_client_name(sptr, TRUE));
@@ -3240,7 +3240,7 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	};
 	int i, acmd = 0;
 
-	if (is_allowed(sptr, ACL_SET))
+	if (!is_allowed(sptr, ACL_SET))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	if (parc > 1)

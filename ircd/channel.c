@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.227 2004/08/18 12:29:15 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.228 2004/08/21 21:36:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1881,7 +1881,7 @@ static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 
 #ifdef CLIENTS_CHANNEL
 	if (*chptr->chname == '&' && !strcmp(chptr->chname, "&CLIENTS")
-		&& !is_allowed(sptr, ACL_CLIENTS))
+		&& is_allowed(sptr, ACL_CLIENTS))
 		return 0;
 #endif
 

@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.38 2004/06/26 00:49:09 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.39 2004/08/21 21:36:49 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -1656,7 +1656,7 @@ int	m_dns(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	aCache	*cp;
 	Reg	int	i;
 
-	if (is_allowed(sptr, ACL_DNS))
+	if (!is_allowed(sptr, ACL_DNS))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	if (parv[1] && *parv[1] == 'l') {

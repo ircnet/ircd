@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.79 2004/08/13 01:23:03 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.80 2004/08/21 21:36:48 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -681,7 +681,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 		if (!(IsServer(cptr) || IsService(cptr)))
 		    {	/* Flood control partly migrated into penalty */
 			if ((bootopt & BOOT_PROT) &&
-				is_allowed(cptr, ACL_NOPENALTY))
+				!is_allowed(cptr, ACL_NOPENALTY))
 				cptr->since += (1 + i / 100);
 			else
 				cptr->since = timeofday;
@@ -787,7 +787,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	** a LOCAL user client.
 	*/
 	if ((ret > 0) && IsRegisteredUser(cptr) && (bootopt & BOOT_PROT)
-		&& is_allowed(cptr, ACL_NOPENALTY))
+		&& !is_allowed(cptr, ACL_NOPENALTY))
 	    {
 		cptr->since += ret;
 /* only to lurk

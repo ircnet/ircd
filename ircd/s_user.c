@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.231 2004/08/21 20:54:28 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.232 2004/08/21 21:36:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2625,7 +2625,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	*user, *path, *killer;
 	int	chasing = 0;
 
-	if (is_allowed(sptr, ACL_KILL))
+	if (!is_allowed(sptr, ACL_KILL))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	user = parv[1];
@@ -2657,7 +2657,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			   ME, parv[0], user, acptr->name);
 		chasing = 1;
 	    }
-	if (!MyConnect(acptr) && is_allowed(cptr, ACL_KILLREMOTE))
+	if (!MyConnect(acptr) && !is_allowed(cptr, ACL_KILLREMOTE))
 	    {
 		return m_nopriv(cptr, sptr, parc, parv);
 	    }
@@ -3613,7 +3613,7 @@ int	m_save(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 /*
 ** Given client cptr and function decide access.
-** Return 0 for OK, 1 for forbidden.
+** Return 1 for OK, 0 for forbidden.
 */
 
 int	is_allowed(aClient *cptr, long function)
@@ -3622,15 +3622,15 @@ int	is_allowed(aClient *cptr, long function)
 
 	/* We cannot judge not our clients. Yet. */
 	if (!MyConnect(cptr) || IsServer(cptr))
-		return 0;
+		return 1;
 
 	/* minimal control, but nothing else service can do anyway. */
 	if (IsService(cptr))
 	{
 		if (function == ACL_TKLINE &&
 			(cptr->service->wants & SERVICE_WANT_TKLINE))
-			return 0;
-		return 1;
+			return 1;
+		return 0;
 	}
 
 	for (tmp = cptr->confs; tmp; tmp = tmp->next)
@@ -3641,11 +3641,11 @@ int	is_allowed(aClient *cptr, long function)
 
 	/* no O: conf found */
 	if (!tmp)
-		return 1;
+		return 0;
 
 	/* check access */
 	if ((tmp->value.aconf->flags & function))
-		return 0;
+		return 1;
 
-	return 1;
+	return 0;
 }
