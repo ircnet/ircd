@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.125 2004/03/21 18:24:38 jv Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.126 2004/04/07 16:56:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -914,8 +914,11 @@ int	main(int argc, char *argv[])
 
                 for (i = 0; i <= highest_fd; i++)
                     {   
-                        if ((acptr = listeners[i]))
-                                break;
+			if (!(acptr = local[i]))
+				continue;
+			if (IsListening(acptr))
+				break;
+			acptr = NULL;
 		    }
 		/* exit if there is nothing to listen to */
 		if (acptr == NULL && !(bootopt & BOOT_INETD))

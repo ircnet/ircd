@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.137 2004/03/22 14:15:14 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.138 2004/04/07 16:57:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -49,7 +49,6 @@ static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.137 2004/03/22 14:15:14 jv Exp $";
 #endif
 
 aClient	*local[MAXCONNECTIONS];
-aClient	*listeners[MAXCONNECTIONS];
 FdAry	fdas, fdall;
 int	highest_fd = 0, readcalls = 0, udpfd = -1, resfd = -1, adfd = -1;
 time_t	timeofday;
@@ -310,6 +309,7 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 	cptr->ip.s_addr = server.sin_addr.s_addr; /* broken on linux at least*/
 #endif
 	cptr->port = port;
+	local[cptr->fd] = cptr;
 
 	if (dolisten)
 	{
@@ -363,7 +363,6 @@ int	add_listener(aConfItem *aconf)
 		cptr->confs = make_link();
 		cptr->confs->next = NULL;
 		cptr->confs->value.aconf = aconf;
-		listeners[cptr->fd] = cptr;
 		add_fd(cptr->fd, &fdas);
 		add_fd(cptr->fd, &fdall);
 		set_non_blocking(cptr->fd, cptr);
@@ -427,6 +426,7 @@ int	unixport(aClient *cptr, char *path, int port)
 	(void)chmod(unixpath, 0777);
 	SetUnixSock(cptr);
 	cptr->port = 0;
+	local[cptr->fd] = cptr;
 
 	return 0;
 }
@@ -451,9 +451,9 @@ void	close_listeners(void)
 	 */
 	for (i = highest_fd; i >= 0; i--)
 	    {
-		if (!(cptr = listeners[i]))
+		if (!(cptr = local[i]))
 			continue;
-		if (cptr == &me)
+		if (cptr == &me || !IsListening(cptr))
 			continue;
 		aconf = cptr->confs->value.aconf;
 
@@ -479,9 +479,9 @@ void	activate_delayed_listeners(void)
 	
 	for (i = highest_fd; i >= 0; i--)
 	{
-		if (!(cptr = listeners[i]))
+		if (!(cptr = local[i]))
 			continue;
-		if (cptr == &me)
+		if (cptr == &me || !IsListening(cptr))
 			continue;
 
 		if (IsListenerInactive(cptr))
@@ -656,11 +656,9 @@ void	init_sys(void)
 	fdas.highest = fdall.highest = -1;
 	/* we need stderr open, don't close() it, daemonize() will do it */
 	local[0] = local[1] = local[2] = NULL;
-	listeners[0] = listeners[1] = listeners[2] = NULL;
 	for (fd = 3; fd < MAXCONNECTIONS; fd++)
 	{
 		local[fd] = NULL;
-		listeners[fd] = NULL;
 		(void)close(fd);
 	}
 }
@@ -1267,7 +1265,7 @@ void	close_connection(aClient *cptr)
 		sendto_iauth("%d D", cptr->fd);
 #endif
 		flush_connections(i);
-		if (IsServer(cptr))
+		if (IsServer(cptr) || IsListening(cptr))
 		    {
 			del_fd(i, &fdas);
 #ifdef	ZIP_LINKS
@@ -1278,11 +1276,6 @@ void	close_connection(aClient *cptr)
 			zip_free(cptr);
 #endif
 		    }
-		else if (IsListening(cptr))
-		{
-			del_fd(i, &fdas);
-			listeners[i] = NULL;
-		}
 		else if (IsClient(cptr))
 		    {
 #ifdef	SO_LINGER
@@ -1985,10 +1978,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 		for (i = fdp->highest; i >= 0; i--)
 		    {
 			fd = fdp->fd[i];
-			cptr = local[fd];
-			if (!cptr)
-				cptr = listeners[fd];
-			if (!cptr)
+			if (!(cptr = local[fd]))
 				continue;
 			Debug((DEBUG_L11, "fd %d cptr %#x %d %#x %s",
 				fd, cptr, cptr->status, cptr->flags,
@@ -2187,10 +2177,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 	    {
 #if ! USE_POLL
 		fd = fdp->fd[i];
-		cptr = local[fd];
-		if (!cptr)
-			cptr = listeners[fd];
-		if (!cptr)
+		if (!(cptr = local[fd]))
 			continue;
 #else
 		fd = pfd->fd;
@@ -2222,10 +2209,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 #if USE_POLL
 		    }
 		fd = pfd->fd;
-		cptr = local[fd];
-		if (!cptr)
-			cptr = listeners[fd];
-		if (!cptr)
+		if (!(cptr = local[fd]))
 			continue;
 #else
 		fd = cptr->fd;

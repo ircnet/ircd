@@ -25,7 +25,6 @@
  */
 #ifndef S_BSD_C
 extern aClient *local[];
-extern aClient *listeners[];
 extern FdAry fdas, fdaa, fdall;
 extern int highest_fd, readcalls, udpfd, resfd, adfd;
 extern time_t timeofday;
