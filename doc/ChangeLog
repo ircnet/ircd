@@ -8,6 +8,10 @@
 	  is not defined.
 	* s_serv.c/m_lusers(): send 265 and 266 only if request was for all
 	  clients (either no param or param "*").
+	* channel.c/m_join(): disable '#' and '!' as first +channel name.
+	* s_serv.c/m_stats(): stats k honours TXT_NOSTATSK define.
+	* s_user.c/m_ping(): local PING is answered with PONG containing text
+	  used as argument to PING; removed unnecessary parts of code.
 
 2004-10-05  Piotr Kucharski
 
