@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.184 2004/02/19 00:16:16 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.185 2004/02/19 00:25:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2755,6 +2755,10 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	*buf = '\0';
 
 	parv[1] = canonize(parv[1]);
+	comment = (BadPtr(parv[2])) ? "" : parv[2];
+	if (strlen(comment) > TOPICLEN)
+		comment[TOPICLEN] = '\0';
+
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	    {
 		convert_scandinavian(name, cptr);
@@ -2775,12 +2779,6 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				   name);
 			continue;
 		    }
-		comment = (BadPtr(parv[2])) ? parv[0] : parv[2];
-		if (IsAnonymous(chptr) && (comment == parv[0]))
-			comment = "None";
-		if (strlen(comment) > (size_t) TOPICLEN)
-			comment[TOPICLEN] = '\0';
-
 		/*
 		**  Remove user from the old channel (if any)
 		*/
