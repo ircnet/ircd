@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.193 2004/06/11 17:07:56 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.194 2004/06/12 14:55:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2721,17 +2721,14 @@ static	void	trace_one(aClient *sptr, aClient *acptr)
 				   class, name);
 			break;
 			
-		case STAT_CLIENT:
-			if (IsAnOper(acptr))
-			{
+		case STAT_OPER:
 				sendto_one(sptr, replies[RPL_TRACEOPERATOR], ME,
 					to, class, name);
-			}
-			else
-			{
+			break;
+
+		case STAT_CLIENT:
 				sendto_one(sptr, replies[RPL_TRACEUSER], ME,
 					to, class, name);
-			}
 			break;
 			
                 case STAT_SERVER:
