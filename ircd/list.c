@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.39 2005/01/03 22:17:00 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.40 2005/01/30 13:42:03 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -40,25 +40,6 @@ static	struct	liststats {
 aServer	*svrtop = NULL;
 
 int	numclients = 0;
-
-/*
-** There is a max of CHIDNB ^ (SIDLEN - 1) servers
-** with tokens (ie. 2.10).
-*/
-
-#if CHIDNB == 36 && SIDLEN == 4
-# define MAX210SERVERS 46656
-#else
-# error Fix MAX210SERVERS.
-#endif
-
-/* we keep tokens in a bit array, hence /8 */
-/* +7 to make sure it's big enough */
-unsigned char	used_tokens[(MAX210SERVERS + 7 ) / 8];
-
-#define	IsBitSet(x)	(used_tokens[x / 8] & (1 << (x % 8)))
-#define	SetBit(x)	(used_tokens[x / 8] |= (1 << (x % 8)))
-#define	ClearBit(x)	(used_tokens[x / 8] &= ~(1 << (x % 8)))
 
 void	initlists(void)
 {
@@ -222,27 +203,9 @@ anUser	*make_user(aClient *cptr, int iplen)
 aServer	*make_server(aClient *cptr)
 {
 	aServer	*serv = cptr->serv;
-	int	tok;
 
 	if (!serv)
 	    {
-		/* 
-		** me is number 1 and is first added.
-		** There is a max of MAX210SERVERS.
-		*/
-		for (tok = 1; tok < MAX210SERVERS ; tok++)
-		{
-			if (!IsBitSet(tok))
-			{
-				break;
-			}
-		}
-		if (tok == MAX210SERVERS)
-		{
-			sendto_flag(SCH_ERROR, "No more tokens");
-			return NULL;
-		}
-
 		serv = (aServer *)MyMalloc(sizeof(aServer));
 		memset(serv, 0, sizeof(aServer));
 #ifdef	DEBUGMODE
@@ -254,15 +217,10 @@ aServer	*make_server(aClient *cptr)
 		serv->user = NULL;
 		serv->snum = -1;
 		*serv->by = '\0';
-		*serv->tok = '\0';
-		serv->stok = 0;
 		serv->up = NULL;
 		serv->refcnt = 1;
 		serv->nexts = NULL;
 		serv->prevs = NULL;
-		SetBit(tok);
-		serv->ltok = tok;
-		sprintf(serv->tok, "%d", serv->ltok);
 		serv->bcptr = cptr;
 		serv->lastload = 0;
 	    }
@@ -388,8 +346,6 @@ void	free_server(aServer *serv)
 				    cptr, cptr ? cptr->name : "<noname>", buf);
 #endif
 		}
-		/* Free token */
-		ClearBit(serv->ltok);
 
 		MyFree(serv);
 	}
