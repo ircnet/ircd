@@ -207,10 +207,25 @@ eatline:
 	return ConfigTop;
 }
 
+/* should be called with topmost config struct */
 void config_free(aConfig *cnf)
 {
 	aConfig *p;
+	aFile *pf, *pt;
 
+	if (cnf == NULL)
+	{
+		return;
+	}
+
+	pf = cnf->file;
+	while(pf)
+	{
+		pt = pf;
+		pf = pf->next;
+		MyFree(pt->filename);
+		MyFree(pt);
+	}
 	while (cnf)
 	{
 		p = cnf;
@@ -218,6 +233,7 @@ void config_free(aConfig *cnf)
 		MyFree(p->line);
 		MyFree(p);
 	}
+	return;
 }
 
 aFile *new_config_file(char *filename, aFile *parent, int fnr)
