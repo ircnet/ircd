@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.132 2005/02/08 01:49:03 chopin Exp $
+ *   $Id: struct_def.h,v 1.133 2005/02/09 18:44:55 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -760,6 +760,7 @@ struct Channel	{
 #define	MyOper(x)			(MyConnect(x) && IsOper(x))
 #define	MyService(x)			(MyConnect(x) && IsService(x))
 #define	ME	me.name
+#define	MES	me.serv->sid
 
 #define	GotDependantClient(x)	(x->prev &&				\
 		 		 ((IsRegisteredUser(x->prev) &&		\
@@ -854,18 +855,12 @@ typedef	struct	{
 
 #define	MATCH_SERVER	1
 #define	MATCH_HOST	2
-#define	MATCH_OLDSYNTAX	4
 
 /* used for sendto_serv */
 
 #define	SV_OLD		0x0000
-#define SV_2_10		0x0001 /* 2.10.2+, 2.10.1 is considered to be SV_OLD
-				  because it would kill SAVEd users */
-#define SV_UID		0x0002
-#define	SV_2_11		(SV_2_10|SV_UID)
-
-#define	SV_OLDSQUIT	0x1000	/* server uses OLD SQUIT logic */
-
+#define SV_UID		0x0001
+#define	SV_2_11		SV_UID
 
 /* used for sendto_flag */
 
