@@ -1,3 +1,8 @@
+1999-07-05  Piotr Kucharski
+
+	* channel.c/m_invite(): invite to :-channels was sometimes 
+	lost with no error
+
 1999-07-04  Christophe Kalt
 
 	* a_conf_def.h, a_conf.c, a_io.c: added the "timeout" option.
