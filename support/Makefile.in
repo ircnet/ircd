@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.59 2004/09/07 15:12:24 chopin Exp $
+#*   $Id: Makefile.in,v 1.60 2004/09/08 19:25:25 chopin Exp $
 #*
 #*/
 
@@ -72,7 +72,7 @@ server_man_dir = @mandir@/man8
 # Directory where config files (ircd.conf, ircd.motd and iauth.conf) live.
 ircd_conf_dir = @sysconfdir@
 # Directory where state files (ircd.pid, ircd.tune) live.
-ircd_var_dir = @localstatedir@
+ircd_var_dir = @localstatedir@/run
 # Directory where log files (users, opers, rejects and auth) live.
 ircd_log_dir = @logdir@
 
@@ -239,7 +239,7 @@ install-server: install-ircd server
 	$(INSTALL_DATA) ../doc/iauth.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/iauth.conf.5 $(conf_man_dir)
 	$(INSTALL_DATA) ../contrib/ircdwatch/ircdwatch.8 $(server_man_dir)
-	$(INSTALL_DATA) ../doc/example.conf $(ircd_conf_dir)
+	$(INSTALL_DATA) ../doc/example.conf $(ircd_conf_dir)/ircd.conf.example
 	-@if [ ! -f $(IAUTHCONF_PATH) ]; then \
 		$(INSTALL_DATA) ../support/iauth.conf $(IAUTHCONF_PATH); \
 	fi
