@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.25 1999/02/01 20:33:46 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.26 1999/02/01 20:35:50 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -208,7 +208,7 @@ read_iauth()
 			    ** about it! -kalt
 			    */
 			    sendto_flag(SCH_AUTH,
-			"last='%u' start=%x end=%x buf=%x olen=%d i=%d",
+				"last=%u start=%x end=%x buf=%x olen=%d i=%d",
 					last, start, end, buf, olen, i);
 			    sendto_iauth(
 			 "-1 E last=%u start=%x end=%x buf=%x olen=%d i=%d",
