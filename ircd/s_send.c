@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_send.c,v 1.8 2004/10/02 01:20:44 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_send.c,v 1.9 2004/10/09 12:40:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -314,7 +314,8 @@ void	esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 			/* to local users */
 			if (plen == 0)
 			{
-				plen = sprintf(":anonymous!anonymous@"
+				plen = sprintf(prefixbuf,
+					":anonymous!anonymous@"
 					"anonymous. %s %s", imsg,
 					chptr->chname);
 			}
