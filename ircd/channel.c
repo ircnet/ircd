@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.171 2004/02/10 23:39:49 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.172 2004/02/12 19:53:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -474,9 +474,10 @@ void	remove_user_from_channel(aClient *sptr, aChannel *chptr)
 			 * the time to be able to later massreop if
 			 * necessary.
 			 */
-			if (*chptr->chname == '!' &&
-			    (tmp->flags & CHFL_CHANOP))
+			if (tmp->flags & CHFL_CHANOP)
+			{
 				chptr->reop = timeofday + LDELAYCHASETIMELIMIT;
+			}
 
 			*curr = tmp->next;
 			free_link(tmp);
@@ -1453,7 +1454,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 		    }
 		/*
 		 * Make sure new (+R) mode won't get mixed with old modes
-		 * together on the same line. OTOH: why not? --B.
+		 * together on the same line.
 		 */
 		if (MyClient(sptr) && curr && *curr != '-' && *curr != '+')
 		{
@@ -1696,7 +1697,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				case MODE_REOPLIST :
 					tmp_chfl = CHFL_REOPLIST; break;
 				}
-				/* XXX: remove this in 2.11.1 */
+				/* XXX: fix this in 2.11.1 */
 				if ((whatt & MODE_ADD) &&
 					tmp_chfl == CHFL_REOPLIST &&
 					MyClient(sptr))
