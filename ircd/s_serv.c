@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.98 2002/05/18 23:55:10 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.99 2002/05/19 00:18:11 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2611,7 +2611,7 @@ char	*parv[];
 						     * trace is person */
 			    && !(a2cptr == sptr)    /* but not user self */
 			    && !(IsAnOper(a2cptr))  /* nor some oper */
-		 	    && !(IsAnOper(sptr) && MyConnect(sptr))
+			    && !(IsAnOper(sptr) && MyConnect(sptr))
 						    /* nor it is my oper
 						     * doing trace */
 			   )
