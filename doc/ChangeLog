@@ -1,3 +1,28 @@
+Mon May 25 15:13:51 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* struct_def.h, channel.c, hash.c, s_misc.c: changed new channels
+	prefix to ! (instead of -).
+
+	* parse.c: undefining LOCOP_* had no effect (reported by Eumel).
+
+	* s_service.c: SERVICE_WANT_OPER burst fix (from Jonathan Chapman).
+
+	* s_bsd.c: SO_LINGER patch (from Andrew Snare <ajs@pigpond.com>).
+
+	* configure.in: better logic for --resconf.
+
+	* channel.c:
+		* m_invite() fix for &channels.
+		* add_modeid() always used RPL_BANLIST.
+		* bIe modes coming from a server were rejected
+		add_modeid() if another mode with the same pattern existed.
+	
+	* c_debug_ext.h, c_debug.c, chkconf.c, s_misc.c, s_zip.c: fixes
+	for DEBUGMODE (from Andrew Snare <ajs@pigpond.com> & Magnus
+	Tjernstrom <d92-mtm@ludd.luth.se>)
+
+	* hash.c: bigger_prime() useless optimization from Magnus :-)
+
 Tue May  5 19:26:25 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* config.h.dist, Makefile.in, struct_def.h, s_externs.h, send.c,
