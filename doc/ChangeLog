@@ -1,6 +1,8 @@
 2004-03-09  Piotr Kucharski
 
 	* s_bsd.c/add_connection(): move check_clones() before DNS starts.
+	* s_bsd.c/init_sys(): initalize listeners[]; also not bzero, just set
+	  all to NULLs.
 
 2004-03-08  Piotr Kucharski
 
