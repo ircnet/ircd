@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.58 2004/06/22 21:54:12 chopin Exp $
+#*   $Id: Makefile.in,v 1.59 2004/09/07 15:12:24 chopin Exp $
 #*
 #*/
 
@@ -153,7 +153,6 @@ SERVER_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
 IAUTH_COMMON_OBJS = clsupport.o clmatch.o # This is a little evil
 IAUTH_OBJS = iauth.o a_conf.o a_io.o a_log.o \
              mod_lhex.o mod_pipe.o mod_rfc931.o mod_socks.o
-IAUTH = iauth
 
 CHKCONF_COMMON_OBJS = match.o
 CHKCONF_OBJS = chkconf.o
@@ -208,7 +207,7 @@ $(TKSERV): tkserv.o
 
 install: install-server
 
-install-ircd: ircd
+install-ircd: $(SERVER)
 	-@if [ ! -d $(server_bin_dir) ]; then \
 		$(MKDIRHIER) $(server_bin_dir); \
 	fi
