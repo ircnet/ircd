@@ -1,3 +1,9 @@
+2.10.0p1
+
+Fri Sep 25 22:21:06 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* channel.c: check for +r mode before calling reop_channel().
+
 2.10.0
 
 Wed Sep 23 19:55:14 1998  Christophe Kalt  <kalt@millennium.stealth.net>
