@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.101 2001/12/30 02:11:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.102 2001/12/30 05:43:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1171,7 +1171,7 @@ char	*parv[];
 		return 2;
 	    }
 
-	if (strlen(uid) > NICKLEN)
+	if (!check_uid(uid))
 	{
 		/* Any better numeric? */
 		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, 
