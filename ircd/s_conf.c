@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.119 2004/06/29 23:40:27 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.120 2004/06/30 14:37:16 jv Exp $";
 #endif
 
 #include "os.h"
@@ -285,6 +285,36 @@ long	oline_flags_parse(char *string)
 	}
 	return tmp;
 }
+#ifdef XLINE
+char *xline_flags_to_string(long flags)
+{
+	static char xfsbuf[BUFSIZE];
+	char *s;
+
+	s = xfsbuf;
+	
+	if (flags & XFLAG_WHOLE)
+	{
+		*s++ = 'W';
+	}
+	if (s == xfsbuf)
+	{
+		*s++ = '-';
+	}
+	*s++ = '\0';
+	return xfsbuf;
+}
+long xline_flags_parse(char *string)
+{
+	long tmp = 0;
+	if (index(string, 'W'))
+	{
+		tmp |= XFLAG_WHOLE;
+	}
+	return tmp;
+}
+
+#endif
 /*
  * remove all conf entries from the client except those which match
  * the status field mask.
@@ -1474,6 +1504,11 @@ int 	initconf(int opt)
 			case 'y':
 			        aconf->status = CONF_CLASS;
 		        	break;
+#ifdef XLINE
+			case 'X':
+				aconf->status = CONF_XLINE;
+				break;
+#endif
 		    default:
 			Debug((DEBUG_ERROR, "Error in config file: %s", line));
 			break;
@@ -1610,7 +1645,12 @@ int 	initconf(int opt)
 				}
 			}
 		}
-
+#ifdef XLINE
+		if (aconf->status & CONF_XLINE && tmp3)
+		{
+			aconf->flags = xline_flags_parse(tmp3);
+		}
+#endif
 		if (aconf->status & CONF_SERVICE)
 			aconf->port &= SERVICE_MASK_ALL;
 		if (aconf->status & (CONF_SERVER_MASK|CONF_SERVICE))
