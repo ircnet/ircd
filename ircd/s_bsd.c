@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.169 2004/11/10 15:39:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.170 2004/11/19 15:22:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2106,6 +2106,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 	time_t	delay2 = delay;
 	int	res, length, fd, i;
 	int	auth;
+	int	write_err = 0;
 
 	for (res = 0;;)
 	    {
@@ -2384,7 +2385,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 			continue;
 		if (TST_WRITE_EVENT(fd))
 		    {
-			int	write_err = 0;
+			write_err = 0;
 			/*
 			** ...room for writing, empty some queue then...
 			*/
