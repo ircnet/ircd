@@ -1,5 +1,5 @@
 /************************************************************************
- *   IRC - Internet Relay Chat, iauth/mod_rfc921.c
+ *   IRC - Internet Relay Chat, iauth/mod_rfc931.c
  *   Copyright (C) 1998 Christophe Kalt
  *
  *   This program is free software; you can redistribute it and/or modify
@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.6 1998/09/18 22:49:40 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.7 1999/01/05 19:59:33 kalt Exp $";
 #endif
 
 #include "os.h"
