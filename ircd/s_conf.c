@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.105 2004/03/21 18:19:06 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.106 2004/04/15 12:52:18 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -815,8 +815,8 @@ aConfItem	*find_conf_name(char *name, int statmask)
 	for (tmp = conf; tmp; tmp = tmp->next)
 	    {
 		/*
-		** Accept if the *real* hostname (usually sockecthost)
-		** matches *either* host or name field of the configuration.
+		** Accept if the hostname matches name field
+		** of the configuration.
 		*/
 		if ((tmp->status & statmask) &&
 		    (!tmp->name || match(tmp->name, name) == 0))
@@ -2043,8 +2043,7 @@ aConfItem	*find_denied(char *name, int class)
 		    aServer	*asptr;
 
 		    for (asptr = svrtop; asptr; asptr = asptr->nexts)
-			    if (aconf->host &&
-				!match(aconf->host, asptr->bcptr->name))
+			    if (!match(aconf->host, asptr->bcptr->name))
 				    return aconf;
 		}
 	}
