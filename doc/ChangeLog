@@ -1,3 +1,10 @@
+2002-05-19  Jakub Vlasek
+	
+	* s_user.c/who_find(): Initialise myoper to 1, show +i user
+	  to himself.
+	* s_serv.c/m_trace(): Fixed condition causing wrong users being
+	  shown, added comments.
+
 2002-04-23  Jakub Vlasek
 	
 	* s_conf.c/rehash(): Do not delist config entries which are still
