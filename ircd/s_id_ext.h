@@ -40,4 +40,8 @@ EXTERN void cache_chid __P((aChannel *));
 EXTERN int check_chid __P((char *));
 EXTERN void collect_chid __P(());
 EXTERN int cid_ok __P((char *));
+
+EXTERN void init_sid __P((char *));
+EXTERN char *next_uid __P(());
+EXTERN int check_uid __P((char *));
 #undef EXTERN
