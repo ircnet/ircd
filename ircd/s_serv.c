@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.213 2004/06/26 00:42:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.214 2004/06/26 00:44:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2958,6 +2958,9 @@ int	m_close(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	aClient	*acptr;
 	Reg	int	i;
 	int	closed = 0;
+
+	if (is_allowed(sptr, ACL_CLOSE))
+		return m_nopriv(cptr, sptr, parc, parv);
 
 	for (i = highest_fd; i; i--)
 	    {
