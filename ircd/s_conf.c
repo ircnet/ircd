@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.149 2004/11/10 00:08:35 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.150 2004/11/10 17:56:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1760,8 +1760,10 @@ int 	initconf(int opt)
 				strncpyzt(me.serv->namebuf, aconf->host,
 					  sizeof(me.serv->namebuf));
 			if (me.serv->sid[0] == '\0' && tmp && *tmp)
-				strncpyzt(me.serv->sid, tmp,
-					sizeof(me.serv->sid));
+			{
+				for(i = 0; i < sizeof(me.serv->sid); i++)
+					me.serv->sid[i] = toupper(tmp[i]);
+			}
 						
 			if (aconf->port)
 				setup_ping(aconf);
