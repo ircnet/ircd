@@ -59,4 +59,5 @@ EXTERN void send_umode (aClient *cptr, aClient *sptr, int old,
 			    int sendmask, char *umode_buf);
 EXTERN void send_umode_out (aClient *cptr, aClient *sptr, int old);
 EXTERN int m_save (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int is_allowed(aClient *, ACL);
 #undef EXTERN

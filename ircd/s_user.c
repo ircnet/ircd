@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.208 2004/06/12 14:56:47 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.209 2004/06/12 22:07:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3568,3 +3568,72 @@ int	m_save(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	return 0;
 }
 
+/*
+** Given client cptr and function (enum) decide access.
+** Return 0 for OK, 1 for forbidden.
+*/
+
+/* Note: assumption of oper functions guarded by handler in parse().
+** Note: these #ifdefs mimic 2.10 behaviour; this function, however,
+** is written with O:line permission flags in mind. --B. */
+
+int	is_allowed(aClient *cptr, ACL function)
+{
+	int	ret;
+
+	if (!MyClient(cptr))
+		return 0;
+
+	switch (function)
+	{
+	case ACL_KILL:
+	case ACL_SQUIT:
+	case ACL_CONNECT:
+	case ACL_CLOSE:
+	case ACL_HAZH:
+	case ACL_DNS:
+		ret = 0;
+		break;
+
+#ifdef OPER_REHASH
+	case ACL_REHASH:
+# ifndef LOCOP_REHASH
+		if (IsOper(cptr))
+# endif
+		ret = 0;
+		break;
+#endif
+
+#ifdef OPER_RESTART
+	case ACL_RESTART:
+# ifndef LOCOP_RESTART
+		if (IsOper(cptr))
+# endif
+		ret = 0;
+		break;
+#endif
+
+#ifdef OPER_DIE
+	case ACL_DIE:
+# ifndef LOCOP_DIE
+		if (IsOper(cptr))
+# endif
+		ret = 0;
+		break;
+#endif
+
+#ifdef OPER_SET
+	case ACL_SET:
+# ifndef LOCOP_SET
+		if (IsOper(cptr))
+# endif
+		ret = 0;
+		break;
+#endif
+
+	default:
+		ret = 1;
+	}
+
+	return ret;
+}
