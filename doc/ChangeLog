@@ -1,3 +1,15 @@
+2005-02-20  Piotr Kucharski
+
+	* s_user.c/m_nick(): drop 2.10 related code (introducing new clients
+	  from servers using NICK).
+	* s_user.c/m_user(): drop 2.8 related code (passing new clients info
+	  from servers using USER).
+
+2005-02-19  Piotr Kucharski
+
+	* channel.c/set_mode(): do not rebroadcast +lk if they come from server
+	  and are already set.
+
 2005-02-17  Piotr Kucharski
 
 	* s_conf.c/do_tkline(), m_tkline(): use time_t, not int.
