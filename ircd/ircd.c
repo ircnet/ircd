@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.83 2002/07/05 23:14:06 jv Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.84 2002/07/06 03:12:09 jv Exp $";
 #endif
 
 #include "os.h"
@@ -345,7 +345,7 @@ time_t	currenttime;
 #endif /* TIMEDKLINES */
 			rehashed)
 		    {
-			if (IsPerson(cptr))
+			if (IsPerson(cptr) && !IsKlineExempt(cptr))
 			    {
 				kflag = find_kill(cptr, rehashed, &reason);
 #ifdef R_LINES_OFTEN
