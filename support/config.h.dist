@@ -108,6 +108,9 @@
  */
 #define TKLINE
 
+/* If you want tklines to be limited in time, define this (seconds). */
+/* #define TKLINE_MAXTIME 86400 */
+
 /* 
  * Operator rights can be precisely defined in O:line flags. However
  * if you undefine any of the following, it will make given function
@@ -785,4 +788,8 @@
 
 #if !defined(HELLO_MSG)
 #error HELLO_MSG must be defined
+#endif
+
+#if defined(TKLINE_MAXTIME) && (TKLINE_MAXTIME + 0) == 0
+#undef TKLINE_MAXTIME
 #endif
