@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.140 2004/02/10 02:12:03 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.141 2004/02/11 11:08:34 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3135,8 +3135,8 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 
 	
-		sendto_flag(SCH_DEBUG, "Received EOB for %s (mass)",
-			 acptr->serv->sid);
+		sendto_flag(SCH_DEBUG, "Received EOB for %s [%s] (mass)",
+			 acptr->name, acptr->serv->sid);
 
 		/* SIDLEN + 1 = ",SID" */
 		if (((int) (e - eobbuf)) > eobmaxlen)
