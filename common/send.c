@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.63 2003/10/14 20:19:53 q Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.64 2003/10/14 20:35:15 q Exp $";
 #endif
 
 #include "os.h"
@@ -38,10 +38,10 @@ static  char rcsid[] = "@(#)$Id: send.c,v 1.63 2003/10/14 20:19:53 q Exp $";
 
 static	char	sendbuf[2048];
 
-static void	vsendto_prefix_one(aClient *, aClient *, char *, va_list);
 
 
 #ifndef CLIENT_COMPILE
+static	void	vsendto_prefix_one(aClient *, aClient *, char *, va_list);
 static	char	psendbuf[2048];
 static	int	sentalong[MAXCONNECTIONS];
 #endif
@@ -254,7 +254,7 @@ tryagain:
 }
 #else /* CLIENT_COMPILE */
 {
-	int	rlen = 0, i;
+	int	rlen = 0;
 
 	Debug((DEBUG_SEND,"Sending %s %d [%s] ", to->name, to->fd, msg));
 
@@ -295,7 +295,9 @@ aClient *to;
 {
 	char	*msg;
 	int	len, rlen, more = 0;
+#ifndef CLIENT_COMPILE
 	aClient *bysptr = NULL;
+#endif
 
 	/*
 	** Once socket is marked dead, we cannot start writing to it,

@@ -1,7 +1,9 @@
 2003-10-14  Kurt Roeckx
 
 	* send.c, a_conf.c, c_conf_ext.h, s_serv.c: More warning fixes (from
-	 Robbert Muller)
+	  Robbert Muller)
+	* send.c, ircdwatch.c, a_log.c, mod_rfc931.c, mod_socks.c, chkconf.c:
+	  Even more warning fixes (from Robbert Muller)
 
 2003-10-13  Piotr Kucharski
 

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.19 2003/10/02 22:42:58 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.20 2003/10/14 20:34:28 q Exp $";
 #endif
 
 #include "os.h"
@@ -61,8 +61,11 @@ static	struct	wordcount *files;
 
 int	main(int argc, char *argv[])
 {
+#ifdef DEBUGMODE
 	struct wordcount *filelist = files;
+#endif
 	aConfItem *result;
+
 	if (argc > 1 && !strncmp(argv[1], "-h", 2))
 	{
 		(void)fprintf(stderr, "Usage: %s [-h] [-d[#]] [%s]\n",

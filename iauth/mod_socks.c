@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.31 2002/09/28 21:02:21 jv Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.32 2003/10/14 20:35:16 q Exp $";
 #endif
 
 #include "os.h"
@@ -28,6 +28,8 @@ static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.31 2002/09/28 21:02:21 jv Exp $
 #undef MOD_SOCKS_C
 
 /****************************** PRIVATE *************************************/
+
+int	socks_start(u_int cl);
 
 #define CACHETIME 30
 #define SOCKSPORT 1080
@@ -192,7 +194,7 @@ static int socks_check_cache(u_int cl)
 		cl, cldata[cl].itsip));
 
 	last = &(mydata->cache);
-	while (pl = *last)
+	while ((pl = *last))
 	{
 		DebugLog((ALOG_DSOCKSC, 0, "socks_check_cache(%d): cache %s",
 			cl, pl->ip));
@@ -235,7 +237,9 @@ static int socks_check_cache(u_int cl)
 
 static int socks_write(u_int cl, char *strver)
 {
+#ifdef	INET6
 	struct socks_private *mydata = cldata[cl].instance->data;
+#endif
 	u_char query[22];    /* big enough to hold all queries */
 	int query_len = 13;  /* lenght of socks4 query */
 #ifndef	INET6
@@ -676,7 +680,6 @@ void socks_stats(AnInstance *self)
  */
 int socks_start(u_int cl)
 {
-	struct socks_private *mydata = cldata[cl].instance->data;
 	char *error;
 	int fd;
 

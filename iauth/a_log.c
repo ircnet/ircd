@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_log.c,v 1.8 2002/07/29 21:36:07 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_log.c,v 1.9 2003/10/14 20:35:16 q Exp $";
 #endif
 
 #include "os.h"
@@ -27,7 +27,10 @@ static  char rcsid[] = "@(#)$Id: a_log.c,v 1.8 2002/07/29 21:36:07 chopin Exp $"
 #include "a_externs.h"
 #undef A_LOG_C
 
-static FILE	*debug = NULL, *authlog = NULL;
+#if defined(IAUTH_DEBUG)
+static FILE	*debug = NULL;
+#endif
+static FILE	*authlog = NULL;
 
 void
 init_filelogs()
