@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.6 1997/06/19 15:07:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.7 1997/06/20 15:08:07 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -662,7 +662,7 @@ int	debug;
 		   _CHANNELHASHSIZE, sizeof(aHashEntry) * _CHANNELHASHSIZE);
 	d_db = db = istat.is_dbufnow * sizeof(dbufbuf);
 	db = istat.is_dbufnow * sizeof(dbufbuf);
-	sendto_one(cptr, ":%s %d %s :Dbuf blocks %u(%d) (%u < %u < %u) [%u]",
+	sendto_one(cptr, ":%s %d %s :Dbuf blocks %u(%d) (> %u) (%u < %u) [%u]",
 		   me.name, RPL_STATSDEBUG, nick, istat.is_dbufnow, db,
 		   istat.is_dbuf, istat.is_dbufuse, istat.is_dbufmax,
 		   istat.is_dbufmore);
