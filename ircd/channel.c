@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.68 1998/09/26 02:23:31 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.69 1998/10/08 17:46:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -50,7 +50,7 @@ static	int	check_channelmask __P((aClient *, aClient *, char *));
 static	aChannel *get_channel __P((aClient *, char *, int));
 static	int	set_mode __P((aClient *, aClient *, aChannel *, int *, int,\
 				char **, char *,char *));
-static	void	sub1_from_channel __P((aChannel *));
+static	void	free_channel __P((aChannel *));
 
 static	int	add_modeid __P((int, aClient *, aChannel *, char *));
 static	int	del_modeid __P((int, aChannel *, char *));
@@ -414,7 +414,7 @@ aChannel *chptr;
 				      chptr->users-1);
 #endif
 	if (--chptr->users <= 0)
-		sub1_from_channel(chptr);
+		free_channel(chptr);
 	istat.is_chanusers--;
 }
 
@@ -674,9 +674,13 @@ void	send_channel_modes(cptr, chptr)
 aClient *cptr;
 aChannel *chptr;
 {
+#if 0
+this is probably going to be very annoying, but leaving the following code
+uncommented may just lead to desynchs..
 	if ((*chptr->chname != '#' && *chptr->chname != '!')
 	    || chptr->users == 0) /* channel is empty (locked), thus no mode */
 		return;
+#endif
 
 	if (check_channelmask(&me, cptr, chptr->chname))
 		return;
@@ -1819,55 +1823,54 @@ aChannel *chptr;
 }
 
 /*
-**  The last user has left the channel, free the channel block
+**  The last user has left the channel, free data in the channel block,
+**  and eventually the channel block itself.
 */
-static	void	sub1_from_channel(chptr)
-Reg	aChannel *chptr;
+static	void	free_channel(chptr)
+aChannel *chptr;
 {
 	Reg	Link *tmp;
 	Link	*obtmp;
-	int	len = sizeof(aChannel) + strlen(chptr->chname);
+	int	len = sizeof(aChannel) + strlen(chptr->chname), now = 0;
 
-	/*
-	 * Now, find all invite links from channel structure
-	 */
-	while ((tmp = chptr->invites))
-		del_invite(tmp->value.cptr, chptr);
+        if (chptr->history == 0 || timeofday >= chptr->history)
+		/* no lock, nor expired lock, channel is no more, free it */
+		now = 1;
 
-	tmp = chptr->mlist;
-	while (tmp)
+	if (*chptr->chname != '!' || now)
 	    {
-		obtmp = tmp;
-		tmp = tmp->next;
-		istat.is_banmem -= (strlen(obtmp->value.cp) + 1);
-		istat.is_bans--;
-		MyFree(obtmp->value.cp);
-		free_link(obtmp);
+		while ((tmp = chptr->invites))
+			del_invite(tmp->value.cptr, chptr);
+		
+		tmp = chptr->mlist;
+		while (tmp)
+		    {
+			obtmp = tmp;
+			tmp = tmp->next;
+			istat.is_banmem -= (strlen(obtmp->value.cp) + 1);
+			istat.is_bans--;
+			MyFree(obtmp->value.cp);
+			free_link(obtmp);
+		    }
+		chptr->mlist = NULL;
 	    }
 
-	istat.is_chan--;
-	istat.is_chanmem -= len;
-	if (chptr->history == 0 || timeofday >= chptr->history)
-	    {	/* No lock nor expired lock, we can release the channel */
+	if (now)
+	    {
+		istat.is_chan--;
+		istat.is_chanmem -= len;
 		if (chptr->prevch)
 			chptr->prevch->nextch = chptr->nextch;
 		else
 			channel = chptr->nextch;
 		if (chptr->nextch)
 			chptr->nextch->prevch = chptr->prevch;
-		(void)del_from_channel_hash_table(chptr->chname,chptr);
-		MyFree((char *)chptr);
-	    }
-	else	/* Lock is active */
-	    {
-		/*
-		** make sure adding a ban will work next time,
-		** keep topic (not sent on netjoins)
-		** keep modes for local use (don't send on netjoins!)
-		*/
-		chptr->mlist = NULL;
-		istat.is_hchan++;
-		istat.is_hchanmem += len;
+		del_from_channel_hash_table(chptr->chname, chptr);
+
+		if (*chptr->chname == '!' && close_chid(chptr->chname+1))
+			cache_chid(chptr);
+		else
+			MyFree((char *)chptr);
 	    }
 }
 
@@ -3174,21 +3177,9 @@ time_t	now;
 		if ((chptr->users == 0) && (chptr->history <= now))
 		    {
 			del_ch = chptr;
-			if (del_ch->prevch)
-				chptr = del_ch->prevch->nextch = del_ch->nextch;
-			else
-				chptr = channel = del_ch->nextch;
-			if (del_ch->nextch)
-				del_ch->nextch->prevch = del_ch->prevch;
-			(void)del_from_channel_hash_table(del_ch->chname,del_ch);
-			istat.is_hchan--;
-			istat.is_hchanmem -= sizeof(aChannel) 
-				+ strlen(del_ch->chname);
-			if (*del_ch->chname == '!' &&
-			    close_chid(del_ch->chname+1))
-				cache_chid(del_ch);
-			else
-				MyFree((char *)del_ch);
+
+			chptr = del_ch->nextch;
+			free_channel(del_ch);
 		    }
 		else
 			chptr = chptr->nextch;
