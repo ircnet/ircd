@@ -1,3 +1,10 @@
+2003-02-14  Piotr Kucharski
+
+	* channel.c/match_modeid(): wrong UID ban checks.
+	* channel.c/set_mode(): removing key on channel with no key resulted
+	  in desynch, when combined with other modes after -k (from Grega
+	  Pogacnik).
+
 2003-02-13  Piotr Kucharski
 
 	* match.c/match(): added quick parsing of '*' mask; added '#'

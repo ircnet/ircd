@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.143 2003/02/14 00:27:15 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.144 2003/02/14 23:36:34 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -339,7 +339,7 @@ aChannel *chptr;
 	{
 		if (tmp->flags == type)
 		{
-			if (match(tmp->value.alist->nick, cptr->name) != 0 ||
+			if (match(tmp->value.alist->nick, cptr->name) != 0 &&
 				((isdigit(tmp->value.alist->nick[0]) || 
 				tmp->value.alist->nick[0] == '#') &&
 				match(tmp->value.alist->nick, cptr->user->uid) != 0))
@@ -1265,7 +1265,7 @@ char	*parv[];
 			    }
 			else if (whatt == MODE_DEL)
 			    {
-				if (ischop || IsServer(cptr))
+				if (*mode->key && (ischop || IsServer(cptr)))
 				    {
 					lp = &chops[opcnt++];
 					lp->value.cp = mode->key;
