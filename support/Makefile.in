@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.26 1998/08/05 02:55:42 kalt Exp $
+#*   $Id: Makefile.in,v 1.27 1998/08/08 18:22:53 kalt Exp $
 #*
 #*/
 
@@ -30,7 +30,7 @@ CC = @CC@
 # for the server
 S_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common @IRC_ZLIB_INCLUDE@
 # for the authentication daemon
-A_CFLAGS = @CFLAGS@ -I. -I../iauth -I../common
+A_CFLAGS = @CFLAGS@ -I. -I../iauth -I../common @IRC_ZLIB_INCLUDE@
 # for chkconfig
 CC_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common
 # for the client
