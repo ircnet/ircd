@@ -1,3 +1,10 @@
+2004-10-27  Piotr Kucharski
+
+	* match.c/match(): return NOMATCH for null masks too.
+	* chkconf.c/initconf(): updated I-line flags, added O-line flags.
+	* s_serv.c: change name of dump_sid_map to dump_map_sid.
+	* s_serv.c/dump_map*(): add "mask" parameter to limit output.
+
 2.11.0b15
 
 2004-10-26  Piotr Kucharski
