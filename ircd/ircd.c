@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.62 1999/08/13 17:17:42 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.63 1999/08/15 21:02:53 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -857,6 +857,7 @@ char	*argv[];
 	timeofday = time(NULL);
 	open_debugfile();
 	timeofday = time(NULL);
+	init_sid(NULL);
 	(void)init_sys();
 
 #ifdef USE_SYSLOG
