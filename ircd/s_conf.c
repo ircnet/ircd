@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.20 1997/10/01 17:43:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.21 1997/10/08 23:44:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1228,10 +1228,12 @@ char	**comment;
 	if (*reply)
 		sendto_one(cptr, reply, ME, now, cptr->name);
 	else if (tmp)
-		sendto_one(cptr, ":%s %d %s :%s", ME,
+		sendto_one(cptr, ":%s %d %s :%s%s", ME,
 			   ERR_YOUREBANNEDCREEP, cptr->name,
 			   BadPtr(tmp->passwd) ?
-			   "You are not welcome to this server" : tmp->passwd);
+			   "You are not welcome to this server" :
+			   "You are not welcome to this server: ",
+			   BadPtr(tmp->passwd) ? "" : tmp->passwd);
 
 	if (tmp && !BadPtr(tmp->passwd))
 		*comment = tmp->passwd;
