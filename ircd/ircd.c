@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.129 2004/04/14 21:31:13 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.130 2004/05/16 15:20:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -218,6 +218,9 @@ static	time_t	try_connections(time_t currenttime)
 		/* Also when already connecting! (update holdtimes) --SRB */
 		if (!(aconf->status & (CONF_CONNECT_SERVER|CONF_ZCONNECT_SERVER)))
 			continue;
+		/* Not a candidate for AC */
+		if (aconf->port <= 0)
+			continue;
 		/*
 		** Skip this entry if the use of it is still on hold until
 		** future. Otherwise handle this entry (and set it on hold
@@ -232,8 +235,6 @@ static	time_t	try_connections(time_t currenttime)
 			continue;
 		    }
 		send_ping(aconf);
-		if (aconf->port <= 0)
-			continue;
 
 		cltmp = Class(aconf);
 		confrq = get_con_freq(cltmp);
