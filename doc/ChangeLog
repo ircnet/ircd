@@ -1,3 +1,10 @@
+1999-09-21  Piotr Kucharski
+
+	* channel.c, class.c, parse.c, s_bsd.c, s_conf.c, s_err.c,
+	s_err_ext.h, s_misc.c, s_serv.c, s_service.c, s_user.c,
+	struct_def.h, whowas.c: rewritten to use replies[] table
+	directly, not rpl_str()/err_str().
+
 1999-09-18  Christophe Kalt
 
 	* wrote s_send.c to provide specialized functions equivalent to
