@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.33 1999/01/29 00:00:18 kalt Exp $
+  $Id: INSTALL.txt,v 1.34 1999/02/21 00:36:12 kalt Exp $
 
   This document describes how to install, and configure IRC 2.10.2.
 
@@ -26,13 +26,17 @@
         files will go. It is important to set this properly. (default is
         prefix/sbin)
 
-     ----lliibbddiirr==DDIIRR
-        changes the default directory where most irc files will go.
-        (default is prefix/lib/ircd)
-
      ----llooggddiirr==DDIIRR
         changes the default directory where the irc log files will go.
-        (default is prefix/lib/ircd)
+        (default is prefix/var/log/ircd)
+
+     ----ssyyssccoonnffddiirr==DDIIRR
+        changes the default directory where the irc server configuration
+        files will go. (default is prefix/etc)
+
+     ----llooccaallssttaatteeddiirr==DDIIRR
+        changes the default directory where the irc server state files
+        will go. (default is prefix/var/run)
 
      ----rreessccoonnff==FFIILLEE
         defines the file to be used by ircd to initialize its resolver.
@@ -130,6 +134,7 @@
 
   The LPATH #define should be set to ``/dev/null'' unless you plan to
   debug the ircd program.  Note that the logfile grows very quickly.
+
   Define MPATH to be the path to the ``motd'' (message of the day) file
   for the server.  Keep in mind this is automatically displayed whenever
   anyone signs on to your server.
@@ -191,11 +196,6 @@
   privilidges does not have the power to cause untoward things to occur.
   To further curb the actions of guest operators, LOCAL_KILL_ONLY can be
   defined to only allow locally connected clients to be KILLed.
-
-
-
-
-
   22..99..  ZZIIPP__LLIINNKKSS,, ZZIIPP__LLEEVVEELL
 
   As of the 2.9.3 version of the server, server-server connections may
