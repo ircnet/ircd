@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.130 2002/08/24 01:33:32 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.131 2002/09/08 20:20:45 jv Exp $";
 #endif
 
 #include "os.h"
@@ -3027,6 +3027,7 @@ char	*parv[];
 	if (BadPtr(parv[1]))
 	{
 		Link *lp;
+		int listedchannels = 0;
 		
 		if (!sptr->user)
 		{
@@ -3035,6 +3036,13 @@ char	*parv[];
 			return 2;
 		}
 		
+#ifdef LIST_ALIS_NOTE
+		if (MyConnect(sptr))
+		{
+			sendto_one(sptr, ":%s NOTICE %s :%s", ME, parv[0],
+				LIST_ALIS_NOTE);
+		}
+#endif
 		/* First, show all +s/+p channels user is on */
 		for (lp = sptr->user->channel; lp; lp = lp->next)
 		{
@@ -3044,6 +3052,7 @@ char	*parv[];
 				sendto_one(sptr, replies[RPL_LIST], ME,
 					   BadTo(parv[0]), chptr->chname,
 					   chptr->users, chptr->topic);
+				listedchannels++;
 			}
 		}
 
@@ -3060,8 +3069,21 @@ char	*parv[];
 			sendto_one(sptr, replies[RPL_LIST], ME, BadTo(parv[0]),
 				chptr->chname, chptr->users,
 				chptr->topic);
+			listedchannels++;
 			
 		}
+		
+#ifdef LIST_ALIS_NOTE
+		/* Send second notice if we listed more than 24 channels
+		 * - usual height of irc client in text mode.
+		 */
+		if (MyConnect(sptr) && (listedchannels > 24))
+		{
+			sendto_one(sptr, ":%s NOTICE %s :%s", ME, parv[0],
+				LIST_ALIS_NOTE);
+		}
+#endif
+	
 	}
 	else
 	{

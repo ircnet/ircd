@@ -501,6 +501,12 @@
 /* #undef	NO_IDENT */
 /* #undef	NO_PREFIX */
 
+/* Following notice is sent before and after /LIST output.
+ * If you do not want such behaviour, undefine.
+ */
+#define LIST_ALIS_NOTE "Usage of /list for listing all channels is " \
+		       "deprecated. Please use \"/squery alis help\" instead."
+
 /* ------------------------- END CONFIGURATION SECTION -------------------- */
 #ifndef ENABLE_SUMMON
 #  undef LEAST_IDLE
