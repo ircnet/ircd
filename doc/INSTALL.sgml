@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.67 2004/07/03 16:12:26 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.68 2004/07/13 23:15:15 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -670,24 +670,25 @@ one character in size, can be combined and their order does not matter.
 They define privileges of an operator.
 <itemize>
 <item>L - local operator (disables all remote functions)
-<item>A - enables all flags (except local operator)
-<item>K - allows KILL (local and remote)
-<item>k - allows only local KILL
-<item>S - allows SQUIT (local and remote)
-<item>s - allows only local SQUIT
-<item>C - allows CONNECT (local and remote)
-<item>c - allows only local CONNECT
-<item>l - allows CLOSE
-<item>h - allows HAZH
-<item>d - allows DNS
-<item>r - allows REHASH
-<item>R - allows RESTART
-<item>D - allows DIE
-<item>e - allows SET
-<item>T - allows TKLINE
-<item>&amp; - allows joining &amp;CLIENTS
 <item>P - removes penalty
-<item>T - allows flooding
+<item>p - allows flooding
+<item>&amp; - allows joining &amp;CLIENTS
+<item>A - enables all flags below
+<item>C - allows local and remote CONNECT
+<item>c - allows local CONNECT
+<item>D - allows DIE
+<item>d - allows DNS
+<item>e - allows SET
+<item>h - allows HAZH
+<item>K - allows local and remote KILL
+<item>k - allows local KILL
+<item>l - allows CLOSE
+<item>R - allows RESTART
+<item>r - allows REHASH
+<item>S - allows local and remote SQUIT 
+<item>s - allows local SQUIT
+<item>T - allows TKLINE
+<item>t - enables full TRACE and STATS L
 </itemize>
 ``L'' flag cannot be overridden by other flags.
 If &lt;Flags&gt; field is left empty, no privileges will be granted. 
@@ -697,6 +698,7 @@ There is an OPERATOR at ``orion.cair.du.edu'' that can get
 Operator priviliges if he specifies a password of ``pyunxc''
 and uses a NICKNAME of ``Jeff'' and is granted all possible privileges.
 <tag/Note/ Host NAME accepts IP bitmasks.
+<tag/Note/ Some privileges may be disabled during compilation time in config.h.
 </descrip>
 
 <sect1>Excluded accounts

@@ -1,3 +1,8 @@
+2004-07-13  Piotr Kucharski
+
+	* s_conf.c: move oper flags config.h restrictions from initconf() to
+	  oline_flags_parse(); make flag 'A' equivalent to what's O: in 2.10.
+
 2004-07-12  Piotr Kucharski
 
 	* config_read.c/config_read(): if included file was empty we got core.

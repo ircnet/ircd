@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.67 2004/07/03 16:12:26 chopin Exp $
+  $Id: INSTALL.txt,v 1.68 2004/07/13 23:15:15 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -842,42 +842,44 @@
 
         +o  L - local operator (disables all remote functions)
 
-        +o  A - enables all flags (except local operator)
+        +o  P - removes penalty
 
-        +o  K - allows KILL (local and remote)
-
-        +o  k - allows only local KILL
-
-        +o  S - allows SQUIT (local and remote)
-
-        +o  s - allows only local SQUIT
-
-        +o  C - allows CONNECT (local and remote)
-
-
-        +o  c - allows only local CONNECT
-
-        +o  l - allows CLOSE
-
-        +o  h - allows HAZH
-
-        +o  d - allows DNS
-
-        +o  r - allows REHASH
-
-        +o  R - allows RESTART
-
-        +o  D - allows DIE
-
-        +o  e - allows SET
-
-        +o  T - allows TKLINE
+        +o  p - allows flooding
 
         +o  & - allows joining &CLIENTS
 
-        +o  P - removes penalty
+        +o  A - enables all flags below
 
-        +o  T - allows flooding
+        +o  C - allows local and remote CONNECT
+
+        +o  c - allows local CONNECT
+
+
+        +o  D - allows DIE
+
+        +o  d - allows DNS
+
+        +o  e - allows SET
+
+        +o  h - allows HAZH
+
+        +o  K - allows local and remote KILL
+
+        +o  k - allows local KILL
+
+        +o  l - allows CLOSE
+
+        +o  R - allows RESTART
+
+        +o  r - allows REHASH
+
+        +o  S - allows local and remote SQUIT
+
+        +o  s - allows local SQUIT
+
+        +o  T - allows TKLINE
+
+        +o  t - enables full TRACE and STATS L
 
         ``L'' flag cannot be overridden by other flags.  If <Flags>
         field is left empty, no privileges will be granted.
@@ -892,6 +894,10 @@
 
      NNoottee
         Host NAME accepts IP bitmasks.
+
+     NNoottee
+        Some privileges may be disabled during compilation time in
+        config.h.
 
 
   44..77..  EExxcclluuddeedd aaccccoouunnttss
@@ -1043,6 +1049,7 @@
         functionality.
 
 
+
   44..99..  SSeerrvveerr ccoonnnneeccttiioonnss
 
   How to connect to other servers, How other servers can connect to you
@@ -1107,6 +1114,7 @@
         to.  If ``user@'' prefixes the actual hostname or IP address the
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
+
 
      PPaasssswwoorrdd
         The password of the other host.  A password must always be
@@ -1306,7 +1314,6 @@
      SSeerrvveerr NNaammee
         This field is matched against the server name that the server
         wants to auto connect to.
-
      SSeerrvveerr CCllaassss
         This field is used to match against the class to which belong
         the servers for which an autoconnect is set.
@@ -1373,8 +1380,6 @@
      NNoottee
         It is possible to have and use multiple H-lines (or L-lines) for
         the one server.  eg:
-
-
         H:*.edu:*:*.bu.edu::
         H:*.au:*:*.bu.edu::
 
@@ -1572,8 +1577,6 @@
         unallowed command. Services however, are not affected by flood
         control and can be granted special privileges. It is therefore
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
-
-
   44..1166..  BBoouunnccee sseerrvveerr
 
 
@@ -1638,6 +1641,7 @@
         port 6667.
 
 
+
   55..  RReellaatteedd rreessoouurrcceess
 
 
@@ -1646,6 +1650,7 @@
         trouble running ircd, or wish to discuss the future, you can
         subscribe by sending an email to majordomo@irc.org, with
         ``ssuubbssccrriibbee iirrccdd--uusseerrss'' in the body.
+
         If you just have a question and don't want to subscribe to the
         list, mail to ircd-users@irc.org.  Be sure to indicate which
         version you are using.
@@ -1698,6 +1703,7 @@
 
      FFiixx
         If you have a fix, don't forget to include it.
+
 
 
   66..22..  WWhheerree ttoo sseenndd aa bbuugg rreeppoorrtt

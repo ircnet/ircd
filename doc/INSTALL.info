@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-8189/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-2806/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.67 2004/07/03 16:12:25 chopin Exp $
+     $Id: INSTALL.info,v 1.68 2004/07/13 23:15:15 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -924,41 +924,43 @@ How to become the IRC administrator on your site
      define privileges of an operator.
         * L - local operator (disables all remote functions)
 
-        * A - enables all flags (except local operator)
+        * P - removes penalty
 
-        * K - allows KILL (local and remote)
-
-        * k - allows only local KILL
-
-        * S - allows SQUIT (local and remote)
-
-        * s - allows only local SQUIT
-
-        * C - allows CONNECT (local and remote)
-
-        * c - allows only local CONNECT
-
-        * l - allows CLOSE
-
-        * h - allows HAZH
-
-        * d - allows DNS
-
-        * r - allows REHASH
-
-        * R - allows RESTART
-
-        * D - allows DIE
-
-        * e - allows SET
-
-        * T - allows TKLINE
+        * p - allows flooding
 
         * & - allows joining &CLIENTS
 
-        * P - removes penalty
+        * A - enables all flags below
 
-        * T - allows flooding
+        * C - allows local and remote CONNECT
+
+        * c - allows local CONNECT
+
+        * D - allows DIE
+
+        * d - allows DNS
+
+        * e - allows SET
+
+        * h - allows HAZH
+
+        * K - allows local and remote KILL
+
+        * k - allows local KILL
+
+        * l - allows CLOSE
+
+        * R - allows RESTART
+
+        * r - allows REHASH
+
+        * S - allows local and remote SQUIT
+
+        * s - allows local SQUIT
+
+        * T - allows TKLINE
+
+        * t - enables full TRACE and STATS L
 
      "L" flag cannot be overridden by other flags.  If <Flags> field is
      left empty, no privileges will be granted.
@@ -972,6 +974,10 @@ How to become the IRC administrator on your site
 
 `Note'
      Host NAME accepts IP bitmasks.
+
+`Note'
+     Some privileges may be disabled during compilation time in
+     config.h.
 
 
 
@@ -1795,19 +1801,19 @@ Node: Port connections17827
 Node: Connection Classes19976
 Node: Client connections25103
 Node: Operator priviliges30885
-Node: Excluded accounts34093
-Node: X Excluded accounts38006
-Node: Server connections39296
-Node: Deny auto-connections47926
-Node: Hub connections49495
-Node: Leaf connections50983
-Node: Version limitations53067
-Node: Excluded machines54825
-Node: Service connections56130
-Node: Bounce server57724
-Node: Related resources59585
-Node: Reporting a bug60624
-Node: How to report a bug60881
-Node: Where to send a bug report61892
+Node: Excluded accounts34187
+Node: X Excluded accounts38100
+Node: Server connections39390
+Node: Deny auto-connections48020
+Node: Hub connections49589
+Node: Leaf connections51077
+Node: Version limitations53161
+Node: Excluded machines54919
+Node: Service connections56224
+Node: Bounce server57818
+Node: Related resources59679
+Node: Reporting a bug60718
+Node: How to report a bug60975
+Node: Where to send a bug report61986
 
 End Tag Table
