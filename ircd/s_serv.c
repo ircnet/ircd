@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.211 2004/06/24 17:39:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.212 2004/06/24 17:46:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2479,10 +2479,9 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aConfItem *aconf;
 	aClient *acptr;
 
-	if (parc > 3 && IsLocOp(sptr))
+	if (!is_allowed(sptr, parc > 3 ? ACL_CONNECTREMOTE : ACL_CONNECTLOCAL))
 	    {
-		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
-		return 1;
+		return m_nopriv(cptr, sptr, parc, parv);
 	    }
 
 	if (hunt_server(cptr,sptr,":%s CONNECT %s %s :%s",
