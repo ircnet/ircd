@@ -1313,7 +1313,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.17 1998/02/07 14:21:19 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.18 1998/02/12 20:01:25 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1323,7 +1323,7 @@ IRC_PROG_CC
 AC_PROG_CPP
 AC_PROG_AWK
 IRC_PROG_INSTALL
-AC_PATH_PROGS(SUM, sum cksum, true)
+AC_PATH_PROGS(SUM, md5sum sum cksum, true)
 AC_PROG_GCC_TRADITIONAL
 
 IRC_AIX
