@@ -80,7 +80,7 @@ extern	aConfItem *find_conf_exact __P((char *, char *, char *, int));
 extern	aConfItem *find_conf_host __P((Link *, char *, int));
 extern	aConfItem *find_conf_ip __P((Link *, char *, char *, int));
 extern	aConfItem *find_conf_name __P((char *, int));
-extern	int	find_kill __P((aClient *, int));
+extern	int	find_kill __P((aClient *, int, char **));
 extern	int	find_two_masks __P((char *, char *, int));
 extern	int	find_conf_flags __P((char *, char *, int));
 extern	int	find_restrict __P((aClient *));
