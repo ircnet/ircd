@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.16 1998/06/12 23:28:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.17 1998/06/13 21:08:15 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -642,9 +642,9 @@ char	*buffer, *bufend;
 		return-1;
 	    }
 	if (MyConnect(from) && !IsServer(from) &&
-		(mptr->flags & (MSG_LOP|MSG_OP)))
-		if (!IsOper(from) &&
-		    !((mptr->flags & MSG_LOP) && IsLocOp(from)))
+	    (mptr->flags & (MSG_LOP|MSG_OP)) &&
+	    !((mptr->flags & MSG_OP) && (IsOper(from))) &&
+	    !((mptr->flags & MSG_LOP) && (IsLocOp(from))))
 		    {
 			sendto_one(from, err_str(ERR_NOPRIVILEGES, para[0]));
 			return -1;
