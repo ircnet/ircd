@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.51 2004/06/19 18:07:40 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.52 2004/06/29 00:44:57 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -9,8 +9,6 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* M: requires SID now. Please read INSTALL.txt and example.conf
 	* A: accepts "network name" parameter.
 	* H: can have SID masks to accept. Read docs.
-	* O: and o: in the config has swapped in the meaning, to match
-	  the umode. Update your config.
 	* Nicknames of local clients cannot have [\]{|} chars. Sorry.
 	* Channelnames created on 2.11.0 will have chars {}~\ in their name
 	  automatically converted to []^|. Sorry.
@@ -38,6 +36,7 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* new commands: TKLINE and UNTKLINE.
 	* stats K returns list of klines, stats k list of tklines.
 	* rehash t removes all tklines.
+	* O: have flags now, check INSTALL file for details.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================

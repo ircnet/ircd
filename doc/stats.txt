@@ -1,6 +1,6 @@
   STATS unleashed
   Piotr Kucharski
-  $Id: stats.txt,v 1.2 2004/04/14 14:04:53 chopin Exp $
+  $Id: stats.txt,v 1.3 2004/06/29 00:44:57 chopin Exp $
 
   This document describes all STATS for ircd server 2.11.
 
@@ -73,16 +73,6 @@
      when introducing us to this server (allows masking).
 
 
-     CC -- ccllaassss ssttaattiissttiiccss
-
-
-          Class 0 13
-
-
-
-     There are 13 clients (users, services, servers) using class 0.
-
-
      dd,, DD -- ddeeffiinneess
 
 
@@ -124,6 +114,7 @@
 
         +o  WWD (WRITEWAITDELAY): seconds to wait for write() call to
            complete if stuck
+
         +o  ATO (ACCEPTTIMEOUT): seconds to wait for all auth/dns to
            complete (after that client quits with a ``Ping timeout''
            reason)
@@ -190,6 +181,7 @@
 
         +o  DC (DELAY_CLOSE): seconds to keep too fast reconnecting
            clones delayed before closing their sockets (``-1'' if none)
+
         +o  AC: auto connect status
 
         +o  SS (SPLIT_SERVERS): state of split if number of servers on
@@ -250,18 +242,17 @@
 
 
 
-     2nd field is an IP address, IP mask or CIDR, 3rd is password
-     (disguised by ``*'' if present), 4th is a hostname required to
-     match, 5th is a port this line is valid for, 6th is the class
-     client will be put in and finally 7th field is I-line flags (all
-     explained in the INSTALL file). 2nd and 4th fields can be prefixed
-     by ``user@'', which means ident must match as well.
+     2nd field is an IP address, IP mask or CIDR, 3rd is password (dis-
+     guised by ``*'' if present), 4th is a hostname required to match,
+     5th is a port this line is valid for, 6th is the class client will
+     be put in and finally 7th field is I-line flags (all explained in
+     the INSTALL file). 2nd and 4th fields can be prefixed by ``user@'',
+     which means ident must match as well.
 
 
      kk,, KK -- ddiissaalllloowweedd uusseerr ccoonnnneeccttiioonnss ((aakkaa kkiillll lliinneess))
 
-
-          K pc*.example.org sorry,no,entrance * 0 -1
+     K pc*.example.org sorry,no,entrance * 0 -1
 
 
 
@@ -321,9 +312,9 @@
 
 
      1st is servername (and its socketname), 2nd is sequence number of
-     last udp ping sent, 3rd is number of received answers, 4th is aver-
-     age response time in miliseconds, 5th is preference used in auto-
-     connecting. Only last 20 minutes are remembered.
+     last udp ping sent, 3rd is number of received answers, 4th is
+     average response time in miliseconds, 5th is preference used in
+     autoconnecting. Only last 20 minutes are remembered.
 
 
      PP -- ppoorrttss lliisstteenniinngg
@@ -384,8 +375,6 @@
 
           accepts 1269601 refused 1173948
 
-
-
      Clients accepted and refused.
 
 
@@ -429,22 +418,22 @@
      sec), simply refused.
 
 
-
-     whowas turnover 490/13570/34247 [90]
-     ndelay turnover 8001/46556/195114 [1800]
-     abuse protections 1 strict 1
-     delay close 0 total 996
+          whowas turnover 490/13570/34247 [90]
+          ndelay turnover 8001/46556/195114 [1800]
+          abuse protections 1 strict 1
+          delay close 0 total 996
 
 
 
      Current number of delayed fds and total.
 
 
-          Client - Server
-          connected 58205 1
-          bytes sent 4566999994 30687304
-          bytes recv 376478537 500907236
-          time connected 844868798 367786
+
+     Client - Server
+     connected 58205 1
+     bytes sent 4566999994 30687304
+     bytes recv 376478537 500907236
+     time connected 844868798 367786
 
 
 
@@ -494,15 +483,16 @@
      yy,, YY -- ccllaassss lliinneess
 
 
-          Y 0 300 0 16000 3000000 12.2 24.2
+          Y 0 300 0 16000 3000000 12.2 24.2 13
 
 
 
      2nd field is class number, 3rd is ping frequency, 4th is connect
      frequency (used only by servers), 5th maximum number of clients
      that can attach to this class, 6th is maximum sendQ for each
-     client, 7th defines local limits and 8th field global limits (read
-     the INSTALL file for details).
+     client, 7th defines local limits, 8th field global limits (read the
+     INSTALL file for details) and 9th is number of clients using this Y
+     line.
 
 
      zz,, ZZ -- mmeemmoorryy uussaaggee
@@ -552,11 +542,13 @@
      (ch), all client related items (cl), all configuration lines (co)
      and all dbufs allocated (db).
 
-     TOTAL: 172842930 sbrk(0)-etext: 249755424
+
+          TOTAL: 172842930 sbrk(0)-etext: 249755424
 
 
 
      Total amount of memory used from sbrk() call.
+
 
 
      ?? -- ccoonnnneecctteedd sseerrvveerrss iinnffoo

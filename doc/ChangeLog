@@ -1,3 +1,24 @@
+2004-06-28  Piotr Kucharski
+
+	* s_user.c/is_allowed(): silly bug.
+	* s_user.c/m_kill(): service can be killed, too, format &KILLS message
+	  appropriately.
+	* struct_def.h: SCH_* changed to enum.
+	* send.c/setup_svchans(), send.c/sendto_flag(): adjustments to SCH
+	  being enum (and starting from 0).
+
+2004-06-27  Piotr Kucharski
+
+	* s_serv.c/check_link(): make check_link() accept sptr, not cptr.
+	* s_serv.c/check_link(): free opers from RPL_TRYAGAIN.
+	* s_serv.c/m_stats(): change a little what's subject to RPL_TRYAGAIN
+	  for users (now only stats i c k m t z).
+
+2004-06-26  Piotr Kucharski
+
+	* s_user.c/m_kill(): recent cleaning did too much, we must not cut the
+	  path from remotes.
+
 2004-06-25  Piotr Kucharski
 
 	* config.h.dist, send.c/logfiles_open(): LOGFILES_ALWAYS_CREATE define.
