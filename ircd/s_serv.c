@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.197 2004/06/15 16:19:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.198 2004/06/15 16:34:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2414,12 +2414,6 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 	}
 	
-#ifndef SHOW_INVISIBLE_LUSERS
-	if (!IsOper(sptr))
-	{
-		i_count = 0;
-	}
-#endif
 	sendto_one(sptr, replies[RPL_LUSERCLIENT], ME, BadTo(parv[0]),
 		   c_count + i_count, v_count, s_count);
 	if (o_count)

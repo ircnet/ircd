@@ -79,14 +79,6 @@
 #undef	ENABLE_SUMMON	/* local summon */
 #undef	ENABLE_USERS	/* enables local /users (same as who/finger output) */
 
-/* SHOW_INVISIBLE_LUSERS
- *
- * As defined this will show the correct invisible count for anyone who does
- * LUSERS on your server. On a large net this doesnt mean much, but on a
- * small net it might be an advantage to undefine it.
- */
-#define	SHOW_INVISIBLE_LUSERS
-
 /* NO_DEFAULT_INVISIBLE
  *
  * When defined, your users will not automatically be attributed with user
