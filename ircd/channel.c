@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.154 2003/08/08 21:28:26 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.155 2003/08/08 21:31:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3519,7 +3519,7 @@ char	*parv[];
 			continue;
 		}
 		nlen = strlen(acptr->name);
-		if (nlen > NICKLEN)
+		if (strchr(acptr->name, '.'))
 		{
 			continue;
 		}
