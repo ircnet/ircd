@@ -1,3 +1,11 @@
+1999-07-28  Christophe Kalt
+
+	* struct_def.h: IsChannelName() macro cannot use cid_ok() for the
+	client.
+	
+	* channel.c/m_njoin(): inverse condition prevented modes from
+	being sent to users and 2.9 servers.
+
 1999-07-27  Piotr Kucharski
 
 	* s_id.c/cid_ok(): quite unfortunate typo which made joining
