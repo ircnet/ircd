@@ -61,7 +61,6 @@
 #define MSG_MODE     "MODE"	/* MODE */
 #define MSG_UMODE    "UMODE"	/* UMOD */
 #define MSG_KICK     "KICK"	/* KICK */
-#define	MSG_RECONECT "RECONNECT" /* RECONNECT -> RECO */
 #define MSG_SERVICE  "SERVICE"	/* SERV -> SRVI */
 #define MSG_USERHOST "USERHOST"	/* USER -> USRH */
 #define MSG_ISON     "ISON"	/* ISON */

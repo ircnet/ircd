@@ -35,8 +35,6 @@ EXTERN int check_version __P((aClient *cptr));
 EXTERN int m_server __P((aClient *cptr, aClient *sptr, int parc,
 			 char *parv[]));
 EXTERN int m_server_estab __P((Reg aClient *cptr));
-EXTERN int m_reconnect __P((aClient *cptr, aClient *sptr, int parc,
-			    char *parv[]));
 EXTERN int m_info __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_links __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_summon __P((aClient *cptr, aClient *sptr, int parc,

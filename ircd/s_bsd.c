@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.75 2001/10/20 17:57:28 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.76 2001/12/20 22:42:25 q Exp $";
 #endif
 
 #include "os.h"
@@ -883,14 +883,13 @@ aClient	*cptr;
 			hp = gethost_byname(s, &lin);
 		    }
 	    }
-	return check_server(cptr, hp, c_conf, n_conf, 0);
+	return check_server(cptr, hp, c_conf, n_conf);
 }
 
-int	check_server(cptr, hp, c_conf, n_conf, estab)
+int	check_server(cptr, hp, c_conf, n_conf)
 aClient	*cptr;
 Reg	aConfItem	*n_conf, *c_conf;
 Reg	struct	hostent	*hp;
-int	estab;
 {
 	Reg	char	*name;
 	char	abuff[HOSTLEN+USERLEN+2];
@@ -1028,8 +1027,6 @@ check_serverback:
 
 	Debug((DEBUG_DNS,"sv_cl: access ok: %s[%s]",
 		name, cptr->sockhost));
-	if (estab)
-		return m_server_estab(cptr);
 	return 0;
 }
 
@@ -1089,90 +1086,6 @@ aClient	*cptr;
 	    }
 
 	return (IsDead(cptr)) ? -1 : 0;
-}
-
-int	hold_server(cptr)
-aClient	*cptr;
-{
-	return -1; /* needs to be fixed, don't forget virtual hosts */
-
-#if 0              /* code and variables declarations are removed, this
-		      avoids compiler warnings */
-
-	struct	SOCKADDR_IN	sin;
-	aConfItem	*aconf;
-	aClient	*acptr;
-	int	fd;
-
-#ifdef	ZIP_LINKS
-	/*
-	 * reconnecting will not work with compressed links,
-	 * unless someones fixes reconnect and implements what's needed
-	 * to have it work for compressed links. -krys
-	 */
-	return -1;
-#else
-	if (!IsServer(cptr) ||
-	    !(aconf = find_conf_name(cptr->name, CFLAG)))
-		return -1;
-
-	if (!aconf->port)
-		return -1;
-
-	fd = socket(AFINET, SOCK_STREAM, 0);
-
-	if (fd >= MAXCLIENTS)
-	    {
-		(void)close(fd);
-		sendto_flag(SCH_ERROR,
-			    "Can't reconnect - all connections in use");
-		return -1;
-	    }
-
-	cptr->flags |= FLAGS_HELD;
-	(void)close(cptr->fd);
-	del_fd(cptr->fd, &fdall);
-	del_fd(cptr->fd, &fdas);
-	cptr->fd = -2;
-
-	acptr = make_client(NULL);
-	acptr->fd = fd;
-	acptr->port = aconf->port;
-	set_non_blocking(acptr->fd, acptr);
-	(void)set_sock_opts(acptr->fd, acptr);
-	bzero((char *)&sin, sizeof(sin));
-	sin.SIN_FAMILY = AFINET;
-	sin.SIN_PORT = htons(aconf->port);
-	bcopy((char *)&cptr->ip, (char *)&sin.SIN_ADDR, sizeof(cptr->ip));
-	bcopy((char *)&cptr->ip, (char *)&acptr->ip, sizeof(cptr->ip));
-
-	if (connect(acptr->fd, (SAP)&sin, sizeof(sin)) < 0 &&
-	   errno != EINPROGRESS)
-	    {
-		report_error("Connect to host %s failed: %s", acptr); /*buggy*/
-		(void)close(acptr->fd);
-		MyFree((char *)acptr);
-		return -1;
-	    }
-
-	acptr->status = STAT_RECONNECT;
-	if (acptr->fd > highest_fd)
-		highest_fd = acptr->fd;
-	add_fd(acptr->fd, &fdall);
-	local[acptr->fd] = acptr;
-	acptr->acpt = &me;
-	add_client_to_list(acptr);
-	(void)strcpy(acptr->name, cptr->name);
-	/* broken syntax
-	sendto_one(acptr, "PASS %s %s", aconf->passwd, pass_version);
-	*/
-	sendto_one(acptr, "RECONNECT %s %d", acptr->name, cptr->sendM);
-	sendto_flag(SCH_NOTICE, "Reconnecting to %s", acptr->name);
-	Debug((DEBUG_NOTICE, "Reconnect %s %#x via %#x %d", cptr->name, cptr,
-		acptr, acptr->fd));
-	return 0;
-#endif
-#endif
 }
 
 /*
@@ -1994,8 +1907,7 @@ int	ro;
 #endif
 		for (i = fdp->highest; i >= 0; i--)
 		    {
-			if (!(cptr = local[fd = fdp->fd[i]]) ||
-			    IsLog(cptr) || IsHeld(cptr))
+			if (!(cptr = local[fd = fdp->fd[i]]) || IsLog(cptr))
 				continue;
 			Debug((DEBUG_L11, "fd %d cptr %#x %d %#x %s",
 				fd, cptr, cptr->status, cptr->flags,
@@ -2067,15 +1979,19 @@ int	ro;
 			** If we have anything in the sendQ, check if there is
 			** room to write data.
 			*/
-			if (DBufLength(&cptr->sendQ) || IsConnecting(cptr) ||
+			if (DBufLength(&cptr->sendQ) || 
 #ifdef	ZIP_LINKS
 			    ((cptr->flags & FLAGS_ZIP) &&
 			     (cptr->zip->outcount > 0)) ||
 #endif
-			    IsReconnect(cptr))
+			    IsConnecting(cptr))
+			{
 				if (IsServer(cptr) || IsConnecting(cptr) ||
-				    ro == 0)
-					SET_WRITE_EVENT( fd );
+					ro == 0)
+				{
+					SET_WRITE_EVENT(fd);
+				}
+			}
 		    }
 
 		if (udpfd >= 0)
@@ -2328,8 +2244,6 @@ deadsocket:
 					     (timeconnected % 86400) / 3600,
 					     (timeconnected % 3600)/60, 
 					     timeconnected % 60);
-				if (hold_server(cptr) == 0)
-					continue;
 			    }
 		    }
 		(void)exit_client(cptr, cptr, &me, length >= 0 ?

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.68 2001/10/20 17:57:29 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.69 2001/12/20 22:42:26 q Exp $";
 #endif
 
 #include "os.h"
@@ -1015,52 +1015,6 @@ Reg	aClient	*cptr;
  	    (float) 100*cptr->zip->out->total_out/cptr->zip->out->total_in);
 #endif
 	return 0;
-}
-
-int	m_reconnect(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
-{
-	aConfItem *aconf;
-	aClient	*acptr = NULL;
-	char	*name;
-	int	i;
-
-	if (IsRegistered(sptr))
-		return exit_client(cptr, sptr, &me, "Already registered");
-
-	if (parc < 3)
-		return 1;
-
-	name = parv[1];
-
-	for (i = highest_fd; i >= 0; i--)
-	     {
-		if (!(acptr = local[i]) || !IsHeld(acptr) ||
-		    bcmp((char *)&acptr->ip, (char *)&cptr->ip,
-			 sizeof(acptr->ip)) || mycmp(acptr->name, name))
-			continue;
-		if (!(aconf = find_conf_name(name, CONF_CONNECT_SERVER|
-					     CONF_ZCONNECT_SERVER)) ||
-		    atoi(parv[2]) != acptr->receiveM)
-			break;
-		attach_confs(acptr, name, CONF_SERVER_MASK);
-		acptr->flags &= ~FLAGS_HELD;
-		acptr->fd = cptr->fd;
-		cptr->fd = -2;
-		SetUnknown(acptr);
-		if (check_server(acptr, NULL, NULL, NULL, TRUE) < 0)
-			break;
-		sendto_flag(SCH_NOTICE, "%s has reconnected", 
-			    get_client_name(acptr, TRUE));
-		return exit_client(cptr, sptr, &me, "Reconnected");
-	    }
-	sendto_flag(SCH_NOTICE, "Reconnect from %s failed", 
-		    get_client_name(cptr, TRUE));
-	if (acptr)
-		(void) exit_client(cptr, acptr, &me, "Reconnect failed");
-	return exit_client(cptr, sptr, &me, "Reconnect failed");
 }
 
 /*
@@ -2183,10 +2137,6 @@ char	*parv[];
 					   acptr->serv->by : "*", "*", ME,
 					   acptr->serv->version,
 					   (acptr->flags & FLAGS_ZIP) ?"z":"");			break;
-		case STAT_RECONNECT:
-			sendto_one(sptr, replies[RPL_TRACERECONNECT], ME, BadTo(parv[0]),
-				   class, name);
-			break;
 		case STAT_SERVICE:
 			sendto_one(sptr, replies[RPL_TRACESERVICE], ME, BadTo(parv[0]),
 				   class, name, acptr->service->type,

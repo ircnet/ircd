@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.29 2001/10/20 17:57:29 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.30 2001/12/20 22:42:26 q Exp $";
 #endif
 
 #include "os.h"
@@ -238,7 +238,7 @@ char *	replies[] = {
 /* 207 RPL_TRACESERVICE */	":%s 207 %s Service %d %s 0x%X 0x%X",
 /* 208 RPL_TRACENEWTYPE */	":%s 208 %s <newtype> 0 %s",
 /* 209 RPL_TRACECLASS */	":%s 209 %s Class %d %d",
-/* 210 RPL_TRACERECONNECT */	":%s 210 %s Retry. %d %s",
+/* 210 */ NULL,
 /* 211 RPL_STATSLINKINFO */	(char *)NULL,
 /* 212 RPL_STATSCOMMANDS */	":%s 212 %s %s %u %u %u",
 /* 213 RPL_STATSCLINE */	":%s 213 %s %c %s %s %s %d %d",

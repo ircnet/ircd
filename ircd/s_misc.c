@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.34 2001/10/20 17:57:29 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.35 2001/12/20 22:42:26 q Exp $";
 #endif
 
 #include "os.h"
@@ -366,7 +366,7 @@ char	*comment;	/* Reason for the exit */
 	char	comment1[HOSTLEN + HOSTLEN + 2];
 	int	flags = 0;
 
-	if (MyConnect(sptr) || (sptr->flags & FLAGS_HELD))
+	if (MyConnect(sptr))
 	    {
 		if (sptr->flags & FLAGS_KILLED)
 		    {
@@ -504,7 +504,7 @@ char	*comment;	/* Reason for the exit */
 				    }
 			    }
 		    } /* If (IsServer(sptr)) */
-	    } /* if (MyConnect(sptr) || (sptr->flags & FLAGS_HELD)) */
+	    } /* if (MyConnect(sptr) */
 
  	if (IsServer(sptr) && GotDependantClient(sptr))
  	{

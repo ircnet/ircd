@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.66 2001/12/08 00:41:27 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.67 2001/12/20 22:42:25 q Exp $";
 #endif
 
 #include "os.h"
@@ -319,26 +319,6 @@ time_t	currenttime;
 	return (next);
 }
 
-
-static	void	close_held(cptr)
-aClient	*cptr;
-{
-	Reg	aClient	*acptr;
-	int	i;
-
-	for (i = highest_fd; i >= 0; i--)
-		if ((acptr = local[i]) && (cptr->port == acptr->port) &&
-		    (acptr != cptr) && IsHeld(acptr) &&
-		    !bcmp((char *)&cptr->ip, (char *)&acptr->ip,
-			  sizeof(acptr->ip)))
-		    {
-			(void) exit_client(acptr, acptr, &me,
-					   "Reconnect Timeout");
-			return;
-		    }
-}
-
-
 static	time_t	check_pings(currenttime)
 time_t	currenttime;
 {
@@ -351,8 +331,7 @@ time_t	currenttime;
 
 	for (i = highest_fd; i >= 0; i--)
 	    {
-		if (!(cptr = local[i]) || IsListening(cptr) || IsLog(cptr) ||
-		    IsHeld(cptr))
+		if (!(cptr = local[i]) || IsListening(cptr) || IsLog(cptr))
 			continue;
 
 		/*
@@ -402,15 +381,6 @@ time_t	currenttime;
 		    (!IsRegistered(cptr) &&
 		     (currenttime - cptr->firsttime) >= ping))
 		    {
-			if (IsReconnect(cptr))
-			    {
-				sendto_flag(SCH_ERROR,
-					    "Reconnect timeout to %s",
-					    get_client_name(cptr, TRUE));
-				close_held(cptr);
-				(void)exit_client(cptr, cptr, &me,
-						  "Ping timeout");
-			    }
 			if (!IsRegistered(cptr) && 
 			    (DoingDNS(cptr) || DoingAuth(cptr) ||
 			     DoingXAuth(cptr)))

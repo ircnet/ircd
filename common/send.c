@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.42 2001/10/20 17:57:21 q Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.43 2001/12/20 22:42:24 q Exp $";
 #endif
 
 #include "os.h"
@@ -67,8 +67,6 @@ static	int	dead_link(to, notice)
 aClient *to;
 char	*notice;
 {
-	if (IsHeld(to))
-		return -1;
 	to->flags |= FLAGS_DEADSOCKET;
 	/*
 	 * If because of BUFFERPOOL problem then clean dbufs now so that

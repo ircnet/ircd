@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.28 2001/10/20 17:57:21 q Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.29 2001/12/20 22:42:24 q Exp $";
 #endif
 
 #include "os.h"
@@ -95,7 +95,6 @@ struct Message msgtab[] = {
   { MSG_INFO,    m_info,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_MOTD,    m_motd,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_CLOSE,   m_close,    MAXPARA, MSG_LAG|MSG_REGU|MSG_OP, 0, 0, 0L},
-  { MSG_RECONECT,m_reconnect,MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_SERVICE, m_service,  MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
 #ifdef	USE_SERVICES
   { MSG_SERVSET, m_servset,  MAXPARA, MSG_LAG|MSG_SVC, 0, 0, 0L},

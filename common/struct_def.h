@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.44 2001/12/08 00:49:16 chopin Exp $
+ *   $Id: struct_def.h,v 1.45 2001/12/20 22:42:24 q Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -106,7 +106,6 @@ typedef struct        LineItem aExtData;
 #define	BOOT_STRICTPROT	0x200
 #define	BOOT_NOIAUTH	0x400
 
-#define	STAT_RECONNECT	-7	/* Reconnect attempt for server connections */
 #define	STAT_LOG	-6	/* logfile for -x */
 #define	STAT_MASTER	-5	/* Local ircd master before identification */
 #define	STAT_CONNECTING	-4
@@ -132,7 +131,6 @@ typedef struct        LineItem aExtData;
 #define	IsClient(x)		((x)->status == STAT_CLIENT)
 #define	IsLog(x)		((x)->status == STAT_LOG)
 #define	IsService(x)		((x)->status == STAT_SERVICE && (x)->service)
-#define	IsReconnect(x)		((x)->status == STAT_RECONNECT)
 
 #define	SetMaster(x)		((x)->status = STAT_MASTER)
 #define	SetConnecting(x)	((x)->status = STAT_CONNECTING)
@@ -169,7 +167,6 @@ typedef struct        LineItem aExtData;
 #define	FLAGS_ZIP      0x400000 /* link is zipped */
 #define	FLAGS_ZIPRQ    0x800000 /* zip requested */
 #define	FLAGS_ZIPSTART 0x1000000 /* start of zip (ignore any CRLF) */
-#define	FLAGS_HELD     0x8000000 /* connection held and reconnect try */
 
 #define	FLAGS_OPER       0x0001	/* Operator */
 #define	FLAGS_LOCOP      0x0002 /* Local operator -- SRB */
@@ -198,7 +195,6 @@ typedef struct        LineItem aExtData;
 #define	IsListening(x)		((x)->flags & FLAGS_LISTEN)
 #define	IsLocal(x)		(MyConnect(x) && (x)->flags & FLAGS_LOCAL)
 #define	IsDead(x)		((x)->flags & FLAGS_DEADSOCKET)
-#define	IsHeld(x)		((x)->flags & FLAGS_HELD)
 #define	CBurst(x)		((x)->flags & FLAGS_CBURST)
 
 #define	SetOper(x)		((x)->user->flags |= FLAGS_OPER)
@@ -396,7 +392,7 @@ struct	Server	{
 				** Note: The size of this depends on the 
 				** on idtol(), with n set to SIDLEN.
 				*/
-	char	sid[SIDLEN + 1]	/* The Server ID. */
+	char	sid[SIDLEN + 1];/* The Server ID. */
 	u_int	sidhashv;	/* Raw hash value. */
 	aServer	*sidhnext;	/* Next server in the sid hash. */
 	time_t	lastload;	/* penalty like counters, see s_serv.c

@@ -48,9 +48,7 @@ EXTERN void write_pidfile();
 EXTERN int check_client __P((Reg aClient *cptr));
 EXTERN int check_server_init __P((aClient *cptr));
 EXTERN int check_server __P((aClient *cptr, Reg struct hostent *hp,
-			     Reg aConfItem *c_conf, Reg aConfItem *n_conf,
-			     int estab));
-EXTERN int hold_server __P((aClient *cptr));
+			     Reg aConfItem *c_conf, Reg aConfItem *n_conf));
 EXTERN void close_connection __P((aClient *cptr));
 EXTERN int get_sockerr __P((aClient *cptr));
 EXTERN void set_non_blocking __P((int fd, aClient *cptr));
