@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.38 1998/09/12 23:01:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.39 1998/09/13 16:47:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1481,7 +1481,11 @@ int	fd;
 
 		if (getpeername(fd, (SAP)&addr, &len) == -1)
 		    {
-			report_error("Failed in connecting to %s :%s", cptr);
+#if defined(linux)
+			if (errno != ENOTCONN)
+#endif
+				report_error("Failed in connecting to %s :%s",
+					     cptr);
 add_con_refuse:
 			ircstp->is_ref++;
 			acptr->fd = -2;
