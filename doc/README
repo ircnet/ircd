@@ -1,4 +1,4 @@
-# @(#)$Id: README,v 1.3 1997/07/26 20:28:19 kalt Exp $
+# @(#)$Id: README,v 1.4 1998/09/24 17:45:18 kalt Exp $
 
 This directory contains the documentation related to this package.
 
@@ -17,15 +17,19 @@ example.conf	- server configuration example file (useful complement to
 Other files of interest:
 
 ChangeLog	- log of source changes
-2.9-New		- transition documentation from 2.8 to 2.9 version
+BUGS		- list of known bugs
+2.10-New	- transition documentation from 2.9 to 2.10 version
 Etiquette	- IRC Etiquette
 irc.1		- man page for the client
-Nets/		- documentation about various IRC networks
 ircd.8		- man page for the server
+iauth.8		- man page for iauth
+iauth.conf.5	- man page for the iauth.conf file
 Authors		- irc contributors
+Nets/		- documentation about various IRC networks
 Juped/		- old/obsolete documentation files
 alt-irc-faq	- alt.irc faq
 m4macros	- note on m4 macros for the server configuration file
+2.9-New		- old transition documentation from 2.8 to 2.9 version
 
 
 

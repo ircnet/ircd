@@ -1,3 +1,33 @@
+2.10.0
+
+Wed Sep 23 19:55:14 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* configure.in, os.h: don't trust poll() to work if it exists.
+	
+	* channel.c:
+		* removed FULLV2_10 ifdef's
+		* don't send empty NJOIN in m_njoin() (Reported by Beeth).
+	
+	* channel.c, s_debug.c, config.h.dist: removed MIRC_KLUDGE.
+
+	* chkconf.c: added warning about old V line format.
+
+	* config.h.dist: OPER_DIE is now defined by default.
+
+	* s_user.c: reverted last change, and hostnames are now truncated.
+
+	* os.h: preprocessor syntax fix.
+
+	* s_conf.c: stupid typo in match_ipmask().
+
+	* s_auth.c: added a new debugging notice.
+
+	* s_debug.c: flags update.
+
+	* ircd.c:
+		* added some debugging info in restart notice.
+		* changed strdup() in mystrdup() (from Andrew Snare).
+
 Sun Sep 20 15:22:25 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* os.h, configure.in: configure now checks for poll() existence to

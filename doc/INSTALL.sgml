@@ -4,9 +4,9 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.29 1998/09/14 11:44:51 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.30 1998/09/24 17:45:17 kalt Exp $
 <abstract>
-This document describes how to install, and configure IRC 2.9.5.
+This document describes how to install, and configure IRC 2.10.
 </abstract>
 
 <sect>Installing IRC.
@@ -24,6 +24,9 @@ change the default behaviour:
 <tag/--prefix=DIR/ changes the default directory into which
 ircd will install using ``make install''.  This defaults
 to /usr/local
+<tag/--sbindir=DIR/ changes the default directory where the
+system admin executable files will go. It is important to
+set this properly. (default is prefix/sbin)
 <tag/--libdir=DIR/ changes the default directory where most
 irc files will go. (default is prefix/lib/ircd)
 <tag/--logdir=DIR/ changes the default directory where the
@@ -1308,12 +1311,57 @@ ircd-users</bf>'' in the body.
 <p>
 If you just have a question and don't want to subscribe to
 the list, mail to <htmlurl url="mailto:ircd-users@stealth.net"
-name="ircd-users@stealth.net">
+name="ircd-users@stealth.net">.  Be sure to indicate which
+version you are using.
+<tag/Development/ Technical discussions and development are
+carried on ircd-dev@stealth.net.  People interested in very
+early testing, and/or working on the source code are
+welcome.  This is done by sending an email to <htmlurl
+url="mailto:majordomo@stealth.net"
+name="majordomo@stealth.net">, with ``<bf>subscribe
+ircd-dev</bf>'' in the body.
 <tag/FAQ/ It can be found on the WWW, at <url
 url="http://www.stealth.net/~kalt/irc/faq.html">.
 <tag/WWW 2.9/ Vesa Ruokonen has also put serveral pages
 related to the 2.9 servers on the WWW: <url
 url="http://www.irc.org/~irc/server/">.
 </descrip>
+
+<sect>Reporting a bug
+<p>
+If you encounter a bug in the software, here is how and
+where to report it.
+
+<sect1>How to report a bug
+<p>
+To save everyone time, make sure that your e-mail contains
+all the information related to your problem.  In particular,
+we need to know:
+<descrip>
+<tag/Package version/
+The IRC software version you are using: please include the
+output obtained by running ``irc -v'' for the client, and/or
+``ircd -v'' for the server.
+<p>
+Also, let us know if you have applied any patch to the
+package or if it is the vanilla version.
+<tag/OS/
+Please, indicate which OS version you are running.
+<tag/Configuration/
+If it is related to a configuration problem with the server,
+include the relevant parts of the configuration file.
+<tag/Backtrace/
+If the bug results in a crash, please include the
+backtrace.  (This can be done, for example, by running
+``gdb'' on the core file, and typing ``where'').
+<tag/Fix/
+If you have a fix, don't forget to include it.
+</descrip>
+
+<sect1>Where to send a bug report
+<p>
+Reports should be sent to <htmlurl url="mailto:ircd-bugs@stealth.net"
+name="ircd-bugs@stealth.net">.  Your report will be reviewed
+and forwarded to the appropriate mailing list.
 
 </article>

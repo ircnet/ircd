@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info28572tmp2.
+input file /tmp/sgml2info3232tmp2.
 
    \input texinfo
 
@@ -10,9 +10,9 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.29 1998/09/14 11:44:50 kalt Exp $
+     $Id: INSTALL.info,v 1.30 1998/09/24 17:45:16 kalt Exp $
 
-   This document describes how to install, and configure IRC 2.9.5.
+   This document describes how to install, and configure IRC 2.10.
 
 * Menu:
 
@@ -21,6 +21,7 @@ Installing IRC - The Internet Relay Chat Program
 * Editing the Makefile and compiling::
 * The ircd-conf file::
 * Related resources::
+* Reporting a bug::
 
 
 File: INSTALL.info,  Node: Installing IRC-,  Next: The config-h file,  Prev: Top,  Up: Top
@@ -50,6 +51,11 @@ default behaviour:
 `--prefix=DIR'
      changes the default directory into which ircd will install using
      "make install".  This defaults to /usr/local
+
+`--sbindir=DIR'
+     changes the default directory where the system admin executable
+     files will go. It is important to set this properly. (default is
+     prefix/sbin)
 
 `--libdir=DIR'
      changes the default directory where most irc files will go.
@@ -1595,7 +1601,7 @@ Default local server (for local clients) `*OBSOLETED*'
      If the port number is omitted, irc will default to using 6667.
 
 
-File: INSTALL.info,  Node: Related resources,  Prev: The ircd-conf file,  Up: Top
+File: INSTALL.info,  Node: Related resources,  Next: Reporting a bug,  Prev: The ircd-conf file,  Up: Top
 
 Related resources
 *****************
@@ -1606,7 +1612,13 @@ Related resources
      sending an email to , with "`subscribe ircd-users"' in the body.
 
      If you just have a question and don't want to subscribe to the
-     list, mail to
+     list, mail to .  Be sure to indicate which version you are using.
+
+`Development'
+     Technical discussions and development are carried on
+     ircd-dev@stealth.net.  People interested in very early testing,
+     and/or working on the source code are welcome.  This is done by
+     sending an email to , with "`subscribe ircd-dev"' in the body.
 
 `FAQ'
      It can be found on the WWW, at .
@@ -1615,45 +1627,102 @@ Related resources
      Vesa Ruokonen has also put serveral pages related to the 2.9
      servers on the WWW: .
 
+
+File: INSTALL.info,  Node: Reporting a bug,  Prev: Related resources,  Up: Top
+
+Reporting a bug
+***************
+
+   If you encounter a bug in the software, here is how and where to
+report it.
+
+* Menu:
+
+* How to report a bug::
+* Where to send a bug report::
+
+
+File: INSTALL.info,  Node: How to report a bug,  Next: Where to send a bug report,  Up: Reporting a bug
+
+How to report a bug
+===================
+
+   To save everyone time, make sure that your e-mail contains all the
+information related to your problem.  In particular, we need to know:
+`Package version'
+     The IRC software version you are using: please include the output
+     obtained by running "irc -v" for the client, and/or "ircd -v" for
+     the server.
+
+     Also, let us know if you have applied any patch to the package or
+     if it is the vanilla version.
+
+`OS'
+     Please, indicate which OS version you are running.
+
+`Configuration'
+     If it is related to a configuration problem with the server,
+     include the relevant parts of the configuration file.
+
+`Backtrace'
+     If the bug results in a crash, please include the backtrace.
+     (This can be done, for example, by running "gdb" on the core file,
+     and typing "where").
+
+`Fix'
+     If you have a fix, don't forget to include it.
+
+
+File: INSTALL.info,  Node: Where to send a bug report,  Prev: How to report a bug,  Up: Reporting a bug
+
+Where to send a bug report
+==========================
+
+   Reports should be sent to .  Your report will be reviewed and
+forwarded to the appropriate mailing list.
+
 
 
 Tag Table:
-Node: Top123
-Node: Installing IRC-610
-Node: The configure script801
-Node: Notes for Cygwin32 users2627
-Node: The config-h file3519
-Node: Define what type of UNIX your machine uses-4191
-Node: DEBUGMODE4591
-Node: CPATH MPATH LPATH PPATH TPATH QPATH OPATH5255
-Node: CACHED_MOTD6483
-Node: CHROOTDIR6959
-Node: ENABLE_SUMMON ENABLE_USERS7283
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7819
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY8502
-Node: ZIP_LINKS ZIP_LEVEL9134
-Node: SLOW_ACCEPT10145
-Node: CLONE_CHECK10763
-Node: Other #define's11103
-Node: Editing the Makefile and compiling11428
-Node: The ircd-conf file12068
-Node: Machine information14100
-Node: Administrative info16196
-Node: Port connections18231
-Node: Connection Classes20441
-Node: Client connections25892
-Node: Operator priviliges31405
-Node: Restrict connections33525
-Node: Excluded accounts34840
-Node: Server connections38806
-Node: Deny auto-connections47245
-Node: Hub connections48618
-Node: Leaf connections49834
-Node: Version limitations51917
-Node: Excluded machines53633
-Node: Service connections54940
-Node: Bounce server56533
-Node: Default local server (for local clients) `*OBSOLETED*'58235
-Node: Related resources59118
+Node: Top122
+Node: Installing IRC-628
+Node: The configure script819
+Node: Notes for Cygwin32 users2819
+Node: The config-h file3711
+Node: Define what type of UNIX your machine uses-4383
+Node: DEBUGMODE4783
+Node: CPATH MPATH LPATH PPATH TPATH QPATH OPATH5447
+Node: CACHED_MOTD6675
+Node: CHROOTDIR7151
+Node: ENABLE_SUMMON ENABLE_USERS7475
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE8011
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY8694
+Node: ZIP_LINKS ZIP_LEVEL9326
+Node: SLOW_ACCEPT10337
+Node: CLONE_CHECK10955
+Node: Other #define's11295
+Node: Editing the Makefile and compiling11620
+Node: The ircd-conf file12260
+Node: Machine information14292
+Node: Administrative info16388
+Node: Port connections18423
+Node: Connection Classes20633
+Node: Client connections26084
+Node: Operator priviliges31597
+Node: Restrict connections33717
+Node: Excluded accounts35032
+Node: Server connections38998
+Node: Deny auto-connections47437
+Node: Hub connections48810
+Node: Leaf connections50026
+Node: Version limitations52109
+Node: Excluded machines53825
+Node: Service connections55132
+Node: Bounce server56725
+Node: Default local server (for local clients) `*OBSOLETED*'58427
+Node: Related resources59310
+Node: Reporting a bug60252
+Node: How to report a bug60512
+Node: Where to send a bug report61525
 
 End Tag Table

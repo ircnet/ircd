@@ -1,8 +1,8 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.29 1998/09/14 11:44:51 kalt Exp $
+  $Id: INSTALL.txt,v 1.30 1998/09/24 17:45:17 kalt Exp $
 
-  This document describes how to install, and configure IRC 2.9.5.
+  This document describes how to install, and configure IRC 2.10.
 
   11..  IInnssttaalllliinngg IIRRCC..
 
@@ -20,6 +20,11 @@
      ----pprreeffiixx==DDIIRR
         changes the default directory into which ircd will install using
         ``make install''.  This defaults to /usr/local
+
+     ----ssbbiinnddiirr==DDIIRR
+        changes the default directory where the system admin executable
+        files will go. It is important to set this properly. (default is
+        prefix/sbin)
 
      ----lliibbddiirr==DDIIRR
         changes the default directory where most irc files will go.
@@ -54,6 +59,9 @@
      ----wwiitthhoouutt--zzlliibb
         tells ``configure'' not to look for the zlib.  Defining this
         will keep you from using server link compression.
+
+
+
 
 
   11..22..  NNootteess ffoorr CCyyggwwiinn3322 uusseerrss
@@ -122,12 +130,8 @@
   Define QPATH to be the directory path to the ``iauth.conf'' file. This
   path is usually /usr/local/lib/ircd/iauth.conf.  The format of this
   file is described by a manual page.
-
   The OPATH #define should be set to ``/dev/null'' unless you plan to
   debug the iauth program.  Note that the logfile grows very quickly.
-
-
-
 
 
   22..44..  CCAACCHHEEDD__MMOOTTDD
@@ -328,6 +332,7 @@
         If the machine on which you run the server has several IP
         addresses, you can define which IP# to use for outgoing
         connections.  This overrides overrides the ``Server NAME''.
+
         See Also the ``Port Connections'' section.
 
      GGeeooggrraapphhiicc LLooccaattiioonn
@@ -455,7 +460,6 @@
      is decoded and compared segment by segment. Thus
 
      P:::128.2*.1.2:6664:
-
      will not match 128.20.1.2.
 
      PPoorrtt
@@ -525,7 +529,6 @@
         is still alive.  Unless you are sure of what you are doing, use
         the default value which is in your config.h file.
 
-
      CCoonnnneecctt FFrreeqquueennccyy
         By changing this number, you change how often your server checks
         to see if it can connect to this server. If you want to check
@@ -592,6 +595,7 @@
         checked every 300 seconds.  The connection is allowed to remain
         silent for 120 seconds before a PING is sent.  NOTE: fields 3 &
         4 are in seconds.  The SendQ is set to 100000 bytes.
+
         Another feature of connection class is the ability to do
         automatic routing by using the class as a ``priority''.  If you
         are connected to a server which has a class lower than one of
@@ -654,10 +658,10 @@
         ident server be the same as the one given before the ``@''.
         Wildcards are permitted unless using a bitmask (e.g.
         1.2.3.0/24).
-
      PPaasssswwoorrdd
         The password that must be given by the client to be allowed on
         the server.
+
      TTAARRGGEETT HHoosstt NNAAMMEE
         Specifies the host name(s) of the machines allowed to connect to
         the server.  If ``user@'' prefixes the actual IP address the
@@ -724,6 +728,7 @@
         and take your network ports. Of course the same things can be
         done by simply telnetting to your machine's SMTP port (for
         example).
+
         I:x::*.fi:6667:1
 
         Allow clients from machines matching ``*.fi'' to connect on the
@@ -849,6 +854,7 @@
         connecting from.  If you wanted to restrict connects to IRC from
         ``orion.cair.du.edu'' then you would want to enter
         ``orion.cair.du.edu''.
+
 
      PPrrooggrraamm
         This is the external program to run to know if the user is
@@ -987,7 +993,6 @@
 
   +o  ``garfield.mit.edu''        - Tertiary Connection
 
-
   +o  ``irc.nada.kth.se''         - Secondary Connection
 
   +o  ``nic.funet.fi''            - Primary Connection
@@ -1049,7 +1054,6 @@
         it.  If you were connecting to nic.funet.fi you would receive
         ``nic.funet.fi'' and that is what you should place in this
         field.
-
      TTAARRGGEETT PPOORRTT
         The INTERNET Port that you want to connect to on the TARGET
         machine. Most of the time this will be set to ``6667''.  If this
@@ -1245,6 +1249,9 @@
         the network.
 
 
+
+
+
   44..1111..  HHuubb ccoonnnneeccttiioonnss
 
 
@@ -1316,7 +1323,6 @@
         If, for example, the leaf server connects to another server
         which doesnt have an L-line for it, the one which does will drop
         the connection, once again making the server a leaf.
-
 
      FFoorrmmaatt
 
@@ -1449,7 +1455,6 @@
         Services are not intended for interactive usage, and are better
         suited for automated clients.
 
-
      FFoorrmmaatt
 
         S:<TARGET Host Mask>:<Password>:<Service Name>:<Service Type>:<Class>
@@ -1577,68 +1582,63 @@
         ``ssuubbssccrriibbee iirrccdd--uusseerrss'' in the body.
 
         If you just have a question and don't want to subscribe to the
-        list, mail to ircd-users@stealth.net
+        list, mail to ircd-users@stealth.net.  Be sure to indicate which
+        version you are using.
+
+     DDeevveellooppmmeenntt
+        Technical discussions and development are carried on ircd-
+        dev@stealth.net.  People interested in very early testing,
+        and/or working on the source code are welcome.  This is done by
+        sending an email to majordomo@stealth.net, with ``ssuubbssccrriibbee
+        iirrccdd--ddeevv'' in the body.
 
      FFAAQQ
         It can be found on the WWW, at
         <http://www.stealth.net/~kalt/irc/faq.html>.
+
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
 
 
+  66..  RReeppoorrttiinngg aa bbuugg
+
+  If you encounter a bug in the software, here is how and where to
+  report it.
 
 
+  66..11..  HHooww ttoo rreeppoorrtt aa bbuugg
+
+  To save everyone time, make sure that your e-mail contains all the
+  information related to your problem.  In particular, we need to know:
+
+     PPaacckkaaggee vveerrssiioonn
+        The IRC software version you are using: please include the
+        output obtained by running ``irc -v'' for the client, and/or
+        ``ircd -v'' for the server.
+
+        Also, let us know if you have applied any patch to the package
+        or if it is the vanilla version.
+
+     OOSS Please, indicate which OS version you are running.
+
+     CCoonnffiigguurraattiioonn
+        If it is related to a configuration problem with the server,
+        include the relevant parts of the configuration file.
+
+     BBaacckkttrraaccee
+        If the bug results in a crash, please include the backtrace.
+        (This can be done, for example, by running ``gdb'' on the core
+        file, and typing ``where'').
+
+     FFiixx
+        If you have a fix, don't forget to include it.
 
 
+  66..22..  WWhheerree ttoo sseenndd aa bbuugg rreeppoorrtt
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  Reports should be sent to ircd-bugs@stealth.net.  Your report will be
+  reviewed and forwarded to the appropriate mailing list.
 
 
 
