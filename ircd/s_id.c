@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.18 2001/12/30 05:38:36 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.19 2001/12/30 07:24:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -71,7 +71,7 @@ static unsigned int alphabet_id[256] =
 */
 char *ltoid(long l, int n)
 {
-static	char	idrpl[NICKLEN+1]; /* Currently nothing longer should be used. */
+static	char	idrpl[UIDLEN+1]; /* Currently nothing longer should be used. */
 	int	i = n - 1;
 
 	if (n > sizeof(idrpl))
@@ -267,12 +267,12 @@ void init_sid(char *conf)
 
 char * next_uid()
 {
-static	char	uid[NICKLEN+1+5];
+static	char	uid[UIDLEN+1+5];	/* why +5? --Beeth */
 static	long	curr_cid = 0;
 
 	do
 	{
-		sprintf(uid, "%s%s", me.serv->sid, ltoid(curr_cid, NICKLEN-SIDLEN));
+		sprintf(uid, "%s%s", me.serv->sid, ltoid(curr_cid, UIDLEN-SIDLEN));
 		curr_cid++;
 
 		/* 
@@ -285,7 +285,7 @@ static	long	curr_cid = 0;
 		** This pow() should probably be removed, and use some contant
 		** instead.
 		*/
-		if (curr_cid > pow(CHIDNB, (NICKLEN-SIDLEN)))
+		if (curr_cid > pow(CHIDNB, (UIDLEN-SIDLEN)))
 		{
 			curr_cid = 0;
 		}
@@ -303,9 +303,9 @@ int
 check_uid(uid)
 char *uid;
 {
-	if (isdigit(uid[0]) && strlen(uid) == NICKLEN)
+	if (isdigit(uid[0]) && strlen(uid) == UIDLEN)
 	{
-		return cid_ok(uid, NICKLEN - 1);
+		return cid_ok(uid, UIDLEN - 1);
 	}
 	/*
 	 * need to check for sid collisions.. ick, how?

@@ -544,15 +544,15 @@
 
 #if defined(CLIENT_FLOOD)
 # if	(CLIENT_FLOOD > 8000) || (CLIENT_FLOOD < 512)
-error CLIENT_FLOOD needs redefining.
+#error CLIENT_FLOOD needs redefining.
 # endif
 #else
-error CLIENT_FLOOD undefined
+#error CLIENT_FLOOD undefined
 #endif
 
 #if defined(ZIP_LINKS)
 # if	(ZIP_MINIMUM > ZIP_MAXIMUM)
-error ZIP_MINIMUM needs redefining.
+#error ZIP_MINIMUM needs redefining.
 # endif
 #endif
 
@@ -572,7 +572,7 @@ error ZIP_MINIMUM needs redefining.
 
 #if ! USE_POLL
 # if (MAXCONNECTIONS > FD_SETSIZE)
-error FD_SETSIZE must be bigger than MAXCONNECTIONS
+#error FD_SETSIZE must be bigger than MAXCONNECTIONS
 # endif
 #endif
 
@@ -601,7 +601,7 @@ error FD_SETSIZE must be bigger than MAXCONNECTIONS
 **
 */
 #if defined(R_LINES_OFTEN) && !defined(TIMEDKLINES)
-error TIMEDKLINES must be defined for R_LINES_OFTEN to work (are you sure you need them?)
+#error TIMEDKLINES must be defined for R_LINES_OFTEN to work (are you sure you need them?)
 #endif
 
 /*
@@ -609,3 +609,11 @@ error TIMEDKLINES must be defined for R_LINES_OFTEN to work (are you sure you ne
 */
 #define	NOWRITEALARM	1
 
+/* safety checks */
+# if	(UIDLEN > NICKLEN)
+#error UIDLEN must not be bigger than NICKLEN
+# endif
+
+# if	(UIDLEN <= SIDLEN)
+#error UIDLEN must be bigger than SIDLEN
+# endif

@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.48 2001/12/29 20:54:06 q Exp $
+ *   $Id: struct_def.h,v 1.49 2001/12/30 07:24:08 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -47,6 +47,7 @@ typedef struct        LineItem aExtData;
 				** This preserves compatibility with old
 				** servers --msa
 				*/
+#define UIDLEN		9	/* must not be less than NICKLEN --Beeth */
 #define	USERLEN		10
 #define	REALLEN	 	50
 #define	TOPICLEN	80
@@ -368,7 +369,7 @@ struct	User	{
 	aClient	*uhnext;
 	aClient	*bcptr;
 	char	username[USERLEN+1];
-	char	uid[NICKLEN+1];
+	char	uid[UIDLEN+1];
 	char	host[HOSTLEN+1];
 	char	*server;
 	char	sip[40];	/* ip as a string, big enough for ipv6 */
