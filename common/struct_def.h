@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.65 2002/11/24 15:28:21 jv Exp $
+ *   $Id: struct_def.h,v 1.66 2002/12/28 21:18:31 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -933,3 +933,14 @@ typedef	struct	Ignore {
  */
 #define CHIDNB 36
 
+
+/* Defines used for SET command */
+#define TSET_ACONNECT 0x001
+#define TSET_POOLSIZE 0x002
+#define TSET_SHOWALL (int) ~0
+
+/* Runtime onfiguration structure */
+typedef struct
+{
+	int aconnect;	/* 1 - ON 0 - OFF */
+} iconf_t;
