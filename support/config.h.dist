@@ -425,6 +425,11 @@
 /* #define XLINE_EXIT_REASON "X-denied user" */
 #define XLINE_EXIT_REASON "Too many host connections (global)"
 
+/*
+** Define this to whatever you want to see after successful OPER
+*/
+#define TXT_YOUREOPER "You are now an IRC Operator"
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */

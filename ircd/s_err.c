@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.53 2004/06/24 17:16:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.54 2004/06/30 19:44:22 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -413,7 +413,7 @@ char *	replies[] = {
 /* 378 */ (char *)NULL,
 /* 379 */ (char *)NULL,
 /* 380 */ (char *)NULL,
-/* 381 RPL_YOUREOPER */	":%s 381 %s :You are now an IRC Operator",
+/* 381 RPL_YOUREOPER */	":%s 381 %s :" TXT_YOUREOPER,
 /* 382 RPL_REHASHING */	":%s 382 %s %s :Rehashing",
 /* 383 RPL_YOURESERVICE */	":%s 383 %s :You are service %s",
 /* 384 RPL_MYPORTIS */	":%s 384 %s %d :Port to local server is\r\n",
