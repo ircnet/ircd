@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.22 1998/01/23 13:28:12 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.23 1998/01/23 13:40:26 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -941,8 +941,15 @@ char	*parv[], *mbuf, *pbuf;
 				Reg	u_char	*s;
 
 				for (s = (u_char *)*parv; *s; )
-					*s++ &= 0x7f;
+					if (*s > 0x7f)
+						if (*s > 0xa0)
+							*s++ &= 0x7f;
+						else
+							*s = '\0';
 			}
+
+			if (!**parv)
+				break;
 			*parv = check_string(*parv);
 			if (opcnt >= MAXMODEPARAMS)
 #ifndef V29PlusOnly
