@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.262 2005/01/30 17:56:32 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.263 2005/02/08 00:14:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2672,7 +2672,7 @@ static	void	trace_one(aClient *sptr, aClient *acptr)
 	int class;
 	char *to;
 
-	/* to = ST_UID(acptr) && HasUID(sptr) ? sptr->user->uid : sptr->name; */
+	/* to = ST_UID(acptr) && sptr->user ? sptr->user->uid : sptr->name; */
 	to = sptr->name;
 	name = get_client_name(acptr, FALSE);
 	class = get_client_class(acptr);

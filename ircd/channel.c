@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.247 2005/02/06 23:28:09 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.248 2005/02/08 00:14:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -905,7 +905,7 @@ void	send_channel_members(aClient *cptr, aChannel *chptr)
 	for (lp = chptr->members; lp; lp = lp->next)
 	    {
 		c2ptr = lp->value.cptr;
-		p = (ST_UID(cptr) && HasUID(c2ptr)) ?
+		p = (ST_UID(cptr) && c2ptr->user) ?
 			c2ptr->user->uid : c2ptr->name;
 		nlen = strlen(p);
 		if ((len + nlen) > (size_t) (BUFSIZE - 9)) /* ,@+ \r\n\0 */
@@ -1579,19 +1579,19 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 			case MODE_CHANOP :
 				c = 'o';
 				cp = lp->value.cptr->name;
-				ucp = HasUID(lp->value.cptr) ?
+				ucp = lp->value.cptr->user ?
 					lp->value.cptr->user->uid : cp;
 				break;
 			case MODE_UNIQOP :
 				c = 'O';
 				cp = lp->value.cptr->name;
-				ucp = HasUID(lp->value.cptr) ?
+				ucp = lp->value.cptr->user ?
 					lp->value.cptr->user->uid : cp;
 				break;
 			case MODE_VOICE :
 				c = 'v';
 				cp = lp->value.cptr->name;
-				ucp = HasUID(lp->value.cptr) ?
+				ucp = lp->value.cptr->user ?
 					lp->value.cptr->user->uid : cp;
 				break;
 			case MODE_BAN :
@@ -1825,7 +1825,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 		{
 			s = sptr->serv->sid;
 		}
-		else if (HasUID(sptr))
+		else if (sptr->user)
 		{
 			s = sptr->user->uid;
 		}
@@ -2533,7 +2533,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				s && s[0] == 'o' && s[1] == 'v' ? "@+" :
 				s && s[0] == 'o' ? "@" :
 				s && s[0] == 'v' ? "+" : "",
-				HasUID(sptr) ? sptr->user->uid : parv[0]);
+				sptr->user ? sptr->user->uid : parv[0]);
 			sendto_match_servs_notv(chptr, cptr, SV_UID,
 				":%s NJOIN %s :%s%s", ME, name,
 				s && s[0] == 'O' && s[1] == 'v' ? "@@+" : 
@@ -2552,7 +2552,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				s && s[0] == 'o' && s[1] == 'v' ? "@+" :
 				s && s[0] == 'o' ? "@" :
 				s && s[0] == 'v' ? "+" : "",
-				HasUID(sptr) ? sptr->user->uid : parv[0]);
+				sptr->user ? sptr->user->uid : parv[0]);
 			sendto_serv_notv(cptr, SV_UID, ":%s NJOIN %s :%s%s",
 				ME, name,
 				s && s[0] == 'O' && s[1] == 'v' ? "@@+" : 
@@ -2747,7 +2747,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 
 		/* For 2.11 servers. */
-		target = HasUID(acptr) ? acptr->user->uid : acptr->name;
+		target = acptr->user ? acptr->user->uid : acptr->name;
 		while (*target)
 		{
 			*u++ = *target++;
@@ -2953,7 +2953,7 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		sender = sptr->serv->sid;
 	}
-	else if (HasUID(sptr))
+	else if (sptr->user)
 	{
 		sender = sptr->user->uid;
 	}
@@ -3022,7 +3022,7 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				/* as we need space for ",nick", we should add
 				** 1 on the left side; instead we subtracted 1
 				** on the right side, before the loop. */
-				if (strlen(nbuf) + (HasUID(who) ? UIDLEN :
+				if (strlen(nbuf) + (who->user ? UIDLEN :
 					strlen(who->name)) >= clen)
 				{
 					sendto_match_servs_v(chptr, cptr,
@@ -3034,7 +3034,7 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				{
 					strcat(nbuf, ",");
 				}
-				strcat(nbuf, HasUID(who) ? who->user->uid :
+				strcat(nbuf, who->user ? who->user->uid :
 					who->name);
 
 				/* nick buffer to kick out, build for 2.10 */

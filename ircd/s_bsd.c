@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.173 2005/01/30 16:03:39 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.174 2005/02/08 00:14:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2650,7 +2650,7 @@ free_server:
 	if (by && IsPerson(by))
 	    {
 		(void)strcpy(cptr->serv->by, by->name);
-		if (HasUID(by))
+		if (by->user)
 		{
 			strcpy(cptr->serv->byuid, by->user->uid);
 		}

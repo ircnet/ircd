@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.61 2005/01/30 14:34:43 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.62 2005/02/08 00:14:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -142,7 +142,7 @@ void	check_services_butone(long action, char *server, aClient *cptr,
 				va_end(va);
 				if ((sp->wants & SERVICE_WANT_UID))
 					sendto_one(sp->bcptr, ":%s%s", 
-						HasUID(cptr) ? cptr->user->uid :
+						cptr->user ? cptr->user->uid :
 						cptr->name, buf);
 				else
 					sendto_one(sp->bcptr, ":%s!%s@%s%s",
@@ -172,7 +172,7 @@ static	void	sendnum_toone(aClient *cptr, int wants, aClient *sptr,
 	if (!*umode)
 		umode = "+";
 
-	if ((wants & SERVICE_WANT_UID) && HasUID(sptr))
+	if ((wants & SERVICE_WANT_UID) && sptr->user)
 		sendto_one(cptr, ":%s UNICK %s %s %s %s %s %s :%s",
 			sptr->user->servp->sid,
 			(wants & SERVICE_WANT_NICK) ? sptr->name : ".",

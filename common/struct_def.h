@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.130 2005/02/04 18:08:48 chopin Exp $
+ *   $Id: struct_def.h,v 1.131 2005/02/08 00:14:05 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -767,7 +767,6 @@ struct Channel	{
 				  (IsService(x->prev) &&		\
 				  x->prev->service->servp == x->serv)))
 
-#define	HasUID(x)		(x->user && x->user->uid[0])
 #define	IsMasked(x)		(x && x->serv && x->serv->maskedby != x)
 
 #define IsSplit()		(iconf.split == 1)

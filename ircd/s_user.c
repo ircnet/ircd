@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.246 2005/02/04 18:40:07 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.247 2005/02/08 00:14:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1084,7 +1084,7 @@ badparamcountkills:
 	** Since it's not a new client, it might have an UID here, so check
 	** both to have one.  If they both have one, SAVE them.
 	*/
-	if (HasUID(sptr) && HasUID(acptr))
+	if (sptr->user && acptr->user)	/* XXX check if needed at all */
 	{
 		char	path[BUFSIZE];
 
@@ -2683,7 +2683,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	*/
 	if (!MyConnect(acptr) || !MyConnect(sptr) || !IsAnOper(sptr))
 	    {
-		if (HasUID(acptr))
+		if (acptr->user)
 		    {
 			sendto_serv_v(cptr, SV_UID, ":%s KILL %s :%s!%s",
 				      parv[0], acptr->user->uid, inpath, path);
