@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.14 1997/06/27 13:38:30 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.15 1997/06/30 20:21:15 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -335,10 +335,12 @@ tryagain:
 					poolsize -= MaxSendq(aconf->class) >>1;
 					IncSendq(aconf->class);
 					poolsize += MaxSendq(aconf->class) >>1;
+#ifndef	CLIENT_COMPILE
 					sendto_flag(SCH_NOTICE,
 					    "New poolsize %d. (reached)",
 						    poolsize);
 					istat.is_dbufmore++;
+#endif
 					goto tryagain;
 				    }
 				else
@@ -463,16 +465,17 @@ static	anUser	ausr = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL, NULL, NULL,
 static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 			 &anon, -2, 0, STAT_CLIENT, "anonymous", "anonymous",
 			 "anonymous identity hider", 0, "",
-#ifdef	ZIP_LINKS
+# ifdef	ZIP_LINKS
 			 NULL,
-#endif
+# endif
 			 0, {0, 0, NULL }, {0, 0, NULL },
 			 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, NULL,
 			 0, 0, 0
-#if defined(__STDC__)	/* hack around union{} initialization	-Vesa */
+# if defined(__STDC__)	/* hack around union{} initialization	-Vesa */
 			 ,{0}, NULL, "", ""
-#endif
+# endif
 			};
+#endif
 
 /*
  *
@@ -683,7 +686,7 @@ int	sendto_one(aClient *to, char *pattern, ...)
 }
 #endif
 
-
+#ifndef CLIENT_COMPILE
 #ifndef USE_STDARG
 /*VARARGS*/
 void	sendto_channel_butone(one, from, chptr, pattern,
