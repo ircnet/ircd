@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.65 2004/06/11 23:22:34 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.66 2004/06/11 23:44:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -28,102 +28,103 @@ static  char rcsid[] = "@(#)$Id: parse.c,v 1.65 2004/06/11 23:22:34 chopin Exp $
 #include "s_externs.h"
 #undef PARSE_C
 
+#define MAXPARA 15
+
 struct Message msgtab[] = {
-  { MSG_PRIVATE, m_private,  2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_NJOIN,   m_njoin,    2, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-  { MSG_JOIN,    m_join,     1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_MODE,    m_mode,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_UNICK,   m_unick,    7, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-  { MSG_NICK,    m_nick,     1, MAXPARA, MSG_LAG, 0, 0, 0L},
-  { MSG_PART,    m_part,     1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_QUIT,    m_quit,     0, MAXPARA, MSG_LAG, 0, 0, 0L},
-  { MSG_NOTICE,  m_notice,   2, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_KICK,    m_kick,     2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_SERVER,  m_server,   2, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-  { MSG_SMASK,   m_smask,    3, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-  { MSG_TRACE,   m_trace,    0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_TOPIC,   m_topic,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_INVITE,  m_invite,   2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_WALLOPS, m_wallops,  1, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-  { MSG_PING,    m_ping,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_PONG,    m_pong,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_ERROR,   m_error,    1, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+{ "PRIVMSG", m_private,  2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "NJOIN",   m_njoin,    2, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+{ "JOIN",    m_join,     1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "MODE",    m_mode,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "UNICK",   m_unick,    7, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+{ "NICK",    m_nick,     1, MAXPARA, MSG_LAG, 0, 0, 0L},
+{ "PART",    m_part,     1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "QUIT",    m_quit,     0, MAXPARA, MSG_LAG, 0, 0, 0L},
+{ "NOTICE",  m_notice,   2, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "KICK",    m_kick,     2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "SERVER",  m_server,   2, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+{ "SMASK",   m_smask,    3, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+{ "TRACE",   m_trace,    0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "TOPIC",   m_topic,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "INVITE",  m_invite,   2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "WALLOPS", m_wallops,  1, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+{ "PING",    m_ping,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "PONG",    m_pong,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "ERROR",   m_error,    1, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
 #ifdef	OPER_KILL
-  { MSG_KILL,    m_kill,     1, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
+{ "KILL",    m_kill,     1, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
 #else
-  { MSG_KILL,    m_kill,     2, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+{ "KILL",    m_kill,     2, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
 #endif
-  { MSG_SAVE,    m_save,     1, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-  { MSG_USER,    m_user,     4, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-  { MSG_AWAY,    m_away,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_UMODE,   m_umode,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_ISON,    m_ison,     1, 1,	 MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_SQUIT,   m_squit,    0, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
-  { MSG_WHOIS,   m_whois,    1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_WHO,     m_who,      1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_WHOWAS,  m_whowas,   1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_LIST,    m_list,     0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_NAMES,   m_names,    0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_USERHOST,m_userhost, 1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_PASS,    m_pass,     1, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-  { MSG_LUSERS,  m_lusers,   0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_TIME,    m_time,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_OPER,    m_oper,     2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_CONNECT, m_connect,  1, MAXPARA,
-				MSG_LAG|MSG_REGU|MSG_OP|MSG_LOP, 0, 0, 0L},
-  { MSG_VERSION, m_version,  0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_STATS,   m_stats,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_LINKS,   m_links,    0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_ADMIN,   m_admin,    0, MAXPARA, MSG_LAG, 0, 0, 0L},
-  { MSG_USERS,   m_users,    0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_SUMMON,  m_summon,   0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_HELP,    m_help,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_INFO,    m_info,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_MOTD,    m_motd,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_CLOSE,   m_close,    0, MAXPARA, MSG_LAG|MSG_REGU|MSG_OP, 0, 0, 0L},
-  { MSG_SERVICE, m_service,  4, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-  { MSG_EOB,     m_eob,      0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
-  { MSG_EOBACK,  m_eoback,   0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
-  { MSG_ENCAP,   m_encap,    1, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
-  { MSG_SDIE,    m_sdie,     0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
+{ "SAVE",    m_save,     1, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+{ "USER",    m_user,     4, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+{ "AWAY",    m_away,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "UMODE",   m_umode,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "ISON",    m_ison,     1, 1,	 MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "SQUIT",   m_squit,    0, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
+{ "WHOIS",   m_whois,    1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "WHO",     m_who,      1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "WHOWAS",  m_whowas,   1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "LIST",    m_list,     0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "NAMES",   m_names,    0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "USERHOST", m_userhost, 1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "PASS",    m_pass,     1, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+{ "LUSERS",  m_lusers,   0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "TIME",    m_time,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "OPER",    m_oper,     2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "CONNECT", m_connect,  1, MAXPARA, MSG_LAG|MSG_REGU|MSG_OP|MSG_LOP, 0, 0, 0L},
+{ "VERSION", m_version,  0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "STATS",   m_stats,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "LINKS",   m_links,    0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "ADMIN",   m_admin,    0, MAXPARA, MSG_LAG, 0, 0, 0L},
+{ "USERS",   m_users,    0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "SUMMON",  m_summon,   0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "HELP",    m_help,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "INFO",    m_info,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "MOTD",    m_motd,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "CLOSE",   m_close,    0, MAXPARA, MSG_LAG|MSG_REGU|MSG_OP, 0, 0, 0L},
+{ "SERVICE", m_service,  4, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+{ "EOB",     m_eob,      0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
+{ "EOBACK",  m_eoback,   0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
+{ "ENCAP",   m_encap,    1, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
+{ "SDIE",    m_sdie,     0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
 #ifdef	USE_SERVICES
-  { MSG_SERVSET, m_servset,  1, MAXPARA, MSG_LAG|MSG_SVC, 0, 0, 0L},
+{ "SERVSET", m_servset,  1, MAXPARA, MSG_LAG|MSG_SVC, 0, 0, 0L},
 #endif
-  { MSG_SQUERY,  m_squery,   2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_SERVLIST,m_servlist, 0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-  { MSG_HASH,    m_hash,     1, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0, 0, 0L},
-  { MSG_DNS,     m_dns,      0, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0, 0, 0L},
+{ "SQUERY",  m_squery,   2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
+{ "SERVLIST", m_servlist, 0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
+{ "HAZH",    m_hash,     1, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0, 0, 0L},
+{ "DNS",     m_dns,      0, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0, 0, 0L},
 #ifdef	OPER_REHASH
-  { MSG_REHASH,  m_rehash,   0, MAXPARA, MSG_REGU|MSG_OP
+{ "REHASH",  m_rehash,   0, MAXPARA, MSG_REGU|MSG_OP
 # ifdef	LOCOP_REHASH
 					 |MSG_LOP
 # endif
 					, 0, 0, 0L},
 #endif
 #ifdef	OPER_RESTART
-  { MSG_RESTART,  m_restart,   0, MAXPARA, MSG_REGU|MSG_OP
+{ "RESTART",  m_restart,   0, MAXPARA, MSG_REGU|MSG_OP
 # ifdef	LOCOP_RESTART
 					 |MSG_LOP
 # endif
 					, 0, 0, 0L},
 #endif
 #ifdef	OPER_DIE
-  { MSG_DIE,  m_die,   0, MAXPARA, MSG_REGU|MSG_OP
+{ "DIE",  m_die,   0, MAXPARA, MSG_REGU|MSG_OP
 # ifdef	LOCOP_DIE
 					 |MSG_LOP
 # endif
 					, 0, 0, 0L},
 #endif
 #ifdef OPER_SET
-  { MSG_SET,  m_set,   0, MAXPARA, MSG_REGU|MSG_OP
+{ "SET",  m_set,   0, MAXPARA, MSG_REGU|MSG_OP
 #ifdef LOCOP_SET
 					| MSG_LOP
 #endif
 					, 0, 0, 0L},
 #endif /* OPER_SET */
-  { MSG_MAP,  m_map,   0, MAXPARA, MSG_LAG | MSG_REG, 0, 0, 0L},
-  { MSG_POST,    m_post,     0, MAXPARA, MSG_NOU, 0, 0, 0L},
-  { NULL, NULL, 0, 0, 0, 0, 0L}
+{ "MAP",  m_map,   0, MAXPARA, MSG_LAG | MSG_REG, 0, 0, 0L},
+{ "POST",    m_post,     0, MAXPARA, MSG_NOU, 0, 0, 0L},
+{ NULL, NULL, 0, 0, 0, 0, 0L}
 };
 
 /*
