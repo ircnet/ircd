@@ -69,7 +69,6 @@ aConfig *config_read(int fd, int depth)
 		if (*i == '#')
 		{
 			char	*start = i + 9, *end = p;
-			int	dont = 0;
 
 			end--;			/* eat last \n */
 			if (*end == '\r')
@@ -94,7 +93,8 @@ aConfig *config_read(int fd, int depth)
 						"config: too nested (%d)",
 						depth);
 #endif
-					dont = 1;
+					i = p + 1;
+					continue;
 				}
 				if (*(start+1) != '/')
 				{
@@ -111,7 +111,8 @@ aConfig *config_read(int fd, int depth)
 					sendto_flag(SCH_ERROR, "config: too "
 						"long filename to process");
 #endif
-					dont = 1;
+					i = p + 1;
+					continue;
 				}
 				start++;
 				memcpy(filep, start, end - start);
@@ -128,27 +129,29 @@ aConfig *config_read(int fd, int depth)
 						"config: error opening %s "
 						"(depth=%d)", file, depth);
 #endif
-					dont = 1;
-				}
-				if (dont == 0)
-				{
-					ret = config_read(fd, depth + 1);
-					close(fd);
-					if (ConfigCur)
-						ConfigCur->next = ret;
-					else
-						ConfigTop = ret;
-					while (ConfigCur->next)
-					{
-						ConfigCur = ConfigCur->next;
-					}
 					i = p + 1;
 					continue;
 				}
+				ret = config_read(fd, depth + 1);
+				close(fd);
+				if (ConfigCur)
+				{
+					ConfigCur->next = ret;
+				}
+				else
+				{
+					ConfigTop = ret;
+					ConfigCur = ret;
+				}
+				while ((ConfigCur->next))
+				{
+					ConfigCur = ConfigCur->next;
+				}
+				i = p + 1;
+				continue;
 			}
-			/* comments and bad #include directives are not
-			** discarded -- upper layer may want to do something
-			** with them (like new directives? --B. */
+			/* comments and unknown #directives are not discarded,
+			** bad #include directives are --B. */
 		}
 		linelen = p - i;
 		if (*(p - 1) == '\r')
