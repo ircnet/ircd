@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.266 2005/02/08 02:47:11 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.267 2005/02/08 13:03:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -621,33 +621,35 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return exit_client(cptr, cptr, &me, "Server version too old");
 	}
 
-	/* remote is 2.11+ */
-	if (parc < 6)
+	if (IsServer(cptr))
 	{
-		sendto_flag(SCH_ERROR,
-			"Not enough parameters to SERVER (%d < 6), "
-			"dropping link to %s",	parc, 
-			get_client_name(cptr,TRUE));
-		return exit_client(cptr, cptr, &me,
-			"Not enough parameters to SERVER");
-	}
-	if (!sid_valid(parv[3]))
-	{
-		sendto_flag(SCH_ERROR,
-			"Invalid SID %s from %s, dropping link",
-			parv[3], get_client_name(cptr, TRUE));
-		return exit_client(cptr, cptr, &me, "Invalid SID");
-	}
-	if (find_sid(parv[3],NULL))
-	{
-		/* check for SID collision */
-		char ecbuf[BUFSIZE];
-
-		sendto_flag(SCH_NOTICE, "Link %s tried to introduce"
-			" already existing SID (%s), dropping link",
-			get_client_name(cptr, TRUE), parv[3]);
-		sprintf(ecbuf, "SID collision (%s)", parv[3]);
-		return exit_client(cptr, cptr, &me, ecbuf);
+		if (parc < 6)
+		{
+			sendto_flag(SCH_ERROR,
+				"Not enough parameters to SERVER (%d < 6), "
+				"dropping link to %s",	parc, 
+				get_client_name(cptr,TRUE));
+			return exit_client(cptr, cptr, &me,
+				"Not enough parameters to SERVER");
+		}
+		if (!sid_valid(parv[3]))
+		{
+			sendto_flag(SCH_ERROR,
+				"Invalid SID %s from %s, dropping link",
+				parv[3], get_client_name(cptr, TRUE));
+			return exit_client(cptr, cptr, &me, "Invalid SID");
+		}
+		if (find_sid(parv[3],NULL))
+		{
+			/* check for SID collision */
+			char ecbuf[BUFSIZE];
+	
+			sendto_flag(SCH_NOTICE, "Link %s tried to introduce"
+				" already existing SID (%s), dropping link",
+				get_client_name(cptr, TRUE), parv[3]);
+			sprintf(ecbuf, "SID collision (%s)", parv[3]);
+			return exit_client(cptr, cptr, &me, ecbuf);
+		}
 	}
 
 	host = parv[1];
