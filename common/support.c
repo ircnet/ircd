@@ -18,21 +18,13 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.37 2004/02/15 13:17:40 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.38 2004/06/11 18:00:59 chopin Exp $";
 #endif
 
 #include "os.h"
-#ifndef CLIENT_COMPILE
-# include "s_defines.h"
-#else
-# include "c_defines.h"
-#endif
+#include "s_defines.h"
 #define SUPPORT_C
-#ifndef CLIENT_COMPILE
-# include "s_externs.h"
-#else
-# include "c_externs.h"
-#endif
+#include "s_externs.h"
 #undef SUPPORT_C
 
 unsigned char minus_one[]={ 255, 255, 255, 255, 255, 255, 255, 255, 255,
