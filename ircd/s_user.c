@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.89 1999/09/20 22:39:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.90 2001/01/15 00:09:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1251,8 +1251,8 @@ char	*parv[];
 	    pv[1] = parv[4];
 	    pv[2] = parv[5];
 	    pv[3] = parv[6];
-	    pv[4] = parv[7];
-	    pv[5] = parv[8];
+	    pv[4] = parv[8];
+	    pv[5] = parv[7];
 	    pv[6] = NULL;
 	    m_user(cptr, sptr, 6, pv);
 	}
