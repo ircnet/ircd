@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.247 2004/10/13 16:28:23 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.248 2004/10/13 16:55:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3690,19 +3690,19 @@ static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf, int size)
         *pbuf= '\0';
 	if (IsBursting(root))
 	{
-		snprintf(pbuf, size, "%s %s %d %s bursting %ds",
+		snprintf(pbuf, size, "%s %d %s %s bursting %ds",
 			IsMasked(root) ? root->serv->maskedby->name : root->name,
-			root->serv->sid,
 			root->serv->usercnt[0] + root->serv->usercnt[1],
+			root->serv->sid,
 			BadTo(root->serv->verstr),
 			MyConnect(root) ? (int) (timeofday - root->firsttime) : -1);
 	}
 	else
 	{
-		snprintf(pbuf, size, "%s %s %d %s",
+		snprintf(pbuf, size, "%s %d %s %s",
 			IsMasked(root) ? root->serv->maskedby->name : root->name,
-			root->serv->sid,
 			root->serv->usercnt[0] + root->serv->usercnt[1],
+			root->serv->sid,
 			BadTo(root->serv->verstr));
 	}
 	sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
@@ -3759,8 +3759,8 @@ static	void	dump_map(aClient *sptr, aClient *root, aClient **prevserver,
 	/* Display itself if not masked */
 	if (!IsMasked(root))
 	{
-        	*pbuf= '\0';
-	        strcat(pbuf, root->name);
+		*pbuf= '\0';
+		strcat(pbuf, root->name);
 		sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
 	}
 	
@@ -3833,7 +3833,7 @@ int	m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		/* print full dump of the network */
 		sendto_one(sptr, replies[RPL_MAPSTART], ME, BadTo(sptr->name),
-				"Server SID users version");
+				"Server users SID version");
 		dump_sid_map(sptr, &me, buf, sizeof(buf) - 
 			strlen(BadTo(sptr->name)) - strlen(ME) - 8);
 		sendto_one(sptr, replies[RPL_MAPEND], ME, BadTo(sptr->name));
