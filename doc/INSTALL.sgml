@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.43 2002/11/22 21:23:16 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.44 2004/02/10 01:16:23 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.10.3.
 </abstract>
@@ -1051,9 +1051,11 @@ also implements H-lines to determine which servers may act
 as a hub and what they may ``hub for''.  If a server is only
 going to supply its own name (ie act as a solitary leaf)
 then no H-line is required for, else a H-line must be added.
-<tag/Format/<verb>H:&lt;Server Mask&gt;:*:&lt;Server Name&gt;::
+<tag/Format/<verb>H:&lt;Server Mask&gt;:&lt;SID Mask&gt;:&lt;Server Name&gt;::
 </verb>
 <tag/Server Mask/ All servers that are allowed via this
+H-line must match the mask given in this field.
+<tag/SID Mask/ SIDs of all servers that are allowed via this
 H-line must match the mask given in this field.
 <tag/Server Name/ This field is used to match exactly
 against a server name, wildcards being treated as literal
@@ -1061,12 +1063,12 @@ characters.
 <tag/Examples/H:*.edu::*.bu.edu::
 <p>
 Allows a server named ``*.bu.edu'' to introduce only servers
-that match the ``*.edu'' name mask.
+that match the ``*.edu'' name mask, no matter what SID they have.
 <p>
-H:*::eff.org::
+H:*:616*:eff.org::
 <p>
 Allows ``eff.org'' to introduce (and act as a hub for) any
-server.
+server which SID begins with ``616''.
 <tag/Note/ It is possible to have and use multiple H-lines
 (or L-lines) for the one server.  eg:
 <p>

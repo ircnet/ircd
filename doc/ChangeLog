@@ -9,6 +9,10 @@
 	* RELEASE_NOTES: docs.
 	* s_conf.c: erroneous IsIllegal() traps removed.
 	* res.c/bad_hostname(): isalnum is enough.
+	* s_serv.c/m_server(): move some SID checks earlier.
+	* s_conf.c/find_conf_host_sid(): match SID mask (2nd field) in H:.
+	* s_serv.c/m_server(): check new server for SID mask match.
+	* s_serv.c/report_configured_links(): show SID mask field in STATS H.
 
 2004-02-08  Piotr Kucharski
 
