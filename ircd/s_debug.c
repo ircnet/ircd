@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.13 1997/10/17 17:45:39 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.14 1997/11/11 19:11:52 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -310,18 +310,14 @@ aClient *cptr;
 char	*nick;
 {
 #ifdef HUB
-    	sendto_one(cptr, 
-   ":%s %d %s :HUB:%d MS:%d LQ:%d MXC:%d TS:%d HRD:%d HGL:%d WWD:%d CTO:%d",
-		   ME, RPL_STATSDEFINE, nick, HUB, MAXSERVERS, LISTENQUEUE, 
-		   MAXCONNECTIONS, TIMESEC, HANGONRETRYDELAY, HANGONGOODLINK,
-		   WRITEWAITDELAY, CONNECTTIMEOUT);
-#else
+    	sendto_one(cptr, ":%s %d %s :HUB:%d MS:%d", 
+		   ME, RPL_STATSDEFINE, nick, HUB, MAXSERVERS);
+#endif
     	sendto_one(cptr,
 		   ":%s %d %s :LQ:%d MXC:%d TS:%d HRD:%d HGL:%d WWD:%d CTO:%d",
 		   ME, RPL_STATSDEFINE, nick, LISTENQUEUE, MAXCONNECTIONS,
 		   TIMESEC, HANGONRETRYDELAY, HANGONGOODLINK, WRITEWAITDELAY,
 		   CONNECTTIMEOUT);
-#endif
     	sendto_one(cptr, ":%s %d %s :KCTL:%d DCTL:%d CF:%d MCPU:%d",
 		   ME, RPL_STATSDEFINE, nick, KILLCHASETIMELIMIT,
 		   DELAYCHASETIMELIMIT, CLIENT_FLOOD, MAXCHANNELSPERUSER);
