@@ -2,6 +2,10 @@
 
 	* s_serv.c/m_squit(): squit without comment bug (noted by Marcin Krol).
 	* hash.c/bigger_hash_table(): uid hash table bug (endless loop).
+	* s_user.c/m_nick(): another try, this time "NICK 0" seems to work
+	  before USER (with help from fiction).
+	* s_user.c/register_user(): add_to_client_hash_table() when registering
+	  after "NICK 0".
 
 2004-02-27  Piotr Kucharski
 

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.183 2004/02/28 09:31:29 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.184 2004/02/29 22:30:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -659,6 +659,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		{
 			strncpyzt(nick, sptr->user->uid, UIDLEN + 1);
 			(void)strcpy(sptr->name, nick);
+			(void)add_to_client_hash_table(nick, sptr);
 		}
 		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
 		add_to_uid_hash_table(sptr->user->uid, sptr);
@@ -835,13 +836,6 @@ badparamcountkills:
 	if (MyConnect(sptr) && IsUnknown(sptr)
 		&& nick[0] == '0' && nick[1] == '\0')
 	{
-		if (!sptr->user)
-		{
-			/* Sorry, too much fuss with client hash tables
-			** about making "NICK 0" work before USER --B. */
-			sendto_one(sptr, replies[ERR_NOTREGISTERED], ME, "*");
-			return 1;
-		}
 		/* Allow registering with nick "0", this will be
 		** overwritten in register_user() */
 		goto nickkilldone;
@@ -1196,6 +1190,7 @@ nickkilldone:
 		/* This had to be copied here to avoid problems.. */
 		(void)strcpy(sptr->name, nick);
 		if (sptr->user)
+		{
 			/*
 			** USER already received, now we have NICK.
 			** *NOTE* For servers "NICK" *must* precede the
@@ -1208,9 +1203,31 @@ nickkilldone:
 					  sptr->user->username)
 			    == FLUSH_BUFFER)
 				return FLUSH_BUFFER;
+		}
+		/* If we returned from register_user, then the user registered
+		** and sptr->name is not "0" anymore; add_to_client_hash_table
+		** (few lines down) would be called second time for that client
+		** because register_user does that for "NICK 0" after copying
+		** UID onto client nick.
+		** OTOH, if no USER was yet received, isdigit is true only for
+		** client trying to register with "NICK 0". As we would have
+		** returned without adding "0" to client hash table anyway,
+		** we can safely return here. --B. */
+		if (isdigit(sptr->name[0]))
+		{
+			return 3;
+		}
 	    }
-	/* Finally set new nick name. */
-	(void)add_to_client_hash_table(nick, sptr);
+	/* Registered client doing "NICK 0" already has UID in sptr->name.
+	** If sptr->name is "0" here, it means there was no "USER" (thanks
+	** to that fiction's "isdigit" check above after register_user), so
+	** do not add_to_client_hash_table with nick "0", let register_user
+	** fill in UID first and add that to client hash table. --B. */
+	if (sptr->name[0] != '0' || sptr->name[1] != '\0')
+	{
+		/* Finally set new nick name. */
+		(void)add_to_client_hash_table(nick, sptr);
+	}
 	if (lp)
 		return 15;
 	else
