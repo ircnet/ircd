@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.55 2004/06/30 19:27:40 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.56 2004/09/21 14:13:05 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -26,7 +26,7 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* redundant bans are allowed to be set now.
 	* SERVICE command has been changed slightly (removed 2nd (stok) and 5th
 	  (hopcount) parameters), please update your services.
-	* localstatedir in configure changed from var/run to var, be careful.
+	* file names and layout changed a bit, read 2.11-New and be careful.
 	* user mode +w is doing nothing: class usage is in stats Y and wallops
 	  are sent to a new server channel &WALLOPS.
 	* irc client is no longer included.
@@ -41,6 +41,8 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	  (if defined) clients connects, quits, nickchanges.
 	* new way of excluding users, X:line.
 	* new wildcard (#), matching any digit.
+	* mod_socks no longer works on default 1080, you have to explicitly set
+	  "port = " in module configuration in iauth.conf.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================

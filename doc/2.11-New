@@ -106,3 +106,6 @@ Admin:
 		T - allows TKLINE
 		t - enables full TRACE and STATS L
 	* New config X-line.
+	* New module to iauth: mod_webproxy.
+	* socks and webproxy modules can connect to different ports.
+	* "delayed" execution mode for iauth.
