@@ -1,3 +1,13 @@
+2004-09-12  Piotr Kucharski
+
+	* changed LOCAL_KILL_ONLY to OPER_KILL_REMOTE and moved it to other
+	  OPER_ defines in config.h.
+	* s_auth.c/read_iauth(): allow iauth to kill clients after registration.
+	* a_conf.c/conf_read(), iauth.conf.5, a_conf_def.h: "delayed" keyword.
+	* a_io.c/next_io(): send fake "done" message to ircd for delayed
+	  modules.
+	* mod_socks.c/socks_init(): show in conf line if module is delayed.
+
 2004-09-10  Piotr Kucharski
 
 	* configure.in: logdir defaults to $(localstatedir)/log, not directly
