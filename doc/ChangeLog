@@ -1,3 +1,9 @@
+2002-03-15  Jakub Vlasek
+	* support.c,s_conf.c: Read network name from ircd.conf.
+	* s_conf.c/s_conf_ext.h: Added networkname global variable.
+	* ircd.c: Added warning message about network name not being set.
+	* config.h.dist: Removed SERVER_ID and NETWORK_NAME defines.
+	
 2002-03-14  Jakub Vlasek
 	* s_bsd.c,s_bsd_ext.h: Moved daemonization from init_sys() into
 	  daemonize().
