@@ -27,6 +27,7 @@
 extern aClient me;
 extern aClient *client;
 extern istat_t istat;
+extern iconf_t iconf;
 extern char **myargv;
 extern int rehashed;
 extern int portnum;
