@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.131 2004/05/16 15:26:21 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.132 2004/05/16 16:05:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -215,59 +215,67 @@ static	time_t	try_connections(time_t currenttime)
 	Debug((DEBUG_NOTICE,"Connection check at   : %s",
 		myctime(currenttime)));
 	for (aconf = conf; aconf; aconf = aconf->next )
-	    {
-		/* Also when already connecting! (update holdtimes) --SRB */
+	{
+		/* not a C-line */
 		if (!(aconf->status & (CONF_CONNECT_SERVER|CONF_ZCONNECT_SERVER)))
 			continue;
-		/* Not a candidate for AC */
+
+		/* not a candidate for AC */
 		if (aconf->port <= 0)
 			continue;
-		/*
-		** Skip this entry if the use of it is still on hold until
-		** future. Otherwise handle this entry (and set it on hold
-		** until next time). Will reset only hold times, if already
-		** made one successfull connection... [this algorithm is
-		** a bit fuzzy... -- msa >;) ]
-		*/
-		if ((aconf->hold > currenttime))
-		    {
-			if ((next > aconf->hold) || (next == 0))
-				next = aconf->hold;
+
+		/* minimize next to lowest hold time of all AC-able C-lines */
+		if (next > aconf->hold || next == 0)
+			next = aconf->hold;
+
+		/* skip conf if the use of it is on hold until future. */
+		if (aconf->hold > currenttime)
 			continue;
-		    }
-		allheld = 0;	/* at least one candidate not held for future */
+
+		/* at least one candidate not held for future, good */
+		allheld = 0;
+
+		/* send (udp) pings for all AC-able C-lines, we'll use it to
+		** calculate preferences */
 		send_ping(aconf);
 
 		cltmp = Class(aconf);
+		/* see if another link in this conf is allowed */
+		if (Links(cltmp) >= MaxLinks(cltmp))
+			continue;
+		
+		/* next possible check after connfreq secs for this C-line */
 		confrq = get_con_freq(cltmp);
 		aconf->hold = currenttime + confrq;
-		/*
-		** Found a CONNECT config with port specified, scan clients
-		** and see if this server is already connected?
-		*/
+
+		/* is this server already connected? */
 		cptr = find_name(aconf->name, (aClient *)NULL);
 		if (!cptr)
 			cptr = find_mask(aconf->name, (aClient *)NULL);
-		/*
-		** It is not connected, scan clients and see if any matches
-		** a D(eny) line.
-		*/
+
+		/* matching client already exists, no AC to it */
+		if (cptr)
+			continue;
+
+		/* no such server, check D-lines */
 		if (find_denied(aconf->name, Class(cltmp)))
 			continue;
-		/* We have a candidate, let's see if it could be the best. */
-		if (!cptr && (Links(cltmp) < MaxLinks(cltmp)) &&
-		    (!con_conf ||
+
+		/* we have a candidate! */
+
+		/* choose the best. */
+		if (!con_conf ||
 		     (con_conf->pref > aconf->pref && aconf->pref >= 0) ||
 		     (con_conf->pref == -1 &&
-		      Class(cltmp) > ConfClass(con_conf))))
+		      Class(cltmp) > ConfClass(con_conf)))
+		{
 			con_conf = aconf;
-		if ((next > aconf->hold) || (next == 0))
-			next = aconf->hold;
-	    }
+		}
+	}
 	if (con_conf)
-	    {
+	{
 		if (con_conf->next)  /* are we already last? */
-		    {
+		{
 			for (pconf = &conf; (aconf = *pconf);
 			     pconf = &(aconf->next))
 				/* put the current one at the end and
@@ -276,7 +284,7 @@ static	time_t	try_connections(time_t currenttime)
 				if (aconf == con_conf)
 					*pconf = aconf->next;
 			(*pconf = con_conf)->next = 0;
-		    }
+		}
 		if (!iconf.aconnect)
 		{
 			sendto_flag(SCH_NOTICE,
@@ -285,10 +293,12 @@ static	time_t	try_connections(time_t currenttime)
 		}
 		else if (connect_server(con_conf, (aClient *)NULL,
 				   (struct hostent *)NULL) == 0)
+		{
 			sendto_flag(SCH_NOTICE,
 				    "Connection to %s[%s] activated.",
 				    con_conf->name, con_conf->host);
-	    }
+		}
+	}
 	else
 	if (allheld == 0)	/* disable AC only when some C: got checked */
 	{
