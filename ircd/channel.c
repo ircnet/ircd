@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.58 1998/08/24 02:21:07 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.59 1998/08/24 16:54:44 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1074,6 +1074,9 @@ char	*parv[], *mbuf, *pbuf;
 				else if (ischop &&
 				    (!*mode->key || IsServer(cptr)))
 				    {
+					if (**parv == ':')
+						/* this won't propagate right*/
+						break;
 					lp = &chops[opcnt++];
 					lp->value.cp = *parv;
 					if (strlen(lp->value.cp) >
