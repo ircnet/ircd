@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.5 1997/05/28 13:38:14 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.6 1997/05/30 19:07:00 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -423,10 +423,14 @@ char	*parv[];
 			return exit_client(cptr, sptr, &me, "Service Exists");
 		    }
 		attach_conf(sptr, aconf);
-		sendto_one(sptr, rpl_str(RPL_WELCOME, sptr->name), sptr->name);
+		sendto_one(sptr, rpl_str(RPL_YOURESERVICE, sptr->name),
+			   sptr->name);
+		sendto_one(sptr, rpl_str(RPL_YOURHOST, sptr->name),
+                           get_client_name(&me, FALSE), version);
 		sendto_one(sptr, rpl_str(RPL_MYINFO, sptr->name), ME, version);
 		sendto_flag(SCH_NOTICE, "Service %s connected",
 			    get_client_name(sptr, TRUE));
+		istat.is_unknown--;
 		istat.is_myservice++;
 	    }
 #endif
