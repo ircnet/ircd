@@ -702,33 +702,33 @@ char mydummy2[MYDUMMY_SIZE];
 
 /* Courtesy of AC_CHECK_TYPES autoconf macro in configure */
 #if !HAVE_INT16_T
-typedef int16_t short
+typedef short int16_t;
 #endif
 #if !HAVE_INT32_T
-typedef int32_t int
+typedef int int32_t;
 #endif
 #if !HAVE_INT8_T
-typedef int8_t char
+typedef char int8_t;
 #endif
 #if !HAVE_U_CHAR
-typedef u_char unsigned char
+typedef unsigned char u_char;
 #endif
 #if !HAVE_U_INT
-typedef u_int unsigned int
+typedef unsigned int u_int;
 #endif
 #if !HAVE_U_INT32_T
-typedef u_int32_t unsigned int
+typedef unsigned int u_int32_t;
 #endif
 #if !HAVE_U_INT16_T
-typedef u_int16_t unsigned short
+typedef unsigned short u_int16_t;
 #endif
 #if !HAVE_U_INT8_T
-typedef u_int8_t unsigned char
+typedef unsigned char u_int8_t;
 #endif
 #if !HAVE_U_LONG
-typedef u_long unsigned long
+typedef unsigned long u_long;
 #endif
 #if !HAVE_U_SHORT
-typedef u_short unsigned short
+typedef unsigned short u_short;
 #endif
 
