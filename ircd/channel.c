@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.37 1998/05/05 23:30:16 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.38 1998/05/12 16:57:54 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -193,8 +193,7 @@ char	*modeid;
 				else
 					rpl = RPL_INVITELIST;
 
-				sendto_one(cptr, rpl_str(RPL_BANLIST,
-							 cptr->name),
+				sendto_one(cptr, rpl_str(rpl, cptr->name),
 					   chptr->chname, mode->value.cp);
 				return -1;
 			    }
