@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.178 2004/02/15 20:23:59 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.179 2004/02/16 01:29:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3581,7 +3581,7 @@ static int	reop_channel(time_t now, aChannel *chptr, int reopmode)
 			/* If channel reop is heavily overdue, don't care about
 			** idle. Find the least idle client possible.
 			*/
-			if (now - chptr->history > 7*LDELAYCHASETIMELIMIT)
+			if (now - chptr->reop > 7*LDELAYCHASETIMELIMIT)
 			{
 				if (op.value.cptr == NULL ||
 					lp->value.cptr->user->last >
