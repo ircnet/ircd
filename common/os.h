@@ -223,15 +223,6 @@
 # include <zlib.h>
 #endif
 
-#if defined(INET6) && defined(CLIENT_COMPILE)
-# ifdef HAVE_RESOLV_H
-#  include <resolv.h>
-# endif
-# if HAVE_ARPA_NAMESER_H
-#  include <arpa/nameser.h>
-# endif
-#endif
-
 #if defined(HAVE_DLFCN_H)
 # include <dlfcn.h>
 #endif
