@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.216 2004/06/27 20:54:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.217 2004/06/27 21:10:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1546,7 +1546,7 @@ int	m_info(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char **text = infotext;
 
-	if (IsServer(cptr) && check_link(sptr))
+	if (check_link(sptr))
 	    {
 		sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]),
 			   "INFO");
@@ -1588,7 +1588,7 @@ int	m_links(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (parc > 2)
 	    {
-		if (IsServer(cptr) && check_link(sptr) && !IsOper(sptr))
+		if (check_link(sptr))
 		    {
 			sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]),
 				   "LINKS");
@@ -2024,11 +2024,6 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		case 'a': case 'A':	/* iauth conf */
 		case 'b': case 'B':	/* B:lines */
 		case '?': 		/* connected servers */
-			if (IsOper(sptr))
-			{
-				break;
-			}
-			/* else fallthrough */
 		default:
 			if (check_link(sptr))
 			{
@@ -2102,7 +2097,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		 */
 		if (doall || wilds)
 		    {
-			if (IsServer(cptr) && check_link(sptr))
+			if (check_link(sptr))
 		    	{
 				sendto_one(sptr, replies[RPL_TRYAGAIN], ME,
 					BadTo(parv[0]), "STATS");
