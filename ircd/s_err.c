@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.48 2004/03/07 03:34:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.49 2004/05/12 16:39:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -237,7 +237,7 @@ char *	replies[] = {
 /* 206 RPL_TRACESERVER */	":%s 206 %s Serv %d %dS %dC %s %s!%s@%s V%X%s",
 /* 207 RPL_TRACESERVICE */	":%s 207 %s Service %d %s 0x%X 0x%X",
 /* 208 RPL_TRACENEWTYPE */	":%s 208 %s <newtype> 0 %s",
-/* 209 RPL_TRACECLASS */	":%s 209 %s Class %d %d",
+/* 209 */ NULL,
 /* 210 */ NULL,
 /* 211 RPL_STATSLINKINFO */	(char *)NULL,
 /* 212 RPL_STATSCOMMANDS */	":%s 212 %s %s %u %u %u",
@@ -246,7 +246,7 @@ char *	replies[] = {
 /* 215 RPL_STATSILINE */	":%s 215 %s %c %s %s %s %d %d %s",
 /* 216 RPL_STATSKLINE */	":%s 216 %s %c %s %s %s %d %d",
 /* 217 RPL_STATSQLINE */	":%s 217 %s %c %s %s %s %d %d",
-/* 218 RPL_STATSYLINE */	":%s 218 %s %c %d %d %d %d %ld %d.%d %d.%d",
+/* 218 RPL_STATSYLINE */	":%s 218 %s %c %d %d %d %d %ld %d.%d %d.%d %d",
 /* 219 RPL_ENDOFSTATS */	":%s 219 %s %c :End of STATS report",
 /* 220 */ (char *)NULL,
 /* 221 RPL_UMODEIS */	":%s 221 %s %s",
