@@ -27,15 +27,15 @@ struct Config
 	aConfig *next;
 };
 
+#ifdef CONFIG_DIRECTIVE_INCLUDE
 static aConfig	*config_read(int, int, aFile *);
 static void	config_free(aConfig *);
-#ifdef CONFIG_DIRECTIVE_INCLUDE
+aFile	*new_config_file(char *, aFile *, int);
 #define STACKTYPE aFile
 #else
 #define STACKTYPE char
 #endif
 void	config_error(int, STACKTYPE *, int, char *, ...);
-aFile	*new_config_file(char *, aFile *, int);
 
 
 #ifdef CONFIG_DIRECTIVE_INCLUDE
@@ -263,7 +263,7 @@ void config_error(int level, STACKTYPE *stack, int line, char *pattern, ...)
 	int len;
 	static int etclen = 0;
 	va_list va;
-	char vbuf[BUFSIZE];
+	char vbuf[8192];
 	char *filep;
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 	aFile *curF = stack;
