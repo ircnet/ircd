@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.31 1998/01/23 13:28:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.32 1998/02/09 14:22:11 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1041,7 +1041,7 @@ char	*parv[];
 	    {
 		int	qlen = strlen(parv[2]);
 
-		if ((qlen < 4 || qlen < strlen(parv[1]) ||
+		if ((qlen < 4 || qlen < (int)strlen(parv[1]) ||
 		     index(parv[2]+1, '*') || index(parv[2]+1, '?')) &&
 		    IsServer(cptr) && check_link(cptr))
 		    {
