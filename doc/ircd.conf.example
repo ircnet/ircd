@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.23 2005/01/31 13:14:07 chopin Exp $
+# $Id: ircd.conf.example,v 1.24 2005/02/01 18:13:45 chopin Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -463,18 +463,17 @@ D::2:*.fi:3:
 # The first and third fields accept wildcards.  The fields are as follow:
 # V:<Version Mask>:<Flags>:<Server Mask>::
 #
-# Example, you believe 2.10.3 is a really old version, and you want your
-# peers to upgrade:
-V:021003*::*::
+# Example, 2.10 is an old version, and you want your peers to upgrade:
+V:IRC/0210*::*::
 #
 # If you are running a production network, you most likely don't want to
 # allow servers compiled in DEBUGMODE which is a threat for the net
 # as well as for the privacy of the users:
 V:*:D:*::
 #
-# Finally, you don't want *.edu servers to be version 2.9.2 *OR* to be
+# Finally, you don't want *.edu servers to be version 2.10.2 *OR* to be
 # compiled with remote oper kills enabled:
-V:020902*:K:*.edu::
+V:IRC/021002*:K:*.edu::
 #
 #
 ############################
