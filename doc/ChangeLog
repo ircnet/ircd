@@ -1,3 +1,8 @@
+1999-07-21  Piotr Kucharski
+
+	* channel.c/set_mode(): send ERR_UNKNOWNMODE to 'mode O' issued
+	on non-!channels.
+
 1999-07-21  Christophe Kalt
 
 	* s_misc.c/exit_one_client(): generate fake PARTs for users
