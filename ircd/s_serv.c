@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.116 2002/11/24 21:02:39 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.117 2002/11/25 21:41:54 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2010,12 +2010,15 @@ char	*parv[];
 	case 'Y' : case 'y' : /* Y lines */
 		report_classes(cptr, parv[0]);
 		break;
-	case 'Z' : 	      /* memory use (OPER only) */
+	case 'Z':
+#ifdef DEBUGMODE
+		 /* memory use (OPER only) */
 		if (MyOper(sptr))
 			count_memory(cptr, parv[0], 1);
 		else
 			sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
 		break;
+#endif
 	case 'z' :	      /* memory use */
 		count_memory(cptr, parv[0], 0);
 		break;
