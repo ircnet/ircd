@@ -1,6 +1,8 @@
 2002-04-06  Jakub Vlasek
-	* s_user.c/save_user(): Send ME as source of RPL_SAVENICK if collision 
+	* s_user.c/save_user(): Send ME as source of RPL_SAVENICK if collision
 	  is generated locally.
+	* s_serv.c/m_eob(): Pass sid+1 as a parameter to find_tokserver()
+	  for fake SIDs.
 
 2002-04-05  Jakub Vlasek
 	* s_service.c/m_service(),m_servset(),m_servlist(): Changed atoi()
