@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>v1.1, 7 April 1997
+<date>$Id: INSTALL.sgml,v 1.3 1997/04/15 19:52:11 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.3.
 </abstract>
@@ -582,7 +582,7 @@ or not.
 <tag/Introduction/ R lines provide a convenient way to
 handle user access to the server with an external program.
 The outside program given three parameters: the client's
-username (set by the NICK command), the client's hostname,
+username (set by the USER command), the client's hostname,
 and the client's ident reply (``unknown'' if none).
 <p>It is expected to return a reply line where the first
 word is either ``Y'' or ``N'' meaning `Yes Let them in'' or
