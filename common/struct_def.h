@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.134 2005/02/22 16:34:02 chopin Exp $
+ *   $Id: struct_def.h,v 1.135 2005/03/29 23:23:49 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -186,8 +186,8 @@ typedef enum Status {
 #ifdef XLINE
 #define FLAGS_XLINED	0x0100	/* X-lined client */
 #endif
-#define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP|FLAGS_AWAY)
-#define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP|FLAGS_RESTRICT)
+#define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP|FLAGS_AWAY|FLAGS_RESTRICT)
+#define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP)
 
 /*
  * user flags macros.
