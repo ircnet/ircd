@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.16 2004/10/01 20:22:14 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.17 2005/01/03 22:16:59 q Exp $";
 #endif
 
 #include "os.h"
@@ -172,7 +172,7 @@ aClass	*find_class(int cclass)
 	return classes;
 }
 
-void	check_class()
+void	check_class(void)
 {
 	Reg	aClass	*cltmp, *cltmp2;
 
@@ -198,7 +198,7 @@ void	check_class()
 	    }
 }
 
-void	initclass()
+void	initclass(void)
 {
 	classes = (aClass *)make_class();
 	istat.is_class++;

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.38 2004/11/19 15:14:41 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.39 2005/01/03 22:17:00 q Exp $";
 #endif
 
 #include "os.h"
@@ -60,7 +60,7 @@ unsigned char	used_tokens[(MAX210SERVERS + 7 ) / 8];
 #define	SetBit(x)	(used_tokens[x / 8] |= (1 << (x % 8)))
 #define	ClearBit(x)	(used_tokens[x / 8] &= ~(1 << (x % 8)))
 
-void	initlists()
+void	initlists(void)
 {
 #ifdef	DEBUGMODE
 	bzero((char *)&cloc, sizeof(cloc));
@@ -73,7 +73,7 @@ void	initlists()
 #endif
 }
 
-void	outofmemory()
+void	outofmemory(void)
 {
 	if (serverbooting)
 	{
@@ -547,7 +547,7 @@ Link  *find_channel_link(Link *lp, aChannel *ptr)
 	return NULL;    
 }
 
-Link	*make_link()
+Link	*make_link(void)
 {
 	Reg	Link	*lp;
 
@@ -559,7 +559,7 @@ Link	*make_link()
 	return lp;
 }
 
-invLink	*make_invlink()
+invLink	*make_invlink(void)
 {
 	Reg	invLink	*lp;
 
@@ -587,7 +587,7 @@ void	free_invlink(invLink *lp)
 #endif
 }
 
-aClass	*make_class()
+aClass	*make_class(void)
 {
 	Reg	aClass	*tmp;
 
@@ -606,7 +606,7 @@ void	free_class(aClass *tmp)
 #endif
 }
 
-aConfItem	*make_conf()
+aConfItem	*make_conf(void)
 {
 	Reg	aConfItem *aconf;
 

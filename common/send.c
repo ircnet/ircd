@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.96 2004/12/10 14:39:04 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.97 2005/01/03 22:16:58 q Exp $";
 #endif
 
 #include "os.h"
@@ -361,7 +361,7 @@ int	send_queued(aClient *to)
 static	anUser	ausr;
 static	aClient	anon;
 
-void initanonymous()
+void initanonymous(void)
 {
 	memset(&ausr, 0, sizeof(anUser));
 	strcpy(ausr.username, "anonymous");

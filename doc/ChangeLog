@@ -1,7 +1,7 @@
 2005-01-03  Kurt Roeckx
 
 	* ircd.c/check_pings(): Initialise the reason variable.  It could be
-	  used unintialised when TIMEDKLINES is not defined.
+	  used uninitialised when TIMEDKLINES is not defined.
 	* configure, setup.h.in, os.h: Make configure detect the arguments of
 	  accept() and use the 3rd argument for SOCK_LEN_TYPE, which should be
           socklen_t in most cases.
@@ -10,8 +10,10 @@
 	* os.h, support.c, support_ext.h, a_io.c, nameser_def.h, res.c,
 	  s_bsd.c: Don't use macro variables as #if VAR but use #ifdef VAR
 	  or #if defined(VAR)
-	* s_bsd.c, s_bsd_ext.h: Make reopen_listeners() a function with
-	  prototype: set parameter to void.
+	* s_bsd.c, s_bsd_ext.h, send.c, mkpasswd.c, iauth.c, chkconf.c,
+	  class.c, hash.c, ircd.c, list.c, res.c, res_init.c: Give all
+	  defenitions and declartions of function a proper prototype:
+	  add void as parameter if none is used.
 
 2005-01-02  Kurt Roeckx
 

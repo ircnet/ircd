@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.43 2005/01/03 17:33:55 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.44 2005/01/03 22:17:00 q Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -1645,7 +1645,7 @@ time_t	expire_cache(time_t now)
 /*
  * remove all dns cache entries.
  */
-void	flush_cache()
+void	flush_cache(void)
 {
 	Reg	aCache	*cp;
 

@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const volatile char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static const volatile char rcsid[] = "$Id: res_init.c,v 1.15 2004/10/01 20:22:14 chopin Exp $";
+static const volatile char rcsid[] = "$Id: res_init.c,v 1.16 2005/01/03 22:17:00 q Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -139,7 +139,7 @@ struct __res_state ircd_res
  *
  * Return 0 if completes successfully, -1 on error
  */
-int	ircd_res_init()
+int	ircd_res_init(void)
 {
 	register FILE *fp;
 	register char *cp, **pp;
@@ -650,7 +650,7 @@ static int	ircd_netinfo_res_init(int *haveenv, int *havesearch)
 }
 #endif	/* NEXT */
 
-u_int	ircd_res_randomid()
+u_int	ircd_res_randomid(void)
 {
 	struct timeval now;
 

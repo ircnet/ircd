@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: iauth.c,v 1.17 2004/10/01 20:22:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: iauth.c,v 1.18 2005/01/03 22:16:59 q Exp $";
 #endif
 
 #include "os.h"
@@ -132,7 +132,7 @@ static	void	init_signals(void)
 #endif
 }
 
-void	write_pidfile()
+void	write_pidfile(void)
 {
 	int fd;
 	char pidbuf[32];

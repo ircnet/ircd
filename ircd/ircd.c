@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.154 2005/01/03 13:53:18 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.155 2005/01/03 22:16:59 q Exp $";
 #endif
 
 #include "os.h"
@@ -152,7 +152,7 @@ RETSIGTYPE s_restart(int s)
 	dorestart = 1;
 }
 
-void	server_reboot()
+void	server_reboot(void)
 {
 	Reg	int	i;
 
@@ -1273,7 +1273,7 @@ static	void	io_loop(void)
  * set from the command line by -x, use /dev/null as the dummy logfile as long
  * as DEBUGMODE has been defined, else don't waste the fd.
  */
-static	void	open_debugfile()
+static	void	open_debugfile(void)
 {
 #ifdef	DEBUGMODE
 	int	fd;
@@ -1303,7 +1303,7 @@ static	void	open_debugfile()
 	return;
 }
 
-static	void	setup_signals()
+static	void	setup_signals(void)
 {
 #if POSIX_SIGNALS
 	struct	sigaction act;
