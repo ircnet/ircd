@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.134 2004/08/13 01:23:04 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.135 2004/08/18 12:18:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1708,6 +1708,9 @@ int 	initconf(int opt)
 		if (tmp3 && (aconf->status & CONF_OPERATOR))
 		{
 			aconf->flags |= oline_flags_parse(tmp3);
+			/* remove this when removing o: lines --B. */
+			if (aconf->flags & ACL_LOCOP)
+				aconf->flags &= ~ACL_ALL_REMOTE;
 		}
 		if (aconf->status & CONF_SERVER_MASK)
 		    {
