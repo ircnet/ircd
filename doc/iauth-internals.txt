@@ -16,6 +16,9 @@ process. The ircd communicates with the iauth daemon about new
 connections, and the iauth slave communicates information back as it
 becomes available.
 
+This document has been updated on September 28 2002 to accomodate
+changes for ircd release 2.11.
+
 Communication Protocol
 ----------------------
 
@@ -234,9 +237,9 @@ line-based and has the following form:
 
         This is used to indicate a client should be killed. The
 	information provided is of the form <identifier> <remote IP>
-	<remote port>. Eg:
+	<remote port> :<reason>. Eg:
 
-	K 2 203.36.167.162 13578
+	K 2 203.36.167.162 13578 :Open proxy found.
 
      -  "k"
 
@@ -330,10 +333,7 @@ limitations (in rough order of importance) are:
 1) After ircd has registered a client, iauth cannot reject or kill a
 connection. It is strongly desired that this be fixed.
 
-2) There is no way for a module to specify the "reason" a client
-connection was rejected (for display or other purposes).
-
-3) The current module design assumes a separate TCP/IP connection is
+2) The current module design assumes a separate TCP/IP connection is
 required for each client check (or at least separate file-descriptors
 for each client can be watched for activity). While it's possible
 tricks could be used to work around this assumption, it has not been
