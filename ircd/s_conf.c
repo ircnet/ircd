@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.100 2004/03/20 21:14:33 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.101 2004/03/20 21:16:06 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1490,7 +1490,7 @@ int 	initconf(int opt)
 		if ((aconf->status & CONF_LISTEN_PORT) && tmp3)
 		{
 			/* Parse P-line flags */
-			aconf->flags |= pline_flags_parse(tmp3);
+			aconf->flags = pline_flags_parse(tmp3);
 		}
 		
 		if (aconf->status & CONF_SERVICE)
