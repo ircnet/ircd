@@ -28,7 +28,6 @@
 #include "dbuf_def.h"
 #include "class_def.h"
 #include "struct_def.h"
-#include "msg_def.h"
 #include "numeric_def.h"
 #include "support_def.h"
 #include "channel_def.h"
