@@ -567,13 +567,20 @@ extern pid_t wait (int *);
  *  systems still use int (resp. int *), which is not always equal to size_t
  *  (resp. size_t *).
  *
- *  Note. This test should be more portable and put in configure ... but I've
- *        no idea on how to build a test for configure that will guess if the
- *        system uses size_t or int for their socket operations. If you've some
- *        idea, please tell it to me. :)             -- Alain.Nissen@ulg.ac.be
+ *  And then POSIX changed it again to a socklen_t, which seems to be an
+ *  unsigned int in most cases.
+ *
+ *  This is now attempted to be detected by configure, we fall back to
+ *  socklen_t if configure failed and socklen_t was found.  Else it's using
+ *  the old code.
+ *
  */
 
-#if defined(AIX) && defined(_XOPEN_SOURCE_EXTENDED) && _XOPEN_SOURCE_EXTENDED
+#if defined(ACCEPT_TYPE_ARG3)
+# define SOCK_LEN_TYPE ACCEPT_TYPE_ARG3
+#elif defined(HAVE_SOCKLEN_T)
+# define SOCK_LEN_TYPE socklen_t
+#elif defined(AIX) && defined(_XOPEN_SOURCE_EXTENDED) && _XOPEN_SOURCE_EXTENDED
 # define SOCK_LEN_TYPE size_t
 #else
 # define SOCK_LEN_TYPE int

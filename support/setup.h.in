@@ -1,5 +1,8 @@
 /* ../support/setup.h.in.  Generated from configure.in by autoheader.  */
 
+/* Type of the 3rd argument of accept() */
+#undef ACCEPT_TYPE_ARG3
+
 /* Define if the operating system is AIX 3.2. */
 #undef AIX_3_2
 
@@ -141,6 +144,9 @@
 /* Define to 1 if you have the `sigset' function. */
 #undef HAVE_SIGSET
 
+/* Define to 1 if the system has the type `socklen_t'. */
+#undef HAVE_SOCKLEN_T
+
 /* Define to 1 if you have the <stdarg.h> header file. */
 #undef HAVE_STDARG_H
 
@@ -245,6 +251,15 @@
 
 /* Define to 1 if you have the `truncate' function. */
 #undef HAVE_TRUNCATE
+
+/* Define to 1 if the system has the type `uint16_t'. */
+#undef HAVE_UINT16_T
+
+/* Define to 1 if the system has the type `uint32_t'. */
+#undef HAVE_UINT32_T
+
+/* Define to 1 if the system has the type `uint8_t'. */
+#undef HAVE_UINT8_T
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
