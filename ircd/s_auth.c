@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.31 1999/03/08 21:59:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.32 1999/03/13 23:14:06 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -144,13 +144,14 @@ read_iauth()
 		    if (*start == 'O') /* options */
 			{
 			    iauth_options = 0;
+			    if (strchr(start+2, 'A'))
+				    iauth_options |= XOPT_EARLYPARSE;
 			    if (strchr(start+2, 'R'))
 				    iauth_options |= XOPT_REQUIRED;
 			    if (strchr(start+2, 'T'))
 				    iauth_options |= XOPT_NOTIMEOUT;
 			    if (strchr(start+2, 'W'))
 				    iauth_options |= XOPT_EXTWAIT;
-
 			    if (iauth_options)
 				    sendto_flag(SCH_AUTH, "iauth options: %x",
 						iauth_options);
@@ -328,6 +329,14 @@ read_iauth()
 			    /*authentication finished*/
 			    ClearXAuth(cptr);
 			    SetDoneXAuth(cptr);
+			    if (WaitingXAuth(cptr))
+				{
+				    ClearWXAuth(cptr);
+				    register_user(cptr, cptr, cptr->name,
+						  cptr->user->username);
+				}
+			    else
+				    ClearWXAuth(cptr);
 		      }
 		    else
 			{

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.16 1999/03/13 21:56:10 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.17 1999/03/13 23:14:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -73,7 +73,7 @@ char *cfile;
 {
 	u_char ident = 0; /* make sure this module is used */
 	u_char needh = 0; /* do we need hostname information for any host? */
-	u_char o_req = 0, o_dto = 0;
+	u_char o_req = 0, o_dto = 0, o_wup = 0;
 	static char o_all[5];
 	u_int lnnb = 0, i;
 	u_char icount = 0, Mcnt = 0;
@@ -116,6 +116,11 @@ char *cfile;
 			if (!strncmp("notimeout", buffer, 9))
 			  {
 				o_dto = 1;
+				continue;
+			  }
+			if (!strncmp("extinfo", buffer, 7))
+			  {
+				o_wup = 1;
 				continue;
 			  }
 			/* debugmode setting */
@@ -393,6 +398,7 @@ char *cfile;
 	ch = o_all;
 	if (o_req) *ch++ = 'R';
 	if (o_dto) *ch++ = 'T';
+	if (o_wup) *ch++ = 'A';
 	if (needh) *ch++ = 'W';
 	*ch++ = '\0';
 	return o_all;

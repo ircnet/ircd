@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.10 1999/03/11 20:22:07 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1999/03/11 20:22:07 $"
+.\" @(#)$Id: iauth.conf.5,v 1.11 1999/03/13 23:14:06 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1999/03/13 23:14:06 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -48,6 +48,11 @@ connections unless the authentication is handled by iauth.
 By specifying this keyword, the IRC server is told not to accept new user
 connections if iauth hasn't finished its work in time.
 .TP
+.B extinfo
+This keyword allows extra information (user supplied username, and
+eventually password) to be received by iauth from the server.  This is only
+useful is a module using this information is loaded.
+.TP
 .B shared <name> <mod_name.so>
 If iauth was compiled with Dynamically Shared Module support, it can be
 told to dynamically load a module using this option.  The module can then
@@ -88,7 +93,8 @@ to set the cache lifetime in minutes.  By default, caching is enabled for
 .TP
 .B rfc931
 This module is for authentication TCP connections using the protocol
-defined in RFC 1413 (which obsoletes RFC 931).
+defined in RFC 1413 (which obsoletes RFC 931).  It is always loaded, and
+does not recognize the "host" nor "ip" fields.
 .SH EXAMPLE
 The following file will cause the IRC daemon to reject all connections
 originating from a system where an open proxy is running for hosts within
@@ -107,8 +113,15 @@ module socks
 module rfc931
 .fi
 .RE
+.SH CAVEATS
+When the option
+.B extinfo
+is set, connections registering as a server or a service with the IRC
+server are not guaranteed to receive the "user" authentication provided by
+modules (such as the rfc931 module).
+.RE
 .SH COPYRIGHT
-(c) 1998 Christophe Kalt
+(c) 1998,1999 Christophe Kalt
 .LP
 For full COPYRIGHT see LICENSE file with IRC package.
 .LP

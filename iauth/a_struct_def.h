@@ -28,6 +28,7 @@ struct AuthData
 {
 	/* the following are set by a_io.c and may be read by modules */
 	char	user[USERLEN+1];	/* username */
+	char	passwd[PASSWDLEN+1];	/* password */
 	char	host[HOSTLEN+1];	/* hostname */
 	char	itsip[HOSTLEN+1];	/* client ip */
 	u_short	itsport;		/* client port */
@@ -56,11 +57,12 @@ struct AuthData
 #define	A_START		0x0002	/* go through modules from beginning */
 #define	A_DONE		0x0004	/* nothing left to be done */
 #define	A_IGNORE	0x0010	/* ignore subsequent messages from ircd */
+#define	A_LATE		0x0080	/* ircd is no longer waiting for a reply */
 
 #define	A_GOTU		0x0100	/* got username (from ircd) */
-#define	A_GOTH		0x0200	/* got hostname (from ircd) */
-#define	A_NOH		0x0400	/* no hostname available */
-#define	A_LATE		0x0800	/* ircd is no longer waiting for a reply */
+#define	A_GOTP		0x0200	/* got password (from ircd) */
+#define	A_GOTH		0x0400	/* got hostname (from ircd) */
+#define	A_NOH		0x0800	/* no hostname available */
 
 #define A_UNIX		0x1000	/* authuser is suitable for use by ircd */
 #define A_DENY		0x8000	/* connection should be denied access */

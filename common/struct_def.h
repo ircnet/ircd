@@ -155,8 +155,8 @@ typedef struct        LineItem aExtData;
 #define	FLAGS_LOCAL	 0x0800 /* set for local clients */
 #define	FLAGS_GOTID	 0x1000	/* successful ident lookup achieved */
 #define	FLAGS_XAUTH	 0x2000	/* waiting on external authentication */
-#define	FLAGS_NONL	 0x4000 /* No \n in buffer */
-#define	FLAGS_HELD	 0x8000	/* connection held and reconnect try */
+#define	FLAGS_WXAUTH	 0x4000	/* same as above, but also prevent parsing */
+#define	FLAGS_NONL	 0x8000 /* No \n in buffer */
 #define	FLAGS_CBURST	0x10000	/* set to mark connection burst being sent */
 #define FLAGS_RILINE    0x20000 /* Restricted i-line [unused?] */
 #define FLAGS_QUIT      0x40000 /* QUIT :comment shows it's not a split */
@@ -165,7 +165,8 @@ typedef struct        LineItem aExtData;
 #define	FLAGS_UNKCMD   0x200000	/* has sent an unknown command */
 #define	FLAGS_ZIP      0x400000 /* link is zipped */
 #define	FLAGS_ZIPRQ    0x800000 /* zip requested */
-#define	FLAGS_ZIPSTART	0x1000000 /* start of zip (ignore any CRLF) */
+#define	FLAGS_ZIPSTART 0x1000000 /* start of zip (ignore any CRLF) */
+#define	FLAGS_HELD     0x8000000 /* connection held and reconnect try */
 
 #define	FLAGS_OPER       0x0001	/* Operator */
 #define	FLAGS_LOCOP      0x0002 /* Local operator -- SRB */
@@ -208,6 +209,7 @@ typedef struct        LineItem aExtData;
 #define	DoingDNS(x)		((x)->flags & FLAGS_DOINGDNS)
 #define	DoingAuth(x)		((x)->flags & FLAGS_AUTH)
 #define	DoingXAuth(x)		((x)->flags & FLAGS_XAUTH)
+#define	WaitingXAuth(x)		((x)->flags & FLAGS_WXAUTH)
 #define	DoneXAuth(x)		((x)->flags & FLAGS_XAUTHDONE)
 #define	NoNewLine(x)		((x)->flags & FLAGS_NONL)
 
@@ -218,6 +220,7 @@ typedef struct        LineItem aExtData;
 #define	ClearDNS(x)		((x)->flags &= ~FLAGS_DOINGDNS)
 #define	ClearAuth(x)		((x)->flags &= ~FLAGS_AUTH)
 #define	ClearXAuth(x)		((x)->flags &= ~FLAGS_XAUTH)
+#define	ClearWXAuth(x)		((x)->flags &= ~FLAGS_WXAUTH)
 
 /*
  * defined debugging levels
@@ -788,6 +791,8 @@ typedef	struct	{
 #define	XOPT_REQUIRED	0x01	/* require authentication be done by iauth */
 #define	XOPT_NOTIMEOUT	0x02	/* disallow iauth time outs */
 #define XOPT_EXTWAIT	0x10	/* extend registration ping timeout */
+#define XOPT_EARLYPARSE	0x20	/* allow early parsing and send USER/PASS
+				   information to iauth */
 
 /* misc defines */
 

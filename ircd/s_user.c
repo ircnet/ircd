@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.71 1999/03/08 21:59:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.72 1999/03/13 23:14:06 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -355,7 +355,7 @@ char *shortm, *longm;
 **	   nick from local user or kill him/her...
 */
 
-static	int	register_user(cptr, sptr, nick, username)
+int	register_user(cptr, sptr, nick, username)
 aClient	*cptr;
 aClient	*sptr;
 char	*nick, *username;
@@ -380,6 +380,18 @@ char	*nick, *username;
 		char *reason = NULL;
 
 #if defined(USE_IAUTH)
+		if (iauth_options & XOPT_EARLYPARSE && DoingXAuth(cptr))
+		    {
+			cptr->flags |= FLAGS_WXAUTH;
+			/* fool check_pings() and give iauth more time! */
+			cptr->firsttime = timeofday;
+			cptr->lasttime = timeofday;
+			strncpyzt(sptr->user->username, username, USERLEN+1);
+			if (sptr->passwd[0])
+				sendto_iauth("%d P %s", sptr->fd,sptr->passwd);
+			sendto_iauth("%d U %s", sptr->fd, username);
+			return 1;
+		    }
 		if (!DoneXAuth(sptr) && (iauth_options & XOPT_REQUIRED))
 		    {
 			time_t last = 0;
@@ -1834,10 +1846,6 @@ user_finish:
 	if (strlen(realname) > REALLEN)
 		realname[REALLEN] = '\0';
 	sptr->info = mystrdup(realname);
-#if defined(USE_IAUTH)
-	if (MyConnect(sptr))
-		sendto_iauth("%d U %.*s", sptr->fd, USERLEN+1, username);
-#endif
 	if (sptr->name[0]) /* NICK already received, now we have USER... */
 	    {
 		if ((parc == 6) && IsServer(cptr)) /* internal m_user() */

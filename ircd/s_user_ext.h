@@ -33,6 +33,7 @@ EXTERN int hunt_server __P((aClient *cptr, aClient *sptr, char *command,
 			    int server, int parc, char *parv[]));
 EXTERN int do_nick_name __P((char *nick, int server));
 EXTERN int ereject_user __P((aClient *, char *, char *));
+EXTERN int register_user __P((aClient *, aClient *, char *, char *));
 EXTERN char *canonize __P((char *buffer));
 EXTERN int m_nick __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_private __P((aClient *cptr, aClient *sptr, int parc,

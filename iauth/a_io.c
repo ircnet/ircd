@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.18 1999/03/13 21:40:10 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.19 1999/03/13 23:14:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -262,6 +262,7 @@ parse_ircd()
 				cldata[cl].inbuffer = NULL;
 			    }
 			cldata[cl].user[0] = '\0';
+			cldata[cl].passwd[0] = '\0';
 			cldata[cl].host[0] = '\0';
 			bzero(cldata[cl].idone, BDSIZE);
 			cldata[cl].buflen = 0;
@@ -423,8 +424,27 @@ parse_ircd()
 			    }
 			if (cldata[cl].state & A_IGNORE)
 				break;
-			cldata[cl].state |= A_GOTU;
-			/* hmmpf */
+			strcpy(cldata[cl].user, chp+2);
+			cldata[cl].state |= A_GOTU|A_START;
+			if (cldata[cl].instance == NULL)
+				next_io(cl, NULL);
+			break;
+		case 'P': /* user provided password */
+			if (!(cldata[cl].state & A_ACTIVE))
+			    {
+				/* let's be conservative and just ignore */
+                                sendto_log(ALOG_IRCD, LOG_WARNING,
+				   "Warning: Entry %d [P] is not active.", cl);
+				break;
+			    }
+			if (cldata[cl].state & A_IGNORE)
+				break;
+			strcpy(cldata[cl].passwd, chp+2);
+			cldata[cl].state |= A_GOTP;
+			/*
+			** U message will follow immediately, 
+			** no need to do any thing else here
+			*/
 			break;
 		case 'T': /* ircd is registering the client */
 			/* what to do with this? abort/continue? */
