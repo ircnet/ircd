@@ -1,3 +1,35 @@
+Tue Mar 31 18:52:41 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* s_serv.c: removed now obsolete USE_NJOIN.
+
+	* numeric_def.h, struct_def.h, channel.c, s_debug.c, s_err.c,
+	s_serv.c: added channel modes +e (EFnet's exceptions to bans) and
+	+I (invitations); raised MAXBANS (should be renamed) to 30.
+
+	* support.c: extended make_version().
+
+	* channel.c:
+		* notify user when a ban is rejected because "redundant".
+		* /invite (from chanop) now overrides bans & limit.
+
+	* s_debug.c, s_serv.c: /stats r no longer restricted to DEBUGMODE.
+
+	* s_bsd.c: getrlimit()/setrlimit() is now used regardless of
+	poll() availibility.
+
+Sun Mar 22 14:01:24 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* channel.c: MIRC_KLUDGE sent bogus modes on channel creation.
+
+	* os.h, support.c, s_bsd.c: CYGWIN32 cleanup from Dave Miller.
+
+	* s_user.c: hunt_server() cleanup.
+
+	* s_conf.c: match_ipmask() choked on a.b.c.d/z (reported by Helmut
+	Springer <delta@RUS.Uni-Stuttgart.DE>).
+
+2.9.5
+
 Tue Feb 17 21:25:02 1998  Christophe Kalt
 
 	* s_bsd.c: w32 doesn't have a working fork().
