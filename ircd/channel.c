@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.216 2004/06/29 23:25:58 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.217 2004/06/29 23:34:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1860,6 +1860,12 @@ static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 	if (chptr->users == 0 && (bootopt & BOOT_PROT) && 
 	    chptr->history != 0 && *chptr->chname != '!')
 		return (timeofday > chptr->history) ? 0 : ERR_UNAVAILRESOURCE;
+
+#ifdef CLIENTS_CHANNEL
+	if (*chptr->chname == '&' && !strcmp(chptr->chname, "&CLIENTS")
+		&& is_allowed(sptr, ACL_CLIENTS))
+		return (ERR_INVITEONLYCHAN);
+#endif
 
 	for (lp = sptr->user->invited; lp; lp = lp->next)
 		if (lp->chptr == chptr)
