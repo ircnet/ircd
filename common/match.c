@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: match.c,v 1.4 1999/01/23 22:55:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: match.c,v 1.5 1999/02/05 22:00:25 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -110,7 +110,7 @@ unsigned char char_atribs[] = {
 /* 16-23 */	CNTRL, CNTRL, CNTRL, CNTRL, CNTRL, CNTRL, CNTRL, CNTRL,
 /* 24-31 */	CNTRL, CNTRL, CNTRL, CNTRL, CNTRL, CNTRL, CNTRL, CNTRL,
 /* space */	PRINT|SPACE,
-/* !"#$%&'( */	PRINT, PRINT, PRINT, PRINT, PRINT, PRINT, PRINT, PRINT,
+/* !""#$%&'( */	PRINT, PRINT, PRINT, PRINT, PRINT, PRINT, PRINT, PRINT,
 /* )*+,-./ */	PRINT, PRINT, PRINT, PRINT, PRINT, PRINT, PRINT,
 /* 0123 */	PRINT|DIGIT, PRINT|DIGIT, PRINT|DIGIT, PRINT|DIGIT,
 /* 4567 */	PRINT|DIGIT, PRINT|DIGIT, PRINT|DIGIT, PRINT|DIGIT,
@@ -203,11 +203,7 @@ char	*mask, *name;
 			n = (u_char *)++na;
 		    }
 		else if (!*n)
-		    {
-			while(*m == '*')
-				m++;
-			return (*m != 0);
-		    }
+			return 1;
 		if ((*m == '\\') && ((m[1] == '*') || (m[1] == '?')))
 		    {
 			m++;
