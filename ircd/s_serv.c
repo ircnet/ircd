@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.178 2004/03/24 22:49:06 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.179 2004/03/24 22:52:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1887,6 +1887,7 @@ static	void	report_configured_links(aClient *sptr, char *to, int mask)
 			if (tmp->status == CONF_KILL
 			    || tmp->status == CONF_OTHERKILL
 			    || tmp->status == CONF_HUB
+			    || tmp->status == CONF_QUARANTINED_SERVER
 			    || tmp->status == CONF_VER)
 			{
 				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
