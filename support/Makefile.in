@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.64 2004/10/04 19:55:34 chopin Exp $
+#*   $Id: Makefile.in,v 1.65 2004/11/01 14:11:34 chopin Exp $
 #*
 #*/
 
@@ -135,8 +135,9 @@ ircd_mode = 711
 TKSERV_LOGFILE = $(ircd_log_dir)/$(TKSERV).log
 # TK line service access file 
 TKSERV_ACCESSFILE = $(ircd_conf_dir)/$(TKSERV).access
-# IRCD config file without path (from CPATH)
-TKSERV_IRCD_CONF = $(IRCD).conf
+# TK config file to append tklines to.
+# It could be $(IRCDCONF_PATH), but is not recommended.
+TKSERV_CONF_PATH = $(ircd_conf_dir)/$(TKSERV).kline
 
 # End of system configuration section.
 # ------------------------------------------------------------------------
@@ -424,7 +425,7 @@ mkpasswd.o: ../contrib/mkpasswd/mkpasswd.c
 	$(CC) $(O_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c
 
 tkserv.o: ../contrib/tkserv/tkserv.c tkconf.h
-	$(CC) $(O_CFLAGS) -DTKSERV_LOGFILE="\"$(TKSERV_LOGFILE)\"" -DTKSERV_ACCESSFILE="\"$(TKSERV_ACCESSFILE)\"" -DTKSERV_IRCD_CONF="\"$(TKSERV_IRCD_CONF)\"" -DCPATH="\"$(IRCDCONF_PATH)\"" -DPPATH="\"$(IRCDPID_PATH)\"" -c -o $@ ../contrib/tkserv/tkserv.c
+	$(CC) $(O_CFLAGS) -DTKSERV_LOGFILE="\"$(TKSERV_LOGFILE)\"" -DTKSERV_ACCESSFILE="\"$(TKSERV_ACCESSFILE)\"" -DCPATH="\"$(TKSERV_CONF_PATH)\"" -DPPATH="\"$(IRCDPID_PATH)\"" -c -o $@ ../contrib/tkserv/tkserv.c
 
 clean:
 	$(RM) $(IRCD_BIN) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH) $(TKSERV) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
