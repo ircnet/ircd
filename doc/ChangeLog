@@ -8,6 +8,11 @@
 	* s_misc.c/exit_server(): regenerate SQUITs to send them to &SERVERS.
 	* s_serv.c/m_server(): squit link if no SID was given on a 2.11 link.
 	* hash.c/bigger_hash_table(): add only ST_UID sptrs to sid_hash_table.
+	* parse.c/find_sender(): strlen(sid)==SIDLEN, not sid[SIDLEN]=='\0'.
+	* list.c/make_server(), s_serv.c/m_smask(), s_user.c/register_user():
+	  fix bug of dropping unknown clients (NICKs) coming behind from 2.10
+	  masked behind 2.11. *NOTE*: do it better, like add all servers to
+	  svrtop or have token array. (from Q).
 
 2002-01-05  Piotr Kucharski
 
