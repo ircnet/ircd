@@ -619,10 +619,6 @@
 #undef	ZIP_LINKS
 #endif
 
-#ifdef TIMEDKLINES && !defined(TIMEDKLINES)
-#error Define TIMEDKLINES to number of seconds...
-#endif
-
 #if defined(TIMEDKLINES)
 # if (TIMEDKLINES < 60)
 # error TIMEDKLINES must be bigger than 60 seconds
