@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.6 1997/04/24 21:16:44 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.7 1997/04/24 21:50:06 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -713,7 +713,7 @@ char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 			if (IsQuiet(channels->value.chptr))
 				continue;
 			for (lp=channels->value.chptr->members;lp;
-			     user=user->next)
+			     lp=lp->next)
 			    {
 				cptr = lp->value.cptr;
 				if (user == cptr)
