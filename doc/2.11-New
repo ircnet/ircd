@@ -66,4 +66,21 @@ Admin:
 	  set.
 	* Stats l/L shows count in Bytes, not kBytes.
 	* SERVICE command changed, it uses SID now.
+	* O:line flags for better control
+		L - local operator (disables all remote functions)
+		A - enables all flags (except local operator)
+		K - allows KILL (local and remote)
+		k - allows only local KILL
+		S - allows SQUIT (local and remote)
+		s - allows only local SQUIT
+		C - allows CONNECT (local and remote)
+		c - allows only local CONNECT
+		l - allows CLOSE
+		h - allows HAZH
+		d - allows DNS
+		r - allows REHASH
+		R - allows RESTART
+		D - allows DIE
+		e - allows SET
+		T - allows TKLINE
 

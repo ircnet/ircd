@@ -1,3 +1,30 @@
+2004-06-25  Piotr Kucharski
+
+	* config.h.dist, send.c/logfiles_open(): LOGFILES_ALWAYS_CREATE define.
+	* s_serv.c/m_squit(): show server name, not sid, in wallops.
+	* s_serv.c/m_close(), res.c/m_dns(), hash.c/m_hash(): add is_allowed().
+
+2004-06-24  Piotr Kucharski
+
+	* parse.c: require 2 params for KILL and SQUIT.
+	* s_serv.c/m_squit(), s_user.c/m_kill(): remove code checking and
+	  dealing with less than 2 params.
+	* struct_def.h: remove ACL enum, use #define ACL_mumble.
+	* s_conf.c: new functions oline_flags_to_string(), oline_flags_parse().
+	* s_conf.c/initconf(): use oline_flags_parse().
+	* s_err.c: add room for oline flags in STATSOLINE.
+	* s_serv.c/report_configured_links(): use oline_flags_to_string() to
+	  report O:line flags.
+	* s_err.c: change 481 to not mention not being irc operator.
+	* s_user.c/is_allowed(): use O:line flags to decide access.
+	* s_debug.c: removed unused LOCOP_ defines.
+	* s_serv.c/m_squit(): use ACL_SQUITREMOTE to decide if allowed.
+	* s_serv.c/m_connect(): use ACL_CONNECT* to decide if allowed.
+	* s_user.c/m_kill(): use ACL_KILL* to decide if allowed; also remove
+	  #ifdef LOCAL_KILL_ONLY, initconf() takes care of guarding it.
+	* config.h.dist: OPER_mumble all defined by default.
+	* INSTALL: changed O: format and described O:line flags.
+
 2004-06-22  Piotr Kucharski
 
 	* Makefile.in: add implicit dependency for struct_def.h
