@@ -53,6 +53,8 @@
 
 #if USE_STDARG
 # include <stdarg.h>
+#else
+#error You need working stdarg.
 #endif
 
 #if HAVE_UNISTD_H

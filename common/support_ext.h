@@ -67,9 +67,6 @@ EXTERN void MyFree __P((char *x));
 EXTERN char *MyMalloc __P((size_t x));
 EXTERN char *MyRealloc __P((char *x, size_t y));
 #endif /* DEBUGMODE && !CLIENT_COMPILE && !DO_DEBUG_MALLOC */
-#if ! USE_STDARG
-EXTERN int irc_sprintf();
-#endif /* USE_STDARG */
 EXTERN int dgets __P((int fd, char *buf, int num));
 EXTERN char *make_version();
 EXTERN char **make_isupport();

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.44 2001/10/20 17:57:28 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.45 2002/07/29 21:36:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -105,22 +105,12 @@ static aExtData	*iauth_stats = NULL;
  *	Send the buffer to the authentication slave process.
  *	Return 0 if everything went well, -1 otherwise.
  */
-#if ! USE_STDARG
-int
-sendto_iauth(pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
-char    *pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10;
-#else
 int
 vsendto_iauth(char *pattern, va_list va)
-#endif
 {
     static char abuf[BUFSIZ];
 
-#if ! USE_STDARG
-    sprintf(abuf, pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
-#else   
     vsprintf(abuf, pattern, va);
-#endif  
     strcat(abuf, "\n");
 
     if (adfd < 0)
@@ -136,7 +126,6 @@ vsendto_iauth(char *pattern, va_list va)
     return 0;
 }
 
-# if USE_STDARG
 int
 sendto_iauth(char *pattern, ...)
 {
@@ -148,7 +137,6 @@ sendto_iauth(char *pattern, ...)
         va_end(va);
 	return i;
 }
-# endif
 
 /*
  * read_iauth

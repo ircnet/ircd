@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_log.c,v 1.7 2001/10/20 17:57:25 q Exp $";
+static  char rcsid[] = "@(#)$Id: a_log.c,v 1.8 2002/07/29 21:36:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -63,24 +63,13 @@ init_syslog()
 #endif
 }
 
-#if ! USE_STDARG
-void
-sendto_log(flags, slflag, pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
-int flags, slflag;
-char    *pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10;
-#else
 void
 vsendto_log(int flags, int slflag, char *pattern, va_list va)
-#endif
 {
 	char	logbuf[4096];
 
 	logbuf[0] = '>';
-#if ! USE_STDARG
-	sprintf(logbuf+1, pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
-#else
 	vsprintf(logbuf+1, pattern, va);
-#endif
 
 #if defined(USE_SYSLOG)
 	if (slflag)
@@ -114,7 +103,6 @@ vsendto_log(int flags, int slflag, char *pattern, va_list va)
 	    }
 }
 
-#if USE_STDARG
 void
 sendto_log(int flags, int slflag, char *pattern, ...)
 {
@@ -123,4 +111,3 @@ sendto_log(int flags, int slflag, char *pattern, ...)
         vsendto_log(flags, slflag, pattern, va);
         va_end(va);
 }
-#endif

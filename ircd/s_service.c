@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.36 2002/04/04 20:32:03 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.37 2002/07/29 21:36:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -106,16 +106,8 @@ aClient *cptr;
 **	action	type on notice
 **	server	origin
 */
-#if ! USE_STDARG
-void	check_services_butone(action, server, cptr, fmt, p1, p2, p3, p4,
-			      p5, p6, p7, p8)
-long	action;
-aClient	*cptr; /* shouldn't this be named sptr? */
-char	*fmt, *server;
-void	*p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8;
-#else
 void	check_services_butone(long action, char *server, aClient *cptr, char *fmt, ...)
-#endif
+/* shouldn't cptr be named sptr? */
 {
 	char nbuf[NICKLEN + USERLEN + HOSTLEN + 3];
 	Reg	aClient	*acptr;
@@ -137,35 +129,22 @@ void	check_services_butone(long action, char *server, aClient *cptr, char *fmt, 
 			    cptr && IsRegisteredUser(cptr) &&
 			    (action & SERVICE_MASK_PREFIX))
 			    {
-#if USE_STDARG
 				char	buf[2048];
 				va_list	va;
 				va_start(va, fmt);
 				va_arg(va, char *);
 				vsprintf(buf, fmt+3, va);
 				va_end(va);
-#endif
 				sprintf(nbuf, "%s!%s@%s", cptr->name,
 					cptr->user->username,cptr->user->host);
-
-#if ! USE_STDARG
-				sendto_one(sp->bcptr, fmt, nbuf, p2, p3, p4, p5,
-					   p6, p7, p8);
-#else
 				sendto_one(sp->bcptr, ":%s%s", nbuf, buf);
-#endif
 			    }
 			else
 			    {
-#if ! USE_STDARG
-				sendto_one(sp->bcptr, fmt, p1, p2, p3, p4, p5,
-					   p6, p7, p8);
-#else
 				va_list	va;
 				va_start(va, fmt);
 				vsendto_one(sp->bcptr, fmt, va);
 				va_end(va);
-#endif
 			    }
 	    }
 	return;

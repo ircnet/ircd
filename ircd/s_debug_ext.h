@@ -34,11 +34,7 @@ extern char serveropts[];
 #else /* S_DEBUG_C */
 #define EXTERN
 #endif /* S_DEBUG_C */
-#if ! USE_STDARG
-EXTERN void debug();
-#else /* USE_STDARG */
 EXTERN void debug (int level, char *form, ...);
-#endif /* USE_STDARG */
 EXTERN void send_usage __P((aClient *cptr, char *nick));
 EXTERN void send_defines __P((aClient *cptr, char *nick));
 EXTERN void count_memory __P((aClient *cptr, char *nick, int debug));

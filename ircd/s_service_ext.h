@@ -37,12 +37,8 @@ extern	aService	*svctop;
 EXTERN aService *make_service __P((aClient *cptr));
 EXTERN void free_service __P((aClient *cptr));
 #ifdef	USE_SERVICES
-#ifndef USE_STDARG
-EXTERN void check_services_butone();
-#else /* USE_STDARG */
 EXTERN void check_services_butone __P((long action, char *server,
 				       aClient *cptr, char *fmt, ...));
-#endif /* USE_STDARG */
 EXTERN void check_services_num __P((aClient *sptr, char *umode));
 EXTERN aConfItem *find_conf_service __P((aClient *cptr, int type,
 					 aConfItem *aconf));

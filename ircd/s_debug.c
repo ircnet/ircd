@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.30 2001/12/30 07:24:08 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.31 2002/07/29 21:36:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -153,22 +153,13 @@ char	serveropts[] = {
 #ifdef DEBUGMODE
 static	char	debugbuf[2*READBUF_SIZE]; /* needs to be big.. */
 
-#if ! USE_STDARG
-void	debug(level, form, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
-int	level;
-char	*form, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10;
-#else
 void	debug(int level, char *form, ...)
-#endif
 {
 	int	err = errno;
 
 #ifdef	USE_SYSLOG
 	if (level == DEBUG_ERROR)
 	    {
-#if ! USE_STDARG
-		syslog(LOG_ERR, form, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
-#else
 # if HAVE_VSYSLOG
 		va_list va;
 		va_start(va, form);
@@ -181,20 +172,14 @@ void	debug(int level, char *form, ...)
 		va_end(va);
 		syslog(LOG_ERR, "%s", debugbuf);
 # endif
-#endif
 	    }
 #endif
 	if ((debuglevel >= 0) && (level <= debuglevel))
 	    {
-#if ! USE_STDARG
-		(void)sprintf(debugbuf, form,
-				p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
-#else
 		va_list va;
 		va_start(va, form);
 		(void)vsprintf(debugbuf, form, va);
 		va_end(va);
-#endif
 		if (local[2])
 		    {
 			local[2]->sendM++;

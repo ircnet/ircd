@@ -1,3 +1,7 @@
+2002-07-29  Piotr Kucharski
+
+	* got rid of !STDARG from everywhere.
+
 2002-07-06  Jakub Vlasek
 
 	* struct_def.h: added defines for I: line flags. Added ->flags to

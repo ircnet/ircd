@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.23 2001/10/20 17:57:25 q Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.24 2002/07/29 21:36:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -45,22 +45,12 @@ init_io()
 }
 
 /* sendto_ircd() functions */
-#if ! USE_STDARG
-void
-sendto_ircd(pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
-char    *pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10;
-#else
 void
 vsendto_ircd(char *pattern, va_list va)
-#endif
 {
 	char	ibuf[4096];
 
-#if ! USE_STDARG
-	sprintf(ibuf, pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
-#else
 	vsprintf(ibuf, pattern, va);
-#endif
 	DebugLog((ALOG_DSPY, 0, "To ircd: [%s]", ibuf));
 	strcat(ibuf, "\n");
 	if (write(0, ibuf, strlen(ibuf)) != strlen(ibuf))
@@ -71,7 +61,6 @@ vsendto_ircd(char *pattern, va_list va)
 	    }
 }
 
-#if USE_STDARG
 void
 sendto_ircd(char *pattern, ...)
 {
@@ -80,7 +69,6 @@ sendto_ircd(char *pattern, ...)
         vsendto_ircd(pattern, va);
         va_end(va);
 }
-#endif
 
 /*
  * next_io

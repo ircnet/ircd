@@ -36,11 +36,7 @@
 
 EXTERN void init_filelogs();
 EXTERN void init_syslog();
-#if ! USE_STDARG
-EXTERN void sendto_log();
-#else /* USE_STDARG */
 EXTERN void vsendto_log (int, int, char *, va_list);
 EXTERN void sendto_log (int, int, char *, ...);
-#endif /* USE_STDARG */
 
 #undef EXTERN
