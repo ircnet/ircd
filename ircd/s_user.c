@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.214 2004/06/22 22:19:20 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.215 2004/06/24 16:01:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2574,20 +2574,10 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	user = parv[1];
-	/* one day we'll require path, remember to change in msgtab[] --B. */
-	path = parv[2]; /* Either defined or NULL (parc >= 2!!) */
+	path = parv[2];
 
-	if (IsAnOper(cptr))
-	    {
-		if (BadPtr(path))
-		    {
-			sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
-				   "KILL");
-			return 1;
-		    }
-		if (strlen(path) > (size_t) TOPICLEN)
-			path[TOPICLEN] = '\0';
-	    }
+	if (strlen(path) > (size_t) TOPICLEN)
+		path[TOPICLEN] = '\0';
 
 	/* first, _if coming from a server_ check for kill on UID */
 	if (IsServer(cptr))
@@ -2650,17 +2640,10 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		else
 #endif
 			inpath = cptr->sockhost;
-		if (!BadPtr(path))
-		    {
-			sprintf(buf, "%s%s (%s)",
-				cptr->name, IsOper(sptr) ? "" : "(L)", path);
-			path = buf;
-		    }
-		else
-			path = cptr->name;
+		sprintf(buf, "%s%s (%s)",
+			cptr->name, IsOper(sptr) ? "" : "(L)", path);
+		path = buf;
 	    }
-	else if (BadPtr(path))
-		 path = "*no-path*"; /* Bogus server sending??? */
 	/*
 	** Notify all *local* opers about the KILL (this includes the one
 	** originating the kill, if from this server--the special numeric
@@ -2730,8 +2713,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (MyConnect(acptr) && MyConnect(sptr) && IsAnOper(sptr))
 	    {
 		acptr->exitc = EXITC_KILL;
-		sprintf(buf2, "Local Kill by %s (%s)", sptr->name,
-			BadPtr(parv[2]) ? sptr->name : parv[2]);
+		sprintf(buf2, "Local Kill by %s (%s)", sptr->name, parv[2]);
 	    }
 	else
 	    {
