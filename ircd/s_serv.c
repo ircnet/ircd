@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.239 2004/10/04 20:29:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.240 2004/10/04 23:05:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -990,7 +990,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	{
 		bysptr = find_uid(cptr->serv->byuid, NULL);
 		/* we are interrested only in *remote* opers */
-		if (MyConnect(bysptr))
+		if (bysptr && MyConnect(bysptr))
 		{
 			bysptr = NULL;
 		}
