@@ -39,9 +39,12 @@ EXTERN int close_chid __P((char *));
 EXTERN void cache_chid __P((aChannel *));
 EXTERN int check_chid __P((char *));
 EXTERN void collect_chid __P(());
-EXTERN int cid_ok __P((char *, int));
 
 EXTERN void init_sid __P((char *));
 EXTERN char *next_uid __P(());
 EXTERN int check_uid __P((char *));
+EXTERN char *ltoid __P((long l, int n));
+EXTERN long idtol __P((char *id, int n));
+EXTERN int sid_valid __P((char *sid));
+
 #undef EXTERN
