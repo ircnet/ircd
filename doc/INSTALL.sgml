@@ -4,9 +4,9 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.58 2004/05/12 17:29:36 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.59 2004/05/18 09:34:46 chopin Exp $
 <abstract>
-This document describes how to install, and configure IRC 2.11.0.
+This document describes how to install, and configure IRC 2.11.0
 </abstract>
 
 <sect>Installing IRC.
