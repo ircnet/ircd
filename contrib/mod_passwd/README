@@ -1,0 +1,30 @@
+$Id: README,v 1.1 1999/03/13 23:06:15 kalt Exp $
+
+This is an example module for the authentication program (iauth) used by
+the IRC server.
+
+* This module demonstrates how a module can access and use the PASS and
+  USER information provided by users.  It is *NOT* a finished product.  In
+  particular, the actual password validation is not implemented.
+
+* This module also demonstrates how a DSM module should be written.  You'll
+  note that it is completely identical to ordinary modules, except for one
+  extra function: "passwd_load()"
+
+To be used, this module needs to be compiled from the normal compilation
+directory.  It should be linked as a dynamic library.  Methods vary
+depending on the compiler and platform.
+
+$ gcc -c -g -I../iauth -I../common -I. ../contrib/mod_passwd/mod_passwd.c
+$ ld -Bshareable mod_passwd.o -o mod_passwd.so
+$ ls -l mod_passwd.so
+-rwxr--r--  1 kalt  staff  26932 Mar 13 17:59 mod_passwd.so
+$
+
+To be used by iauth, add the following lines to the iauth.conf file:
+
+      extinfo
+      shared passwd /path/to/mod_passwd.so
+      module passwd
+
+See iauth.conf(5) for more information on configuring iauth.
