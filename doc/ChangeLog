@@ -3,7 +3,7 @@
 	* s_id.c/cid_ok(): quite unfortunate typo which made joining
 	!channels impossible (from Michal Svoboda).
 
-1999-07-25  Christophe Kalt  <kalt@azurite.nyc.fp.deshaw.com>
+1999-07-25  Christophe Kalt
 
 	* channel.c: sanity checks to drop modes on +channels even when
 	received from servers (from Michal Svoboda).
