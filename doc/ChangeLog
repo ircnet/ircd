@@ -5,6 +5,7 @@
 	* s_serv.c/m_server_estab(): send njoin dot for other server to lock
 	  empty channel; also send modes for empty !channels.
 	* ircd.c/check_pings(): don't check pings more often than once in 30s.
+	* config.h.dist: default LISTENER_DELAY 1 for undefined SLOW_ACCEPT.
 
 2004-11-13  Piotr Kucharski
 
