@@ -1,3 +1,13 @@
+2003-07-19  Piotr Kucharski
+
+	* s_user.c/m_user(): changed unused (since 2.9.x) FLAGS_RILINE
+	  to FLAGS_RESTRICT.
+	* send.c/sendto_match_butone(),sendto_match_butone_old(): fixed
+	  comments.
+	* common/struct_def.h: added MATCH_OLDSYNTAX
+	* s_user.c/m_message(): accept old syntax of $/#-mask, correctly
+	  send both old and new syntax to old and new servers.
+
 2003-07-18  Piotr Kucharski
 
 	* irc_sprintf.c, irc_sprintf_body.c, irc_sprintf_ext.h: various
