@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.17 1997/07/28 01:14:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.18 1997/08/03 22:26:29 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -1128,7 +1128,7 @@ int	parc, notice;
 				else if (!notice)
 					sendto_one(sptr, err_str(
 						   ERR_TOOMANYTARGETS,
-						   parv[0]), nick);
+						   parv[0]), "Duplicate",nick);
 				continue;
 			    }
 		    }
