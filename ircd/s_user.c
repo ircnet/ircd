@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.45 1998/05/05 23:30:26 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.46 1998/06/12 23:06:06 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2256,8 +2256,7 @@ char	*parv[];
 		sendto_flag(SCH_NOTICE, "%s (%s@%s) is now operator (%c)",
 			    parv[0], sptr->user->username, sptr->user->host,
 			   IsOper(sptr) ? 'o' : 'O');
-		if (IsOper(sptr))
-			send_umode_out(cptr, sptr, old);
+		send_umode_out(cptr, sptr, old);
  		sendto_one(sptr, rpl_str(RPL_YOUREOPER, parv[0]));
 #if !defined(CRYPT_OPER_PASSWORD) && (defined(FNAME_OPERLOG) ||\
     (defined(USE_SYSLOG) && defined(SYSLOG_OPER)))
@@ -2620,6 +2619,16 @@ char	*parv[];
 				      parv[0]);
 #endif
 	    }
+	else if (MyConnect(sptr) && !IsLocOp(sptr) && (setflags & FLAGS_LOCOP))
+	    {
+		istat.is_oper--;
+#ifdef USE_SERVICES
+		check_services_butone(SERVICE_WANT_OPER, sptr->user->server,
+				      sptr, ":%s MODE %s :-O", parv[0],     
+				      parv[0]);
+#endif                               
+	    }                         
+
 	return penalty;
 }
 	
