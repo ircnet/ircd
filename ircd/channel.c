@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.43 1998/06/12 22:59:57 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.44 1998/06/12 23:14:53 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1259,6 +1259,16 @@ char	*parv[], *mbuf, *pbuf;
 					   !IsServer(sptr) &&
 					   *chptr->chname == '#'))
 				    {
+					/*
+				        ** If the channel is +s, ignore +p
+					** modes coming from a server.
+					** (Otherwise, it's desynch'ed) -kalt
+					*/
+					if (whatt == MODE_ADD &&
+					    *ip == MODE_PRIVATE &&
+					    IsServer(sptr) &&
+					    (new & MODE_SECRET))
+						break;
 					if (whatt == MODE_ADD)
 					    {
 						if (*ip == MODE_PRIVATE)
