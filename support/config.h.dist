@@ -352,8 +352,6 @@
  *
  * NOTE: Enabling this feature will significantly increase the CPU usage
  * for servers carrying several hundred clients and getting many connections.
- *
- * IMPORTANT: This **MUST** defined if SLOW_ACCEPT is NOT defined
  */
 #define	CLONE_CHECK
 
@@ -600,6 +598,15 @@
 */
 #define SPLIT_CONNECT_NOTICE "Server is currently in split-mode."
 
+/*
+ * Undefining NO_OPER_REMOTE removes the restriction that O-lines only become
+ * fully effective for people on the 'same network' as the server.
+ * Defined, it increases the security of the server by
+ * placing restrictions on where people can use operator powers from.
+ * Dubious consideration, IMO.
+ */
+#undef	NO_OPER_REMOTE
+
 /* ------------------------- END CONFIGURATION SECTION -------------------- */
 #ifndef ENABLE_SUMMON
 #  undef LEAST_IDLE
@@ -625,6 +632,8 @@
 #error CLIENT_FLOOD needs redefining.
 # endif
 #else
+#error CLIENT_FLOOD undefined
+#endif
 
 /* sanity check */
 #if defined(DELAY_CLOSE)
@@ -636,20 +645,19 @@
 #  endif
 #endif
 
-
-#error CLIENT_FLOOD undefined
-#endif
-
 #if defined(ZIP_LINKS)
 # if	(ZIP_MINIMUM > ZIP_MAXIMUM)
 #error ZIP_MINIMUM needs redefining.
 # endif
 #endif
 
+/* I think we may allow undefining both SLOW_ACCEPT and CLONE_CHECK --B. */
+#if 0
 #if !defined(SLOW_ACCEPT) && !defined(CLONE_CHECK)
 # define	CLONE_CHECK
 # define	CLONE_MAX       2
 # define	CLONE_PERIOD    10
+#endif
 #endif
 
 /*
@@ -728,14 +736,6 @@
 #ifndef SPLIT_SERVERS
 #error SPLIT_SERVERS must be defined
 #endif
-/*
- * Undefining NO_OPER_REMOTE removes the restriction that O-lines only become
- * fully effective for people on the 'same network' as the server.
- * Defined, it increases the security of the server by
- * placing restrictions on where people can use operator powers from.
- * Dubious consideration, IMO.
- */
-#undef	NO_OPER_REMOTE
 
 #if defined(CONFIG_DIRECTIVE_INCLUDE) && defined(M4_PREPROC)
 #error CONFIG_DIRECTIVE_INCLUDE and M4_PREPROC are mutually exclusive
