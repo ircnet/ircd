@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.35 2002/03/24 19:56:33 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.36 2002/04/04 20:32:03 jv Exp $";
 #endif
 
 #include "os.h"
@@ -378,7 +378,7 @@ char	*parv[];
 #endif
 
 	dist = parv[3];
-	type = atoi(parv[4]);
+	type = strtol(parv[4], NULL, 0);
 	info = parv[6];
 
 #ifdef	USE_SERVICES
@@ -505,7 +505,7 @@ char	*parv[];
 	int	type = 0;
 
 	if (parc > 2)
-		type = BadPtr(parv[2]) ? 0 : atoi(parv[2]);
+		type = BadPtr(parv[2]) ? 0 : strtol(parv[2], NULL, 0);
 	for (sp = svctop; sp; sp = sp->nexts)
 		if  ((acptr = sp->bcptr) && (!type || type == sp->type) &&
 		     (match(mask, acptr->name) == 0))
@@ -554,7 +554,7 @@ char	*parv[];
 		return 1;
 
 	/* check against configuration */
-	sptr->service->wants = atoi(parv[1]) & sptr->service->type;
+	sptr->service->wants = strtol(parv[1], NULL, 0) & sptr->service->type;
 	/* check that service is global for some requests */
 	if (strcmp(sptr->service->dist, "*"))
 		sptr->service->wants &= ~SERVICE_MASK_GLOBAL;
@@ -565,7 +565,7 @@ char	*parv[];
 		   sptr->service->wants);
 
 	if (parc < 3 ||
-	    ((burst = sptr->service->wants & atoi(parv[2])) == 0))
+	    ((burst = sptr->service->wants & strtol(parv[2], NULL, 0)) == 0))
 		return 0;
 
 	/*
