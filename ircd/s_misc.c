@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.61 2003/10/18 15:31:26 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.62 2003/10/18 16:48:16 q Exp $";
 #endif
 
 #include "os.h"
@@ -351,8 +351,8 @@ int	mark_blind_servers (aClient *cptr, aClient *server)
 **	comment: The original comment for the SQUIT. (Only for cptr itself.)
 **	comment2: The comment for (S)QUIT reasons for the rest.
 */
-void	exit_server(aClient *cptr, aClient *acptr, char *comment,
-		char *comment2)
+static	void	exit_server(aClient *cptr, aClient *acptr, char *comment,
+			char *comment2)
 {
 	aClient	*acptr2;
 	int	flags;

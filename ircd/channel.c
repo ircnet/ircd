@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.162 2003/10/18 15:55:10 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.163 2003/10/18 16:48:15 q Exp $";
 #endif
 
 #include "os.h"
@@ -161,7 +161,7 @@ static	char *make_nick_user_host(char *nick, char *name, char *host)
 	return (namebuf);
 }
 
-void	free_bei(aListItem *bei)
+static	void	free_bei(aListItem *bei)
 {
 	if (bei->nick != asterix)
 	{
@@ -178,7 +178,7 @@ void	free_bei(aListItem *bei)
 	MyFree(bei);
 }
 
-aListItem	*make_bei(char *nick, char *user, char *host)
+static	aListItem	*make_bei(char *nick, char *user, char *host)
 {
 	aListItem	*tmp;
 
@@ -1858,7 +1858,7 @@ void	clean_channelname(char *cn)
 ** XXX: Do NOT allow 2.10 and next version on the same net!
 **
 */
-void   convert_scandinavian(Reg char *cn, aClient *cptr)
+static	void   convert_scandinavian(Reg char *cn, aClient *cptr)
 {
 	if (ST_NOTUID(cptr) || MyPerson(cptr))
 	{

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.97 2003/10/18 15:31:24 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.98 2003/10/18 16:48:16 q Exp $";
 #endif
 
 #include "os.h"
@@ -1085,7 +1085,7 @@ int	main(int argc, char *argv[])
 }
 
 
-void	io_loop()
+static	void	io_loop(void)
 {
 	static	time_t	delay = 0;
 	int maxs = 4;

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.131 2003/10/18 15:31:26 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.132 2003/10/18 16:48:16 q Exp $";
 #endif
 
 #include "os.h"
@@ -2647,7 +2647,7 @@ int	m_restart(aClient *cptr, aClient *sptr, int parc, char *parv[])
 }
 #endif
 
-void	trace_one(aClient *sptr, aClient *acptr)
+static	void	trace_one(aClient *sptr, aClient *acptr)
 {
 	char *name;
 	int class;
@@ -3430,7 +3430,7 @@ static	int	check_link(aClient *cptr)
 ** Returns 0 if ok, all else is some kind of error, which serves
 ** as index in check_servername_errors[] table.
 */
-int	check_servername(char *hostname)
+static	int	check_servername(char *hostname)
 {
 	register char *ch;
 	int dots, chars, rc;
