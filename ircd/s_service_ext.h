@@ -21,6 +21,12 @@
     defined in ircd/s_service.c.
  */
 
+/*  External definitions for global variables.
+ */
+#ifndef S_SERVICE_C
+extern	aService	*svctop;
+#endif
+
 /*  External definitions for global functions.
  */
 #ifndef S_SERVICE_C

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.11 1997/09/03 20:33:26 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.12 1997/10/08 20:20:02 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -367,6 +367,7 @@ char	*comment;	/* Reason for the exit */
 	Reg	aClient	*acptr;
 	Reg	aClient	*next;
 	Reg	aServer *asptr;
+	Reg	aService *asvptr;
 #if defined(FNAME_USERLOG) || defined(USE_SYSLOG) || defined(USE_SERVICES)
 	time_t	on_for;
 #endif
@@ -497,7 +498,8 @@ char	*comment;	/* Reason for the exit */
 				    || (asptr->bcptr->from != sptr
 					&& asptr->bcptr != sptr))
 					continue;
-				/* This version doesn't need QUITs to be
+				/*
+			        ** This version doesn't need QUITs to be
 				** propagaged unless the remote server is
 				** hidden (by a hostmask)
 				*/
@@ -524,6 +526,7 @@ char	*comment;	/* Reason for the exit */
 			** on remote servers: services,it would be much smarter
 			** to only check services instead of wasting CPU - krys
 			*/
+#if 0
 			for (acptr = client; acptr; acptr = next)
 			    {
 				next = acptr->next;
@@ -531,7 +534,7 @@ char	*comment;	/* Reason for the exit */
 				    {
 					/*
 					** Let's see if things are ever wrong.
-					** Second step would be finally change
+					** Second step would be: finally change
 					** this loop to go through the services
 					** list. -krys
 					*/
@@ -547,6 +550,28 @@ char	*comment;	/* Reason for the exit */
 							comment1);
 				    }
 			    }
+#else
+			/*
+			** I'm now trying to put more comments in this function
+			** than code.  The above could be re-enabled some time
+			** for curiosity/debugging.
+			** I've only heard of one instance when the above
+			** notice showed up, and it was due to a bug, now
+			** fixed.
+			** With 2.9 combined NICK protocol, it should never
+			** happen, as a NICK is immediately associated to a
+			** server.
+			** Avalon made me do it. ;) -krys
+			*/
+			for (asvptr = svctop; asvptr; asvptr =(aService *)next)
+			    {
+				next = (aClient *)asvptr->nexts;
+				if ((acptr = asvptr->bcptr) && 
+				    acptr->from == sptr)
+					exit_one_client(NULL, acptr, &me,
+                                                        comment1);
+			    }
+#endif
 			/*
 			** Second SQUIT all servers behind this link
 			*/

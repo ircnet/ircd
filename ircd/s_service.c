@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.16 1997/09/11 03:50:31 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.17 1997/10/08 20:20:03 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -31,7 +31,7 @@ static  char rcsid[] = "@(#)$Id: s_service.c,v 1.16 1997/09/11 03:50:31 kalt Exp
 #include "s_externs.h"
 #undef S_SERVICE_C
 
-static	aService	*svctop = NULL;
+aService	*svctop = NULL;
 
 aService	*make_service(cptr)
 aClient	*cptr;
