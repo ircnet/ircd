@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.3 1997/06/08 23:06:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.4 1997/06/30 20:38:51 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -52,7 +52,7 @@ char	*s;
 **			of separators
 **			argv 9/90
 **
-**	$Id: support.c,v 1.3 1997/06/08 23:06:13 kalt Exp $
+**	$Id: support.c,v 1.4 1997/06/30 20:38:51 kalt Exp $
 */
 
 char *strtoken(save, str, fs)
@@ -106,7 +106,7 @@ char *str, *fs;
 **	strerror - return an appropriate system error string to a given errno
 **
 **		   argv 11/90
-**	$Id: support.c,v 1.3 1997/06/08 23:06:13 kalt Exp $
+**	$Id: support.c,v 1.4 1997/06/30 20:38:51 kalt Exp $
 */
 
 char *strerror(err_no)
@@ -140,7 +140,7 @@ int err_no;
 **			internet number (some ULTRIX don't have this)
 **			argv 11/90).
 **	inet_ntoa --	its broken on some Ultrix/Dynix too. -avalon
-**	$Id: support.c,v 1.3 1997/06/08 23:06:13 kalt Exp $
+**	$Id: support.c,v 1.4 1997/06/30 20:38:51 kalt Exp $
 */
 
 char	*inetntoa(in)
@@ -163,7 +163,7 @@ char	*in;
 /*
 **	inet_netof --	return the net portion of an internet number
 **			argv 11/90
-**	$Id: support.c,v 1.3 1997/06/08 23:06:13 kalt Exp $
+**	$Id: support.c,v 1.4 1997/06/30 20:38:51 kalt Exp $
 **
 */
 
@@ -590,16 +590,16 @@ char	*i0, *i1, *i2, *i3, *i4, *i5, *i6, *i7, *i8, *i9, *i10, *i11;
  */
 char *make_version()
 {
-	int ve, re, pl, be, al;
+	int ve, re, mi, dv, pl;
 	char ver[15];
 
-	sscanf(PATCHLEVEL, "%2d%2d%2d%2d%2d", &ve, &re, &pl, &be, &al);
+	sscanf(PATCHLEVEL, "%2d%2d%2d%2d%2d", &ve, &re, &mi, &dv, &pl);
 	sprintf(ver, "%d.%d", ve, re);	/* version & revision */
+	if (mi)	/* minor revision */
+		sprintf(ver + strlen(ver), ".%d", dv ? mi+1 : mi);
+	if (dv)	/* alpha/beta, note how visual patchlevel is raised above */
+		sprintf(ver + strlen(ver), "%c%d", DEVLEVEL, dv);
 	if (pl)	/* patchlevel */
-		sprintf(ver + strlen(ver), ".%d", be ? pl+1 : pl);
-	if (be)	/* beta, note how visual patchlevel is raised above */
-		sprintf(ver + strlen(ver), "b%d", be);
-	if (al)	/* patch */
-		sprintf(ver + strlen(ver), "p%d", al);
+		sprintf(ver + strlen(ver), "p%d", pl);
 	return mystrdup(ver);
 }
