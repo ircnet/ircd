@@ -77,4 +77,5 @@ EXTERN int m_set(aClient *cptr, aClient *sptr, int parc, char *parv[]);
 void	add_server_to_tree(aClient *cptr);
 void	remove_server_from_tree(aClient *cptr);
 void	do_emulated_eob(aClient *sptr);
+int	check_servername(char *);
 #undef EXTERN

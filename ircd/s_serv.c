@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.167 2004/03/07 21:42:19 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.168 2004/03/08 21:45:25 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -36,7 +36,6 @@ static	char	buf[BUFSIZE];
 static	int	check_link (aClient *);
 static	int	get_version (char *version, char *id);
 static	void	trace_one (aClient *sptr, aClient *acptr);
-static	int	check_servername (char *hostname);
 static	void	report_listeners(aClient *sptr, char *to);
 const	char	*check_servername_errors[3][2] = {
 	{ "too long", "Bogus servername - too long" },
@@ -3468,7 +3467,7 @@ static	int	check_link(aClient *cptr)
 ** Returns 0 if ok, all else is some kind of error, which serves
 ** as index in check_servername_errors[] table.
 */
-static	int	check_servername(char *hostname)
+int	check_servername(char *hostname)
 {
 	register char *ch;
 	int dots, chars, rc;
