@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.30 1997/10/06 15:04:46 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.31 1997/10/10 22:17:46 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2161,7 +2161,8 @@ char	*parv[];
 	if (!(aconf = find_conf_exact(name, sptr->username, sptr->sockhost,
 				      CONF_OPS)) &&
 	    !(aconf = find_conf_exact(name, sptr->username,
-				      inetntoa((char *)&cptr->ip), CONF_OPS)))
+				      (char *)inetntoa((char *)&cptr->ip),
+				      CONF_OPS)))
 	    {
 		sendto_one(sptr, err_str(ERR_NOOPERHOST, parv[0]));
 		return 1;
