@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.75 2002/03/14 02:05:20 jv Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.76 2002/03/14 23:14:20 jv Exp $";
 #endif
 
 #include "os.h"
@@ -653,7 +653,6 @@ char	*argv[];
 	make_server(&me);
 
 	version = make_version();	/* Generate readable version string */
-	isupport = make_isupport();	/* Generate RPL_ISUPPORT (005) numerics */
 
 	/*
 	** All command line parameters have the syntax "-fstring"
@@ -904,6 +903,12 @@ char	*argv[];
 				me.serv->sid);
 			exit(-1);
 		}
+		if (!networkname)
+		{
+			fprintf(stderr,
+			"Warning: Network name is not set in ircd.conf\n");
+		}
+		isupport = make_isupport();	/* Generate RPL_ISUPPORT (005) numerics */
 	    }
 
 	setup_me(&me);
