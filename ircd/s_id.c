@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.14 2001/12/27 18:55:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.15 2001/12/29 03:08:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -244,7 +244,7 @@ int cid_ok(char *name, int n)
 int	sid_valid(char *sid)
 {
 	if ((isdigit(sid[0]) || sid[0] == '$')
-		&& sid[SIDLEN] == '\0')
+		&& strlen(sid) <> SIDLEN)
 	{
 		return cid_ok(sid, SIDLEN - 1);
 	}
