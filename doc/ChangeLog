@@ -1,3 +1,7 @@
+2004-07-15  Jakub Vlasek
+	
+	* s_bsd.c/activate_delayed_listeners(): Use ListenerLL.
+
 2004-07-13  Piotr Kucharski
 
 	* s_conf.c: move oper flags config.h restrictions from initconf() to
