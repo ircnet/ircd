@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.39 2004/02/12 19:39:08 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.40 2004/03/07 03:02:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -171,11 +171,6 @@ void	debug(int level, char *form, ...)
 		va_start(va, form);
 		(void)vsprintf(debugbuf, form, va);
 		va_end(va);
-		if (local[2])
-		    {
-			local[2]->sendM++;
-			local[2]->sendB += strlen(debugbuf);
-		    }
 		(void)fprintf(stderr, "%s\n", debugbuf);
 	    }
 	errno = err;

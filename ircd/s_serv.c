@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.165 2004/03/07 02:47:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.166 2004/03/07 03:02:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2796,11 +2796,6 @@ static	void	trace_one(aClient *sptr, aClient *acptr)
                         sendto_one(sptr, replies[RPL_TRACESERVICE], ME, to,
 				   class, name,
 				   acptr->service->type, acptr->service->wants);
-                        break;
-
-                case STAT_LOG:
-                        sendto_one(sptr, replies[RPL_TRACELOG], ME, to, ME,
-                                   acptr->port);
                         break;
 
                 default: /* ...we actually shouldn't come here... --msa */

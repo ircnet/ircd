@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.87 2004/03/07 02:47:50 chopin Exp $
+ *   $Id: struct_def.h,v 1.88 2004/03/07 03:02:13 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -111,7 +111,6 @@ typedef struct        LineItem aExtData;
 #define	BOOT_STRICTPROT	0x200
 #define	BOOT_NOIAUTH	0x400
 
-#define	STAT_LOG	-6	/* logfile for -x */
 #define	STAT_MASTER	-5	/* Local ircd master before identification */
 #define	STAT_CONNECTING	-4
 #define	STAT_HANDSHAKE	-3
@@ -134,7 +133,6 @@ typedef struct        LineItem aExtData;
 				 (x)->status == STAT_MASTER)
 #define	IsServer(x)		((x)->status == STAT_SERVER)
 #define	IsClient(x)		((x)->status == STAT_CLIENT)
-#define	IsLog(x)		((x)->status == STAT_LOG)
 #define	IsService(x)		((x)->status == STAT_SERVICE && (x)->service)
 
 #define	SetMaster(x)		((x)->status = STAT_MASTER)
@@ -144,7 +142,6 @@ typedef struct        LineItem aExtData;
 #define	SetUnknown(x)		((x)->status = STAT_UNKNOWN)
 #define	SetServer(x)		((x)->status = STAT_SERVER)
 #define	SetClient(x)		((x)->status = STAT_CLIENT)
-#define	SetLog(x)		((x)->status = STAT_LOG)
 #define	SetService(x)		((x)->status = STAT_SERVICE)
 
 #define	FLAGS_PINGSENT	0x0000001 /* Unreplied ping sent */

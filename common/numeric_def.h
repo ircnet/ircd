@@ -342,7 +342,6 @@
 #define	RPL_ADMINLOC2        258
 #define	RPL_ADMINEMAIL       259
 
-#define	RPL_TRACELOG         261
 #define	RPL_TRACEEND         262
 #define	RPL_TRYAGAIN         263
 

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.112 2004/03/07 02:47:50 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.113 2004/03/07 03:02:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -405,7 +405,7 @@ static	time_t	check_pings(time_t currenttime)
 
 	for (i = highest_fd; i >= 0; i--)
 	    {
-		if (!(cptr = local[i]) || IsListening(cptr) || IsLog(cptr))
+		if (!(cptr = local[i]) || IsListening(cptr))
 			continue;
 
 #ifdef TIMEDKLINES
@@ -1204,15 +1204,6 @@ static	void	open_debugfile()
 
 	if (debuglevel >= 0)
 	    {
-		cptr = make_client(NULL);
-		cptr->fd = 2;
-		SetLog(cptr);
-		cptr->port = debuglevel;
-		cptr->flags = 0;
-		cptr->acpt = cptr;
-		local[2] = cptr;
-		(void)strcpy(cptr->sockhost, me.sockhost);
-
 		(void)printf("isatty = %d ttyname = %#x\n",
 			isatty(2), (u_int)ttyname(2));
 		if (!(bootopt & BOOT_TTY)) /* leave debugging output on fd 2 */
@@ -1226,17 +1217,12 @@ static	void	open_debugfile()
 				(void)dup2(fd, 2);
 				(void)close(fd); 
 			    }
-			strncpyzt(cptr->name, IRCDDBG_PATH,sizeof(cptr->name));
 		    }
-		else if (isatty(2) && ttyname(2))
-			strncpyzt(cptr->name, ttyname(2), sizeof(cptr->name));
-		else
-			(void)strcpy(cptr->name, "FD2-Pipe");
 		Debug((DEBUG_FATAL, "Debug: File <%s> Level: %d at %s",
-			cptr->name, cptr->port, myctime(time(NULL))));
+			( (!(bootopt & BOOT_TTY)) ? IRCDDBG_PATH :
+			(isatty(2) && ttyname(2)) ? ttyname(2) : "FD2-Pipe"),
+			debuglevel, myctime(time(NULL))));
 	    }
-	else
-		local[2] = NULL;
 #endif
 	return;
 }
