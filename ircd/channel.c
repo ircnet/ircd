@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.101 1999/07/05 16:25:33 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.102 1999/07/19 00:05:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1001,30 +1001,38 @@ char	*parv[], *mbuf, *pbuf;
 			whatt = MODE_DEL;
 			break;
 		case 'O':
-			if (*chptr->chname == '!' && parc > 0 &&
-			    IsMember(sptr, chptr))
-			    {
-				*penalty += 1;
-				parc--;
-				/* Feature: no other modes after this query */
-                                *(curr+1) = '\0';
-				for (lp = chptr->members; lp; lp = lp->next)
-					if (lp->flags & CHFL_UNIQOP)
-					    {
+			if (*chptr->chname == '!' && parc > 0)
+			    if (IsMember(sptr, chptr))
+			        {
+					*penalty += 1;
+					parc--;
+					/* Feature: no other modes after this query */
+     	                           *(curr+1) = '\0';
+					for (lp = chptr->members; lp; lp = lp->next)
+						if (lp->flags & CHFL_UNIQOP)
+						    {
+							sendto_one(sptr,
+							   rpl_str(RPL_UNIQOPIS,
+								   sptr->name),
+								   chptr->chname,
+							   lp->value.cptr->name);
+							break;
+						    }
+					if (!lp)
 						sendto_one(sptr,
-						   rpl_str(RPL_UNIQOPIS,
-							   sptr->name),
-							   chptr->chname,
-						   lp->value.cptr->name);
+							   err_str(ERR_NOSUCHNICK,
+								   sptr->name),
+							   chptr->chname);
+					break;
+				    }
+				else
+					if (!IsServer(sptr))
+					    {
+						sendto_one(sptr, err_str(ERR_NOTONCHANNEL, sptr->name),
+							    chptr->chname);
+						*(curr+1) = '\0';
 						break;
 					    }
-				if (!lp)
-					sendto_one(sptr,
-						   err_str(ERR_NOSUCHNICK,
-							   sptr->name),
-						   chptr->chname);
-				break;
-			    }
 			/*
 			 * is this really ever used ?
 			 * or do ^G & NJOIN do the trick?
@@ -1049,6 +1057,13 @@ char	*parv[], *mbuf, *pbuf;
 			    if (MyClient(sptr) || opcnt >= MAXMODEPARAMS + 1)
 #endif
 				break;
+			if (!IsServer(sptr) && !IsMember(sptr, chptr))
+			    {
+				sendto_one(sptr, err_str(ERR_NOTONCHANNEL,
+								 sptr->name),
+					    chptr->chname);
+				break;
+			    }
 			/*
 			 * Check for nickname changes and try to follow these
 			 * to make sure the right client is affected by the
@@ -1356,7 +1371,7 @@ char	*parv[], *mbuf, *pbuf;
 				    whatt == MODE_DEL && *chptr->chname == '!')
 					sendto_one(sptr,
 					   err_str(ERR_UNIQOPRIVSNEEDED,
-						   parv[0]), chptr->chname);
+						   sptr->name), chptr->chname);
 				else if (((*ip == MODE_ANONYMOUS &&
 					   whatt == MODE_ADD &&
 					   *chptr->chname == '#') ||
@@ -1365,7 +1380,7 @@ char	*parv[], *mbuf, *pbuf;
 					 !IsServer(sptr))
 					sendto_one(cptr,
 						   err_str(ERR_UNKNOWNMODE,
-						   parv[0]), *curr,
+						   sptr->name), *curr,
 						   chptr->chname);
 				else if ((*ip == MODE_REOP ||
 					  *ip == MODE_ANONYMOUS) &&
@@ -1375,7 +1390,7 @@ char	*parv[], *mbuf, *pbuf;
 					/* 2 modes restricted to UNIQOP */
 					sendto_one(sptr,
 					   err_str(ERR_UNIQOPRIVSNEEDED,
-						   parv[0]), chptr->chname);
+						   sptr->name), chptr->chname);
 				else
 				    {
 					/*
@@ -2532,8 +2547,12 @@ char	*parv[];
 			continue;
 		if (!IsServer(sptr) && !is_chan_op(sptr, chptr))
 		    {
-			sendto_one(sptr, err_str(ERR_CHANOPRIVSNEEDED,
-				   parv[0]), chptr->chname);
+			if (!IsMember(sptr, chptr))
+				sendto_one(sptr, err_str(ERR_NOTONCHANNEL,
+					    parv[0]), chptr->chname);
+			else
+				sendto_one(sptr, err_str(ERR_CHANOPRIVSNEEDED,
+					    parv[0]), chptr->chname);
 			continue;
 		    }
 		if (len + mlen + strlen(name) < (size_t) BUFSIZE / 2)
