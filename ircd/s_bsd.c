@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.2 1997/04/14 15:04:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.3 1997/04/14 20:03:48 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1854,7 +1854,7 @@ FdAry	*fdp;
 			if (udpfd > highfd)
 				highfd = udpfd;
 #else
-			res_pfd = pfd;
+			udp_pfd = pfd;
 #endif
 		    }
 		if (resfd >= 0)
@@ -1919,7 +1919,7 @@ FdAry	*fdp;
 	    {
 		polludp();
 		nfds--;
-		CLR_READ_EVENT(udpfd, res_pfd);
+		CLR_READ_EVENT(udpfd, udp_pfd);
 	    }
 
 #ifndef	_DO_POLL_
@@ -2012,6 +2012,7 @@ FdAry	*fdp;
 				sendto_flag(SCH_ERROR,
 					    "All connections in use. (%s)",
 					    get_client_name(cptr, TRUE));
+				find_bounce(NULL, fdnew);
 				(void)send(fdnew,
 					   "ERROR :All connections in use\r\n",
 					   32, 0);
@@ -2781,7 +2782,7 @@ int	len;
 static	void	polludp()
 {
 	static	time_t	last = 0;
-	static	int	cnt = 0, mlen = 0;
+	static	int	cnt = 0, mlen = 0, lasterr = 0;
 	Reg	char	*s;
 	struct	sockaddr_in	from;
 	Ping	pi;
@@ -2800,16 +2801,9 @@ static	void	polludp()
 	Debug((DEBUG_DEBUG,"udp poll"));
 
 	n = recvfrom(udpfd, readbuf, mlen, 0, (SAP)&from, &fromlen);
-	if (timeofday == last)
-		if (++cnt > 14)
-			return;
-	else
-		cnt = 0, last = timeofday;
-	Debug((DEBUG_NOTICE, "udp (%d) %d bytes from %s,%d", cnt, n,
-		inetntoa((char *)&from.sin_addr), ntohs(from.sin_port)));
-
 	if (n == -1)
 	    {
+		ircstp->is_udperr++;
 		if ((errno == EWOULDBLOCK) || (errno == EAGAIN))
 			return;
 		else
@@ -2818,8 +2812,31 @@ static	void	polludp()
 			return;
 		    }
 	    }
+
+	sendto_flag(SCH_DEBUG, "udp packet from: %d bytes from %s.%d",
+		    n,inetntoa((char *)&from.sin_addr),
+		    ntohs(from.sin_port));
+	if (timeofday == last)
+	    {
+		if (timeofday > lasterr + 30)
+		    {
+			sendto_flag(SCH_NOTICE,
+				    "udp packet dropped: %d bytes from %s.%d",
+				    n,inetntoa((char *)&from.sin_addr),
+				    ntohs(from.sin_port));
+			lasterr = timeofday;
+		    }
+		ircstp->is_udpdrop++;
+		return;
+	    }
+	else
+		cnt = 0, last = timeofday;
+
+	Debug((DEBUG_NOTICE, "udp (%d) %d bytes from %s,%d", cnt, n,
+		inetntoa((char *)&from.sin_addr), ntohs(from.sin_port)));
+
 	readbuf[n] = '\0';
-	ircstp->is_udp++;
+	ircstp->is_udpok++;
 	if (n  < 8)
 		return;
 

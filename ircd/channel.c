@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.2 1997/04/14 15:04:15 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.3 1997/04/14 20:03:48 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -488,6 +488,9 @@ aClient	*mp;
 	chptr = get_channel(mp, "&LOCAL", CREATE);
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
+	chptr = get_channel(mp, "&DEBUG", CREATE);
+	add_user_to_channel(chptr, mp, CHFL_CHANOP);
+	chptr->mode.mode = smode|MODE_PRIVATE;
 
 	setup_svchans();
 }
@@ -701,6 +704,10 @@ char	*parv[];
 			    }
 			if (strlen(modebuf) > (size_t)1)
 			    {	/* got new mode to pass on */
+				sendto_match_servs(chptr, cptr,
+						   ":%s MODE %s %s %s",
+						   parv[0], name, modebuf,
+						   parabuf);
 				if ((IsServer(cptr) && !IsServer(sptr) &&
 				     !chanop) || mcount < 0)
 				    {
@@ -727,10 +734,6 @@ char	*parv[];
 						      parv[0], name, modebuf);
 #endif
 				    }
-				sendto_match_servs(chptr, cptr,
-						   ":%s MODE %s %s %s",
-						   parv[0], name, modebuf,
-						   parabuf);
 			   } /* if(modebuf) */
 		    } /* else(parc>2) */
 	    } /* for (parv1) */

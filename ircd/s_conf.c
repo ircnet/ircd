@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.2 1997/04/14 15:04:23 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.3 1997/04/14 20:03:49 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -159,7 +159,9 @@ attach_iline:
 		if (aconf->status & CONF_RCLIENT)
 			SetRestricted(cptr);
 		get_sockhost(cptr, uhost);
-		return attach_conf(cptr, aconf);
+		if ((i = attach_conf(cptr, aconf)) < -1)
+			find_bounce(cptr, aconf->pref);
+		return i;
 	    }
 	return -1;
 }
@@ -826,6 +828,10 @@ int	opt;
 			case 'a': /* of this server. */
 				aconf->status = CONF_ADMIN;
 				break;
+			case 'B': /* Name of alternate servers */
+			case 'b':
+				aconf->status = CONF_BOUNCE;
+				break;
 			case 'C': /* Server where I should try to connect */
 			  	  /* in case of lp failures             */
 				ccount++;
@@ -1375,3 +1381,51 @@ char	*interval, *reply;
 	    }
 	return(0);
 }
+
+/*
+** find_bounce
+**	send a bounce numeric to a client.
+**	if cptr is NULL, class is considered to be a fd (ugly, isn't it?)
+*/
+void	find_bounce(cptr, class)
+aClient *cptr;
+int	class;
+    {
+	Reg	aConfItem	*aconf;
+
+	for (aconf = conf; aconf; aconf = aconf->next)
+	    {
+		if (aconf->status & CONF_BOUNCE)
+			continue;
+		/* early rejection, connection class is unknown */
+		if (cptr == NULL && atoi(aconf->host) == -1)
+			continue;
+		/*
+		** "too many" type rejection, class is known.
+		** check if B line is for a class #,
+		** and if it is for a hostname.
+		*/
+		if (cptr && isdigit(*aconf->host) &&
+		    class != atoi(aconf->host) &&
+		    match(aconf->host, cptr->sockhost))
+			continue;
+
+		if (cptr)
+			sendto_one(cptr, rpl_str(RPL_BOUNCE, cptr->name),
+				   aconf->name,
+				   (aconf->port) ? aconf->port : 6667);
+		else
+		    {
+			char rpl[BUFSIZE];
+
+			irc_sprintf(rpl, rpl_str(RPL_BOUNCE, "unknown"),
+				    aconf->name,
+				    (aconf->port) ? aconf->port : 6667);
+			strcat(rpl, "\r\n");
+			send(class, rpl, strlen(rpl), 0);
+		    }
+		return;
+	    }
+	
+    }
+
