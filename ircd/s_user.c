@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.7 1997/05/05 18:27:03 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.8 1997/05/08 02:12:37 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -1849,7 +1849,7 @@ char	*parv[];
 	    {
 		sendto_serv_butone(cptr, ":%s KILL %s :%s!%s",
 				   parv[0], acptr->name, inpath, path);
-		if (chasing)
+		if (chasing && !IsClient(cptr))
 			sendto_one(cptr, ":%s KILL %s :%s!%s",
 				   ME, acptr->name, inpath, path);
 		acptr->flags |= FLAGS_KILLED;
