@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile,v 1.3 1997/04/14 15:09:39 kalt Exp $
+#*   $Id: Makefile,v 1.4 1997/04/14 18:00:20 kalt Exp $
 #*
 #*/
 
@@ -40,6 +40,8 @@ all install config configure:
 		fi; \
 		/bin/cp ../support/Makefile.irc ../support/Makefile.ircd .; \
 		cd ..; \
+		echo; \
+		echo "Have you read doc/README? (I hope so)"; \
 		echo "Next cd ${rev}, edit config.h and run make to build"; \
 	fi
 
