@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.186 2004/04/07 17:02:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.187 2004/05/12 16:36:38 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1996,7 +1996,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* Although I have no idea, why only for opers. --B. */
 		case 'o': case 'O':	/* O:lines */
 		case 'c': 		/* C:/N: lines */
-		case 'C': 		/* class usage */
+		case 'y': case 'Y': 	/* Y:lines */
 		case 'h': case 'H':	/* H:/D: lines */
 		case 'a': case 'A':	/* iauth conf */
 		case 'b': case 'B':	/* B:lines */
@@ -2123,9 +2123,6 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #endif
 	case 'B' : case 'b' : /* B conf lines */
 		report_configured_links(cptr, parv[0], CONF_BOUNCE);
-		break;
-	case 'C': /* class usage stats */
-		report_class_usage(cptr, BadTo(parv[0]));
 		break;
 	case 'c': /* C and N conf lines */
 		report_configured_links(cptr, parv[0], CONF_CONNECT_SERVER|
@@ -3775,20 +3772,5 @@ static void report_listeners(aClient *sptr, char *to)
 			timeofday - acptr->firsttime,
 			acptr->confs->value.aconf->clients,
 			IsListenerInactive(acptr) ? "inactive" : "active" );
-	}
-}
-
-/* Reports class usage */
-static void report_class_usage(aClient *sptr, char *to)
-{
-	aClass  *tmp;
-
-	for (tmp = FirstClass(); tmp; tmp = NextClass(tmp))
-	{
-		if (Links(tmp) > 0)
-		{
-			sendto_one(sptr, replies[RPL_TRACECLASS],
-				ME, to, Class(tmp), Links(tmp));
-		}
 	}
 }
