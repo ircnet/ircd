@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.90 2002/10/09 21:23:20 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.91 2002/11/24 15:29:53 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2434,6 +2434,8 @@ Reg	aClient	*cptr;
 int	*lenp;
 {
 	static	struct	SOCKADDR_IN	server;
+	struct SOCKADDR_IN outip;
+	
 	Reg	struct	hostent	*hp;
 	aClient	*acptr;
 	int	i;
@@ -2453,7 +2455,25 @@ int	*lenp;
 	bzero((char *)&server, sizeof(server));
 	server.SIN_FAMILY = AFINET;
 	get_sockhost(cptr, aconf->host);
-
+	
+	if (aconf->source_ip)
+	{
+		memset(&outip, 0, sizeof(outip));
+		outip.SIN_PORT = 0;
+		outip.SIN_FAMILY = AFINET;
+#ifdef INET6
+		if (!inetpton(AF_INET6, aconf->source_ip, outip.sin_addr.s6_addr))
+#else
+		if ((outip.sin_addr.s_addr = inetaddr(aconf->source_ip)) == -1)
+#endif
+		{
+			memcpy(&mysk, &outip, sizeof(mysk));		
+		}
+	}
+	else
+	{
+		memcpy(&outip, &mysk, sizeof(mysk));		
+	}
 	if (cptr->fd == -1)
 	    {
 		report_error("opening stream socket to server %s:%s", cptr);
@@ -2465,7 +2485,7 @@ int	*lenp;
 	** with more than one IP#.
 	** With VIFs, M:line defines outgoing IP# and initialises mysk.
 	*/
-	if (bind(cptr->fd, (SAP)&mysk, sizeof(mysk)) == -1)
+	if (bind(cptr->fd, (SAP)&outip, sizeof(outip)) == -1)
 	    {
 		report_error("error binding to local port for %s:%s", cptr);
 		return NULL;
