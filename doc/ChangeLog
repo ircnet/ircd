@@ -1,3 +1,11 @@
+2004-03-20  Jakub Vlasek
+
+	* struct_def.h: Added PFLAG_DELAYED, PFLAG_SERVERONLY,
+	  IsConfDelayed(), IsConfServeronly().
+	* s_serv.c/report_listeners(): Report P-line flags.
+	* s_conf.c: Added pline_flags_parse() and pline_flags_to_string().
+	* s_conf.c/initconf(): Parse P-line flags.
+
 2004-03-19  Jakub Vlasek
 
 	* s_serv.c/m_server_estab(): Introduce services to 2.11 using new
