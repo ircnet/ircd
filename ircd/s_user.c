@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.156 2003/08/08 19:16:14 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.157 2003/08/08 21:56:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -255,7 +255,7 @@ int	server;
 	if (!strcasecmp(nick, "anonymous"))
 		return 0;
 
-	for (ch = nick; *ch && (ch - nick) < NICKLEN; ch++)
+	for (ch = nick; *ch && (ch - nick) < (server?NICKLEN:ONICKLEN); ch++)
 	{
 		/* Transition period. Until all 2.10 are gone, disable
 		** these chars in nicks for users. --B. */
