@@ -15,6 +15,7 @@ struct Config
 static aConfig	*config_read(int, int);
 static void	config_free(aConfig *);
 
+#ifdef CONFIG_DIRECTIVE_INCLUDE
 /* 
 ** Syntax of include is simple (but very strict):
 ** #include "filename"
@@ -185,3 +186,4 @@ void config_free(aConfig *cnf)
 		MyFree(p);
 	}
 }
+#endif /* CONFIG_DIRECTIVE_INCLUDE */
