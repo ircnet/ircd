@@ -55,6 +55,8 @@ EXTERN aConfItem *find_conf_name (char *name, int statmask);
 EXTERN aConfItem *find_conf (Link *lp, char *name, int statmask);
 EXTERN aConfItem *find_conf_host (Reg Link *lp, char *host,
 				      Reg int statmask);
+EXTERN aConfItem *find_conf_host_sid (Reg Link *lp, char *host, char *sid,
+				      Reg int statmask);
 EXTERN aConfItem *find_conf_ip (Link *lp, char *ip, char *user,
 				    int statmask);
 EXTERN aConfItem *find_conf_entry (aConfItem *aconf, u_int mask);
