@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.106 2002/07/30 00:15:00 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.107 2002/07/30 16:29:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2419,7 +2419,7 @@ void trace_one(aClient *sptr, aClient *acptr)
 	int class;
 	char *to;
 
-	to = HasUID(sptr) ? sptr->user->uid : sptr->name;
+	to = ST_UID(acptr) && HasUID(sptr) ? sptr->user->uid : sptr->name;
 	
 	name = get_client_name(acptr, FALSE);
 	class = get_client_class(acptr);
