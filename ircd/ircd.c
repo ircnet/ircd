@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.95 2003/10/17 19:46:23 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.96 2003/10/17 19:49:38 q Exp $";
 #endif
 
 #include "os.h"
@@ -63,31 +63,6 @@ time_t	nextiarestart = 1;	/* next time to check if iauth is alive */
 #ifdef DELAYED_KILLS
 int	dk_tocheck = 0;		/* # clients we have to check */
 int	dk_lastfd = 0;		/* last fd we checked */
-#endif
-
-#ifdef	PROFIL
-extern	etext();
-
-RETSIGTYPE	s_monitor(s)
-int s;
-{
-	static	int	mon = 0;
-#if POSIX_SIGNALS
-	struct	sigaction act;
-#endif
-
-	(void)moncontrol(mon);
-	mon = 1 - mon;
-#if POSIX_SIGNALS
-	act.sa_handler = s_rehash;
-	act.sa_flags = 0;
-	(void)sigemptyset(&act.sa_mask);
-	(void)sigaddset(&act.sa_mask, SIGUSR1);
-	(void)sigaction(SIGUSR1, &act, NULL);
-#else
-	(void)signal(SIGUSR1, s_monitor);
-#endif
-}
 #endif
 
 RETSIGTYPE s_die(s)

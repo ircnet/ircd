@@ -52,9 +52,6 @@ extern time_t nextexpire;
 #else /* IRCD_C */
 #define EXTERN
 #endif /* IRCD_C */
-#ifdef	PROFIL
-EXTERN RETSIGTYPE s_monitor __P((int s));
-#endif /* PROFIL */
 EXTERN RETSIGTYPE s_die __P((int s));
 EXTERN void restart __P((char *mesg));
 EXTERN RETSIGTYPE s_restart __P((int s));
