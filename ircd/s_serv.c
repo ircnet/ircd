@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.48 1998/10/29 07:56:03 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.49 1998/11/02 17:50:41 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1083,9 +1083,7 @@ char	*parv[];
 	    {
 		int	qlen = strlen(parv[2]);
 
-		if ((qlen < 4 || qlen < (int)strlen(parv[1]) ||
-		     index(parv[2]+1, '*') || index(parv[2]+1, '?')) &&
-		    IsServer(cptr) && check_link(cptr))
+		if (IsServer(cptr) && check_link(cptr) && !IsOper(sptr))
 		    {
 			sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
 				   "LINKS");
@@ -1344,7 +1342,7 @@ char	*parv[];
 
 	if (IsServer(cptr) &&
 	    (stat != 'd' && stat != 'p' && stat != 'q' && stat != 's' &&
-	     stat != 't' && stat != 'u' && stat != 'v') &&
+	     stat != 'u' && stat != 'v') &&
 	    !(stat == 'o' && IsOper(sptr)))
 	    {
 		if (check_link(cptr))
@@ -1611,8 +1609,8 @@ char	*parv[];
 	int i;
 
 	for (i = 0; msgtab[i].cmd; i++)
-		sendto_one(sptr,":%s NOTICE %s :%s",
-			   ME, parv[0], msgtab[i].cmd);
+	  sendto_one(sptr,":%s NOTICE %s :%s",
+		     ME, parv[0], msgtab[i].cmd);
 	return 2;
     }
 
@@ -1638,11 +1636,11 @@ char	*parv[];
 	aClient *acptr;
 
 	if (parc > 2)
-		if(hunt_server(cptr, sptr, ":%s LUSERS %s :%s", 2, parc, parv)
-				!= HUNTED_ISME)
+		if (hunt_server(cptr, sptr, ":%s LUSERS %s :%s", 2, parc, parv)
+		    != HUNTED_ISME)
 			return 3;
 
-	if (parc == 1)
+	if (parc == 1 || !MyConnect(sptr))
 	    {
 		sendto_one(sptr, rpl_str(RPL_LUSERCLIENT, parv[0]),
 			   istat.is_user[0] + istat.is_user[1],
