@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.117 2002/11/25 21:41:54 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.118 2002/12/28 21:22:40 jv Exp $";
 #endif
 
 #include "os.h"
@@ -3126,6 +3126,116 @@ char	*parv[];
 }
 #endif
 
+#if defined(OPER_SET) || defined(LOCOP_SET)
+int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+	typedef struct
+	{
+		int id;
+		char *command;
+	} SetEntry;
+
+	SetEntry set_table[] =
+	{
+		{ TSET_POOLSIZE, "POOLSIZE" },
+		{ TSET_ACONNECT, "ACONNECT" },
+		{ 0, NULL }
+	};
+	int i, acmd = 0;
+
+	if (parc > 1)
+	{
+		/* Find specified command */	
+		for (i = 0; set_table[i].command != NULL; i++)
+		{
+			if (!mycmp(parv[1], set_table[i].command))
+			{
+				acmd = set_table[i].id;
+				break;
+			}
+		}
+		/* Invalid option requested */
+		if (!acmd)
+		{
+			sendto_one(sptr, ":%s NOTICE %s :Invalid option %s",
+					ME, parv[0], parv[1]);
+		}
+	}
+	else
+	{
+		/* No arguments, list all avaible options */
+		acmd = TSET_SHOWALL;
+	}
+
+	if (parc > 2)
+	{
+		/* Change settings */
+		switch (acmd)
+		{
+			case TSET_ACONNECT:
+			{
+				if (!mycmp(parv[2], "ON"))
+				{
+					iconf.aconnect = 1;
+				}
+				else if (!mycmp(parv[2], "OFF"))
+				{
+					iconf.aconnect = 0;
+				}
+				else
+				{
+					sendto_one(sptr, ":%s NOTICE %s SET "
+						":Illegal value for ACONNECT"
+						"Possible values: ON OFF",
+						ME, parv[0]);
+					break;
+				}
+				sendto_flag(SCH_NOTICE, "%s changed value of "
+					"ACONNECT to %s", sptr->name, parv[2]);
+				break;
+			} /* TSET_ACONNECT */
+
+			case TSET_POOLSIZE:
+			{
+				int tmp;
+				tmp = atoi(parv[2]);
+				if (poolsize > tmp)
+				{
+					sendto_one(sptr,
+						":%s NOTICE %s SET :Poolsize"
+						" can not be made smaller", ME,
+						parv[0]);
+							
+				}
+				else
+				{
+					sendto_flag(SCH_NOTICE,
+						"%s changed value of poolsize"
+						" from %d to %d", sptr->name,
+						poolsize, tmp);
+					poolsize = tmp;
+				}
+				break;
+			} /* TSET_POOLSIZE */
+		} /* switch(acmd) */
+	} /* parc > 2 */
+
+	if (acmd)
+	{
+		if (acmd & TSET_POOLSIZE)
+		{
+			sendto_one(sptr, ":%s NOTICE %s :POOLSIZE = %d",
+				ME, parv[0], poolsize);
+		}
+		if (acmd & TSET_ACONNECT)
+		{
+			sendto_one(sptr, ":%s NOTICE %s :ACONNECT = %s", ME,
+				parv[0], iconf.aconnect == 1 ? "ON" : "OFF");
+		}
+	}
+	return 1;
+}
+#endif
 /*
 ** storing server names in User structures is a real waste,
 ** the following functions change it to only store a pointer.
