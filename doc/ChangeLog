@@ -1,3 +1,8 @@
+1999-07-11  Piotr Kucharski
+
+	* mod_socks.c/socks_write(): a typo made iauth allow open proxies
+	and caused a lot of false BADPROTO warnings (from KIKUCHI Takahiro).
+
 1999-07-09  Christophe Kalt
 
 	* configure.in, os.h, s_bsd.c: IPv6 updates (from KIKUCHI Takahiro).
@@ -10,7 +15,7 @@
 1999-07-05  Piotr Kucharski
 
 	* channel.c/m_invite(): invite to :-channels was sometimes 
-	lost with no error
+	lost with no error.
 
 1999-07-04  Christophe Kalt
 
