@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.62 1998/09/10 21:05:49 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.63 1998/09/13 16:48:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1037,11 +1037,13 @@ char	*parv[], *mbuf, *pbuf;
 			** just some extra messages if nick appeared more than
 			** once in the MODE message... --msa
 			*/
+/* nobody can figure this part of the code anymore.. -kalt
 			if (chasing && ischop)
 				sendto_one(cptr, ":%s MODE %s %c%c %s",
 					   ME, chptr->chname,
 					   whatt == MODE_ADD ? '+' : '-',
 					   *curr, who->name);
+*/
 			count++;
 			*penalty += 2;
 			break;
