@@ -60,4 +60,5 @@ Admin:
 	  ircd values during runtime (like dbuf poolsize and autoconnect).
 	* Stats Z no longer computes real memory statistics unless DEBUGMODE
 	  set.
+	* Stats l shows count in Bytes, not kBytes.
 
