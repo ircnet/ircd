@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.89 2004/11/10 19:24:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.90 2004/11/11 22:05:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -184,22 +184,39 @@ int	send_message(aClient *to, char *msg, int len)
 tryagain:
 	if (len && (i = dbuf_put(&to->sendQ, msg, len)) < 0)
 	{
-		if (i == -2 && CBurst(to))
-		    {	/* poolsize was exceeded while connect burst */
-
+		if (i == -2	/* Poolsize was exceeded. */
+#ifdef POOLSIZE_LIMITED
+			/*
+			** Defining this retains old ircd behaviour (will
+			** allow client quit with buffer allocation error
+			** as a result of poolsize starvation). As it may
+			** happen to all clients on a big channel without
+			** their fault, I think this is not right.
+			** In the long run it should not matter (poolsize
+			** or memory usage-wise), because if client lacks
+			** the poolsize, the poolsize is too small anyway
+			** and next netburst would probably make it grow.
+			** IMO increasing poolsize with no limits is good
+			** for clients -- hence this is not defined. --B.
+			*/
+			&& CBurst(to)
+#endif
+			)
+		{
+			/* Anyway, 10% increase. */
 			poolsize *= 1.1;
 			sendto_flag(SCH_NOTICE,
 				    "New poolsize %d. (reached)",
 				    poolsize);
 			istat.is_dbufmore++;
 			goto tryagain;
-		    }
+		}
 		else
-		    {
+		{
 			to->exitc = EXITC_MBUF;
 			return dead_link(to,
 				"Buffer allocation error for %s");
-		    }
+		}
 	}
 	/*
 	** Update statistics. The following is slightly incorrect
