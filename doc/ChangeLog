@@ -1,3 +1,22 @@
+2004-06-06  Piotr Kucharski
+
+	* channel.c/set_mode(): allow +k even if there already is a key set.
+	* channel.c/check_string(): use global static asterix.
+	* channel.c/make_bei(): use check_string() before copying; also copy
+	  at most max lens for each part (problem reported by Marcin Rozycki).
+	* channel.c/set_mode(): get rid of make_nick_user_host(), use alist.
+	* channel.c/make_nick_user_host(): removed whole function.
+	* channel.c/set_mode(): possible tiny memleak fixed.
+
+2004-06-02  Piotr Kucharski
+
+	* match.c/isvalidusername(): allow two non-alphanums in username.
+
+2004-05-24  Piotr Kucharski
+
+	* channel.c/set_mode(): use supplied key when removing, don't change it
+	  before sending out to the one on the server.
+
 2004-05-18  Piotr Kucharski
 
 	* channel.c/m_njoin(): properly end buffers before sending.
