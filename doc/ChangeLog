@@ -1,3 +1,16 @@
+2002-04-16  Jakub Vlasek
+
+	* parse.c, parse_ext.h: added find_matching_client().
+	* struct_def.h: added usercnt[3] array to struct server for per-server
+	  user counts.
+	* channel.c, channel_ext.h: removed count_channels().
+	* s_misc.c/exit_one_client(), s_user.c/register_user, m_oper():
+	  Update per-server user count.
+	* s_serv.c/m_trace(): splitted into two functions, m_trace
+	  and trace_one().
+	* s_serv.c/m_lusers(),m_trace(): Improved performance by using
+	  per-server usercnt[], instead of counting users each time.
+
 2002-04-11  Piotr Kucharski
 
 	* s_user.c/register_user(): validusername() was checking also OTHER
