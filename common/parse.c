@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.82 2004/10/01 20:22:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.83 2004/10/23 13:54:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -31,80 +31,82 @@ static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.82 2004/10/01 20:22:1
 /* max parameters accepted */
 #define MPAR 15
 
+#define _m(f) {f, 0, 0, 0L, 0L}
 /* commands should be sorted by their average usage count */
 /* handlers are for: server, client, oper, service, unregistered */
 struct Message msgtab[] = {
-{ "PRIVMSG",  2, MPAR, 0, 0, 0L, { m_nop, m_private, m_private, m_nop, m_unreg } },
-{ "NJOIN",    2, MPAR, 0, 0, 0L, { m_njoin, m_nop, m_nop, m_nop, m_unreg } },
-{ "JOIN",     1, MPAR, 0, 0, 0L, { m_nop, m_join, m_join, m_nop, m_unreg } },
-{ "MODE",     1, MPAR, 0, 0, 0L, { m_mode, m_mode, m_mode, m_nop, m_unreg } },
-{ "UNICK",    7, MPAR, 0, 0, 0L, { m_unick, m_nop, m_nop, m_nop, m_unreg } },
-{ "NICK",     1, MPAR, 0, 0, 0L, { m_nick, m_nick, m_nick, m_nop, m_nick } },
-{ "PART",     1, MPAR, 0, 0, 0L, { m_part, m_part, m_part, m_nop, m_unreg } },
-{ "QUIT",     0, MPAR, 0, 0, 0L, { m_quit, m_quit, m_quit, m_quit, m_quit } },
-{ "NOTICE",   2, MPAR, 0, 0, 0L, { m_notice, m_notice, m_notice, m_notice, m_unreg } },
-{ "KICK",     2, MPAR, 0, 0, 0L, { m_kick, m_kick, m_kick, m_nop, m_unreg } },
-{ "SERVER",   2, MPAR, 0, 0, 0L, { m_server, m_nop, m_nop, m_nop, m_server } },
-{ "SMASK",    2, MPAR, 0, 0, 0L, { m_smask, m_nop, m_nop, m_nop, m_unreg } },
-{ "TRACE",    0, MPAR, 0, 0, 0L, { m_trace, m_trace, m_trace, m_nop, m_unreg } },
-{ "TOPIC",    1, MPAR, 0, 0, 0L, { m_nop, m_topic, m_topic, m_nop, m_unreg } },
-{ "INVITE",   2, MPAR, 0, 0, 0L, { m_nop, m_invite, m_invite, m_nop, m_unreg } },
-{ "WALLOPS",  1, MPAR, 0, 0, 0L, { m_wallops, m_nop, m_nop, m_nop, m_unreg } },
-{ "PING",     1, MPAR, 0, 0, 0L, { m_ping, m_ping, m_ping, m_ping, m_unreg } },
-{ "PONG",     1, MPAR, 0, 0, 0L, { m_pong, m_pong, m_pong, m_pong, m_unreg } },
-{ "ERROR",    1, MPAR, 0, 0, 0L, { m_error, m_nop, m_nop, m_nop, m_unreg } },
-{ "KILL",     2, MPAR, 0, 0, 0L, { m_kill, m_nopriv, m_kill, m_nop, m_unreg } },
-{ "SAVE",     1, MPAR, 0, 0, 0L, { m_save, m_nop, m_nop, m_nop, m_unreg } },
-{ "USER",     4, MPAR, 0, 0, 0L, { m_nop, m_reg, m_reg, m_nop, m_user } },
-{ "AWAY",     0, MPAR, 0, 0, 0L, { m_nop, m_away, m_away, m_nop, m_unreg } },
-{ "UMODE",    1, MPAR, 0, 0, 0L, { m_nop, m_umode, m_umode, m_nop, m_unreg } },
-{ "ISON",     1,    1, 0, 0, 0L, { m_ison, m_ison, m_ison, m_nop, m_unreg } },
-{ "SQUIT",    2, MPAR, 0, 0, 0L, { m_squit, m_nopriv, m_squit, m_nop, m_unreg } },
-{ "WHOIS",    1, MPAR, 0, 0, 0L, { m_whois, m_whois, m_whois, m_nop, m_unreg } },
-{ "WHO",      1, MPAR, 0, 0, 0L, { m_who, m_who, m_who, m_nop, m_unreg } },
-{ "WHOWAS",   1, MPAR, 0, 0, 0L, { m_whowas, m_whowas, m_whowas, m_nop, m_unreg } },
-{ "LIST",     0, MPAR, 0, 0, 0L, { m_list, m_list, m_list, m_nop, m_unreg } },
-{ "NAMES",    0, MPAR, 0, 0, 0L, { m_nop, m_names, m_names, m_nop, m_unreg } },
-{ "USERHOST", 1, MPAR, 0, 0, 0L, { m_userhost, m_userhost, m_userhost, m_nop, m_unreg } },
-{ "PASS",     1, MPAR, 0, 0, 0L, { m_nop, m_reg, m_reg, m_nop, m_pass } },
-{ "LUSERS",   0, MPAR, 0, 0, 0L, { m_lusers, m_lusers, m_lusers, m_nop, m_unreg } },
-{ "TIME",     0, MPAR, 0, 0, 0L, { m_nop, m_time, m_time, m_nop, m_unreg } },
-{ "OPER",     2, MPAR, 0, 0, 0L, { m_nop, m_oper, m_nop, m_nop, m_unreg } },
-{ "CONNECT",  1, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_connect, m_nop, m_unreg } },
-{ "VERSION",  0, MPAR, 0, 0, 0L, { m_nop, m_version, m_version, m_nop, m_unreg } },
-{ "STATS",    1, MPAR, 0, 0, 0L, { m_nop, m_stats, m_stats, m_nop, m_unreg } },
-{ "LINKS",    0, MPAR, 0, 0, 0L, { m_links, m_links, m_links, m_nop, m_unreg } },
-{ "ADMIN",    0, MPAR, 0, 0, 0L, { m_admin, m_admin, m_admin, m_admin, m_admin } },
-{ "USERS",    0, MPAR, 0, 0, 0L, { m_nop, m_users, m_users, m_nop, m_unreg } },
-{ "SUMMON",   0, MPAR, 0, 0, 0L, { m_nop, m_summon, m_summon, m_nop, m_unreg } },
-{ "HELP",     0, MPAR, 0, 0, 0L, { m_nop, m_help, m_help, m_nop, m_unreg } },
-{ "INFO",     0, MPAR, 0, 0, 0L, { m_nop, m_info, m_info, m_nop, m_unreg } },
-{ "MOTD",     0, MPAR, 0, 0, 0L, { m_nop, m_motd, m_motd, m_nop, m_unreg } },
-{ "CLOSE",    0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_close, m_nop, m_unreg } },
-{ "SERVICE",  4, MPAR, 0, 0, 0L, { m_service, m_nop, m_nop, m_nop, m_service } },
-{ "EOB",      0, MPAR, 0, 0, 0L, { m_eob, m_nop, m_nop, m_nop, m_unreg } },
-{ "EOBACK",   0, MPAR, 0, 0, 0L, { m_eoback, m_nop, m_nop, m_nop, m_unreg } },
-{ "ENCAP",    1, MPAR, 0, 0, 0L, { m_encap, m_nop, m_nop, m_nop, m_nop } },
-{ "SDIE",     0, MPAR, 0, 0, 0L, { m_sdie, m_nop, m_nop, m_nop, m_unreg } },
+{ "PRIVMSG",  2, MPAR, { _m(m_nop), _m(m_private), _m(m_private), _m(m_nop), _m(m_unreg) } },
+{ "NJOIN",    2, MPAR, { _m(m_njoin), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
+{ "JOIN",     1, MPAR, { _m(m_nop), _m(m_join), _m(m_join), _m(m_nop), _m(m_unreg) } },
+{ "MODE",     1, MPAR, { _m(m_mode), _m(m_mode), _m(m_mode), _m(m_nop), _m(m_unreg) } },
+{ "UNICK",    7, MPAR, { _m(m_unick), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
+{ "NICK",     1, MPAR, { _m(m_nick), _m(m_nick), _m(m_nick), _m(m_nop), _m(m_nick) } },
+{ "PART",     1, MPAR, { _m(m_part), _m(m_part), _m(m_part), _m(m_nop), _m(m_unreg) } },
+{ "QUIT",     0, MPAR, { _m(m_quit), _m(m_quit), _m(m_quit), _m(m_quit), _m(m_quit) } },
+{ "NOTICE",   2, MPAR, { _m(m_notice), _m(m_notice), _m(m_notice), _m(m_notice), _m(m_unreg) } },
+{ "KICK",     2, MPAR, { _m(m_kick), _m(m_kick), _m(m_kick), _m(m_nop), _m(m_unreg) } },
+{ "SERVER",   2, MPAR, { _m(m_server), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_server) } },
+{ "SMASK",    2, MPAR, { _m(m_smask), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
+{ "TRACE",    0, MPAR, { _m(m_trace), _m(m_trace), _m(m_trace), _m(m_nop), _m(m_unreg) } },
+{ "TOPIC",    1, MPAR, { _m(m_nop), _m(m_topic), _m(m_topic), _m(m_nop), _m(m_unreg) } },
+{ "INVITE",   2, MPAR, { _m(m_nop), _m(m_invite), _m(m_invite), _m(m_nop), _m(m_unreg) } },
+{ "WALLOPS",  1, MPAR, { _m(m_wallops), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
+{ "PING",     1, MPAR, { _m(m_ping), _m(m_ping), _m(m_ping), _m(m_ping), _m(m_unreg) } },
+{ "PONG",     1, MPAR, { _m(m_pong), _m(m_pong), _m(m_pong), _m(m_pong), _m(m_unreg) } },
+{ "ERROR",    1, MPAR, { _m(m_error), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
+{ "KILL",     2, MPAR, { _m(m_kill), _m(m_nopriv), _m(m_kill), _m(m_nop), _m(m_unreg) } },
+{ "SAVE",     1, MPAR, { _m(m_save), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
+{ "USER",     4, MPAR, { _m(m_nop), _m(m_reg), _m(m_reg), _m(m_nop), _m(m_user) } },
+{ "AWAY",     0, MPAR, { _m(m_nop), _m(m_away), _m(m_away), _m(m_nop), _m(m_unreg) } },
+{ "UMODE",    1, MPAR, { _m(m_nop), _m(m_umode), _m(m_umode), _m(m_nop), _m(m_unreg) } },
+{ "ISON",     1,    1, { _m(m_ison), _m(m_ison), _m(m_ison), _m(m_nop), _m(m_unreg) } },
+{ "SQUIT",    2, MPAR, { _m(m_squit), _m(m_nopriv), _m(m_squit), _m(m_nop), _m(m_unreg) } },
+{ "WHOIS",    1, MPAR, { _m(m_whois), _m(m_whois), _m(m_whois), _m(m_nop), _m(m_unreg) } },
+{ "WHO",      1, MPAR, { _m(m_who), _m(m_who), _m(m_who), _m(m_nop), _m(m_unreg) } },
+{ "WHOWAS",   1, MPAR, { _m(m_whowas), _m(m_whowas), _m(m_whowas), _m(m_nop), _m(m_unreg) } },
+{ "LIST",     0, MPAR, { _m(m_list), _m(m_list), _m(m_list), _m(m_nop), _m(m_unreg) } },
+{ "NAMES",    0, MPAR, { _m(m_nop), _m(m_names), _m(m_names), _m(m_nop), _m(m_unreg) } },
+{ "USERHOST", 1, MPAR, { _m(m_userhost), _m(m_userhost), _m(m_userhost), _m(m_nop), _m(m_unreg) } },
+{ "PASS",     1, MPAR, { _m(m_nop), _m(m_reg), _m(m_reg), _m(m_nop), _m(m_pass) } },
+{ "LUSERS",   0, MPAR, { _m(m_lusers), _m(m_lusers), _m(m_lusers), _m(m_nop), _m(m_unreg) } },
+{ "TIME",     0, MPAR, { _m(m_nop), _m(m_time), _m(m_time), _m(m_nop), _m(m_unreg) } },
+{ "OPER",     2, MPAR, { _m(m_nop), _m(m_oper), _m(m_nop), _m(m_nop), _m(m_unreg) } },
+{ "CONNECT",  1, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_connect), _m(m_nop), _m(m_unreg) } },
+{ "VERSION",  0, MPAR, { _m(m_nop), _m(m_version), _m(m_version), _m(m_nop), _m(m_unreg) } },
+{ "STATS",    1, MPAR, { _m(m_nop), _m(m_stats), _m(m_stats), _m(m_nop), _m(m_unreg) } },
+{ "LINKS",    0, MPAR, { _m(m_links), _m(m_links), _m(m_links), _m(m_nop), _m(m_unreg) } },
+{ "ADMIN",    0, MPAR, { _m(m_admin), _m(m_admin), _m(m_admin), _m(m_admin), _m(m_admin) } },
+{ "USERS",    0, MPAR, { _m(m_nop), _m(m_users), _m(m_users), _m(m_nop), _m(m_unreg) } },
+{ "SUMMON",   0, MPAR, { _m(m_nop), _m(m_summon), _m(m_summon), _m(m_nop), _m(m_unreg) } },
+{ "HELP",     0, MPAR, { _m(m_nop), _m(m_help), _m(m_help), _m(m_nop), _m(m_unreg) } },
+{ "INFO",     0, MPAR, { _m(m_nop), _m(m_info), _m(m_info), _m(m_nop), _m(m_unreg) } },
+{ "MOTD",     0, MPAR, { _m(m_nop), _m(m_motd), _m(m_motd), _m(m_nop), _m(m_unreg) } },
+{ "CLOSE",    0, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_close), _m(m_nop), _m(m_unreg) } },
+{ "SERVICE",  4, MPAR, { _m(m_service), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_service) } },
+{ "EOB",      0, MPAR, { _m(m_eob), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
+{ "EOBACK",   0, MPAR, { _m(m_eoback), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
+{ "ENCAP",    1, MPAR, { _m(m_encap), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_nop) } },
+{ "SDIE",     0, MPAR, { _m(m_sdie), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
 #ifdef	USE_SERVICES
-{ "SERVSET",  1, MPAR, 0, 0, 0L, { m_nop, m_nop, m_nop, m_servset, m_nop } },
+{ "SERVSET",  1, MPAR, { _m(m_nop), _m(m_nop), _m(m_nop), _m(m_servset), _m(m_nop) } },
 #endif
-{ "SQUERY",   2, MPAR, 0, 0, 0L, { m_nop, m_squery, m_squery, m_nop, m_unreg } },
-{ "SERVLIST", 0, MPAR, 0, 0, 0L, { m_servlist, m_servlist, m_servlist, m_nop, m_unreg } },
-{ "HAZH",     0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_hash, m_nop, m_nop } },
-{ "DNS",      0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_dns, m_nop, m_nop } },
-{ "REHASH",   0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_rehash, m_nop, m_unreg } },
-{ "RESTART",  0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_restart, m_nop, m_unreg } },
-{ "DIE",      0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_die, m_nop, m_unreg } },
-{ "SET",      0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_set, m_nop, m_unreg } },
-{ "MAP",      0, MPAR, 0, 0, 0L, { m_map, m_map, m_map, m_nop, m_unreg } },
-{ "POST",     0, MPAR, 0, 0, 0L, { m_nop, m_nop, m_nop, m_nop, m_post } },
+{ "SQUERY",   2, MPAR, { _m(m_nop), _m(m_squery), _m(m_squery), _m(m_nop), _m(m_unreg) } },
+{ "SERVLIST", 0, MPAR, { _m(m_servlist), _m(m_servlist), _m(m_servlist), _m(m_nop), _m(m_unreg) } },
+{ "HAZH",     0, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_hash), _m(m_nop), _m(m_nop) } },
+{ "DNS",      0, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_dns), _m(m_nop), _m(m_nop) } },
+{ "REHASH",   0, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_rehash), _m(m_nop), _m(m_unreg) } },
+{ "RESTART",  0, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_restart), _m(m_nop), _m(m_unreg) } },
+{ "DIE",      0, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_die), _m(m_nop), _m(m_unreg) } },
+{ "SET",      0, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_set), _m(m_nop), _m(m_unreg) } },
+{ "MAP",      0, MPAR, { _m(m_map), _m(m_map), _m(m_map), _m(m_nop), _m(m_unreg) } },
+{ "POST",     0, MPAR, { _m(m_nop), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_post) } },
 #ifdef TKLINE
-{ "TKLINE",   3, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_tkline, m_tkline, m_unreg } },
-{ "UNTKLINE", 1, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_untkline, m_untkline, m_unreg } },
+{ "TKLINE",   3, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_tkline), _m(m_tkline), _m(m_unreg) } },
+{ "UNTKLINE", 1, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_untkline), _m(m_untkline), _m(m_unreg) } },
 #endif
-{ NULL,       0,    0, 0, 0, 0L, { NULL, NULL, NULL, NULL, NULL } }
+{ NULL,       0,    0, { _m(NULL), _m(NULL), _m(NULL), _m(NULL), _m(NULL) } }
 };
+#undef _m
 
 /*
  * NOTE: parse() should not be called recursively by other functions!
@@ -569,6 +571,8 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	Reg	struct	Message *mptr = NULL;
 	int	ret;
 	int	status;
+	struct Cmd	*handler;
+	CmdHandler	fhandler;
 
 	Debug((DEBUG_DEBUG, "Parsing %s: %s",
 		get_client_name(cptr, FALSE), buffer));
@@ -677,7 +681,16 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 		    }
 		paramcount = mptr->maxparams;
 		i = bufend - ((s) ? s : ch);
-		mptr->bytes += i;
+		status = from->status < STAT_SERVER ? STAT_UNREG : from->status;
+		handler = &(mptr->handlers[status]);
+		fhandler = handler->handler;
+		handler->count++;
+		handler->bytes += i;
+		if (!MyConnect(from))
+		{
+			handler->rcount++;
+			handler->rbytes += i;
+		}
 		if (!(IsServer(cptr) || IsService(cptr)))
 		    {	/* Flood control partly migrated into penalty */
 			if ((bootopt & BOOT_PROT) &&
@@ -738,21 +751,17 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	para[++i] = NULL; /* at worst, ++i is paramcount (MPAR) */
 	if (mptr == NULL)
 		return (do_numeric(numeric, cptr, from, i, para));
-	mptr->count++;
-	if (!MyConnect(from))
-		mptr->rcount++;
-	status = from->status < STAT_SERVER ? STAT_UNREG : from->status;
 	if (IsRegisteredUser(cptr) &&
 #ifdef	IDLE_FROM_MSG
-	    mptr->handler[status] == m_private)
+	    fhandler == m_private)
 #else
-	    mptr->handler[status] != m_ping && mptr->handler[status] != m_pong)
+	    fhandler != m_ping && fhandler != m_pong)
 #endif
 		from->user->last = timeofday;
 	Debug((DEBUG_DEBUG, "Function(%d): %#x = %s parc %d parv %#x",
-		status, mptr->handler[status], mptr->cmd, i, para));
-	if (mptr->handler[status] != m_nop && mptr->handler[status] != m_nopriv
-		&& mptr->handler[status] != m_unreg &&
+		status, fhandler, mptr->cmd, i, para));
+	if (fhandler != m_nop && fhandler != m_nopriv
+		&& fhandler != m_unreg &&
 		mptr->minparams > 0 && 
 		(i <= mptr->minparams || para[mptr->minparams][0] == '\0'))
 	{
@@ -780,7 +789,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 		**   >=0 if protocol message processing was successful. The return
 		**       value indicates the penalty score.
 		*/
-		ret = (*mptr->handler[status])(cptr, from, i, para);
+		ret = (*fhandler)(cptr, from, i, para);
 	}
 	/*
         ** Add penalty score for sucessfully parsed command if issued by

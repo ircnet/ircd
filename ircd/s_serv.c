@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.248 2004/10/13 16:55:35 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.249 2004/10/23 13:54:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2188,11 +2188,26 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		break;
 	case 'M' : case 'm' : /* commands use/stats */
 		for (mptr = msgtab; mptr->cmd; mptr++)
-			if (mptr->count)
+		{
+#define _mh(n) (mptr->handlers[n])
+			if (_mh(0).count + _mh(1).count + _mh(2).count
+				+ _mh(3).count + _mh(4).count > 0)
+			{
 				sendto_one(cptr, replies[RPL_STATSCOMMANDS],
-					   ME, BadTo(parv[0]), mptr->cmd,
-					   mptr->count, mptr->bytes,
-					   mptr->rcount);
+					ME, BadTo(parv[0]), mptr->cmd,
+					_mh(0).count, _mh(0).bytes,
+					_mh(0).rcount, _mh(0).rbytes,
+					_mh(1).count, _mh(1).bytes,
+					_mh(1).rcount, _mh(1).rbytes,
+					_mh(2).count, _mh(2).bytes,
+					_mh(2).rcount, _mh(2).rbytes,
+					_mh(3).count, _mh(3).bytes,
+					_mh(3).rcount, _mh(3).rbytes,
+					_mh(4).count, _mh(4).bytes,
+					_mh(4).rcount, _mh(4).rbytes);
+			}
+#undef _mh
+		}
 		break;
 	case 'o' : case 'O' : /* O (and o) lines */
 		report_configured_links(cptr, parv[0], CONF_OPS);
