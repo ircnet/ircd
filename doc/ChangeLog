@@ -1,3 +1,18 @@
+2.9.3
+
+Wed Jul 23 11:23:30 1997  Christophe Kalt
+
+	* res.c: queries were never resent when reaching timeout (C. Behrens).
+
+	* acconfig.h, configure.in: better sys_errlist test (A. Nissen).
+
+	* version.c.SH.in: portability (A. Nissen).
+
+	* acconfig.h, configure.in, common.h, config.h.dist: AIX cleanup
+	and optimization flags (A. Nissen).
+
+	* configure.in: typo.
+
 Thu Jul 17 23:04:48 1997  Christophe Kalt
 
 	* c_numeric.c, irc.c: fixes from Vesa.

@@ -1,8 +1,6 @@
-# @(#)$Id: RELEASE_NOTES,v 1.8 1997/07/15 20:58:00 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.9 1997/07/24 12:37:33 kalt Exp $
 
-This is a development version of the package,
-
-			USE AT YOUR OWN RISK
+This is version 2.9.3 of the IRC software.
 
 ---
 
@@ -20,14 +18,11 @@ New features:
 	* V lines created. (restrict peers' compile time options)
 	* new type of client: services.
 
+---
+
 Important configuration changes:
 
 	* M and P lines format has changed since 2.9.2, it is important
 	  to update your ircd.conf !
 	* kill lines are now case sensitive (K: and k: are different)
 
----
-
-2.9.3b7 introduces a change in the PASS syntax which makes
-the `link compression negociation' *incompatible* with
-previous betas.
