@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.104 2004/06/22 22:05:27 chopin Exp $
+ *   $Id: struct_def.h,v 1.105 2004/06/24 16:32:31 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -961,21 +961,28 @@ typedef struct
 	int split_minusers;
 } iconf_t;
 
-/* functions being subject to access checking */
-typedef enum ACL {
-	ACL_KILL,
-	ACL_SQUIT,
-	ACL_CONNECT,
-	ACL_CLOSE,
-	ACL_HAZH,
-	ACL_DNS,
-	ACL_REHASH,
-	ACL_RESTART,
-	ACL_DIE,
-	ACL_SET,
-#ifdef TKLINE
-	ACL_TKLINE,
-	ACL_UNTKLINE,
-#endif
-	ACL_MAX
-} ACL; 
+/* O:line flags, used also in is_allowed() */
+#define ACL_LOCOP		0x00001
+#define ACL_KILLLOCAL		0x00002
+#define ACL_KILLREMOTE		0x00004
+#define ACL_KILL		(ACL_KILLLOCAL|ACL_KILLREMOTE)
+#define ACL_SQUITLOCAL		0x00008
+#define ACL_SQUITREMOTE		0x00010
+#define ACL_SQUIT		(ACL_SQUITLOCAL|ACL_SQUITREMOTE)
+#define ACL_CONNECTLOCAL	0x00020
+#define ACL_CONNECTREMOTE	0x00040
+#define ACL_CONNECT		(ACL_CONNECTLOCAL|ACL_CONNECTREMOTE)
+#define ACL_CLOSE		0x00080
+#define ACL_HAZH		0x00100
+#define ACL_DNS			0x00200
+#define ACL_REHASH		0x00400
+#define ACL_RESTART		0x00800
+#define ACL_DIE			0x01000
+#define ACL_SET			0x02000
+#define ACL_TKLINE		0x04000
+#define ACL_UNTKLINE		ACL_TKLINE
+#define ACL_LOCOP_MASK		(ACL_KILLLOCAL|ACL_SQUITLOCAL|ACL_CONNECTLOCAL|\
+				ACL_CLOSE|ACL_HAZH|ACL_DNS|ACL_REHASH|\
+				ACL_RESTART|ACL_DIE|ACL_SET|ACL_TKLINE)
+#define ACL_ALL_MASK		(ACL_LOCOP_MASK|ACL_KILLREMOTE|ACL_SQUITREMOTE|\
+				ACL_CONNECTREMOTE)
