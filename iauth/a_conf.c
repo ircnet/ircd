@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.13 1999/03/11 20:22:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.14 1999/03/11 21:03:02 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -43,6 +43,27 @@ char *msg, *chk;
 	else
 		sendto_log(ALOG_DCONF, LOG_ERR,
 			   "Configuration error line %d: %s", nb, msg);
+}
+
+/*
+ * Match address by #IP bitmask (10.11.12.128/27)
+ */
+static int
+match_ipmask(mask, ipaddr)
+aTarget	*mask;
+char	*ipaddr;
+{
+#ifdef INET6
+	return 1;
+#else
+        int i1, i2, i3, i4;
+	u_long iptested;
+
+        if (sscanf(ipaddr, "%d.%d.%d.%d", &i1, &i2, &i3, &i4) != 4) 
+		return -1;
+	iptested = htonl(i1 * 0x1000000 + i2 * 0x10000 + i3 * 0x100 + i4);
+        return ((iptested & mask->lmask) == mask->baseip) ? 0 : 1;
+#endif
 }
 
 /* conf_read: read the configuration file, instanciate modules */
@@ -202,6 +223,7 @@ char *cfile;
 			while (fgets(buffer, 160, cfh))
 			    {
 				aTarget **ttmp;
+				u_long baseip = 0, lmask = 0;
 
 				if (ch = index(buffer, '\n'))
 					lnnb += 1;
@@ -248,6 +270,31 @@ char *cfile;
 				    {
 					ttmp = &((*last)->address);
 					ch = buffer + 6;
+					if (strchr(ch, '/'))
+					    {
+						int i1, i2, i3, i4, m;
+						
+						if (sscanf(ch,"%d.%d.%d.%d/%d",
+							   &i1, &i2, &i3, &i4,
+							   &m) != 5 ||
+						    m < 1 || m > 31)
+						    {
+							conf_err(lnnb,
+								 "Bad mask.",
+								 cfile);
+							continue;
+						    }
+						lmask = htonl((u_long)0xffffffffL << (32 - m));
+						baseip = htonl(i1 * 0x1000000 +
+							       i2 * 0x10000 +
+							       i3 * 0x100 +
+							       i4);
+					    }
+					else
+					    {
+						lmask = 0;
+						baseip = 0;
+					    }
 				    }
 				else
 				    {
@@ -268,6 +315,11 @@ char *cfile;
 				else
 					(*ttmp)->yes = 0;
 				(*ttmp)->value = mystrdup(ch);
+				if ((*ttmp)->baseip)
+				    {
+					(*ttmp)->lmask = lmask;
+					(*ttmp)->baseip = baseip;
+				    }
 				(*ttmp)->nextt = NULL;
 			    }
 
@@ -364,8 +416,14 @@ AnInstance *inst;
 	if (ttmp = inst->address)
 		while (ttmp)
 		    {
-			if (match(ttmp->value, cldata[cl].itsip) == 0)
-				return ttmp->yes;
+			if (ttmp->baseip)
+			    {
+				if (match_ipmask(ttmp, cldata[cl].itsip) == 0)
+					return ttmp->yes;
+			    }
+			else
+				if (match(ttmp->value, cldata[cl].itsip) == 0)
+					return ttmp->yes;
 			ttmp = ttmp->nextt;
 		    }
 	/* check matches on hostnames */
