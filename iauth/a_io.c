@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.27 2004/09/13 01:39:04 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.28 2004/09/21 13:38:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -463,6 +463,10 @@ static	void	parse_ircd(void)
 		case 'E': /* error message from ircd */
 			sendto_log(ALOG_DIRCD, LOG_DEBUG,
 				   "Error from ircd: %s", chp);
+			break;
+		case 'M':
+			/* RPL_HELLO to be exact, but who cares. */
+			strConnLen = sprintf(strConn, ":%s 020 * :", chp+2);
 			break;
 		default:
 			sendto_log(ALOG_IRCD, LOG_ERR, "Unexpected data [%s]",
