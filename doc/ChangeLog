@@ -7,6 +7,8 @@
 	* struct_def.h: TOPICLEN increased.
 	* config.h.dist: MCPU increased.
 	* RELEASE_NOTES: docs.
+	* s_conf.c: erroneous IsIllegal() traps removed.
+	* res.c/bad_hostname(): isalnum is enough.
 
 2004-02-08  Piotr Kucharski
 
