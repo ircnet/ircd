@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.120 2004/03/10 15:28:27 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.121 2004/03/14 17:45:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -902,10 +902,8 @@ int	main(int argc, char *argv[])
 	initstats();
 	initruntimeconf();
 	ircd_readtune(tunefile);
-#ifdef	CACHED_MOTD
 	motd = NULL;
 	read_motd(IRCDMOTD_PATH);
-#endif
 	inithashtables();
 	initlists();
 	initclass();

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.76 2004/03/14 13:21:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.77 2004/03/14 17:45:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1084,9 +1084,8 @@ void	tstats(aClient *cptr, char *name)
 #endif
 }
 
-#ifdef CACHED_MOTD
 aMotd		*motd = NULL;
-struct tm	motd_tm;
+time_t		motd_mtime;
 
 void	read_motd(char *filename)
 {
@@ -1103,13 +1102,17 @@ void	read_motd(char *filename)
 		close(fd);
 		return;
 	    }
+	if (Sb.st_mtime <= motd_mtime)
+	{
+		return;
+	}
+	motd_mtime = Sb.st_mtime;
 	for(;motd != NULL;motd=last)
 	    {
 		last = motd->next;
 		MyFree(motd->line);
 		MyFree(motd);
 	    }
-	motd_tm = *localtime(&Sb.st_mtime);
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
 	last = NULL;
 	while ((len=dgets(fd, line, sizeof(line)-1)) > 0)
@@ -1134,7 +1137,6 @@ void	read_motd(char *filename)
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
 	close(fd);
 }
-#endif
 
 void	check_split(void)
 {

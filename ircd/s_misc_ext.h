@@ -25,10 +25,8 @@
  */
 #ifndef S_MISC_C
 extern struct stats ircst, *ircstp;
-#ifdef  CACHED_MOTD
 extern aMotd *motd;
-extern struct tm motd_tm;
-#endif /* CACHED_MOTD */
+extern time_t motd_mtime;
 #endif /* S_MISC_C */
 
 /*  External definitions for global functions.
@@ -53,9 +51,7 @@ EXTERN void checklist(void);
 EXTERN void initstats(void);
 EXTERN void initruntimeconf(void);
 EXTERN void tstats (aClient *cptr, char *name);
-#ifdef  CACHED_MOTD
 EXTERN void read_motd (char *filename);
-#endif /* CACHED_MOTD */
 EXTERN void check_split(void);
 EXTERN int myrand(void);
 EXTERN void mysrand(unsigned int seed);

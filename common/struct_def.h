@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.90 2004/03/10 15:28:26 chopin Exp $
+ *   $Id: struct_def.h,v 1.91 2004/03/14 17:45:59 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -33,9 +33,7 @@ typedef	struct	SMode	Mode;
 typedef	struct	fdarray	FdAry;
 typedef	struct	CPing	aCPing;
 typedef	struct	Zdata	aZdata;
-#if defined(CACHED_MOTD)
 typedef struct        LineItem aMotd;
-#endif
 #if defined(USE_IAUTH)
 typedef struct        LineItem aExtCf;
 typedef struct        LineItem aExtData;

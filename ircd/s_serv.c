@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.171 2004/03/11 02:42:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.172 2004/03/14 17:46:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1344,6 +1344,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 
 	cptr->flags |= FLAGS_CBURST;
 	add_server_to_tree(cptr);
+	/* why no add_client_to_list() here? --B. */
 	if (ST_NOTUID(cptr))
 	{
 		(void) add_to_server_hash_table(cptr->serv, cptr);
@@ -2951,16 +2952,8 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-#ifdef	CACHED_MOTD
 	register aMotd *temp;
 	struct tm *tm;
-#else
-	int	fd;
-	char	line[80];
-	Reg	char	 *tmp;
-	struct	stat	sb;
-	struct	tm	*tm;
-#endif
 
 	if (check_link(cptr))
 	    {
@@ -2969,8 +2962,7 @@ int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    }
 	if (hunt_server(cptr, sptr, ":%s MOTD :%s", 1,parc,parv)!=HUNTED_ISME)
 		return 5;
-#ifdef CACHED_MOTD
-	tm = &motd_tm;
+	tm = localtime(&motd_mtime);
 	if (motd == NULL)
 	    {
 		sendto_one(sptr, replies[ERR_NOMOTD], ME, BadTo(parv[0]));
@@ -2985,39 +2977,6 @@ int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[RPL_MOTD], ME, BadTo(parv[0]), temp->line);
 	sendto_one(sptr, replies[RPL_ENDOFMOTD], ME, BadTo(parv[0]));
 	return 2;
-#else
-	/*
-	 * stop NFS hangs...most systems should be able to open a file in
-	 * 3 seconds. -avalon (curtesy of wumpus)
-	 */
-	(void)alarm(3);
-	fd = open(IRCDMOTD_PATH, O_RDONLY);
-	(void)alarm(0);
-	if (fd == -1)
-	    {
-		sendto_one(sptr, replies[ERR_NOMOTD], ME, BadTo(parv[0]));
-		return 1;
-	    }
-	(void)fstat(fd, &sb);
-	sendto_one(sptr, replies[RPL_MOTDSTART], ME, BadTo(parv[0]), ME);
-	tm = localtime(&sb.st_mtime);
-	sendto_one(sptr, ":%s %d %s :- %d/%d/%d %d:%02d", ME, RPL_MOTD,
-		   parv[0], tm->tm_mday, tm->tm_mon + 1, 1900 + tm->tm_year,
-		   tm->tm_hour, tm->tm_min);
-	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
-	while (dgets(fd, line, sizeof(line)-1) > 0)
-	    {
-		if ((tmp = (char *)index(line,'\n')))
-			*tmp = '\0';
-		if ((tmp = (char *)index(line,'\r')))
-			*tmp = '\0';
-		sendto_one(sptr, replies[RPL_MOTD], ME, BadTo(parv[0]), line);
-	    }
-	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
-	sendto_one(sptr, replies[RPL_ENDOFMOTD], ME, BadTo(parv[0]));
-	(void)close(fd);
-	return 2;
-#endif	/* CACHED_MOTD */
 }
 
 /*

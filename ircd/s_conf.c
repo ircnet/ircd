@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.97 2004/03/07 02:47:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.98 2004/03/14 17:45:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1011,9 +1011,7 @@ int	rehash(aClient *cptr, aClient *sptr, int sig)
 			free_conf(tmp2);
 		}
 	
-#ifdef CACHED_MOTD
 	read_motd(IRCDMOTD_PATH);
-#endif
 	if (rehashed == 1)
 	{
 		/* queue another rehash for later */

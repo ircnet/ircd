@@ -51,13 +51,6 @@
  *
  */
 
-/*
- * If you don't want the server to keep reading the MOTD file from the disk,
- * define CACHED_MOTD.  The server will store the MOTD in memory, and only
- * read it again from the disk when rehashing if the file has changed.
- */
-#define	CACHED_MOTD
-
 /* CHROOTDIR
  *
  * Define for value added security if you are a rooter.
