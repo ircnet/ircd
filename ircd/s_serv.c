@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.137 2004/02/10 00:46:28 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.138 2004/02/10 01:04:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -795,7 +795,8 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/*
 		**
 		*/
-		if (!(aconf = find_conf_host(cptr->confs, host, CONF_HUB)) ||
+		if (!(aconf = find_conf_host_sid(cptr->confs, host, 
+			ST_UID(cptr) ? parv[3] : "", CONF_HUB)) ||
 		    (aconf->port && (hop > aconf->port)) )
 		    {
 			sendto_flag(SCH_ERROR,
