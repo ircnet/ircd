@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.20 2002/08/01 01:56:52 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.21 2002/09/28 21:02:57 jv Exp $";
 #endif
 
 #include "os.h"
@@ -172,6 +172,14 @@ aClient	*cptr;
 		istat.is_authmem -= strlen(cptr->auth) + 1;
 		istat.is_auth -= 1;
 		MyFree(cptr->auth);
+	}
+	/* True only for local clients */
+	if (cptr->hopcount == 0)
+	{
+		if (cptr->reason)
+		{
+			MyFree(cptr->reason);
+		}
 	}
 	MyFree((char *)cptr);
 }
