@@ -1,3 +1,14 @@
+2004-03-09  Piotr Kucharski
+
+	* s_bsd.c/add_connection(): move check_clones() before DNS starts.
+
+2004-03-08  Piotr Kucharski
+
+	* s_user.c/m_nick(): DISABLE_NICKCHANGE_WHEN_BANNED, default undefined,
+	  allows to do what advertised (only local clients affected, of course).
+	* ircd.c/main(): check_servername(ME) added, this disallows things like
+	  spaces in server name in M: etc.
+
 2004-03-07  Piotr Kucharski
 
 	* parse.c: DNS command is oper only from now.
