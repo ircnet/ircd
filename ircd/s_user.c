@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.32 1997/10/11 04:21:22 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.33 1998/01/07 20:44:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -440,6 +440,7 @@ char	*nick, *username;
 					prefix = '+';
 			*user->username = prefix;
 			strncpy(&user->username[1], buf2, USERLEN);
+			user->username[USERLEN] = '\0';
 		    }
 #endif
 
