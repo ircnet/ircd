@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.152 2004/02/16 12:52:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.153 2004/02/16 18:31:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1466,6 +1466,9 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			/* send EOBs */
 			for (asptr = svrtop; asptr; asptr = asptr->nexts)
 			{
+				/* No appending of own SID */
+				if (asptr->bcptr == &me)
+					continue;
 				/* Send EOBs only for servers which already
 				 * finished bursting */
 				if (!IsBursting(asptr->bcptr))
