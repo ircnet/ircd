@@ -12,8 +12,8 @@
 	* Client's username and hostname are checked for valid chars.
 
 	* Operator broadcast message syntax has been changed to:
-		$$*.tld - message all users matching given server mask
-		$#*.tld - message all users matching given hostname mask
+		$$*.mask - message all users matching given server mask
+		$#*.mask - message all users matching given hostname mask
 	
 	* Essential notices were moved from &LOCAL to &NOTICES
 	* WHOIS now shows the time user signed on.
