@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.65 2001/10/20 17:57:28 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.66 2001/12/08 00:41:27 q Exp $";
 #endif
 
 #include "os.h"
@@ -912,6 +912,7 @@ char	*argv[];
 	dbuf_init();
 	setup_me(&me);
 	init_sid(SERVER_ID);
+	add_to_sid_hash_table(SERVER_ID,&me);
 	check_class();
 	ircd_writetune(tunefile);
 	if (bootopt & BOOT_INETD)

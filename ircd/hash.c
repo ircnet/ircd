@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.17 2001/10/20 17:57:27 q Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.18 2001/12/08 00:41:27 q Exp $";
 #endif
 
 #include "os.h"
@@ -30,15 +30,18 @@ static	aHashEntry	*clientTable = NULL;
 static	aHashEntry	*uidTable = NULL;
 static	aHashEntry	*channelTable = NULL;
 static	aHashEntry	*serverTable = NULL;
+static	aHashEntry	*sidTable = NULL;
 static	unsigned int	*hashtab = NULL;
 static	int	clhits = 0, clmiss = 0, clsize = 0;
 static	int	uidhits = 0, uidmiss = 0, uidsize = 0;
 static	int	chhits = 0, chmiss = 0, chsize = 0;
+static	int	sidhits = 0, sidmiss = 0, sidsize = 0;
 static	int	svsize = 0;
 int	_HASHSIZE = 0;
 int	_UIDSIZE = 0;
 int	_CHANNELHASHSIZE = 0;
 int	_SERVERSIZE = 0;
+int	_SIDSIZE = 0;
 
 /*
  * Hashing.
@@ -116,7 +119,10 @@ int	*store;
 		hash <<= 1;
 		hash += hashtab[(int)ch];
 	}
-	*store = hash;
+	if (store)
+	{
+		*store = hash;
+	}
 	hash %= _UIDSIZE;
 	return (hash);
 }
@@ -215,6 +221,7 @@ int	size;
 	_UIDSIZE = bigger_prime(size);
 	uidhits = 0;
 	uidmiss = 0;
+	uidsize = 0;
 	if (!uidTable)
 		uidTable = (aHashEntry *)MyMalloc(_UIDSIZE *
 						  sizeof(aHashEntry));
@@ -250,6 +257,20 @@ int	size;
 		_SERVERSIZE, size));
 }
 
+
+static	void	clear_sid_hash_table(int size)
+{
+	_SIDSIZE = bigger_prime(size);
+	sidhits = 0;
+	sidmiss = 0;
+	sidsize = 0;
+	if (!sidTable)
+		sidTable = (aHashEntry *)MyMalloc(_SERVERSIZE *
+						     sizeof(aHashEntry));
+	bzero((char *)sidTable, sizeof(aHashEntry) * _SIDSIZE);
+	Debug((DEBUG_DEBUG, "Sid Hash Table Init: %d (%d)", _SIDSIZE, size));
+}
+
 void	inithashtables()
 {
 	Reg int i;
@@ -260,6 +281,8 @@ void	inithashtables()
 	clear_channel_hash_table((_CHANNELHASHSIZE) ? _CHANNELHASHSIZE
                                  : CHANNELHASHSIZE);
 	clear_server_hash_table((_SERVERSIZE) ? _SERVERSIZE : SERVERSIZE);
+	_SIDSIZE = _SERVERSIZE;
+	clear_sid_hash_table(_SIDSIZE);
 
 	/*
 	 * Moved multiplication out from the hashfunctions and into
@@ -368,9 +391,25 @@ int	new;
 			(void)add_to_server_hash_table(sptr, sptr->bcptr);
 		MyFree(otab);
 	    }
+	else if (otab == sidTable)
+	{
+		Debug((DEBUG_ERROR, "sid Hash Table from %d to %d (%d)",
+			osize, new, sidsize));
+		sendto_flag(SCH_HASH, "sid Hash Table from %d to %d (%d)",
+			osize, new, sidsize);
+		sidmiss = 0;
+		sidhits = 0;
+		sidsize = 0;
+		sidTable = table;
+		for (sptr = svrtop; sptr; sptr = sptr->nexts)
+		{
+			(void)add_to_sid_hash_table(sptr->sid, sptr->bcptr);
+		}
+		MyFree(otab);
+	}
+
 	return;
 }
-
 
 /*
  * add_to_client_hash_table
@@ -456,6 +495,27 @@ aClient	*cptr;
 }
 
 /*
+** add_to_sid_hash_table
+*/
+int	add_to_sid_hash_table(char *sid, aClient *cptr)
+{
+	Reg	u_int	hashv;
+
+	hashv = hash_uid(sid, &cptr->serv->sidhashv);
+	cptr->serv->sidhnext = (aServer *)sidTable[hashv].list;
+	sidTable[hashv].list = (void *)cptr->serv;
+	sidTable[hashv].links++;
+	sidTable[hashv].hits++;
+	sidsize++;
+	if (sidsize > _SIDSIZE)
+	{
+		bigger_hash_table(&_SIDSIZE, sidTable, 0);
+	}
+	return 0;
+}
+
+
+/*
  * del_from_client_hash_table
  */
 int	del_from_client_hash_table(name, cptr)
@@ -524,7 +584,7 @@ aClient	*cptr;
 			if (uidTable[hashv].links > 0)
 			    {
 				uidTable[hashv].links--;
-				clsize--;
+				uidsize--;
 				return 1;
 			    }
 			else
@@ -622,6 +682,45 @@ aClient	*cptr;
 	return 0;
 }
 
+/*
+** del_from_server_hash_table
+*/
+int	del_from_server_hash_table(aServer *sptr, aClient *cptr)
+{
+	Reg	aServer	*tmp, *prev = NULL;
+	Reg	u_int	hashv;
+
+	hashv = cptr->serv->sidhashv;
+	hashv %= _SIDSIZE;
+	for (tmp = (aServer *)sidTable[hashv].list; tmp; tmp = tmp->sidhnext)
+	{
+		if (tmp == sptr)
+		{
+			if (prev)
+			{
+				prev->sidhnext = tmp->sidhnext;
+			}
+			else
+			{
+				sidTable[hashv].list = (void *)tmp->sidhnext;
+			}
+			tmp->sidhnext = NULL;
+			if (sidTable[hashv].links > 0)
+			{
+				sidTable[hashv].links--;
+				sidsize--;
+				return 1;
+			}
+			else
+			{
+                                sendto_flag(SCH_ERROR, "sid-hash failure");
+				return -1;
+			}
+		}
+		prev = tmp;
+	}
+	return 0;
+}
 
 /*
  * hash_find_client
@@ -703,6 +802,7 @@ aClient	*cptr;
 			 * block of code is also used for channels and
 			 * servers for the same performance reasons.
 			 */
+#if 0
 			if (prv)
 			    {
 				aClient *tmp2;
@@ -712,6 +812,7 @@ aClient	*cptr;
 				prv->user->uhnext = tmp->user->uhnext;
 				tmp->user->uhnext = tmp2;
 			    }
+#endif
 			return (tmp);
 		    }
 	uidmiss++;
@@ -894,6 +995,32 @@ void	*dummy;
 		    }
 	return (aServer *)dummy;
 }
+
+/*
+** hash_find_sid
+*/
+aServer	*hash_find_sid(char *sid, aclient *cptr)
+{
+	Reg     aServer *tmp;
+	Reg     aServer *prv = NULL;
+	Reg     aHashEntry      *tmp3;
+	u_int   hashv, hv;
+
+	hashv = hash_uid(sid, &hv);
+	tmp3 = &sidTable[hashv];
+
+	for (tmp = (aServer *)tmp3->list; tmp; prv = tmp, tmp = tmp->sidhnext)
+	{
+		if (hv == tmp->sidhashv && mycmp(sid, tmp->sid) == 0)
+		{
+			sidhits++;
+			return (tmp);
+		}
+	}
+	sidmiss++;
+	return (cptr);
+}
+
 
 /*
  * NOTE: this command is not supposed to be an offical part of the ircd

@@ -380,8 +380,8 @@ struct	Server	{
 	aConfItem *nline;	/* N-line pointer for this server */
 	int	version;        /* version id for local client */
 	int	snum;
-	int	stok,
-		ltok;
+	int	stok,		/* The token a 2.10 sends us. */
+		ltok;		/* Are we still using this one? */
 	int	refcnt;		/* Number of times this block is referenced
 				** from anUser (field servp), aService (field
 				** servp) and aClient (field serv)
@@ -389,7 +389,14 @@ struct	Server	{
 	struct	Server	*nexts, *prevs, *shnext;
 	aClient	*bcptr;
 	char	by[NICKLEN+1];
-	char	tok[5];
+	char	tok[6];		/* This is the prepared token we'll be
+				** sending to 2.10 servers.
+				** Note: The size of this depends on the 
+				** on idtol(), with n set to SIDLEN.
+				*/
+	char	sid[SIDLEN + 1]	/* The Server ID. */
+	u_int	sidhashv;	/* Raw hash value. */
+	aServer	*sidhnext;	/* Next server in the sid hash. */
 	time_t	lastload;	/* penalty like counters, see s_serv.c
 				** should be in the local part, but..
 				*/
