@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.234 2004/10/30 15:29:56 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.235 2004/11/02 16:17:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -698,6 +698,10 @@ void	setup_server_channels(aClient *mp)
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 #endif
+	chptr = get_channel(mp, "&OPER", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: for your trusted eyes only");
+	add_user_to_channel(chptr, mp, CHFL_CHANOP);
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 
 	setup_svchans();
 }
@@ -1884,6 +1888,9 @@ static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 		&& is_allowed(sptr, ACL_CLIENTS))
 		return 0;
 #endif
+	if (*chptr->chname == '&' && !strcmp(chptr->chname, "&OPER")
+		&& IsAnOper(sptr))
+		return 0;
 
 	for (lp = sptr->user->invited; lp; lp = lp->next)
 		if (lp->chptr == chptr)
