@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.6 1997/06/18 17:14:29 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.7 1997/07/07 21:23:43 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -1075,8 +1075,9 @@ void ircd_readtune(filename)
 char *filename;
 {
 	int fd, t_data[6];
-	char buf[100] = "";
+	char buf[100];
 
+	buf[0] = '\0';
 	if ((fd = open(filename, O_RDONLY)) != -1)
 	    {
 		read(fd, buf, 100);	/* no panic if this fails.. */

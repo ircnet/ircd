@@ -93,7 +93,9 @@ extern	int	initconf __P((int));
 extern	int	rehashed;
 
 extern	char	*MyMalloc __P((size_t)), *MyRealloc __P((char *, size_t));
+#if defined(DEBUGMODE) && !defined(CLIENT_COMPILE) && defined(DO_DEBUG_MALLOC)
 extern	void	MyFree __P((char *));
+#endif
 extern	char	*debugmode, *configfile, *sbrk0;
 extern	char	*getfield __P((char *));
 extern	void	get_sockhost __P((aClient *, char *));
