@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.100 2001/12/30 00:13:56 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.101 2001/12/30 02:11:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -640,7 +640,7 @@ char	*nick, *username;
 		if ((acptr->serv->version & SV_UID) && user->uid[0])
 			sendto_one(acptr,
 				   ":%s UNICK %s %s %s %s %s %s :%s",
-				   me.serv->sid, nick, user->uid,
+				   user->servp->sid, nick, user->uid,
 				   user->username, user->host,
 				   user->sip,
 				   (*buf) ? buf : "+",
