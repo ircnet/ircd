@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.31 1997/10/10 22:17:46 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.32 1997/10/11 04:21:22 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -345,6 +345,9 @@ char	*nick, *username;
 		** but check_client()->attach_Iline() now needs to know the
 		** username for global u@h limits.
 		** moving this shit here shouldn't be a problem. -krys
+		** what a piece of $#@!.. restricted can only be known
+		** *after* attach_Iline(), so it matters and I have to move
+		** come of it back below.  so global u@h limits really suck.
 		*/
 #ifndef	NO_PREFIX
 		/*
@@ -357,24 +360,14 @@ char	*nick, *username;
 		**	=	i line with OTHER type ident
 		**	-	i line, no ident
 		*/
-		if (IsRestricted(sptr))
-			if (!(sptr->flags & FLAGS_GOTID))
-				prefix = '-';
-			else
-				if (*sptr->username == '-' ||
-				    index(sptr->username, '@'))
-					prefix = '=';
-				else
-					prefix = '+';
+		if (!(sptr->flags & FLAGS_GOTID))
+			prefix = '~';
 		else
-			if (!(sptr->flags & FLAGS_GOTID))
-				prefix = '~';
+			if (*sptr->username == '-' ||
+			    index(sptr->username, '@'))
+				prefix = '^';
 			else
-				if (*sptr->username == '-' ||
-                                    index(sptr->username, '@'))
-					prefix = '^';
-				else
-					prefix = '\0';
+				prefix = '\0';
 
 		/* OTHER type idents have '-' prefix (from s_auth.c),       */
 		/* and they are not supposed to be used as userid (rfc1413) */
@@ -433,6 +426,23 @@ char	*nick, *username;
 #endif
 			return exit_client(cptr, sptr, &me, exit_msg[i].longm);
 		    }
+
+#ifndef	NO_PREFIX
+		if (IsRestricted(sptr))
+		    {
+			if (!(sptr->flags & FLAGS_GOTID))
+				prefix = '-';
+			else
+				if (*sptr->username == '-' ||
+				    index(sptr->username, '@'))
+					prefix = '=';
+				else
+					prefix = '+';
+			*user->username = prefix;
+			strncpy(&user->username[1], buf2, USERLEN);
+		    }
+#endif
+
 		aconf = sptr->confs->value.aconf;
 		if (IsUnixSocket(sptr))
 			strncpyzt(user->host, me.sockhost, HOSTLEN+1);
