@@ -191,6 +191,7 @@ eatline:
 		memcpy(new->line, i, linelen);
 		new->line[linelen] = '\0';
 		new->linenum = linenum;
+		new->file = curfile;
 		new->next = NULL;
 		if (ConfigCur)
 		{
