@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.53 2002/11/23 18:04:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.54 2002/12/28 21:21:45 jv Exp $";
 #endif
 
 #include "os.h"
@@ -932,6 +932,12 @@ void	initstats()
 	istat.is_m_myclnt_t = timeofday;
 	istat.is_l_myclnt_t = timeofday;
 	bzero((char *)&ircst, sizeof(ircst));
+}
+
+void	initruntimeconf()
+{
+	memset((char *)&iconf, 0, sizeof(iconf));
+	iconf.aconnect = 1; /* default to ON */
 }
 
 void	tstats(cptr, name)
