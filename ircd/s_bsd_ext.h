@@ -43,6 +43,8 @@ EXTERN int inetport (aClient *cptr, char *ip, char *ipmask, int port,
 		int dolisten);
 EXTERN int add_listener (aConfItem *aconf);
 EXTERN void close_listeners(void);
+EXTERN void open_listener(aClient *cptr);
+EXTERN void reopen_listeners();
 EXTERN void activate_delayed_listeners(void);
 EXTERN void start_iauth (int);
 EXTERN void init_sys(void);
