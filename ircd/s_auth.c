@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.14 1998/08/07 02:04:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.15 1998/08/07 03:33:36 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -335,7 +335,7 @@ Reg	aClient	*cptr;
 
 		sprintf(abuf, "%d C %s %u ", cptr->fd,
 			inetntoa((char *)&them.sin_addr),ntohs(them.sin_port));
-		sprintf(abuf+strlen(abuf), "%s %u\n",
+		sprintf(abuf+strlen(abuf), "%s %u",
 			inetntoa((char *)&us.sin_addr), ntohs(us.sin_port));
 		if (sendto_iauth(abuf) == 0)
 		    {
