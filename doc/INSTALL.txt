@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.63 2004/06/30 00:10:34 chopin Exp $
+  $Id: INSTALL.txt,v 1.64 2004/06/30 18:43:00 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -239,28 +239,31 @@
 
   7. Excluded accounts     (K,k)
 
-  8. Server connections    (C,c,N)
+  8. X Excluded accounts   (X)
 
-  9. Deny auto-connections (D)
+  9. Server connections    (C,c,N)
 
   10.
-     Hub connections       (H)
+     Deny auto-connections (D)
 
   11.
-     Leaf connections      (L)
+     Hub connections       (H)
 
   12.
-     Version limitations   (V)
+     Leaf connections      (L)
 
   13.
-     Excluded machines     (Q)
+     Version limitations   (V)
 
   14.
-     Service connections   (S)
+     Excluded machines     (Q)
 
   15.
-     Bounce server         (B)
+     Service connections   (S)
 
+
+  16.
+     Bounce server         (B)
 
   Except for types ``M'' and ``A'', you are allowed to have multiple
   records of the same type.  In some cases, you can have concurrent
@@ -389,6 +392,7 @@
 
      OOtthheerr
         This is really an OTHER field - you can add what you want here.
+
 
      NNeettwwoorrkk nnaammee
         Use this field to announce your network name in 005 numerics.
@@ -587,7 +591,6 @@
         checked every 300 seconds.  The connection is allowed to remain
         silent for 120 seconds before a PING is sent.  NOTE: fields 3 &
         4 are in seconds.  The SendQ is set to 800000 bytes.
-
         Y:1:60:0:50:20000:2:5: (client class)
 
         In case of a client class, the fields are interpreted a bit
@@ -720,7 +723,6 @@
         For example, if you were installing IRC on tolsun.oulu.fi and
         you wanted to let your own clients to connect to your server,
         you would add this entry to the file:
-
         I:::tolsun.oulu.fi::1
 
         If you wanted to let remote clients connect, you could add the
@@ -786,8 +788,8 @@
         to become an operator and what their ``Nickname'' and
         ``Password'' is.
 
-     FFoorrmmaatt
 
+     FFoorrmmaatt
 
         O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>:<Flags>
 
@@ -852,8 +854,8 @@
 
         +o  c - allows only local CONNECT
 
-        +o  l - allows CLOSE
 
+        +o  l - allows CLOSE
 
         +o  h - allows HAZH
 
@@ -871,15 +873,16 @@
 
         +o  & - allows joining &CLIENTS
 
-        ``L'' flag cannot be overridden by other flags.  Warning: If
-        flags field is left empty, no privileges will be granted.
+        ``L'' flag cannot be overridden by other flags.  If <Flags>
+        field is left empty, no privileges will be granted.
 
      EExxaammppllee
-        o:orion.cair.du.edu:pyunxc:Jeff::1
+        O:orion.cair.du.edu:pyunxc:Jeff::1:A
 
         There is an OPERATOR at ``orion.cair.du.edu'' that can get
         Operator priviliges if he specifies a password of ``pyunxc'' and
-        uses a NICKNAME of ``Jeff''.
+        uses a NICKNAME of ``Jeff'' and is granted all possible
+        privileges.
 
      NNoottee
         Host NAME accepts IP bitmasks.
@@ -921,6 +924,7 @@
         If you specify an IP address, IP mask, or an IP bitmask, it will
         match clients connecting from the matching addresses, no matter
         if they resolve or not.
+
         You can prefix an IP address, an IP mask, or IP bitmask by ``=''
         in which case only non resolving matching hosts will be banned.
 
@@ -992,7 +996,48 @@
         ircd.
 
 
-  44..88..  SSeerrvveerr ccoonnnneeccttiioonnss
+  44..88..  XX EExxcclluuddeedd aaccccoouunnttss
+
+  Remove an errant user from IRC on your site.
+
+     IInnttrroodduuccttiioonn
+        Obviously it is hoped that you wouldn't have to use this
+        command.  Unfortunately sometimes a virus can become difficult
+        to remove by other means and this is your only recourse - the
+        XKILL USER command.  THIS COMMAND ONLY AFFECTS YOUR SERVER - If
+        this user can connect to another SERVER somewhere else in the
+        IRC-Network then you would have to talk to the administrator on
+        that site to disable his access from that IRCD Server as well.
+
+     FFoorrmmaatt
+
+        X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:
+
+
+
+     XX  ``X'' tells the IRCD that you are making an XKILL USER command
+        entry.
+
+     UUSSEERR nn--tthh aarrgg
+        Given field will be matched against corresponding parameter of
+        client USER command. If left empty it matches any. It may
+        contain wildcards.
+
+     EExxaammpplleess
+        X:guest:::guest If user registers with the following USER
+        command
+
+        USER guest anything anything :guest
+
+
+     then IMMEDIATELY REMOVE HIM from my IRCD.
+
+     NNoottee
+        You need to compile server with #define XLINE to get this
+        functionality.
+
+
+  44..99..  SSeerrvveerr ccoonnnneeccttiioonnss
 
   How to connect to other servers, How other servers can connect to you
 
@@ -1006,6 +1051,7 @@
   other machines:
 
   +o  ``garfield.mit.edu''        - Tertiary Connection
+
 
   +o  ``irc.nada.kth.se''         - Secondary Connection
 
@@ -1118,7 +1164,6 @@
      but if ``irc.nada.kth.se'' requests a connection, allow it to
      connect.
 
-
   Now back to our original problem, we wanted OUR server CONNECT to 3
   hosts,  ``nic.funet.fi'', ``irc.nada.kth.se'' and ``garfield.mit.edu''
   in that order.  So as we enter these entries into the file they must
@@ -1138,7 +1183,6 @@
   entry contains the password, if any, that you require other hosts to
   have before they can connect to you.  These entries are of the same
   format as the ``C'' entries.
-
 
 
      FFoorrmmaatt
@@ -1184,7 +1228,6 @@
         ``nic.funet.fi'' and that is what you should place in this
         field.
 
-
      DDoommaaiinn MMaasskk
         Domain masking, see below.
 
@@ -1228,7 +1271,7 @@
 
 
 
-  44..99..  DDeennyy aauuttoo--ccoonnnneeccttiioonnss
+  44..1100..  DDeennyy aauuttoo--ccoonnnneeccttiioonnss
 
 
      IInnttrroodduuccttiioonn
@@ -1274,7 +1317,7 @@
         the network.
 
 
-  44..1100..  HHuubb ccoonnnneeccttiioonnss
+  44..1111..  HHuubb ccoonnnneeccttiioonnss
 
 
      IInnttrroodduuccttiioonn
@@ -1333,7 +1376,7 @@
 
 
 
-  44..1111..  LLeeaaff ccoonnnneeccttiioonnss
+  44..1122..  LLeeaaff ccoonnnneeccttiioonnss
 
 
      IInnttrroodduuccttiioonn
@@ -1380,8 +1423,7 @@
         this new server.
 
 
-
-  44..1122..  VVeerrssiioonn lliimmiittaattiioonnss
+  44..1133..  VVeerrssiioonn lliimmiittaattiioonnss
 
 
      IInnttrroodduuccttiioonn
@@ -1404,6 +1446,7 @@
      SSeerrvveerr MMaasskk
         This field is used to match server names.  The V line will be
         used for servers matching the mask given in this field.
+
 
      SSeerrvveerr TTyyppee
         Both the VVeerrssiioonn MMaasskk and the FFllaaggss should be prefixed with the
@@ -1446,8 +1489,7 @@
         specific identification.
 
 
-
-  44..1133..  EExxcclluuddeedd mmaacchhiinneess
+  44..1144..  EExxcclluuddeedd mmaacchhiinneess
 
   Disallowing SERVERS in your irc net.
 
@@ -1472,9 +1514,7 @@
         This command excludes a server named ``foo.bar.baz'', the reason
         is given to be security holes (you should give a reason, it is
         polite). The first field is unused, so leave it empty.
-
-
-  44..1144..  SSeerrvviiccee ccoonnnneeccttiioonnss
+  44..1155..  SSeerrvviiccee ccoonnnneeccttiioonnss
 
 
      IInnttrroodduuccttiioonn
@@ -1512,7 +1552,6 @@
      CCllaassss
         The class field should refer to an existing class.
 
-
      NNootteess
         A service is not a very useful sort of client, it cannot join
         channels or issue certain commands although most are available
@@ -1522,7 +1561,7 @@
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
 
 
-  44..1155..  BBoouunnccee sseerrvveerr
+  44..1166..  BBoouunnccee sseerrvveerr
 
 
      IInnttrroodduuccttiioonn
@@ -1579,6 +1618,7 @@
 
         When the server is completely full, clients should use the
         secondary server.
+
         B:-1::our.server.example:6667:
 
         Clients that connected to server-only port should really use
@@ -1604,6 +1644,7 @@
         working on the source code are welcome.  This is done by sending
         an email to majordomo@irc.org, with ``ssuubbssccrriibbee iirrccdd--ddeevv'' in
         the body.
+
 
      FFAAQQ
         It can be found on the WWW, at
@@ -1643,7 +1684,6 @@
         If the bug results in a crash, please include the backtrace.
         (This can be done, for example, by running ``gdb'' on the core
         file, and typing ``where'').
-
 
      FFiixx
         If you have a fix, don't forget to include it.

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.63 2004/06/30 00:10:34 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.64 2004/06/30 18:43:00 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -216,6 +216,7 @@ configuration options.  The record types are as follows:
 <item>Client connections    (I,i)
 <item>Operator privileges   (O,o)
 <item>Excluded accounts     (K,k)
+<item>X Excluded accounts   (X)
 <item>Server connections    (C,c,N)
 <item>Deny auto-connections (D)
 <item>Hub connections       (H)
@@ -686,12 +687,12 @@ They define privileges of an operator.
 <item>&amp; - allows joining &amp;CLIENTS
 </itemize>
 ``L'' flag cannot be overridden by other flags.
-Warning: If flags field is left empty, no privileges will be granted. 
-<tag/Example/ o:orion.cair.du.edu:pyunxc:Jeff::1
+If &lt;Flags&gt; field is left empty, no privileges will be granted. 
+<tag/Example/ O:orion.cair.du.edu:pyunxc:Jeff::1:A
 <p>
 There is an OPERATOR at ``orion.cair.du.edu'' that can get
 Operator priviliges if he specifies a password of ``pyunxc''
-and uses a NICKNAME of ``Jeff''.
+and uses a NICKNAME of ``Jeff'' and is granted all possible privileges.
 <tag/Note/ Host NAME accepts IP bitmasks.
 </descrip>
 
@@ -789,6 +790,35 @@ K:=192.11.35.0/24::*:0:
 This line disallows all hosts whose IP address is from network
 ``192.11.35.0/24'' and which didn't resolve to login to the
 ircd.
+</descrip>
+
+<sect1>X Excluded accounts
+<p>
+Remove an errant user from IRC on your site.
+<descrip>
+<tag/Introduction/
+Obviously it is hoped that you wouldn't have to use this
+command.  Unfortunately sometimes a virus can become
+difficult to remove by other means and this is your only recourse - 
+the XKILL USER
+command.  THIS COMMAND ONLY AFFECTS YOUR SERVER - If this
+user can connect to another SERVER somewhere else in the
+IRC-Network then you would have to talk to the administrator
+on that site to disable his access from that IRCD Server as
+well.
+<tag/Format/<verb>
+X:&lt;USER 1st arg&gt;:&lt;USER 2nd arg&gt;:&lt;USER 3rd arg&gt;:&lt;USER 4th arg&gt;:
+</verb>
+<tag/X/``X'' tells the IRCD that you are making an XKILL USER
+command entry.
+<tag/USER n-th arg/ Given field will be matched against corresponding parameter
+of client USER command. If left empty it matches any. It may contain wildcards.
+<tag/Examples/ X:guest:::guest
+If user registers with the following USER command
+<verb>USER guest anything anything :guest</verb>
+then IMMEDIATELY REMOVE HIM from my IRCD.
+<tag/Note/ You need to compile server with #define XLINE to get this
+functionality.
 </descrip>
 
 <sect1>Server connections

@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-22011/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-20751/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.63 2004/06/30 00:10:34 chopin Exp $
+     $Id: INSTALL.info,v 1.64 2004/06/30 18:43:00 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -325,21 +325,23 @@ configuration options.  The record types are as follows:
 
   7. Excluded accounts     (K,k)
 
-  8. Server connections    (C,c,N)
+  8. X Excluded accounts   (X)
 
-  9. Deny auto-connections (D)
+  9. Server connections    (C,c,N)
 
- 10. Hub connections       (H)
+ 10. Deny auto-connections (D)
 
- 11. Leaf connections      (L)
+ 11. Hub connections       (H)
 
- 12. Version limitations   (V)
+ 12. Leaf connections      (L)
 
- 13. Excluded machines     (Q)
+ 13. Version limitations   (V)
 
- 14. Service connections   (S)
+ 14. Excluded machines     (Q)
 
- 15. Bounce server         (B)
+ 15. Service connections   (S)
+
+ 16. Bounce server         (B)
 
    Except for types "M" and "A", you are allowed to have multiple
 records of the same type.  In some cases, you can have concurrent
@@ -367,6 +369,7 @@ connections).
 * Client connections::
 * Operator priviliges::
 * Excluded accounts::
+* X Excluded accounts::
 * Server connections::
 * Deny auto-connections::
 * Hub connections::
@@ -951,22 +954,22 @@ How to become the IRC administrator on your site
 
         * & - allows joining &CLIENTS
 
-     "L" flag cannot be overridden by other flags.  Warning: If flags
-     field is left empty, no privileges will be granted.
+     "L" flag cannot be overridden by other flags.  If <Flags> field is
+     left empty, no privileges will be granted.
 
 `Example'
-     o:orion.cair.du.edu:pyunxc:Jeff::1
+     O:orion.cair.du.edu:pyunxc:Jeff::1:A
 
      There is an OPERATOR at "orion.cair.du.edu" that can get Operator
      priviliges if he specifies a password of "pyunxc" and uses a
-     NICKNAME of "Jeff".
+     NICKNAME of "Jeff" and is granted all possible privileges.
 
 `Note'
      Host NAME accepts IP bitmasks.
 
 
 
-File: INSTALL.info,  Node: Excluded accounts,  Next: Server connections,  Prev: Operator priviliges,  Up: The ircd-conf file
+File: INSTALL.info,  Node: Excluded accounts,  Next: X Excluded accounts,  Prev: Operator priviliges,  Up: The ircd-conf file
 
 Excluded accounts
 =================
@@ -1071,7 +1074,44 @@ Remove an errant user from IRC on your site.
 
 
 
-File: INSTALL.info,  Node: Server connections,  Next: Deny auto-connections,  Prev: Excluded accounts,  Up: The ircd-conf file
+File: INSTALL.info,  Node: X Excluded accounts,  Next: Server connections,  Prev: Excluded accounts,  Up: The ircd-conf file
+
+X Excluded accounts
+===================
+
+Remove an errant user from IRC on your site.
+`Introduction'
+     Obviously it is hoped that you wouldn't have to use this command.
+     Unfortunately sometimes a virus can become difficult to remove by
+     other means and this is your only recourse - the XKILL USER
+     command.  THIS COMMAND ONLY AFFECTS YOUR SERVER - If this user can
+     connect to another SERVER somewhere else in the IRC-Network then
+     you would have to talk to the administrator on that site to
+     disable his access from that IRCD Server as well.
+
+`Format'
+     X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:
+
+`X'
+     "X" tells the IRCD that you are making an XKILL USER command entry.
+
+`USER n-th arg'
+     Given field will be matched against corresponding parameter of
+     client USER command. If left empty it matches any. It may contain
+     wildcards.
+
+`Examples'
+     X:guest:::guest If user registers with the following USER command
+     USER guest anything anything :guest then IMMEDIATELY REMOVE HIM
+     from my IRCD.
+
+`Note'
+     You need to compile server with #define XLINE to get this
+     functionality.
+
+
+
+File: INSTALL.info,  Node: Server connections,  Next: Deny auto-connections,  Prev: X Excluded accounts,  Up: The ircd-conf file
 
 Server connections
 ==================
@@ -1738,24 +1778,25 @@ Node: CLONE_CHECK8967
 Node: Other #define's9330
 Node: Editing the Makefile and compiling9652
 Node: The ircd-conf file10637
-Node: Machine information13006
-Node: Administrative info15621
-Node: Port connections17772
-Node: Connection Classes19921
-Node: Client connections25048
-Node: Operator priviliges30782
-Node: Excluded accounts33894
-Node: Server connections37806
-Node: Deny auto-connections46434
-Node: Hub connections47808
-Node: Leaf connections49296
-Node: Version limitations51380
-Node: Excluded machines53138
-Node: Service connections54443
-Node: Bounce server56037
-Node: Related resources57898
-Node: Reporting a bug58937
-Node: How to report a bug59194
-Node: Where to send a bug report60205
+Node: Machine information13062
+Node: Administrative info15677
+Node: Port connections17828
+Node: Connection Classes19977
+Node: Client connections25104
+Node: Operator priviliges30838
+Node: Excluded accounts33984
+Node: X Excluded accounts37897
+Node: Server connections39187
+Node: Deny auto-connections47817
+Node: Hub connections49191
+Node: Leaf connections50679
+Node: Version limitations52763
+Node: Excluded machines54521
+Node: Service connections55826
+Node: Bounce server57420
+Node: Related resources59281
+Node: Reporting a bug60320
+Node: How to report a bug60577
+Node: Where to send a bug report61588
 
 End Tag Table
