@@ -51,7 +51,7 @@
 # include <stddef.h>
 #endif
 
-#if USE_STDARG
+#if HAVE_STDARG_H
 # include <stdarg.h>
 #else
 #error You need working stdarg.
