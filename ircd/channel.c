@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.161 2003/10/18 15:31:24 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.162 2003/10/18 15:55:10 q Exp $";
 #endif
 
 #include "os.h"
@@ -1306,13 +1306,13 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				/* this is horribly temporary,
 				** we deal with it later, find
 				** parseNUH to check */
-				lp->value.alist = *parv;
+				lp->value.cp = *parv;
 				lp->flags = MODE_ADD|tmp_mode;
 			}
 			else if (whatt == MODE_DEL)
 			{
 				lp = &chops[opcnt++];
-				lp->value.alist = *parv;
+				lp->value.cp = *parv;
 				lp->flags = MODE_DEL|tmp_mode;
 			}
 			count++;
@@ -1576,7 +1576,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 					c = 'R'; break;
 				}
 				/* parseNUH: */
-				cp = lp->value.alist;	/* see? we get it back */
+				cp = lp->value.cp;	/* see? we get it back */
 				if ((user = index(cp, '!')))
 					*user++ = '\0';
 				if ((host = rindex(user ? user : cp, '@')))
