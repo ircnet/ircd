@@ -530,8 +530,8 @@
  * DELAYCHASETIMELIMIT is the default,
  * LDELAYCHASETIMELIMIT applies to !channels and should be really long.
  */
-#define DELAYCHASETIMELIMIT	900	/* Recommended value: 900 */
-#define LDELAYCHASETIMELIMIT	3600	/* Recommended value: 3600 */
+#define DELAYCHASETIMELIMIT	1800	/* Recommended value: 1800 */
+#define LDELAYCHASETIMELIMIT	5400	/* Recommended value: 5400 */
 
 /*
  * Max number of channels a user is allowed to join.
