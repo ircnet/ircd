@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.10 1997/07/28 01:14:14 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.11 1997/08/08 16:15:34 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -2065,7 +2065,8 @@ char	*parv[];
 			continue;
 		if (!MyConnect(sptr) && (BadPtr(para) || (rlen > CHREPLLEN)))
 			break;
-		if (!ShowChannel(sptr, chptr))
+		if ((BadPtr(para) || !HiddenChannel(chptr)) &&
+		    !ShowChannel(sptr, chptr))
 			continue; /* -- users on this are not listed */
 
 		/* Find users on same channel (defined by chptr) */
