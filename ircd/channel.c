@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.191 2004/03/01 02:18:20 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.192 2004/03/01 02:19:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2546,7 +2546,8 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (parc < 3 || *parv[2] == '\0')
 	    {
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),"NJOIN");
+		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME,
+			BadTo(parv[0]), "NJOIN");
 		return 1;
 	    }
 	*nbuf = '\0'; q = nbuf;
