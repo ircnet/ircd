@@ -1,4 +1,11 @@
-2004-07-31  Jakub Vlasek
+2004-08-02  Piotr Kucharski
+
+	* channel.c/del_modeid(): missing parens (noted by Matyas Koszik).
+	* channel.c/set_mode(): we change parv directly, so we have to restore
+	  it, so another channel loop in m_mode could use it again (noted by
+	  Matyas Koszik).
+
+2004-08-02  Jakub Vlasek
 
 	* ircd.c/setup_me(), main(): Call register_server.
 	* list.c/free_server(): Don't change svrtop and take only one
