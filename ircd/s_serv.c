@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.227 2004/08/12 23:29:13 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.228 2004/08/13 00:00:47 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3799,6 +3799,7 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 /* announces server DIE */
 int	m_sdie(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
+	sendto_serv_v(cptr, SV_UID, ":%s SDIE", sptr->serv->sid);
 	return 0;
 }
 
