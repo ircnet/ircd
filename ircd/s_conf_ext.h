@@ -25,6 +25,9 @@
  */
 #ifndef S_CONF_C
 extern aConfItem *conf, *kconf;
+#ifdef TKLINE
+extern aConfItem *tkconf;
+#endif
 extern char *networkname;
 #endif /* S_CONF_C */
 
@@ -76,4 +79,10 @@ EXTERN long pline_flags_parse(char *string);
 # ifdef	INET6
 EXTERN char *ipv6_convert (char *orig);
 # endif
+#ifdef TKLINE
+EXTERN int m_tkline(aClient *, aClient *, int, char **);
+EXTERN int m_untkline(aClient *, aClient *, int, char **);
+EXTERN time_t tkline_expire(int);
+EXTERN aConfItem *do_tkline(int, int, char *, char *, char *, int, char *);
+#endif
 #undef EXTERN

@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.110 2004/06/19 00:16:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.111 2004/06/19 17:26:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -69,6 +69,9 @@ static	int	lookup_confhost (aConfItem *);
 aConfItem	*conf = NULL;
 aConfItem	*kconf = NULL;
 char		*networkname = NULL;
+#ifdef TKLINE
+aConfItem	*tkconf = NULL;
+#endif
 
 /* Parse I-lines flags from string.
  * D - Restricted, if no DNS.
@@ -2074,3 +2077,282 @@ aConfItem	*find_denied(char *name, int class)
     return NULL;
 }
 
+#ifdef TKLINE
+int	m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
+{
+	int	time, status = CONF_TKILL;
+	char	*user, *host, *reason, *s;
+	aConfItem	*tmp;
+
+	if (is_allowed(sptr, ACL_TKLINE))
+		return m_nopriv(cptr, sptr, parc, parv);
+
+	/* sanity checks */
+	for (s = parv[1]; *s; s++)
+	{
+		if (!isdigit(*s))
+			break;
+	}
+	user = parv[2];
+	host = strchr(user, '@');
+	if (*s || !host)
+	{
+		/* error */
+		if (!IsPerson(sptr))
+		{
+			sendto_one(sptr, ":%s NOTICE %s "
+				":TKLINE: Incorrect format",
+				ME, parv[0]);
+			return exit_client(cptr, cptr, &me,
+				"TKLINE: Incorrect format");
+		}
+		sendto_one(sptr, ":%s NOTICE %s :TKLINE: Incorrect format",
+			ME, parv[0]);
+		return 2;
+	}
+
+	/* All seems fine. */
+	time = atoi(parv[1]);
+	if (*user == '=')
+	{
+		status = CONF_TOTHERKILL;
+		*user++;
+	}
+	*host++ = '\0';
+	reason = parv[3];
+	if (strlen(reason) > TOPICLEN)
+	{
+		reason[TOPICLEN] = '\0';
+	}
+
+	/* Check if such u@h already exists in tkconf. */
+	for (tmp = tkconf; tmp; tmp = tmp->next)
+	{
+		if (0==strcasecmp(tmp->host, host) && 
+			0==strcasecmp(tmp->name, user))
+		{
+			tmp->hold = timeofday + time;
+			break;
+		}
+	}
+	if (!tmp)
+	{
+		tmp = do_tkline(status, time, user, host, reason, 1, parv[0]);
+	}
+
+	if (!nexttkexpire || nexttkexpire > tmp->hold)
+	{
+		nexttkexpire = MAX(timeofday + 60, tmp->hold);
+	}
+	return 1;
+}
+
+/* 
+ * Adds tkline, if doall removes matching clients.
+ * status (CONF_TKILL or CONF_TOTHERKILL), time for how long is active,
+ * user, host, reason self explanatory.
+ * Returns created conf line or NULL.
+ */
+aConfItem *do_tkline(int status, int time, char *user, char *host, char *reason, int doall, char *who)
+{
+	char buff[BUFSIZE];
+	aClient	*acptr;
+	aConfItem	*aconf;
+	int i;
+
+	buff[0] = '\0';
+	aconf = make_conf();
+	aconf->next = NULL;
+	aconf->status = status;
+	aconf->hold = timeofday + time;
+	aconf->port = 0;
+	Class(aconf) = find_class(0);
+	DupString(aconf->name, BadTo(user));
+	DupString(aconf->host, BadTo(host));
+	DupString(aconf->passwd, reason);
+	istat.is_confmem += strlen(aconf->name) + 1;
+	istat.is_confmem += strlen(aconf->host) + 1;
+	istat.is_confmem += strlen(aconf->passwd) + 1;
+
+	/* put on top of tkconf */
+	if (tkconf)
+	{
+		aconf->next = tkconf;
+	}
+	tkconf = aconf;
+
+	if (!doall)
+	{
+		return NULL;
+	}
+
+	/* mark for delayed_kills to work */
+	if (rehashed == 0 || rehashed == 1)
+	{
+		rehashed++;
+	}
+	sendto_flag(SCH_NOTICE, "TKLINE %s@%s (%d) by %s",
+		aconf->name, aconf->host, time, who);
+
+	/* get rid of tklined clients */
+	for (i = highest_fd; i >= 0; i--)
+	{
+		if (!(acptr = local[i]) || !IsPerson(acptr)
+			|| IsKlineExempt(acptr))
+		{
+			continue;
+		}
+		if (!strcmp(acptr->sockhost, acptr->user->sip))
+		{
+			/* unresolved */
+			if (strchr(aconf->host, '/'))
+			{
+				if (match_ipmask(*aconf->host == '=' ?
+					aconf->host + 1 : aconf->host,
+					acptr, 1))
+				{
+					continue;
+				}
+			}
+			else
+			{
+				if (match(*aconf->host == '=' ?
+					aconf->host + 1 : aconf->host,
+					acptr->sockhost))
+				{
+					continue;
+				}
+			}
+		}
+		else
+		{
+			/* resolved */
+			if (*aconf->host == '=')
+			{
+				/* IP only */
+				continue;
+			}
+			if (strchr(aconf->host, '/'))
+			{
+				if (match_ipmask(aconf->host, acptr, 1))
+				{
+					continue;
+				}
+			}
+			else
+			{
+				if (match(aconf->host, acptr->user->sip)
+					&& match(aconf->host,
+					acptr->user->host))
+				{
+					continue;
+				}
+			}
+		}
+		if (match(aconf->name, aconf->status == CONF_TOTHERKILL ?
+			acptr->auth : (IsRestricted(acptr) &&
+			acptr->user->username[0] == '+' ?
+			acptr->user->username+1 :
+			acptr->user->username)) == 0)
+		{
+			sendto_one(acptr, replies[ERR_YOUREBANNEDCREEP],
+				ME, acptr->name, aconf->name, aconf->host,
+				": ", reason);
+			sendto_flag(SCH_NOTICE,
+				"TKill line active for %s",
+				get_client_name(acptr, FALSE));
+			if (buff[0] == '\0')
+			{
+				sprintf(buff, "Kill line active: %.80s",
+					reason);
+			}
+			(void) exit_client(acptr, acptr, &me, buff);
+		}
+	}
+	return aconf;
+}
+
+int	m_untkline(aClient *cptr, aClient *sptr, int parc, char **parv)
+{
+	aConfItem	*tmp, *prev;
+	char	*user, *host;
+	int	deleted = 0;
+	
+	if (is_allowed(sptr, ACL_UNTKLINE))
+		return m_nopriv(cptr, sptr, parc, parv);
+
+	user = parv[1];
+	host = strchr(user, '@');
+	if (!host)
+	{
+		/* error */
+		if (!IsPerson(sptr))
+		{
+			sendto_one(sptr, ":%s NOTICE %s "
+				":UNTKLINE: Incorrect format",
+				ME, parv[0]);
+			return exit_client(cptr, cptr, &me,
+				"UNTKLINE: Incorrect format");
+		}
+		sendto_one(sptr, ":%s NOTICE %s :UNTKLINE: Incorrect format",
+			ME, parv[0]);
+		return 2;
+	}
+	if (*user == '=')
+	{
+		*user++;
+	}
+	*host++ = '\0';
+
+	for (prev = tkconf, tmp = tkconf; tmp; tmp = tmp->next)
+	{
+		if (0==strcasecmp(tmp->host, host) && 
+			0==strcasecmp(tmp->name, user))
+		{
+			if (tmp == tkconf)
+				tkconf = tmp->next;
+			else
+				prev->next = tmp->next;
+			free_conf(tmp);
+			deleted = 1;
+			break;
+		}
+		prev = tmp;
+	}
+
+	if (deleted)
+	{
+		sendto_flag(SCH_NOTICE, "UNTKLINE %s@%s by %s",
+			user, host, parv[0]);
+	}
+	return 1;
+}
+
+time_t	tkline_expire(int all)
+{
+	aConfItem	*tmp = NULL, *tmp2 = tkconf, *prev = tkconf;
+	time_t	min = 0;
+	
+	while ((tmp = tmp2))
+	{
+		tmp2 = tmp->next;
+		if (all || tmp->hold < timeofday)
+		{
+			if (tmp == tkconf)
+				tkconf = tmp->next;
+			else
+				prev->next = tmp->next;
+			free_conf(tmp);
+			continue;
+		}
+		if (tmp->hold < min)
+		{
+			min = tmp->hold;
+		}
+		prev = tmp;
+	}
+	if (min && min < nexttkexpire + 60)
+		min = nexttkexpire + 60;
+	return min;
+}
+#endif
