@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.102 2004/03/20 22:10:29 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.103 2004/03/21 00:40:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1972,7 +1972,8 @@ void	find_bounce(aClient *cptr, int class, int fd)
 		** and if it is for a hostname.
 		*/
 		if (fd != -2 &&
-		    !strchr(aconf->host, '.') && isdigit(*aconf->host))
+		    !strchr(aconf->host, '.') &&
+			(isdigit(*aconf->host) || *aconf->host == '-'))
 		{
 			if (class != atoi(aconf->host))
 			{
