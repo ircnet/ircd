@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.107 2004/06/24 16:42:09 chopin Exp $
+ *   $Id: struct_def.h,v 1.108 2004/06/24 17:26:18 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -321,7 +321,7 @@ struct	ListItem	{
 #define	CONF_CONNECT_SERVER	0x000008
 #define	CONF_NOCONNECT_SERVER	0x000010
 #define	CONF_ZCONNECT_SERVER	0x000020
-#define	CONF_LOCOP		0x000040
+
 #define	CONF_OPERATOR		0x000080
 #define	CONF_ME			0x000100
 #define	CONF_KILL		0x000200
@@ -340,7 +340,7 @@ struct	ListItem	{
 #define	CONF_TOTHERKILL		0x400000
 #endif
 
-#define	CONF_OPS		(CONF_OPERATOR | CONF_LOCOP)
+#define	CONF_OPS		CONF_OPERATOR
 #define	CONF_SERVER_MASK	(CONF_CONNECT_SERVER | CONF_NOCONNECT_SERVER |\
 				 CONF_ZCONNECT_SERVER)
 #define	CONF_CLIENT_MASK	(CONF_CLIENT | CONF_SERVICE | CONF_OPS | \

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.208 2004/06/24 17:14:22 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.209 2004/06/24 17:26:18 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1847,9 +1847,8 @@ static int report_array[18][3] = {
 		{ CONF_KILL,		  RPL_STATSKLINE, 'K'},
 		{ CONF_QUARANTINED_SERVER,RPL_STATSQLINE, 'Q'},
 		{ CONF_LEAF,		  RPL_STATSLLINE, 'L'},
-		{ CONF_OPERATOR,	  RPL_STATSOLINE, 'o'},
+		{ CONF_OPERATOR,	  RPL_STATSOLINE, 'O'},
 		{ CONF_HUB,		  RPL_STATSHLINE, 'H'},
-		{ CONF_LOCOP,		  RPL_STATSOLINE, 'O'},
 		{ CONF_SERVICE,		  RPL_STATSSLINE, 'S'},
 		{ CONF_VER,		  RPL_STATSVLINE, 'V'},
 		{ CONF_BOUNCE,		  RPL_STATSBLINE, 'B'},
@@ -1924,7 +1923,7 @@ static	void	report_configured_links(aClient *sptr, char *to, int mask)
 					   iline_flags_to_string(tmp->flags));
 
 			}
-			else if ((tmp->status & (CONF_OPERATOR|CONF_LOCOP)))
+			else if ((tmp->status & CONF_OPERATOR))
 			{
 				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
 					   c, host, (pass) ? "*" : null,

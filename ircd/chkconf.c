@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.26 2004/06/18 23:54:41 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.27 2004/06/24 17:26:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -348,11 +348,8 @@ static	aConfItem 	*initconf()
 				aconf->status = CONF_NOCONNECT_SERVER;
 				break;
 			case 'o':
-				aconf->status = CONF_OPERATOR;
-				break;
-			/* Local Operator, (limited privs --SRB) */
 			case 'O':
-				aconf->status = CONF_LOCOP;
+				aconf->status = CONF_OPERATOR;
 				break;
 			case 'P': /* listen port line */
 			case 'p':

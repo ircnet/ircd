@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.116 2004/06/24 17:09:48 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.117 2004/06/24 17:26:18 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -640,7 +640,7 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		return 1;
 	if (IsIllegal(aconf))
 		return -1; /* EXITC_FAILURE, hmm */
-	if ((aconf->status & (CONF_LOCOP | CONF_OPERATOR | CONF_CLIENT )))
+	if ((aconf->status & (CONF_OPERATOR | CONF_CLIENT )))
 	    {
 		if (aconf->clients >= ConfMaxLinks(aconf) &&
 		    ConfMaxLinks(aconf) > 0)
@@ -836,7 +836,7 @@ aConfItem	*find_conf_exact(char *name, char *user, char *host,
 		*/
 		if (match(tmp->host, userhost))
 			continue;
-		if (tmp->status & (CONF_OPERATOR|CONF_LOCOP))
+		if (tmp->status & CONF_OPERATOR)
 		    {
 			if (tmp->clients < MaxLinks(Class(tmp)))
 				return tmp;
@@ -1444,11 +1444,9 @@ int 	initconf(int opt)
 				aconf->status = CONF_NOCONNECT_SERVER;
 				break;
 			case 'o':
-				aconf->status = CONF_OPERATOR;
-				break;
-			/* Local Operator, (limited privs --SRB) */
+				aconf->flags |= ACL_LOCOP;
 			case 'O':
-				aconf->status = CONF_LOCOP;
+				aconf->status = CONF_OPERATOR;
 				break;
 			case 'P': /* listen port line */
 			case 'p':
@@ -1485,7 +1483,7 @@ int 	initconf(int opt)
 				(CONF_CONNECT_SERVER|CONF_ZCONNECT_SERVER
 				|CONF_CLIENT|CONF_KILL
 				|CONF_OTHERKILL|CONF_NOCONNECT_SERVER
-				|CONF_OPERATOR|CONF_LOCOP|CONF_LISTEN_PORT
+				|CONF_OPERATOR|CONF_LISTEN_PORT
 				|CONF_SERVICE))
 				aconf->host = ipv6_convert(tmp);
 			else
@@ -1615,7 +1613,7 @@ int 	initconf(int opt)
 				continue;
 
 		if (aconf->status &
-		    (CONF_SERVER_MASK|CONF_LOCOP|CONF_OPERATOR|CONF_SERVICE))
+		    (CONF_SERVER_MASK|CONF_OPERATOR|CONF_SERVICE))
 			if (!index(aconf->host, '@') && *aconf->host != '/')
 			    {
 				char	*newhost;
@@ -1628,7 +1626,7 @@ int 	initconf(int opt)
 				aconf->host = newhost;
 				istat.is_confmem += 2;
 			    }
-		if (tmp3 && (aconf->status & (CONF_OPERATOR|CONF_LOCOP)))
+		if (tmp3 && (aconf->status & CONF_OPERATOR))
 		{
 			aconf->flags |= oline_flags_parse(tmp3);
 			if (aconf->flags & ACL_LOCOP)
