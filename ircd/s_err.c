@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.35 2002/07/06 03:14:26 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.36 2002/11/11 18:42:13 jv Exp $";
 #endif
 
 #include "os.h"
@@ -451,7 +451,7 @@ char *	replies[] = {
 /* 413 ERR_NOTOPLEVEL */	":%s 413 %s %s :No toplevel domain specified",
 /* 414 ERR_WILDTOPLEVEL */	":%s 414 %s %s :Wildcard in toplevel Domain",
 /* 415 ERR_BADMASK */	":%s 415 %s %s :Bad Server/host mask",
-/* 416 ERR_TOOMANYMATCHES */	":%s 416 %s %s %s :Output too long (try locally)",
+/* 416 ERR_TOOMANYMATCHES */	":%s 416 %s %s :output too big, truncated",
 /* 417 */ (char *)NULL,
 /* 418 */ (char *)NULL,
 /* 419 */ (char *)NULL,
