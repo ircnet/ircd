@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.57 2004/07/02 15:06:16 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.58 2004/07/02 15:10:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -409,6 +409,8 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #ifdef	USE_SERVICES
 	if (!IsServer(cptr))
 	    {
+		char **isup = isupport;
+
 		svc = make_service(sptr);
 		sptr->hopcount = 0;
 		server = ME;
@@ -462,6 +464,12 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			   sptr->name);
 		sendto_one(sptr, replies[RPL_YOURHOST], ME, BadTo(sptr->name),
                            get_client_name(&me, FALSE), version);
+		while (*isup)
+		{
+			sendto_one(sptr,replies[RPL_ISUPPORT], ME,
+			BadTo(sptr->name), *isup);
+			isup++;
+		}
 		sendto_one(sptr, replies[RPL_MYINFO], ME, BadTo(sptr->name), ME, version);
 		sendto_flag(SCH_NOTICE, "Service %s connected",
 			    get_client_name(sptr, TRUE));
