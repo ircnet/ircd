@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.8 1999/01/14 19:24:54 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.9 1999/01/15 14:45:39 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -51,7 +51,7 @@ struct socks_private
 	u_int lifetime;
 	u_char options;
 	/* stats */
-	u_int chit, cmiss, cnow, cmax;
+	u_int chit, chit2, cmiss, cnow, cmax;
 	u_int closed, open;
 };
 
@@ -152,8 +152,12 @@ socks_check_cache(cl)
 			      cl, pl->open));
 		    pl->expire = now + mydata->lifetime; /* dubious */
 		    if (pl->open)
+			{
 			    socks_open_proxy(cl);
-		    mydata->chit += 1;
+			    mydata->chit += 1;
+			}
+		    else
+			    mydata->chit2 += 1;
 		    return -1;
 		}
 	    last = &(pl->next);
@@ -256,8 +260,8 @@ AnInstance *self;
 {
 	struct socks_private *mydata = self->data;
 
-	sendto_ircd("S socks open %u closed %u cache hit %u miss %u (%u < %u)",
-		    mydata->open, mydata->closed, mydata->chit,
+	sendto_ircd("S socks open[%u/%u] closed[%u/%u] cache miss %u (%u < %u)",
+		    mydata->open, ,mydata->chit, mydata->closed, mydata->chit2,
 		    mydata->cmiss, mydata->cnow, mydata->cmax);
 }
 
