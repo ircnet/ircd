@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.50 2005/01/30 13:41:09 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.51 2005/01/30 17:59:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1217,7 +1217,7 @@ int	m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	
 	if (parc < 2)
 	{
-		sendto_one(sptr, ":%s NOTICE %s: Syntax: HASH <hash> [command]"
+		sendto_one(sptr, ":%s NOTICE %s: Syntax: HAZH <hash> [command]"
 				,ME, sptr->name);
 		i = 0;
 		while (HashTables[i].hash)
