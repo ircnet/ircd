@@ -24,7 +24,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: whowas.c,v 1.5 1998/05/05 21:26:58 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: whowas.c,v 1.6 1999/06/27 19:08:46 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -61,6 +61,7 @@ static	void	grow_history()
 **	usually called before changing to a new name (nick).
 **	Client must be a fully registered user (specifically,
 **	the user structure must have been allocated).
+**	if nodelay is NULL, then the nickname will be subject to NickDelay
 */
 void	add_history(cptr, nodelay)
 Reg	aClient	*cptr, *nodelay;
