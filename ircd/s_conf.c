@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.7 1997/05/14 19:52:48 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.8 1997/06/02 13:17:15 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -160,7 +160,7 @@ attach_iline:
 			SetRestricted(cptr);
 		get_sockhost(cptr, uhost);
 		if ((i = attach_conf(cptr, aconf)) < -1)
-			find_bounce(cptr, aconf->pref);
+			find_bounce(cptr, ConfClass(aconf));
 		return i;
 	    }
 	return -1;
@@ -950,6 +950,11 @@ int	opt;
 		istat.is_confmem += aconf->name ? strlen(aconf->name)+1 : 0;
 
 		/*
+		** Bounce line fields are mandatory
+		*/
+		if (aconf->status == CONF_BOUNCE && aconf->port == 0)
+			continue;
+		/*
                 ** If conf line is a class definition, create a class entry
                 ** for it and make the conf_line illegal and delete it.
                 */
@@ -1414,33 +1419,42 @@ int	class;
 	    {
 		if (aconf->status != CONF_BOUNCE)
 			continue;
-		/* early rejection, connection class is unknown */
-		if (cptr == NULL && atoi(aconf->host) == -1)
-			continue;
+
+		if (cptr == NULL)
+			/*
+			** early rejection,
+			** connection class and hostname are unknown
+			*/
+			if (atoi(aconf->host) == -1)
+			    {
+				char rpl[BUFSIZE];
+				
+				irc_sprintf(rpl, rpl_str(RPL_BOUNCE,"unknown"),
+					    aconf->name, aconf->port);
+				strcat(rpl, "\r\n");
+				send(class, rpl, strlen(rpl), 0);
+				return;
+			    }
+			else
+				continue;
+
+		/* cptr != NULL */
 		/*
 		** "too many" type rejection, class is known.
 		** check if B line is for a class #,
 		** and if it is for a hostname.
 		*/
-		if (cptr && isdigit(*aconf->host) &&
-		    class != atoi(aconf->host) &&
-		    match(aconf->host, cptr->sockhost))
-			continue;
-
-		if (cptr)
-			sendto_one(cptr, rpl_str(RPL_BOUNCE, cptr->name),
-				   aconf->name,
-				   (aconf->port) ? aconf->port : 6667);
-		else
+		if (isdigit(*aconf->host))
 		    {
-			char rpl[BUFSIZE];
-
-			irc_sprintf(rpl, rpl_str(RPL_BOUNCE, "unknown"),
-				    aconf->name,
-				    (aconf->port) ? aconf->port : 6667);
-			strcat(rpl, "\r\n");
-			send(class, rpl, strlen(rpl), 0);
+			if (class != atoi(aconf->host))
+				continue;
 		    }
+		else
+			if (match(aconf->host, cptr->sockhost))
+				continue;
+
+		sendto_one(cptr, rpl_str(RPL_BOUNCE, cptr->name), aconf->name,
+			   aconf->port);
 		return;
 	    }
 	

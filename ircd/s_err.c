@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.4 1997/05/30 19:06:59 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.5 1997/06/02 13:17:16 kalt Exp $";
 #endif
 
 #include "sys.h"
@@ -246,15 +246,16 @@ static	Numeric	numeric_replies[] = {
 /* 234 */	RPL_SERVLIST, "%s %s %s %d %d :%s",
 /* 235 */	RPL_SERVLISTEND, "%s %d :End of service listing",
 		0, (char *)NULL, 0, (char *)NULL, 0, (char *)NULL,
-		0, (char *)NULL, 0, (char *)NULL,
+		0, (char *)NULL,
+/* 240 */	RPL_STATSVLINE, "%c %s %s %s %d %d",
 /* 241 */	RPL_STATSLLINE, "%c %s %s %s %d %d",
 /* 242 */	RPL_STATSUPTIME, ":Server Up %d days, %d:%02d:%02d",
 /* 243 */	RPL_STATSOLINE, "%c %s %s %s %d %d",
 /* 244 */	RPL_STATSHLINE, "%c %s %s %s %d %d", 
 /* 245 */	RPL_STATSSLINE, "%c %s %s %s 0x%X %d", 
 /* 246 */	RPL_STATSPING, "%s %d %d %d %d",
+/* 247 */	RPL_STATSBLINE, "%c %s %s %s %d %d",
 		0, (char *)NULL, 0, (char *)NULL, 0, (char *)NULL,
-		0, (char *)NULL,
 /* 251 */	RPL_LUSERCLIENT,
 		":There are %d users and %d services on %d servers",
 /* 252 */	RPL_LUSEROP, "%d :operators online",

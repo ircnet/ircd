@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.12 1997/05/28 13:38:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.13 1997/06/02 13:17:16 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1187,7 +1187,7 @@ char	*parv[];
 **	      it--not reversed as in ircd.conf!
 */
 
-static int report_array[15][3] = {
+static int report_array[16][3] = {
 		{ CONF_ZCONNECT_SERVER,	  RPL_STATSCLINE, 'c'},
 		{ CONF_CONNECT_SERVER,	  RPL_STATSCLINE, 'C'},
 		{ CONF_NOCONNECT_SERVER,  RPL_STATSNLINE, 'N'},
@@ -1201,8 +1201,8 @@ static int report_array[15][3] = {
 		{ CONF_HUB,		  RPL_STATSHLINE, 'H'},
 		{ CONF_LOCOP,		  RPL_STATSOLINE, 'o'},
 		{ CONF_SERVICE,		  RPL_STATSSLINE, 'S'},
-		{ CONF_VER,		  RPL_STATSSLINE, 'V'},
-		{ CONF_BOUNCE,		  RPL_STATSSLINE, 'B'},
+		{ CONF_VER,		  RPL_STATSVLINE, 'V'},
+		{ CONF_BOUNCE,		  RPL_STATSBLINE, 'B'},
 		{ 0, 0, 0}
 	};
 
