@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.131 2004/07/16 22:25:56 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.132 2004/08/10 03:07:53 jv Exp $";
 #endif
 
 #include "os.h"
@@ -650,7 +650,7 @@ int	detach_conf(aClient *cptr, aConfItem *aconf)
 					Class(aconf) = NULL;
 				    }
 			     }
-			if (aconf && !--aconf->clients && IsIllegal(aconf))
+			if (aconf && --aconf->clients <= 0 && IsIllegal(aconf))
 			{
 				/* Remove the conf entry from the Conf linked list */
 				for (aconf2 = &conf; (aconf3 = *aconf2); )
@@ -1194,7 +1194,7 @@ int	rehash(aClient *cptr, aClient *sptr, int sig)
 	 * Flush *unused* config entries.
 	 */
 	for (tmp = &conf; (tmp2 = *tmp); )
-		if (!(tmp2->status & CONF_ILLEGAL) || tmp2->clients)
+		if (!(tmp2->status & CONF_ILLEGAL) || (tmp2->clients > 0))
 			tmp = &tmp2->next;
 		else
 		{
