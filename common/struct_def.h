@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.127 2004/11/13 15:40:08 chopin Exp $
+ *   $Id: struct_def.h,v 1.128 2004/11/19 15:12:59 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -306,7 +306,7 @@ struct	ConfItem	{
 	char	*name;
 	int	port;
 	long	flags;		/* I-line flags */
-	u_int	pref;		/* preference value */
+	int	pref;		/* preference value */
 	struct	CPing	*ping;
 	time_t	hold;	/* Hold action until this time (calendar time) */
 	char	*source_ip;
