@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.58 2002/06/06 14:01:13 chopin Exp $
+ *   $Id: struct_def.h,v 1.59 2002/07/05 23:13:26 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -381,7 +381,8 @@ struct	User	{
 	char	*server;
 	u_int	hhashv;		/* hostname hash value */
 	struct User *hhnext;	/* next entry in hostname hash */
-	char	sip[40];	/* ip as a string, big enough for ipv6 */
+	char	sip[1];		/* ip as a string, big enough for ipv6
+				 * allocated to real size in make_user */
 
 };
 
