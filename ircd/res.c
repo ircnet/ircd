@@ -31,7 +31,7 @@
 #include "res.h"
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.8 1997/07/16 19:27:39 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.9 1997/07/23 16:37:00 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -232,41 +232,43 @@ time_t	now;
 	    {
 		r2ptr = rptr->next;
 		tout = rptr->sentat + rptr->timeout;
-		if (now >= tout && --rptr->retries <= 0)
-		    {
+		if (now >= tout)
+			if (--rptr->retries <= 0)
+			    {
 #ifdef DEBUG
-			Debug((DEBUG_ERROR,"timeout %x now %d cptr %x",
-				rptr, now, rptr->cinfo.value.cptr));
+				Debug((DEBUG_ERROR,"timeout %x now %d cptr %x",
+				       rptr, now, rptr->cinfo.value.cptr));
 #endif
-			reinfo.re_timeouts++;
-			cptr = rptr->cinfo.value.cptr;
-			switch (rptr->cinfo.flags)
-			{
-			case ASYNC_CLIENT :
-				ClearDNS(cptr);
-				if (!DoingAuth(cptr))
-					SetAccess(cptr);
-				break;
-			case ASYNC_CONNECT :
-				sendto_flag(SCH_ERROR,
-					    "Host %s unknown", rptr->name);
-				break;
-			}
-			rem_request(rptr);
-			continue;
-		    }
-		else
-		    {
-			rptr->sentat = now;
-			rptr->timeout += rptr->timeout;
-			resend_query(rptr);
-			tout = now + rptr->timeout;
+				reinfo.re_timeouts++;
+				cptr = rptr->cinfo.value.cptr;
+				switch (rptr->cinfo.flags)
+				    {
+				case ASYNC_CLIENT :
+					ClearDNS(cptr);
+					if (!DoingAuth(cptr))
+						SetAccess(cptr);
+					break;
+				case ASYNC_CONNECT :
+					sendto_flag(SCH_ERROR,
+						    "Host %s unknown",
+						    rptr->name);
+					break;
+				    }
+				rem_request(rptr);
+				continue;
+			    }
+			else
+			    {
+				rptr->sentat = now;
+				rptr->timeout += rptr->timeout;
+				resend_query(rptr);
+				tout = now + rptr->timeout;
 #ifdef DEBUG
-			Debug((DEBUG_INFO,"r %x now %d retry %d c %x",
-				rptr, now, rptr->retries,
-				rptr->cinfo.value.cptr));
+				Debug((DEBUG_INFO,"r %x now %d retry %d c %x",
+				       rptr, now, rptr->retries,
+				       rptr->cinfo.value.cptr));
 #endif
-		    }
+			    }
 		if (!next || tout < next)
 			next = tout;
 	    }
