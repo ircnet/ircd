@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.19 1997/11/11 19:11:20 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.20 1997/12/16 17:18:32 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -624,6 +624,9 @@ aChannel *chptr;
 {
 	if (*chptr->chname != '#'
 	    || chptr->users == 0) /* channel is empty (locked), thus no mode */
+		return;
+
+	if (check_channelmask(&me, cptr, chptr->chname))
 		return;
 
 	*modebuf = *parabuf = '\0';
