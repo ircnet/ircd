@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.14 1999/03/11 19:53:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.15 1999/03/19 13:59:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -393,7 +393,7 @@ u_int cl;
 						;
 				else if (mydata->options & OPT_PARANOID)
 					open = 1;
-				if (open)
+				if (open == 1)
 					socks_open_proxy(cl);
 				socks_add_cache(cl, open);
 				if (cldata[cl].inbuffer[1] != 90 &&
