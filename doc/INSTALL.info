@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info20993tmp2.
+input file /tmp/sgml2info27263tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.26 1998/08/24 02:26:42 kalt Exp $
+     $Id: INSTALL.info,v 1.27 1998/09/09 14:53:29 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.5.
 
@@ -1407,16 +1407,16 @@ Version limitations
 `Server Type'
      Both the `Version Mask' and the `Flags' should be prefixed with
      the server type identification.  This implementation uses the id
-     "`IRC"'.
+     "`IRC"' (starting with version 2.10).
 
 `Examples'
-     V:IRC/020901*::*::
+     V:IRC/021001*::*::
 
-     Disallows any "IRC" server which version is 2.9.1* to connect.
+     Disallows any "IRC" server which version is 2.10.1* to connect.
 
-     V:IRC/020901*:IRC/*D*:*::
+     V:IRC/021001*:IRC/*D*:*::
 
-     Disallows any "IRC" server which version is 2.9.1* or which has
+     Disallows any "IRC" server which version is 2.10.1* or which has
      been compiled with DEBUGMODE defined to connect.
 
      V:*/0209*::*::
@@ -1427,9 +1427,9 @@ Version limitations
      It is possible to have and use multiple V-lines for the one server
      mask.
 
-     V:IRC/020901*:*:*::
+     V:IRC/021001*:*:*::
 
-     V:IRC/020902*:*:*::
+     V:IRC/021002*:*:*::
 
      is allowed.
 
@@ -1651,10 +1651,10 @@ Node: Deny auto-connections47208
 Node: Hub connections48581
 Node: Leaf connections49797
 Node: Version limitations51880
-Node: Excluded machines53565
-Node: Service connections54872
-Node: Bounce server56465
-Node: Default local server (for local clients) `*OBSOLETED*'58167
-Node: Related resources59050
+Node: Excluded machines53596
+Node: Service connections54903
+Node: Bounce server56496
+Node: Default local server (for local clients) `*OBSOLETED*'58198
+Node: Related resources59081
 
 End Tag Table

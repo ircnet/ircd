@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.26 1998/08/24 02:26:43 kalt Exp $
+  $Id: INSTALL.txt,v 1.27 1998/09/09 14:53:30 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.5.
 
@@ -1373,17 +1373,19 @@
      SSeerrvveerr TTyyppee
         Both the VVeerrssiioonn MMaasskk and the FFllaaggss should be prefixed with the
         server type identification.  This implementation uses the id
-        ``IIRRCC''.
+        ``IIRRCC'' (starting with version 2.10).
 
      EExxaammpplleess
-        V:IRC/020901*::*::
+        V:IRC/021001*::*::
 
-        Disallows any ``IRC'' server which version is 2.9.1* to connect.
+        Disallows any ``IRC'' server which version is 2.10.1* to
+        connect.
 
-        V:IRC/020901*:IRC/*D*:*::
+        V:IRC/021001*:IRC/*D*:*::
 
-        Disallows any ``IRC'' server which version is 2.9.1* or which
+        Disallows any ``IRC'' server which version is 2.10.1* or which
         has been compiled with DEBUGMODE defined to connect.
+
         V:*/0209*::*::
 
         Disallows any server using the 2.9 protocol to connect.
@@ -1392,9 +1394,9 @@
         It is possible to have and use multiple V-lines for the one
         server mask.
 
-        V:IRC/020901*:*:*::
+        V:IRC/021001*:*:*::
 
-        V:IRC/020902*:*:*::
+        V:IRC/021002*:*:*::
 
         is allowed.
 
@@ -1447,8 +1449,8 @@
         Services are not intended for interactive usage, and are better
         suited for automated clients.
 
-     FFoorrmmaatt
 
+     FFoorrmmaatt
 
         S:<TARGET Host Mask>:<Password>:<Service Name>:<Service Type>:<Class>
 
@@ -1580,8 +1582,6 @@
      FFAAQQ
         It can be found on the WWW, at
         <http://www.stealth.net/~kalt/irc/faq.html>.
-
-
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.

@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.23 1998/08/24 02:26:43 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.24 1998/09/09 14:53:31 kalt Exp $
 
 This is a development version of the IRC software.
 
@@ -19,6 +19,11 @@ New features in 2.10.0:
 Important configuration changes between 2.9.x and 2.10.x:
 
 	* The V line format has changed!
+
+------
+
+If the irc daemon is unable to bind any socket to listen to for incoming
+connections, it will die rather than stay alive.
 
 ===============================================================================
 

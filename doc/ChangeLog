@@ -1,3 +1,12 @@
+Tue Sep  8 21:23:27 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* s_user.c: user mode +a propagation bugfix.
+
+	* ircd.c: die immediately if no listener exists after reading the conf.
+
+	* send_ext.h, send.c, channel.c: backward compatibility fix for eI
+	channel modes (added sendto_match_servs_v()).
+
 Mon Sep  7 18:03:34 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* s_bsd.c: inversed test for -s in start_iauth().

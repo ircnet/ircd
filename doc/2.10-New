@@ -1,0 +1,17 @@
+	* +a (away) user mode
+          This user mode is used to propagate users' away status between
+	  servers.
+
+	* added channel mode +e (exceptions to bans).
+	* added channel mode +I (invitations).
+	* invites can now be used to override channel bans and limit.
+	* ! channels introduced (can't be collided);
+	  A quite detailed technical description can be found on the web:
+		http://www.stealth.net/~kalt/irc/channel.html
+
+	* NJOIN for 2.10 <-> 2.10 communication on connect bursts instead of
+	  the combined JOIN/MODE introduced by 2.9 (and now deprecated)
+
+	* a slave process is now used to authenticate incoming connections.
+	  The slave's modular design makes it easy to add new authentication
+	  modules.
