@@ -1,4 +1,33 @@
-1998-10-28  Christophe Kalt  <kalt@azurite.london.deshaw.com>
+2.10.1
+
+1998-11-12  Christophe Kalt
+
+	* Doc references to @stealth.net changed to @irc.org.
+
+	* s_serv.c: report_ping() now sends some extra info to &DEBUG.
+
+	* s_bsd.c: send_ping() window set to 20 minutes (instead of 10),
+	and never close it.
+
+1998-11-03  Christophe Kalt
+
+	* s_serv.c: changed m_trace() to only show unknowns to opers and
+	local clients.
+
+	* a_io.c: fd remap processing bugfix (from Q@ping.be).
+
+	* s_bsd.c: fixed ircd/iauth problem with servers ircd connects to.
+
+1998-10-31  Christophe Kalt
+
+	* parse.c: reordered msgtab[].
+
+	* s_serv.c: added more restrictions to m_links(), m_stats() [t],
+	m_motd() and m_lusers() for remote clients. (*sigh*)
+
+	* channel.c: fixed count_channels() not to count empty channels.
+
+1998-10-28  Christophe Kalt
 
 	* s_user.c: optimized m_whois() (pointed out by several people).
 
