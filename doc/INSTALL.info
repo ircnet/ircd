@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info11344tmp2.
+input file /tmp/sgml2info19992tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.13 1997/09/12 02:09:29 kalt Exp $
+     $Id: INSTALL.info,v 1.14 1997/09/12 17:47:22 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.4.
 
@@ -606,6 +606,11 @@ Connection Classes
 
 `Note'
      Only the local limitation is accurate.
+
+`Note'
+     If you define a gobal limit, you should also define a local limit
+     (same or lower) as it won't take more CPU and will make the global
+     limit more accurate.
 
 `Example'
      Y:23:120:300:5:100000:0:0: (server class)
@@ -1440,18 +1445,18 @@ Node: Machine information12366
 Node: Administrative info14462
 Node: Port connections16497
 Node: Connection Classes18707
-Node: Client connections23121
-Node: Operator priviliges26406
-Node: Restrict connections28526
-Node: Excluded accounts29841
-Node: Server connections33141
-Node: Hub connections41574
-Node: Leaf connections42787
-Node: Version limitations44870
-Node: Excluded machines46109
-Node: Service connections47416
-Node: Bounce server49009
-Node: Default local server (for local clients) `*OBSOLETED*'50632
-Node: Related resources51515
+Node: Client connections23298
+Node: Operator priviliges26583
+Node: Restrict connections28703
+Node: Excluded accounts30018
+Node: Server connections33318
+Node: Hub connections41751
+Node: Leaf connections42964
+Node: Version limitations45047
+Node: Excluded machines46286
+Node: Service connections47593
+Node: Bounce server49186
+Node: Default local server (for local clients) `*OBSOLETED*'50809
+Node: Related resources51692
 
 End Tag Table

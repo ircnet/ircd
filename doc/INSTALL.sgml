@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.13 1997/09/12 02:09:30 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.14 1997/09/12 17:47:23 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.4.
 </abstract>
@@ -444,6 +444,9 @@ effective limit will be per host, not per user@host. Also,
 some ident servers return encrypted data which changes for
 every connection making the limit void.
 <tag/Note/ Only the local limitation is accurate.
+<tag/Note/ If you define a gobal limit, you should also
+define a local limit (same or lower) as it won't take more
+CPU and will make the global limit more accurate.
 <tag/Example/ Y:23:120:300:5:100000:0:0: (server class)
 <p>
 This defines class 23 to allow 5 auto-connections, which are

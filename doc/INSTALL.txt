@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.13 1997/09/12 02:09:30 kalt Exp $
+  $Id: INSTALL.txt,v 1.14 1997/09/12 17:47:23 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.4.
 
@@ -533,6 +533,11 @@
      NNoottee
         Only the local limitation is accurate.
 
+     NNoottee
+        If you define a gobal limit, you should also define a local
+        limit (same or lower) as it won't take more CPU and will make
+        the global limit more accurate.
+
      EExxaammppllee
         Y:23:120:300:5:100000:0:0: (server class)
 
@@ -653,10 +658,11 @@
         To become an IRC Administrator, IRC must know who is authorized
         to become an operator and what their ``Nickname'' and
         ``Password'' is.
-
      FFoorrmmaatt
 
         O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>
+
+
 
      OO  Speficies Operator record. If you use capital letter (``O'') in
         it, it specifies a global operator. Small letter (``o'')
@@ -717,10 +723,10 @@
         let them in''.  If the first word begins with neither ``Y'' or
         ``N'' the default is to let the person on.
 
+
      FFoorrmmaatt
 
         R:<Target Host Name>:<Program>:<User>:::
-
 
 
 
@@ -849,6 +855,7 @@
   the machine "rieska.oulu.fi" and I want to connect to irc daemons on 3
   other machines:
 
+
   +o  ``garfield.mit.edu''        - Tertiary Connection
 
   +o  ``irc.nada.kth.se''         - Secondary Connection
@@ -922,6 +929,7 @@
         separated by a . In this case, the first port is used when auto-
         connecting, the second port is used for the UDP pings to the
         targer server.
+
      CCllaassss
         The class field should refer to an existing class and determines
         the maximum number of simultaneous uses of the C-line allowable
@@ -979,8 +987,6 @@
         The format for the NOCONNECT entry in the ``ircd.conf'' is:
 
         N:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<Domain Mask>:<Class>
-
-
 
      Let us assume that ``garfield.mit.edu'' connects to your server and
      you want to place password authorization authorization on garfield.
@@ -1054,6 +1060,7 @@
         be ``*.fi''. Note that with wildcard name ``*.fi'' you could NOT
         connect to ``nic.funet.fi'' because that would result in a
         server name ccoolllliissiioonn (*.fi matches nic.funet.fi).
+
         I advice you to not to use wildcard servers before you know for
         sure how they are used, they are mostly beneficial for backbones
         of countries and other large areas with common domain.
@@ -1110,7 +1117,6 @@
 
      L:*.edu:*:*.au::
      L:*.com:*:*.au::
-
 
 
 
@@ -1251,7 +1257,6 @@
 
      FFoorrmmaatt
 
-
         S:<TARGET Host Mask>:<Password>:<Service Name>:<Service Type>:<Class>
 
 
@@ -1313,7 +1318,6 @@
         doesn't process the connections at all, and has no knowledge of
         the client's host name, or class number.  For these cases, this
         field must be empty.
-
      SSeerrvveerr NNaammee
         This specifies the IRC server hostname that the client should
         use.
@@ -1380,13 +1384,9 @@
      FFAAQQ
         It can be found on the WWW, at
         <http://www.stealth.net/~kalt/irc/faq.html>.
-
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
 
 
 
