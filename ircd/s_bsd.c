@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.124 2004/03/10 15:28:27 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.125 2004/03/10 18:41:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2485,7 +2485,6 @@ static	struct	SOCKADDR *connect_inet(aConfItem *aconf, aClient *cptr,
 			    "No more connections allowed (%s)", cptr->name);
 		return NULL;
 	    }
-	mysk.SIN_PORT = 0;
 	bzero((char *)&server, sizeof(server));
 	server.SIN_FAMILY = AFINET;
 	get_sockhost(cptr, aconf->host);
@@ -2501,7 +2500,9 @@ static	struct	SOCKADDR *connect_inet(aConfItem *aconf, aClient *cptr,
 		if ((outip.sin_addr.s_addr = inetaddr(aconf->source_ip)) == -1)
 #endif
 		{
-			memcpy(&mysk, &outip, sizeof(mysk));		
+			sendto_flag(SCH_ERROR, "Invalid source IP (%s) in C:line",
+				aconf->source_ip);
+			memcpy(&outip, &mysk, sizeof(mysk));
 		}
 	}
 	else
@@ -2776,6 +2777,7 @@ void	get_my_name(aClient *cptr, char *name, int len)
 	*/
 	bzero((char *)&mysk, sizeof(mysk));
 	mysk.SIN_FAMILY = AFINET;
+	mysk.SIN_PORT = 0;
 	
 	if ((aconf = find_me())->passwd && isdigit(*aconf->passwd))
 #ifdef INET6
