@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.6 1999/01/13 02:14:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.7 1999/01/14 01:20:41 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -389,7 +389,7 @@ u_int cl;
 				    cldata[cl].inbuffer[1] != 91)
 				    {
 					sendto_log(ALOG_FLOG, LOG_WARNING,
-				   "socks: unexpected reply: %d %s[%s]",
+				   "socks: unexpected reply: %u %s[%s]",
 						   cldata[cl].inbuffer[1],
 						   cldata[cl].host,
 						   cldata[cl].itsip);
