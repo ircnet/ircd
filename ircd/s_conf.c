@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.121 2004/06/30 18:00:44 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.122 2004/06/30 18:04:40 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -285,36 +285,6 @@ long	oline_flags_parse(char *string)
 	}
 	return tmp;
 }
-#ifdef XLINE
-char *xline_flags_to_string(long flags)
-{
-	static char xfsbuf[BUFSIZE];
-	char *s;
-
-	s = xfsbuf;
-	
-	if (flags & XFLAG_WHOLE)
-	{
-		*s++ = 'W';
-	}
-	if (s == xfsbuf)
-	{
-		*s++ = '-';
-	}
-	*s++ = '\0';
-	return xfsbuf;
-}
-long xline_flags_parse(char *string)
-{
-	long tmp = 0;
-	if (index(string, 'W'))
-	{
-		tmp |= XFLAG_WHOLE;
-	}
-	return tmp;
-}
-
-#endif
 /*
  * remove all conf entries from the client except those which match
  * the status field mask.
