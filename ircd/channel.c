@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.209 2004/06/06 10:54:21 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.210 2004/06/06 10:55:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -132,31 +132,6 @@ static	char	*check_string(char *s)
 		    }
 
 	return (BadPtr(str)) ? asterix : str;
-}
-
-/*
- * create a string of form "foo!bar@fubar" given foo, bar and fubar
- * as the parameters.  If NULL, they become "*".
- */
-static	char *make_nick_user_host(char *nick, char *name, char *host)
-{
-	static	char	namebuf[NICKLEN+USERLEN+HOSTLEN+6];
-	Reg	char	*s = namebuf;
-
-	bzero(namebuf, sizeof(namebuf));
-	nick = check_string(nick);
-	strncpyzt(namebuf, nick, NICKLEN + 1);
-	s += strlen(s);
-	*s++ = '!';
-	name = check_string(name);
-	strncpyzt(s, name, USERLEN + 1);
-	s += strlen(s);
-	*s++ = '@';
-	host = check_string(host);
-	strncpyzt(s, host, HOSTLEN + 1);
-	s += strlen(s);
-	*s = '\0';
-	return (namebuf);
 }
 
 static	void	free_bei(aListItem *bei)
