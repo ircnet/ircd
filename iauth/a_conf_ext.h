@@ -37,7 +37,7 @@ extern AnInstance *instances;
 #endif /* A_CONF_C */
 
 EXTERN char *conf_read __P((char *));
-EXTERN int conf_match __P((u_int, AnInstance *, int));
+EXTERN int conf_match __P((u_int, AnInstance *));
 EXTERN void conf_ircd();
 
 #undef EXTERN

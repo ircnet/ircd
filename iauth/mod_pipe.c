@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.2 1999/01/13 02:32:41 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.3 1999/03/11 19:53:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -73,7 +73,7 @@ AnInstance *self;
  *
  *	This procedure is called to start an authentication.
  *	Returns 0 if everything went fine,
- *	anything else otherwise (nothing to be done, or failure)
+ *	-1 otherwise (nothing to be done, or failure)
  *
  *	It is responsible for sending error messages where appropriate.
  *	In case of failure, it's responsible for cleaning up (e.g. pipe_clean

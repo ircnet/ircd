@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.15 1999/02/03 22:11:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.16 1999/03/11 19:53:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -93,7 +93,12 @@ AnInstance *last;
 {
     DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): last=%s state=0x%X", cl, last,
 	      (last) ? last->mod->name : "", cldata[cl].state));
-    /* first, make sure the last instance which ran cleaned up */
+
+    /* first, bail out immediately if the entry is flagged A_DONE */
+    if (cldata[cl].state & A_DONE)
+	    return;
+
+    /* second, make sure the last instance which ran cleaned up */
     if (cldata[cl].rfd > 0 || cldata[cl].wfd > 0)
 	{
 	    /* last is defined here */
@@ -112,94 +117,64 @@ AnInstance *last;
     cldata[cl].instance = NULL;
     cldata[cl].timeout = 0;
 
-    /* second, if A_START is set, a new pass has to be started */
+    /* third, if A_START is set, a new pass has to be started */
     if (cldata[cl].state & A_START)
 	{
 	    cldata[cl].state ^= A_START;
-	    if (cldata[cl].tried)
-		    /* A_GOTH is set */
-		    DebugLog((ALOG_DIO, 0,
-			      "next_io(#%d, %x): Starting 2nd pass",
-			      cl, last));
-	    else
-		    DebugLog((ALOG_DIO, 0,
-			      "next_io(#%d, %x): Starting 1st pass",
-			      cl, last));
-	    next_io(cl, NULL); /* start from beginning */
-	    return;
-	}
-
-    /* third, did the last module obtain an authentication? */
-    if (cldata[cl].authuser && cldata[cl].best == last)
-	{
-	    /* we got an authentication from the last module, stop here */
-	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): Stopping", cl, last));
-	    if (cldata[cl].state & (A_GOTH|A_NOH))
-		{
-		    /*
-		    ** we have the hostname info, so this is already the
-		    ** 2nd pass we made,
-		    ** or we won't get the info,
-		    ** ---> we're done.
-		    */
-		    sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip,
-				cldata[cl].itsport);
-		    cldata[cl].state |= A_DONE;
-		    free(cldata[cl].inbuffer);
-		    cldata[cl].inbuffer = NULL;
-		}
-	    return;
+	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): Starting again",
+		      cl, last));
+	    last = NULL; /* start from beginning */
 	}
 
     /* fourth, find next instance to be ran */
     if (last == NULL)
+	{
 	    cldata[cl].instance = instances;
+	    cldata[cl].ileft = 0;
+	}
     else
 	    cldata[cl].instance = last->nexti;
 
     while (cldata[cl].instance)
 	{
-	    int noipchk = 1;
+	    int cm;
 
-	    if (!(cldata[cl].state & A_GOTH))
-		    /* still 1st pass */
-		    noipchk = 0;
-	    else if (cldata[cl].state & A_CHKALL)
-		    /*
-		    ** 2nd pass, trying an instance which wasn't reached
-		    ** during the 1st pass.
-		    */
-		    noipchk = 0;
-	    else
-		    /* 2nd pass */
-		    if (cldata[cl].instance == cldata[cl].tried)
-			    /*
-			    ** we've reached the last module
-			    ** tried in the 1st pass, remember it.
-			    */
-			    cldata[cl].state |= A_CHKALL;
-
-	    if (conf_match(cl, cldata[cl].instance, noipchk) == 0)
+	    if (CheckBit(cldata[cl].idone, cldata[cl].instance->in))
+		{
+		    DebugLog((ALOG_DIO, 0,
+	      "conf_match(#%d, %x, goth=%d, noh=%d) skipped %x (%s)",
+			      cl, last, (cldata[cl].state & A_GOTH) == A_GOTH,
+			      (cldata[cl].state & A_NOH) == A_NOH,
+			      cldata[cl].instance,
+			      cldata[cl].instance->mod->name));
+		    cldata[cl].instance = cldata[cl].instance->nexti;
+		    continue;
+		}
+	    cm = conf_match(cl, cldata[cl].instance);
+	    DebugLog((ALOG_DIO, 0,
+	      "conf_match(#%d, %x, goth=%d, noh=%d) said \"%s\" for %x (%s)",
+		      cl, last, (cldata[cl].state & A_GOTH) == A_GOTH,
+		      (cldata[cl].state & A_NOH) == A_NOH,
+		      (cm==-1) ? "no match" : (cm==0) ? "match" : "try again",
+		      cldata[cl].instance, cldata[cl].instance->mod->name));
+	    if (cm == 0)
 		    break;
-	    DebugLog((ALOG_DIO, 0,"next_io(#%d, %x): no match(%d) for %x (%s)",
-		      cl, last, noipchk, cldata[cl].instance,
-		      cldata[cl].instance->mod->name));
+	    if (cm == -1)
+		    SetBit(cldata[cl].idone, cldata[cl].instance->in);
+	    else /* cm == 1 */
+		    cldata[cl].ileft += 1;
 	    cldata[cl].instance = cldata[cl].instance->nexti;
 	}
 
-    /* fifth, when there's no instance to try.. */
     if (cldata[cl].instance == NULL)
+	    /* fifth, when there's no instance to try.. */
 	{
 	    DebugLog((ALOG_DIO, 0,
-		      "next_io(#%d, %x): no more instances to try (%X)",
-		      cl, last, cldata[cl].state & (A_GOTH|A_NOH)));
-	    if (cldata[cl].state & (A_GOTH|A_NOH))
+		      "next_io(#%d, %x): no more instances to try (%d)",
+		      cl, last, cldata[cl].ileft));
+	    if (cldata[cl].ileft == 0)
 		{
-		    /*
-		    ** either this is the 2nd pass,
-		    ** or the 1st but we already know that have no hostname,
-		    ** ---> we're done.
-		    */
+		    /* we are done */
 		    sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip,
 				cldata[cl].itsport);
                     cldata[cl].state |= A_DONE;
@@ -208,28 +183,23 @@ AnInstance *last;
 		}
 	    return;
 	}
-
-    /* sixth, we've got an instance to try */
-    if ((cldata[cl].state & A_GOTH) == 0)
-	{
-	    /* record progress of the 1st pass */
-	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): 1st pass: %x (%s)",
-		      cl, last, cldata[cl].instance,
-		      cldata[cl].instance->mod->name));
-	    cldata[cl].tried = cldata[cl].instance;
-	}
     else
+	    /* sixth, we've got an instance to try */
 	{
-	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): 2nd pass: %x (%s)",
-		      cl, last, cldata[cl].instance,
-		      cldata[cl].instance->mod->name));
-	}
+	    int r;
 
-    /* run the module */
-    cldata[cl].timeout = time(NULL) + 120; /* hmmpf */
-    if (cldata[cl].instance->mod->start(cl) != 0)
-	    /* start() failed, or had nothing to do */
-	    next_io(cl, cldata[cl].instance);
+	    cldata[cl].timeout = time(NULL) + 15; /* hmmpf */
+	    r = cldata[cl].instance->mod->start(cl);
+	    DebugLog((ALOG_DIO, 0,
+		      "next_io(#%d, %x): %s->start() returned %d",
+		      cl, last, cldata[cl].instance->mod->name, r));
+	    if (r != 1)
+		    /* started, or nothing to do or failed: don't try again */
+		    SetBit(cldata[cl].idone, cldata[cl].instance->in);
+	    if (r != 0)
+		    /* start() didn't start something */
+		    next_io(cl, cldata[cl].instance);
+	}
 }
 
 /*
@@ -291,10 +261,10 @@ parse_ircd()
 			    }
 			cldata[cl].user[0] = '\0';
 			cldata[cl].host[0] = '\0';
-			cldata[cl].best = cldata[cl].tried = NULL;
+			bzero(cldata[cl].idone, BDSIZE);
 			cldata[cl].buflen = 0;
 			if (chp[0] == 'C')
-				cldata[cl].state = A_ACTIVE|A_START;
+				cldata[cl].state = A_ACTIVE;
 			else
 			    {
 				cldata[cl].state = A_ACTIVE|A_IGNORE;
@@ -459,24 +429,18 @@ parse_ircd()
 			cldata[cl].state |= A_LATE;
 			break;
 		case 'd': /* DNS timeout */
+		case 'n': /* No hostname information, but no timeout either */
 			if (!(cldata[cl].state & A_ACTIVE))
 			    {
 				/* let's be conservative and just ignore */
                                 sendto_log(ALOG_IRCD, LOG_WARNING,
-				   "Warning: Entry %d [d] is not active.", cl);
+				   "Warning: Entry %d [%c] is not active.", 
+					   cl, chp[0]);
 				break;
 			    }
-			cldata[cl].state |= A_NOH;
+			cldata[cl].state |= A_NOH|A_START;
 			if (cldata[cl].instance == NULL)
-			    {
-				/* the first pass is already finished. */
-				sendto_ircd("D %d %s %u ", cl,
-					    cldata[cl].itsip,
-					    cldata[cl].itsport);
-				cldata[cl].state |= A_DONE;
-				free(cldata[cl].inbuffer);
-				cldata[cl].inbuffer = NULL;
-			    }
+				next_io(cl, NULL);
 			break;
 		case 'E': /* error message from ircd */
 			sendto_log(ALOG_DIRCD, LOG_DEBUG,

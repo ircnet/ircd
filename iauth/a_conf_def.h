@@ -37,6 +37,7 @@ struct Module
 struct Instance
 {
     AnInstance	*nexti;
+    u_char	in;
     aModule	*mod;			/* module */
     char	*opt;			/* options read from file */
     char	*popt;			/* options to send to ircd */

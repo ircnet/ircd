@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.13 1999/03/05 01:53:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.14 1999/03/11 19:53:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -276,7 +276,7 @@ AnInstance *self;
  *
  *	This procedure is called to start the socks check procedure.
  *	Returns 0 if everything went fine,
- *	anything else otherwise (nothing to be done, or failure)
+ *	-1 otherwise (nothing to be done, or failure)
  *
  *	It is responsible for sending error messages where appropriate.
  *	In case of failure, it's responsible for cleaning up (e.g. socks_clean

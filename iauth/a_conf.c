@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.11 1999/03/10 00:30:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.12 1999/03/11 19:53:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -30,7 +30,6 @@ static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.11 1999/03/10 00:30:17 kalt Exp $"
 static aModule *Mlist[16];
 
 u_int	debuglevel = 0;
-u_char	iauth_required = 0;
 
 AnInstance *instances = NULL;
 
@@ -55,7 +54,8 @@ char *cfile;
 	u_char needh = 0; /* do we need hostname information for any host? */
 	u_char o_req = 0, o_dto = 0;
 	static char o_all[5];
-	u_int lnnb = 0, i, Mcnt = 0;
+	u_int lnnb = 0, i;
+	u_char icount = 0, Mcnt = 0;
 	char buffer[160], *ch;
 	AnInstance **last = &instances, *itmp;
 	FILE *cfh;
@@ -88,9 +88,15 @@ char *cfile;
 			if (ch = index(buffer, '#'))
 				*ch = '\0';
 			if (!strncmp("required", buffer, 8))
+			  {
 				o_req = 1;
+				continue;
+			  }
 			if (!strncmp("notimeout", buffer, 9))
+			  {
 				o_dto = 1;
+				continue;
+			  }
 			/* debugmode setting */
 			if (!strncmp("debuglvl = 0x", buffer, 13))
 			    {
@@ -186,6 +192,7 @@ char *cfile;
 			    }
 			*last = (AnInstance *) malloc(sizeof(AnInstance));
 			(*last)->nexti = NULL;
+			(*last)->in = icount++;
 			(*last)->mod = Mlist[i];
 			(*last)->opt = NULL;
 			(*last)->data = NULL;
@@ -325,29 +332,49 @@ char *cfile;
 
 /* conf_match: check if an instance is to be applied to a connection */
 int
-conf_match(cl, inst, noipchk)
+conf_match(cl, inst)
 u_int cl;
 AnInstance *inst;
 {
 	aTarget *ttmp;
 
-	if (noipchk == 0 && inst->address == NULL && inst->hostname == NULL)
+	/* general case, always matches */
+	if (inst->address == NULL && inst->hostname == NULL)
 		return 0;
-	if ((ttmp = inst->hostname) && (cldata[cl].state & A_GOTH))
-		while (ttmp)
-		    {
-			if (match(ttmp->value, cldata[cl].host) == 0)
-				return 0;
-			ttmp = ttmp->nextt;
-		    }
-	if (noipchk == 0 && (ttmp = inst->address))
+	/* feature case, "host = *" to force to wait for DNS info */
+	if ((cldata[cl].state & A_NOH) && inst->hostname &&
+	    !strcmp(inst->hostname->value, "*"))
+		return 0;
+	/* check matches on IP addresses */
+	if (ttmp = inst->address)
 		while (ttmp)
 		    {
 			if (match(ttmp->value, cldata[cl].itsip) == 0)
 				return 0;
 			ttmp = ttmp->nextt;
 		    }
-	return 1;
+	/* check matches on hostnames */
+	if (ttmp = inst->hostname)
+	    {
+		if (cldata[cl].state & A_GOTH)
+		    {
+			while (ttmp)
+			    {
+				if (match(ttmp->value, cldata[cl].host) == 0)
+					return 0;
+				ttmp = ttmp->nextt;
+			    }
+			/* no match, will never match */
+			return -1;
+		    }
+		else if (cldata[cl].state & A_NOH)
+			return -1;
+		else
+			/* may be later, once we have DNS information */
+			return 1;
+	    }
+	/* fall through, no match, will never match */
+	return -1;
 }
 
 /* conf_ircd: send the configuration to the ircd daemon */

@@ -20,7 +20,9 @@
 
 typedef struct AuthData anAuthData;
 
-#define	INBUFSIZE 4096
+#define INBUFSIZE 4096		/* I/O buffer size */
+#define MAXI 16			/* maximum number of instances */
+#define BDSIZE ((MAXI + 7) / 8)	/* bit data size */
 
 struct AuthData
 {
@@ -35,10 +37,11 @@ struct AuthData
 
 	/* the following are set by modules */
 	char	*authuser;		/* authenticated username */
-	AnInstance	*best;		/* where we got authuser from */
+	u_char	authfrom;		/* where we got authuser from */
 
 	/* the following are for use by a_io.c only */
-	AnInstance	*tried;		/* last instance tried in 1st pass */
+	char	idone[BDSIZE];		/* keeping track of instances' work */
+	u_char	ileft;			/* time saver, anything left? */
 
 	/* the following are shared by a_io.c & modules */
 	char	*inbuffer;		/* input buffer */
@@ -52,8 +55,7 @@ struct AuthData
 #define	A_ACTIVE	0x0001	/* entry is active */
 #define	A_START		0x0002	/* go through modules from beginning */
 #define	A_DONE		0x0004	/* nothing left to be done */
-#define	A_CHKALL	0x0010	/* CPU saver */
-#define	A_IGNORE	0x0020	/* ignore subsequent messages from ircd */
+#define	A_IGNORE	0x0010	/* ignore subsequent messages from ircd */
 
 #define	A_GOTU		0x0100	/* got username (from ircd) */
 #define	A_GOTH		0x0200	/* got hostname (from ircd) */
@@ -63,3 +65,6 @@ struct AuthData
 #define A_UNIX		0x1000	/* authuser is suitable for use by ircd */
 #define A_DENY		0x8000	/* connection should be denied access */
 
+#define SetBit(v,n)	v[n/8] |=  (1 << (n % 8))
+#define UnsetBit(v,n)	v[n/8] &= ~(1 << (n % 8))
+#define CheckBit(v,n)	(v[n/8] & (1 << (n % 8)))
