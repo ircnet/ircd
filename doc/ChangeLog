@@ -1,3 +1,9 @@
+2002-04-19  Jakub Vlasek
+
+	* res.c/bad_hostname(): added defineable more restrictive hostname
+	checking (by Mario 'BitKoenig' Holbe)
+	* config.h.in: added define RESTRICT_HOSTNAMES.
+
 2002-04-16  Jakub Vlasek
 
 	* parse.c, parse_ext.h: added find_matching_client().
