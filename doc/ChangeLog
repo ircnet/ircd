@@ -1,3 +1,9 @@
+1999-09-18  Christophe Kalt
+
+	* wrote s_send.c to provide specialized functions equivalent to
+	sendto_*() but dealing with UID issues and hiding them from above
+	layers.
+
 1999-08-31  Kurt Roeckx
 
 	* s_user.c/m_kill: acptr wasn't initialised
