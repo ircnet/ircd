@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.60 2004/06/15 17:35:11 chopin Exp $
+  $Id: INSTALL.txt,v 1.61 2004/06/22 21:19:12 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -269,6 +269,21 @@
   connections).
 
 
+     NNEEWW!!!!!!
+        As of the 2.11.0 version of the server, if the server has been
+        compiled with #define CONFIG_DIRECTIVE_INCLUDE, you will be able
+        to use #include directive in ircd.conf to include files without
+        the need of M4.
+
+        #include "filename"
+
+
+     Note that syntax is very strict, it must be followed to the letter.
+     If filename does not start with slash, ircd config directory is
+     prepended.  Also note that chkconf will follow such includes, giv-
+     ing however wrong line numbers in output.
+
+
   44..11..  MMaacchhiinnee iinnffoorrmmaattiioonn
 
 
@@ -458,7 +473,6 @@
         Flags changing behaviour of a given P-line. It can be empty or
         one of:
 
-
         +o  D - delayed accept (not active until first netjoin)
 
         +o  S - server-only (user connections are rejected)
@@ -523,7 +537,6 @@
      SSeennddQQ
         This field defines the ``SendQ'' value for this class.  If this
         field is not present, the default (from config.h) is assigned.
-
 
      LLooccaall lliimmiitt
         This field is used to limit the number of local concurrent
@@ -656,7 +669,6 @@
         is not working (they will rather be denied connection). Use
         ``N'' ffllaagg.
 
-
      PPoorrtt
         Specifies the port number for which this configuration line is
         valid.  An empty field, or ``0'' matches all ports.
@@ -723,6 +735,7 @@
 
         Allow clients from a machine with that IP number aanndd that
         hostname to connect.
+
         I::secret:*.tut.fi::1
 
         Allow clients from machines matching ``*.tut.fi'' to connect
@@ -774,6 +787,7 @@
         ``Password'' is.
 
      FFoorrmmaatt
+
 
         O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>
 
@@ -1039,7 +1053,6 @@
      NNEEWW!!!!!!
         As of the 2.11.0 version of the server, SSoouurrccee IIPP field has been
         added.
-
   Some examples:
 
   +o  C:nic.funet.fi::nic.funet.fi:6667:1
@@ -1106,7 +1119,6 @@
      This line says: expect a Connection from host ``18.72.0.252'', and
      don't expect login password.  The connecting host should identify
      itself as ``garfield.mit.edu''.
-
      NN  ``N'' corresponds to a server Noconnect option.
 
      TTAARRGGEETT HHoosstt AAddddrr
@@ -1119,6 +1131,7 @@
         The password of the other host.  A password must always be
         present for the line to be recognized. If CRYPT_LINK_PASSWORD is
         defined in config.h, this password must be crypted.
+
      TTAARRGGEETT HHoosstt NNAAMMEE
         The full hostname of the target machine. This is the name that
         the TARGET server will identify itself with when you connect to
@@ -1250,6 +1263,7 @@
         Allows a server named ``*.bu.edu'' to introduce only servers
         that match the ``*.edu'' name mask, no matter what SID they
         have.
+
         H:*:616*:eff.org::
 
         Allows ``eff.org'' to introduce (and act as a hub for) any
@@ -1364,6 +1378,7 @@
 
         Disallows any server using the 2.9 protocol to connect.
 
+
      NNoottee
         It is possible to have and use multiple V-lines for the one
         server mask.
@@ -1379,7 +1394,6 @@
         define the protocol version.  The remaining of the string is
         implementation dependant; matches on this part should be used
         with particular identification.
-
 
      FFllaaggss
         are not standard.  Therefore, this field sshhoouulldd aallwwaayyss contain a
@@ -1447,6 +1461,7 @@
         The type of service. It defines the priviledges given to the
         service. Be very careful in the types you allow.  The types can
         be found in include/service.h
+
      CCllaassss
         The class field should refer to an existing class.
 
@@ -1513,6 +1528,7 @@
         anymore.
 
         B:::irc2.stealth.net:6667:
+
         When the server is completely full, clients should use the
         secondary server.
 
@@ -1555,6 +1571,7 @@
 
   If you encounter a bug in the software, here is how and where to
   report it.
+
 
 
   66..11..  HHooww ttoo rreeppoorrtt aa bbuugg

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.60 2004/06/15 17:35:11 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.61 2004/06/22 21:19:12 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -232,6 +232,18 @@ have concurrent records.  <bf>It is important to note that
 the last matching record will be used</bf>.  This is
 especially useful when setting up I records (client
 connections).
+
+<descrip>
+<tag/NEW!!!/ As of the 2.11.0 version of the server, if the 
+server has been compiled with #define CONFIG_DIRECTIVE_INCLUDE, you will be
+able to use #include directive in ircd.conf to include files without
+the need of M4.
+<verb>#include "filename"</verb>
+Note that syntax is very strict, it must be followed to the letter.
+If filename does not start with slash, ircd config directory is prepended.
+Also note that chkconf will follow such includes, giving however wrong line
+numbers in output.
+</descrip>
 
 <sect1>Machine information
 <p>

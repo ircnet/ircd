@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-14478/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-28922/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.60 2004/06/15 17:35:10 chopin Exp $
+     $Id: INSTALL.info,v 1.61 2004/06/22 21:19:11 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -346,6 +346,17 @@ records of the same type.  In some cases, you can have concurrent
 records.  `It is important to note that the last matching record will
 be used'.  This is especially useful when setting up I records (client
 connections).
+
+`NEW!!!'
+     As of the 2.11.0 version of the server, if the server has been
+     compiled with #define CONFIG_DIRECTIVE_INCLUDE, you will be able
+     to use #include directive in ircd.conf to include files without
+     the need of M4.  #include "filename" Note that syntax is very
+     strict, it must be followed to the letter.  If filename does not
+     start with slash, ircd config directory is prepended.  Also note
+     that chkconf will follow such includes, giving however wrong line
+     numbers in output.
+
 
 * Menu:
 
@@ -1686,24 +1697,24 @@ Node: CLONE_CHECK8967
 Node: Other #define's9330
 Node: Editing the Makefile and compiling9652
 Node: The ircd-conf file10637
-Node: Machine information12486
-Node: Administrative info15101
-Node: Port connections17252
-Node: Connection Classes19401
-Node: Client connections24528
-Node: Operator priviliges30262
-Node: Excluded accounts32426
-Node: Server connections36338
-Node: Deny auto-connections44966
-Node: Hub connections46340
-Node: Leaf connections47828
-Node: Version limitations49912
-Node: Excluded machines51670
-Node: Service connections52975
-Node: Bounce server54569
-Node: Related resources56430
-Node: Reporting a bug57469
-Node: How to report a bug57726
-Node: Where to send a bug report58737
+Node: Machine information13006
+Node: Administrative info15621
+Node: Port connections17772
+Node: Connection Classes19921
+Node: Client connections25048
+Node: Operator priviliges30782
+Node: Excluded accounts32946
+Node: Server connections36858
+Node: Deny auto-connections45486
+Node: Hub connections46860
+Node: Leaf connections48348
+Node: Version limitations50432
+Node: Excluded machines52190
+Node: Service connections53495
+Node: Bounce server55089
+Node: Related resources56950
+Node: Reporting a bug57989
+Node: How to report a bug58246
+Node: Where to send a bug report59257
 
 End Tag Table
