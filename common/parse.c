@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.87 2004/11/21 00:44:42 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.88 2005/01/03 22:34:56 q Exp $";
 #endif
 
 #include "os.h"
@@ -538,7 +538,7 @@ aClient	*find_target(char *name, aClient *cptr)
 			aServer *asptr;
 			asptr = find_tokserver(idtol(name + 1, SIDLEN - 1),
 				cptr, NULL);
-			if (acptr)
+			if (asptr)
 			{
 				acptr = asptr->bcptr;
 			}

@@ -14,6 +14,9 @@
 	  class.c, hash.c, ircd.c, list.c, res.c, res_init.c: Give all
 	  defenitions and declartions of function a proper prototype:
 	  add void as parameter if none is used.
+	* parse.c/find_target(): When using $SID, it checked the wrong
+	  variable which was always NULL, resulting in it never finding 
+	  those servers.
 
 2005-01-02  Kurt Roeckx
 
