@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.131 2004/03/17 21:03:09 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.132 2004/03/18 00:30:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -371,6 +371,7 @@ int	add_listener(aConfItem *aconf)
 int	unixport(aClient *cptr, char *path, int port)
 {
 	struct sockaddr_un un;
+	struct stat buf;
 
 	if ((cptr->fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
 	    {
@@ -388,10 +389,15 @@ int	unixport(aClient *cptr, char *path, int port)
 	un.sun_family = AF_UNIX;
 	(void)mkdir(path, 0755);
 	sprintf(unixpath, "%s/%d", path, port);
-	(void)unlink(unixpath);
+	get_sockhost(cptr, unixpath);
+	if (stat(unixpath, &buf)==0)
+	{
+		report_error("unix domain socket %s:%s", cptr);
+		(void)close(cptr->fd);
+		return -1;
+	}
 	strncpyzt(un.sun_path, unixpath, sizeof(un.sun_path));
 	errno = 0;
-	get_sockhost(cptr, unixpath);
 
 	if (bind(cptr->fd, (SAP)&un, strlen(unixpath)+2) == -1)
 	    {
