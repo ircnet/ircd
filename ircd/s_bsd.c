@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.120 2004/03/07 03:09:35 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.121 2004/03/07 21:40:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -49,6 +49,7 @@ static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.120 2004/03/07 03:09:35 chopin Exp 
 #endif
 
 aClient	*local[MAXCONNECTIONS];
+aClient	*listeners[MAXCONNECTIONS];
 FdAry	fdas, fdall;
 int	highest_fd = 0, readcalls = 0, udpfd = -1, resfd = -1, adfd = -1;
 time_t	timeofday;
@@ -310,7 +311,6 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port)
 #endif
 	cptr->port = port;
 	(void)listen(cptr->fd, LISTENQUEUE);
-	local[cptr->fd] = cptr;
 
 	return 0;
 }
@@ -348,6 +348,7 @@ int	add_listener(aConfItem *aconf)
 		cptr->confs = make_link();
 		cptr->confs->next = NULL;
 		cptr->confs->value.aconf = aconf;
+		listeners[cptr->fd] = cptr;
 		add_fd(cptr->fd, &fdas);
 		add_fd(cptr->fd, &fdall);
 		set_non_blocking(cptr->fd, cptr);
@@ -405,7 +406,6 @@ int	unixport(aClient *cptr, char *path, int port)
 	(void)chmod(unixpath, 0777);
 	cptr->flags |= FLAGS_UNIX;
 	cptr->port = 0;
-	local[cptr->fd] = cptr;
 
 	return 0;
 }
@@ -430,9 +430,9 @@ void	close_listeners(void)
 	 */
 	for (i = highest_fd; i >= 0; i--)
 	    {
-		if (!(cptr = local[i]))
+		if (!(cptr = listeners[i]))
 			continue;
-		if (cptr == &me || !IsListening(cptr))
+		if (cptr == &me)
 			continue;
 		aconf = cptr->confs->value.aconf;
 
@@ -1208,7 +1208,7 @@ void	close_connection(aClient *cptr)
 		sendto_iauth("%d D", cptr->fd);
 #endif
 		flush_connections(i);
-		if (IsServer(cptr) || IsListening(cptr))
+		if (IsServer(cptr))
 		    {
 			del_fd(i, &fdas);
 #ifdef	ZIP_LINKS
@@ -1219,6 +1219,11 @@ void	close_connection(aClient *cptr)
 			zip_free(cptr);
 #endif
 		    }
+		else if (IsListening(cptr))
+		{
+			del_fd(i, &fdas);
+			listeners[i] = NULL;
+		}
 		else if (IsClient(cptr))
 		    {
 #ifdef	SO_LINGER
@@ -1915,7 +1920,11 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 #endif
 		for (i = fdp->highest; i >= 0; i--)
 		    {
-			if (!(cptr = local[fd = fdp->fd[i]]))
+			fd = fdp->fd[i];
+			cptr = local[fd];
+			if (!cptr)
+				cptr = listeners[fd];
+			if (!cptr)
 				continue;
 			Debug((DEBUG_L11, "fd %d cptr %#x %d %#x %s",
 				fd, cptr, cptr->status, cptr->flags,
@@ -2113,7 +2122,11 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 #endif
 	    {
 #if ! USE_POLL
-		if (!(cptr = local[fd = fdp->fd[i]]))
+		fd = fdp->fd[i];
+		cptr = local[fd];
+		if (!cptr)
+			cptr = listeners[fd];
+		if (!cptr)
 			continue;
 #else
 		fd = pfd->fd;
@@ -2145,7 +2158,10 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 #if USE_POLL
 		    }
 		fd = pfd->fd;
-		if (!(cptr = local[fd]))
+		cptr = local[fd];
+		if (!cptr)
+			cptr = listeners[fd];
+		if (!cptr)
 			continue;
 #else
 		fd = cptr->fd;

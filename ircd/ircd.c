@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.115 2004/03/07 03:25:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.116 2004/03/07 21:40:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -934,11 +934,8 @@ int	main(int argc, char *argv[])
 
                 for (i = 0; i <= highest_fd; i++)
                     {   
-                        if (!(acptr = local[i]))
-                                continue;
-			if (IsListening(acptr))
-				break;
-			acptr = NULL;
+                        if ((acptr = listeners[i]))
+                                break;
 		    }
 		/* exit if there is nothing to listen to */
 		if (acptr == NULL && !(bootopt & BOOT_INETD))
@@ -1098,9 +1095,8 @@ static	void	io_loop(void)
 		delay = MIN(delay, TIMESEC);
 
 	/*
-	** First, try to drain traffic from servers (this includes listening
-	** ports).  Give up, either if there's no traffic, or too many
-	** iterations.
+	** First, try to drain traffic from servers and listening sockets.
+	** Give up either if there's no traffic or too many iterations.
 	*/
 	while (maxs--)
 		if (read_message(0, &fdas, 0))
