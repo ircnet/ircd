@@ -3,6 +3,7 @@
 	* mod_webproxy.c, mod_webproxy_ext.h: new files.
 	* new command 'M' in ircd>iauth communication, passing ircd name.
 	* a_conf.c: "port" setting mandatory for webproxy.
+	* support/iauth.conf: more examples.
 
 2004-09-20  Piotr Kucharski
 

@@ -1,14 +1,16 @@
 #
 # Default iauth configuration file
 #
-# $Id: iauth.conf.example,v 1.3 2002/06/01 18:26:23 chopin Exp $
+# $Id: iauth.conf.example,v 1.4 2004/09/21 15:40:38 chopin Exp $
 #
 
 # Important note: there must be one tab only before modules options.
-# Otherwise iauth will be dieing continously.
+# Otherwise iauth will be dieing continously. Make sure to check your
+# changes with iauth -c iauth.conf.
 
 # If iauth timeouts, then reject user
 notimeout
+
 # This makes the IRC server require that iauth performs the authentication
 # in order for a new user connection to be accepted
 required
@@ -16,6 +18,30 @@ required
 # Perform ident lookups
 module rfc931
 
+# Modules below this keyword will work in delayed execution mode.
+# This means client will be allowed to enter irc and if any module below
+# decides it shouldn't have, this client will be removed.
+#delayed
+
 # Check and reject open SOCKS proxies
+module socks
+	port = 1080
+	option = reject,paranoid
+#	reason = Denied access (insecure proxy found)
+
 #module socks
+#	port = 559
 #	option = reject,paranoid
+#	reason = Denied access (insecure proxy found)
+
+# Check and reject HTTP CONNECT proxies on port 8080
+module webproxy
+	port = 8080
+	option = reject
+#	reason = Denied access (insecure proxy found)
+
+# Check and reject HTTP CONNECT proxies on port 3128
+#module webproxy
+#	port = 3128
+#	option = reject,careful
+#	reason = Denied access (insecure proxy found)
