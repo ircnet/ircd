@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.77 2004/03/04 11:39:34 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.78 2004/03/04 11:43:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -324,28 +324,17 @@ attach_iline:
 			}
 		}
 
-		if (aconf->status & CONF_RCLIENT)
+		/* Various cases of +r. */
+		if (aconf->status & CONF_RCLIENT ||
+			IsConfRestricted(aconf) ||
+			(!hp && IsConfRNoDNS(aconf)) ||
+			(!(cptr->flags & FLAGS_GOTID) && IsConfRNoIdent(aconf)))
 		{
 			SetRestricted(cptr);
 		}
-		
-		if (IsConfRestricted(aconf))
-		{
-			SetRestricted(cptr);
-		}
-		
-		if (!hp && IsConfRNoDNS(aconf))
-		{
-			SetRestricted(cptr);
-		}
-		
 		if (IsConfKlineExempt(aconf))
 		{
 			SetKlineExempt(cptr);
-		}
-		if (!(cptr->flags & FLAGS_GOTID) && IsConfRNoIdent(aconf))
-		{
-			SetRestricted(cptr);
 		}
 		get_sockhost(cptr, uhost);
 		if ((i = attach_conf(cptr, aconf)) < -1)
