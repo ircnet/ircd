@@ -24,6 +24,12 @@
  * -avalon
  */
 
+#ifdef CACHED_MOTD
+extern aMotd *motd;
+extern struct tm motd_tm;
+extern void read_motd __P((char *));
+#endif
+
 extern	time_t	nextconnect, nextdnscheck, nextping, timeofday;
 extern	aClient	*client, me, *local[];
 extern	aChannel *channel;
@@ -58,6 +64,7 @@ extern	aServer	*find_tokserver __P((int, aClient *, aClient *));
 extern	aClient	*find_nickserv __P((char *, aClient *));
 extern	aClient	*find_service __P((char *, aClient *));
 extern	aClient	*find_userhost __P((char *, char *, aClient *, int *));
+extern	void	find_bounce __P((aClient *, int));
 
 extern	int	attach_conf __P((aClient *, aConfItem *));
 extern	aConfItem *attach_confs __P((aClient*, char *, int));
@@ -74,12 +81,15 @@ extern	aConfItem *find_conf_host __P((Link *, char *, int));
 extern	aConfItem *find_conf_ip __P((Link *, char *, char *, int));
 extern	aConfItem *find_conf_name __P((char *, int));
 extern	int	find_kill __P((aClient *, int));
+extern	int	find_two_masks __P((char *, char *, int));
+extern	int	find_conf_flags __P((char *, char *, int));
 extern	int	find_restrict __P((aClient *));
 extern	int	rehash __P((aClient *, aClient *, int));
 extern	int	initconf __P((int));
 extern	int	rehashed;
 
 extern	char	*MyMalloc __P((size_t)), *MyRealloc __P((char *, size_t));
+extern	void	MyFree __P((char *));
 extern	char	*debugmode, *configfile, *sbrk0;
 extern	char	*getfield __P((char *));
 extern	void	get_sockhost __P((aClient *, char *));
@@ -89,11 +99,13 @@ extern	int	dgets __P((int, char *, int));
 extern	void	ircsprintf __P(());
 extern	char	*inetntoa __P((char *)), *mystrdup __P((char *));
 
-extern	int	dbufalloc, dbufblocks, debuglevel, errno, h_errno, poolsize;
+extern	u_int	dbufalloc, dbufblocks, poolsize;
+extern	int	debuglevel, errno, h_errno;
 extern	int	highest_fd, debuglevel, portnum, debugtty, maxusersperchannel;
 extern	int	readcalls, udpfd, resfd;
 extern	aClient	*add_connection __P((aClient *, int));
 extern	int	add_listener __P((aConfItem *));
+extern	int	setup_ping __P((aConfItem *));
 extern	void	add_local_domain __P((char *, int));
 extern	int	check_client __P((aClient *));
 extern	int	check_server __P((aClient *, struct hostent *, \
@@ -105,7 +117,7 @@ extern	void	close_listeners __P(());
 extern	int	connect_server __P((aConfItem *, aClient *, struct hostent *));
 extern	void	get_my_name __P((aClient *, char *, int));
 extern	int	get_sockerr __P((aClient *));
-extern	int	inetport __P((aClient *, char *, int));
+extern	int	inetport __P((aClient *, char *, char *, int));
 extern	void	init_sys __P(());
 extern	int	read_message __P((time_t, FdAry *));
 extern	void	report_error __P((char *, aClient *));
@@ -158,8 +170,7 @@ extern	void	sendto_flag();
 
 extern	void	setup_svchans __P(());
 
-extern	void	sendto_flog __P((char *, char *, time_t, char *, char *,
-				 char *, char *));
+extern	void	sendto_flog __P((aClient *, char *, time_t, char *, char *));
 extern	int	writecalls, writeb[];
 extern	int	deliver_it __P((aClient *, char *, int));
 
@@ -203,6 +214,7 @@ extern	aClass	*make_class __P(());
 extern	aServer	*make_server __P(());
 extern	aClient	*make_client __P((aClient *));
 extern	Link	*find_user_link __P((Link *, aClient *));
+extern	Link	*find_channel_link __P((Link *, aChannel *));
 extern	void	add_client_to_list __P((aClient *));
 extern	void	checklist __P(());
 extern	void	remove_client_from_list __P((aClient *));
@@ -232,6 +244,7 @@ extern	struct	hostent	*gethost_byname __P((char *, Link *));
 extern	void	flush_cache __P(());
 extern	u_long	cres_mem __P((aClient *, char *));
 extern	int	init_resolver __P((int));
+extern	int	ircd_res_init __P(());
 extern	time_t	timeout_query_list __P((time_t));
 extern	time_t	expire_cache __P((time_t));
 extern	void    del_queries __P((char *));
@@ -277,9 +290,16 @@ extern	void	count_memory __P((aClient *, char *, int));
 extern	void	send_defines __P((aClient *, char *));
 #endif
 
-#ifdef KRYS
+#ifdef	KRYS
 extern	char	*find_server_string __P((int));
 extern	int	find_server_num __P((char *));
 #endif
 
 extern	char	*make_version();
+
+#ifdef	ZIP_LINKS
+extern	int	zip_init __P((aClient *));
+extern	char	*unzip_packet __P((aClient *, char *, int *));
+extern	char	*zip_buffer __P((aClient *, char *, int *, int));
+extern	void	zip_free __P((aClient *));
+#endif
