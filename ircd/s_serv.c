@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.81 2002/01/05 02:49:08 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.82 2002/01/06 02:53:39 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -123,10 +123,10 @@ int	m_squit(cptr, sptr, parc, parv)
 aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
-    {
+{
 	Reg	aConfItem *aconf;
 	char	*server;
-	Reg	aClient	*acptr;
+	Reg	aClient	*acptr = NULL;
 	char	*comment = (parc > 2 && parv[2]) ? parv[2] : cptr->name;
 
 	if (parc > 1)
@@ -148,13 +148,39 @@ char	*parv[];
 			break; /* WARNING is normal here */
 		    }
 		/*
-		** The following allows wild cards in SQUIT. Only usefull
+		** Find server matching (compatibility) SID
+		*/
+		if (server[0]=='$')
+		{
+			aServer *servptr;
+
+			servptr = find_tokserver(idtol(server + 1, SIDLEN - 1),
+				cptr, NULL);
+			if (servptr)
+			{
+				acptr = servptr->bcptr;
+			}
+		}
+		else	/* if (strlen(server)==SIDLEN) perhaps? --Beeth */
+		{
+			acptr = find_sid(server, NULL);
+		}
+		/*
+		** The following allows wild cards in SQUIT. Only useful
 		** when the command is issued by an oper.
 		*/
-		for (acptr = client; (acptr = next_client(acptr, server));
-		     acptr = acptr->next)
-			if (IsServer(acptr) || IsMe(acptr))
-				break;
+		if (!acptr)
+		{
+			for (acptr = client;
+				(acptr = next_client(acptr, server));
+				acptr = acptr->next)
+			{
+				if (IsServer(acptr) || IsMe(acptr))
+				{
+					break;
+				}
+			}
+		}
 		if (acptr && IsMe(acptr))
 		    {
 			acptr = cptr;
@@ -274,18 +300,14 @@ char	*parv[];
 			    (timeconnected % 3600)/60, 
 			    timeconnected % 60);
 	    }
-	sendto_flag(SCH_SERVER, "Received SQUIT %s from %s (%s)",
-		    acptr->name, parv[0], comment);
+	if (!IsMasked(acptr)
+	{
+		sendto_flag(SCH_SERVER, "Received SQUIT %s from %s (%s)",
+			acptr->name, parv[0], comment);
+	}
 
-	if (MyConnect(acptr) && 
-	    IsServer(cptr) && (cptr->serv->version & SV_OLDSQUIT) == 0)
-	    {
-		sendto_one(cptr, ":%s SQUIT %s :%s", ME, acptr->name, comment);
-		sendto_flag(SCH_DEBUG, "Issuing additionnal SQUIT %s for %s",
-			    acptr->name, acptr->from->name);
-	    }
 	return exit_client(cptr, acptr, sptr, comment);
-    }
+}
 
 /*
 ** get_version()
