@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.174 2004/02/20 01:36:33 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.175 2004/02/20 01:55:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1299,6 +1299,16 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	acptr = find_client(nick, NULL);
 	if (acptr)
 	    {
+		/*
+		** If the older one is "non-person", the new entry is just
+		** allowed to overwrite it. Just silently drop non-person,
+		** and proceed with the unick.
+		*/
+		if (IsUnknown(acptr) && MyConnect(acptr))
+		{
+			(void) exit_client(acptr, acptr, &me, "Overridden");
+		}
+		else
 		/*
 		** Ouch, this new client is trying to take an already
 		** existing nickname..
