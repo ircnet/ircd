@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.18 2001/10/20 17:57:22 q Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.19 2002/03/03 21:57:39 jv Exp $";
 #endif
 
 #include "os.h"
@@ -864,6 +864,30 @@ char *make_version()
 	return mystrdup(ver);
 }
 
+/* Make RPL_ISUPPORT (055) numeric contens */
+char **make_isupport()
+{
+	char **tis;
+	
+	tis = (char **) MyMalloc(3 * sizeof(char *));
+	
+	/* Warning: There must be up to 13 tokens in each string */
+	tis[0] = (char *) MyMalloc(BUFSIZE);
+	SPRINTF(tis[0],
+	"RFC2812 PREFIX=(ov)@+ CHANTYPES=#&!+ MODES=%d MAXCHANNELS=%d "
+	"NICKLEN=%d TOPICLEN=%d KICKLEN=%d MAXBANS=%d CHANNELLEN=%d CHIDLEN=%d "
+	"NETWORK=%s CHANMODES=beI,k,l,imnpstaqr",
+	MAXMODEPARAMS,MAXCHANNELSPERUSER,
+	NICKLEN,TOPICLEN,TOPICLEN,MAXBANS,CHANNELLEN,CHIDLEN,
+	NETWORK_NAME);
+
+	tis[1] = (char *) MyMalloc(BUFSIZE);
+	SPRINTF(tis[1],	"PENALTY FNC EXCEPTS INVEX");
+
+	tis[2] = NULL;
+
+	return tis;
+}
 #ifndef HAVE_TRUNCATE
 /* truncate: set a file to a specified length
  * I don't know of any UNIX that doesn't have truncate, but CYGWIN32 beta18
