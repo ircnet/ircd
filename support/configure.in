@@ -26,11 +26,12 @@ AC_DEFUN(IRC_MATHLIB, [
 
 AC_DEFUN(IRC_PATH_ZLIB,
 [AC_MSG_CHECKING(for zlib package)
-AC_ARG_WITH(zlib, [  --with-zlib             checks for zlib; if found, enables compressed links])
+AC_ARG_WITH(zlib, [  --with-zlib[[=ZDIR]]      checks for zlib; if found, enables compressed links])
 AC_ARG_WITH(zlib, [  --without-zlib          does not check for zlib; disables compressed links])
 if test "x$with_zlib" = xno; then
   no_zlib=yes
 else
+irc_zlib_prefix=$with_zlib
 AC_CACHE_VAL(irc_cv_path_zlib,
 [no_zlib=yes
 no_zlib_include=yes
@@ -793,7 +794,7 @@ dnl main
 dnl ----
 
 AC_INIT([irc],[2.11],[ircd-bugs@irc.org])
-AC_REVISION([$Id: configure.in,v 1.61 2004/09/09 15:52:58 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.62 2004/09/28 22:42:08 chopin Exp $])
 AC_PREREQ(2.59)
 
 AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [[localstatedir/log]]], [
