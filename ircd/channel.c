@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.242 2005/01/30 16:59:42 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.243 2005/01/30 22:08:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2011,6 +2011,7 @@ static	int	check_channelmask(aClient *sptr, aClient *cptr, char *chname)
 	if (*s == '\0')
 	{
 		/* ':' was last char (thus empty mask) --B. */
+		*(s-1) = '\0';
 		return 0;
 	}
 	if (match(s, ME) || (IsServer(cptr) && match(s, cptr->name)))
