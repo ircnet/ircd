@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.74 2002/03/03 21:46:43 jv Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.75 2002/03/14 02:05:20 jv Exp $";
 #endif
 
 #include "os.h"
@@ -40,6 +40,7 @@ int	portnum = -1;		    /* Server port number, listening this */
 char	*configfile = IRCDCONF_PATH;	/* Server configuration file */
 int	debuglevel = -1;		/* Server debug level */
 int	bootopt = BOOT_PROT|BOOT_STRICTPROT;	/* Server boot option flags */
+int	serverbooting = 1;
 char	*debugmode = "";		/*  -"-    -"-   -"-   -"- */
 char	*sbrk0;				/* initial sbrk(0) */
 char	*tunefile = IRCDTUNE_PATH;
@@ -554,12 +555,6 @@ aClient	*mp;
 	mp->user = NULL;
 	mp->fd = -1;
 	SetMe(mp);
-	if (!make_server(mp))
-	{
-		/* if make_server returns NULL here,
-		** we are completely stuck, abort mission! */
-		abort();
-	}
 	mp->serv->snum = find_server_num (ME);
 	(void) make_user(mp);
 	istat.is_users++;	/* here, cptr->next is NULL, see make_user() */
@@ -574,7 +569,6 @@ aClient	*mp;
 	(void)add_to_client_hash_table(mp->name, mp);
 
 	setup_server_channels(mp);
-	strncpyzt(me.serv->sid, SERVER_ID, SIDLEN+1);
 }
 
 /*
@@ -607,11 +601,6 @@ char	*argv[];
 {
 	uid_t	uid, euid;
 
-	if (!sid_valid(SERVER_ID))
-	{
-		fprintf(stderr,"Invalid SERVER_ID (%s).\n", SERVER_ID);
-		exit(6);
-	}
 	(void) myctime(time(NULL));	/* Don't ask, just *don't* ask */
 	sbrk0 = (char *)sbrk((size_t)0);
 	uid = getuid();
@@ -660,6 +649,8 @@ char	*argv[];
 	myargv = argv;
 	(void)umask(077);                /* better safe than sorry --SRB */
 	bzero((char *)&me, sizeof(me));
+
+	make_server(&me);
 
 	version = make_version();	/* Generate readable version string */
 	isupport = make_isupport();	/* Generate RPL_ISUPPORT (005) numerics */
@@ -803,6 +794,8 @@ char	*argv[];
 #endif /*CHROOTDIR/UID/GID*/
 
 #if defined(USE_IAUTH)
+	/* At this point, we just check whether iauth is there. Real start
+	 * is done in init_sys(). */
 	if ((bootopt & BOOT_NOIAUTH) == 0)
 		switch (vfork())
 		    {
@@ -863,12 +856,12 @@ char	*argv[];
 	timeofday = time(NULL);
 	if (initconf(bootopt) == -1)
 	    {
-		Debug((DEBUG_FATAL, "Failed in reading configuration file %s",
+		Debug((DEBUG_FATAL, "Couldn't open configuration file %s",
 			configfile));
-		/* no can do.
-		(void)printf("Couldn't open configuration file %s\n",
-			configfile);
-		*/
+		(void)fprintf(stderr,
+			"Couldn't open configuration file %s (%s)\n",
+			 configfile,strerror(errno));
+		
 		exit(-1);
 	    }
 	else
@@ -886,13 +879,33 @@ char	*argv[];
 		    }
 		/* exit if there is nothing to listen to */
 		if (acptr == NULL && !(bootopt & BOOT_INETD))
+		{
+			fprintf(stderr,
+			"Fatal Error: No working P-line in ircd.conf\n");
 			exit(-1);
+		}
 		/* Is there an M-line? */
 		if (!find_me())
+		{
+			fprintf(stderr,
+			"Fatal Error: No M-line in ircd.conf.\n");
 			exit(-1);
+		}
+		if (!me.serv->sid)
+		{
+			fprintf(stderr,
+			"Fatal Error: No SID specified in ircd.conf\n");
+			exit(-1);
+		}
+		if (!sid_valid(me.serv->sid))
+		{
+			fprintf(stderr,
+			"Fatal Error: Invalid sid %s specified in ircd.conf\n",
+				me.serv->sid);
+			exit(-1);
+		}
 	    }
 
-	dbuf_init();
 	setup_me(&me);
 	add_to_sid_hash_table(me.serv->sid,&me);
 	check_class();
@@ -946,12 +959,22 @@ char	*argv[];
 	else
 		write_pidfile();
 
+
 	Debug((DEBUG_NOTICE,"Server ready..."));
 #ifdef USE_SYSLOG
 	syslog(LOG_NOTICE, "Server Ready: v%s (%s #%s)", version, creation,
 	       generation);
 #endif
+	printf("Server %s (%s) version %s starting.\n", ME, me.serv->sid,
+		version);
+
 	timeofday = time(NULL);
+	
+	daemonize();	
+	dbuf_init();
+	
+	serverbooting = 0;
+	
 	while (1)
 		io_loop();
 }
