@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.45 2001/12/27 18:50:53 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.46 2001/12/27 19:08:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1441,7 +1441,7 @@ char	**comment;
 	if (!strcmp(host, ip))
 		ip = NULL; /* we don't have a name for the ip# */
 	name = cptr->user->username;
-	if (name[0] == '+')
+	if (IsRestricted(cptr) && name[0] == '+')
 	{
 		/*
 		** since we added '+' at the begining of valid
