@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.44 2005/01/03 22:17:00 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.45 2005/02/22 17:24:17 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -487,7 +487,7 @@ static	int	do_query_number(Link *lp, struct IN_ADDR *numb, ResRQ *rptr)
 			"%x.%x.%x.%x.%x.%x.%x.%x."
 			"%x.%x.%x.%x.%x.%x.%x.%x."
 			"%x.%x.%x.%x.%x.%x.%x.%x."
-			"%x.%x.%x.%x.%x.%x.%x.%x.ip6.%s.",
+			"%x.%x.%x.%x.%x.%x.%x.%x.ip6.arpa.",
 		(u_int)(cp[15]&0xf), (u_int)(cp[15]>>4),
 		(u_int)(cp[14]&0xf), (u_int)(cp[14]>>4),
 		(u_int)(cp[13]&0xf), (u_int)(cp[13]>>4),
@@ -503,13 +503,7 @@ static	int	do_query_number(Link *lp, struct IN_ADDR *numb, ResRQ *rptr)
 		(u_int)(cp[3]&0xf), (u_int)(cp[3]>>4),
 		(u_int)(cp[2]&0xf), (u_int)(cp[2]>>4),
 		(u_int)(cp[1]&0xf), (u_int)(cp[1]>>4),
-		(u_int)(cp[0]&0xf), (u_int)(cp[0]>>4),
-#ifdef SIXBONE_HACK
-		/* use ip6.arpa for 2001, ip6.int for all the rest
-		   (idea from Axu) --B. */
-		(cp[0] != 0x20 || cp[1] != 0x01) ? "int" :
-#endif
-		"arpa");
+		(u_int)(cp[0]&0xf), (u_int)(cp[0]>>4));
 	    }
 #else
 	cp = (u_char *)&numb->s_addr;

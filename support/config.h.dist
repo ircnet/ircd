@@ -404,14 +404,6 @@
 #define	CLONE_CHECK
 
 /*
- * Because it takes a while for IANA to delegate reverse mappings,
- * this option allows you to resolve 2001 block using ip6.arpa.
- * and the rest via ip6.int.
- * Note that ip6.int is officially discontinued.
- */
-#undef SIXBONE_HACK
-
-/*
 ** Servers with many clients and lots of K:lines are having noticable
 ** lag after rehash. Define this to the number of clients you want to
 ** be checked each time (all clients will eventually be checked, of course).
