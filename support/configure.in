@@ -551,6 +551,7 @@ AC_DEFUN(IRC_STDARG,
 [AC_MSG_CHECKING([for working stdarg])
 AC_CACHE_VAL(irc_cv_stdarg,
 AC_TRY_RUN(
+[
 changequote(<<, >>)dnl
 <<
 #if HAVE_STDIO_H
@@ -630,8 +631,9 @@ int main(void)
 
   exit(res ? 0 : 1);
 }
->>,
+>>
 changequote([, ])dnl
+],
 irc_cv_stdarg=yes,
 irc_cv_stdarg=no)
 )
@@ -1315,7 +1317,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.15 1997/10/18 13:42:12 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.16 1998/01/07 16:40:21 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Id: configure.in,v 1.14 1997/10/13 17:42:29 kalt Exp 
+# From configure.in Id: configure.in,v 1.15 1997/10/18 13:42:12 kalt Exp 
 
 # Guess values for system-dependent variables and create Makefiles.
 # Generated automatically using autoconf version 2.12 
@@ -3652,6 +3652,7 @@ else
 #line 3653 "configure"
 #include "confdefs.h"
 
+
 #if HAVE_STDIO_H
 #include <stdio.h>
 #endif
@@ -3662,7 +3663,7 @@ else
 #include <string.h>
 #endif
 
-char buf1256;
+char buf1[256];
 
 int level1(char *data, char *format, va_list ap)
 {
@@ -3702,11 +3703,11 @@ int dotest(int size, char *val, char *data)
 int base(char *val, char *format, ...)
 {
   int res = 1;
-  char data256;
+  char data[256];
 
   {
     va_list ap;
-    data0=0;
+    data[0]=0;
     va_start(ap, format);
     res = dotest(level3(data, format, ap), val, data);
     va_end(ap);
@@ -3714,7 +3715,7 @@ int base(char *val, char *format, ...)
 
   {
     va_list ap;
-    data0=0;
+    data[0]=0;
     va_start(ap, format);
     res = res && dotest(level3(data, format, ap), val, data);
     va_end(ap);
@@ -3730,8 +3731,9 @@ int main(void)
   exit(res ? 0 : 1);
 }
 
+
 EOF
-if { (eval echo configure:3735: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
+if { (eval echo configure:3737: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest && (./conftest; exit) 2>/dev/null
 then
   irc_cv_stdarg=yes
 else
@@ -3757,7 +3759,7 @@ else
 fi
 
 echo $ac_n "checking for resolver configuration file""... $ac_c" 1>&6
-echo "configure:3761: checking for resolver configuration file" >&5
+echo "configure:3763: checking for resolver configuration file" >&5
 if eval "test \"`echo '$''{'irc_cv_path_resconf'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -3790,12 +3792,12 @@ EOF
 fi
 
 echo $ac_n "checking whether this is an alpha/beta release""... $ac_c" 1>&6
-echo "configure:3794: checking whether this is an alpha/beta release" >&5
+echo "configure:3796: checking whether this is an alpha/beta release" >&5
 if eval "test \"`echo '$''{'irc_cv_alpha_beta'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3799 "configure"
+#line 3801 "configure"
 #include "confdefs.h"
 #include "../common/patchlevel.h"
 #ifdef PATCHLEVEL
