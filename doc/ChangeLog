@@ -1,3 +1,8 @@
+2005-02-17  Piotr Kucharski
+
+	* s_conf.c/do_tkline(), m_tkline(): use time_t, not int.
+	* config.h.dist: limit TKLINE_MAXTIME to 99999999.
+
 2005-02-15  Piotr Kucharski
 
 	* s_conf.c/initconf(): use fdopen again.
