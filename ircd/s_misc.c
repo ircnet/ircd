@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.89 2004/06/18 01:14:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.90 2004/06/29 17:27:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -469,7 +469,7 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 				    sptr->user->host);
 # endif
 		}
-		else
+		else if (!IsService(sptr))
 		{
 # if defined(FNAME_CONNLOG) || defined(USE_SERVICES) || \
 	(defined(USE_SYSLOG) && defined(SYSLOG_CONN))
