@@ -1,3 +1,13 @@
+Sun Sep 14 19:44:27 1997  Christophe Kalt
+
+	* ircd.c: redundant/useless code commented out.
+
+	* struct_def.h, parse.c, s_err.c, s_serv.c: `stats m' is more verbose.
+
+	* os.h, Makefile.in: zlib.h was missing from includes.
+
+	* s_user.c: 2 fixes (a NULL pointer, and a non reinitialized one).
+
 Thu Sep 11 21:43:20 1997  Christophe Kalt
 
 	* class_def.h, class_ext.h, class.c, s_bsd.c, s_conf.c, s_err.c,
