@@ -738,3 +738,7 @@ char mydummy2[MYDUMMY_SIZE];
 # define WHOSTENTP(x) (x)
 # define IRCDCONF_DELIMITER ':'
 #endif
+
+#if defined(HAVE_MMAP)
+#include <sys/mman.h>
+#endif
