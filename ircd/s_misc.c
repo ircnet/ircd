@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.57 2003/10/13 21:48:53 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.58 2003/10/13 22:17:44 q Exp $";
 #endif
 
 #include "os.h"
@@ -855,7 +855,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			/* Clean up invitefield */
 			while ((ilp = sptr->user->invited))
 			{
-				del_invite(sptr, ilp->value.chptr);
+				del_invite(sptr, ilp->chptr);
 				/* again, this is all that is needed */
 			}
 

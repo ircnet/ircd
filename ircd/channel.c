@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.157 2003/10/13 21:48:51 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.158 2003/10/13 22:17:44 q Exp $";
 #endif
 
 #include "os.h"
@@ -1828,7 +1828,7 @@ char	*key;
 		return (timeofday > chptr->history) ? 0 : ERR_UNAVAILRESOURCE;
 
 	for (lp = sptr->user->invited; lp; lp = lp->next)
-		if (lp->value.chptr == chptr)
+		if (lp->chptr == chptr)
 			break;
 
 	if ((banned = match_modeid(CHFL_BAN, sptr, chptr)))
@@ -2017,7 +2017,7 @@ aChannel *chptr;	/* what channel */
 	 */
 	if (list_length(cptr->user->invited) >= MAXCHANNELSPERUSER)
 	{
-		del_invite(cptr, cptr->user->invited->value.chptr);
+		del_invite(cptr, cptr->user->invited->chptr);
 	}
 
 	/*
@@ -2044,7 +2044,7 @@ aChannel *chptr;	/* what channel */
 			;
 		inv = make_invlink();
 		(*tmp) = inv;
-		inv->value.chptr = chptr;
+		inv->chptr = chptr;
 		inv->next = NULL;
 		len = sprintf(who, "%s!%s@%s", sptr->name,
 			sptr->user->username, sptr->user->host);
@@ -2081,7 +2081,7 @@ aChannel *chptr;
 
 		for (inv = &(cptr->user->invited); (tmp = *inv); inv = &tmp->next)
 		{
-			if (tmp->value.chptr == chptr)
+			if (tmp->chptr == chptr)
 			{
 				*inv = tmp->next;
 				istat.is_banmem -= (strlen(tmp->who)+1);
