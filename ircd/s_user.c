@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.254 2005/02/20 21:56:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.255 2005/02/20 22:26:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -346,7 +346,9 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 	if (MyConnect(sptr))
 	    {
 		char *reason = NULL;
+#ifdef RESTRICT_USERNAMES
 		char *lbuf = NULL;
+#endif
 
 #if defined(USE_IAUTH)
 		static time_t last = 0;
@@ -2099,11 +2101,11 @@ int	m_whois(aClient *cptr, aClient *sptr, int parc, char *parv[])
 ** m_user
 **	parv[0] = sender prefix
 **	parv[1] = username (login name, account)
-**	parv[2] = client host name (used only from other servers)
-**	parv[3] = server host name (used only from other servers)
-**	parv[4] = users real name info
-**	parv[5] = users mode (is only used internally by the server,
-**		  NULL otherwise)
+**	parv[2] = user modes
+**	parv[3] = unused
+**	parv[4] = real name info
+**
+** NOTE: As of 2.11.1 we no longer call m_user() internally. --B.
 */
 int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
@@ -2119,7 +2121,7 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	  {'\0', 0}
 	};
 
-	char	*username, *host, *server, *realname;
+	char	*username, *umodes, *server, *realname;
 	anUser	*user;
 	char	ipbuf[BUFSIZE];
 	int	what,i;
@@ -2139,98 +2141,23 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, BadTo(parv[0]));
 		return 1;
    	    }
-	if (parc > 2 && (username = (char *)index(parv[1],'@')))
+	if ((username = (char *)index(parv[1],'@')))
 		*username = '\0'; 
-	if (parc < 5 || *parv[1] == '\0' || *parv[2] == '\0' ||
-	    *parv[3] == '\0' || *parv[4] == '\0')
-	    {
-		/* this may come from internal m_user call (from m_nick), so we
-		** have to deal with it here; will be gone in next version --B. */
-		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]), "USER");
-		if (IsServer(cptr))
-		    {
-			/* send error */
-			sendto_flag(SCH_NOTICE,
-				    "bad USER param count for %s from %s",
-				    parv[0], get_client_name(cptr, FALSE));
-			/*
-			** and kill it, as there's no reason to expect more
-			** USER messages about it, or we'll create a ghost.
-			*/
-			sendto_one(cptr,
-				   ":%s KILL %s :%s (bad USER param count)",
-				   ME, parv[0], ME);
-			sptr->flags |= FLAGS_KILLED;
-			exit_client(NULL, sptr, &me, "bad USER param count");
-		    }
-		return 1;
-	    }
 
 	/* Copy parameters into better documenting variables */
 
-	username = (parc < 2 || BadPtr(parv[1])) ? "<bad-boy>" : parv[1];
-	host     = (parc < 3 || BadPtr(parv[2])) ? "<nohost>" : parv[2];
-	server   = (parc < 4 || BadPtr(parv[3])) ? "<noserver>" : parv[3];
-	realname = (parc < 5 || BadPtr(parv[4])) ? "<bad-realname>" : parv[4];
+	username = parv[1];
+	umodes   = parv[2];
+	server   = parv[3];
+	realname = parv[4];
 	
-	if (MyConnect(sptr))
-	{
-		/* internal call of m_user for *local* user */
 #ifdef INET6
-		inetntop(AF_INET6, (char *)&sptr->ip, ipbuf,
-				sizeof(ipbuf));
+	inetntop(AF_INET6, (char *)&sptr->ip, ipbuf, sizeof(ipbuf));
 #else
-		strcpy(ipbuf, (char *)inetntoa((char *)&sptr->ip));
+	strcpy(ipbuf, (char *)inetntoa((char *)&sptr->ip));
 #endif
-		user = make_user(sptr, strlen(ipbuf));
-		
-		strcpy(user->sip, ipbuf);
-	}
-	else
-	{
-		/* m_user is used only by NICK, which may come only from
-		 * 2.10 servers, hence we have no IP -> using 0
-		 */
-		user = make_user(sptr, 0);
-	}
-
-	if (!MyConnect(sptr))
-	    {
-		aClient	*acptr = NULL;
-		aServer	*sp = NULL;
-
-		/*
-		** Why? Why do we keep doing this?
-		** s_service.c had the same kind of kludge.
-		** Can't we get rid of this? - krys
-		*/
-		acptr = find_server(server, NULL);
-		if (acptr)
-			sendto_flag(SCH_ERROR,
-		    "ERROR: SERVER:%s uses wrong syntax for NICK (%s)",
-				    get_client_name(cptr, FALSE),
-				    parv[0]);
-		if (acptr)
-			sp = acptr->serv;
-		else if (!sp)
-		    {
-			sendto_flag(SCH_ERROR,
-                        	    "ERROR: USER:%s without SERVER:%s from %s",
-				    parv[0], server,
-				    get_client_name(cptr, FALSE));
-			ircstp->is_nosrv++;
-			(void) exit_client(NULL, sptr, &me, "No Such Server");
-			return exit_client(cptr, cptr, &me, "USER without SERVER");
-		    }
-		user->servp = sp;
-		user->servp->refcnt++;
-
-		Debug((DEBUG_DEBUG, "from %s user %s server %s -> %#x %s",
-			parv[0], username, server, sp, sp->bcptr->name));
-		strncpyzt(user->host, host, sizeof(user->host));
-		user->server = find_server_string(sp->snum);
-		goto user_finish;
-	    }
+	user = make_user(sptr, strlen(ipbuf));
+	strcpy(user->sip, ipbuf);
 
 	user->servp = me.serv;
 	me.serv->refcnt++;
@@ -2238,7 +2165,6 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	SetInvisible(sptr);
 #endif
 #ifdef XLINE
-	if (MyConnect(sptr))
 	{
 		aConfItem *tmp;
 
@@ -2250,7 +2176,7 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				continue;
 			if (!BadPtr(tmp->host) && match(tmp->host, username))
 				continue;
-			if (!BadPtr(tmp->passwd) && match(tmp->passwd, host))
+			if (!BadPtr(tmp->passwd) && match(tmp->passwd, umodes))
 				continue;
 			if (!BadPtr(tmp->name) && match(tmp->name, server))
 				continue;
@@ -2262,14 +2188,14 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	/* parse desired user modes sent in USER */
 	/* rfc behaviour - bits */
-	if (isdigit(*host))
+	if (isdigit(*umodes))
 	{
-		for (s = host+1; *s; s++)
+		for (s = umodes+1; *s; s++)
 			if (!isdigit(*s))
 				break;
 		if (*s == '\0')
 			/* allows only umodes specified in UFLAGS - see above */
-			sptr->user->flags |= (UFLAGS & atoi(host));
+			sptr->user->flags |= (UFLAGS & atoi(umodes));
 	}
 	else	/* new behaviour */
 	{
@@ -2279,7 +2205,7 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		 * - jv
 		 */
 		what = 0;
-		for (s = host; *s; s++)
+		for (s = umodes; *s; s++)
 		{
 			switch (*s)
 			{
@@ -2313,10 +2239,8 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			}
 		}
 	}
-	strncpyzt(user->host, host, sizeof(user->host));
 	user->server = find_server_string(me.serv->snum);
 	
-user_finish:
 	reorder_client_in_list(sptr);
 	if (sptr->info != DefInfo)
 		MyFree(sptr->info);
@@ -2324,25 +2248,13 @@ user_finish:
 		realname[REALLEN] = '\0';
 	sptr->info = mystrdup(realname);
 	if (sptr->name[0]) /* NICK already received, now we have USER... */
-	    {
-		if ((parc == 6) && IsServer(cptr)) /* internal m_user() */
-		    {
-			char	*pv[4];
-
-			pv[0] = ME;
-			pv[1] = sptr->name;
-			pv[2] = parv[5];
-			pv[3] = NULL;
-			m_umode(NULL, sptr, 3, pv);/*internal fake call again*/
-			/* The internal m_umode does NOT propagate to 2.8
-			** servers. (it can NOT since NICK/USER hasn't been
-			** sent yet). See register_user()
-			*/
-		    }
+	{
 		return register_user(cptr, sptr, sptr->name, username);
-	    }
+	}
 	else
+	{
 		strncpyzt(sptr->user->username, username, USERLEN+1);
+	}
 	return 2;
 }
 
