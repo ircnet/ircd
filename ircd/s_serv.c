@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.109 2002/08/24 01:09:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.110 2002/08/24 01:33:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -728,7 +728,7 @@ char	*parv[];
 		/* A server can only be introduced by another server. */
 		if (!IsServer(sptr))
 		    {
-			sendto_flag(SCH_LOCAL,
+			sendto_flag(SCH_NOTICE,
 			    "Squitting %s brought by %s (introduced by %s)",
 				    host, get_client_name(cptr, FALSE),
 				    sptr->name);

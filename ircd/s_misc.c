@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.49 2002/07/30 00:14:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.50 2002/08/24 01:33:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -455,7 +455,7 @@ char	*comment;	/* Reason for the exit */
 	    {
 		if (sptr->flags & FLAGS_KILLED)
 		    {
-			sendto_flag(SCH_LOCAL, "Killed: %s.",
+			sendto_flag(SCH_NOTICE, "Killed: %s.",
 				    get_client_name(sptr, TRUE));
 			sptr->exitc = EXITC_KILL;
 		    }

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.45 2002/06/04 09:29:51 jv Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.46 2002/08/24 01:33:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1003,7 +1003,7 @@ char	*sender;
 	if (index(sender, '.') /* <- buggy, it could be a service! */
 	    && !index(sender, '@')) /* better.. */
 	    {
-		sendto_flag(SCH_LOCAL, "Squitting unknown %s brought by %s.",
+		sendto_flag(SCH_NOTICE, "Squitting unknown %s brought by %s.",
 			    sender, get_client_name(cptr, FALSE));
 		sendto_one(cptr, ":%s SQUIT %s :(Unknown from %s)",
 			   me.name, sender, get_client_name(cptr, FALSE));
@@ -1018,7 +1018,7 @@ char	*sender;
 	 * if we get here and sender is a service, we should probably issue
 	 * a kill in this case! -krys
 	 */
-		sendto_flag(SCH_LOCAL, "Dropping unknown %s brought by %s.",
+		sendto_flag(SCH_NOTICE, "Dropping unknown %s brought by %s.",
 			    sender, get_client_name(cptr, FALSE));
 }
 #endif
