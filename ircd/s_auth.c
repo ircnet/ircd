@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.7 1998/08/04 15:28:25 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.8 1998/08/05 01:41:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -63,12 +63,17 @@ char *buf;
 void
 read_iauth()
 {
-    static char obuf[READBUF_SIZE];
+    static char obuf[READBUF_SIZE+1];
     static int olen = 0;
-    char buf[READBUF_SIZE], *start, *end, tbuf[BUFSIZ];
+    char buf[READBUF_SIZE+1], *start, *end, tbuf[BUFSIZ];
     aClient *cptr;
     int i;
 
+    if (adfd == -1)
+	{
+	    olen = 0;
+	    return;
+	}
     while (1)
 	{
 	    if (olen)
@@ -89,31 +94,35 @@ read_iauth()
 	    while (end = index(start, '\n'))
 		{
 		    *end++ = '\0';
-		    if (*buf == '>')
+		    if (*start == '>')
+			{
 			    sendto_flag(SCH_AUTH, "%s", start+1);
-		    else if (*buf != 'U' && *buf != 'u' &&
-			     *buf != 'K' && *buf != 'D')
+			    start = end;
+			    continue;
+			}
+		    if (*start != 'U' && *start != 'u' &&
+			*start != 'K' && *start != 'D')
 			{
 			    sendto_flag(SCH_AUTH, "Garbage from iauth [%.*]",
 					start);
 			    start = end;
 			    continue;
 			}
-		    if ((cptr = local[i = atoi(buf+2)]) == NULL)
+		    if ((cptr = local[i = atoi(start+2)]) == NULL)
 			{
 			    sendto_flag(SCH_DEBUG, "client gone");
 			    start = end;
 			    continue;
 			}
-		    sprintf(tbuf, "%c %d %s %u ", buf[0], i,
+		    sprintf(tbuf, "%c %d %s %u ", start[0], i,
 			    inetntoa((char *)&cptr->ip), cptr->port);
-		    if (strncmp(tbuf, buf, strlen(tbuf)))
+		    if (strncmp(tbuf, start, strlen(tbuf)))
 			{
 			    sendto_flag(SCH_DEBUG, "mismatch");
 			    start = end;
 			    continue;
 			}
-		    if (buf[0] == 'U')
+		    if (start[0] == 'U')
 			{
 			    if (cptr->auth != cptr->username)
 				{   
@@ -121,13 +130,13 @@ read_iauth()
 				    istat.is_auth -= 1;
 				    MyFree(cptr->auth);
 				}
-			    cptr->auth =cptr->username;
+			    cptr->auth = cptr->username;
 			    strncpy(cptr->username, start+strlen(tbuf),
 				    USERLEN+1);
 			    cptr->username[USERLEN] = '\0';
 			    cptr->flags |= FLAGS_GOTID;
 			}
-		    else if (buf[0] == 'u')
+		    else if (start[0] == 'u')
 			{
 			    if (cptr->auth != cptr->username)
 				{
@@ -147,7 +156,7 @@ read_iauth()
 			    istat.is_auth += 1;
 			    cptr->flags |= FLAGS_GOTID;
 			}
-		    else if (buf[0] == 'D')
+		    else if (start[0] == 'D')
 			    /*authentication finished*/
 			    ClearXAuth(cptr);
 		    else
@@ -166,7 +175,7 @@ read_iauth()
 	    else
 		    olen = 0;
 	}
-    if (olen)
+/*    if (olen)
 	    bcopy(buf, obuf, olen); /* for next time */		    
 }
 #endif

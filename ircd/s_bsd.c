@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.31 1998/08/04 15:28:25 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.32 1998/08/05 01:41:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -424,9 +424,10 @@ start_iauth()
 	if (adfd >= 0)
 	    {
 		sendto_flag(SCH_AUTH,
-			    "Attempted to start iauth a second time!");
+			    "iauth is already running, restart aborted");
 		return;
 	    }
+	read_iauth(); /* to reset olen */
 	sendto_flag(SCH_AUTH, "Starting iauth...");
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sp) < 0)
 	    {
