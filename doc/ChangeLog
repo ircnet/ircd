@@ -1,3 +1,22 @@
+Thu Oct  8 18:33:50 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* configure.in: always compile with -g flag, and never strip.
+
+	* channel.c:
+		* renamed sub1_from_channel() to free_channel().
+		* always send modes for empty channels during netjoin.
+		* fixed old (2.9.x) memory leak in collect_channel_garbage().
+
+	* s_id.c:
+		* linked list corruption bugfix in collect_chid().
+		* added logic to avoid excessive caching in cache_chid().
+
+	* s_service.c: stdarg bugfix in check_service_butone (from O.G.).
+
+Sun Sep 27 15:12:53 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* s_user.c: prefix bugfix (reported by mrg).
+
 2.10.0p1
 
 Fri Sep 25 22:21:06 1998  Christophe Kalt  <kalt@millennium.stealth.net>
