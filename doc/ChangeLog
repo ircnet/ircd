@@ -4,6 +4,9 @@
 	* Makefile.in: added IAUTHPID_PATH.
 	* s_user.c/m_quit(): enclose local users' supplied quit reasons with
 	  double quotes; get rid of default "I Quit" message.
+	* s_misc.c/exit_client(): take advantage of double quotes enclosing.
+	* s_misc.c/exit_client(): do not call check_split() every client
+	  quitting (leave it only every server quitting).
 
 2004-01-20  Piotr Kucharski
 
