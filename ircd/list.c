@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.37 2004/10/01 20:22:14 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.38 2004/11/19 15:14:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -618,7 +618,7 @@ aConfItem	*make_conf()
 	istat.is_conf++;
 	istat.is_confmem += sizeof(aConfItem);
 
-	bzero((char *)&aconf->ipnum, sizeof(struct in_addr));
+	bzero((char *)&aconf->ipnum, sizeof(struct IN_ADDR));
 	aconf->clients = aconf->port = 0;
 	aconf->next = NULL;
 	aconf->host = aconf->passwd = aconf->name = NULL;
