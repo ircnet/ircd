@@ -51,7 +51,7 @@ cat >version.c <<!SUB!THIS!
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.9 1999/07/21 22:59:54 kalt Exp $";
+static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.10 2002/03/03 21:40:51 jv Exp $";
 #endif
 
 #include "os.h"
@@ -63,6 +63,7 @@ static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.9 1999/07/21 22:59:54 kalt
 char *generation = "$generation";
 char *creation = "$creation";
 char *version;				/* Filled by make_version() */
+char **isupport;			/* Filled by make_isupport() */
 char *pass_version = PATCHLEVEL;
 
 char *infotext[] =
