@@ -23,6 +23,7 @@ typedef struct Class {
 	int	pingFreq;
 	int	maxLinks;
 	int	maxSendq;
+	int	maxBSendq;
 	int	maxHLocal;
 	int	maxUHLocal;
 	int	maxHGlobal;
@@ -36,6 +37,7 @@ typedef struct Class {
 #define	PingFreq(x)	((x)->pingFreq)
 #define	MaxLinks(x)	((x)->maxLinks)
 #define	MaxSendq(x)	((x)->maxSendq)
+#define	MaxBSendq(x)	((x)->maxBSendq)
 #define	MaxHLocal(x)	((x)->maxHLocal)
 #define	MaxUHLocal(x)	((x)->maxUHLocal)
 #define	MaxHGlobal(x)	((x)->maxHGlobal)
