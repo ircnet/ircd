@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.121 2004/03/14 17:45:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.122 2004/03/17 21:03:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -587,31 +587,8 @@ static	void	setup_me(aClient *mp)
 	strncpyzt(mp->username, (p) ? p->pw_name : "unknown",
 		  sizeof(mp->username));
 	(void)get_my_name(mp, mp->sockhost, sizeof(mp->sockhost)-1);
-
-	/* Setup hostp - fake record to resolve localhost. -Toor */
-	mp->hostp = (struct hostent *)MyMalloc(sizeof(struct hostent));
-	mp->hostp->h_name = MyMalloc(strlen(me.sockhost)+1);
-	strcpy(mp->hostp->h_name, mp->sockhost);
-	mp->hostp->h_aliases = (char **)MyMalloc(sizeof(char *));
-	*mp->hostp->h_aliases = NULL;
-	mp->hostp->h_addrtype = AFINET;
-	mp->hostp->h_length = 
-#ifdef	INET6
-				IN6ADDRSZ;
-#else
-				sizeof(long);
-#endif
-	mp->hostp->h_addr_list = (char **)MyMalloc(2*sizeof(char *));
-#ifdef	INET6
-	mp->hostp->h_addr_list[0] = (void *)MyMalloc(mp->hostp->h_length);
-	memcpy(mp->hostp->h_addr_list[0], &in6addr_loopback,
-		mp->hostp->h_length);
-#else
-	mp->hostp->h_addr_list[0] = (void *)MyMalloc(mp->hostp->h_length);
-	*(long *)(mp->hostp->h_addr_list[0]) = IN_LOOPBACKNET;
-#endif
-	mp->hostp->h_addr_list[1] = NULL ;
-
+	/* I think we need no hostp, especially fake one --B.  */
+	mp->hostp = NULL;
 	if (mp->serv->namebuf[0] == '\0')
 		strncpyzt(mp->serv->namebuf, mp->sockhost, sizeof(mp->serv->namebuf));
 	if (me.info == DefInfo)

@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.130 2004/03/14 12:04:24 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.131 2004/03/17 21:03:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -726,14 +726,6 @@ static	int	check_init(aClient *cptr, char *sockn)
 #else
 	(void)strcpy(sockn, (char *)inetntoa((char *)&sk.sin_addr));
 #endif
-#ifdef INET6
-	if (IN6_IS_ADDR_LOOPBACK(&sk.SIN_ADDR))
-#else
-	if (inetnetof(sk.SIN_ADDR) == IN_LOOPBACKNET)
-#endif
-	    {
-		cptr->hostp = me.hostp;
-	    }
 	bcopy((char *)&sk.SIN_ADDR, (char *)&cptr->ip, sizeof(struct IN_ADDR));
 	cptr->port = ntohs(sk.SIN_PORT);
 
@@ -770,10 +762,8 @@ int	check_client(aClient *cptr)
 	/*
 	 * Verify that the host to ip mapping is correct both ways and that
 	 * the ip#(s) for the socket is listed for the host.
-	 * We shouldn't check it for localhost, because hp is fake in that
-	 * case. -Toor
 	 */
-	if (hp && (hp != me.hostp))
+	if (hp)
 	    {
 		for (i = 0; hp->h_addr_list[i]; i++)
 			if (!bcmp(hp->h_addr_list[i], (char *)&cptr->ip,
