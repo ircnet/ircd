@@ -32,8 +32,8 @@ EXTERN int send_queued __P((aClient *to));
 #if ! USE_STDARG
 EXTERN int sendto_one();
 #else /* USE_STDARG */
-EXTERN int vsendto_one __P((aClient *to, char *pattern, va_list va);
-EXTERN int sendto_one __P((aClient *to, char *pattern, ...);
+EXTERN int vsendto_one __P((aClient *to, char *pattern, va_list va));
+EXTERN int sendto_one __P((aClient *to, char *pattern, ...));
 #endif /* USE_STDARG */
 #ifndef CLIENT_COMPILE
 EXTERN void flush_connections __P((int fd));
