@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.84 2002/01/06 03:35:39 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.85 2002/01/06 04:19:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -655,6 +655,7 @@ char	*parv[];
 	}
 
 	host = parv[1];
+	hop = atoi(parv[2]);
 	strncpyzt(info, parv[parc-1], REALLEN);
 
 	/* check if the servername is valid */
