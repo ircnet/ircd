@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.55 1999/02/12 04:06:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.56 1999/02/19 01:01:39 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -274,24 +274,10 @@ aClient	*cptr;
 	else
 		id = "";
 
-	if (!strncmp(cptr->info, "021", 3) ||
-	    !strncmp(cptr->info, "020999", 6))
+	if (!strncmp(cptr->info, "021", 3))
 		cptr->hopcount = SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN; /* SV_2_10*/
 	else if (!strncmp(cptr->info, "0209", 4))
-	    {
 		cptr->hopcount = SV_29;	/* 2.9+ protocol */
-		if (!(cptr->info[4] == '0' &&
-		      (cptr->info[5] == '0' || cptr->info[5] == '1' ||
-		       cptr->info[5] == '2' || cptr->info[5] == '3' ||
-		       cptr->info[5] == '4' ||
-		       (cptr->info[5] == '5' && cptr->info[6] == '0' &&
-			cptr->info[7] == '0'))))
-			/*
-			** the NJOIN command appeared on 2.9.5
-			** Unfortunately, m_njoin() has a fatal bug in 2.9.5
-			*/
-			cptr->hopcount |= SV_NJOIN;
-	    }
 	else
 		cptr->hopcount = SV_OLD; /* uhuh */
 
