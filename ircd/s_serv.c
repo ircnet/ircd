@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.91 2002/03/22 21:46:47 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.92 2002/04/05 03:06:44 jv Exp $";
 #endif
 
 #include "os.h"
@@ -872,8 +872,15 @@ char	*parv[];
 			acptr->serv->stok = atoi(parv[3]);
 			strcpy(acptr->serv->verstr,"0");
 
-			SPRINTF(acptr->serv->sid, "$%s", 
+			SPRINTF(acptr->serv->sid, "$%s",
 				ltoid(acptr->serv->ltok, SIDLEN - 1));
+			
+			aconf = cptr->serv->nline;
+			/* Send PING for EOB emulation */
+			sendto_one(cptr, ":%s PING %s :%s",
+				my_name_for_link(ME, aconf->port),
+				my_name_for_link(ME, aconf->port),
+				acptr->name);
 		}
 
 		SetServer(acptr);
@@ -1292,7 +1299,69 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 				send_channel_modes(cptr, chptr);
 			    }
 	    }
+	if (ST_UID(cptr))
+	{
+		if (istat.is_myserv == 1)
+		{ /* remote server is the only we have connected */
+			sendto_one(cptr, ":%s EOB", me.serv->sid);
+		}
+		else
+		{
+			aServer *asptr;
+			char eobbuf[BUFSIZE];
+			char *e;
+			int eobmaxlen;
+			int flag;
 
+			e = eobbuf;
+			eobmaxlen = BUFSIZE
+				        - 1		/*    ":"     */
+					- SIDLEN 	/*  my SID    */
+					- 6 		/*   " EOB :" */
+					- 2;		/*   "\r\n"   */
+
+			/* space for last comma and SID (calculation moved
+        		 * from "if (e - eobbuf > eobmaxlen)" inside following
+			 * loop)
+			 */ 
+			eobmaxlen -= SIDLEN + 1;
+			
+			/* send EOBs */
+			for (asptr = svrtop; asptr; asptr = asptr->nexts)
+			{
+				/* Send EOBs only for servers which already
+				 * finished bursting */
+				if (!IsBursting(asptr->bcptr))
+				{
+					if ((int) (e  - eobbuf) > eobmaxlen)
+					{
+						*e = '\0';
+						/* eobbuf always starts with
+						 * comma, so +1 gets rid of it
+						 */
+						sendto_one(cptr, ":%s EOB :%s",
+							me.serv->sid,
+							eobbuf + 1);
+						e = eobbuf;
+					}
+
+					*e++ = ',';
+					memcpy(e, asptr->sid, SIDLEN);
+					e += SIDLEN;
+				}
+			}
+			/* Send the rest */
+			*e = '\0';
+			sendto_one(cptr, ":%s EOB :%s", me.serv->sid,
+					eobbuf+1);
+		}
+	}
+	else
+	{
+		/* Send PING for EOB emulation */
+		sendto_one(cptr, ":%s PING %s :%s", mlname, mlname,
+			   cptr->name);
+	}
 	cptr->flags &= ~FLAGS_CBURST;
 #ifdef	ZIP_LINKS
  	/*
@@ -2587,7 +2656,136 @@ char	*parv[];
 	sendto_one(sptr, replies[RPL_CLOSEEND], ME, BadTo(parv[0]), closed);
 	return 1;
 }
+/* End Of Burst command
+** parv[0] - server sending the SQUIT
+** parv[1] - optional comma separated list of servers for which this EOB
+**           is also valid.
+*/
+int	m_eob(cptr, sptr, parc, parv)
+aClient	*cptr, *sptr;
+int	parc;
+char	*parv[];
+{
+	char eobbuf[BUFSIZE];
+	char *e;	
+	char *sid;
+	char *p = NULL;
+	int eobmaxlen;
+	aClient *acptr;
 
+	if (!IsServer(sptr))
+	{
+		return 0;
+	}
+	
+	if (IsBursting(sptr))
+	{
+		if (MyConnect(sptr))
+		{
+			sendto_flag(SCH_NOTICE,
+				"End of burst from %s after %d seconds.",
+				sptr->name, timeofday - sptr->firsttime);
+		}
+		SetEOB(sptr);
+		istat.is_eobservers++;
+	}
+	
+	if (parc < 2)	
+	{
+		sendto_serv_v(sptr, SV_UID, ":%s EOB", sptr->serv->sid);
+		return 1;
+	}
+
+	eobmaxlen = BUFSIZE
+		- 1             /*     ":"     */
+		- SIDLEN        /*   my SID    */
+		- 6             /*  " EOB :"   */
+		- 2;            /*   "\r\n"    */
+
+	/* space for last comma and SID (calculation moved
+	 * from "if (e - eobbuf > eobmaxlen)" inside following loop)
+	 */
+	eobmaxlen -= SIDLEN + 1;
+
+	e = eobbuf;
+	
+	for (; (sid = strtoken(&p, parv[1], ",")); parv[1] = NULL)
+	{
+		if (sid[0] == '$')
+		{
+			aServer *asptr;
+			/* Fake sid (comes from EOB emulation */
+			asptr = find_tokserver(idtol(sid), cptr, NULL);
+			if (asptr)
+			{
+				acptr = asptr->bcptr;
+			}
+		}
+		else
+		{
+			acptr = find_sid(sid, NULL);
+		}
+		if (!acptr)
+		{
+			sendto_flag(SCH_SERVER,
+				"Received EOB for unknown SID (%s) from (%s), "
+				"dropping link",
+				sid, cptr->name);
+			return exit_client(cptr, cptr, &me,
+				  "Unknown SID in EOB");
+		}
+		
+		if (acptr->from != cptr)
+		{
+			sendto_flag(SCH_NOTICE,
+				"Received EOB for (%s) from wrong direction "
+				"(%s != %s), dropping link",
+				sid, sptr->name, acptr->from->name);
+			return exit_client(cptr, cptr, &me,
+				"Wrong EOB Direction");
+		}
+		
+		if (!IsBursting(acptr))
+		{
+			sendto_flag(SCH_ERROR,
+				"Received another EOB for server %s from %s",
+					sid, cptr->name);
+			continue;
+		}
+
+	
+		sendto_flag(SCH_DEBUG, "Received EOB for %s (mass)",
+			 acptr->serv->sid);
+
+		/* SIDLEN + 1 = ",SID" */
+		if (((int) (e - eobbuf)) > eobmaxlen)
+		{
+			*e = '\0';
+			/* We have exceeded available space in buf.
+			 * eobbuf always starts with comma, * so +1 gets
+			 * rid of it */
+			sendto_serv_v(sptr, SV_UID, ":%s EOB :%s",
+					sptr->serv->sid, eobbuf + 1);
+			e = eobbuf;
+		}
+		
+		SetEOB(acptr);
+		istat.is_eobservers++;
+		/* regenerate buffer - it might be fake sid,
+		** which will change at this point - jv
+		*/
+		*e++ = ',';
+		memcpy(e, acptr->serv->sid, SIDLEN);
+		e += SIDLEN;
+
+	}
+	
+	*e = '\0';
+	/* Send the rest */
+	sendto_serv_v(sptr, SV_UID, ":%s EOB :%s", sptr->serv->sid, eobbuf + 1);
+	
+	return 1;
+}
 #if defined(OPER_DIE) || defined(LOCOP_DIE)
 int	m_die(cptr, sptr, parc, parv)
 aClient	*cptr, *sptr;
@@ -2844,3 +3042,45 @@ void	remove_server_from_tree(aClient *cptr)
 	return;
 }
 
+/* Process emulated EOB */
+void do_emulated_eob(aClient *sptr)
+{
+	aClient *acptr = sptr;
+
+	SetEOB(sptr);
+
+	if (IsBursting(sptr))
+	{
+		istat.is_eobservers++;
+	}
+	
+	if (MyConnect(sptr))
+	{
+		sendto_flag(SCH_SERVER,
+			"End of burst from %s after %d seconds.",
+			sptr->name, timeofday - sptr->firsttime);
+	}
+	else
+	{
+		sendto_flag(SCH_DEBUG, "EOB from %s (PONG)", sptr->name);
+	}
+	sendto_serv_v(sptr,SV_UID,":%s EOB :%s", me.serv->sid,
+		      sptr->serv->sid);
+
+	/* Try to bubble EOB up */
+	while ((acptr = acptr->serv->up) && acptr != &me)
+	{
+		if (IsBursting(acptr))
+		{
+			SetEOB(acptr);
+			istat.is_eobservers++;
+			sendto_flag(SCH_DEBUG, "EOB from %s (bubbled)",
+				acptr->name);
+				
+			sendto_serv_v(sptr, SV_UID, ":%s EOB :%s",
+				me.serv->sid, sptr->serv->sid);
+
+		}
+	}
+	return;
+}
