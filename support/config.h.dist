@@ -495,7 +495,7 @@
 /*
  * Max number of channels a user is allowed to join.
  */
-#define MAXCHANNELSPERUSER  21	/* Recommended value: 10 */
+#define MAXCHANNELSPERUSER  21	/* Recommended value: 21 */
 
 /*
  * USE_IAUTH makes ircd use the iauth program for authentication.
