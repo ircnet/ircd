@@ -1,3 +1,14 @@
+2005-02-15  Piotr Kucharski
+
+	* s_conf.c/initconf(): use fdopen again.
+	* fileio.c, fileio.h: new files imported from ircd-ratbox, for use
+	  instead of buggy FILE functions on Sun.
+	* config_read.c: redefine fopen() to ratbox fbopen() etc. when being
+	  compiled on Sun.
+	* s_user.c/m_oper(): honour LOGFILES_ALWAYS_CREATE for oper log too.
+	* chkconf.c/initconf(): ignore tabs and spaces in flags field.
+	* channel.c/reop_channel(): return 1 only when we did reop.
+
 2005-02-11  Piotr Kucharski
 
 	* s_conf.c/initconf(): do not use buggy fdopen.
