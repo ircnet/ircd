@@ -1,3 +1,12 @@
+2005-02-10  Piotr Kucharski
+
+	* config.h.dist, s_bsd.c, s_debug.c, s_err.c, s_serv.c, s_user.c:
+	  changed some define names to avoid confusion.
+	* channel.c/set_mode(): remove not sending +R to old servers.
+	* channel.c/m_join(), m_njoin(), m_kick(): remove calls to 
+	  sendto_match_servs_notv() (and buffers around them).
+	* send.c: ifdef-out unused pieces of code (sendto*_servs_notv).
+
 2005-02-09  Piotr Kucharski
 
 	* channel.c/m_join(): get rid of ^G hack; simplify, as we don't get
