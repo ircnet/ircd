@@ -1,3 +1,14 @@
+1999-07-21  Christophe Kalt
+
+	* s_misc.c/exit_one_client(): generate fake PARTs for users
+	quitting anonymous channels.
+
+	* send.c/sendto_common_channels(): skip anonymous channels.
+
+	* Makefile.in: ircdwatch needs clsupport.o which needs clmatch.o.
+
+	* channel.c: added notices to warn users about +a channels.
+
 1999-07-20  Kurt Roeckx
 
 	* channel.c:
