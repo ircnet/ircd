@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.3 1997/07/15 04:35:49 kalt Exp $
+#*   $Id: Makefile.in,v 1.4 1997/07/15 13:50:45 kalt Exp $
 #*
 #*/
 
@@ -121,19 +121,13 @@ install-server: server
 	-@if [ ! -d $(server_man_dir) ]; then \
 	$(MKDIRHIER) $(server_man_dir); \
 	fi
-	-@if [ ! -d $(config_dir) ]; then \
-	$(MKDIRHIER) $(config_dir); \
-	fi
-	-@if [ ! -d $(log_dir) ]; then \
-	$(MKDIRHIER) $(log_dir); \
-	fi
-	-@if [ ! -d $(run_dir) ]; then \
-	$(MKDIRHIER) $(run_dir); \
+	-@if [ ! -d $(irc_dir) ]; then \
+	$(MKDIRHIER) $(irc_dir); \
 	fi
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(CHKCONF) $(server_bin_dir)
 	(cd ../doc; $(INSTALL_DATA) ircd.8 $(server_man_dir))
-	(cd ../doc; $(INSTALL_DATA) example.conf $(config_dir))
+	(cd ../doc; $(INSTALL_DATA) example.conf $(irc_dir))
 	@echo "installation of server done."
 
 clbsd.o: ../common/bsd.c setup.h config.h
