@@ -1,4 +1,17 @@
-# @(#)$Id: RELEASE_NOTES,v 1.36 2003/10/13 23:06:48 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.37 2004/02/09 00:06:25 chopin Exp $
+
+This is version 2.11.0 of the IRC software.
+===============================================================================
+Important changes in 2.11.0 (since 2.10.3p5):
+
+	* M: requires SID now. Please read INSTALL.txt and example.conf
+	* A: accepts "network name" parameter.
+	* O: and o: in the config has swapped in the meaning, to match
+	  the umode. Update your config.
+	* For a transition period (read: until 2.10 is connected), nicknames
+	  of local clients cannot have [\]^{|}~ chars. Sorry.
+	* For a transition period channelnames created on 2.11 will have
+	  chars {}~\ in their name automatically converted to []^|. Sorry.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================
