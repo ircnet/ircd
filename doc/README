@@ -1,4 +1,4 @@
-# @(#)$Id: README,v 1.5 1999/03/08 17:31:42 kalt Exp $
+# @(#)$Id: README,v 1.6 2003/02/16 01:10:23 chopin Exp $
 
 This directory contains the documentation related to this package.
 
@@ -19,6 +19,7 @@ Other files of interest:
 LICENSE		- license agreement
 ChangeLog	- log of source changes
 BUGS		- list of known bugs
+2.11-New	- transition documentation from 2.10 to 2.11 version
 2.10-New	- transition documentation from 2.9 to 2.10 version
 Etiquette	- IRC Etiquette
 irc.1		- man page for the client

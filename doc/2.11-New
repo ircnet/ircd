@@ -1,3 +1,5 @@
+XXX: group them into 3: servers, admins, clients changes.
+
 	* New server to server protocol, based on Unique IDs
 	* Ability to specify outgoing IP in C: line.
 	* I-line flags
