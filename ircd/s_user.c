@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.82 1999/07/02 16:49:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.83 1999/07/02 17:12:30 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1167,13 +1167,6 @@ int	parc, notice;
 			if (*s == '*' || *s == '?')
 			    {
 				sendto_one(sptr, err_str(ERR_WILDTOPLEVEL,
-					   parv[0]), nick);
-				continue;
-			    }
-			if ((s = (char *)rindex(ME, '.')) &&
-			    strcasecmp(rindex(nick, '.'), s))
-			    {
-				sendto_one(sptr, err_str(ERR_BADMASK,
 					   parv[0]), nick);
 				continue;
 			    }
