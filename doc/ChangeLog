@@ -1,6 +1,10 @@
 2004-04-18  Jakub Vlasek
 
 	* s_bsd.c/read_message(): Do not check cptrs of delayed listeners.
+	* list.c/free_client(): hopcount=1 of directly connected servers.
+	* s_misc.c/exit_cone_client(): incorrect SQUITs were sent to 2.10 which
+	  resulted in strange remote client quits (looking as if whole net was
+	  breaking apart).
 
 2004-04-17  Piotr Kucharski
 
