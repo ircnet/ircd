@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.21 1999/01/20 01:28:47 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.22 1999/02/12 04:05:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -181,15 +181,15 @@ static	Numeric	numeric_replies[] = {
 /* 312 */	{ RPL_WHOISSERVER, "%s %s :%s" },
 /* 313 */	{ RPL_WHOISOPERATOR, "%s :is an IRC Operator" },
 /* 314 */	{ RPL_WHOWASUSER, "%s %s %s * :%s" },
-/* 315 */	{ RPL_ENDOFWHO, "%s :End of /WHO list." },
+/* 315 */	{ RPL_ENDOFWHO, "%s :End of WHO list." },
 /* 316 */	{ RPL_WHOISCHANOP, (char *)NULL },
 /* 317 */	{ RPL_WHOISIDLE, "%s %ld :seconds idle" },
-/* 318 */	{ RPL_ENDOFWHOIS, "%s :End of /WHOIS list." },
+/* 318 */	{ RPL_ENDOFWHOIS, "%s :End of WHOIS list." },
 /* 319 */	{ RPL_WHOISCHANNELS, "%s :%s" },
 		{ 0, (char *)NULL },
 /* 321 */	{ RPL_LISTSTART, "Channel :Users  Name" },
 /* 322 */	{ RPL_LIST, "%s %d :%s" },
-/* 323 */	{ RPL_LISTEND, ":End of /LIST" },
+/* 323 */	{ RPL_LISTEND, ":End of LIST" },
 /* 324 */	{ RPL_CHANNELMODEIS, "%s %s %s" },
 /* 325 */	{ RPL_UNIQOPIS, "%s %s %s" },
 		{ 0, (char *)NULL },
@@ -231,8 +231,8 @@ static	Numeric	numeric_replies[] = {
 /* 362 */	{ RPL_CLOSING, "%s :Closed. Status = %d" },
 /* 363 */	{ RPL_CLOSEEND, "%d: Connections Closed" },
 /* 364 */	{ RPL_LINKS, "%s %s :%d %s" },
-/* 365 */	{ RPL_ENDOFLINKS, "%s :End of /LINKS list." },
-/* 366 */	{ RPL_ENDOFNAMES, "%s :End of /NAMES list." },
+/* 365 */	{ RPL_ENDOFLINKS, "%s :End of LINKS list." },
+/* 366 */	{ RPL_ENDOFNAMES, "%s :End of NAMES list." },
 /* 367 */	{ RPL_BANLIST, "%s %s" },
 /* 368 */	{ RPL_ENDOFBANLIST, "%s :End of Channel Ban List" },
 /* 369 */	{ RPL_ENDOFWHOWAS, "%s :End of WHOWAS" },
@@ -240,9 +240,9 @@ static	Numeric	numeric_replies[] = {
 /* 371 */	{ RPL_INFO, ":%s" },
 /* 372 */	{ RPL_MOTD, ":- %s" },
 /* 373 */	{ RPL_INFOSTART, ":Server INFO" },
-/* 374 */	{ RPL_ENDOFINFO, ":End of /INFO list." },
+/* 374 */	{ RPL_ENDOFINFO, ":End of INFO list." },
 /* 375 */	{ RPL_MOTDSTART, ":- %s Message of the Day - " },
-/* 376 */	{ RPL_ENDOFMOTD, ":End of /MOTD command." },
+/* 376 */	{ RPL_ENDOFMOTD, ":End of MOTD command." },
 		{ 0, (char *)NULL },
 		{ 0, (char *)NULL },
 		{ 0, (char *)NULL },
@@ -292,7 +292,7 @@ static	Numeric	numeric_replies[] = {
 /* 216 */	{ RPL_STATSKLINE, "%c %s %s %s %d %d" },
 /* 217 */	{ RPL_STATSQLINE, "%c %s %s %s %d %d" },
 /* 218 */	{ RPL_STATSYLINE, "%c %d %d %d %d %ld %d.%d %d.%d" },
-/* 219 */	{ RPL_ENDOFSTATS, "%c :End of /STATS report" },
+/* 219 */	{ RPL_ENDOFSTATS, "%c :End of STATS report" },
 		{ 0, (char *)NULL },
 /* 221 */	{ RPL_UMODEIS, "%s" },
 		{ 0, (char *)NULL },
