@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.141 2004/08/12 21:43:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.142 2004/08/12 22:46:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -885,7 +885,7 @@ int	main(int argc, char *argv[])
 		    }
 	    }
 
-	if (strlen(tunefile) > 255)
+	if (strlen(tunefile) > 1023 || strlen(mybasename(tunefile)) > 42)
 	{
 		fprintf(stderr, "Too long tune filename\n");
 		exit(-1);
