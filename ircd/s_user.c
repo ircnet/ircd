@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.191 2004/03/07 18:32:53 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.192 2004/03/07 21:32:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -726,7 +726,8 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 
 	for (i = fdas.highest; i >= 0; i--)
 	    {	/* Find my leaf servers and feed the new client to them */
-		if ((acptr = local[fdas.fd[i]]) == cptr || IsMe(acptr))
+		if (!(acptr = local[fdas.fd[i]]) || !IsServer(acptr) ||
+			acptr == cptr || IsMe(acptr))
 			continue;
 		if (ST_UID(acptr) && user->uid[0])
 			sendto_one(acptr,
