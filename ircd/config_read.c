@@ -96,7 +96,7 @@ aConfig *config_read(int fd, int depth)
 #endif
 					dont = 1;
 				}
-				if (*start == '<')
+				if (*start == '<' && *(start+1) != '/')
 				{
 					strcat(file, IRCDCONF_PATH);
 					filep = strrchr(file, '/') + 1;
