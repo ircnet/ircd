@@ -633,21 +633,6 @@
  */
 #define KILLCHASETIMELIMIT 90   /* Recommended value: 90 */
 
-/*
- * Max time for the channel history and nick delay to be effective.
- * It should be the same value on all servers of a same net, and
- * be greater than the split durations usually seen.
- * DELAYCHASETIMELIMIT is the default.
- */
-#define DELAYCHASETIMELIMIT	1800	/* Recommended value: 1800 */
-
-/*
- * Max time for !channel history, this *MUST* be fairly long (usually
- * much longer than the value above) to ensure shortname unicity.
- * It makes very little sense to use a short time limit here.
- */
-#define LDELAYCHASETIMELIMIT	5400	/* Recommended value: 5400 */
-
 #ifdef ZIP_LINKS
 /*
  * the compression level used. (Suggested values: 3, 4, 5)
