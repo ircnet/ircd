@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.11 1997/06/02 13:15:27 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.12 1997/06/06 19:59:34 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -969,7 +969,7 @@ int	parc, notice;
 	Reg	aClient	*acptr;
 	Reg	char	*s;
 	aChannel *chptr;
-	char	*nick, *server, *p, *cmd, *host;
+	char	*nick, *server, *p, *cmd, *user, *host;
 	int	count = 0, penalty = 0;
 
 	cmd = notice ? MSG_NOTICE : MSG_PRIVATE;
@@ -1070,7 +1070,29 @@ int	parc, notice;
 					    cmd, nick, parv[2]);
 			continue;
 		    }
-	
+		
+		/*
+		** nick!user@host addressed?
+		*/
+		if ((user = (char *)index(nick, '!')) &&
+		    (host = (char *)index(nick, '@')))
+		    {
+			*user = '\0';
+			*host = '\0';
+			if ((acptr = find_person(nick, NULL)) &&
+			    !mycmp(user+1, acptr->user->username) &&
+			    !mycmp(host+1, acptr->user->host))
+			    {
+				sendto_prefix_one(acptr, sptr, ":%s %s %s :%s",
+						  parv[0], cmd, nick, parv[2]);
+				*user = '!';
+				*host = '@';
+				continue;
+			    }
+			*user = '!';
+			*host = '@';
+		    }
+
 		/*
 		** user[%host]@server addressed?
 		*/
