@@ -143,7 +143,7 @@ aConfig *config_read(int fd, int depth)
 					ConfigTop = ret;
 					ConfigCur = ret;
 				}
-				while ((ConfigCur->next))
+				while ((ConfigCur && ConfigCur->next))
 				{
 					ConfigCur = ConfigCur->next;
 				}
