@@ -209,15 +209,6 @@
  */
 /* #define	HUB */
 
-/* 
- * Defining PREFER_SERVER will give priority to server traffic over
- * client traffic.
- * Define this correctly for performance reasons. If defined, value of 0
- * creates biggest load on cpu, and bigger values decrease the cpu load
- * on price of user-friendlyness.
- */
-#define PREFER_SERVER 1
-
 #ifdef HUB
 /*
  * MAXSERVERS is the maximum number of servers that will be linked
