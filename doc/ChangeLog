@@ -11,6 +11,8 @@
 	* s_serv.c/m_eob(): Fix notices about received EOBs, warn about
 	  multiple local EOBs.
 	* support.c/inetntop(): Use the_size for bcopy() properly.
+	* ircd.c/setup_me(): Copy PATCHLEVEL into me.serv->verstr.
+	* ircd.c: Move add_to_sid_hash_table to setup_me() from main().
 
 2002-04-06  Jakub Vlasek
 
