@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.40 1999/04/12 19:45:04 kalt Exp $
+#*   $Id: Makefile.in,v 1.41 1999/06/26 15:06:13 kalt Exp $
 #*
 #*/
 
@@ -465,13 +465,13 @@ chkconf.o: ../ircd/chkconf.c setup.h config.h
 # stuff in contrib/
 
 ircdwatch.o: ../contrib/ircdwatch/ircdwatch.c
-	$(CC) $(O_CFLAGS) $(IRCD_FILES) -DIRCDWATCH_PID_FILENAME="\"$(IRCDWATCHPID_PATH)\"" -DIRCD_PATH="\"$(IRCD_PATH)\"" -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" -DIRCDPID_PATH="\"$(IRCDPID_PATH)\"" -c -o $@ ../contrib/ircdwatch/ircdwatch.c
+	$(CC) $(O_CFLAGS) -DIRCDWATCH_PID_FILENAME="\"$(IRCDWATCHPID_PATH)\"" -DIRCD_PATH="\"$(IRCD_PATH)\"" -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" -DIRCDPID_PATH="\"$(IRCDPID_PATH)\"" -c -o $@ ../contrib/ircdwatch/ircdwatch.c
 
 mkpasswd.o: ../contrib/mkpasswd/mkpasswd.c
 	$(CC) $(O_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c
 
 tkserv.o: ../contrib/tkserv/tkserv.c tkconf.h
-	$(CC) $(O_CFLAGS)  $(IRCD_FILES) -DTKSERV_LOGFILE="\"$(TKSERV_LOGFILE)\"" -DTKSERV_ACCESSFILE="\"$(TKSERV_ACCESSFILE)\"" -DTKSERV_IRCD_CONF="\"$(TKSERV_IRCD_CONF)\"" -c -o $@ ../contrib/tkserv/tkserv.c
+	$(CC) $(O_CFLAGS) -DTKSERV_LOGFILE="\"$(TKSERV_LOGFILE)\"" -DTKSERV_ACCESSFILE="\"$(TKSERV_ACCESSFILE)\"" -DTKSERV_IRCD_CONF="\"$(TKSERV_IRCD_CONF)\"" -DCPATH="\"$(IRCDCONF_PATH)\"" -DPPATH="\"$(IRCDPID_PATH)\"" -c -o $@ ../contrib/tkserv/tkserv.c
 
 clean:
 	$(RM) $(CLIENT) $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH) $(TKSERV) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
