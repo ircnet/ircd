@@ -44,6 +44,7 @@ EXTERN int add_listener __P((aConfItem *aconf));
 EXTERN void close_listeners();
 EXTERN void start_iauth __P((int));
 EXTERN void init_sys();
+EXTERN void daemonize();
 EXTERN void write_pidfile();
 EXTERN int check_client __P((Reg aClient *cptr));
 EXTERN int check_server_init __P((aClient *cptr));
