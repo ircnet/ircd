@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.135 2002/08/05 14:56:15 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.136 2002/08/16 01:10:05 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2119,7 +2119,7 @@ char	*parv[];
 	{
 		/* internal call of m_user for *local* user */
 #ifdef INET6
-		inetntop(AF_INET6, (char *)&sptr->ip, user->sip,
+		inetntop(AF_INET6, (char *)&sptr->ip, ipbuf,
 				sizeof(ipbuf));
 #else
 		strcpy(ipbuf, (char *)inetntoa((char *)&sptr->ip));
