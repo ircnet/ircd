@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.59 2002/07/05 23:13:26 jv Exp $
+ *   $Id: struct_def.h,v 1.60 2002/07/06 03:11:13 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -181,6 +181,8 @@ typedef struct        LineItem aExtData;
 #define FLAGS_RESTRICT	0x0010 /* Restricted user */
 #define FLAGS_AWAY	0x0020 /* user is away */
 
+#define FLAGS_EXEMPT    0x0040 /* User is exemped from k-lines */
+	
 #define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP|FLAGS_AWAY)
 #define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP|FLAGS_RESTRICT)
 
@@ -202,6 +204,8 @@ typedef struct        LineItem aExtData;
 #define	IsLocal(x)		(MyConnect(x) && (x)->flags & FLAGS_LOCAL)
 #define	IsDead(x)		((x)->flags & FLAGS_DEADSOCK)
 #define	IsBursting(x)		(!((x)->flags & FLAGS_EOB))
+#define IsKlineExempt(x)        ((x)->user && (x)->user->flags & FLAGS_EXEMPT)
+
 #define	SetDead(x)		((x)->flags |= FLAGS_DEADSOCK)
 #define	CBurst(x)		((x)->flags & FLAGS_CBURST)
 #define	SetOper(x)		((x)->user->flags |= FLAGS_OPER)
@@ -213,6 +217,8 @@ typedef struct        LineItem aExtData;
 #define	SetDNS(x)		((x)->flags |= FLAGS_DOINGDNS)
 #define	SetDoneXAuth(x)		((x)->flags |= FLAGS_XAUTHDONE)
 #define	SetEOB(x)		((x)->flags |= FLAGS_EOB)
+#define SetKlineExempt(x)	((x)->user->flags |= FLAGS_EXEMPT)
+
 #define	DoingDNS(x)		((x)->flags & FLAGS_DOINGDNS)
 #define	DoingAuth(x)		((x)->flags & FLAGS_AUTH)
 #define	DoingXAuth(x)		((x)->flags & FLAGS_XAUTH)
@@ -272,6 +278,7 @@ struct	ConfItem	{
 	char	*passwd;
 	char	*name;
 	int	port;
+	long	flags;		/* I-line flags */
 	u_int	pref;		/* preference value */
 	struct	CPing	*ping;
 	time_t	hold;	/* Hold action until this time (calendar time) */
@@ -312,6 +319,16 @@ struct	ConfItem	{
 				 CONF_ZCONNECT_SERVER)
 #define	CONF_CLIENT_MASK	(CONF_CLIENT | CONF_RCLIENT | CONF_SERVICE | CONF_OPS | \
 				 CONF_SERVER_MASK)
+
+#define CFLAG_RESTRICTED	0x00001
+#define CFLAG_RNODNS		0x00002
+#define CFLAG_RNOIDENT		0x00004
+#define CFLAG_KEXEMPT		0x00008
+
+#define IsConfRestricted(x)	((x)->flags & CFLAG_RESTRICTED)
+#define IsConfRNoDNS(x)		((x)->flags & CFLAG_RNODNS)
+#define IsConfRNoIdent(x)	((x)->flags & CFLAG_RNOIDENT)
+#define IsConfKlineExempt(x)	((x)->flags & CFLAG_KEXEMPT)
 
 #define	IsIllegal(x)	((x)->status & CONF_ILLEGAL)
 
