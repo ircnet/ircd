@@ -146,7 +146,8 @@
  * if you have a lot of server connections, it may be worth splitting the load
  * over 2 or more servers.
  * 1 server = 1 connection, 1 user = 1 connection.
- * This should be at *least* 3: 1 listen port, 1 dns port + 1 client
+ * This should be at *least* 4: 2 listen ports (1 tcp, 1 udp)
+ *				1 dns port, 1 client
  */
 #define MAXCONNECTIONS	50
 
@@ -536,9 +537,9 @@
 				 */
 /*
  * safety margin so we can always have one spare fd, for motd/authd or
- * whatever else.  -4 allows "safety" margin of 1 and space reserved.
+ * whatever else.  -5 allows "safety" margin of 1 and space reserved.
  */
-#define	MAXCLIENTS	(MAXCONNECTIONS-4)
+#define	MAXCLIENTS	(MAXCONNECTIONS-5)
 
 #if defined(CLIENT_FLOOD)
 # if	(CLIENT_FLOOD > 8000) || (CLIENT_FLOOD < 512)
