@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.43 1998/11/03 17:50:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.44 1998/11/12 11:46:36 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2767,10 +2767,10 @@ aConfItem *aconf;
 	pi.pi_seq = cp->lseq++;
 	cp->seq++;
 	/*
-	 * Only recognise stats from the last 10 minutes as significant...
+	 * Only recognise stats from the last 20 minutes as significant...
 	 * Try and fake sliding along a "window" here.
 	 */
-	if (cp->seq * aconf->class->conFreq > 600)
+	if (cp->seq > 1 && cp->seq * aconf->class->conFreq > 1200)
 	    {
 		if (cp->recv)
 		    {
