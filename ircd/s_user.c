@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.222 2004/06/28 21:29:30 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.223 2004/06/28 22:13:40 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2642,11 +2642,24 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	** Note: "acptr->name" is used instead of "user" because we may
 	**	 have changed the target because of the nickname change.
 	*/
-	sendto_flag(SCH_KILL,
-		    "Received KILL message for %s!%s@%s[%s/%s]. From %s Path: %s!%s",
-		    acptr->name, acptr->user->username, acptr->user->host,
-		acptr->user->servp->bcptr->name, isdigit(acptr->user->servp->sid[0]) ?
-		acptr->user->servp->sid : "2.10", parv[0], inpath, path);
+	if (IsService(acptr))
+	{
+		sendto_flag(SCH_KILL, "Received KILL message for %s[%s]. "
+			"From %s Path: %s!%s", acptr->name, 
+			isdigit(acptr->service->servp->sid[0]) ?
+			acptr->service->servp->sid : "2.10", parv[0], inpath,
+			path);
+	}
+	else
+	{
+		sendto_flag(SCH_KILL, "Received KILL message for "
+			"%s!%s@%s[%s/%s]. From %s Path: %s!%s",
+			acptr->name, acptr->user->username, acptr->user->host,
+			acptr->user->servp->bcptr->name, 
+			isdigit(acptr->user->servp->sid[0]) ?
+			acptr->user->servp->sid : "2.10", parv[0], inpath,
+			path);
+	}
 #if defined(USE_SYSLOG) && defined(SYSLOG_KILL)
 	if (IsOper(sptr))
 		syslog(LOG_DEBUG,"KILL From %s For %s Path %s!%s",
