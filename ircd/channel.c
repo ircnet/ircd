@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.125 2002/06/11 12:55:08 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.126 2002/07/04 22:28:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1546,17 +1546,20 @@ char	*parv[];
 			case MODE_CHANOP :
 				c = 'o';
 				cp = lp->value.cptr->name;
-				ucp = lp->value.cptr->user->uid;
+				ucp = HasUID(lp->value.cptr) ?
+					lp->value.cptr->user->uid : cp;
 				break;
 			case MODE_UNIQOP :
 				c = 'O';
 				cp = lp->value.cptr->name;
-				ucp = lp->value.cptr->user->uid;
+				ucp = HasUID(lp->value.cptr) ?
+					lp->value.cptr->user->uid : cp;
 				break;
 			case MODE_VOICE :
 				c = 'v';
 				cp = lp->value.cptr->name;
-				ucp = lp->value.cptr->user->uid;
+				ucp = HasUID(lp->value.cptr) ?
+					lp->value.cptr->user->uid : cp;
 				break;
 			case MODE_BAN :
 				c = 'b';
