@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.51 1998/08/02 18:29:08 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.52 1998/08/02 22:34:11 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1158,6 +1158,14 @@ char	*parv[], *mbuf, *pbuf;
 				break;
 			    }
 			parv++;
+#if !defined(FULLV2_10)
+			if (!IsServer(cptr))
+			    {
+				sendto_one(cptr, err_str(ERR_UNKNOWNMODE,
+							 cptr->name), *curr);
+				break;
+			    }
+#endif
 			if (BadPtr(*parv))
 				break;
 			if (opcnt >= MAXMODEPARAMS)
@@ -1201,6 +1209,14 @@ char	*parv[], *mbuf, *pbuf;
 				break;
 			    }
 			parv++;
+#if !defined(FULLV2_10)
+			if (!IsServer(cptr))
+			    {
+				sendto_one(cptr, err_str(ERR_UNKNOWNMODE,
+							 cptr->name), *curr);
+				break;
+			    }
+#endif
 			if (BadPtr(*parv))
 				break;
 			if (opcnt >= MAXMODEPARAMS)
@@ -1929,6 +1945,11 @@ char	*parv[];
 						    sptr->name);
 					continue;
 				    }
+#if !defined(FULLV2_10)
+				sendto_one(sptr, err_str(ERR_NOSUCHCHANNEL,
+							 parv[0]), name);
+				continue;
+#endif
 				if (get_channel(sptr, name+2, 0))
 				    {
 					sendto_one(sptr,
