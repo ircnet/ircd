@@ -22,4 +22,6 @@
 	  autoconnects)
 	* LUSERS shows local and global usercount maximum.
 	* STATS ? shows quick information about connected servers.
+	* STATS f, avaible to local operators only, shows detailed
+	  information about client TCP connection.
 	* INVITE overriding ban shows inviter's n!u@h in channel notice.
