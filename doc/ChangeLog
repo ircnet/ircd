@@ -1,3 +1,9 @@
+2004-02-11  Piotr Kucharski
+
+	* parse.c: unick requires registered connection (msgtab).
+	* s_serv.c/m_eob(): show also server name in debug.
+	* s_user.c/m_nick(): allow "NICK 0" during registration.
+
 2004-02-10  Piotr Kucharski
 
 	* s_service.c/m_service(): lacking parameter added.
