@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.102 2005/02/10 18:09:16 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.103 2005/02/20 23:10:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -190,7 +190,7 @@ tryagain:
 			/* Anyway, 10% increase. */
 			poolsize *= 1.1;
 			sendto_flag(SCH_NOTICE,
-				    "New poolsize %d. (reached)",
+				    "New poolsize %u. (reached)",
 				    poolsize);
 			istat.is_dbufmore++;
 			goto tryagain;
