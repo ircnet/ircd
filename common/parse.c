@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.37 2002/01/06 03:30:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.38 2002/01/06 04:57:40 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -405,11 +405,12 @@ int	find_sender(aClient *cptr, aClient **sptr, char *sender, char *buffer)
 {
 	aClient *from = NULL;
 
+#ifndef	CLIENT_COMPILE
 	if (ST_UID(cptr))
 	{
 		if (isdigit(*sender))
 		{
-			if (sender[SIDLEN] == '\0')
+			if (strlen(sender) == SIDLEN)
 			{
 				/* SID */
 				from = find_sid(sender, NULL);
@@ -433,7 +434,7 @@ int	find_sender(aClient *cptr, aClient **sptr, char *sender, char *buffer)
 			}
 		}
 	}
-
+#endif
 	if (!from)
 	{
 		from = find_client(sender, (aClient *) NULL);
@@ -460,13 +461,12 @@ int	find_sender(aClient *cptr, aClient **sptr, char *sender, char *buffer)
 	{
 		from = find_mask(sender, (aClient *) NULL);
 	}
-#endif
-
 	if (isdigit(sender[0]) || sender[0] == '$')
 	{
 		para[0] = from->name;
 	}
 	else
+#endif
 	{
 		para[0] = sender;
 	}
