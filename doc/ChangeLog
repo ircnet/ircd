@@ -1,3 +1,28 @@
+Tue Dec 16 17:12:16 1997  Christophe Kalt
+
+	* s_conf.c: finished D lines.
+
+	* numeric_def.h, struct_def.h, list.c, s_err.c, s_serv.c: added
+	check_link() to prevent server links from being flooded by replies
+	to user requests.
+
+	* s_bsd.c: try to prevent the server from flooding with UDP pings.
+
+	* channel.c: #foo:*.tld modes were always sent during the burst.
+
+Wed Nov 12 21:02:15 1997  Christophe Kalt
+
+	* struct_def.h, s_conf_ext.h, s_conf.c, ircd.c, chkconf.c,
+	numeric_def.h, s_err.c , s_serv.c: added D configuration
+	lines. (/stats h)
+
+	* send.c, s_service.c: allocate more dbufs during a service burst
+	if needed.
+
+	* channel.c: cosmetics, and fixed the use of MAXPENALTY in m_kick().
+
+	* s_debug.c: too many parameters in a call to sendto_one().
+
 2.9.4
 
 Sat Oct 18 09:37:33 1997  Christophe Kalt
