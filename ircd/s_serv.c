@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.88 2002/01/07 02:08:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.89 2002/01/08 03:37:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -574,7 +574,10 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 
 	acptr = make_client(cptr);
-	make_server(acptr, FALSE);
+	if (!make_server(acptr))
+	{
+		return exit_client(cptr, cptr, &me, "No more tokens");
+	}
 	acptr->hopcount = sptr->hopcount + 1;
 	strncpyzt(acptr->name, sptr->name, sizeof(acptr->name));
 	acptr->info = mystrdup("Masked Server");
@@ -804,7 +807,10 @@ char	*parv[];
 		    }
 
 		acptr = make_client(cptr);
-		(void)make_server(acptr, TRUE);
+		if (!make_server(acptr))
+		{
+			return exit_client(cptr, cptr, &me, "No more tokens");
+		}
 		acptr->hopcount = hop;
 		strncpyzt(acptr->name, host, sizeof(acptr->name));
 		if (acptr->info != DefInfo)
@@ -1159,7 +1165,10 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		    cptr->hopcount, (cptr->flags & FLAGS_ZIP) ? "z" : "");
 	(void)add_to_client_hash_table(cptr->name, cptr);
 	/* doesnt duplicate cptr->serv if allocted this struct already */
-	(void)make_server(cptr, TRUE);
+	if (!make_server(cptr))
+	{
+		return exit_client(cptr, cptr, &me, "No more tokens");
+	}
 	cptr->serv->up = &me;
 	cptr->serv->maskedby = cptr;
 	cptr->serv->nline = aconf;
@@ -1374,6 +1383,10 @@ char	*parv[];
 	for (asptr = svrtop, (void)collapse(mask); asptr; asptr = asptr->nexts) 
 	    {
 		acptr = asptr->bcptr;
+		if (IsMasked(acptr))
+		{
+			continue;
+		}
 		if (!BadPtr(mask) && match(mask, acptr->name))
 			continue;
 		sendto_one(sptr, replies[RPL_LINKS], ME, BadTo(parv[0]),
