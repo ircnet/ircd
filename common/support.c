@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.16 1999/04/10 16:24:11 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.17 1999/06/25 15:36:16 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -149,6 +149,21 @@ time_t	value;
 		*p = '\0';
 
 	return buf;
+}
+
+/*
+** mybasename()
+**	removes path from a filename
+*/
+char *
+mybasename(path)
+char *path;
+{
+	char *lastslash;
+
+	if (lastslash = rindex(path, '/'))
+		return lastslash + 1;
+	return path;
 }
 
 #ifdef INET6
