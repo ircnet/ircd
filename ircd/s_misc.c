@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.98 2004/11/04 21:04:53 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.99 2005/01/30 13:42:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -777,8 +777,6 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 				      ":%s SQUIT %s :%s", from->name,
 				      sptr->name, comment);
 #endif
-		(void) del_from_server_hash_table(sptr->serv, cptr ? cptr :
-						  sptr->from);
 		del_from_sid_hash_table(sptr->serv);
 		remove_server_from_tree(sptr);
 		/* remove server from svrtop */
