@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.269 2005/02/09 17:52:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.270 2005/02/09 18:35:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1135,18 +1135,18 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		}
 	}
 
-	if (!(cptr->hopcount & SV_2_10))
+	if ((cptr->hopcount & SV_OLD))
 	{
-		/* remote is older than 2.10.2 */
-		sendto_flag(SCH_ERROR, "Remote server %s is too old "
-			"(<2.10.2), dropping link", get_client_name(cptr,TRUE));
+		/* remote is too old */
+		sendto_flag(SCH_ERROR, "Remote server %s is too old, "
+			"dropping link", get_client_name(cptr,TRUE));
 		if (bysptr)
 		{
 			sendto_one(bysptr, ":%s NOTICE %s :Remote server %s is"
-				"too old (<2.10.2), dropping link",
+				"too old, dropping link",
 				ME, bysptr->name, get_client_name(cptr, TRUE));
 		}
-		return exit_client(cptr,cptr,&me,"Too old version");
+		return exit_client(cptr, cptr, &me, "Too old version");
 	}
 
 	det_confs_butmask(cptr, CONF_LEAF|CONF_HUB|CONF_NOCONNECT_SERVER);
