@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.103 2003/10/18 21:37:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.104 2003/10/19 17:22:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -415,7 +415,7 @@ static	time_t	check_pings(time_t currenttime)
 		** Once per TIMEDKLINES seconds.
 		** (1 minute is minimum resolution in K-line field)
 		*/
-		if ((currenttime - lkill > TIMEDKLINES) ||
+		if ((currenttime - lkill > TIMEDKLINES)
 			&& IsPerson(cptr) && !IsKlineExempt(cptr))
 		{
 			kflag = find_kill(cptr, 1, &reason);
