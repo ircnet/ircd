@@ -107,7 +107,7 @@ extern	char	*mystrdup __P((char *));
 #ifdef	NEED_INET_NTOA
 extern	char	*inetntoa __P((char *));
 #else
-# define inetntoa inet_ntoa
+# define inetntoa(x) inet_ntoa(*(struct in_addr *)(x))
 #endif
 #ifdef	NEED_INET_ADDR
 extern	u_long	inetaddr __P((const char *));

@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static char rcsid[] = "$Id: res_init.c,v 1.4 1997/07/15 04:35:46 kalt Exp $";
+static char rcsid[] = "$Id: res_init.c,v 1.5 1997/07/18 03:04:34 kalt Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include <sys/types.h>
@@ -75,6 +75,12 @@ static char rcsid[] = "$Id: res_init.c,v 1.4 1997/07/15 04:35:46 kalt Exp $";
 # include <string.h>
 #else
 # include "portability.h"
+#endif
+#include "setup.h"
+#ifdef  NEED_INET_ATON
+extern  int     inetaton __P((const char *, struct in_addr *));
+#else
+# define inetaton inet_aton
 #endif
 
 /*-------------------------------------- info about "sortlist" --------------
