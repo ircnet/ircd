@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.17 1998/04/07 21:01:43 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.18 1998/04/15 18:29:06 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -738,13 +738,13 @@ char	*argv[];
 	if (argc > 0)
 		bad_command(); /* This exits out */
 
+	initstats();
 	ircd_readtune(tunefile);
 	timeofday = time(NULL);
 #ifdef	CACHED_MOTD
 	motd = NULL;
 	read_motd(MPATH);
 #endif
-	initstats();
 	inithashtables();
 	initlists();
 	initclass();
