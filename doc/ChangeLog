@@ -1,3 +1,12 @@
+2003-09-30  Piotr Kucharski
+
+	* chkconf.c/initconf(): 'N' flag to I:line should be recognized too
+	  (noted by fiction).
+	* struct_def.h, chkconf.c/initconf(), s_conf.c/iline_flags_parse(),
+	  iline_flags_to_string(), attach_Iline(), s_user.c/register_user():
+	  add 'F' (fallthrough) flag to I:lines (from fiction).
+	* struct_def.h: add EXITC_BADPASS.
+
 2003-08-12  Piotr Kucharski
 
 	* res.c/do_query_name(), s_bsd.c/add_local_domain(): fix possible

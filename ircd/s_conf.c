@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.61 2003/02/11 18:44:20 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.62 2003/10/02 22:42:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -70,6 +70,7 @@ char		*networkname = NULL;
  * R - Restricted.
  * E - Kline exempt.
  * N - Do not resolve hostnames (show as IP).
+ * F - Fallthrough to next I:line when password not matched
  */
 long iline_flags_parse(char *string)
 {
@@ -100,6 +101,10 @@ long iline_flags_parse(char *string)
 	{
 		tmp |= CFLAG_NORESOLVE;
 	}
+	if (index(string,'F'))
+	{
+		tmp |= CFLAG_FALL;
+	}
 
 	return tmp;
 }
@@ -129,6 +134,10 @@ char *iline_flags_to_string(long flags)
 	if (flags & CFLAG_NORESOLVE)
 	{
 		*s++ = 'N';
+	}
+	if (flags & CFLAG_FALL)
+	{
+		*s++ = 'F';
 	}
 	*s++ = '\0';
 	
@@ -301,6 +310,21 @@ char	*sockhost;
 			add_local_domain(uhost, sizeof(uhost) - strlen(uhost));
 		    }
 attach_iline:
+		if (!BadPtr(aconf->passwd) &&
+			!StrEq(cptr->passwd, aconf->passwd))
+		{
+			if (IsConfFallThrough(aconf))
+			{
+				continue;
+			}
+			else
+			{
+				sendto_one(cptr, replies[ERR_PASSWDMISMATCH],
+					ME, BadTo(cptr->name));
+				return -8;
+			}
+		}
+
 		if (aconf->status & CONF_RCLIENT)
 		{
 			SetRestricted(cptr);
@@ -1663,7 +1687,8 @@ char	**comment;
 					continue;
 		
 		/* user & port matching */
-		if ((!check || match(tmp->name, check) == 0) &&
+		if ((!check || match(tmp->name,
+			(*check == '+' ? check+1, check)) == 0) &&
 		    (!tmp->port || (tmp->port == cptr->acpt->port)))   
 		    {
 #ifdef TIMEDKLINES

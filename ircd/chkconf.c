@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.18 2003/09/30 20:57:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.19 2003/10/02 22:42:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -419,6 +419,9 @@ static	aConfItem 	*initconf()
 							break;
 						case 'N':
 							aconf->flags |= CFLAG_NORESOLVE;
+							break;
+						case 'F':
+							aconf->flags |= CFLAG_FALL;
 							break;
 						default:
 				                        (void)fprintf(stderr,

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.158 2003/08/31 18:48:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.159 2003/10/02 22:42:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -512,8 +512,9 @@ char	*nick, *username;
 		if ((i = check_client(sptr)))
 		    {
 			struct msg_set { char shortm; char *longm; };
-			    
-			static struct msg_set exit_msg[7] = {
+#define EXIT_MSG_COUNT 8
+			static struct msg_set exit_msg[EXIT_MSG_COUNT] = {
+			{ EXITC_BADPASS, "Bad password" },
 			{ EXITC_GUHMAX, "Too many user connections (global)" },
 			{ EXITC_GHMAX, "Too many host connections (global)" },
 			{ EXITC_LUHMAX, "Too many user connections (local)" },
@@ -522,14 +523,25 @@ char	*nick, *username;
 			{ EXITC_NOILINE, "Unauthorized connection" },
 			{ EXITC_FAILURE, "Connect failure" } };
 
-			i += 7;
-			if (i < 0 || i > 6) /* in case.. */
-				i = 6;
+			if (i > -1)
+			{
+				i = -1;
+			}
+			i += EXIT_MSG_COUNT;
+			if (i > EXIT_MSG_COUNT)
+			{
+				i = EXIT_MSG_COUNT;
+			}
+#undef EXIT_MSG_COUNT
 
 			ircstp->is_ref++;
 			sptr->exitc = exit_msg[i].shortm;
-			sendto_flag(SCH_LOCAL, "%s from %s.",
-				    exit_msg[i].longm, get_client_host(sptr));
+			if (exit_msg[i].shortm != EXITC_BADPASS)
+			{
+				sendto_flag(SCH_LOCAL, "%s from %s.",
+					exit_msg[i].longm,
+					get_client_host(sptr));
+			}
 			return exit_client(cptr, cptr, &me, exit_msg[i].longm);
 		    }
 #ifndef	NO_PREFIX
@@ -555,13 +567,7 @@ char	*nick, *username;
 		else
 			strncpyzt(user->host, sptr->sockhost, HOSTLEN+1);
 
-		if (!BadPtr(aconf->passwd) &&
-		    !StrEq(sptr->passwd, aconf->passwd))
-		    {
-			ircstp->is_ref++;
-			sendto_one(sptr, replies[ERR_PASSWDMISMATCH], ME, BadTo(parv[0]));
-			return exit_client(cptr, sptr, &me, "Bad Password");
-		    }
+		/* hmpf, why that? --B. */
 		bzero(sptr->passwd, sizeof(sptr->passwd));
 		/*
 		 * following block for the benefit of time-dependent K:-lines
