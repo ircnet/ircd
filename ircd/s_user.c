@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.225 2004/06/30 14:39:57 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.226 2004/06/30 17:50:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2470,28 +2470,21 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (MyConnect(sptr))
 	{
 		aConfItem *tmp;
-		char xbuf[BUFSIZE];
-		sprintf(xbuf, "%s %s %s %s", username, host, server, realname);
 
 		for (tmp = conf; tmp; tmp = tmp->next)
 		{
 			if (tmp->status != CONF_XLINE)
 				continue;
-
-			if (IsConfXlineWhole(tmp))
-			{
-			       if (tmp->host && !match(tmp->host, xbuf))
-			       {
-				       SetXlined(sptr);
-			       }
-			}
-			else
-			{
-				if (tmp->host && !match(tmp->host, realname))
-				{
-					SetXlined(sptr);
-				}
-			}
+			if (!BadPtr(tmp->source_ip) && match(tmp->source_ip, realname))
+				continue;
+			if (!BadPtr(tmp->host) && match(tmp->host, username))
+				continue;
+			if (!BadPtr(tmp->passwd) && match(tmp->passwd, host))
+				continue;
+			if (!BadPtr(tmp->name) && match(tmp->name, server))
+				continue;
+			SetXlined(sptr);
+			break;
                }
        }
 #endif
