@@ -86,6 +86,9 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 				linenum++;
 			i++;
 		}
+		/* just in case */
+		if (i >= address + len)
+			break;
 		p = strchr(i, '\n');
 		if (p == NULL)
 		{
@@ -119,7 +122,12 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 				start++;
 				end--;
 			}
-
+			if (start >= end)
+			{
+				config_error(CF_ERR, curfile, linenum,
+					"config: empty include");
+				goto eatline;
+			}
 			*filep = '\0';
 			if (depth >= MAXDEPTH)
 			{
@@ -132,7 +140,7 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 			{
 				filep += sprintf(file, IRCDCONF_DIR);
 			}
-			if (end - start + filep - file >= FILEMAX)
+			if ((end - start) + (filep - file) >= FILEMAX)
 			{
 				config_error(CF_ERR, curfile, linenum,
 					"too long filename (max %d with "
@@ -140,8 +148,8 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 				goto eatline;
 			}
 			savefilep = filep;
-			memcpy(filep, start, end - start + 1);
-			filep += end - start + 1;
+			memcpy(filep, start, (end - start) + 1);
+			filep += (end - start) + 1;
 			*filep = '\0';
 			for (tcf = curfile; tcf; tcf = tcf->parent)
 			{
