@@ -1,3 +1,18 @@
+2001-12-29  Piotr Kucharski
+
+	* s_user.c/register_user(): we assigned uid after we sent UNICK.
+	* s_bsd.c/completed_connection(),s_serv.c/m_server(): send SID
+	  in SERVER command.
+	* s_user.c/register_user(): send user sid as source, not always ours.
+	* s_id.c/check_uid(): use cid_ok() to check all chars, check len.
+	* s_user.c/m_unick(): use check_uid(), not simple strlen(uid).
+	* s_user.c/m_unick(): squit link feeding us with bad UID.
+	* s_user.c/m_unick(),m_nick(): removed checking for collisions
+	  with servers (this cannot happen).
+	* config.h.dist, s_id.c, struct_def.h, s_debug.c: add UIDLEN and
+	  use it wherever possible; this is for allowing longer nicks without
+	  having to have longer uids.
+
 2001-12-28  Piotr Kucharski
 
 	* s_conf.c/find_kill(): make K:user@host remove also +r clients
