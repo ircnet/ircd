@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.25 1998/08/05 21:43:31 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.26 1998/08/16 20:01:06 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -689,6 +689,9 @@ char	*argv[];
 			else
 				bad_command();
 			break;
+		    case 's':
+			bootopt |= BOOT_NOIAUTH;
+			break;
 		    case 't':
                         (void)setuid((uid_t)uid);
 			bootopt |= BOOT_TTY;
@@ -735,19 +738,20 @@ char	*argv[];
 	    }
 #endif
 #if defined(USE_IAUTH)
-	switch (vfork())
-	    {
-	case -1:
-		fprintf(stderr, "%s: Unable to fork!", myargv[0]);
-		exit(-1);
-	case 0:
-		close(0); close(1); close(3);
-		if (execl(APATH, APATH, "-X", NULL) < 0)
-			_exit(-1);
-	default:
+	if ((bootopt & BOOT_NOIAUTH) == 0)
+		switch (vfork())
+		    {
+		case -1:
+			fprintf(stderr, "%s: Unable to fork!", myargv[0]);
+			exit(-1);
+		case 0:
+			close(0); close(1); close(3);
+			if (execl(APATH, APATH, "-X", NULL) < 0)
+				_exit(-1);
+		default:
 		    {
 			int rc;
-
+			
 			(void)wait(&rc);
 			if (rc != 0)
 			    {
@@ -757,7 +761,7 @@ char	*argv[];
 				exit(-1);
 			    }
 		    }
-	    }
+		    }
 #endif
 
 #ifndef IRC_UID

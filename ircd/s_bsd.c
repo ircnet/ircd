@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.35 1998/08/06 02:43:56 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.36 1998/08/16 20:01:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -422,6 +422,8 @@ start_iauth()
 	static char first = 1;
 	int sp[2], fd;
 
+	if ((bootopt & BOOT_NOIAUTH) == 0)
+		return;
 	if (adfd >= 0)
 	    {
 		sendto_flag(SCH_AUTH,

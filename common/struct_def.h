@@ -98,6 +98,7 @@ typedef struct        MotdItem aExtCf;
 #define	BOOT_BADTUNE	0x080
 #define	BOOT_PROT	0x100
 #define	BOOT_STRICTPROT	0x200
+#define	BOOT_NOIAUTH	0x400
 
 #define	STAT_RECONNECT	-7	/* Reconnect attempt for server connections */
 #define	STAT_LOG	-6	/* logfile for -x */

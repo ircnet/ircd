@@ -1,12 +1,12 @@
 .\" @(#)$Id ircd.8 2.0 (beta version) 29 Mar 1989 $
-.TH IRCD 8 "$Date: 1998/08/06 02:44:24 $"
+.TH IRCD 8 "$Date: 1998/08/16 20:01:06 $"
 .SH NAME
 ircd \- The Internet Relay Chat Program Server 
 .SH SYNOPSIS
 .hy 0
 .IP \fBircd\fP
 [
-.B \-abcioqt
+.B \-abcioqst
 ] [
 .BI \-d " directory"
 ] [
@@ -86,6 +86,13 @@ Using this option stops the server from doing DNS lookups on all the
 servers in your \fIircd.conf\fP file when it boots. This can take a lengthy
 amount of time if you have a large number of servers and they are not all
 close by.
+.TP
+.B \-s
+When this option is specified, \fIiauth\fP will not be
+started.  This means that the IRC daemon will perform "ident
+lookups" (RFC 1413) internally to attempt to authenticate
+incoming connections.  No other authentication mechanism
+will be used.
 .TP
 .B \-t
 Instructs the server to direct debugging output to standard output.
