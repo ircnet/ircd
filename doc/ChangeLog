@@ -1,3 +1,7 @@
+2003-02-22  Kurt Roeckx
+
+	* os.h: Always include resolv.h when found.
+
 2003-02-16  Jakub Vlasek
 
         * struct_def.h: Added IsSplit() macro. Added split variables to
