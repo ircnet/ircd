@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.16 1999/06/21 02:55:45 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.17 1999/06/27 19:10:58 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -41,13 +41,21 @@ struct proxylog
 	time_t expire;
 };
 
-#define OPT_LOG		0x01
-#define OPT_DENY	0x02
+#define OPT_LOG     	0x01
+#define OPT_DENY    	0x02
 #define OPT_PARANOID	0x04
+#define OPT_CAREFUL 	0x08
+#define OPT_V4ONLY  	0x10
+#define OPT_V5ONLY  	0x20
 
 #define PROXY_NONE 0
 #define PROXY_OPEN 1
 #define PROXY_CLOSE 2
+#define PROXY_UNEXPECTED 4
+
+#define ST_V4  0x01
+#define ST_V5  0x02
+#define ST_V5b 0x04
 
 struct socks_private
 {
@@ -57,6 +65,7 @@ struct socks_private
 	/* stats */
 	u_int chitc, chito, chitn, cmiss, cnow, cmax;
 	u_int closed4, closed5, open4, open5, noprox;
+	u_int closed5b, open5b;
 };
 
 /*
@@ -88,25 +97,29 @@ int cl;
  *	Add an entry to the cache.
  */
 static void
-socks_add_cache(cl, state, ver)
+socks_add_cache(cl, state)
 int cl, state;
 {
     struct socks_private *mydata = cldata[cl].instance->data;
     struct proxylog *next;
 
-    if (state == 1)
-	    if (ver == 4)
-	      mydata->open4 += 1;
+    if (state == PROXY_OPEN)
+	    if (cldata[cl].mod_status == ST_V4)
+		    mydata->open4 += 1;
+	    else if (cldata[cl].mod_status == ST_V5)
+		    mydata->open5 += 1;
 	    else
-	      mydata->open5 += 1;
-    else if (state == 0)
+		    mydata->open5b += 1;
+    else if (state == PROXY_NONE)
 	    mydata->noprox += 1;
-    else
-      if (ver == 4)
-	      mydata->closed4 += 1;
+    else /* state == PROXY_CLOSE|PROXY_UNEXPECTED) */
+	    if (cldata[cl].mod_status == ST_V4)
+		    mydata->closed4 += 1;
+	    else if (cldata[cl].mod_status == ST_V5)
+		    mydata->closed5 += 1;
 	    else
-	      mydata->closed5 += 1;
-
+		    mydata->closed5b += 1;
+    
     if (mydata->lifetime == 0)
 	    return;
 
@@ -180,6 +193,171 @@ socks_check_cache(cl)
     return 0;
 }
 
+static int
+socks_write(cl, strver)
+u_int cl;
+char *strver;
+{
+    u_char query[13];    /* big enough to hold all queries */
+    int query_len = 13;  /* lenght of socks4 query */
+    u_int a, b, c, d;
+    
+    if (sscanf(cldata[cl].ourip, "%u.%u.%u.%u", &a,&b,&c,&d) != 4)
+	{
+	    sendto_log(ALOG_DSOCKS|ALOG_IRCD, LOG_ERR,
+		       "socks_write%s(%d): sscanf(\"%s\") failed", 
+		       strver, cl, cldata[cl].ourip);
+	    close(cldata[cl].wfd);
+	    cldata[cl].wfd = 0;
+	    return -1;
+	}
+    if (cldata[cl].mod_status == 4)
+	{
+	    query[0] = 4; query[1] = 1;
+	    query[2] = ((cldata[cl].ourport & 0xff00) >> 8);
+	    query[3] = (cldata[cl].ourport & 0x00ff);
+	    query[4] = a; query[5] = b; query[6] = c; query[7] = d;
+	    query[8] = 'u'; query[9] = 's'; query[10] = 'e'; query[11] = 'r';
+	    query[12] = 0;
+	}
+    else 
+	{
+	    query[0] = 5; query[1] = 1; query[2] = 0;
+	    query_len = 3;
+	    if (cldata[cl].mod_status == ST_V5b)
+		{
+		    query_len = 10;
+		    query[3] = 1;
+		    query[4] = a; query[5] = b; query[6] = c; query[7] = d;
+		    query[8] = ((cldata[cl].ourport & 0xff00) >>8);
+		    query[9] = (cldata[cl].ourport & 0x00ff);
+		}
+	}
+    
+    DebugLog((ALOG_DSOCKS, 0, "socks%s_write(%d): Checking %s %u",
+	      strver, cl, cldata[cl].ourip, SOCKSPORT));
+    if (write(cldata[cl].wfd, query, query_len) != query_len)
+	{
+	    /* most likely the connection failed */
+	    DebugLog((ALOG_DSOCKS, 0, "socks%s_write(%d): write() failed: %s",
+		      strver, cl, strerror(errno)));
+	    socks_add_cache(cl, PROXY_NONE, 0);
+	    close(cldata[cl].wfd);
+	    cldata[cl].rfd = cldata[cl].wfd = 0;
+	    return 1;
+	}
+    cldata[cl].rfd = cldata[cl].wfd;
+    cldata[cl].wfd = 0;
+    return 0;
+}
+
+static int
+socks_read(cl, strver)
+u_int cl;
+char *strver;
+{
+    struct socks_private *mydata = cldata[cl].instance->data;
+    int again = 0;
+    u_char state = PROXY_CLOSE;
+    
+    /* data's in from the other end */
+    if (cldata[cl].buflen < 2)
+	    return 0;
+    
+    /* got all we need */
+    DebugLog((ALOG_DSOCKS, 0, "socks%s_read(%d): Got [%d %d]", strver, cl,
+	      cldata[cl].inbuffer[0], cldata[cl].inbuffer[1]));
+    
+    if (cldata[cl].mod_status == ST_V4)
+	{
+	    if (cldata[cl].inbuffer[0] == 0)
+		{
+		    if (cldata[cl].inbuffer[1] < 90 ||
+			cldata[cl].inbuffer[1] > 93)
+			    state = PROXY_UNEXPECTED;
+		    else
+			{
+			    if (cldata[cl].inbuffer[1] == 90)
+				    state = PROXY_OPEN;
+			    else if ((mydata->options & OPT_PARANOID) &&
+				     cldata[cl].inbuffer[1] != 91)
+				    state = PROXY_OPEN;
+			}
+		}
+	    else
+		    state = PROXY_UNEXPECTED;
+	}
+    else /* ST_V5 or ST_V5b */
+	{
+	    if (cldata[cl].inbuffer[0] == 5)
+		    if (cldata[cl].inbuffer[1] == 0)
+			    state = PROXY_OPEN;
+		    else
+			{
+			    if (cldata[cl].mod_status == ST_V5)
+				{
+				    if ((u_char)cldata[cl].inbuffer[1] > 2 &&
+					(u_char)cldata[cl].inbuffer[1] != 255)
+					    state = PROXY_UNEXPECTED;
+				}
+			    else /* ST_V5b */
+				    if ((u_char) cldata[cl].inbuffer[1] > 8)
+					    state = PROXY_UNEXPECTED;
+				    else if ((mydata->options&OPT_PARANOID) &&
+					     cldata[cl].inbuffer[1] != 2)
+					    state = PROXY_OPEN;
+			}
+	    else
+		    state = PROXY_UNEXPECTED;
+	}
+    
+    if (cldata[cl].mod_status == ST_V4 && state != PROXY_OPEN &&
+	!(mydata->options & OPT_V4ONLY))
+	{
+	    cldata[cl].mod_status = ST_V5;
+	    cldata[cl].buflen=0;
+	    close(cldata[cl].rfd);
+	    cldata[cl].rfd = 0;
+	    again = 1;
+	}
+    
+    if (cldata[cl].mod_status == ST_V5 && state == PROXY_OPEN &&
+	(mydata->options & OPT_CAREFUL))
+	{
+	    cldata[cl].mod_status = ST_V5b;
+	    cldata[cl].buflen=0;
+	    close(cldata[cl].rfd);
+	    cldata[cl].rfd = 0;
+	    again = 1;
+	}
+    
+    if (state == PROXY_OPEN && again == 0)
+	    socks_open_proxy(cl);
+    
+    if (state == PROXY_UNEXPECTED)
+	{
+	    sendto_log(ALOG_FLOG, LOG_WARNING,
+		       "socks%d: unexpected reply: %u,%u %s[%s]", strver,
+		       cldata[cl].inbuffer[0], cldata[cl].inbuffer[1],
+		       cldata[cl].host, cldata[cl].itsip);
+	    sendto_log(ALOG_IRCD, 0, "socks%d: unexpected reply: %u,%u",
+		       strver, cldata[cl].inbuffer[0],
+		       cldata[cl].inbuffer[1]);
+	    state = PROXY_CLOSE;
+	}
+    
+    if (again == 1)
+	    return socks_start(cl);
+    else
+	{
+	    socks_add_cache(cl, state);
+	    close(cldata[cl].rfd);
+	    cldata[cl].rfd = 0;
+	    return -1;
+	}
+    return 0;
+}
+
 /******************************** PUBLIC ************************************/
 
 /*
@@ -193,60 +371,78 @@ char *
 socks_init(self)
 AnInstance *self;
 {
-	struct socks_private *mydata;
-	char tmpbuf[32], cbuf[32];
-	static char txtbuf[80];
-
+    struct socks_private *mydata;
+    char tmpbuf[32], cbuf[32];
+    static char txtbuf[80];
+    
 #if defined(INET6)
-	return "IPv6 unsupported.";
+    return "IPv6 unsupported.";
 #endif
-	if (self->opt == NULL)
-		return "Aie! no option(s): nothing to be done!";
-	
-	mydata = (struct socks_private *) malloc(sizeof(struct socks_private));
-	bzero((char *) mydata, sizeof(struct socks_private));
-	mydata->cache = NULL;
-	mydata->lifetime = CACHETIME;
-
-	tmpbuf[0] = txtbuf[0] = '\0';
-	if (strstr(self->opt, "log"))
-	    {
-		mydata->options |= OPT_LOG;
-		strcat(tmpbuf, ",log");
-		strcat(txtbuf, ", Log");
-	    }
-	if (strstr(self->opt, "reject"))
-	    {
-		mydata->options |= OPT_DENY;
-		strcat(tmpbuf, ",reject");
-		strcat(txtbuf, ", Reject");
-	    }
-	if (strstr(self->opt, "paranoid"))
-	    {
-		mydata->options |= OPT_PARANOID;
-		strcat(tmpbuf, ",paranoid");
-		strcat(txtbuf, ", Paranoid");
-	    }
-
-	if (mydata->options == 0)
-		return "Aie! unknown option(s): nothing to be done!";
-
-	if (strstr(self->opt, "cache"))
-	    {
-		char *ch = index(self->opt, '=');
-		
-		if (ch)
-			mydata->lifetime = atoi(ch+1);
-	    }
-	sprintf(cbuf, ",cache=%d", mydata->lifetime);
-	strcat(tmpbuf, cbuf);
-	sprintf(cbuf, ", Cache %d (min)", mydata->lifetime);
-	strcat(txtbuf, cbuf);
-	mydata->lifetime *= 60;
-
-	self->popt = mystrdup(tmpbuf+1);
-	self->data = mydata;
-	return txtbuf+2;
+    if (self->opt == NULL)
+	    return "Aie! no option(s): nothing to be done!";
+    
+    mydata = (struct socks_private *) malloc(sizeof(struct socks_private));
+    bzero((char *) mydata, sizeof(struct socks_private));
+    mydata->cache = NULL;
+    mydata->lifetime = CACHETIME;
+    
+    tmpbuf[0] = txtbuf[0] = '\0';
+    if (strstr(self->opt, "log"))
+	{
+	    mydata->options |= OPT_LOG;
+	    strcat(tmpbuf, ",log");
+	    strcat(txtbuf, ", Log");
+	}
+    if (strstr(self->opt, "reject"))
+	{
+	    mydata->options |= OPT_DENY;
+	    strcat(tmpbuf, ",reject");
+	    strcat(txtbuf, ", Reject");
+	}
+    if (strstr(self->opt, "paranoid"))
+	{
+	    mydata->options |= OPT_PARANOID;
+	    strcat(tmpbuf, ",paranoid");
+	    strcat(txtbuf, ", Paranoid");
+	}
+    if (strstr(self->opt, "careful"))
+	{
+	    mydata->options |= OPT_CAREFUL;
+	    strcat(tmpbuf, ",careful");
+	    strcat(txtbuf, ", Careful");
+	}
+    if (strstr(self->opt, "v4only"))
+	{
+	    mydata->options |= OPT_V4ONLY;
+	    strcat(tmpbuf, ",v4only");
+	    strcat(txtbuf, ", V4only");
+	}
+    if (strstr(self->opt, "v5only"))
+	{
+	    mydata->options |= OPT_V5ONLY;
+	    strcat(tmpbuf, ",v5only");
+	    strcat(txtbuf, ", V5only");
+	}
+    
+    if (mydata->options == 0)
+	    return "Aie! unknown option(s): nothing to be done!";
+    
+    if (strstr(self->opt, "cache"))
+	{
+	    char *ch = index(self->opt, '=');
+	    
+	    if (ch)
+		    mydata->lifetime = atoi(ch+1);
+	}
+    sprintf(cbuf, ",cache=%d", mydata->lifetime);
+    strcat(tmpbuf, cbuf);
+    sprintf(cbuf, ", Cache %d (min)", mydata->lifetime);
+    strcat(txtbuf, cbuf);
+    mydata->lifetime *= 60;
+    
+    self->popt = mystrdup(tmpbuf+1);
+    self->data = mydata;
+    return txtbuf+2;
 }
 
 /*
@@ -258,9 +454,9 @@ void
 socks_release(self)
 AnInstance *self;
 {
-	struct sock_private *mydata = self->data;
-	free(mydata);
-	free(self->popt);
+    struct sock_private *mydata = self->data;
+    free(mydata);
+    free(self->popt);
 }
 
 /*
@@ -272,13 +468,15 @@ void
 socks_stats(self)
 AnInstance *self;
 {
-	struct socks_private *mydata = self->data;
+    struct socks_private *mydata = self->data;
 
-	sendto_ircd("S socks open %u/%u closed %u/%u noproxy %u",
-		    mydata->open4, mydata->open5, mydata->closed4, mydata->closed5, mydata->noprox);
-	sendto_ircd("S socks cache open %u closed %u noproxy %u miss %u (%u <= %u)",
-		    mydata->chito, mydata->chitc, mydata->chitn,
-		    mydata->cmiss, mydata->cnow, mydata->cmax);
+    sendto_ircd("S socks open %u/%u/%u closed %u/%u/%u noproxy %u",
+		mydata->open4, mydata->open5, mydata->open5b,
+		mydata->closed4, mydata->closed5, mydata->closed5b,
+		mydata->noprox);
+    sendto_ircd("S socks cache open %u closed %u noproxy %u miss %u (%u <= %u)",
+		mydata->chito, mydata->chitc, mydata->chitn,
+		mydata->cmiss, mydata->cnow, mydata->cmax);
 }
 
 /*
@@ -296,34 +494,33 @@ int
 socks_start(cl)
 u_int cl;
 {
-	char *error;
-	int fd;
-
-	if (cldata[cl].state & A_DENY)
-	    {
-		/* no point of doing anything */
-		DebugLog((ALOG_DSOCKS, 0,
-			  "socks_start(%d): A_DENY alredy set ", cl));
-		return -1;
-	    }
-
-	if (socks_check_cache(cl))
-		return -1;
-
-	DebugLog((ALOG_DSOCKS, 0, "socks_start(%d): Connecting to %s", cl,
-		  cldata[cl].itsip));
-	fd= tcp_connect(cldata[cl].ourip, cldata[cl].itsip, SOCKSPORT, &error);
-	if (fd < 0)
-	    {
-		DebugLog((ALOG_DSOCKS, 0,
-			  "socks_start(%d): tcp_connect() reported %s",
-			  cl, error));
-		socks_add_cache(cl, PROXY_NONE, 0);
-		return -1;
-	    }
-
-	cldata[cl].wfd = fd; /*so that socks_work() is called when connected*/
-	return 0;
+    char *error;
+    int fd;
+    
+    if (cldata[cl].state & A_DENY)
+	{
+	    /* no point of doing anything */
+	    DebugLog((ALOG_DSOCKS, 0,
+		      "socks_start(%d): A_DENY alredy set ", cl));
+	    return -1;
+	}
+    
+    if (socks_check_cache(cl))
+	    return -1;
+    
+    DebugLog((ALOG_DSOCKS, 0, "socks_start(%d): Connecting to %s", cl,
+	      cldata[cl].itsip));
+    fd= tcp_connect(cldata[cl].ourip, cldata[cl].itsip, SOCKSPORT, &error);
+    if (fd < 0)
+	{
+	    DebugLog((ALOG_DSOCKS, 0,
+		      "socks_start(%d): tcp_connect() reported %s", cl,error));
+	    socks_add_cache(cl, PROXY_NONE, 0);
+	    return -1;
+	}
+    
+    cldata[cl].wfd = fd; /*so that socks_work() is called when connected*/
+    return 0;
 }
 
 /*
@@ -339,128 +536,31 @@ int
 socks_work(cl)
 u_int cl;
 {
-	static	u_char query[13] =
-		{ 4, 1, 26, 11, 0, 0, 0, 0, 'u', 's', 'e', 'r', 0 };
-
-		/* we use .mod_status to call socks4 or socks5; */
-		if (cldata[cl].mod_status == 0) cldata[cl].mod_status = 4;
-
-    	DebugLog((ALOG_DSOCKS, 0, "socks%d_work(%d): %d %d buflen=%d", cldata[cl].mod_status, cl,
-		  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
-	if (cldata[cl].wfd > 0)
-	    {
-		/*
-		** We haven't sent the query yet, the connection was just
-		** established.
-		*/
-		u_int a, b, c, d;
-
-		if (cldata[cl].mod_status == 4) 
-			{
-			if (sscanf(cldata[cl].ourip, "%u.%u.%u.%u", &a,&b,&c,&d) != 4)
-		    {
-			sendto_log(ALOG_DSOCKS|ALOG_IRCD, LOG_ERR,
-				  "socks_work(%d): sscanf(\"%s\") failed", 
-				   cl, cldata[cl].ourip);
-			close(cldata[cl].wfd);
-			cldata[cl].wfd = 0;
-			return -1;
-		    }
-			query[0] = 4; query[1] = 1;
-			query[2] = ((cldata[cl].ourport & 0xff00) >> 8);
-			query[3] = (cldata[cl].ourport & 0x00ff);
-			query[4] = a; query[5] = b; query[6] = c; query[7] = d;
-			}
-		else
-			{
-			query[0] = 5 ; query[1] = 1; query[2] = 0;
-			}
-		
-		DebugLog((ALOG_DSOCKS, 0, "socks%d_work(%d): Checking %s %u", query[0],
-			  cl, cldata[cl].ourip, SOCKSPORT));
-		if (write(cldata[cl].wfd, query, (query[0]==4?13:3)) != (query[0]==4?13:3))
-		    {
-			/* most likely the connection failed */
-			DebugLog((ALOG_DSOCKS, 0,
-				  "socks_work(%d): write() failed: %s",
-				  cl, strerror(errno)));
-			socks_add_cache(cl, PROXY_NONE, 0);
-			close(cldata[cl].wfd);
-			cldata[cl].rfd = cldata[cl].wfd = 0;
-			return 1;
-		    }
-		cldata[cl].rfd = cldata[cl].wfd;
-		cldata[cl].wfd = 0;
-	    }
-	else
-	    {
-		/* data's in from the other end */
-		if (cldata[cl].buflen >= 2)
-		    {
-			/* got all we need */
-			DebugLog((ALOG_DSOCKS, 0,
-				  "socks%d_work(%d): Got [%d.%d]", query[0],
-				  cl, cldata[cl].inbuffer[0],
-				  cldata[cl].inbuffer[1]));
-			if (cldata[cl].inbuffer[0] == (query[0]==4?0:5))
-			    {
-				struct socks_private *mydata;
-				u_char state = PROXY_CLOSE;
-
-				mydata = cldata[cl].instance->data;
-				if (cldata[cl].inbuffer[1] == (query[0]==4?90:0))
-					state = PROXY_OPEN;
-				else if (query[0]==4 && (mydata->options & OPT_PARANOID) &&
-					cldata[cl].inbuffer[1] == 91)
-					state = PROXY_OPEN;
-				if (state == PROXY_OPEN)
-					socks_open_proxy(cl);
-				socks_add_cache(cl, state, query[0]);
-				if ((query[0]==4 && (cldata[cl].inbuffer[1] != 90 &&
-														 cldata[cl].inbuffer[1] != 91 &&
-														 cldata[cl].inbuffer[1] != 92 &&
-														 cldata[cl].inbuffer[1] != 93)) ||
-				    (query[0]==5 && (cldata[cl].inbuffer[1] != 0 &&
-											 			 cldata[cl].inbuffer[1] != 1 &&
-											 			 cldata[cl].inbuffer[1] != 2 &&
-											 			 cldata[cl].inbuffer[1] != -1)))
-				    {
-					sendto_log(ALOG_FLOG, LOG_WARNING,
-				   "socks%d: unexpected reply: %u,%u %s[%s]",
-						   query[0],
-						   cldata[cl].inbuffer[0],
-						   cldata[cl].inbuffer[1],
-						   cldata[cl].host,
-						   cldata[cl].itsip);
-					sendto_log(ALOG_IRCD, 0,
-					   "socks%d: unexpected reply: %u,%u",
-						   query[0],
-						   cldata[cl].inbuffer[0],
-						   cldata[cl].inbuffer[1]);
-					if (cldata[cl].mod_status == 4) cldata[cl].mod_status = 5;
-				    }
-			    }
-			else
-				if (cldata[cl].mod_status == 4)
-				  cldata[cl].mod_status = 5;
-				else
-					socks_add_cache(cl, PROXY_NONE, 0);
-			if (cldata[cl].mod_status == 5)
-					{
-					cldata[cl].mod_status = 1; /* neither 0 (equivalent to 4), nor 5 */
-					cldata[cl].buflen=0;
-					close(cldata[cl].rfd);
-					cldata[cl].rfd = 0;
-					return (socks_start(cl));
-					}
-			close(cldata[cl].rfd);
-			cldata[cl].rfd = 0;
-			return -1;
-		    }
-		else
-			return 0;
-	    }
-	return 0;
+    char *strver = "4";
+    struct socks_private *mydata = cldata[cl].instance->data;
+    
+    if (cldata[cl].mod_status == 0)
+	    if (mydata->options & OPT_V5ONLY)
+		    cldata[cl].mod_status = ST_V5;
+	    else
+		    cldata[cl].mod_status = ST_V4;
+    
+    if (cldata[cl].mod_status & ST_V5)
+	    strver = "5";
+    else if (cldata[cl].mod_status & ST_V5b)
+	    strver = "5b";
+    
+    DebugLog((ALOG_DSOCKS, 0, "socks%s_work(%d): %d %d buflen=%d", strver,
+	      cl, cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
+    
+    if (cldata[cl].wfd > 0)
+	    /*
+	    ** We haven't sent the query yet, the connection was just
+	    ** established.
+	    */
+	    return socks_write(cl, strver);
+    else
+	    return socks_read(cl, strver);
 }
 
 /*
