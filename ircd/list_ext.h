@@ -62,10 +62,4 @@ EXTERN void delist_conf __P((aConfItem *aconf));
 EXTERN void free_conf __P((aConfItem *aconf));
 EXTERN void add_fd __P((int fd, FdAry *ary));
 EXTERN int del_fd __P((int fd, FdAry *ary));
-#ifdef	HUB
-EXTERN void add_active __P((int fd, FdAry *ary));
-EXTERN void decay_activity();
-EXTERN int sort_active __P((const void *a1, const void *a2));
-EXTERN void build_active();
-#endif /* HUB */
 #undef EXTERN

@@ -438,13 +438,10 @@ struct Client	{
 	time_t	lasttime;	/* last time we received data */
 	time_t	firsttime;	/* time client was created */
 	time_t	since;		/* last time we parsed something */
-	u_int	sact;		/* could conceivably grow large...*/
 	aClient	*acpt;		/* listening client which we accepted from */
 	Link	*confs;		/* Configuration record associated */
 	int	authfd;		/* fd for rfc931 authentication */
 	char	*auth;
-	int	priority;	/* priority for selection as active */
-	u_short	ract;		/* no fear about this. */
 	u_short	port;		/* and the remote port# too :-) */
 	struct	IN_ADDR	ip;	/* keep real ip# too */
 	struct	hostent	*hostp;

@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.48 1998/12/28 15:37:01 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.49 1998/12/28 15:44:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -49,7 +49,7 @@ static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.48 1998/12/28 15:37:01 kalt Exp $";
 #endif
 
 aClient	*local[MAXCONNECTIONS];
-FdAry	fdas, fdaa, fdall;
+FdAry	fdas, fdall;
 int	highest_fd = 0, readcalls = 0, udpfd = -1, resfd = -1, adfd = -1;
 time_t	timeofday;
 static	struct	SOCKADDR_IN	mysk;
@@ -567,9 +567,8 @@ void	init_sys()
 #endif
 
 	bzero((char *)&fdas, sizeof(fdas));
-	bzero((char *)&fdaa, sizeof(fdaa));
 	bzero((char *)&fdall, sizeof(fdall));
-	fdas.highest = fdall.highest = fdaa.highest = -1;
+	fdas.highest = fdall.highest = -1;
 
 	for (fd = 3; fd < MAXCONNECTIONS; fd++)
 	    {
@@ -1274,7 +1273,6 @@ aClient *cptr;
 					report_error("setsockopt(SO_LINGER) %s:%s",
 						     cptr);
 #endif
-			del_fd(i, &fdaa);
 		    }
 		del_fd(i, &fdall);
 		local[i] = NULL;
@@ -1307,8 +1305,6 @@ aClient *cptr;
 					del_fd(j, &fdas);
 					add_fd(i, &fdas);
 				    }
-				if (!del_fd(j, &fdaa))
-					add_fd(i, &fdaa);
 				while (!local[highest_fd])
 					highest_fd--;
 #if defined(USE_IAUTH)

@@ -37,7 +37,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.6 1998/08/24 02:26:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.7 1998/12/28 15:44:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -681,104 +681,3 @@ FdAry	*ary;
 	ary->highest--;
 	return 0;
 }
-
-
-#ifdef	HUB
-void	add_active(fd, ary)
-int	fd;
-FdAry	*ary;
-{
-	del_fd(fd, ary);
-
-	if (ary->highest == MAXCONNECTIONS/(HUB+1))
-	    {
-		bcopy((char *)ary->fd, (char *)&ary->fd[1],
-			sizeof(int) * (MAXCONNECTIONS/(HUB + 1) - 1));
-		*ary->fd = fd;
-	    }
-	else
-		ary->fd[++(ary->highest)] = fd;
-}
-
-
-void	decay_activity()
-{
-	aClient	*cptr;
-	int	i;
-
-	for (i = highest_fd; i >= 0; i--)
-		if ((cptr = local[i]) && IsPerson(cptr))
-		    {
-			if (cptr->ract)
-				cptr->ract--;
-			if (cptr->sact)
-				cptr->sact--;
-		    }
-}
-
-
-static	time_t	sorttime;
-
-int	sort_active(a1, a2)
-const void	*a1, *a2;
-{
-	aClient	*acptr = local[*(int *)a1], *bcptr = local[*(int *)a2];
-
-	/*
-	** give preference between a flooded client and a non-flooded client
-	** to the non-flooded client.
-	*/
-	if (acptr->since > sorttime)
-		if (bcptr->since > sorttime)
-			return 0;
-		else
-			return -1;
-	else if (bcptr->since > sorttime)
-		return 1;
-
-	/*
-	** if one client has a partial message in its receive buffer, give
-	** it preference over the other.
-	*/
-	if (DBufLength(&acptr->recvQ) && !DBufLength(&bcptr->recvQ))
-		return 1;
-	else if (DBufLength(&bcptr->recvQ) && !DBufLength(&acptr->recvQ))
-		return -1;
-
-	return local[*(int *)a1]->priority - local[*(int *)a2]->priority;
-}
-
-void	build_active()
-{
-	aClient	*cptr;
-	FdAry	*ap = &fdaa;
-	int	i;
-
-	sorttime = timeofday;
-	/*
-	** first calculate priority...
-	*/
-	for (i = highest_fd; i >= 0; i--)
-	    {
-		if (!(cptr = local[i]))
-			continue;
-		if (!IsPerson(cptr))
-			cptr->priority = 0;
-		else
-			cptr->priority = cptr->ract + cptr->sact;
-	    }
-
-	/*
-	** then generate active array
-	*/
-	ap->highest = -1;
-	for (i = highest_fd; i >= 0; i--)
-		if (local[i])
-			add_fd(i, ap);
-
-	qsort(ap->fd, ap->highest+1, sizeof(*ap->fd), sort_active);
-
-	if (ap->highest >= MAXCONNECTIONS/(HUB+1))
-		ap->highest = MAXCONNECTIONS/(HUB+1)-1;
-}
-#endif

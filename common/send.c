@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.29 1998/12/12 23:48:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.30 1998/12/28 15:44:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -468,8 +468,7 @@ static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 			 NULL,
 # endif
 			 0, {0, 0, NULL }, {0, 0, NULL },
-			 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, NULL,
-			 0, 0, 0
+			 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, NULL, 0
 # if defined(__STDC__)	/* hack around union{} initialization	-Vesa */
 			 ,{0}, NULL, "", ""
 # endif

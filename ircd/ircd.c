@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.37 1998/12/13 00:02:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.38 1998/12/28 15:44:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -941,7 +941,7 @@ time_t	delay;
 	static	time_t	nextc = 0;
 #endif
 #ifdef HUB
-	static	time_t	nextactive = 0, lastl = 0;
+	static	time_t	lastl = 0;
 #endif
 
 	/*
@@ -1000,25 +1000,7 @@ time_t	delay;
 		(void)read_message(delay, &fdall);
 		nextc = timeofday;
 	    }
-/*
-	else
-	    {
-		if (timeofday > nextactive)
-		    {
-			(void)read_message(0, &fdaa);
-			nextactive = timeofday + HUB;
-		    }
-		(void)read_message(1, &fdas);
-	    }
-*/
 	timeofday = time(NULL);
-/*
-	if (timeofday > lastl)
-	    {
-		decay_activity();
-		lastl = timeofday;
-	    }
-*/
 #else
 	(void)read_message(delay, &fdall);
 	timeofday = time(NULL);
