@@ -1398,9 +1398,10 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.27 1998/12/13 00:02:38 kalt Exp $])
-AC_PREREQ(1.12)
+AC_REVISION([$Id: configure.in,v 1.28 1999/01/16 22:01:33 kalt Exp $])
+AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
+AC_VALIDATE_CACHED_SYSTEM_TUPLE()
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
 AC_CONFIG_AUX_DIR(../support)
 
