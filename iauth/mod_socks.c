@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.24 1999/07/11 01:22:56 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.25 1999/08/13 21:06:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -299,8 +299,9 @@ char *strver;
 			{
 			    if (cldata[cl].mod_status == ST_V5)
 				{
-				    if ((u_char)cldata[cl].inbuffer[1] > 2 &&
-					(u_char)cldata[cl].inbuffer[1] != 255)
+				    if ((u_char)cldata[cl].inbuffer[1] == 4 ||
+					((u_char)cldata[cl].inbuffer[1] > 9 &&
+					(u_char)cldata[cl].inbuffer[1] != 255))
 					    state = PROXY_UNEXPECTED;
 				}
 			    else /* ST_V5b */
