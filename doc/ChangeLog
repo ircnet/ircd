@@ -7,6 +7,10 @@
 	  link only when cptr was aServer.
 	* doc/ cleanup.
 	* added ISO-3166-1 file as a reference for choosing SIDs.
+	* struct_def.h: changed SIDLEN to 4. Yes, it's a waste, but at
+	  least it takes off the burden of assigning SIDs. ISO-3166 now!
+	  Also enlarged tok in Server struct to hold long tokens.
+	* list.c: increased MAX210SERVERS to 46656.
 
 2003-06-22  Kurt Roeckx
 
