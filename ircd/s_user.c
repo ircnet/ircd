@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.186 2004/03/05 22:09:58 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.187 2004/03/06 00:01:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -701,6 +701,19 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		(void)m_motd(sptr, sptr, 1, parv);
 		if (IsRestricted(sptr))
 			sendto_one(sptr, replies[ERR_RESTRICTED], ME, BadTo(nick));
+		if (IsConfNoResolve(sptr->confs->value.aconf))
+		{
+			sendto_one(sptr, ":%s NOTICE %s :Due to an administrative"
+				" decision, your hostname is not shown.",
+				ME, nick);
+		}
+		else if (IsConfNoResolveMatch(sptr->confs->value.aconf))
+		{
+			sendto_one(sptr, ":%s NOTICE %s :Due to an administrative"
+				" decision, your hostname is not shown,"
+				" but still matches channel MODEs.",
+				ME, nick);
+		}
 		send_umode(sptr, sptr, 0, ALL_UMODES, buf);
 		nextping = timeofday;
 		
