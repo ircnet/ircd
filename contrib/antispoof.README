@@ -1,6 +1,8 @@
 The nospoof patch was adapted from the nospoof5 patch in use on Undernet
-servers.  It should NOT be needed unless you're running ircd on a really
-old OS which doesn't have a patch against TCP spoofing.
+servers. It should NOT be needed unless you're running ircd on a really
+old OS which doesn't have a patch against TCP spoofing. Note that this
+patch should be applied BEFORE running ./configure -- this is very
+important, and the usual cause of any problems encountered.
 
 When a client connects to the server, they are sent a PING with a random
 number (please do not confuse this with a CTCP PING -- they're very
@@ -9,7 +11,7 @@ random number, it is not registered with the server and cannot do
 anything.
 
 Please note that this does break the RFC. However, it has been tested
-with most popular clients and is in common use of large IRC networks
+with most popular clients and is in common use on large IRC networks
 currently. The only reported client to have problems is Homer (for
 the Macintosh).
 
