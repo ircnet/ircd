@@ -400,8 +400,8 @@
  * Defining this will add an artificial 2 seconds delay for accepting
  * connections.  This is the OLD behaviour of the server.
  *
- * NOTE: this leads of a significant increase in CPU usage if you reject a
- * client which keeps connecting.
+ * NOTE: Undefining this leads of a significant increase in CPU usage if
+ * you reject client which keeps connecting.
  */
 #define	SLOW_ACCEPT
 
