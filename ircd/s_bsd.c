@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.49 1998/12/28 15:44:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.50 1998/12/29 15:23:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1810,8 +1810,7 @@ int	msg_ready;
 			** all that was received.
 			*/
 			if (cptr->flags & FLAGS_ZIP)
-				while (cptr->zip->in->avail_in != 0 ||
-				       cptr->zip->in->avail_out == 0)
+				while (cptr->zip->in->avail_in != 0)
 				    {
 					done = dopacket(cptr, readbuf, 0);
 					if (done && done != 2)
