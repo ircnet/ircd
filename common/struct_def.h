@@ -751,13 +751,16 @@ typedef	struct	{
 #define	SV_29		0x0001	/* useless, but preserved for coherence */
 #define	SV_NJOIN	0x0002	/* server understands the NJOIN command */
 #define	SV_NMODE	0x0004	/* server knows new MODEs (+e/+I) */
-#define	SV_NCHAN	0x0008	/* server knows new channels -????name */
+#define	SV_NCHAN	0x0008	/* server knows new channels !????name */
 				/* ! SV_NJOIN implies ! SV_NCHAN */
 #define	SV_2_10		(SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN)
 #define	SV_UID		0x0010	/* unique IDs for users = SID + CID */
 #define	SV_2_11		(SV_2_10|SV_UID)
 
 #define	SV_OLDSQUIT	0x1000	/* server uses OLD SQUIT logic */
+
+#define	ST_NJOIN(x)	(IsServer(x) && (x->serv->version & SV_NJOIN))
+#define	ST_UID(x)	(IsServer(x) && (x->serv->version & SV_UID))
 
 /* used for sendto_flag */
 
