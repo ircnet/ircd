@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.21 1998/12/13 00:02:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.22 1998/12/13 00:18:30 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -361,11 +361,19 @@ Reg	aClient	*cptr;
 	if (adfd >= 0)
 	    {
 		char abuf[BUFSIZ];
-/* INET6 not done here! */
+#ifdef INET6
+		sprintf(abuf, "%d C %s %u ", cptr->fd,
+			inetntop(AF_INET6, (char *)&them.sin6_addr, mydummy,
+				 MYDUMMY_SIZE), ntohs(them.SIN_PORT));
+		sprintf(abuf+strlen(abuf), "%s %u",
+			inetntop(AF_INET6, (char *)&us.sin6_addr, mydummy,
+				 MYDUMMY_SIZE), ntohs(us.SIN_PORT));
+#else
 		sprintf(abuf, "%d C %s %u ", cptr->fd,
 			inetntoa((char *)&them.sin_addr),ntohs(them.SIN_PORT));
 		sprintf(abuf+strlen(abuf), "%s %u",
 			inetntoa((char *)&us.sin_addr), ntohs(us.SIN_PORT));
+#endif
 		if (sendto_iauth(abuf) == 0)
 		    {
 			close(cptr->authfd);
