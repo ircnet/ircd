@@ -1,3 +1,13 @@
+2004-03-24  Piotr Kucharski
+
+	* s_serv.c/m_trace(): code reporting classes usage moved out to
+	  separate, new function report_class().
+	* s_serv.c/m_stats(): stats C is used to call report_class().
+	* s_serv.c/report_configured_links(): show password (reason) field
+	  of Q-line.
+	* s_serv.c/m_stats(): stats Z behave the same as stats z for non-opers
+	  even in debug mode.
+
 2004-03-23  Piotr Kucharski
 
 	* res.c/init_resolver(): a hack to allow resolving inside FreeBSD

@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.43 2004/03/24 00:49:10 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.44 2004/03/25 00:20:52 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -24,6 +24,8 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* resolving slightly changed: when host has CNAMEs, use the name that
 	  client IP PTR points to, not the CNAME that points to client IP.
 	* resolv.conf can have IPv6 nameservers (this makes ircd fully IPv6).
+	* P: can have flags ('D' and 'S'), check INSTALL file for details.
+	* class summary was moved from trace to (separate) stats C.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================
