@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.70 2001/12/23 03:52:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.71 2001/12/23 20:35:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -35,6 +35,10 @@ static	char	buf[BUFSIZE];
 
 static	int	check_link __P((aClient *));
 static	int	get_version __P((char *version, char *id));
+const	char	*check_servername_errors[3][2] = {
+	{ "too long", "Bogus servername - too long" },
+	{ "invalid", "Bogus servername - invalid hostname" },
+	{ "bogus", "Bogus servername - no dot"}};
 
 /*
 ** m_functions execute protocol messages on this server:
@@ -431,6 +435,7 @@ char	*parv[];
 	aClient *acptr, *bcptr;
 	aConfItem *aconf;
 	int	hop = 0, token = 0;
+	int	tmperr;
 
 	if (sptr->user) /* in case NICK hasn't been received yet */
             {
@@ -462,26 +467,18 @@ char	*parv[];
 				(void)strncat(info, parv[3], REALLEN - i - 2);
 		    }
 	    }
-	/*
-	** Check for "FRENCH " infection ;-) (actually this should
-	** be replaced with routine to check the hostname syntax in
-	** general). [ This check is still needed, even after the parse
-	** is fixed, because someone can send "SERVER :foo bar " ].
-	** Also, changed to check other "difficult" characters, now
-	** that parse lets all through... --msa
-	*/
-	if (strlen(host) > (size_t) HOSTLEN)
-		host[HOSTLEN] = '\0';
-	for (ch = host; *ch; ch++)
-		if (*ch <= ' ' || *ch > '~')
-			break;
-	if (*ch || !index(host, '.'))
-	    {
-		sendto_one(sptr,"ERROR :Bogus server name (%s)", host);
-		sendto_flag(SCH_ERROR, "Bogus server name (%s) from %s", host,
-			    get_client_name(cptr, TRUE));
-		return 2;
-	    }
+
+	/* check if the servername is valid */
+	if ((tmperr = check_servername(host)))
+	{
+		tmperr--;
+		sendto_flag(SCH_ERROR,
+			"Rejected server with %s server name (%s) from %s",
+			check_servername_errors[tmperr][0],
+			host, get_client_name(cptr, TRUE));
+		return exit_client(cptr, cptr, &me,
+			check_servername_errors[tmperr][1]);
+	}
 	
 	/* *WHEN* can it be that "cptr != sptr" ????? --msa */
 	/* When SERVER command (like now) has prefix. -avalon */
@@ -2459,3 +2456,63 @@ aClient	*cptr;
     ircstp->is_cklno++;
     return -1;
 }
+
+/*
+** check_servername
+** 	Simple check for validity of server name.
+** Hostlen, valid chars and whether it contains at least one char
+** and one dot (dot in servername equals no collision between
+** servername and nickname (no more ultimate jupes ;>)). --Beeth
+**
+** Returns 0 if ok, all else is some kind of error, which serves
+** as index in check_servername_errors[] table.
+*/
+int check_servername(hostname)
+char *hostname;
+{
+	register char *ch;
+	int dots, chars, rc = 0;
+
+	if (strlen(hostname) > HOSTLEN)
+	{
+		rc = 1;
+	}
+	else
+	{
+		for (ch = hostname; *ch; ch++)
+		{
+			if (*ch == '.')
+			{
+				dots++;
+				continue;
+			}
+			if ((*ch >= 'a' && *ch <= 'z')
+				|| (*ch >= 'A' && *ch <= 'Z')
+				|| *ch == '-' || *ch == '*')
+			{
+				chars++;
+				continue;
+			}
+			if (isdigit(*ch))
+			{
+				continue;
+			}
+			/* all else is invalid as servername! */
+			rc = 2;
+			break;
+		}
+		if (!rc && !dots)
+		{
+			/* not a single dot? not allowed. */
+			rc = 3;
+		}
+		if (!rc && !chars)
+		{
+			/* no chars? not allowed. */
+			rc = 2;
+		}
+	}
+
+	return rc;
+}
+
