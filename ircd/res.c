@@ -31,7 +31,7 @@
 #include "res.h"
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.7 1997/07/15 04:35:46 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.8 1997/07/16 19:27:39 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -847,7 +847,7 @@ Reg	u_char	*ip;
 	hashv += (int)*ip++;
 	hashv += hashv + (int)*ip++;
 	hashv += hashv + (int)*ip++;
-	hashv += hashv + (int)*ip++;
+	hashv += hashv + (int)*ip;
 	hashv %= ARES_CACSIZE;
 	return (hashv);
 }

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.6 1997/07/15 20:22:10 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.7 1997/07/16 19:27:40 kalt Exp $";
 #endif
 
 #include "setup.h"
@@ -53,7 +53,7 @@ char	*s;
 **			of separators
 **			argv 9/90
 **
-**	$Id: support.c,v 1.6 1997/07/15 20:22:10 kalt Exp $
+**	$Id: support.c,v 1.7 1997/07/16 19:27:40 kalt Exp $
 */
 
 char *strtoken(save, str, fs)
@@ -107,7 +107,7 @@ char *str, *fs;
 **	strerror - return an appropriate system error string to a given errno
 **
 **		   argv 11/90
-**	$Id: support.c,v 1.6 1997/07/15 20:22:10 kalt Exp $
+**	$Id: support.c,v 1.7 1997/07/16 19:27:40 kalt Exp $
 */
 
 char *strerror(err_no)
@@ -142,7 +142,7 @@ int err_no;
 **			internet number (some ULTRIX don't have this)
 **			argv 11/90).
 **	inet_ntoa --	its broken on some Ultrix/Dynix too. -avalon
-**	$Id: support.c,v 1.6 1997/07/15 20:22:10 kalt Exp $
+**	$Id: support.c,v 1.7 1997/07/16 19:27:40 kalt Exp $
 */
 
 char	*inetntoa(in)
@@ -155,7 +155,7 @@ char	*in;
 	a = (int)*s++;
 	b = (int)*s++;
 	c = (int)*s++;
-	d = (int)*s++;
+	d = (int)*s;
 	(void)sprintf(buf, "%d.%d.%d.%d", a,b,c,d );
 
 	return buf;
