@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.58 2004/09/28 22:42:42 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.59 2004/09/28 23:19:48 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -81,6 +81,7 @@ Important changes in 2.11.0 (since 2.10.3):
 	  (hopcount) parameters), please update your services.
 
 Important configuration changes between 2.10.x and 2.11.0:
+	* ircd.tune must be removed when upgrading from 2.10.x to 2.11.x
 	* M: has a new mandatory field: SID. Please read INSTALL.
 	* A: has a new field: "network name". 
 	* H: can have SID masks to accept.
