@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.121 2002/04/06 05:29:51 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.122 2002/04/11 21:38:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -437,22 +437,19 @@ char	*nick, *username;
 		/*
 		** Do not allow special chars in the username.
 		*/
-		if (!(sptr->flags & FLAGS_GOTID))
+		if ((sptr->flags & FLAGS_GOTID) &&
+			! (*sptr->username == '-' ||
+			index(sptr->username, '@')))
 		{
-			/* no ident, use whatever client gave us */
-			lbuf = username;
+			/* got ident and it is not OTHER
+			 * (which could be encrypted), so check
+			 * this one for validity */
+			lbuf = sptr->username;
 		}
 		else
 		{
-			/* got ident */
-			lbuf = sptr->username;
-
-			if (*sptr->username == '-' ||
-			    index(sptr->username, '@'))
-			{
-				/* OTHER type ident is prefixed, omit it */
-				lbuf++;
-			}
+			/* either no ident or ident OTHER */
+			lbuf = username;
 		}
 		if (!isvalidusername(lbuf))
 		{
