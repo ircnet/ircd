@@ -1,3 +1,11 @@
+2004-06-29  Piotr Kucharski
+
+	* s_service.c/m_service(): set FLAGS_CBURST on service.
+	* send.c/send_message(): support bursting services.
+	* s_misc.c/exit_client(): do not log service quits to users log.
+	* send.c/sendto_flog(): revert from tabs to spaces in logs, do not
+	  write ending "\n" to syslog and services.
+
 2004-06-28  Piotr Kucharski
 
 	* s_user.c/is_allowed(): silly bug.

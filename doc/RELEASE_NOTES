@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.52 2004/06/29 00:44:57 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.53 2004/06/29 17:51:34 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -36,7 +36,8 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* new commands: TKLINE and UNTKLINE.
 	* stats K returns list of klines, stats k list of tklines.
 	* rehash t removes all tklines.
-	* O: have flags now, check INSTALL file for details.
+	* O: have flags now, check INSTALL file for details; WARNING: no flags
+	  means no privileges at all!
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================

@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.18 2004/06/21 23:06:18 chopin Exp $
+# $Id: ircd.conf.example,v 1.19 2004/06/29 17:51:34 chopin Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -239,7 +239,7 @@ I:::*@indial*.irc.org::12
 # administrator can use 'kill -HUP' on the ircd to reload the configuration
 # file. 
 #
-# o:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>
+# o:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>:<Flags>
 #
 # If the person in "Nickname" is not coming from the hostname defined in
 # the first field then the person will get the error message "No O: lines
@@ -273,6 +273,14 @@ O:*.bu.edu:ITBites:jhs::10
 #
 o:rocker@csa.bu.edu:T0eiVgHrqeKTQ:Rocker::10
 #
+# New for 2.11 as flags for O:line that specify permissions for operator.
+# The simplest is flag 'A' -- all possible permissions. 
+# Note that lower case o:line (which will be removed in next vesion) and
+# O:line with 'L' flag have exactly the same meaning.
+#
+O:192.168.0.0/16:icmptz:Beeth::10:A
+#
+# Be warned: if you add no flags, no privileges will be granted. 
 #
 ############################
 # c/C: [NETWORKED]. These lines define what servers your server tries to
