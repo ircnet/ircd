@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.24 1998/01/23 14:39:28 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.25 1998/01/23 14:45:48 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1954,7 +1954,7 @@ char	*parv[];
 
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	    {
-		if (penalty++ >= MAXPENALTY)
+		if (penalty++ >= MAXPENALTY && MyPerson(sptr))
 			break;
 		chptr = get_channel(sptr, name, !CREATE);
 		if (!chptr)
@@ -2012,7 +2012,7 @@ char	*parv[];
 						   who->name, comment);
 				remove_user_from_channel(who,chptr);
 				penalty += 2;
-				if (penalty > MAXPENALTY)
+				if (penalty > MAXPENALTY && MyPerson(sptr))
 					break;
 			    }
 			else
