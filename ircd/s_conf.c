@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.11 1997/09/03 17:45:58 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.12 1997/09/03 18:16:53 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -979,6 +979,8 @@ int	opt;
 				 aconf->status == CONF_LISTEN_PORT)
 				(void)add_listener(aconf);
 		    }
+		if (aconf->status & CONF_SERVICE)
+			aconf->port &= SERVICE_MASK_ALL;
 		if (aconf->status & (CONF_SERVER_MASK|CONF_SERVICE))
 			if (ncount > MAXCONFLINKS || ccount > MAXCONFLINKS ||
 			    !aconf->host || index(aconf->host, '*') ||
