@@ -1,3 +1,7 @@
+2005-02-06  Piotr Kucharski
+
+	* channel.c/set_mode(): allow -r on all channels.
+
 2005-02-04  Piotr Kucharski
 
 	* struct_def.h et al: change ONICKLEN to LOCALNICKLEN, which is allowed
@@ -10,6 +14,7 @@
 	  use for channel names.
 	* match.c: ~ (tilde) is valid for nicks now.
 	* s_user.c/do_nick_name(): no need for special case of ~ from servers.
+	* channel.c/set_mode(): allow +R from all chanops.
 
 2005-01-30  Piotr Kucharski
 
