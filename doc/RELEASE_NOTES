@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.4 1997/05/15 20:31:36 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.5 1997/05/21 17:03:00 kalt Exp $
 
 This is a development version of the package,
 
@@ -11,28 +11,21 @@ and 2.7 servers on the same network.
 
 ---
 
-2.9.3 supports compression of server links, see INSTALL.txt
+New features:
 
----
+	* compression of server links.
+	* k lines created.
+	* V lines created.
+	* whois reply uses ! instead of + for the +v(oice) mode.
 
-2.9.3 reintroduce the port number in the M line, see INSTALL.txt
+Important configuration changes:
 
----
-
-The format of M and P lines has changed since 2.9.2, your old config
-might need to be updated.
-
----
-
-2.9.3b8 changes + to ! in whois replies
+	* M and P lines format has changed since 2.9.2, it is important
+	  to update your ircd.conf !
+	* kill lines are now case sensitive.
 
 ---
 
 2.9.3b7 introduces a change in the PASS syntax which makes
 the `link compression negociation' *incompatible* with
 previous betas.
-
----
-
-2.9.3b16 creates (lowercase) k(ill) lines.  Be sure to
-update your ircd.conf file
