@@ -7,8 +7,8 @@
 	  in zlib headers).
 	* s_zip.c: add some casts to get rid of warnings.
 	* a_conf.c: add "exit" keyword.
-	* s_serv.c/m_server_estab(), report_error(): find_uid() can return
-	  NULL, better check before MyConnect().
+	* s_serv.c/m_server_estab(), s_bsd.c/report_error(): find_uid() can
+	  return NULL, better check before MyConnect().
 
 2004-10-03  Piotr Kucharski
 
