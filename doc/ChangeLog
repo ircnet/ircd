@@ -10,6 +10,10 @@
 
 	* configure.in: update for CYGWIN environment.
 
+1999-08-13  Piotr Kucharski
+
+	* mod_socks.c/socks_read(): allow more methods in socks5 check.
+
 1999-08-01  Piotr Kucharski
 
 	* ircd.c/bad_command(): -d command line option no longer exists,
