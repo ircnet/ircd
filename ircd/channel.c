@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.149 2003/06/22 16:12:17 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.150 2003/08/05 14:53:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1800,6 +1800,7 @@ char	*key;
 {
 	invLink	*lp = NULL;
 	Link	*banned;
+	int	limit = 0;
 
 	if (chptr->users == 0 && (bootopt & BOOT_PROT) && 
 	    chptr->history != 0 && *chptr->chname != '!')
@@ -1829,19 +1830,31 @@ char	*key;
 	if (*chptr->mode.key && (BadPtr(key) || mycmp(chptr->mode.key, key)))
 		return (ERR_BADCHANNELKEY);
 
-	if (chptr->mode.limit && (chptr->users >= chptr->mode.limit) &&
-	    (lp == NULL))
-		return (ERR_CHANNELISFULL);
+	if (chptr->mode.limit && (chptr->users >= chptr->mode.limit))
+	{
+		if (lp == NULL)
+			return (ERR_CHANNELISFULL);
+		else
+			limit = 1;
+	}
 
 	if (banned)
 	{
 		sendto_channel_butone(&me, &me, chptr,
 			":%s NOTICE %s :%s carries an invitation from %s"
-			" (overriding ban on %s!%s@%s).",
-			ME, chptr->chname, sptr->name,
-			lp->who, banned->value.alist->nick,
+			" (overriding%s ban on %s!%s@%s).",
+			ME, chptr->chname, sptr->name, lp->who,
+			limit ? " channel limit and" : "",
+			banned->value.alist->nick,
 			banned->value.alist->user,
 			banned->value.alist->host);
+	}
+	else if (limit)
+	{
+		sendto_channel_butone(&me, &me, chptr,
+			":%s NOTICE %s :%s carries an invitation from %s"
+			" (overriding channel limit).", ME, chptr->chname,
+			sptr->name, lp->who);
 	}
 	return 0;
 }
