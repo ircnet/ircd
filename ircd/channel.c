@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.164 2003/10/18 17:26:34 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.165 2003/12/12 16:36:03 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -330,21 +330,37 @@ static	Link	*match_modeid(int type, aClient *cptr, aChannel *chptr)
 	{
 		if (tmp->flags == type)
 		{
-			if (match(tmp->value.alist->nick, cptr->name) != 0 &&
-				((isdigit(tmp->value.alist->nick[0]) || 
-				tmp->value.alist->nick[0] == '#') &&
-				match(tmp->value.alist->nick, cptr->user->uid) != 0))
+			if (match(tmp->value.alist->nick, cptr->name) != 0)
 			{
-				/* no match on nick part */
-				continue;
+				/* seems like no match on nick, but... */
+				if (isdigit(tmp->value.alist->nick[0]) || 
+					tmp->value.alist->nick[0] == '#')
+				{
+					/* ...perhaps it is UID-ban? */
+					if (match(tmp->value.alist->nick, 
+						cptr->user->uid) != 0)
+					{
+						/* no match on UID */
+						continue;
+					}
+					/* We have match on UID!
+					 * Go now for the user part */
+				}
+				else
+				{
+					/* no match on nick part */
+					continue;
+				}
 			}
 			if (match(tmp->value.alist->user, cptr->username) != 0)
 			{
 				/* no match on user part */
 				continue;
 			}
-			/* So now we know n!u of a client matches that of a beI */
-			/* Proceeding to more intensive checks of hostname, IP, CIDR */
+			/* At this point n!u of a client matches that of a beI.
+			 * Proceeding to more intensive checks of hostname,
+			 * IP, CIDR
+			 */
 			if (match(tmp->value.alist->host, cptr->user->host) == 0)
 			{
 				/* match */
