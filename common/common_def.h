@@ -21,7 +21,6 @@
 #undef	SPRINTF
 #endif
 #define	SPRINTF	(void) irc_sprintf
-#endif
 
 #define DupString(x,y) do {x = (char *)MyMalloc(strlen((char *)y) + 1);\
 			   (void)strcpy((char *)x, (char *)y);\
