@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.199 2004/06/15 20:12:28 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.200 2004/06/15 21:43:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2578,11 +2578,6 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int	m_wallops(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	if (!IsServer(sptr))
-	    {
-		sendto_flag(SCH_ERROR, "User WALLOP from %s", sptr->name);
-		return 2;
-	    }
 	sendto_ops_butone(IsServer(cptr) ? cptr : NULL, parv[0], "%s", parv[1]);
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_WALLOP, NULL, sptr,
