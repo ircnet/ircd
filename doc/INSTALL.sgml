@@ -4,9 +4,9 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.37 1999/07/09 20:37:21 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.38 1999/08/13 17:19:52 kalt Exp $
 <abstract>
-This document describes how to install, and configure IRC 2.10.2.
+This document describes how to install, and configure IRC 2.10.3.
 </abstract>
 
 <sect>Installing IRC.
@@ -55,13 +55,11 @@ Defining this will keep you from using server link compression.
 
 <sect1>Notes for Cygwin32 users
 <p>
-The 2.9.5 release compiles properly on W32 systems which
-have the GNU-Win32 environment (<url
+The daemon of 2.10.3 release compiles properly on W32
+systems which have the GNU-Win32 environment (<url
 url="http://www.cygnus.com/misc/gnu-win32/">) setup.  At the
-time of the release, tests were made using the version b18
-of the Cygwin32 library with the ``coolview'' patch from
-Sergey Okhapkin.  (This patch should be rolled in the next
-beta)
+time of the release, tests were made using the version b20.1
+of the Cygwin32 library.
 <p>
 When compiling on such system, you want to make sure that
 you have carefully followed the Cygwin32 installation
@@ -74,6 +72,11 @@ Also, the IRC server needs a <bf>resolv.conf</bf> file in
 order to initialize the resolver.  This file can be anywhere
 (see configure options), and is typically in <bf>/etc</bf>
 on UNIX systems.
+<p>
+Finally, iauth is automatically disabled.  Even though the
+iauth program compiles properly, extra work is required to
+have a working communication channel between the IRC server
+and the iauth program.
 
 <sect1>Notes concerning IPv6 support
 <p>
