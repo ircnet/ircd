@@ -136,7 +136,17 @@
 #endif
 
 #if HAVE_NETDB_H
-# include <netdb.h>
+# if BAD___CONST_NETDB_H
+#  ifndef __const
+#   define __const
+#   include <netdb.h>
+#   undef __const
+#  else
+#   include <netdb.h>
+#  endif
+# else
+#  include <netdb.h>
+# endif
 #endif
 
 #if HAVE_NETINET_IN_H
@@ -382,32 +392,36 @@
 /*  inet_ntoa(), inet_aton(), inet_addr() and inet_netof() portability
  *  problems.
  *
- *  The undef's are "needed" because of the way Paul Vixie majorly screws
- *  up system's include files with bind.  In this case, it's bind 8.x
- *  installing /usr/local/include/arpa/inet.h -krys
+ *  The undefs and prototypes are "needed" because of the way Paul Vixie
+ *  majorly screws up system's include files with Bind.  In this case, it's
+ *  Bind 8.x installing /usr[/local]/include/arpa/inet.h -krys
  */
 
 #if HAVE_INET_NTOA
 # ifdef inet_ntoa
 #  undef inet_ntoa
+extern char *inet_ntoa __P((struct in_addr in));
 # endif
 # define inetntoa(x) inet_ntoa(*(struct in_addr *)(x))
 #endif
 #if HAVE_INET_ATON
 # ifdef inet_aton
 #  undef inet_aton
+extern int inet_aton __P((const char *cp, struct in_addr *addr));
 # endif
 # define inetaton inet_aton
 #endif
 #if HAVE_INET_ADDR
 # ifdef inet_addr
 #  undef inet_addr
+extern unsigned long int inet_addr __P((const char *cp));
 # endif
 # define inetaddr inet_addr
 #endif
 #if HAVE_INET_NETOF
 # ifdef inet_netof
 #  undef inet_netof
+extern int inet_netof __P((struct in_addr in));
 # endif
 # define inetnetof inet_netof
 #endif

@@ -232,6 +232,7 @@ if test "$irc_cv_solaris_2" = no; then
   AC_MSG_RESULT(no)
 else
   AC_MSG_RESULT([yes, $irc_cv_solaris_2])
+  AC_DEFINE(SOLARIS_2)
   if echo "$irc_cv_solaris_2" | egrep "^2\.(0|1|2)" >/dev/null; then
     AC_DEFINE(SOLARIS_2_0_2_1_2_2)
   elif echo "$irc_cv_solaris_2" | grep "^2\.3" >/dev/null; then
@@ -429,7 +430,7 @@ else
 #define SIGCHLD SIGCLD
 #endif
 
-int got;
+int got = 0;
 
 RETSIGTYPE hand()
 {
@@ -660,6 +661,52 @@ if test "$no_resconf" = yes; then
 else
   AC_MSG_RESULT($irc_cv_path_resconf)
   AC_DEFINE_UNQUOTED(IRC_RESCONF, "$irc_cv_path_resconf")
+fi
+])
+
+
+AC_DEFUN(IRC_EGREP_RMLF_CPP,
+[cat > conftest.$ac_ext <<EOF
+[#]line __oline__ "configure"
+#include "confdefs.h"
+[$2]
+EOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&AC_FD_CC |
+  $AWK "{if (NR > 1) printf(\" \"); printf(\[$]0)}" |
+changequote(, )dnl
+  egrep "$1" >/dev/null 2>&1; then
+changequote([, ])dnl
+  ifelse([$3], , :, [rm -rf conftest*
+  $3])
+ifelse([$4], , , [else
+  rm -rf conftest*
+  $4
+])dnl
+fi
+rm -f conftest*
+])
+
+
+AC_DEFUN(IRC_LINUX,
+[AC_MSG_CHECKING(for Linux)
+AC_CACHE_VAL(irc_cv_linux,
+[if test "x`(uname) 2>/dev/null`" = "xLinux"; then
+  IRC_EGREP_RMLF_CPP(
+    [struct( |	)+hostent( |	)+\{.*const.*h_name],
+    [#include <netdb.h>],
+    irc_cv_linux=bad,
+    irc_cv_linux=good)
+else
+  irc_cv_linux=no
+fi
+])
+if test "$irc_cv_linux" = no; then
+  AC_MSG_RESULT(no)
+elif test "$irc_cv_linux" = good; then
+  AC_MSG_RESULT([yes, with a good <netdb.h> file])
+else
+  AC_MSG_RESULT([yes, with a bad <netdb.h> file])
+  AC_DEFINE(BAD___CONST_NETDB_H)
 fi
 ])
 
@@ -1196,9 +1243,7 @@ fi
 
 
 AC_DEFUN(IRC_AIX,
-[AC_BEFORE([$0], [AC_TRY_COMPILE])dnl
-AC_BEFORE([$0], [AC_TRY_RUN])dnl
-AC_MSG_CHECKING(for AIX)
+[AC_MSG_CHECKING(for AIX)
 AC_CACHE_VAL(irc_cv_aix,
 [if test "x`(uname) 2>/dev/null`" = "xAIX"; then
   irc_cv_aix="`uname -rv`"
@@ -1266,7 +1311,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.13 1997/09/24 18:41:03 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.14 1997/10/13 17:42:29 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1274,6 +1319,7 @@ AC_CONFIG_AUX_DIR(../support)
 
 IRC_PROG_CC
 AC_PROG_CPP
+AC_PROG_AWK
 IRC_PROG_INSTALL
 AC_PATH_PROGS(SUM, sum cksum, true)
 AC_PROG_GCC_TRADITIONAL
@@ -1283,6 +1329,7 @@ AC_ISC_POSIX
 AC_MINIX
 IRC_SGI_CC
 IRC_SOLARIS_2
+IRC_LINUX
 
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
@@ -1325,11 +1372,11 @@ IRC_CURSES_TERMCAP
 AC_FUNC_SETPGRP
 AC_FUNC_SETVBUF_REVERSED
 AC_FUNC_VFORK
-AC_CHECK_FUNCS(setpgrp strchr strrchr memcmp memset memmove memcpy index rindex bcmp bcopy bzero select inet_ntoa inet_aton inet_addr inet_netof getrusage times strerror strtoken strtok)
+AC_CHECK_FUNCS(setpgrp strchr strrchr memcmp memset memmove memcpy index rindex bcmp bcopy bzero select inet_ntoa inet_aton inet_addr inet_netof getrusage times strerror strtoken strtok sigaction sigset)
 dnl ---
 dnl Note: additional tests should be performed and used inside the source code
 dnl       for the following functions:
-dnl       gethostname gettimeofday lrand48 mkdir sigaction sigset socket
+dnl       gethostname gettimeofday lrand48 mkdir socket
 dnl ---
 IRC_FUNC_MEMCMP
 IRC_SELECT_POLL

@@ -1,4 +1,4 @@
-/* $Id: acconfig.h,v 1.5 1997/09/24 18:40:59 kalt Exp $ */
+/* $Id: acconfig.h,v 1.6 1997/10/13 17:42:28 kalt Exp $ */
 
 /* Define if zlib package must be used for compilation/linking. */
 #undef USE_ZLIB
@@ -38,11 +38,17 @@
 /* Define if the operating system is AIX 3.2.  */
 #undef AIX_3_2
 
+/* Define if the operating system is Solaris 2.x (SunOS 5.x).  */
+#undef SOLARIS_2
+
 /* Define if the operating system is Solaris 2.3 (SunOS 5.3).  */
 #undef SOLARIS_2_3
 
 /* Define if the operating system is Solaris 2.[0-2] (SunOS 5.[0-2]).  */
 #undef SOLARIS_2_0_2_1_2_2
+
+/* Define if <netdb.h> contains bad __const usages (Linux). */
+#undef BAD___CONST_NETDB_H
 
 /* Define if sys_errlist is declared in stdio.h or errno.h. */
 #undef SYS_ERRLIST_DECLARED
