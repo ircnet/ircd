@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.218 2004/06/24 17:33:11 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.219 2004/06/24 17:49:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2602,10 +2602,9 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			   ME, parv[0], user, acptr->name);
 		chasing = 1;
 	    }
-	if (!MyConnect(acptr) && IsLocOp(cptr))
+	if (!MyConnect(acptr) && is_allowed(cptr, ACL_KILLREMOTE))
 	    {
-		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
-		return 1;
+		return m_nopriv(cptr, sptr, parc, parv);
 	    }
 	if (IsServer(acptr) || IsMe(acptr))
 	    {
@@ -2615,15 +2614,6 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			   acptr->name);
 		return 1;
 	    }
-
-#ifdef	LOCAL_KILL_ONLY
-	if (MyOper(sptr) && !MyConnect(acptr))
-	    {
-		sendto_one(sptr, ":%s NOTICE %s :Nick %s isnt on your server",
-			   ME, parv[0], acptr->name);
-		return 1;
-	    }
-#endif
 	if (!IsServer(cptr))
 	    {
 		/*
