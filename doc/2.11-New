@@ -1,0 +1,27 @@
+	* New server to server protocol, based on Unique IDs
+	* Ability to specify outgoing IP in C: line.
+	* I-line flags
+		D - restricted, when client has no reverse DNS
+		I - restricted, when client has no ident.
+		R - restricted.
+		E - client is exempted from K: lines
+		
+	* Channels now keep information who set the topic.
+	* LIST does not disconnect if client's sendQ fills.
+	* Reject reason sent to client can be specified in iauth.conf.
+	* Client's username and hostname are checked for valid chars.
+
+	* Operator broadcast message syntax has been changed to:
+		$$*.tld - message all users matching given server mask
+		$#*.tld - message all users matching given hostname mask
+	
+	* Essential notices were moved from &LOCAL to &NOTICES
+	* WHOIS now shows the time user signed on.
+	* Possibility of using port 0 in server connects (even remote)
+	  ircd will use port from ircd.conf (which can be negative to turn off
+	  autoconnects)
+	* LUSERS shows local and global usercount maximum.
+	* STATS ? shows quick information about connected servers.
+	* Invite overriding ban notice shows nick of client who issued the
+	  invite.
+	
