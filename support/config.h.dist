@@ -534,6 +534,17 @@
 */
 #undef DELAYED_KILLS
 
+/*
+** Split detection
+*/
+#define SPLIT_USERS	15000
+#define SPLIT_SERVERS	15
+
+/*
+** Notice sent to connecting users if the server is in the split-mode. 
+*/
+#define SPLIT_CONNECT_NOTICE "Server is currently in split-mode."
+
 /* ------------------------- END CONFIGURATION SECTION -------------------- */
 #ifndef ENABLE_SUMMON
 #  undef LEAST_IDLE
@@ -645,4 +656,12 @@
 */
 #ifdef DELAYED_KILLS
 # define MAXDELAYEDKILLS 200
+#endif
+
+#ifndef SPLIT_USERS
+#error SPLIT_USERS must be defined
+#endif
+
+#ifndef SPLIT_SERVERS
+#error SPLIT_SERVERS must be defined
 #endif
