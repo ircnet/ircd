@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.181 2004/02/16 02:15:01 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.182 2004/02/18 21:43:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3683,6 +3683,11 @@ time_t	collect_channel_garbage(time_t now)
 
 			if (IsSplit())
 			{
+				if (chptr->reop > 0)
+				{
+					/* Extend reop */
+					chptr->reop += CHECKFREQ;
+				}
 				continue;
 			}
 			if (chptr->reop == 0 || chptr->reop > now)
