@@ -1,3 +1,16 @@
+2003-10-13  Piotr Kucharski
+
+	* res.c/proc_answer(): possible buffer overflow.
+	* res.c/get_res() : "wrong type" error for ipv4 server names 
+	  on ipv6 servers.
+	* res.c/do_query_number(), config.h.dist: SIXBONE_HACK.
+	* config.h.dist: CLONE_CHECK is now default, not SLOW_ACCEPT.
+	* s_user.c/m_nick(): username and hostname were erroneously empty
+	  in legal collisions.
+	* s_conf.c: some CONF_RCLIENT missing.
+	* s_bsd.c/polludp(): remove confusing "udp port recvfrom()" message.
+	* s_bsd.c/inetport(): check ipmask validity.
+
 2003-10-13  Kurt Roeckx
 
 	* match_ext.h, send_ext.h, c_conf.c, channel.c, hash.c, ircd.c, res.c,
