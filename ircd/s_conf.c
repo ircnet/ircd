@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.103 2004/03/21 00:40:26 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.104 2004/03/21 00:42:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1931,6 +1931,12 @@ static	int	check_time_interval(char *interval, char *reply)
 void	find_bounce(aClient *cptr, int class, int fd)
 {
 	Reg	aConfItem	*aconf;
+
+	if (fd < 0 && cptr == NULL)
+	{
+		/* nowhere to send error to */
+		return;
+	}
 
 	for (aconf = conf; aconf; aconf = aconf->next)
 	{
