@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.19 2005/01/30 16:23:18 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.20 2005/01/30 16:24:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -129,7 +129,7 @@ int	get_con_freq(aClass *clptr)
  * immeadiately after the first one (class 0).
  */
 void	add_class(int class, int ping, int confreq, int maxli, int sendq,
-		int hlocal, int uhlocal, int hglobal, int uhglobal)
+		int bsendq, int hlocal, int uhlocal, int hglobal, int uhglobal)
 {
 	aClass *t, *p;
 
@@ -145,8 +145,8 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 	else
 		p = t;
 	Debug((DEBUG_DEBUG,
-"Add Class %d: p %x t %x - cf: %d pf: %d ml: %d sq: %d ml: %d.%d mg: %d.%d",
-		class, p, t, confreq, ping, maxli, QUEUELEN, hlocal, uhlocal,
+"Add Class %d: p %x t %x - cf: %d pf: %d ml: %d sq: %d.%d ml: %d.%d mg: %d.%d",
+		class, p, t, confreq, ping, maxli, sendq, bsendq, hlocal, uhlocal,
 	       hglobal, uhglobal));
 	Class(p) = class;
 	ConFreq(p) = confreq;
@@ -154,6 +154,7 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 	MaxLinks(p) = maxli;
 	if (sendq)
 		MaxSendq(p) = sendq;
+	MaxBSendq(p) = bsendq ? bsendq : MaxSendq(p);
 	MaxHLocal(p) = hlocal;
 	MaxUHLocal(p) = uhlocal;
 	MaxHGlobal(p) = hglobal;
