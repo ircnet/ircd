@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.38 1999/08/13 17:22:12 kalt Exp $
+     $Id: INSTALL.info,v 1.39 2002/11/22 21:23:16 chopin Exp $
 
    This document describes how to install, and configure IRC 2.10.3.
 
@@ -1322,7 +1322,7 @@ Deny auto-connections
 
      D::2:eff.org:3:
 
-     Do now auto-connect to "eff.org", or any server in class "3" if a
+     Do not auto-connect to "eff.org", or any server in class "3" if a
      server defined to be in class "2" is currently present on the
      network.
 

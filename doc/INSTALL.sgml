@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.42 2002/06/01 18:14:58 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.43 2002/11/22 21:23:16 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.10.3.
 </abstract>
@@ -1038,7 +1038,7 @@ present on the network matches ``*.edu''.
 <p>
 D::2:eff.org:3:
 <p>
-Do now auto-connect to ``eff.org'', or any server in class
+Do not auto-connect to ``eff.org'', or any server in class
 ``3'' if a server defined to be in class ``2'' is currently
 present on the network.
 </descrip>
