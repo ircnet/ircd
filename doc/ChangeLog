@@ -1,3 +1,9 @@
+2.11.0
+
+2004-12-21  Piotr Kucharski
+
+	* README, RELEASE_LOG, RELEASE_NOTES, iauth-internals.txt: update.
+
 2004-12-16  Piotr Kucharski
 
 	* iauth.conf.5: reason is all-module option, move docs around.
