@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.92 2003/02/09 23:39:18 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.93 2003/02/15 17:55:22 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3015,6 +3015,7 @@ static	void	polludp()
 	    }
 	Debug((DEBUG_DEBUG,"udp poll"));
 
+	memset(&from, 0, fromlen);
 	n = recvfrom(udpfd, readbuf, mlen, 0, (SAP)&from, &fromlen);
 	if (n == -1)
 	    {
@@ -3027,7 +3028,14 @@ static	void	polludp()
 
 			sprintf(buf, "udp port recvfrom() from %s to %%s: %%s",
 #ifdef INET6
-				inetntop(AF_INET6, (char *)&from.sin6_addr, mydummy, MYDUMMY_SIZE)
+				from.sin6_addr
+#else
+				from.sin_addr
+#endif
+				== 0 ? "unknown" :
+#ifdef INET6
+				inetntop(AF_INET6, (char *)&from.sin6_addr,
+					mydummy, MYDUMMY_SIZE)
 #else
 				inetntoa((char *)&from.sin_addr)
 #endif
