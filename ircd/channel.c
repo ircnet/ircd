@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.13 1997/09/11 03:28:27 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.14 1997/09/11 03:50:30 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -282,7 +282,12 @@ int	flags;
 
 #ifdef USE_SERVICES
 		if (chptr->users == 1)
-			check_services_butone(SERVICE_WANT_CHANNEL,
+			check_services_butone(SERVICE_WANT_CHANNEL|
+					      SERVICE_WANT_VCHANNEL,
+					      NULL, &me, "CHANNEL %s %d",
+					      chptr->chname, chptr->users);
+		else
+			check_services_butone(SERVICE_WANT_VCHANNEL,
 					      NULL, &me, "CHANNEL %s %d",
 					      chptr->chname, chptr->users);
 #endif
@@ -347,8 +352,15 @@ aChannel *chptr;
 		istat.is_userc--;
 	    }
 #ifdef USE_SERVICES
-	check_services_butone(SERVICE_WANT_CHANNEL, NULL, &me, "CHANNEL %s %d",
-			      chptr->chname, chptr->users-1);
+	if (chptr->users == 1)
+		check_services_butone(SERVICE_WANT_CHANNEL|
+				      SERVICE_WANT_VCHANNEL, NULL, &me,
+				      "CHANNEL %s %d", chptr->chname,
+				      chptr->users-1);
+	else
+		check_services_butone(SERVICE_WANT_VCHANNEL, NULL, &me,
+				      "CHANNEL %s %d", chptr->chname,
+				      chptr->users-1);
 #endif
 	if (--chptr->users <= 0)
 		sub1_from_channel(chptr);

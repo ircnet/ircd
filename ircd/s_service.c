@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.15 1997/09/03 18:05:11 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.16 1997/09/11 03:50:31 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -630,7 +630,7 @@ char	*parv[];
 		    }
 	    }
 	
-	if (burst & (SERVICE_WANT_CHANNEL|SERVICE_WANT_MODE))
+	if (burst & (SERVICE_WANT_CHANNEL|SERVICE_WANT_VCHANNEL|SERVICE_WANT_MODE))
 	    {
 		char    modebuf[MODEBUFLEN], parabuf[MODEBUFLEN];
 		aChannel	*chptr;
@@ -639,7 +639,7 @@ char	*parv[];
 		    {
 			if (chptr->users == 0)
 				continue;
-			if (burst & SERVICE_WANT_CHANNEL)
+			if (burst&(SERVICE_WANT_CHANNEL|SERVICE_WANT_VCHANNEL))
 				sendto_one(sptr, "CHANNEL %s %d",
 					   chptr->chname, chptr->users);
 			if (burst & SERVICE_WANT_MODE)
