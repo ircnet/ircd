@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.86 2004/10/26 23:26:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.87 2004/11/21 00:44:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -47,7 +47,7 @@ struct Message msgtab[] = {
 { "KICK",     2, MPAR, { _m(m_kick), _m(m_kick), _m(m_kick), _m(m_nop), _m(m_unreg) } },
 { "SERVER",   2, MPAR, { _m(m_server), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_server) } },
 { "SMASK",    2, MPAR, { _m(m_smask), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
-{ "TRACE",    0, MPAR, { _m(m_trace), _m(m_trace), _m(m_trace), _m(m_nop), _m(m_unreg) } },
+{ "TRACE",    0, MPAR, { _m(m_trace), _m(m_trace), _m(m_trace), _m(m_trace), _m(m_unreg) } },
 { "TOPIC",    1, MPAR, { _m(m_nop), _m(m_topic), _m(m_topic), _m(m_nop), _m(m_unreg) } },
 { "INVITE",   2, MPAR, { _m(m_nop), _m(m_invite), _m(m_invite), _m(m_nop), _m(m_unreg) } },
 { "WALLOPS",  1, MPAR, { _m(m_wallops), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
@@ -59,24 +59,24 @@ struct Message msgtab[] = {
 { "USER",     4, MPAR, { _m(m_nop), _m(m_reg), _m(m_reg), _m(m_nop), _m(m_user) } },
 { "AWAY",     0, MPAR, { _m(m_nop), _m(m_away), _m(m_away), _m(m_nop), _m(m_unreg) } },
 { "UMODE",    1, MPAR, { _m(m_nop), _m(m_umode), _m(m_umode), _m(m_nop), _m(m_unreg) } },
-{ "ISON",     1,    1, { _m(m_ison), _m(m_ison), _m(m_ison), _m(m_nop), _m(m_unreg) } },
+{ "ISON",     1,    1, { _m(m_ison), _m(m_ison), _m(m_ison), _m(m_ison), _m(m_unreg) } },
 { "SQUIT",    2, MPAR, { _m(m_squit), _m(m_nopriv), _m(m_squit), _m(m_nop), _m(m_unreg) } },
-{ "WHOIS",    1, MPAR, { _m(m_whois), _m(m_whois), _m(m_whois), _m(m_nop), _m(m_unreg) } },
-{ "WHO",      1, MPAR, { _m(m_who), _m(m_who), _m(m_who), _m(m_nop), _m(m_unreg) } },
-{ "WHOWAS",   1, MPAR, { _m(m_whowas), _m(m_whowas), _m(m_whowas), _m(m_nop), _m(m_unreg) } },
-{ "LIST",     0, MPAR, { _m(m_list), _m(m_list), _m(m_list), _m(m_nop), _m(m_unreg) } },
+{ "WHOIS",    1, MPAR, { _m(m_whois), _m(m_whois), _m(m_whois), _m(m_whois), _m(m_unreg) } },
+{ "WHO",      1, MPAR, { _m(m_who), _m(m_who), _m(m_who), _m(m_who), _m(m_unreg) } },
+{ "WHOWAS",   1, MPAR, { _m(m_whowas), _m(m_whowas), _m(m_whowas), _m(m_whowas), _m(m_unreg) } },
+{ "LIST",     0, MPAR, { _m(m_list), _m(m_list), _m(m_list), _m(m_list), _m(m_unreg) } },
 { "NAMES",    0, MPAR, { _m(m_nop), _m(m_names), _m(m_names), _m(m_nop), _m(m_unreg) } },
-{ "USERHOST", 1, MPAR, { _m(m_userhost), _m(m_userhost), _m(m_userhost), _m(m_nop), _m(m_unreg) } },
+{ "USERHOST", 1, MPAR, { _m(m_userhost), _m(m_userhost), _m(m_userhost), _m(m_userhost), _m(m_unreg) } },
 { "PASS",     1, MPAR, { _m(m_nop), _m(m_reg), _m(m_reg), _m(m_nop), _m(m_pass) } },
-{ "LUSERS",   0, MPAR, { _m(m_lusers), _m(m_lusers), _m(m_lusers), _m(m_nop), _m(m_unreg) } },
+{ "LUSERS",   0, MPAR, { _m(m_lusers), _m(m_lusers), _m(m_lusers), _m(m_lusers), _m(m_unreg) } },
 { "TIME",     0, MPAR, { _m(m_nop), _m(m_time), _m(m_time), _m(m_nop), _m(m_unreg) } },
 { "OPER",     2, MPAR, { _m(m_nop), _m(m_oper), _m(m_nop), _m(m_nop), _m(m_unreg) } },
 { "CONNECT",  1, MPAR, { _m(m_nop), _m(m_nopriv), _m(m_connect), _m(m_nop), _m(m_unreg) } },
 { "VERSION",  0, MPAR, { _m(m_nop), _m(m_version), _m(m_version), _m(m_nop), _m(m_unreg) } },
 { "STATS",    1, MPAR, { _m(m_nop), _m(m_stats), _m(m_stats), _m(m_nop), _m(m_unreg) } },
-{ "LINKS",    0, MPAR, { _m(m_links), _m(m_links), _m(m_links), _m(m_nop), _m(m_unreg) } },
+{ "LINKS",    0, MPAR, { _m(m_links), _m(m_links), _m(m_links), _m(m_links), _m(m_unreg) } },
 { "ADMIN",    0, MPAR, { _m(m_admin), _m(m_admin), _m(m_admin), _m(m_admin), _m(m_admin) } },
-{ "USERS",    0, MPAR, { _m(m_nop), _m(m_users), _m(m_users), _m(m_nop), _m(m_unreg) } },
+{ "USERS",    0, MPAR, { _m(m_nop), _m(m_users), _m(m_users), _m(m_users), _m(m_unreg) } },
 { "SUMMON",   0, MPAR, { _m(m_nop), _m(m_summon), _m(m_summon), _m(m_nop), _m(m_unreg) } },
 { "HELP",     0, MPAR, { _m(m_nop), _m(m_help), _m(m_help), _m(m_nop), _m(m_unreg) } },
 { "INFO",     0, MPAR, { _m(m_nop), _m(m_info), _m(m_info), _m(m_nop), _m(m_unreg) } },
