@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.23 1998/08/03 14:09:23 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.24 1998/08/05 02:39:04 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -380,7 +380,7 @@ char	*comment;	/* Reason for the exit */
 				    sptr->user->host);
 # endif
 		    }
-		else if (sptr->exitc != EXITC_REF)
+		else if (sptr->exitc != EXITC_REF && sptr->exitc != EXITC_AREF)
 		    {
 # if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
 			syslog(LOG_NOTICE, 
