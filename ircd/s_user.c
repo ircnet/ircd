@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.120 2002/04/05 03:58:07 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.121 2002/04/06 05:29:51 jv Exp $";
 #endif
 
 #include "os.h"
@@ -3248,8 +3248,10 @@ char *path;
 {
 	if (MyConnect(sptr))
 	{
-		sendto_one(sptr,replies[RPL_SAVENICK],cptr->name,sptr->name);
+		sendto_one(sptr, replies[RPL_SAVENICK], cptr ? cptr->name : ME,
+			   sptr->name);
 	}
+	
 	sendto_common_channels(sptr, ":%s NICK :%s",
 			       sptr->name, sptr->user->uid);
 	add_history(sptr, NULL);
