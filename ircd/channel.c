@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.63 1998/09/13 16:48:08 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.64 1998/09/18 22:37:18 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1313,9 +1313,11 @@ char	*parv[], *mbuf, *pbuf;
 					sendto_one(sptr,
 					   err_str(ERR_CHANOPRIVSNEEDED,
 						   parv[0]), chptr->chname);
-				else if (*ip == MODE_REOP && !IsServer(sptr) &&
+				else if ((*ip == MODE_REOP ||
+					  *ip == MODE_ANONYMOUS) &&
+					 !IsServer(sptr) &&
 					 !(is_chan_op(sptr,chptr)&CHFL_UNIQOP))
-					/* MODE_REOP is restricted to UNIQOP */
+					/* 2 modes restricted to UNIQOP */
 					sendto_one(sptr,
 					   err_str(ERR_CHANOPRIVSNEEDED,
 						   parv[0]), chptr->chname);
