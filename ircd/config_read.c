@@ -110,6 +110,7 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 				char	*filep = file;
 				char	*savefilep;
 				aConfig	*ret;
+				aFile	*tcf;
 
 				*filep = '\0';
 				if (depth >= MAXDEPTH)
@@ -138,6 +139,16 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 				memcpy(filep, start, end - start);
 				filep += end - start;
 				*filep = '\0';
+				for (tcf = curfile; tcf; tcf = tcf->parent)
+				{
+					if (0 == strcmp(tcf->filename, file))
+					{
+						config_error(CF_ERR, curfile,
+							linenum,
+							"would loop include");
+						goto eatline;
+					}
+				}
 				if ((fd = open(file, O_RDONLY)) < 0)
 				{
 					config_error(CF_ERR, curfile, linenum,
