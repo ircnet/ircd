@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.2 1997/04/14 15:04:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.3 1997/04/18 21:38:55 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -1581,8 +1581,19 @@ char	*parv[];
 		else
 		    {
 			if (!(sp = find_tokserver(atoi(server), cptr, NULL)))
-				acptr = find_server(server, NULL); /* hmm??? */
-/*			strncpyzt(user->tok, server, sizeof(user->tok));*/
+			    {
+				/*
+				** Why? Why do we keep doing this?
+				** s_service.c had the same kind of kludge.
+				** Can't we get rid of this? - krys
+				*/
+				acptr = find_server(server, NULL);
+				if (acptr)
+					sendto_flag(SCH_ERROR,
+			    "ERROR: SERVER:%s uses wrong syntax for NICK (%s)",
+					    get_client_name(cptr, FALSE),
+						    parv[0]);
+			    }
 		    }
 		if (acptr)
 			sp = acptr->serv;
