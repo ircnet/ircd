@@ -1,12 +1,14 @@
 2003-02-11  Piotr Kucharski
 
-	* s_serv.c/m_stats(): stats l server client_not_on_this_server
-	  should not return bogus values (from Grega Pogacnik).
+        * s_serv.c/m_stats(): stats l server client_not_on_this_server
+          should not return bogus values (from Grega Pogacnik).
 
 2003-02-10  Piotr Kucharski
 
-	* channel.c/match_modeid(): added support for CIDR.
-	* Makefile.in: added install-ircd target.
+        * channel.c/match_modeid(): added support for CIDR.
+        * s_conf.c/match_ipmask(): added one param to ease using it
+          with or without user@ part to match CIDRs;
+        * Makefile.in: added install-ircd target.
 
 2003-02-09  Jakub Vlasek
 	
