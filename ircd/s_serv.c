@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.207 2004/06/24 15:55:24 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.208 2004/06/24 17:14:22 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1922,6 +1922,14 @@ static	void	report_configured_links(aClient *sptr, char *to, int mask)
 					   c, host, (pass) ? "*" : null,
 					   name, port, get_conf_class(tmp),
 					   iline_flags_to_string(tmp->flags));
+
+			}
+			else if ((tmp->status & (CONF_OPERATOR|CONF_LOCOP)))
+			{
+				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
+					   c, host, (pass) ? "*" : null,
+					   name, port, get_conf_class(tmp),
+					   oline_flags_to_string(tmp->flags));
 
 			}
 			else
