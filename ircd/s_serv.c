@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.122 2003/02/16 03:53:39 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.123 2003/07/28 17:17:43 jv Exp $";
 #endif
 
 #include "os.h"
@@ -950,12 +950,24 @@ char	*parv[];
 int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 {
 	Reg	aClient	*acptr;
+	aClient *bysptr = NULL;
+	
 	Reg	aConfItem	*aconf, *bconf;
 	char	mlname[HOSTLEN+1], *inpath, *host, *s, *encr, *stok;
 	int	i;
 
 	host = cptr->name;
 	inpath = get_client_name(cptr,TRUE); /* "refresh" inpath with host */
+
+	if (cptr->serv && cptr->serv->byuid[0])
+	{
+		bysptr = find_uid(cptr->serv->byuid, NULL);
+		/* we are interrested only in *remote* opers */
+		if (MyConnect(bysptr))
+		{
+			bysptr = NULL;
+		}
+	}
 
 	if (!(aconf = find_conf(cptr->confs, host, CONF_NOCONNECT_SERVER)))
 	    {
@@ -965,6 +977,13 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			   inpath);
 		sendto_flag(SCH_ERROR,
 			    "Access denied. No N line for server %s", inpath);
+		if (bysptr)
+		{
+			sendto_one(bysptr,
+				":%s NOTICE %s :Access denied. No N line for "
+				"server %s", ME, bysptr->name, inpath);
+		}
+				
 		return exit_client(cptr, cptr, &me, "No N line for server");
 	    }
 	if (!(bconf = find_conf(cptr->confs, host, CONF_CONNECT_SERVER|
@@ -975,6 +994,12 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			   inpath);
 		sendto_flag(SCH_ERROR,
 			    "Only N (no C) field for server %s",inpath);
+		if (bysptr)
+		{
+			sendto_one(bysptr,
+			":%s NOTICE %s :Only N (no C) field for server %s",
+				ME, bysptr->name, inpath);
+		}
 		return exit_client(cptr, cptr, &me, "No C line for server");
 	    }
 
@@ -982,6 +1007,12 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	    {
 		sendto_one(cptr, "ERROR :Server version is too old.");
 		sendto_flag(SCH_ERROR, "Old version for %s", inpath);
+		if (bysptr)
+		{
+			sendto_one(bysptr,
+				":%s NOTICE %s :Old version for %s",
+				ME, bysptr->name, inpath);
+		}
 		return exit_client(cptr, cptr, &me, "Old version");
 	    }
 
@@ -1000,6 +1031,12 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			  	inpath);
 			sendto_flag(SCH_ERROR,
 			    	"Access denied (crypt failed) %s", inpath);
+			if (bysptr)
+			{
+				sendto_one(bysptr,
+					":%s NOTICE %s :Access denied (crypt "
+					"failed %s", ME, bysptr->name, inpath);
+			}
 			return exit_client(cptr, cptr, &me, "Bad Password");
 		    }
 	    }
@@ -1015,6 +1052,12 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			   inpath);
 		sendto_flag(SCH_ERROR,
 			    "Access denied (passwd mismatch) %s", inpath);
+		if (bysptr)
+		{
+			sendto_one(bysptr, ":%s NOTICE %s :Access denied "
+				"(passwd mismatch) %s", ME, bysptr->name,
+				inpath);
+		}
 		return exit_client(cptr, cptr, &me, "Bad Password");
 	    }
 	bzero(cptr->passwd, sizeof(cptr->passwd));
@@ -1026,6 +1069,12 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			ircstp->is_ref++;
 			sendto_flag(SCH_ERROR, "I'm a leaf, cannot link %s",
 				    get_client_name(cptr, TRUE));
+			if (bysptr)
+			{
+				sendto_one(bysptr, ":%s NOTICE %s :I'm a leaf,"
+					" cannot link %s", ME, bysptr->name,
+					get_client_name(cptr, TRUE));
+			}
 			return exit_client(cptr, cptr, &me, "I'm a leaf");
 		    }
 #endif
@@ -1035,13 +1084,26 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	{
 		sendto_flag(SCH_NOTICE, "Mask of server %s is matching "
 			"my name %s, dropping link", cptr->name, mlname);
-		return exit_client(cptr, cptr, &me, 
+		if (bysptr)
+		{
+			sendto_one(bysptr, ":%s NOTICE %s :Mask of server %s "
+				"is matching my name %s, dropping link",
+				ME, bysptr->name, cptr->name, mlname);
+		}
+		return exit_client(cptr, cptr, &me,
 			"Server exists (mask matches)");
 	}
 	if (!match(mlname,cptr->name))
 	{
 		sendto_flag(SCH_NOTICE, "Server %s matches my name for link "
 			"%s, dropping link", cptr->name, mlname);
+		if (bysptr)
+		{
+			sendto_one(bysptr, ":%s NOTICE %s :Server %s "
+				"matches my name for link %s, dropping link",
+				ME, bysptr->name, cptr->name, mlname);
+		}
+
 		return exit_client(cptr, cptr, &me,
 			"Server exists (matches my mask)");
 	}
@@ -1116,6 +1178,13 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			sendto_flag(SCH_ERROR,
 			    "Unable to setup compressed link for %s",
 				    get_client_name(cptr, TRUE));
+			if (bysptr)
+			{
+				sendto_one(bysptr,
+				 	":%s NOTICE %s :Unable to setup "
+					"compressed link for %s",
+				 ME, bysptr->name, get_client_name(cptr, TRUE));
+			}
 			return exit_client(cptr, cptr, &me,
 					   "zip_init() failed");
 		    }
@@ -1130,19 +1199,41 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		{
 			sendto_flag(SCH_ERROR, "Invalid SID from %s",
 				get_client_name(cptr, TRUE));
+			if (bysptr)
+			{
+				sendto_one(bysptr,
+					":%s NOTICE %s :Invalid SID from %s",
+					ME, bysptr->name,
+					get_client_name(cptr, TRUE));
+			}
 			return exit_client(cptr, cptr, &me, "Invalid SID");
 		}
 		if (!sid_valid(sid))
 		{
 			sendto_flag(SCH_ERROR, "Invalid SID %s from %s",
 				sid, get_client_name(cptr, TRUE));
+			if (bysptr)
+			{
+				sendto_one(bysptr,
+					":%s NOTICE %s :Invalid SID %s from %s",
+					ME, bysptr->name, sid,
+					get_client_name(cptr, TRUE));
+			}
 			return exit_client(cptr, cptr, &me, "Invalid SID");
 		}
 		if (find_sid(sid, NULL))
 		{
 			sendto_flag(SCH_NOTICE,	"Link %s tried to introduce"
 				" already existing SID (%s), dropping link",
-				get_client_name(cptr,TRUE),sid);
+				get_client_name(cptr, TRUE), sid);
+			if (bysptr)
+			{
+				sendto_one(bysptr,
+					":%s NOTICE %s :Link %s tried to "
+					"introduce already existing SID (%s), "
+					"dropping link", ME, bysptr->name,
+					get_client_name(cptr, TRUE), sid);
+			}
 			return exit_client(cptr, cptr, &me,"SID collision");
 		}
 	}
@@ -1152,6 +1243,12 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		/* remote is older than 2.10.2 */
 		sendto_flag(SCH_ERROR, "Remote server %s is too old "
 			"(<2.10.2), dropping link", get_client_name(cptr,TRUE));
+		if (bysptr)
+		{
+			sendto_one(bysptr, ":%s NOTICE %s :Remote server %s is"
+				"too old (<2.10.2), dropping link",
+				ME, bysptr->name, get_client_name(cptr, TRUE));
+		}
 		return exit_client(cptr,cptr,&me,"Too old version");
 	}
 
@@ -1179,10 +1276,26 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	nextping = timeofday;
 	sendto_flag(SCH_NOTICE, "Link with %s established. (%X%s)", inpath,
 		    cptr->hopcount, (cptr->flags & FLAGS_ZIP) ? "z" : "");
+	if (bysptr)
+	{
+		sendto_one(bysptr,
+			":%s NOTICE %s :Link with %s established. (%X%s)",
+			ME, bysptr->name, inpath, cptr->hopcount,
+			(cptr->flags & FLAGS_ZIP) ? "z" : "");
+	}
 	(void)add_to_client_hash_table(cptr->name, cptr);
 	/* doesnt duplicate cptr->serv if allocted this struct already */
 	if (!make_server(cptr))
 	{
+		sendto_flag(SCH_ERROR, "Ran out of compatibility tokens for %s"
+				", dropping link", inpath);
+		if (bysptr)
+		{
+			sendto_one(bysptr, ":%s NOTICE %s :Ran out of "
+				"compatibility tokens for %s, dropping link",
+				ME, bysptr->name, inpath);
+					
+		}
 		return exit_client(cptr, cptr, &me, "No more tokens");
 	}
 	cptr->serv->up = &me;
