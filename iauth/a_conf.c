@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.20 1999/07/04 22:09:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.21 1999/07/11 22:11:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -77,7 +77,7 @@ char *cfile;
 	u_char needh = 0; /* do we need hostname information for any host? */
 	u_char o_req = 0, o_dto = 0, o_wup = 0;
 	static char o_all[5];
-	u_int timeout = DEFAULT_TIMEOUT;
+	u_int timeout = DEFAULT_TIMEOUT, totto = 0;
 	u_int lnnb = 0, i;
 	u_char icount = 0, Mcnt = 0;
 	char buffer[160], *ch;
@@ -373,12 +373,33 @@ char *cfile;
 	ident->timeout = MAX(DEFAULT_TIMEOUT, ident->timeout);
 
 	itmp = instances;
+	while (itmp)
+	    {
+		totto += itmp->timeout;
+		itmp = itmp->nexti;
+	    }
+	if (totto > ACCEPTTIMEOUT)
+	    {
+		if (cfile)
+			printf("Warning: sum of timeouts exceeds ACCEPTTIMEOUT!\n");
+		else
+			sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
+			   "Warning: sum of timeouts exceeds ACCEPTTIMEOUT!");
+		if (o_dto)
+			if (cfile)
+				printf("Error: \"notimeout\" is set!\n");
+			else
+				sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
+					   "Error: \"notimeout\" is set!");
+	    }
+
+	itmp = instances;
 	if (cfile)
 	    {
 		aTarget *ttmp;
 		char *err;
 
-		printf("Module(s) loaded:\n");
+		printf("\nModule(s) loaded:\n");
 		while (itmp)
 		    {
 			printf("\t%s\t%s\n", itmp->mod->name,
@@ -424,6 +445,7 @@ char *cfile;
 				itmp->mod->init(itmp);
 			itmp = itmp->nexti;
 		    }
+
 	ch = o_all;
 	if (o_req) *ch++ = 'R';
 	if (o_dto) *ch++ = 'T';
