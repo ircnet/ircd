@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.90 2001/01/15 00:09:07 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.91 2001/02/26 20:25:45 q Exp $";
 #endif
 
 #include "os.h"
@@ -759,7 +759,7 @@ char	*parv[];
 	    {
 		if (sptr->user)
 		    {
-			user = sptr->username;
+			user = sptr->user->username;
 			host = sptr->user->host;
 		    }
 		else
@@ -926,17 +926,42 @@ char	*parv[];
 	** joined and having same nicks in use. We cannot have TWO users with
 	** same nick--purge this NICK from the system with a KILL... >;)
 	**
-	** The client indicated by 'acptr' is dead meat, give at least some
-	** indication of the reason why we are just dropping it cold.
+	** Since 2.11, we will first try to SAVE both users, if possible.
 	*/
-	sendto_one(acptr, replies[ERR_NICKCOLLISION], ME, BadTo(acptr->name),
-		   acptr->name, user, host);
+
+	/*
+	** When dealing with collisions, we can see the following cases:
+	** - Both users have an UID: No problem at all, just SAVE them.
+	** - Neither of them has an UID: Just KILL them both.
+	** - One of them doesn't have an UID.  You have to KILL both clients.
+	**   You atleast have to KILL the one without.  If you send it to the
+	**   other server, the one with UID gets killed too because of the nick
+	**   chase.
+	**   You can't depend on the other to do the KILL for you, since it
+	**   might not even see the collision.  (The user changed nick
+	**   before it.)
+	*/
+
 	/*
 	** This seemingly obscure test (sptr == cptr) differentiates
 	** between "NICK new" (TRUE) and ":old NICK new" (FALSE) forms.
 	*/
 	if (sptr == cptr)
-	    {
+	{
+		/*
+		** A new NICK being introduced by a neighbouring
+		** server (e.g. message type "NICK new" received)
+		*/
+		/*
+		** A new client never has an UID in this function, so
+		** we have to kill both clients.
+		*/
+		sendto_one(acptr, replies[ERR_NICKCOLLISION], ME, acptr->name,
+			acptr->name, user, host);
+		sendto_one(cptr, replies[ERR_NICKCOLLISION], ME, acptr->name,
+			acptr->name, 
+			(acptr->user) ? acptr->user->username : "???",
+			(acptr->user) ? acptr->user->host : "???");
 		sendto_flag(SCH_KILL,
 			    "Nick collision on %s (%s@%s)%s <- (%s@%s)%s",
 			    acptr->name,
@@ -944,10 +969,6 @@ char	*parv[];
 			    (acptr->user) ? acptr->user->host : "???",
 			    acptr->from->name,
 			    user, host, get_client_name(cptr, FALSE));
-		/*
-		** A new NICK being introduced by a neighbouring
-		** server (e.g. message type "NICK new" received)
-		*/
 		ircstp->is_kill++;
 		sendto_serv_butone(NULL, 
 				   ":%s KILL %s :%s ((%s@%s)%s <- (%s@%s)%s)",
@@ -962,7 +983,32 @@ char	*parv[];
 				   get_client_name(cptr, FALSE));
 		acptr->flags |= FLAGS_KILLED;
 		return exit_client(NULL, acptr, &me, "Nick collision");
-	    }
+	}
+
+	/*
+	** Since it's not a new client, it might have an UID here, so check
+	** both to have one.  If they both have one, SAVE them.
+	*/
+	if (HasUID(sptr) && HasUID(acptr))
+	{
+		char	path[BUFSIZE];
+
+		/* Save acptr */
+		sprintf(path, "(%s@%s[%s](%s) <- %s@%s[%s])",
+			acptr->user->username,	acptr->user->host, 
+			acptr->from->name, acptr->name,	user, host, cptr->name);
+		save_user(NULL, acptr, path);
+
+		/* Save sptr */
+		sprintf(path, "(%s@%s[%s] <- %s@%s[%s](%s))",
+			acptr->user->username, acptr->user->host,
+			acptr->from->name, user, host, cptr->name, sptr->name);
+		save_user(NULL, sptr, path);
+
+		/* Everything is done */
+		return 2;
+	}
+
 	/*
 	** A NICK change has collided (e.g. message type
 	** ":old NICK new". This requires more complex cleanout.
@@ -970,6 +1016,12 @@ char	*parv[];
 	** must be killed from the incoming connection, and "old" must
 	** be purged from all outgoing connections.
 	*/
+	sendto_one(acptr, replies[ERR_NICKCOLLISION], ME, acptr->name,
+		acptr->name, user, host);
+	sendto_one(cptr, replies[ERR_NICKCOLLISION], ME, acptr->name,
+		acptr->name, 
+		(acptr->user) ? acptr->user->username : "???",
+		(acptr->user) ? acptr->user->host : "???");
 	sendto_flag(SCH_KILL, "Nick change collision %s!%s@%s to %s %s <- %s",
 		    sptr->name, user, host, acptr->name, acptr->from->name,
 		    get_client_name(cptr, FALSE));
@@ -1145,6 +1197,19 @@ char	*parv[];
 		return 2;
 	    }
 
+	if (strlen(uid) > NICKLEN)
+	{
+		/* Any better numeric? */
+		sendto_one(sptr, replies[ERR_ERRONEUSNICKNAME], ME, 
+			BadTo(parv[0]), parv[2]);
+		ircstp->is_kill++;
+		sendto_flag(SCH_KILL, "Bad UID: %s From: %s %s", uid,
+			    parv[0], get_client_name(cptr, FALSE));
+		sendto_one(cptr, ":%s KILL %s :%s (%s <- %s[%s])", ME, uid, ME,
+			   parv[2], nick, cptr->name);
+		return 2;
+	}
+
 	/*
 	** Check against nick name collisions.
 	**
@@ -1188,8 +1253,7 @@ char	*parv[];
 		sendto_ops_butone(NULL, &me,
 				  ":%s WALLOPS :UID collision for %s from %s",
 				  ME, uid, get_client_name(cptr, FALSE));
-		exit_client(NULL, cptr, &me, "UID collision");
-		return 0;
+		return exit_client(cptr, cptr, &me, "UID collision");
 	    }
 
 	/*
@@ -1205,8 +1269,28 @@ char	*parv[];
 		*/
 		if (*acptr->user->uid)
 		    {
+			char	path[BUFSIZE];
+
 			/* both users have a UID, save them */
-			save_user(&me, acptr, "fill in the blank");
+
+			/* Save the other user.  Send it to all servers. */
+			sprintf(path, "(%s@%s)%s <- (%s@%s)%s",
+				acptr->user->username, acptr->user->host,
+				acptr->user->server, user, host, cptr->name);
+			save_user(NULL, acptr, path);
+
+			/*
+			** We need to send a SAVE for the new user back.
+			** It isn't introduced yet, so we can't just call
+			** save_user().
+			*/
+			sendto_one(cptr,
+				":%s SAVE %s :%s (%s@%s)%s <- (%s@%s)%s", 
+				ME, uid, ME, 
+				acptr->user->username, acptr->user->host,
+				acptr->user->server, user, host, cptr->name);
+
+			/* Just introduce him with the uid to the rest. */
 			strcpy(nick, uid);
 		    }
 		else
@@ -1248,8 +1332,8 @@ char	*parv[];
 	    char	*pv[7];
 	    
 	    pv[0] = nick;
-	    pv[1] = parv[4];
-	    pv[2] = parv[5];
+	    pv[1] = user;
+	    pv[2] = host;
 	    pv[3] = parv[6];
 	    pv[4] = parv[8];
 	    pv[5] = parv[7];
@@ -1258,12 +1342,18 @@ char	*parv[];
 	}
 	/*
 	** NOTE: sptr->name has to be set *after* calling m_user();
+	** else it will already introduce the client which doesn't
+	** can't have the uid set yet.
 	** the extended m_nick() does things the other way around..
 	** I hope this will not cause trouble sometime later. -kalt
+	** You could do things like m_nick(), but you then you should
+	** stop it from making a call to register_user().
 	*/
+	/* The nick is already checked for size, and is a local var. */
 	strcpy(sptr->name, nick);
 	add_to_client_hash_table(nick, sptr);
 	sptr->hopcount = atoi(parv[3]);
+	/* The client is already killed if the uid is too long. */
 	strcpy(sptr->user->uid, uid);
 	add_to_uid_hash_table(uid, sptr);
 	{
@@ -1275,7 +1365,7 @@ char	*parv[];
 	    pv[3] = NULL;
 	    m_umode(NULL, sptr, 3, pv);
 	}
-	register_user(cptr, sptr, sptr->name, sptr->user->username);
+	register_user(cptr, sptr, nick, user);
 	return 0;
 }
 
@@ -2119,7 +2209,7 @@ aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	aClient *acptr;
+	aClient *acptr = NULL;
 	char	*inpath = get_client_name(cptr,FALSE);
 	char	*user, *path, *killer;
 	int	chasing = 0;
@@ -2244,7 +2334,7 @@ char	*parv[];
 	*/
 	if (!MyConnect(acptr) || !MyConnect(sptr) || !IsAnOper(sptr))
 	    {
-		if (UniqueUser(acptr))
+		if (HasUID(acptr))
 		    {
 			sendto_serv_v(cptr, SV_UID, ":%s KILL %s :%s!%s",
 				      parv[0], acptr->user->uid, inpath, path);
@@ -3093,6 +3183,13 @@ int	old;
 
 /*
 ** save_user() added 990618 by Christope Kalt
+**
+** This will save the user sptr, and put the nick he's currently using in
+** nick delay.
+** It will send SAVE to the servers that can deal with it, and just a nick
+** change to the rest.
+** It will adjust the path, to include the link we got the SAVE message from.
+** For internal calls, set cptr to NULL.
 */
 static void
 save_user(cptr, sptr, path)
@@ -3101,19 +3198,18 @@ char *path;
 {
 	sendto_common_channels(sptr, ":%s NICK :%s",
 			       sptr->name, sptr->user->uid);
-	add_history(sptr, sptr);
+	add_history(sptr, NULL);
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_NICK, sptr->user->server, sptr,
 			      ":%s NICK :%s", sptr->name, sptr->user->uid);
 #endif
 	sendto_serv_notv(cptr, SV_UID, ":%s NICK :%s",
 			 sptr->name, sptr->user->uid);
-	sendto_serv_v(cptr, SV_UID, ":%s SAVE %s :%s!%s", cptr->name,
-		      sptr->user->uid, get_client_name(cptr, FALSE), path);
+	sendto_serv_v(cptr, SV_UID, ":%s SAVE %s :%s%c%s", 
+		cptr ? cptr->name : ME, sptr->user->uid, 
+		cptr ? cptr->name : ME, cptr ? '!' : ' ', path);
 	sendto_flag(SCH_SAVE, "Received SAVE message for %s. Path: %s!%s",
-		    sptr->name, get_client_name(cptr, FALSE), path);
-	if (!isdigit(sptr->name[0]))
-		add_history(sptr, NULL);
+		    sptr->name, cptr ? cptr->name : ME, path);
 	del_from_client_hash_table(sptr->name, sptr);
 	strcpy(sptr->name, sptr->user->uid);
 	add_to_client_hash_table(sptr->name, sptr);

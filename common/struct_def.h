@@ -650,7 +650,7 @@ struct Channel	{
 #else
 # define	IsChannelName(n)	((n) && (*(n) == '#' || *(n) == '&' ||\
 					*(n) == '+' || \
-					(*(n) == '!' && cid_ok(n))))
+					(*(n) == '!' && cid_ok(n, CHIDLEN))))
 #endif
 #define	IsQuiet(x)		((x)->mode.mode & MODE_QUIET)
 #define	UseModes(n)		((n) && (*(n) == '#' || *(n) == '&' || \
@@ -676,7 +676,7 @@ struct Channel	{
 				  (IsService(x->prev) &&		\
 				  x->prev->service->servp == x->serv)))
 
-#define	UniqueUser(x)		(x->user && x->user->uid[0])
+#define	HasUID(x)		(x->user && x->user->uid[0])
 
 typedef	struct	{
 	u_long	is_user[2];	/* users, non[0] invis and invis[1] */

@@ -374,6 +374,16 @@
  */
 #undef	CLONE_CHECK
 
+/*
+ * Server ID used for the UID's. Setting one that already exists on the
+ * net means death by chainsaw or anything your coordinator thinks of.
+ *
+ * Note: This must be a string.  It should contain 3 chars.
+ * The first char should be in the range of [0-9], the rest should be in
+ * [0-9A-Z].
+ */
+/* #define SERVER_ID "123" */
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
@@ -553,3 +563,8 @@ error ZIP_MINIMUM needs redefining.
 error FD_SETSIZE must be bigger than MAXCONNECTIONS
 # endif
 #endif
+
+#ifndef SERVER_ID
+#error SERVER_ID not defined
+#endif
+

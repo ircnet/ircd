@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.32 1999/09/20 22:39:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.33 2001/02/26 20:25:45 q Exp $";
 #endif
 
 #include "os.h"
@@ -748,7 +748,7 @@ char	*comment;
 				/* again, this is all that is needed */
 
 			/* remove from uid hash table */
-			if (UniqueUser(sptr))
+			if (HasUID(sptr))
 				del_from_uid_hash_table(sptr->user->uid, sptr);
 
 			/* Add user to history */

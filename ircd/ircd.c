@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.63 1999/08/15 21:02:53 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.64 2001/02/26 20:25:45 q Exp $";
 #endif
 
 #include "os.h"
@@ -857,7 +857,6 @@ char	*argv[];
 	timeofday = time(NULL);
 	open_debugfile();
 	timeofday = time(NULL);
-	init_sid(NULL);
 	(void)init_sys();
 
 #ifdef USE_SYSLOG
@@ -894,6 +893,7 @@ char	*argv[];
 
 	dbuf_init();
 	setup_me(&me);
+	init_sid(SERVER_ID);
 	check_class();
 	ircd_writetune(tunefile);
 	if (bootopt & BOOT_INETD)

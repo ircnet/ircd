@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.10 1999/08/15 21:02:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.11 2001/02/26 20:25:45 q Exp $";
 #endif
 
 #include "os.h"
@@ -33,14 +33,14 @@ static  char rcsid[] = "@(#)$Id: s_id.c,v 1.10 1999/08/15 21:02:08 kalt Exp $";
 #define CHIDNB 36
 
 static unsigned char id_alphabet[CHIDNB+1] =
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890A";
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 static unsigned int alphabet_id[256] =
 	{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-	  /* 0 */ 35, /* 1 */ 26, /* 2 */ 27, /* 3 */ 28, /* 4 */ 29,
-	  /* 5 */ 30, /* 6 */ 31, /* 7 */ 32, /* 8 */ 33, /* 9 */ 34,
+          /* 0 */ 26, /* 1 */ 27, /* 2 */ 28, /* 3 */ 29, /* 4 */ 30,
+          /* 5 */ 31, /* 6 */ 32, /* 7 */ 33, /* 8 */ 34, /* 9 */ 35,
 	  -1, -1, -1, -1, -1, -1, -1,
 	  /* A */ 0, /* B */ 1, /* C */ 2, /* D */ 3, /* E */ 4, /* F */ 5,
 	  /* G */ 6, /* H */ 7, /* I */ 8, /* J */ 9, /* K */ 10, /* L */ 11, 
@@ -62,43 +62,62 @@ static unsigned int alphabet_id[256] =
 	  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	  -1, -1, -1, -1, -1, -1, -1 };
 
-/* ltoid: base 10 -> base 36 conversion */
-static char *
-ltoid(l)
-time_t l;
+/* 
+** ltoid(long l, int n)
+** base 10 -> base 36 conversion
+** Converts l, to a string of n chars, zero ('A') filled. The first chars are
+** dropped if it's longer.
+** Returns a pointer to a static string, or NULL.
+*/
+char *ltoid(long l, int n)
 {
-    static char idrpl[CHIDLEN+1];
-    char c = CHIDLEN-1;
+static	char	idrpl[NICKLEN+1]; /* Currently nothing longer should be used. */
+	int	i = n - 1;
 
-    idrpl[CHIDLEN] = '\0';
-    do
+	if (n > sizeof(idrpl))
 	{
-	    idrpl[c] = id_alphabet[1 + l % CHIDNB];
-	    l /= CHIDNB;
+		/* This should not happen. */
+		return NULL;
 	}
-    while (c-- > 0);
-    return (char *) idrpl;
+
+	idrpl[n] = '\0';
+	do
+	{
+		idrpl[i] = id_alphabet[l % CHIDNB];
+		l /= CHIDNB;
+	} while (i-- > 0);
+
+	return (char *) idrpl;
 }
 
-/* idtol: base 36 -> base 10 conversion */
-static unsigned long
-idtol(id)
-char *id;
+/*
+** idtol(char *id, int n)
+** base 36 -> base 10 conversion
+** Converts the first n char from string id, to a number, and return that.
+*/
+long idtol(char *id, int n)
 {
-    unsigned long l = 0;
-    char c = CHIDLEN-1;
+	long	l = 0;
 
-    l = alphabet_id[*id++];
-    while (c-- > 0)
-	l = l * CHIDNB + alphabet_id[*id++];
-    return l;
+	if (!id)
+	{
+		/* Whatever. */
+		return 0;
+	}
+
+	while (n-- && *id)
+	{
+		l = l * CHIDNB + alphabet_id[*id++];
+	}
+
+	return l;
 }
 
 /* get_chid: give the current id */
 char *
 get_chid()
 {
-    return ltoid(time(NULL));
+    return ltoid((long)time(NULL), CHIDLEN);
 }
 
 /* close_chid: is the ID in the close future? (written for CHIDLEN == 5) */
@@ -119,7 +138,7 @@ char *id;
     if (id_alphabet[1 + alphabet_id[current]] == id[1])
 	    return 1;
     if (id[0] == current &&
-	idtol(id) >= (timeofday % (u_int) pow(CHIDNB, CHIDLEN)))
+	idtol(id, CHIDLEN) >= (timeofday % (u_int) pow(CHIDNB, CHIDLEN)))
 	    return 1;
     return 0;
 }
@@ -189,63 +208,84 @@ collect_chid()
 	}
 }
 
-/* checks wether the ID is valid */
-int
-cid_ok(name)
-char *name;
+/* 
+** checks wether the ID is valid
+** It checks n chars of name to be a valid char for an ID.
+** This skips the first char for now.  It's used in !channels, where the first
+** char is a '!', and for UID's, where the first char should be a number.
+** returns 1 when it's valid, 0 when not.
+*/
+int cid_ok(char *name, int n)
 {
-    int l = 1;
+	int	i;
 
-    while (l <= CHIDLEN)
+	for (i = 1; i <= n; i++)
 	{
-	    if (alphabet_id[name[l]] == -1)
-		    return 0;
-	    l += 1;
+		if (alphabet_id[name[i]] == -1)
+		{
+			return 0;
+		}
 	}
-    if (l != CHIDLEN+1)
-	    return 0;
-    return 1;
+	return 1;
 }
 
 /*
  * unique user IDs
  */
-static char sid[SIDLEN+1];
 
-void
-init_sid(conf)
-char *conf;
+/* 
+** sid_valid(char *sid)
+**
+** Check that the sid is a valid sid.  The first char should be a number in
+** range of [0-9], the rest should be a char in the range of [0-9A-Z].
+** It returns 1 if it's a valid sid, 0 if not.
+*/
+int	sid_valid(char *sid)
 {
+	if (!isdigit(sid[0]))
+	{
+		return 0;
+	}
 
-	if (conf)
-	    {
-		if (strlen(conf) != SIDLEN)
-		    {
-			exit(0); /* ick.. -syrk */
-		    }
-		strcpy(sid, conf);
-	    }
-	else
-	    {
-		char tid[20];
-
-		srand(time(NULL));
-		sprintf(tid, "%d", rand());
-		sprintf(sid, "%.*s", SIDLEN, tid);
-	    }
+	return cid_ok(sid, SIDLEN - 1);
 }
 
-char *
-next_uid()
+static char sid[SIDLEN+1];
+
+void init_sid(char *conf)
 {
-	static char uid[NICKLEN+1+5];
-	char tid[20];
+	if (!conf || (strlen(conf) != SIDLEN) || !sid_valid(conf))
+	{
+		exit(0); /* ick.. -syrk */
+	}
+	strcpy(sid, conf);
+}
+
+char * next_uid()
+{
+static	char	uid[NICKLEN+1+5];
+static	long	curr_cid = 0;
 
 	do
-	    {
-		sprintf(tid, "%d", rand());
-		sprintf(uid, "%s%.*s", sid, NICKLEN-SIDLEN, tid);
-	    }
+	{
+		sprintf(uid, "%s%s", sid, ltoid(curr_cid, NICKLEN-SIDLEN));
+		curr_cid++;
+
+		/* 
+		** We used all uid's, restart from 0.  It isn't really needed
+		** to restart from 0, since bigger numbers get truncated
+		** anyway.
+		** This should almost never happen, you need 
+		** 25K days * clients / sec.  So at 25 clients/sec (huge)
+		** You need an uptime of 1000 days.
+		** This pow() should probably be removed, and use some contant
+		** instead.
+		*/
+		if (curr_cid > pow(CHIDNB, (NICKLEN-SIDLEN)))
+		{
+			curr_cid = 0;
+		}
+	}
 	while (find_uid(uid, NULL) != NULL);
 	return uid;
 }
