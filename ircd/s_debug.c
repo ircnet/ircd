@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.14 1997/11/11 19:11:52 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.15 1998/03/26 14:35:05 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -194,6 +194,7 @@ void	debug(int level, char *form, ...)
 	    }
 	errno = err;
 }
+#endif /* DEBUGMODE */
 
 /*
  * This is part of the STATS replies. There is no offical numeric for this
@@ -206,7 +207,6 @@ void	send_usage(cptr, nick)
 aClient *cptr;
 char	*nick;
 {
-
 #if HAVE_GETRUSAGE
 	struct	rusage	rus;
 	time_t	secs, rup;
@@ -288,11 +288,12 @@ char	*nick;
 		   smin, ssec);
 # endif /* HAVE_TIMES */
 #endif /* HAVE_GETRUSAGE */
-	sendto_one(cptr, ":%s %d %s :Reads %d Writes %d",
-		   me.name, RPL_STATSDEBUG, nick, readcalls, writecalls);
 	sendto_one(cptr, ":%s %d %s :DBUF alloc %d blocks %d",
 		   me.name, RPL_STATSDEBUG, nick, istat.is_dbufuse,
 		   istat.is_dbufnow);
+#ifdef DEBUGMODE
+	sendto_one(cptr, ":%s %d %s :Reads %d Writes %d",
+		   me.name, RPL_STATSDEBUG, nick, readcalls, writecalls);
 	sendto_one(cptr,
 		   ":%s %d %s :Writes:  <0 %d 0 %d <16 %d <32 %d <64 %d",
 		   me.name, RPL_STATSDEBUG, nick,
@@ -301,9 +302,9 @@ char	*nick;
 		   ":%s %d %s :<128 %d <256 %d <512 %d <1024 %d >1024 %d",
 		   me.name, RPL_STATSDEBUG, nick,
 		   writeb[5], writeb[6], writeb[7], writeb[8], writeb[9]);
+#endif
 	return;
 }
-#endif
 
 void	send_defines(cptr, nick)
 aClient *cptr;

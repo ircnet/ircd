@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.32 1998/02/09 14:22:11 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.33 1998/03/26 14:35:05 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1424,9 +1424,7 @@ char	*parv[];
 		report_configured_links(cptr,parv[0],CONF_QUARANTINED_SERVER);
 		break;
 	case 'R' : case 'r' : /* usage */
-#ifdef DEBUGMODE
 		send_usage(cptr, parv[0]);
-#endif
 		break;
 	case 'S' : case 's' : /* S lines */
 		report_configured_links(cptr, parv[0], CONF_SERVICE);
