@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.8 1997/07/28 01:25:39 kalt Exp $
+#*   $Id: Makefile.in,v 1.9 1997/07/28 17:31:33 kalt Exp $
 #*
 #*/
 
@@ -128,6 +128,8 @@ install-server: server
 	fi
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(CHKCONF) $(server_bin_dir)
+	$(RM) $(ircd_dir)/ircd.m4
+	../ircd/buildm4 $(ircd_dir)
 	(cd ../doc; $(INSTALL_DATA) ircd.8 $(server_man_dir))
 	(cd ../doc; $(INSTALL_DATA) example.conf $(ircd_dir))
 	@echo "installation of server done."
