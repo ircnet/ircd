@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.15 1999/07/01 21:50:48 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1999/07/01 21:50:48 $"
+.\" @(#)$Id: iauth.conf.5,v 1.16 1999/07/04 22:09:09 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1999/07/04 22:09:09 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -20,6 +20,7 @@ module\ \fImodule-name\fP
 [TAB]option = \fIstring\fP
 [TAB]host = \fIhost-name\fP
 [TAB]ip = \fIip-address\fP
+[TAB]timeout = \fIvalue\fP
 
 .fi
 .RE
@@ -39,6 +40,11 @@ If no host nor ip entry is specified, then the module will always be used.
 When writing a configuration file, one should \fBalways\fP verify the
 syntax using the \fIiauth\fP program to avoid later problems.
 .SH IAUTH OPTIONS
+.TP
+.B timeout = <seconds>
+This allows to specify how much time each module has to complete its work
+for each connection.  This option can also be specified individually for
+each module.  The default is 30 seconds.
 .TP
 .B required
 By specifying this keyword, the IRC server is told not to accept new user

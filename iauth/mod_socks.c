@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.20 1999/07/04 20:02:25 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.21 1999/07/04 22:09:09 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -515,6 +515,7 @@ int
 socks_start(cl)
 u_int cl;
 {
+    struct socks_private *mydata = cldata[cl].instance->data;
     char *error;
     int fd;
     
@@ -539,8 +540,12 @@ u_int cl;
 	    socks_add_cache(cl, PROXY_NONE, 0);
 	    return -1;
 	}
-    
+
     cldata[cl].wfd = fd; /*so that socks_work() is called when connected*/
+
+    if (mydata->options & (OPT_V4ONLY|OPT_V5ONLY) == 0)
+	    cldata[cl].timeout -= cldata[cl]->instance->timeout % 2;
+
     return 0;
 }
 

@@ -44,6 +44,7 @@ struct Instance
     void	*data;			/* private data: stats, ... */
     aTarget	*address;
     aTarget	*hostname;
+    u_int	timeout;
 };
 
 struct Target

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.19 1999/06/29 16:49:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.20 1999/07/04 22:09:09 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -28,6 +28,8 @@ static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.19 1999/06/29 16:49:57 kalt Exp $"
 #undef A_CONF_C
 
 static aModule *Mlist[16];
+
+#define DEFAULT_TIMEOUT 30
 
 u_int	debuglevel = 0;
 
@@ -71,10 +73,11 @@ char *
 conf_read(cfile)
 char *cfile;
 {
-	u_char ident = 0; /* make sure this module is used */
+	AnInstance *ident = NULL; /* make sure this module is used */
 	u_char needh = 0; /* do we need hostname information for any host? */
 	u_char o_req = 0, o_dto = 0, o_wup = 0;
 	static char o_all[5];
+	u_int timeout = DEFAULT_TIMEOUT;
 	u_int lnnb = 0, i;
 	u_char icount = 0, Mcnt = 0;
 	char buffer[160], *ch;
@@ -124,6 +127,14 @@ char *cfile;
 				o_wup = 1;
 				continue;
 			  }
+			if (!strncmp("timeout = ", buffer, 10))
+			    {
+				if (sscanf(buffer, "timeout = %u",
+					   &timeout) != 1)
+					conf_err(lnnb, "Invalid setting.",
+						 cfile);
+				continue;
+			    }
 			/* debugmode setting */
 			if (!strncmp("debuglvl = 0x", buffer, 13))
 			    {
@@ -207,15 +218,12 @@ char *cfile;
 				conf_err(lnnb, "Unknown module name.", cfile);
 				continue;
 			    }
-			if (Mlist[i] == &Module_rfc931)
+			if (Mlist[i] == &Module_rfc931 && ident)
 			    {
-				if (ident)
-				    {
-					conf_err(lnnb,"Module already loaded.",
-						 cfile);
-					continue;
-				    }
-				ident = 1;
+				conf_err(lnnb, 
+				 "This module can only be loaded once.",
+					 cfile);
+				continue;
 			    }
 			*last = (AnInstance *) malloc(sizeof(AnInstance));
 			(*last)->nexti = NULL;
@@ -226,6 +234,9 @@ char *cfile;
 			(*last)->data = NULL;
 			(*last)->hostname = NULL;
 			(*last)->address = NULL;
+			(*last)->timeout = timeout;
+			if (Mlist[i] == &Module_rfc931)
+				ident = *last;
 
 			while (fgets(buffer, 160, cfh))
 			    {
@@ -303,6 +314,17 @@ char *cfile;
 						baseip = 0;
 					    }
 				    }
+				else if (!strncmp(buffer+1, "timeout = ", 10))
+				    {
+					u_int local_timeout;
+					if (sscanf(buffer+1, "timeout = %u",
+						   &local_timeout) != 1)
+						conf_err(lnnb,
+							 "Invalid setting.",
+							 cfile);
+					(*last)->timeout = local_timeout;
+					continue;
+				    }
 				else
 				    {
 					conf_err(lnnb, "Invalid keyword.",
@@ -338,15 +360,17 @@ char *cfile;
 		perror("fopen");
 		exit(0);
 	    }
-	if (ident == 0)
+	if (ident == NULL)
 	    {
-		*last = (AnInstance *) malloc(sizeof(AnInstance));
+		ident = *last = (AnInstance *) malloc(sizeof(AnInstance));
 		(*last)->nexti = NULL;
 		(*last)->opt = NULL;
 		(*last)->mod = &Module_rfc931;
 		(*last)->hostname = NULL;
 		(*last)->address = NULL;
+		(*last)->timeout = DEFAULT_TIMEOUT;
 	    }
+	ident->timeout = MAX(DEFAULT_TIMEOUT, ident->timeout);
 
 	itmp = instances;
 	if (cfile)
@@ -381,6 +405,9 @@ char *cfile;
 					       ttmp->value);
 				printf("\n");
 			    }
+			if (itmp->timeout != DEFAULT_TIMEOUT)
+				printf("\t\ttimeout: %u seconds\n",
+				       itmp->timeout);
 			if (itmp->mod->init)
 			    {
 				err = itmp->mod->init(itmp);
