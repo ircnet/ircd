@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.153 2003/08/08 19:23:37 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.154 2003/08/08 21:28:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3346,7 +3346,7 @@ static void names_channel(aClient *cptr, aClient *sptr, char *to,
 				 * when someone removes +a mode from them.
 				 * (server is member of such channel).
 				 */
-				if (nlen > NICKLEN)
+				if (strchr(acptr->name, '.'))
 				{
 					continue;
 				}
