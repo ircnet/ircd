@@ -22,7 +22,7 @@ typedef struct Class {
 	int	conFreq;
 	int	pingFreq;
 	int	maxLinks;
-	long	maxSendq;
+	int	maxSendq;
 	int	maxHLocal;
 	int	maxUHLocal;
 	int	maxHGlobal;
