@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.151 2004/02/16 11:52:43 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.152 2004/02/16 12:52:18 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3585,35 +3585,29 @@ void	do_emulated_eob(aClient *sptr)
 	return;
 }
 
-static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf)
+static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf, int size)
 {
         int i = 1;
         aClient *acptr;
 	
-	/* Check if we still have space  */
-	if (pbuf - buf > BUFSIZE - (HOSTLEN + 5
-				    + 1 /* ' ' */
-				    + 10 /* 2147483647 */
-				    + 1 /* ' ' */
-				    + SIDLEN /* '(SID)' */
-				    + 1 /* ' ' */
-				    + sizeof(root->serv->verstr)
-				    + 6 /* ' BURST' */
-				    + 1 /* '\0' */
-				  )
-			)
-	{
-		return;
-	}
-
         *pbuf= '\0';
-	sprintf(pbuf, "%s %s %d %s%s",
-		IsMasked(root) ? root->serv->maskedby->name : root->name,
-		root->serv->sid,
-		root->serv->usercnt[0] + root->serv->usercnt[1],
-		BadTo(root->serv->verstr),
-		IsBursting(root) ? " BURST" : "");
-
+	if (IsBursting(root))
+	{
+		snprintf(pbuf, size, "%s %s %d %s bursting %ds",
+			IsMasked(root) ? root->serv->maskedby->name : root->name,
+			root->serv->sid,
+			root->serv->usercnt[0] + root->serv->usercnt[1],
+			BadTo(root->serv->verstr),
+			MyConnect(root) ? timeofday - root->firsttime : -1);
+	}
+	else
+	{
+		snprintf(pbuf, size, "%s %s %d %s",
+			IsMasked(root) ? root->serv->maskedby->name : root->name,
+			root->serv->sid,
+			root->serv->usercnt[0] + root->serv->usercnt[1],
+			BadTo(root->serv->verstr));
+	}
 	sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
 	
 	if (root->serv->down)
@@ -3645,7 +3639,9 @@ static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf)
 		}
 		*(pbuf + 2) = '-';
 		*(pbuf + 3) = ' ';
-		dump_sid_map(sptr, acptr, pbuf + 4);
+		/* "pbuf + 4" and "size - 4" because each nesting 
+		** we add 4 chars in front of output line --B. */
+		dump_sid_map(sptr, acptr, pbuf + 4, size - 4);
 		i++;
 	}
 }
@@ -3740,13 +3736,14 @@ int	m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		/* print full dump of the network */
 		sendto_one(sptr, replies[RPL_MAPSTART], ME, BadTo(sptr->name),
-				"Server name (SID)");
-		dump_sid_map(sptr, &me, buf);
+				"Server SID users version");
+		dump_sid_map(sptr, &me, buf, sizeof(buf) - 
+			strlen(BadTo(sptr->name)) - strlen(ME) - 8);
 		sendto_one(sptr, replies[RPL_MAPEND], ME, BadTo(sptr->name));
 		return 2;
 	}
 	sendto_one(sptr, replies[RPL_MAPSTART], ME, BadTo(sptr->name),
-			"Server name");
+			"Server");
 	dump_map(sptr, &me, &acptr, buf);
 	sendto_one(sptr, replies[RPL_MAPEND], ME, BadTo(sptr->name));
 	return 2;
