@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.146 2003/04/13 11:34:56 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.147 2003/06/22 15:08:04 q Exp $";
 #endif
 
 #include "os.h"
@@ -2366,7 +2366,7 @@ char	*parv[];
 						       cptr->name, name, s,
 						       parv[0],
 						       *(s+1)=='v'?parv[0]:"");
-			*--s = '\007';
+//			*--s = '\007';
 		    }
 		/*
 		** If s wasn't set to chop+1 above, name is now #chname^Gov
@@ -2380,6 +2380,8 @@ char	*parv[];
 			del_invite(sptr, chptr);
 			if (chptr->topic[0] != '\0')
 			{
+				sendto_one(sptr, replies[RPL_TOPIC], ME,
+					BadTo(parv[0]), name, chptr->topic);
 #ifdef TOPIC_WHO_TIME
 				if (chptr->topic_t > 0)
 				{
@@ -2391,8 +2393,6 @@ char	*parv[];
 						chptr->topic_t);
 				}
 #endif
-				sendto_one(sptr, replies[RPL_TOPIC], ME, BadTo(parv[0]),
-					   name, chptr->topic);
 			}
 
 			names_channel(cptr, sptr, parv[0], chptr, 1);
