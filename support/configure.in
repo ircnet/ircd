@@ -665,6 +665,7 @@ if test $irc_cv_stdarg = yes; then
   AC_DEFINE(USE_STDARG)
 else
   AC_MSG_RESULT(no)
+  AC_MSG_ERROR([Compatibility code for systems without stdarg has not been written, please notify ircd-bugs@irc.org with description of your system type and version.])
 fi
 ])
 
@@ -1434,7 +1435,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.46 1999/08/13 17:18:23 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.47 1999/09/20 00:02:53 kalt Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
