@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.236 2004/10/01 20:22:16 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.237 2004/10/02 01:20:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3644,7 +3644,7 @@ static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf, int size)
 			root->serv->sid,
 			root->serv->usercnt[0] + root->serv->usercnt[1],
 			BadTo(root->serv->verstr),
-			MyConnect(root) ? timeofday - root->firsttime : -1);
+			MyConnect(root) ? (int) (timeofday - root->firsttime) : -1);
 	}
 	else
 	{

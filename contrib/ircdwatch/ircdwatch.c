@@ -17,7 +17,7 @@
  *
  */
 
-static const volatile char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.9 2004/10/01 20:22:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.10 2004/10/02 01:20:43 chopin Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>     /* atol() */
@@ -65,6 +65,7 @@ static void finalize(int i)
   exit(i);
 }
 
+#if 0 /* seems unused */
 static int daemonize(void)
 {
   pid_t pid;
@@ -114,6 +115,7 @@ static int daemonize(void)
 
   return(0);
 }
+#endif
 
 static void sig_handler (int signo) 
 {
@@ -158,6 +160,7 @@ static void set_up_signals(void)
   signal(SIGCHLD, SIG_IGN);
 }
 
+#if 0 /* seems unused */
 static int write_my_pid(void)
 {
   FILE *f;
@@ -167,13 +170,15 @@ static int write_my_pid(void)
     return(-1);
   }
 
-  fprintf(f, "%d\n", getpid());
+  fprintf(f, "%d\n", (int) getpid());
   fclose(f);
 
   return(0);
 }
+#endif
 
 
+#ifdef IRCDWATCH_HUP_ON_CONFIG_CHANGE
 static int file_modified(char *s)
 {
   struct stat st;
@@ -184,6 +189,7 @@ static int file_modified(char *s)
   return(st.st_ctime);
 }
 
+#endif
 
 static int spawn (char *cmd) 
 {
@@ -244,6 +250,7 @@ static int file_exists (char *s)
 
 /* yeah, I'll get around to these in some later version */
 
+#if 0 /* seems unused */
 static int file_readable (char *s)
 {
   return(access(s, R_OK) == 0);
@@ -253,6 +260,7 @@ static int file_writable (char *s)
 {
   return(access(s, W_OK) == 0);
 }
+#endif
 
 static int file_executable (char *s)
 {
@@ -304,6 +312,7 @@ static int ircd_running (void)
   return(0);
 }
 
+#ifdef IRCDWATCH_HUP_ON_CONFIG_CHANGE
 static void hup_ircd (void)
 {
   int pid;
@@ -322,6 +331,7 @@ static void hup_ircd (void)
     }
   }
 }
+#endif
 
 
 static void daemon_run (void) 

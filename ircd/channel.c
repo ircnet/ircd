@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.231 2004/10/01 20:22:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.232 2004/10/02 01:20:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3750,7 +3750,7 @@ static int	reop_channel(time_t now, aChannel *chptr, int reopmode)
 	/* Why do we wait until CD expires? --B. */
 	if (now - chptr->history > DELAYCHASETIMELIMIT)
 	{
-		int idlelimit1, idlelimit2;
+		int idlelimit1 = 0, idlelimit2 = 0;
 
 		if (reopmode != CHFL_REOPLIST)
 		{

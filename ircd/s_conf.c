@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.138 2004/10/01 20:22:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.139 2004/10/02 01:20:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1227,10 +1227,13 @@ int	rehash(aClient *cptr, aClient *sptr, int sig)
  */
 int	openconf(void)
 {
-	int ret;
 #ifdef	M4_PREPROC
 	int	pi[2], i;
+#else
+	int ret;
+#endif
 
+#ifdef	M4_PREPROC
 	if (pipe(pi) == -1)
 		return -1;
 	switch(vfork())

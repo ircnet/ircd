@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: mod_socks.c,v 1.41 2004/10/01 20:22:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: mod_socks.c,v 1.42 2004/10/02 01:20:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -209,13 +209,13 @@ static	int	socks_check_cache(u_int cl)
 
 static	int	socks_write(u_int cl, char *strver)
 {
-	struct socks_private *mydata = cldata[cl].instance->data;
 	u_char query[128];	/* big enough to hold all queries */
 	int query_len;  	/* length of query */
 #ifndef	INET6
 	u_int a, b, c, d;
 #else
 	struct in6_addr	addr;
+	struct socks_private *mydata = cldata[cl].instance->data;
 #endif
 
 #ifndef	INET6

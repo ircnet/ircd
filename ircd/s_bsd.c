@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.161 2004/10/01 20:22:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.162 2004/10/02 01:20:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1673,7 +1673,9 @@ aClient	*add_connection(aClient *cptr, int fd)
 					     cptr);
 add_con_refuse:
 			(void)close(fd);
+#if defined(CLONE_CHECK) && defined(DELAY_CLOSE)
 add_con_refuse_delay:
+#endif
 			ircstp->is_ref++;
 			acptr->fd = -2;
 			free_client(acptr);

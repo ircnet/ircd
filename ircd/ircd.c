@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.145 2004/10/01 20:59:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.146 2004/10/02 01:20:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -215,7 +215,9 @@ static	time_t	try_connections(time_t currenttime)
 	aClass	*cltmp;
 	aConfItem *con_conf = NULL;
 	int	allheld = 1;
+#ifdef DISABLE_DOUBLE_CONNECTS
 	int	i;
+#endif
 
 	Debug((DEBUG_NOTICE,"Connection check at   : %s",
 		myctime(currenttime)));

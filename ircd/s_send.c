@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_send.c,v 1.7 2004/10/01 20:22:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_send.c,v 1.8 2004/10/02 01:20:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -144,6 +144,7 @@ static void	build_new_prefix(aClient *orig, char *imsg, aClient *dest,
 	}
 }
 
+#if 0 /* seems unused */
 /*
 ** build_prefix
 **	function responsible for filling prefixbuf
@@ -196,6 +197,7 @@ static void	build_prefix(aClient *orig, char *imsg, aClient *dest,
 		maxplen = plen;
 	}
 }
+#endif
 
 /*
 ** build_suffix

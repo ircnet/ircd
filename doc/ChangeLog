@@ -1,3 +1,23 @@
+2004-10-01  Piotr Kucharski
+
+	* struct_def.h, s_debug.c/send_defines(), s_misc.c/initruntimeconf():
+	  add caccept to iconf structure.
+	* s_serv.c/m_set(): "SET CACCEPT" with "ON", "OFF" and "SPLIT".
+	* s_bsd.c/read_listener(): do not accept clients on delayed ports if
+	  iconf.caccept if OFF or SPLIT when split.
+	* s_serv.c/report_listeners(): when caccept is off (or split), mark
+	  such ports "noaccept".
+	* get rid of "rcsid defined but not used" warning.
+	* send.c, send_ext.h: initanonymous() function to get rid of that
+	  damn "missing braces around initializer" warning.
+	* ircd.c/main(): run initanonymous().
+	* a_defines.h: include common_def.h so isalpha/isdigit is consistent
+	  with ircd (also gets rid of some warnings).
+	* config.h.dist: SIXBONE_HACK default off.
+	* os.h: include first <syslog.h> and then <sys/syslog.h> (for proper
+	  declaration of syslog(), openlog() etc.)
+	* got rid of all warnings.
+
 2004-09-28  Piotr Kucharski
 
 	* a_conf.c/conf_read(): allow rfc913 timeout be smaller (but warn).

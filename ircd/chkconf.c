@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.37 2004/10/01 20:22:14 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.38 2004/10/02 01:20:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -191,7 +191,7 @@ static	void	showconf()
 {
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
 	aConfig *p, *p2;
-	int etclen;
+	int etclen = 0;
 #else
 	int dh;
 	char	line[512], c[80], *tmp;
