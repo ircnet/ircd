@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.138 2002/09/06 23:41:58 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.139 2002/09/06 23:49:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -909,7 +909,7 @@ badparamcountkills:
 		** A new NICK being introduced by a neighbouring
 		** server (e.g. message type "NICK new" received)
 		*/
-		if (parc == 2)
+		if (parc != 8)
 		{
 			/* New NICK *must* have proper param count */
 			goto badparamcountkills;
