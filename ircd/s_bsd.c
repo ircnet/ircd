@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.95 2003/02/16 22:35:36 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.96 2003/07/18 17:35:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1148,14 +1148,15 @@ aClient *cptr;
 	 */
 	del_queries((char *)cptr);
 	/*
-	 * If the connection has been up for a long amount of time, schedule
-	 * a 'quick' reconnect, else reset the next-connect cycle.
+	 * If the server connection has been up for a long amount of time,
+	 * schedule a 'quick' reconnect, else reset the next-connect cycle.
 	 */
-	if ((aconf = find_conf_exact(cptr->name, cptr->username,
-				    cptr->sockhost, CFLAG)))
+	if (IsServer(cptr) &&
+		(aconf = find_conf_exact(cptr->name, cptr->username,
+		cptr->sockhost, CFLAG)))
 	    {
 		/*
-		 * Reschedule a faster reconnect, if this was a automaticly
+		 * Reschedule a faster reconnect, if this was a automatically
 		 * connected configuration entry. (Note that if we have had
 		 * a rehash in between, the status has been changed to
 		 * CONF_ILLEGAL). But only do this if it was a "good" link.

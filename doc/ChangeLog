@@ -3,6 +3,8 @@
 	* irc_sprintf.c, irc_sprintf_body.c, irc_sprintf_ext.h: various
 	  cleanups, typo fixes (from Zobo).
 	* struct_def.h: removed unused flags, some cleanups.
+	* s_bsd.c/close_connection(): schedule quick reconnect for a good
+	  link only when cptr was aServer.
 
 2003-06-22  Kurt Roeckx
 
