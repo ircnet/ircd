@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_mkquery.c	8.1 (Berkeley) 6/4/93";
-static char rcsid[] = "$Id: res_mkquery.c,v 1.6 2003/10/18 19:25:45 q Exp $";
+static char rcsid[] = "$Id: res_mkquery.c,v 1.7 2004/09/07 15:16:21 chopin Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -136,7 +136,7 @@ int	ircd_res_mkquery(int op, const char *dname, int class, int type,
 		 * Make an additional record for completion domain.
 		 */
 		buflen -= RRFIXEDSZ;
-		n = ircd_dn_comp(data, cp, buflen, dnptrs, lastdnptr);
+		n = ircd_dn_comp((const char *) data, cp, buflen, dnptrs, lastdnptr);
 		if (n < 0)
 			return (-1);
 		cp += n;

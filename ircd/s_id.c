@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.26 2004/03/07 18:28:37 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.27 2004/09/07 15:16:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -30,7 +30,7 @@ static  char rcsid[] = "@(#)$Id: s_id.c,v 1.26 2004/03/07 18:28:37 chopin Exp $"
 static unsigned char id_alphabet[CHIDNB+1] =
 	"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-static unsigned int alphabet_id[256] =
+static signed int alphabet_id[256] =
 	{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
