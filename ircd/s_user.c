@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.204 2004/06/06 14:48:09 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.205 2004/06/06 15:26:25 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2471,8 +2471,8 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	else	/* new behaviour */
 	{
 		/* 0 here is intentional. User MUST specify + or -,
-		 * as we don't want to restrict clients which send
-		 * their hostname in host field (and happen to have r there).
+		 * as we don't want to restrict (broken) clients which send
+		 * their hostname in mode field (and happen to have r there).
 		 * - jv
 		 */
 		what = 0;
@@ -2489,6 +2489,9 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				default:
 					break;
 			}
+			/* If mode does not start with - or +, don't bother. */
+			if (what == 0)
+				break;
 			for (i = 0; umodes_arr[i].umode != '\0'; i++)
 			{
 				if (*s == umodes_arr[i].umode)
@@ -2505,9 +2508,7 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					}
 				}
 			}
-
 		}
-		
 	}
 	strncpyzt(user->host, host, sizeof(user->host));
 	user->server = find_server_string(me.serv->snum);
