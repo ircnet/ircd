@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.95 2001/12/24 20:27:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.96 2001/12/25 15:38:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -620,7 +620,7 @@ char	*nick, *username;
 				   ":%s UNICK %s %s %s %s %s %s :%s",
 				   me.serv->sid, nick, user->uid,
 				   user->username, user->host,
-					user->ip /* or sth */
+				   user->sip,
 				   (*buf) ? buf : "+",
 				   sptr->info);
 		else
@@ -1137,7 +1137,7 @@ char	*parv[];
 {
 	aClient *acptr;
 	int	delayed = 0;
-	char	*uid, nick[NICKLEN+2], *s, *user, *host, *ip;
+	char	*uid, nick[NICKLEN+2], *s, *user, *host;
 	Link	*lp = NULL;
 
 	if (parc < 8)
@@ -1151,7 +1151,6 @@ char	*parv[];
 	uid = parv[2];
 	user = parv[3];
 	host = parv[4];
-	ip = parv[5];
 
 	/*
 	 * if do_nick_name() returns a null name OR if the server sent a nick
@@ -1328,10 +1327,11 @@ char	*parv[];
 	/* The nick is already checked for size, and is a local var. */
 	strcpy(acptr->name, nick);
 	add_to_client_hash_table(nick, acptr);
-	/* we don't have hopcount! what to do? */
-	/* acptr->hopcount = atoi(parv[3]); */
+	/* we don't have hopcount in unick, we take it from sptr */
+	acptr->hopcount = sptr->hopcount;
 	/* The client is already killed if the uid is too long. */
 	strcpy(acptr->user->uid, uid);
+	strcpy(acptr->user->sip, parv[5]);
 	add_to_uid_hash_table(uid, acptr);
 	{
 	    char	*pv[4];

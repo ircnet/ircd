@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.45 2001/12/20 22:42:24 q Exp $
+ *   $Id: struct_def.h,v 1.46 2001/12/25 15:38:40 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -362,6 +362,7 @@ struct	User	{
 				** Unfortunately, in reality, server may
 				** not yet be in links while USER is
 				** introduced... --msa
+				** I think it's not true anymore --Beeth
 				*/
 	u_int	hashv;
 	aClient	*uhnext;
@@ -370,6 +371,7 @@ struct	User	{
 	char	uid[NICKLEN+1];
 	char	host[HOSTLEN+1];
 	char	*server;
+	char	sip[40];	/* ip as a string, big enough for ipv6 */
 };
 
 struct	Server	{
