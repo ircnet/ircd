@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.18 1999/06/27 21:20:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.19 1999/07/04 19:45:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -74,8 +74,9 @@ struct socks_private
  *	Found an open proxy for cl: deal with it!
  */
 static void
-socks_open_proxy(cl)
+socks_open_proxy(cl, strver)
 int cl;
+char *strver;
 {
     struct socks_private *mydata = cldata[cl].instance->data;
 
@@ -87,8 +88,8 @@ int cl;
 			cldata[cl].itsport);
 	}
     if (mydata->options & OPT_LOG)
-	    sendto_log(ALOG_FLOG, LOG_INFO, "socks: open proxy: %s[%s]",
-		       cldata[cl].host, cldata[cl].itsip);
+	    sendto_log(ALOG_FLOG, LOG_INFO, "socks%s: open proxy: %s[%s]",
+		       strver, cldata[cl].host, cldata[cl].itsip);
 }
 
 /*
@@ -178,7 +179,7 @@ socks_check_cache(cl)
 		    pl->expire = now + mydata->lifetime; /* dubious */
 		    if (pl->state == 1)
 			{
-			    socks_open_proxy(cl);
+			    socks_open_proxy(cl, "C");
 			    mydata->chito += 1;
 			}
 		    else if (pl->state == 0)
@@ -332,7 +333,7 @@ char *strver;
 	}
     
     if (state == PROXY_OPEN && again == 0)
-	    socks_open_proxy(cl);
+	    socks_open_proxy(cl, strver);
     
     if (state == PROXY_UNEXPECTED)
 	{
