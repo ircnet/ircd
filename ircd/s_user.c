@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.130 2002/06/06 14:01:17 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.131 2002/07/05 23:16:17 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1246,7 +1246,7 @@ char	*parv[];
 	*/
 	acptr = make_client(cptr);
 	add_client_to_list(acptr);
-	(void)make_user(acptr);
+	(void)make_user(acptr, strlen(parv[5]));
 	/* more corrrect is this, but we don't yet have ->mask, so...
 	acptr->user->servp = find_server_name(sptr->serv->mask->serv->snum);
 	... just remember to change it one day --Beeth */
@@ -2066,6 +2066,7 @@ char	*parv[];
 #define	UFLAGS	(FLAGS_INVISIBLE|FLAGS_WALLOP|FLAGS_RESTRICT)
 	char	*username, *host, *server, *realname;
 	anUser	*user;
+	char	ipbuf[BUFSIZE];
 
 	/* Reject new USER */
 	if (IsServer(sptr) || IsService(sptr) || sptr->user)
@@ -2104,8 +2105,27 @@ char	*parv[];
 	host     = (parc < 3 || BadPtr(parv[2])) ? "<nohost>" : parv[2];
 	server   = (parc < 4 || BadPtr(parv[3])) ? "<noserver>" : parv[3];
 	realname = (parc < 5 || BadPtr(parv[4])) ? "<bad-realname>" : parv[4];
-
- 	user = make_user(sptr);
+	
+	if (MyConnect(sptr))
+	{
+		/* internal call of m_user for *local* user */
+#ifdef INET6
+		inetntop(AF_INET6, (char *)&sptr->ip, user->sip,
+				sizeof(ipbuf));
+#else
+		strcpy(ipbuf, (char *)inetntoa((char *)&sptr->ip));
+#endif
+		user = make_user(sptr, strlen(ipbuf));
+		
+		strcpy(user->sip, ipbuf);
+	}
+	else
+	{
+		/* m_user is used only by NICK, which may come only from
+		 * 2.10 servers, hence we have no IP -> using 0
+		 */
+		user = make_user(sptr, 0);
+	}
 
 	if (!MyConnect(sptr))
 	    {
@@ -2157,12 +2177,7 @@ char	*parv[];
 	sptr->user->flags |= (UFLAGS & atoi(host));
 	strncpyzt(user->host, host, sizeof(user->host));
 	user->server = find_server_string(me.serv->snum);
-#ifdef INET6
-	inetntop(AF_INET6, (char *)&sptr->ip, user->sip, sizeof(user->sip));
-#else
-	strcpy(user->sip, (char *)inetntoa((char *)&sptr->ip));
-#endif
-
+	
 user_finish:
 	reorder_client_in_list(sptr);
 	if (sptr->info != DefInfo)
