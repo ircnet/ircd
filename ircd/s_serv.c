@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.215 2004/06/27 20:06:37 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.216 2004/06/27 20:54:25 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3376,6 +3376,9 @@ int	find_server_num(char *sname)
 static	int	check_link(aClient *cptr)
 {
     if (MyClient(cptr))
+	    return 0;
+    /* Oh well... free opers from RPL_TRYAGAIN. */
+    if (IsOper(cptr))
 	    return 0;
     if (!(bootopt & BOOT_PROT))
 	    return 0;
