@@ -46,5 +46,6 @@ EXTERN int check_uid __P((char *));
 EXTERN char *ltoid __P((long l, int n));
 EXTERN long idtol __P((char *id, int n));
 EXTERN int sid_valid __P((char *sid));
+EXTERN int cid_ok __P((char *name, int n));
 
 #undef EXTERN
