@@ -1,3 +1,11 @@
+2003-07-28  Jakub Vlasek
+
+	* struct_def.h: Added byuid to struct Server. Stores UID of remote
+	  oper initiating the connection.
+	* send.c/send_queued(), ircd.c/check_pings(), s_bsd.c/report_error(),
+	  s_serv/m_server_estab(): Report the error to remote oper who
+	  initiated server connection.
+
 2003-07-24  Piotr Kucharski
 
 	* s_id.c/next_uid(): changed pow() to #define constant; added
