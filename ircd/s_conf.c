@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.155 2005/02/12 01:34:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.156 2005/02/15 18:37:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1396,9 +1396,7 @@ int 	initconf(int opt)
 		return -1;
 	    }
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
-	/* Note for a future: do not use fdopen() for its 256 fd limit --B. */
-	close(fd);
-	fdn = fopen(configfile, "r");
+	fdn = fdopen(fd, "r");
 	if (fdn == NULL)
 	{
 		if (serverbooting)
