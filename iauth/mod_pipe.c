@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.5 2004/10/01 20:22:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.6 2005/01/03 15:36:21 q Exp $";
 #endif
 
 #include "os.h"
@@ -105,8 +105,9 @@ static	int	pipe_start(u_int cl)
 			if (pp[1] != 2 && pp[1] != 1)
 				(void)close(pp[1]);
 			(void)execlp(cldata[cl].instance->popt,
-				     cldata[cl].instance->popt,
-				     cldata[cl].itsip, cldata[cl].itsport);
+				cldata[cl].instance->popt,
+				cldata[cl].itsip, cldata[cl].itsport,
+				(char *) NULL);
 			_exit(-1);
 		    }
 	    default :
