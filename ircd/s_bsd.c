@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.145 2004/04/18 04:31:50 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.146 2004/06/29 21:23:04 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -248,6 +248,11 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 		return -1;
 	    }
 	(void)set_sock_opts(cptr->fd, cptr);
+#if defined (__CYGWIN32__)
+	/* Can anyone explain why setting nonblock here works and does not
+	** in add_listener after we return from inetport()? --B. */
+	(void)set_non_blocking(cptr->fd, cptr);
+#endif
 	/*
 	 * Bind a port to listen for new connections if port is non-null,
 	 * else assume it is already open and try get something from it.
