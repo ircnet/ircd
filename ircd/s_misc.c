@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.47 2002/06/06 04:59:27 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.48 2002/06/06 13:49:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -476,7 +476,7 @@ char	*comment;	/* Reason for the exit */
 		    {
 # if defined(FNAME_CONNLOG) || defined(USE_SERVICES) || \
 	(defined(USE_SYSLOG) && defined(SYSLOG_CONN))
-			if (sptr->exitc == NULL || sptr->exitc == EXITC_REG)
+			if (sptr->exitc == '\0' || sptr->exitc == EXITC_REG)
 			{
 				sptr->exitc = EXITC_UNDEF;
 			}
