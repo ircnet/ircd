@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.65 2004/02/08 02:07:06 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.66 2004/02/08 04:01:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1108,8 +1108,8 @@ void	read_motd(char *filename)
 
 void	check_split(void)
 {
-	/* -1 for this server  */
-	if (istat.is_eobservers < iconf.split_minservers  - 1 ||
+	/* + 1 for this server  */
+	if (istat.is_eobservers + 1 < iconf.split_minservers ||
 	    istat.is_user[0] + istat.is_user[1] < iconf.split_minusers)
 	{
 		/* Split detected */
@@ -1127,8 +1127,8 @@ void	check_split(void)
 		{
 			sendto_flag(SCH_NOTICE,
 				"Network rejoined, split mode deactivated");
+			iconf.split = 0;
 		}
-		iconf.split = 0;
 	}
 }
 
