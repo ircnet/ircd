@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.202 2004/06/19 00:16:24 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.203 2004/06/19 18:01:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1862,6 +1862,10 @@ static int report_array[16][3] = {
 		{ CONF_VER,		  RPL_STATSVLINE, 'V'},
 		{ CONF_BOUNCE,		  RPL_STATSBLINE, 'B'},
 		{ CONF_DENY,		  RPL_STATSDLINE, 'D'},
+#ifdef TKLINE
+		{ CONF_TOTHERKILL,	  RPL_STATSKLINE, 'k'},
+		{ CONF_TKILL,		  RPL_STATSKLINE, 'K'},
+#endif
 		{ 0, 0, 0}
 	};
 
@@ -1871,9 +1875,17 @@ static	void	report_configured_links(aClient *sptr, char *to, int mask)
 	aConfItem *tmp;
 	int	*p, port;
 	char	c, *host, *pass, *name;
+
+	if ((mask & (CONF_KILL|CONF_OTHERKILL)))
+		tmp = kconf;
+#ifdef TKLINE
+	else if ((mask & (CONF_TKILL|CONF_TOTHERKILL)))
+		tmp = tkconf;
+#endif
+	else
+		tmp = conf;
 	
-	for (tmp = (mask & (CONF_KILL|CONF_OTHERKILL)) ? kconf : conf;
-	     tmp; tmp = tmp->next)
+	for (; tmp; tmp = tmp->next)
 		if (tmp->status & mask)
 		    {
 			for (p = &report_array[0][0]; *p; p += 3)
@@ -1901,6 +1913,15 @@ static	void	report_configured_links(aClient *sptr, char *to, int mask)
 					   c, host, (pass) ? pass : null,
 					   name, port, get_conf_class(tmp));
 			}
+#ifdef TKLINE
+			else if ((tmp->status & (CONF_TKILL|CONF_TOTHERKILL)))
+			{
+				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
+					   c, host, (pass) ? pass : null,
+					   name, tmp->hold - timeofday,
+					   get_conf_class(tmp));
+			}
+#endif
 			else if ((tmp->status & CONF_CLIENT))
 			{
 				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
