@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.68 2004/06/12 02:46:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.69 2004/06/12 12:37:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -28,109 +28,96 @@ static  char rcsid[] = "@(#)$Id: parse.c,v 1.68 2004/06/12 02:46:51 chopin Exp $
 #include "s_externs.h"
 #undef PARSE_C
 
-#define MAXPARA 15
+/* max parameters accepted */
+#define MPAR 15
 
+/* commands should be sorted by their average usage count */
+/* handlers are for: server, client, oper, service, unregistered */
 struct Message msgtab[] = {
-{ "PRIVMSG", m_private,  2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "NJOIN",   m_njoin,    2, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-{ "JOIN",    m_join,     1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "MODE",    m_mode,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "UNICK",   m_unick,    7, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-{ "NICK",    m_nick,     1, MAXPARA, MSG_LAG, 0, 0, 0L},
-{ "PART",    m_part,     1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "QUIT",    m_quit,     0, MAXPARA, MSG_LAG, 0, 0, 0L},
-{ "NOTICE",  m_notice,   2, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "KICK",    m_kick,     2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "SERVER",  m_server,   2, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-{ "SMASK",   m_smask,    3, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-{ "TRACE",   m_trace,    0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "TOPIC",   m_topic,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "INVITE",  m_invite,   2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "WALLOPS", m_wallops,  1, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
-{ "PING",    m_ping,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "PONG",    m_pong,     1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "ERROR",   m_error,    1, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+{ "PRIVMSG",  2, MPAR, 0, 0, 0L, { m_nop, m_private, m_private, m_nop, m_unreg } },
+{ "NJOIN",    2, MPAR, 0, 0, 0L, { m_njoin, m_nop, m_nop, m_nop, m_unreg } },
+{ "JOIN",     1, MPAR, 0, 0, 0L, { m_nop, m_join, m_join, m_nop, m_unreg } },
+{ "MODE",     1, MPAR, 0, 0, 0L, { m_mode, m_mode, m_mode, m_nop, m_unreg } },
+{ "UNICK",    7, MPAR, 0, 0, 0L, { m_unick, m_nop, m_nop, m_nop, m_unreg } },
+{ "NICK",     1, MPAR, 0, 0, 0L, { m_nick, m_nick, m_nick, m_nop, m_nick } },
+{ "PART",     1, MPAR, 0, 0, 0L, { m_part, m_part, m_part, m_nop, m_unreg } },
+{ "QUIT",     0, MPAR, 0, 0, 0L, { m_quit, m_quit, m_quit, m_quit, m_quit } },
+{ "NOTICE",   2, MPAR, 0, 0, 0L, { m_notice, m_notice, m_notice, m_notice, m_unreg } },
+{ "KICK",     2, MPAR, 0, 0, 0L, { m_kick, m_kick, m_kick, m_nop, m_unreg } },
+{ "SERVER",   2, MPAR, 0, 0, 0L, { m_server, m_nop, m_nop, m_nop, m_server } },
+{ "SMASK",    3, MPAR, 0, 0, 0L, { m_smask, m_nop, m_nop, m_nop, m_unreg } },
+{ "TRACE",    0, MPAR, 0, 0, 0L, { m_trace, m_trace, m_trace, m_nop, m_unreg } },
+{ "TOPIC",    1, MPAR, 0, 0, 0L, { m_nop, m_topic, m_topic, m_nop, m_unreg } },
+{ "INVITE",   2, MPAR, 0, 0, 0L, { m_nop, m_invite, m_invite, m_nop, m_unreg } },
+{ "WALLOPS",  1, MPAR, 0, 0, 0L, { m_wallops, m_nop, m_nop, m_nop, m_unreg } },
+{ "PING",     1, MPAR, 0, 0, 0L, { m_ping, m_ping, m_ping, m_ping, m_unreg } },
+{ "PONG",     1, MPAR, 0, 0, 0L, { m_pong, m_pong, m_pong, m_pong, m_unreg } },
+{ "ERROR",    1, MPAR, 0, 0, 0L, { m_error, m_nop, m_nop, m_nop, m_unreg } },
 #ifdef	OPER_KILL
-{ "KILL",    m_kill,     1, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
+{ "KILL",     1, MPAR, 0, 0, 0L, { m_kill, m_nopriv, m_kill, m_nop, m_unreg } },
 #else
-{ "KILL",    m_kill,     2, MAXPARA, MSG_LAG|MSG_REG|MSG_NOU, 0, 0, 0L},
+{ "KILL",     2, MPAR, 0, 0, 0L, { m_kill, m_nop, m_nop, m_nop, m_unreg } },
 #endif
-{ "SAVE",    m_save,     1, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-{ "USER",    m_user,     4, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-{ "AWAY",    m_away,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "UMODE",   m_umode,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "ISON",    m_ison,     1, 1,	 MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "SQUIT",   m_squit,    0, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
-{ "WHOIS",   m_whois,    1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "WHO",     m_who,      1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "WHOWAS",  m_whowas,   1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "LIST",    m_list,     0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "NAMES",   m_names,    0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "USERHOST", m_userhost, 1, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "PASS",    m_pass,     1, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-{ "LUSERS",  m_lusers,   0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "TIME",    m_time,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "OPER",    m_oper,     2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "CONNECT", m_connect,  1, MAXPARA, MSG_LAG|MSG_REGU|MSG_OP|MSG_LOP, 0, 0, 0L},
-{ "VERSION", m_version,  0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "STATS",   m_stats,    1, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "LINKS",   m_links,    0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "ADMIN",   m_admin,    0, MAXPARA, MSG_LAG, 0, 0, 0L},
-{ "USERS",   m_users,    0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "SUMMON",  m_summon,   0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "HELP",    m_help,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "INFO",    m_info,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "MOTD",    m_motd,     0, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "CLOSE",   m_close,    0, MAXPARA, MSG_LAG|MSG_REGU|MSG_OP, 0, 0, 0L},
-{ "SERVICE", m_service,  4, MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
-{ "EOB",     m_eob,      0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
-{ "EOBACK",  m_eoback,   0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
-{ "ENCAP",   m_encap,    1, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
-{ "SDIE",    m_sdie,     0, MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
+{ "SAVE",     1, MPAR, 0, 0, 0L, { m_save, m_nop, m_nop, m_nop, m_unreg } },
+{ "USER",     4, MPAR, 0, 0, 0L, { m_nop, m_reg, m_reg, m_nop, m_user } },
+{ "AWAY",     0, MPAR, 0, 0, 0L, { m_nop, m_away, m_away, m_nop, m_unreg } },
+{ "UMODE",    1, MPAR, 0, 0, 0L, { m_nop, m_umode, m_umode, m_nop, m_unreg } },
+{ "ISON",     1,    1, 0, 0, 0L, { m_ison, m_ison, m_ison, m_nop, m_unreg } },
+{ "SQUIT",    0, MPAR, 0, 0, 0L, { m_squit, m_nopriv, m_squit, m_nop, m_unreg } },
+{ "WHOIS",    1, MPAR, 0, 0, 0L, { m_whois, m_whois, m_whois, m_nop, m_unreg } },
+{ "WHO",      1, MPAR, 0, 0, 0L, { m_who, m_who, m_who, m_nop, m_unreg } },
+{ "WHOWAS",   1, MPAR, 0, 0, 0L, { m_whowas, m_whowas, m_whowas, m_nop, m_unreg } },
+{ "LIST",     0, MPAR, 0, 0, 0L, { m_list, m_list, m_list, m_nop, m_unreg } },
+{ "NAMES",    0, MPAR, 0, 0, 0L, { m_nop, m_names, m_names, m_nop, m_unreg } },
+{ "USERHOST", 1, MPAR, 0, 0, 0L, { m_userhost, m_userhost, m_userhost, m_nop, m_unreg } },
+{ "PASS",     1, MPAR, 0, 0, 0L, { m_nop, m_reg, m_reg, m_nop, m_pass } },
+{ "LUSERS",   0, MPAR, 0, 0, 0L, { m_lusers, m_lusers, m_lusers, m_nop, m_unreg } },
+{ "TIME",     0, MPAR, 0, 0, 0L, { m_nop, m_time, m_time, m_nop, m_unreg } },
+{ "OPER",     2, MPAR, 0, 0, 0L, { m_nop, m_oper, m_nop, m_nop, m_unreg } },
+{ "CONNECT",  1, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_connect, m_nop, m_unreg } },
+{ "VERSION",  0, MPAR, 0, 0, 0L, { m_nop, m_version, m_version, m_nop, m_unreg } },
+{ "STATS",    1, MPAR, 0, 0, 0L, { m_nop, m_stats, m_stats, m_nop, m_unreg } },
+{ "LINKS",    0, MPAR, 0, 0, 0L, { m_links, m_links, m_links, m_nop, m_unreg } },
+{ "ADMIN",    0, MPAR, 0, 0, 0L, { m_admin, m_admin, m_admin, m_admin, m_admin } },
+{ "USERS",    0, MPAR, 0, 0, 0L, { m_nop, m_users, m_users, m_nop, m_unreg } },
+{ "SUMMON",   0, MPAR, 0, 0, 0L, { m_nop, m_summon, m_summon, m_nop, m_unreg } },
+{ "HELP",     0, MPAR, 0, 0, 0L, { m_nop, m_help, m_help, m_nop, m_unreg } },
+{ "INFO",     0, MPAR, 0, 0, 0L, { m_nop, m_info, m_info, m_nop, m_unreg } },
+{ "MOTD",     0, MPAR, 0, 0, 0L, { m_nop, m_motd, m_motd, m_nop, m_unreg } },
+{ "CLOSE",    0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_close, m_nop, m_unreg } },
+{ "SERVICE",  4, MPAR, 0, 0, 0L, { m_service, m_nop, m_nop, m_nop, m_service } },
+{ "EOB",      0, MPAR, 0, 0, 0L, { m_eob, m_nop, m_nop, m_nop, m_unreg } },
+{ "EOBACK",   0, MPAR, 0, 0, 0L, { m_eoback, m_nop, m_nop, m_nop, m_unreg } },
+{ "ENCAP",    1, MPAR, 0, 0, 0L, { m_encap, m_nop, m_nop, m_nop, m_nop } },
+{ "SDIE",     0, MPAR, 0, 0, 0L, { m_sdie, m_nop, m_nop, m_nop, m_unreg } },
 #ifdef	USE_SERVICES
-{ "SERVSET", m_servset,  1, MAXPARA, MSG_LAG|MSG_SVC, 0, 0, 0L},
+{ "SERVSET",  1, MPAR, 0, 0, 0L, { m_nop, m_nop, m_nop, m_servset, m_nop } },
 #endif
-{ "SQUERY",  m_squery,   2, MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-{ "SERVLIST", m_servlist, 0, MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
-{ "HAZH",    m_hash,     1, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0, 0, 0L},
-{ "DNS",     m_dns,      0, MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0, 0, 0L},
+{ "SQUERY",   2, MPAR, 0, 0, 0L, { m_nop, m_squery, m_squery, m_nop, m_unreg } },
+{ "SERVLIST", 0, MPAR, 0, 0, 0L, { m_servlist, m_servlist, m_servlist, m_nop, m_unreg } },
+{ "HAZH",     1, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_hash, m_nop, m_nop } },
+{ "DNS",      0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_dns, m_nop, m_nop } },
 #ifdef	OPER_REHASH
-{ "REHASH",  m_rehash,   0, MAXPARA, MSG_REGU|MSG_OP
-# ifdef	LOCOP_REHASH
-					 |MSG_LOP
-# endif
-					, 0, 0, 0L},
+{ "REHASH",   0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_rehash, m_nop, m_unreg } },
 #endif
 #ifdef	OPER_RESTART
-{ "RESTART",  m_restart,   0, MAXPARA, MSG_REGU|MSG_OP
-# ifdef	LOCOP_RESTART
-					 |MSG_LOP
-# endif
-					, 0, 0, 0L},
+{ "RESTART",  0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_restart, m_nop, m_unreg } },
 #endif
 #ifdef	OPER_DIE
-{ "DIE",  m_die,   0, MAXPARA, MSG_REGU|MSG_OP
-# ifdef	LOCOP_DIE
-					 |MSG_LOP
-# endif
-					, 0, 0, 0L},
+{ "DIE",      0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_die, m_nop, m_unreg } },
 #endif
 #ifdef OPER_SET
-{ "SET",  m_set,   0, MAXPARA, MSG_REGU|MSG_OP
-#ifdef LOCOP_SET
-					| MSG_LOP
-#endif
-					, 0, 0, 0L},
+{ "SET",      0, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_set, m_nop, m_unreg } },
 #endif /* OPER_SET */
-{ "MAP",  m_map,   0, MAXPARA, MSG_LAG | MSG_REG, 0, 0, 0L},
-{ "POST",    m_post,     0, MAXPARA, MSG_NOU, 0, 0, 0L},
-{ NULL, NULL, 0, 0, 0, 0, 0L}
+{ "MAP",      0, MPAR, 0, 0, 0L, { m_map, m_map, m_map, m_nop, m_unreg } },
+{ "POST",     0, MPAR, 0, 0, 0L, { m_nop, m_nop, m_nop, m_nop, m_post } },
+{ NULL,       0,    0, 0, 0, 0L,   NULL, NULL, NULL, NULL, NULL }
 };
 
 /*
  * NOTE: parse() should not be called recursively by other functions!
  */
-static	char	*para[MAXPARA+1];
+static	char	*para[MPAR+1];
 
 static	char	sender[HOSTLEN+1];
 static	int	cancel_clients (aClient *, aClient *, char *);
@@ -589,6 +576,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	Reg	int	len, i, numeric = 0, paramcount;
 	Reg	struct	Message *mptr = NULL;
 	int	ret;
+	int	status = from->status < STAT_SERVER ? STAT_UNREG : from->status;
 
 	Debug((DEBUG_DEBUG, "Parsing %s: %s",
 		get_client_name(cptr, FALSE), buffer));
@@ -653,7 +641,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	    {
 		numeric = (*ch - '0') * 100 + (*(ch + 1) - '0') * 10
 			+ (*(ch + 2) - '0');
-		paramcount = MAXPARA;
+		paramcount = MPAR;
 		ircstp->is_num++;
 	    }
 	else
@@ -695,11 +683,10 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 			ircstp->is_unco++;
 			return -1;
 		    }
-		paramcount = mptr->parameters;
+		paramcount = mptr->maxparams;
 		i = bufend - ((s) ? s : ch);
 		mptr->bytes += i;
-		if ((mptr->flags & MSG_LAG) &&
-		    !(IsServer(cptr) || IsService(cptr)))
+		if (!(IsServer(cptr) || IsService(cptr)))
 		    {	/* Flood control partly migrated into penalty */
 			if (bootopt & BOOT_PROT)
 				cptr->since += (1 + i / 100);
@@ -726,8 +713,8 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	i = 0;
 	if (s)
 	    {
-		if (paramcount > MAXPARA)
-			paramcount = MAXPARA;
+		if (paramcount > MPAR)
+			paramcount = MPAR;
 		for (;;)
 		    {
 			/*
@@ -755,7 +742,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 				;
 		    }
 	    }
-	para[++i] = NULL; /* at worst, ++i is paramcount (MAXPARA) */
+	para[++i] = NULL; /* at worst, ++i is paramcount (MPAR) */
 	if (mptr == NULL)
 		return (do_numeric(numeric, cptr, from, i, para));
 	mptr->count++;
@@ -763,32 +750,13 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 		mptr->rcount++;
 	if (IsRegisteredUser(cptr) &&
 #ifdef	IDLE_FROM_MSG
-	    mptr->func == m_private)
+	    mptr->handler[status] == m_private)
 #else
-	    mptr->func != m_ping && mptr->func != m_pong)
+	    mptr->handler[status] != m_ping && mptr->handler[status] != m_pong)
 #endif
 		from->user->last = timeofday;
 	Debug((DEBUG_DEBUG, "Function: %#x = %s parc %d parv %#x",
 		mptr->func, mptr->cmd, i, para));
-	if ((mptr->flags & MSG_REGU) && check_registered_user(from))
-		return -1;
-	if ((mptr->flags & MSG_SVC) && check_registered_service(from))
-		return -1;
-	if ((mptr->flags & MSG_REG) && check_registered(from))
-		return -1;
-	if ((mptr->flags & MSG_NOU) && (MyPerson(from) || MyService(from)))
-	    {
-		sendto_one(from, replies[ERR_ALREADYREGISTRED], ME, BadTo(para[0]));
-		return-1;
-	    }
-	if (MyConnect(from) && !IsServer(from) &&
-	    (mptr->flags & (MSG_LOP|MSG_OP)) &&
-	    !((mptr->flags & MSG_OP) && (IsOper(from))) &&
-	    !((mptr->flags & MSG_LOP) && (IsLocOp(from))))
-		    {
-			sendto_one(from, replies[ERR_NOPRIVILEGES], ME, BadTo(para[0]));
-			return -1;
-		    }
 	if (mptr->minparams > 0 && (i <= mptr->minparams || para[i-1][0] == '\0'))
 	{
 		sendto_one(from, replies[ERR_NEEDMOREPARAMS], 
@@ -797,16 +765,15 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	}
 	else
 	{
-	/*
-	** ALL m_functions return now UNIFORMLY:
-	**   -2  old FLUSH_BUFFER return value (unchanged).
-	**   -1  if parsing of a protocol message leads in a syntactic/semantic
-	**       error and NO penalty scoring should be applied.
-	**   >=0 if protocol message processing was successful. The return
-	**       value indicates the penalty score.
-	*/
-	ret = (*mptr->func)(cptr, from, i, para);
-
+		/*
+		** ALL m_functions return now UNIFORMLY:
+		**   -2  old FLUSH_BUFFER return value (unchanged).
+		**   -1  if parsing of a protocol message leads in a syntactic/semantic
+		**       error and NO penalty scoring should be applied.
+		**   >=0 if protocol message processing was successful. The return
+		**       value indicates the penalty score.
+		*/
+		ret = (*mptr->handler[status])(cptr, from, i, para);
 	}
 	/*
         ** Add penalty score for sucessfully parsed command if issued by
@@ -958,24 +925,24 @@ static	void	remove_unknown(aClient *cptr, char *sender)
 			    sender, get_client_name(cptr, FALSE));
 }
 
-int	m_ignore(aClient *cptr, aClient *sptr, int parc, char **parv)
+int	m_nop(aClient *cptr, aClient *sptr, int parc, char **parv)
 {
 	return 1;
 }
 
-int	m_noprivileges(aClient *cptr, aClient *sptr, int parc, char **parv)
+int	m_nopriv(aClient *cptr, aClient *sptr, int parc, char **parv)
 {
 	sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, parv[0]);
 	return 1;
 }
 
-int	m_unregistered(aClient *cptr, aClient *sptr, int parc, char **parv)
+int	m_unreg(aClient *cptr, aClient *sptr, int parc, char **parv)
 {
 	sendto_one(sptr, replies[ERR_NOTREGISTERED], ME, "*");
 	return -1;
 }
 
-int	m_registered(aClient *cptr, aClient *sptr, int parc, char **parv)
+int	m_reg(aClient *cptr, aClient *sptr, int parc, char **parv)
 {
 	sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, parv[0]);
 	return 1;
