@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.223 2004/06/28 22:13:40 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.224 2004/06/30 00:04:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -682,6 +682,18 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			(void)strcpy(sptr->name, nick);
 			(void)add_to_client_hash_table(nick, sptr);
 		}
+# if defined(CLIENTS_CHANNEL) && (CLIENTS_CHANNEL_LEVEL & CCL_CONN)
+		sendto_flag(SCH_CLIENT, "%s %s %s %s CONN %s"
+# if (CLIENTS_CHANNEL_LEVEL & CCL_CONNINFO)
+			" :%s"
+# endif
+			, user->uid, nick, user->username,
+			user->host, user->sip
+# if (CLIENTS_CHANNEL_LEVEL & CCL_CONNINFO)
+			, sptr->info
+# endif
+			);
+#endif
 		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
 		add_to_uid_hash_table(sptr->user->uid, sptr);
 		sptr->exitc = EXITC_REG;
@@ -1244,6 +1256,12 @@ nickkilldone:
 		** on that channel. Propagate notice to other servers.
 		*/
 		sendto_common_channels(sptr, ":%s NICK :%s", parv[0], nick);
+#if defined(CLIENTS_CHANNEL) && (CLIENTS_CHANNEL_LEVEL & CCL_NICK)
+		if (MyConnect(sptr))
+			sendto_flag(SCH_CLIENT, "%s %s %s %s NICK %s",
+				sptr->user->uid, parv[0],
+				sptr->user->username, sptr->user->host, nick);
+#endif
 		if (sptr->user) /* should always be true.. */
 		    {
 			add_history(sptr, sptr);
