@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.40 2004/10/27 13:37:09 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.41 2004/11/01 14:41:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -209,18 +209,14 @@ static	void	showconf()
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
 	if (debugflag)
 	{
-		char *etc = IRCDCONF_PATH;
-		char *fp;
-
-		fp = strrchr(IRCDCONF_PATH, '/') + 1;
-		etclen = fp - etc;
+		etclen = strlen(IRCDCONF_DIR);
 	}
 	p2 = config_read(fd, 0, new_config_file(configfile, NULL, 0));
 	for(p = p2; p; p = p->next)
 	{
 		if (debugflag)
 			printf("%s:%d:", p->file->filename +
-				(strncmp(p->file->filename, IRCDCONF_PATH,
+				(strncmp(p->file->filename, IRCDCONF_DIR,
 				etclen) == 0 ? etclen : 0), p->linenum);
 		printf("%s\n", p->line);
 	}
