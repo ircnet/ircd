@@ -1,6 +1,6 @@
   STATS unleashed
   Piotr Kucharski
-  $Id: stats.txt,v 1.4 2004/07/03 16:12:26 chopin Exp $
+  $Id: stats.txt,v 1.5 2004/10/06 15:00:39 chopin Exp $
 
   This document describes all STATS for ircd server 2.11.
 
@@ -82,7 +82,8 @@
           H:63 N:9 D:9 U:10 R:50 T:160 C:50 P:20 K:23
           BS:512 MXR:20 MXB:30 MXBL:1024 PY:10
           ZL:-1 CM:2 CP:10 DC:15
-          AC:ON SS:0 SU:2
+          AC: 1 CA:1 S:0 SS:20 SU:40000
+          CCL: 0x1
 
 
 
@@ -124,7 +125,6 @@
 
         +o  DCTL (DELAYCHASETIMELIMIT): seconds of channel delay
            protection
-
         +o  LDCTL (LDELAYCHASETIMELIMIT): seconds of !-channel delay
            protection
 
@@ -182,13 +182,19 @@
         +o  DC (DELAY_CLOSE): seconds to keep too fast reconnecting
            clones delayed before closing their sockets (``-1'' if none)
 
-        +o  AC: auto connect status
+        +o  AC: auto connect status (0 disabled, 1 enabled)
+
+        +o  CA: client accept status (0 disabled, 1 enabled, 2 enabled if
+           not split)
+
+        +o  S: split status (0 no split, 1 in split)
 
         +o  SS (SPLIT_SERVERS): state of split if number of servers on
            the network is below that number
-
         +o  SU (SPLIT_USERS): state of split if number of users on the
            network is below that number
+
+        +o  CCL: bitmask telling what is sent to &CLIENTS channel.
 
 
      ff,, FF -- ffiillee ddeessccrriippttoorrss rreeppoorrtt
@@ -308,7 +314,7 @@
      oo,, OO -- ooppeerraattoorr lliinneess
 
 
-          o *@*.example.org * Beeth 0 10
+     o *@*.example.org * Beeth 0 10
 
 
 
@@ -375,7 +381,8 @@
 
      ss,, SS -- sseerrvviiccee lliinneess
 
-     S *@192.168.1.13 * ServiceName 0x3F00FFFF 0
+
+          S *@192.168.1.13 * ServiceName 0x3F00FFFF 0
 
 
 
@@ -427,11 +434,12 @@
           link checks 38 passed 1 15s/35 30s dropped 0Sq/0Yg/2Fl
 
 
-
      Calls to check_link(), accepted early (last one made more than 15s
      ago, but little sendQ), accepted (more than 30s ago), dropped
      because of too high sendQ (64kB), too young link (less than 60
      sec), simply refused.
+
+
           whowas turnover 490/13570/34247 [90]
           ndelay turnover 8001/46556/195114 [1800]
           abuse protections 1 strict 1
@@ -550,8 +558,8 @@
      increased.
 
 
-          RES table 8072
-          Structs 20440 IP storage 12344 Name storage 12685
+     RES table 8072
+     Structs 20440 IP storage 12344 Name storage 12685
 
 
 

@@ -27,7 +27,8 @@ Client:
 	* Channels now keep information who and when set the topic.
 	* LIST (if allowed) does not disconnect if client's sendQ fills.
 	* WHOIS now shows the time user signed on.
-	* LUSERS shows local and global usercount maximum.
+	* LUSERS (and USERS, if defined) shows local and global usercount and
+	  maximums.
 	* INVITE overriding ban shows inviter's n!u@h in channel notice.
 	* Support for text representation of user modes in USER command
 	  during registration.

@@ -1,3 +1,20 @@
+2004-10-06  Piotr Kucharski
+
+	* common/numeric_def.h, config.h.dist, s_err.c, s_serv.c/m_users():
+	  added USERS_RFC1459 define to choose between rfc1459 behaviour of
+	  USERS and a new one.
+	* s_serv.c: add send_users() used in LUSERS and new USERS.
+	* s_serv.c/m_users(): new behaviour of USERS command if USERS_RFC1459
+	  is not defined.
+	* s_serv.c/m_lusers(): send 265 and 266 only if request was for all
+	  clients (either no param or param "*").
+
+2004-10-05  Piotr Kucharski
+
+	* numeric_def.h, s_err.c, s_serv.c/m_lusers(): revert 251 and 255
+	  numerics changes, readd 266 numeric, change format of 265 and 266
+	  numerics to be alike 251 (but with numbers in front).
+
 2004-10-04  Piotr Kucharski
 
 	* moved support/iauth.conf to doc/iauth.conf.example and
