@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info14763tmp2.
+input file /tmp/sgml2info18063tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.34 1999/02/21 00:36:12 kalt Exp $
+     $Id: INSTALL.info,v 1.35 1999/03/10 00:32:45 kalt Exp $
 
    This document describes how to install, and configure IRC 2.10.2.
 
@@ -98,6 +98,9 @@ default behaviour:
 
 `--enable-ip6'
      Enable IPv6 support (See notes below)
+
+`--enable-dsm'
+     Enable Dynamically Shared Modules support for iauth
 
 
 File: INSTALL.info,  Node: Notes for Cygwin32 users,  Next: Notes concerning IPv6 support,  Prev: The configure script,  Up: Installing IRC-
@@ -1711,43 +1714,43 @@ Tag Table:
 Node: Top123
 Node: Installing IRC-631
 Node: The configure script856
-Node: Notes for Cygwin32 users3071
-Node: Notes concerning IPv6 support4001
-Node: The config-h file4572
-Node: Define what type of UNIX your machine uses-5244
-Node: DEBUGMODE5644
-Node: CPATH MPATH LPATH PPATH TPATH QPATH OPATH6308
-Node: CACHED_MOTD7536
-Node: CHROOTDIR8012
-Node: ENABLE_SUMMON ENABLE_USERS8336
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE8872
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY9555
-Node: ZIP_LINKS ZIP_LEVEL10187
-Node: SLOW_ACCEPT11198
-Node: CLONE_CHECK11816
-Node: Other #define's12156
-Node: Editing the Makefile and compiling12481
-Node: The ircd-conf file13121
-Node: Machine information15153
-Node: Administrative info17249
-Node: Port connections19284
-Node: Connection Classes21494
-Node: Client connections26945
-Node: Operator priviliges32458
-Node: Restrict connections34578
-Node: Excluded accounts35893
-Node: Server connections39859
-Node: Deny auto-connections48298
-Node: Hub connections49671
-Node: Leaf connections50887
-Node: Version limitations52970
-Node: Excluded machines54686
-Node: Service connections55993
-Node: Bounce server57586
-Node: Default local server (for local clients) `*OBSOLETED*'59288
-Node: Related resources60171
-Node: Reporting a bug61109
-Node: How to report a bug61369
-Node: Where to send a bug report62382
+Node: Notes for Cygwin32 users3144
+Node: Notes concerning IPv6 support4074
+Node: The config-h file4645
+Node: Define what type of UNIX your machine uses-5317
+Node: DEBUGMODE5717
+Node: CPATH MPATH LPATH PPATH TPATH QPATH OPATH6381
+Node: CACHED_MOTD7609
+Node: CHROOTDIR8085
+Node: ENABLE_SUMMON ENABLE_USERS8409
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE8945
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY9628
+Node: ZIP_LINKS ZIP_LEVEL10260
+Node: SLOW_ACCEPT11271
+Node: CLONE_CHECK11889
+Node: Other #define's12229
+Node: Editing the Makefile and compiling12554
+Node: The ircd-conf file13194
+Node: Machine information15226
+Node: Administrative info17322
+Node: Port connections19357
+Node: Connection Classes21567
+Node: Client connections27018
+Node: Operator priviliges32531
+Node: Restrict connections34651
+Node: Excluded accounts35966
+Node: Server connections39932
+Node: Deny auto-connections48371
+Node: Hub connections49744
+Node: Leaf connections50960
+Node: Version limitations53043
+Node: Excluded machines54759
+Node: Service connections56066
+Node: Bounce server57659
+Node: Default local server (for local clients) `*OBSOLETED*'59361
+Node: Related resources60244
+Node: Reporting a bug61182
+Node: How to report a bug61442
+Node: Where to send a bug report62455
 
 End Tag Table
