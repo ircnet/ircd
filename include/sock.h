@@ -19,7 +19,7 @@
  */
 
 /*
- * $Id: sock.h,v 1.2 1997/04/15 19:47:13 kalt Exp $
+ * $Id: sock.h,v 1.3 1997/05/27 13:59:22 kalt Exp $
  */
 
 #ifndef	_DO_POLL_
@@ -32,7 +32,7 @@
 # endif
 
 # if (MAXCONNECTIONS > FD_SETSIZE)
-#  error FD_SETSIZE must be bigger than MAXCONNECTIONS
+error FD_SETSIZE must be bigger than MAXCONNECTIONS
 # endif
 
 #endif /* _DO_POLL_ */
