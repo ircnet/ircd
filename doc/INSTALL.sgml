@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.50 2004/03/05 15:31:00 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.51 2004/03/05 22:23:11 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0.
 </abstract>
@@ -547,12 +547,13 @@ allowed on the server.
 <tag/Flags/This field contains flags of an I:line; flags are
 one character in size, can be combined and their order does not matter.
 <itemize>
+<item>E - client is exempted from K: lines
 <item>F - fall-through to next I:line if password did not match
 <item>R - restricted
 <item>I - restricted, when client has no ident.
-<item>E - client is exempted from K: lines
-<item>N - disable resolved host name to be used (clients appear with IP)
 <item>D - restricted, when client has no reverse DNS
+<item>N - disable host resolving (clients appear with IP)
+<item>M - disable resolved host name to be used (clients appear with IP), but allow matching in beIR modes
 </itemize>
 <tag/Note/Restricted I: line means that
 clients matching such I line will not be able to use their operator
@@ -562,11 +563,8 @@ have their username prefixed by +, = or - depending on the ident reply.
 <tag/Note/The server checks if the client hostname 
 matches the <bf>TARGET Host NAME</bf> field.
 If a match is found, server checks <bf>TARGET Host Addr</bf> field.
-If a match is found, the client is accepted.
-If ``N'' flag is not used and the host name is available, it
-is used -- either matching <bf>TARGET Host NAME</bf> field or,
-if this field is empty, first returned by DNS. Using ``N'' flag
-sets the name of the client to its IP.
+If a match is found, the client is accepted. Clients host is set
+either to its hostname (if available) or, using ``N'' or ``M'' flag, to its IP.
 <tag/Examples/
 For example, if you were installing IRC on tolsun.oulu.fi
 and you wanted to let your own
