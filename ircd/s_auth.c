@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.42 1999/06/17 12:40:52 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.43 1999/07/02 16:38:21 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -783,18 +783,20 @@ Reg	aClient	*cptr;
 		return;
 	    }
 	ircstp->is_asuc++;
+	if (cptr->auth != cptr->username)/*impossible, but...*/
+	    {
+		istat.is_authmem -= sizeof(cptr->auth);
+		istat.is_auth -= 1;
+		MyFree(cptr->auth);
+	    }
   	if (!strncmp(system, "OTHER", 5))
 	    { /* OTHER type of identifier */
-		if (cptr->auth != cptr->username)/*impossible, but...*/
-		    {
-			istat.is_authmem -= sizeof(cptr->auth);
-			istat.is_auth -= 1;
-			MyFree(cptr->auth);
-		    }
 		cptr->auth = MyMalloc(strlen(ruser) + 2);
 		*cptr->auth = '-';
 		strcpy(cptr->auth+1, ruser);
 	    }
+	else
+		cptr->auth = mystrdup(ruser);
 	set_clean_username(cptr);
  	cptr->flags |= FLAGS_GOTID;
 	Debug((DEBUG_INFO, "got username [%s]", ruser));
