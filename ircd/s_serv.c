@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.218 2004/06/27 21:14:32 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.219 2004/06/30 14:38:32 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1856,6 +1856,23 @@ static int report_array[18][3] = {
 		{ 0, 0, 0}
 	};
 
+#ifdef XLINE
+static  void    report_x_lines(aClient *sptr, char *to)
+{
+	aConfItem *tmp;
+
+	for (tmp = conf; tmp; tmp = tmp->next)
+	{
+		if (tmp->status != CONF_XLINE)
+			continue;
+
+		sendto_one(sptr,":%s %d %s %s :%s ", ME, RPL_STATSDEBUG, to,
+				 xline_flags_to_string(tmp->flags),
+				 tmp->host);
+	}
+}
+#endif
+
 static	void	report_configured_links(aClient *sptr, char *to, int mask)
 {
 	static	char	null[] = "<NULL>";
@@ -2195,11 +2212,19 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	case 'V' : case 'v' : /* V conf lines */
 		report_configured_links(cptr, parv[0], CONF_VER);
 		break;
-#ifdef	DEBUGMODE
-	case 'X' : case 'x' : /* lists */
-		send_listinfo(cptr, parv[0]);
-		break;
+	case 'X' :
+#ifdef XLINE
+		if (IsAnOper(sptr))
+		{
+			report_x_lines(sptr, parv[0]);
+		}
 #endif
+		break;
+	case 'x' : /* lists */
+#ifdef DEBUGMODE
+		send_listinfo(cptr, parv[0]);
+#endif
+		break;
 	case 'Y' : case 'y' : /* Y lines */
 		report_classes(cptr, parv[0]);
 		break;
