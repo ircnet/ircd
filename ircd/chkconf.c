@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.43 2005/01/03 22:16:59 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.44 2005/02/15 19:21:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -526,6 +526,10 @@ static	aConfItem 	*initconf(void)
 				case 'M':
 				case 'F':
 					break;
+				case ' ':
+				case '\t':
+					/* so there's no weird warnings */
+					break;
 				default:
 					config_error(CF_WARN, CK_FILE, CK_LINE,
 						"unknown I-line flag: %c", *s);
@@ -561,6 +565,10 @@ static	aConfItem 	*initconf(void)
 				case 'p':
 				case 'P':
 				case 't':
+					break;
+				case ' ':
+				case '\t':
+					/* so there's no weird warnings */
 					break;
 				default:
 					config_error(CF_WARN, CK_FILE, CK_LINE,
