@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info29291tmp2.
+input file /tmp/sgml2info20282tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.8 1997/07/15 04:35:42 kalt Exp $
+     $Id: INSTALL.info,v 1.9 1997/07/18 03:13:46 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.3.
 
@@ -266,7 +266,7 @@ Editing the Makefile and compiling
 
    This package now uses GNU autoconf to probe your system and generate
 the correct Makefile.  However you need to edit it to specify specific
-information, such as "prefix", "irc_mode", "ircd_mode" and "irc_dir".
+information, such as "prefix", "irc_mode", "ircd_mode" and "ircd_dir".
 
    Now to build the package, type "make".  If everything goes will, you
 can then install it by typing "make install".
@@ -1434,23 +1434,23 @@ Node: SLOW_ACCEPT8554
 Node: CLONE_CHECK9172
 Node: Other #define's9512
 Node: Editing the Makefile and compiling9837
-Node: The ircd-conf file10472
-Node: Machine information12156
-Node: Administrative info14252
-Node: Port connections16287
-Node: Connection Classes18497
-Node: Client connections22420
-Node: Operator priviliges25705
-Node: Restrict connections27825
-Node: Excluded accounts29140
-Node: Server connections32440
-Node: Hub connections40873
-Node: Leaf connections42086
-Node: Version limitations44169
-Node: Excluded machines45402
-Node: Service connections46709
-Node: Bounce server49082
-Node: Default local server (for local clients) `*OBSOLETED*'50706
-Node: Related resources51589
+Node: The ircd-conf file10473
+Node: Machine information12157
+Node: Administrative info14253
+Node: Port connections16288
+Node: Connection Classes18498
+Node: Client connections22421
+Node: Operator priviliges25706
+Node: Restrict connections27826
+Node: Excluded accounts29141
+Node: Server connections32441
+Node: Hub connections40874
+Node: Leaf connections42087
+Node: Version limitations44170
+Node: Excluded machines45403
+Node: Service connections46710
+Node: Bounce server49083
+Node: Default local server (for local clients) `*OBSOLETED*'50707
+Node: Related resources51590
 
 End Tag Table

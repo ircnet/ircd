@@ -1,3 +1,9 @@
+Thu Jul 17 23:04:48 1997  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* send.c: buffer overflow fix.
+
+	* h.h, res_init.c: portability fixes.
+
 Wed Jul 16 21:35:50 1997  Christophe Kalt
 
 	* s_serv.c: m_die() referenced data after freeing it.

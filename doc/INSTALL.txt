@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.8 1997/07/15 04:35:43 kalt Exp $
+  $Id: INSTALL.txt,v 1.9 1997/07/18 03:13:46 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.3.
 
@@ -190,7 +190,7 @@
   This package now uses GNU autoconf to probe your system and generate
   the correct Makefile.  However you need to edit it to specify specific
   information, such as ``prefix'', ``irc_mode'', ``ircd_mode'' and
-  ``irc_dir''.
+  ``ircd_dir''.
 
   Now to build the package, type ``make''.  If everything goes will, you
   can then install it by typing ``make install''.
