@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.52 1998/08/02 22:34:11 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.53 1998/08/03 01:10:19 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -3009,9 +3009,8 @@ aChannel *chptr;
 			    chptr->reop = 0;
 			    return 0;
 			}
-		    if (!MyConnect(lp->value.cptr))
-			    continue;
-		    op.value.cptr = lp->value.cptr;
+		    if (MyConnect(lp->value.cptr))
+			    op.value.cptr = lp->value.cptr;
 		    lp = lp->next;
 		}
 	    if (op.value.cptr == NULL &&
@@ -3067,9 +3066,8 @@ aChannel *chptr;
 			    chptr->reop = 0;
 			    return 0;
 			}
-		    if (!MyConnect(lp->value.cptr))
-			    continue;
-		    if (lp->value.cptr->user->last > idlelimit &&
+		    if (MyConnect(lp->value.cptr) &&
+			lp->value.cptr->user->last > idlelimit &&
 			(op.value.cptr == NULL ||
 			 lp->value.cptr->user->last>op.value.cptr->user->last))
 			    op.value.cptr = lp->value.cptr;
