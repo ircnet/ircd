@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.17 1997/09/23 20:47:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.18 1997/09/24 18:26:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -277,9 +277,11 @@ aClient *cptr;
 							 cptr->auth, USERLEN))
 						ucnt++;
 				    }
-			if (hcnt >= ConfMaxHLocal(aconf))
+			if (ConfMaxHLocal(aconf) > 0 &&
+			    hcnt >= ConfMaxHLocal(aconf))
 				return -4;	/* for error message */
-			if (ucnt >= ConfMaxUHLocal(aconf))
+			if (ConfMaxUHLocal(aconf) > 0 &&
+			    ucnt >= ConfMaxUHLocal(aconf))
 				return -5;      /* for error message */
 		}
 		/*
@@ -302,9 +304,11 @@ aClient *cptr;
 					continue;
 				if (!strcmp(cptr->sockhost, acptr->user->host))
 				    {
-					if (++ghcnt >= ConfMaxUHGlobal(aconf))
+					if (ConfMaxUHGlobal(aconf) > 0 &&
+					    ++ghcnt >= ConfMaxUHGlobal(aconf))
 						return -6;
-					if (!strcmp(cptr->user->username,
+					if (ConfMaxUHGlobal(aconf) > 0 &&
+					    !strcmp(cptr->user->username,
 						    acptr->user->username) &&
 					    (++gucnt >=ConfMaxUHGlobal(aconf)))
 						return -7;
