@@ -32,6 +32,7 @@ typedef	struct	Zdata	aZdata;
 #ifdef CACHED_MOTD
 typedef struct        MotdItem aMotd;
 typedef struct        MotdItem aExtCf;
+typedef struct        MotdItem aExtData;
 #endif
 
 #define	HOSTLEN		63	/* Length of hostname.  Updated to         */

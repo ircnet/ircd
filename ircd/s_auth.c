@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.22 1998/12/13 00:18:30 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.23 1999/01/13 02:14:36 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -27,7 +27,8 @@ static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.22 1998/12/13 00:18:30 kalt Exp $"
 #include "s_externs.h"
 #undef S_AUTH_C
 
-aExtCf	*iauth_conf = NULL;
+aExtCf		*iauth_conf = NULL;
+aExtData	*iauth_stats = NULL;
 
 #if defined(USE_IAUTH)
 /*
@@ -157,6 +158,38 @@ read_iauth()
 			    while (*ectmp)
 				    ectmp = &((*ectmp)->next);
 			    *ectmp = (aExtCf *) MyMalloc(sizeof(aExtCf));
+			    (*ectmp)->line = mystrdup(start+2);
+			    (*ectmp)->next = NULL;
+			    start = end;
+			    continue;
+			}
+		    if (*start == 's')
+			{
+			    aExtData *ectmp;
+
+			    while (ectmp = iauth_stats)
+				{
+				    iauth_stats = iauth_stats->next;
+				    MyFree(ectmp->line);
+				    MyFree(ectmp);
+				}
+			    iauth_stats = (aExtData *)
+				    MyMalloc(sizeof(aExtData));
+			    iauth_stats->line = MyMalloc(60);
+			    sprintf(iauth_stats->line,
+				    "iauth modules statistics (%s)",
+				    myctime(timeofday));
+			    iauth_stats->next = NULL;
+			    start = end;
+			    continue;
+			}
+		    if (*start == 'S')
+			{
+			    aExtData **ectmp = &iauth_stats;
+
+			    while (*ectmp)
+				    ectmp = &((*ectmp)->next);
+			    *ectmp = (aExtData *) MyMalloc(sizeof(aExtData));
 			    (*ectmp)->line = mystrdup(start+2);
 			    (*ectmp)->next = NULL;
 			    start = end;
@@ -294,10 +327,32 @@ char *to;
 {
 	aExtCf *ectmp = iauth_conf;
 
+	if (adfd < 0)
+		return;
 	while (ectmp)
 	    {
 		sendto_one(sptr, ":%s %d %s :%s",
 			   ME, RPL_STATSIAUTH, to, ectmp->line);
+		ectmp = ectmp->next;
+	    }
+}
+
+/*
+ * report_iauth_stats
+ *
+ * called from m_stats(), this is the reply to /stats A
+ */
+void
+report_iauth_stats(sptr, to)
+aClient *sptr;
+char *to;
+{
+	aExtData *ectmp = iauth_stats;
+
+	while (ectmp)
+	    {
+		sendto_one(sptr, ":%s %d %s :%s",
+			   ME, RPL_STATSDEBUG, to, ectmp->line);
 		ectmp = ectmp->next;
 	    }
 }

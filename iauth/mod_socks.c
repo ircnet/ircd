@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.5 1999/01/12 23:54:25 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.6 1999/01/13 02:14:36 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -26,6 +26,8 @@ static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.5 1999/01/12 23:54:25 kalt Exp 
 #define MOD_SOCKS_C
 #include "a_externs.h"
 #undef MOD_SOCKS_C
+
+/****************************** PRIVATE *************************************/
 
 #define CACHETIME 30
 
@@ -48,6 +50,9 @@ struct socks_private
 	struct proxylog *cache;
 	u_int lifetime;
 	u_char options;
+	/* stats */
+	u_int chit, cmiss, cnow, cmax;
+	u_int closed, open;
 };
 
 /*
@@ -85,8 +90,17 @@ int cl, open;
     struct socks_private *mydata = cldata[cl].instance->data;
     struct proxylog *next;
 
+    if (open)
+	    mydata->open += 1;
+    else
+	    mydata->closed += 1;
+
     if (mydata->lifetime == 0)
 	    return;
+
+    mydata->cnow += 1;
+    if (mydata->cnow > mydata->cmax)
+	    mydata->cmax = mydata->cnow;
 
     next = mydata->cache;
     mydata->cache = (struct proxylog *)malloc(sizeof(struct proxylog));
@@ -128,6 +142,7 @@ socks_check_cache(cl)
 			      cl, pl->ip, pl->expire, now));
 		    *last = pl->next;
 		    free(pl);
+		    mydata->cnow -= 1;
 		    continue;
 		}
 	    if (!strcasecmp(pl->ip, cldata[cl].itsip))
@@ -138,12 +153,16 @@ socks_check_cache(cl)
 		    pl->expire = now + mydata->lifetime; /* dubious */
 		    if (pl->open)
 			    socks_open_proxy(cl);
+		    mydata->chit += 1;
 		    return -1;
 		}
 	    last = &(pl->next);
 	}
+    mydata->cmiss += 1;
     return 0;
 }
+
+/******************************** PUBLIC ************************************/
 
 /*
  * socks_init
@@ -166,10 +185,10 @@ AnInstance *self;
 	if (self->opt == NULL)
 		return "Aie! no option(s): nothing to be done!";
 	
-	mydata = (void *) malloc(sizeof(struct socks_private));
+	mydata = (struct socks_private *) malloc(sizeof(struct socks_private));
+	bzero((char *) mydata, sizeof(struct socks_private));
 	mydata->cache = NULL;
 	mydata->lifetime = CACHETIME;
-	mydata->options = 0;
 
 	tmpbuf[0] = txtbuf[0] = '\0';
 	if (strstr(self->opt, "log"))
@@ -197,7 +216,6 @@ AnInstance *self;
 	if (strstr(self->opt, "cache"))
 	    {
 		char *ch = index(self->opt, '=');
-		char cbuf[10];
 		
 		if (ch)
 			mydata->lifetime = atoi(ch+1);
@@ -211,6 +229,35 @@ AnInstance *self;
 	self->popt = mystrdup(tmpbuf+1);
 	self->data = mydata;
 	return txtbuf+2;
+}
+
+/*
+ * socks_release
+ *
+ *	This procedure is called when a particular module is unloaded.
+ */
+void
+socks_release(self)
+AnInstance *self;
+{
+	struct sock_private *mydata = self->data;
+	free(mydata);
+}
+
+/*
+ * socks_stats
+ *
+ *	This procedure is called regularly to update statistics sent to ircd.
+ */
+void
+socks_stats(self)
+AnInstance *self;
+{
+	struct socks_private *mydata = self->data;
+
+	sendto_ircd("S socks open %u closed %u cache hit %u miss %u (%u < %u)",
+		    mydata->open, mydata->closed, mydata->chit,
+		    mydata->cmiss, mydata->cnow, mydata->cmax);
 }
 
 /*
@@ -352,7 +399,6 @@ u_int cl;
 				    }
 			    }
 			else
-				/* hm. looks like it's not proxy */
 				socks_add_cache(cl, 0);
 			close(cldata[cl].rfd);
 			cldata[cl].rfd = 0;
@@ -405,5 +451,5 @@ u_int cl;
 }
 
 aModule Module_socks =
-	{ "socks", socks_init, NULL, socks_start, socks_work, 
-		  socks_timeout, socks_clean };
+	{ "socks", socks_init, socks_release, socks_stats,
+	  socks_start, socks_work, socks_timeout, socks_clean };

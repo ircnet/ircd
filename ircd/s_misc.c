@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.25 1998/12/13 00:02:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.26 1999/01/13 02:14:36 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -997,6 +997,9 @@ char	*name;
 		   sp->is_ckr, sp->is_cbr, sp->is_skr, sp->is_sbr);
 	sendto_one(cptr, ":%s %d %s :time connected %u %u",
 		   ME, RPL_STATSDEBUG, name, sp->is_cti, sp->is_sti);
+#if defined(USE_IAUTH)
+	report_iauth_stats(cptr, name);
+#endif
 }
 
 #ifdef CACHED_MOTD

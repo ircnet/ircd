@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.7 1999/01/05 19:59:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.8 1999/01/13 02:14:36 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -26,6 +26,59 @@ static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.7 1999/01/05 19:59:33 kalt Exp
 #define MOD_RFC931_C
 #include "a_externs.h"
 #undef MOD_RFC931_C
+
+struct _stats
+{
+	u_int	tried;
+	u_int	connected;
+	u_int	unx;
+	u_int	other;
+	u_int	bad;
+	u_int	clean, timeout;
+};
+
+/*
+ * rfc931_init
+ *
+ *	This procedure is called when a particular module is loaded.
+ *	Returns NULL if everything went fine,
+ *	an error message otherwise.
+ */
+char *
+rfc931_init(self)
+AnInstance *self;
+{
+	self->data = (void *) malloc(sizeof(struct _stats));
+	return NULL;
+}
+
+/*
+ * rfc931_release
+ *
+ *	This procedure is called when a particular module is unloaded.
+ */
+void
+rfc931_release(self)
+AnInstance *self;
+{
+	struct _stats *st = self->data;
+	free(st);
+}
+
+/*
+ * rfc931_stats
+ *
+ *	This procedure is called regularly to update statistics sent to ircd.
+ */
+void
+rfc931_stats(self)
+AnInstance *self;
+{
+	struct _stats *st = self->data;
+
+	sendto_ircd("S rfc931 connected %u unix %u other %u bad %u out of %u",
+		    st->connected, st->unx, st->other, st->bad, st->tried);
+}
 
 /*
  * rfc931_start
@@ -44,9 +97,11 @@ u_int cl;
 {
 	char *error;
 	int fd;
+	struct _stats *st = cldata[cl].instance->data;
 	
 	DebugLog((ALOG_D931, 0, "rfc931_start(%d): Connecting to %s %u", cl,
 		  cldata[cl].itsip, 113));
+	st->tried += 1;
 	fd = tcp_connect(cldata[cl].ourip, cldata[cl].itsip, 113, &error);
 	if (fd < 0)
 	    {
@@ -73,6 +128,8 @@ int
 rfc931_work(cl)
 u_int cl;
 {
+	struct _stats *st = cldata[cl].instance->data;
+
     	DebugLog((ALOG_D931, 0, "rfc931_work(%d): %d %d buflen=%d", cl,
 		  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
 	if (cldata[cl].wfd > 0)
@@ -95,6 +152,8 @@ u_int cl;
 			cldata[cl].rfd = cldata[cl].wfd = 0;
 			return 1;
 		    }
+		else
+			st->connected += 1;
 		cldata[cl].rfd = cldata[cl].wfd;
 		cldata[cl].wfd = 0;
 	    }
@@ -165,15 +224,24 @@ u_int cl;
 						free(cldata[cl].authuser);
 					cldata[cl].authuser = mystrdup(ch);
 					cldata[cl].best = cldata[cl].instance;
-					if (!other)
+					if (other)
+						st->other += 1;
+					else
+					    {
+						st->unx += 1;
 						cldata[cl].state |= A_UNIX;
+					    }
 					sendto_ircd("%c %d %s %u %s",
 						    (other) ? 'u' : 'U', cl,
 						    cldata[cl].itsip,
 						    cldata[cl].itsport,
 						    cldata[cl].authuser);
 				    }
+				else
+					st->bad += 1;
 			    }
+			else
+				st->bad += 1;
 			/*
 			** In any case, our job is done, let's cleanup.
 			*/
@@ -198,16 +266,19 @@ void
 rfc931_clean(cl)
 u_int cl;
 {
-    DebugLog((ALOG_D931, 0, "rfc931_clean(%d): cleaning up", cl));
-    /*
-    ** only one of rfd and wfd may be set at the same time,
-    ** in any case, they would be the same fd, so only close() once
-    */
-    if (cldata[cl].rfd)
-	    close(cldata[cl].rfd);
-    else if (cldata[cl].wfd)
-	    close(cldata[cl].wfd);
-    cldata[cl].rfd = cldata[cl].wfd = 0;
+	struct _stats *st = cldata[cl].instance->data;
+
+	st->clean += 1;
+	DebugLog((ALOG_D931, 0, "rfc931_clean(%d): cleaning up", cl));
+	/*
+	** only one of rfd and wfd may be set at the same time,
+	** in any case, they would be the same fd, so only close() once
+	*/
+	if (cldata[cl].rfd)
+		close(cldata[cl].rfd);
+	else if (cldata[cl].wfd)
+		close(cldata[cl].wfd);
+	cldata[cl].rfd = cldata[cl].wfd = 0;
 }
 
 /*
@@ -222,11 +293,15 @@ int
 rfc931_timeout(cl)
 u_int cl;
 {
-    DebugLog((ALOG_D931, 0, "rfc931_timeout(%d): calling rfc931_clean ", cl));
-    rfc931_clean(cl);
-    return -1;
+	struct _stats *st = cldata[cl].instance->data;
+
+	st->timeout += 1;
+	DebugLog((ALOG_D931, 0, "rfc931_timeout(%d): calling rfc931_clean ",
+		  cl));
+	rfc931_clean(cl);
+	return -1;
 }
 
 aModule Module_rfc931 =
-	{ "rfc931", NULL, NULL, rfc931_start, rfc931_work, 
-		  rfc931_timeout, rfc931_clean };
+	{ "rfc931", rfc931_init, rfc931_release, rfc931_stats,
+	  rfc931_start, rfc931_work, rfc931_timeout, rfc931_clean };

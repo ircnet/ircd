@@ -42,6 +42,8 @@ EXTERN void sendto_ircd();
 EXTERN void vsendto_ircd (char *, va_list);
 EXTERN void sendto_ircd (char *, ...);
 #endif
+EXTERN void init_io __P(());
+EXTERN void loop_io __P(());
 EXTERN int tcp_connect __P((char *, char *, u_short, char **));
 
 /* __P(()) */

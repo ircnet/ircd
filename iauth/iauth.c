@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: iauth.c,v 1.6 1998/12/13 00:34:18 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: iauth.c,v 1.7 1999/01/13 02:14:36 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -139,9 +139,7 @@ int	main(argc, argv)
 int	argc;
 char	*argv[];
 {
-	time_t	delay = 0;
-
-	/*setup_signals();*/
+	time_t	nextst = time(NULL) + 90;
 
 	if (argc == 2 && !strcmp(argv[1], "-X"))
 		exit(0);
@@ -201,6 +199,20 @@ char	*argv[];
 				   "Got SIGUSR2, reinitializing log file(s).");
 			init_filelogs();
 			do_log = 0;
+		    }
+
+		if (time(NULL) > nextst)
+		    {
+			AnInstance *itmp = instances;
+
+			sendto_ircd("s");
+			while (itmp)
+			    {
+				if (itmp->mod->stats)
+					itmp->mod->stats(itmp);
+				itmp = itmp->nexti;
+			    }
+			nextst = time(NULL) + 60;
 		    }
 	    }
 }
