@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.30 1999/07/21 22:57:39 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.31 1999/08/15 21:05:28 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -746,6 +746,10 @@ char	*comment;
 			while ((lp = sptr->user->invited))
 				del_invite(sptr, lp->value.chptr);
 				/* again, this is all that is needed */
+
+			/* remove from uid hash table */
+			if (UniqueUser(sptr))
+				del_from_uid_hash_table(sptr->user->uid, sptr);
 
 			/* Add user to history */
 #ifndef BETTER_NDELAY
