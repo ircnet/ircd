@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.127 2004/03/11 02:08:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.128 2004/03/14 09:30:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2820,7 +2820,7 @@ void	get_my_name(aClient *cptr, char *name, int len)
 			strncpyzt(name, hp->h_name, len);
 		else
 			strncpyzt(name, tmp, len);
-		if (!aconf->passwd)
+		if (BadPtr(aconf->passwd))
 			bcopy(hp->h_addr, (char *)&mysk.SIN_ADDR,
 			      sizeof(struct IN_ADDR));
 		Debug((DEBUG_DEBUG,"local name is %s",
