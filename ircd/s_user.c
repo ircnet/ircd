@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.58 1998/10/28 16:29:49 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.59 1998/10/28 21:25:03 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1488,15 +1488,10 @@ char	*parv[];
 	return penalty;
 }
 
-/*
-** m_whois
-**	parv[0] = sender prefix
-**	parv[1] = nickname masklist
-*/
-int	m_whois(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+/* send_whois() is used by m_whois() to send whois reply to sptr, for acptr */
+static void
+send_whois(sptr, acptr)
+aClient	*sptr, *acptr;
 {
 	static anUser UnknownUser =
 	    {
@@ -1514,13 +1509,86 @@ char	*parv[];
 		"<Unknown>",	/* host */
 		"<Unknown>",	/* server */
 	    };
-	Reg	Link	*lp;
-	Reg	anUser	*user;
-	aClient *acptr, *a2cptr;
+	Link	*lp;
+	anUser	*user;
 	aChannel *chptr;
-	char	*nick, *tmp, *name;
+	aClient *a2cptr;
+	int len, mlen;
+	char *name;
+
+	user = acptr->user ? acptr->user : &UnknownUser;
+	name = (!*acptr->name) ? "?" : acptr->name;
+
+	a2cptr = find_server(user->server, NULL);
+
+	sendto_one(sptr, rpl_str(RPL_WHOISUSER, sptr->name),
+		   name, user->username, user->host, acptr->info);
+
+	mlen = strlen(ME) + strlen(sptr->name) + 6 + strlen(name);
+
+	for (len = 0, *buf = '\0', lp = user->channel; lp; lp = lp->next)
+	    {
+		chptr = lp->value.chptr;
+		if ((!IsAnonymous(chptr) || acptr == sptr) &&
+		    ShowChannel(sptr, chptr))
+		    {
+			if (len + strlen(chptr->chname)
+			    > (size_t) BUFSIZE - 4 - mlen)
+			    {
+				sendto_one(sptr, ":%s %d %s %s :%s", ME,
+					   RPL_WHOISCHANNELS, sptr->name, name,
+					   buf);
+				*buf = '\0';
+				len = 0;
+			    }
+			if (is_chan_op(acptr, chptr))
+				*(buf + len++) = '@';
+			else if (has_voice(acptr, chptr))
+				*(buf + len++) = '+';
+			if (len)
+				*(buf + len) = '\0';
+			(void)strcpy(buf + len, chptr->chname);
+			len += strlen(chptr->chname);
+			(void)strcat(buf + len, " ");
+			len++;
+		    }
+	    }
+	if (buf[0] != '\0')
+		sendto_one(sptr, rpl_str(RPL_WHOISCHANNELS, sptr->name), name,
+			   buf);
+
+	sendto_one(sptr, rpl_str(RPL_WHOISSERVER, sptr->name),
+		   name, user->server,
+		   a2cptr ? a2cptr->info:"*Not On This Net*");
+
+	if (user->flags & FLAGS_AWAY)
+		sendto_one(sptr, rpl_str(RPL_AWAY, sptr->name), name,
+			   (user->away) ? user->away : "Gone");
+
+	if (IsAnOper(acptr))
+		sendto_one(sptr, rpl_str(RPL_WHOISOPERATOR, sptr->name), name);
+
+	if (acptr->user && MyConnect(acptr))
+		sendto_one(sptr, rpl_str(RPL_WHOISIDLE, sptr->name),
+			   name, timeofday - user->last);
+}
+
+/*
+** m_whois
+**	parv[0] = sender prefix
+**	parv[1] = nickname masklist
+*/
+int	m_whois(cptr, sptr, parc, parv)
+aClient *cptr, *sptr;
+int	parc;
+char	*parv[];
+{
+	Link	*lp;
+	aClient *acptr;
+	aChannel *chptr;
+	char	*nick, *tmp;
 	char	*p = NULL;
-	int	found = 0, len, mlen;
+	int	found = 0;
 
     	if (parc < 2)
 	    {
@@ -1551,10 +1619,21 @@ char	*parv[];
 		 * than one wildcard target per command.
 		 * Max 3 targets per command allowed.
 		 */
-		if ((wilds && (!MyConnect(sptr) || p)) ||
-		    found++ > 3) {
+		if ((wilds && (!MyConnect(sptr) || p)) || found++ > 3)
 			break;
-		}
+
+		if (!wilds)
+		    {
+			acptr = hash_find_client(nick, (aClient *)NULL);
+			if (!acptr || !IsPerson(acptr))
+				sendto_one(sptr,
+					   err_str(ERR_NOSUCHNICK, parv[0]),
+					   nick);
+			else
+				send_whois(sptr, acptr);
+			continue;
+		    }
+
 		for (acptr = client; (acptr = next_client(acptr, nick));
 		     acptr = acptr->next)
 		    {
@@ -1574,13 +1653,12 @@ char	*parv[];
 			 * - only send replies about common or public channels
 			 *   the target user(s) are on;
 			 */
-			user = acptr->user ? acptr->user : &UnknownUser;
-			name = (!*acptr->name) ? "?" : acptr->name;
-
-			invis = (user->flags & FLAGS_INVISIBLE);
-			member = (user->channel) ? 1 : 0;
+			invis = (acptr->user) ?
+				(acptr->user->flags & FLAGS_INVISIBLE) : 0;
+			member = (acptr->user && acptr->user->channel) ? 1 : 0;
 			showperson = (wilds && !invis && !member) || !wilds;
-			for (lp = user->channel; lp; lp = lp->next)
+			for (lp = (acptr->user) ? acptr->user->channel : NULL;
+			     lp; lp = lp->next)
 			    {
 				chptr = lp->value.chptr;
 				if (IsAnonymous(chptr))
@@ -1600,65 +1678,9 @@ char	*parv[];
 			if (!showperson)
 				continue;
 
-			a2cptr = find_server(user->server, NULL);
-
-			sendto_one(sptr, rpl_str(RPL_WHOISUSER, parv[0]),
-				   name, user->username, user->host,
-				   acptr->info);
 			found |= 0x10;
-			mlen = strlen(ME) + strlen(parv[0]) + 6 +
-				strlen(name);
-			for (len = 0, *buf = '\0', lp = user->channel; lp;
-			     lp = lp->next)
-			    {
-				chptr = lp->value.chptr;
-				if ((!IsAnonymous(chptr) || acptr == sptr) &&
-				    ShowChannel(sptr, chptr))
-				    {
-					if (len + strlen(chptr->chname)
-					    > (size_t) BUFSIZE - 4 - mlen)
-					    {
-						sendto_one(sptr,
-							   ":%s %d %s %s :%s",
-							   ME,
-							   RPL_WHOISCHANNELS,
-							   parv[0], name, buf);
-						*buf = '\0';
-						len = 0;
-					    }
-					if (is_chan_op(acptr, chptr))
-					    *(buf + len++) = '@';
-					else if (has_voice(acptr, chptr))
-						*(buf + len++) = '+';
-					if (len)
-						*(buf + len) = '\0';
-					(void)strcpy(buf + len, chptr->chname);
-					len += strlen(chptr->chname);
-					(void)strcat(buf + len, " ");
-					len++;
-				    }
-			    }
-			if (buf[0] != '\0')
-				sendto_one(sptr, rpl_str(RPL_WHOISCHANNELS,
-					   parv[0]), name, buf);
 
-			sendto_one(sptr, rpl_str(RPL_WHOISSERVER, parv[0]),
-				   name, user->server,
-				   a2cptr?a2cptr->info:"*Not On This Net*");
-
-			if (user->flags & FLAGS_AWAY)
-				sendto_one(sptr, rpl_str(RPL_AWAY, parv[0]),
-					   name, (user->away) ? user->away :
-					   "Gone");
-
-			if (IsAnOper(acptr))
-				sendto_one(sptr, rpl_str(RPL_WHOISOPERATOR,
-					   parv[0]), name);
-
-			if (acptr->user && MyConnect(acptr))
-				sendto_one(sptr, rpl_str(RPL_WHOISIDLE,
-					   parv[0]), name,
-					   timeofday - user->last);
+			send_whois(sptr, acptr);
 		    }
 		if (!(found & 0x10))
 		    {
