@@ -1,3 +1,15 @@
+2003-10-18  Piotr Kucharski
+
+	* ircd.c: new function delayed_kills() for checking kill-lines.
+	* ircd.c/io_loop(): add delayed_kills next to check_pings().
+	* s_conf.c/rehash(): add "queue" of rehash (when we get rehash
+	  while previous delayed_kills did not finish yet).
+	* s_conf.c/find_kill(), s_conf_ext.h: change param name, reversed
+	  its meaning.
+	* s_user.c/register_user(): find_kill param fix 
+	* s_misc.c: removed old version of DK.
+	* config.h.dist: added MAXDELAYEDKILLS define, removed DELAYED_KILLS.
+
 2003-10-18  Jakub Vlasek
 	
 	* bsd.c, config.h.dist: Removed NOWRITEALARM.
