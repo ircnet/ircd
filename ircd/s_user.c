@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.255 2005/02/20 22:26:42 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.256 2005/02/20 23:07:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -310,22 +310,7 @@ char	*canonize(char *buffer)
 ** register_user
 **	This function is called when both NICK and USER messages
 **	have been accepted for the client, in whatever order. Only
-**	after this the USER message is propagated.
-**
-**	NICK's must be propagated at once when received, although
-**	it would be better to delay them too until full info is
-**	available. Doing it is not so simple though, would have
-**	to implement the following:
-**
-**	1) user telnets in and gives only "NICK foobar" and waits
-**	2) another user far away logs in normally with the nick
-**	   "foobar" (quite legal, as this server didn't propagate
-**	   it).
-**	3) now this server gets nick "foobar" from outside, but
-**	   has already the same defined locally. Current server
-**	   would just issue "KILL foobar" to clean out dups. But,
-**	   this is not fair. It should actually request another
-**	   nick from local user or kill him/her...
+**	after this the UNICK message is propagated.
 */
 
 int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
@@ -344,7 +329,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 	parv[1] = parv[2] = NULL;
 
 	if (MyConnect(sptr))
-	    {
+	{
 		char *reason = NULL;
 #ifdef RESTRICT_USERNAMES
 		char *lbuf = NULL;
@@ -355,45 +340,45 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		static u_int count = 0;
 
 		if (iauth_options & XOPT_EARLYPARSE && DoingXAuth(cptr))
-		    {
+		{
 			cptr->flags |= FLAGS_WXAUTH;
 			/* fool check_pings() and give iauth more time! */
 			cptr->firsttime = timeofday;
 			cptr->lasttime = timeofday;
 			strncpyzt(sptr->user->username, username, USERLEN+1);
 			if (sptr->passwd[0])
-				sendto_iauth("%d P %s", sptr->fd,sptr->passwd);
+				sendto_iauth("%d P %s", sptr->fd, sptr->passwd);
 			sendto_iauth("%d U %s", sptr->fd, sptr->user->username);
 			return 1;
-		    }
+		}
 		if (!DoneXAuth(sptr) && (iauth_options & XOPT_REQUIRED))
-		    {
+		{
 			if (iauth_options & XOPT_NOTIMEOUT)
-			    {
+			{
 				count += 1;
 				if (timeofday - last > 300)
 				    {
 					sendto_flag(SCH_AUTH, 
-	    "iauth may not be running! (refusing new user connections)");
+	    "iauth may be not running! (refusing new user connections)");
 					last = timeofday;
 				    }
 				sptr->exitc = EXITC_AUTHFAIL;
-			    }
+			}
 			else
 				sptr->exitc = EXITC_AUTHTOUT;
 			return exit_client(cptr, cptr, &me,
 				"Authentication failure! - no iauth?");
-		    }
+		}
 		if (timeofday - last > 300 && count)
-		    {
+		{
 			sendto_flag(SCH_AUTH, "%d users rejected.", count);
 			count = 0;
-		    }
+		}
 
 		/* this should not be needed, but there's a bug.. -kalt */
 		/* haven't seen any notice like this, ever.. no bug no more? */
 		if (*cptr->username == '\0')
-		    {
+		{
 			sendto_flag(SCH_AUTH,
 				    "Ouch! Null username for %s (%d %X)",
 				    get_client_name(cptr, TRUE), cptr->fd,
@@ -402,7 +387,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 				     get_client_name(cptr, TRUE), cptr->flags);
 			return exit_client(cptr, sptr, &me,
 					   "Fatal Bug - Try Again");
-		    }
+		}
 #endif
 #ifdef RESTRICT_USERNAMES
 		/*
@@ -471,10 +456,10 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			strncpyzt(buf2, username, USERLEN+1);
 
 		if (prefix)
-		    {
+		{
 			*user->username = prefix;
 			strncpy(&user->username[1], buf2, USERLEN);
-		    }
+		}
 		else
 			strncpy(user->username, buf2, USERLEN+1);
 		user->username[USERLEN] = '\0';
@@ -484,16 +469,16 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #endif
 
 		if (sptr->exitc == EXITC_AREF || sptr->exitc == EXITC_AREFQ)
-		    {
+		{
 			if (sptr->exitc == EXITC_AREF)
 				sendto_flag(SCH_LOCAL,
 					    "Denied connection from %s.",
 					    get_client_host(sptr));
 			return exit_client(cptr, cptr, &me,
 			         sptr->reason ? sptr->reason : "Denied access");
-		    }
+		}
 		if ((i = check_client(sptr)))
-		    {
+		{
 			struct msg_set { char shortm; char *longm; };
 #define EXIT_MSG_COUNT 8
 			static struct msg_set exit_msg[EXIT_MSG_COUNT] = {
@@ -526,10 +511,10 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 					get_client_host(sptr));
 			}
 			return exit_client(cptr, cptr, &me, exit_msg[i].longm);
-		    }
+		}
 #ifndef	NO_PREFIX
 		if (IsRestricted(sptr))
-		    {
+		{
 			if (!(sptr->flags & FLAGS_GOTID))
 				prefix = '-';
 			else
@@ -541,7 +526,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			*user->username = prefix;
 			strncpy(&user->username[1], buf2, USERLEN);
 			user->username[USERLEN] = '\0';
-		    }
+		}
 #endif
 
 		aconf = sptr->confs->value.aconf;
@@ -568,24 +553,24 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		}
 
 		/* hmpf, why that? --B. */
+		/* so already authenticated clients don't have password
+		** kept in ircd memory? --B. */
 		bzero(sptr->passwd, sizeof(sptr->passwd));
 		/*
 		 * following block for the benefit of time-dependent K:-lines
 		 * how come "time-dependant"? I don't see it. --B.
 		 */
 		if (!IsKlineExempt(sptr) && find_kill(sptr, 0, &reason))
-		    {
-			/*char buf[100];*/
-
+		{
 			sendto_flag(SCH_LOCAL, "K-lined %s@%s.",
 				    user->username, sptr->sockhost);
 			ircstp->is_ref++;
 			sptr->exitc = EXITC_KLINE;
 			if (reason)
 				sprintf(buf, "K-lined: %.80s", reason);
-			return exit_client(cptr, sptr, &me, (reason) ? buf :
-					   "K-lined");
-		    }
+			return exit_client(cptr, sptr, &me,
+				(reason) ? buf : "K-lined");
+		}
 #ifdef XLINE
 		if (IsXlined(sptr))
 		{
@@ -594,25 +579,29 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 				XLINE_EXIT_REASON);
 		}
 #endif
-	    }
+	}
 	else
+	{
+		/* Received from other server in UNICK */
 		strncpyzt(user->username, username, USERLEN+1);
+	}
 
 	SetClient(sptr);
 	if (!MyConnect(sptr))
-	    {
+	{
 		acptr = find_server(user->server, NULL);
 		if (acptr && acptr->from != cptr)
-		    {
+		{
+			/* I think this is not possible anymore. --B. */
 			sendto_one(cptr, ":%s KILL %s :%s (%s != %s[%s])",
-				   ME, sptr->name, ME, user->server,
-				   acptr->from->name, acptr->from->sockhost);
+				ME, sptr->name, ME, user->server,
+				acptr->from->name, acptr->from->sockhost);
 			sptr->flags |= FLAGS_KILLED;
 			return exit_client(cptr, sptr, &me,
-					   "USER server wrong direction");
-		    }
+				"UNICK server wrong direction");
+		}
 		send_umode(NULL, sptr, 0, SEND_UMODES, buf);
-	    }
+	}
 	/* below !MyConnect, as it can remove user */
 	if (IsInvisible(sptr))		/* Can be initialized in m_user() */
 	{
@@ -627,10 +616,12 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 	
 	check_split();
 	
-	if ((istat.is_user[1] + istat.is_user[0]) > istat.is_m_users) {
+	if ((istat.is_user[1] + istat.is_user[0]) > istat.is_m_users)
+	{
 
 		istat.is_m_users = istat.is_user[1] + istat.is_user[0];
-		if (timeofday - istat.is_m_users_t >= CLCHSEC) {
+		if (timeofday - istat.is_m_users_t >= CLCHSEC)
+		{
 			sendto_flag(SCH_NOTICE, 
 				"New highest global client connection: %d",
 				istat.is_m_users);
@@ -639,15 +630,17 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 	}
 
 	if (MyConnect(sptr))
-	    {
+	{
 		char **isup;
 		
 		istat.is_unknown--;
 		istat.is_myclnt++;
-		if (istat.is_myclnt > istat.is_m_myclnt) {
+		if (istat.is_myclnt > istat.is_m_myclnt)
+		{
 
 			istat.is_m_myclnt = istat.is_myclnt;
-			if (timeofday - istat.is_m_myclnt_t >= CLCHSEC) {
+			if (timeofday - istat.is_m_myclnt_t >= CLCHSEC)
+			{
 				sendto_flag(SCH_NOTICE,
 					"New highest local client "
 					"connection: %d", istat.is_m_myclnt);
@@ -655,7 +648,8 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			}
 		}
 		if (istat.is_myclnt % CLCHNO == 0 &&
-			istat.is_myclnt != istat.is_l_myclnt) {
+			istat.is_myclnt != istat.is_l_myclnt)
+		{
 			sendto_flag(SCH_NOTICE,
 				"Local %screase from %d to %d clients "
 				"in %d seconds",
@@ -732,7 +726,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 				   SPLIT_CONNECT_NOTICE);
 		}
 #endif
-	    }
+	}
 
 	for (i = fdas.highest; i >= 0; i--)
 	{
@@ -742,8 +736,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		{
 			continue;
 		}
-		/* this will get nicely reduced to UNICK only, when
-		 * we are fully 2.11 */
 		sendto_one(acptr,
 				":%s UNICK %s %s %s %s %s %s :%s",
 				user->servp->sid, nick, user->uid,
