@@ -1,0 +1,50 @@
+.\" @(#)$Id: ircdwatch.8,v 1.1 1998/06/12 22:57:40 kalt Exp $
+.TH IRCDWATCH 8 "$Date: 1998/06/12 22:57:40 $"
+.SH NAME
+ircdwatch \- Daemon for monitoring ircd and ircd.conf
+.SH SYNOPSIS
+.hy 0
+.IP \fBircdwatch\fP
+[
+.BI \-\-kill
+] [
+.BI \-\-rest
+] [
+.BI \-\-help
+]
+.SH DESCRIPTION
+.LP
+\fIircdwatch\fP is a daemon that periodically checks that the 
+\fIircd\fP daemon is running, restarting it of necessary.  This
+daemon can also be configured (at compile time) to check for
+changes to the \fIircd\fP configuration file and make \fIircd\fP
+reload its configuration file by sending it a SIGHUP signal.  
+.LP
+Given command line arguments \fIircdwatch\fP will serve as a remote
+control for stopping both \fIircdwatch\fP and \fIircd\fP or just
+\fIircdwatch\fP.
+
+.SH OPTIONS
+.TP
+.B \-\-kill
+Stop both \fIircd\fP and \fIircdwatch\fP
+.TP
+.B \-\-rest
+Stop \fIircdwatch\fP but leave \fIircd\fP running
+.TP
+.B \-\-help
+List command line arguments
+.SH COPYRIGHT
+Copyright (C) 1998 Bjorn Borud, <borud@guardian.no>
+.LP
+.RE
+.SH FILES
+ "ircd.conf"
+ "ircd.pid"
+ "ircdwatch.pid"
+.SH "SEE ALSO"
+ircd(8)
+.SH BUGS
+There may be some portability issues.  Report bugs to <ircd-users@stealth.net>
+.SH AUTHOR
+Bjorn Borud, <borud@guardian.no>

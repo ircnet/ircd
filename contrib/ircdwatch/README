@@ -1,0 +1,55 @@
+$Id: README,v 1.1 1998/06/12 22:57:40 kalt Exp $
+
+DESCRIPTION
+===========
+  ircdwatch is a daemon that regularly checks to see if ircd is running.
+  if ircd should die or somehow stop running, ircdwatch will respawn the
+  ircd daemon.  if desirable, ircdwatch can be configured to check if
+  the ircd configuration file is changed and send a SIGHUP to the ircd
+  daemon which then causes the daemon to reload the configuration
+  file.
+
+  the ircdwatch program itself is also used as sort of a remote
+  control depending on what command line arguments you feed it. you
+  can use it to start ircd and stop ircd and ircdwatch.
+
+OPTIONS
+=======
+  if you invoke ircdwatch without any command line arguments it will
+  either daemonize itself and become a daemon, or it will exit if it
+  detects that an ircdwatch daemon is already running.
+
+  for using the ircdwatch program as a remote control the following
+  command line options are available:
+
+  --kill
+     stop both ircdwatch and ircd
+
+  --rest
+     stop ircdwatch but leave ircd running
+
+  --help
+     list command line arguments
+
+
+COMPILE TIME CONFIGURATION
+==========================
+  you configure ircdwatch by editing config.h in the directory where
+  you build ircd.  the configuration parameters available for
+  ircdwatch are those starting with the prefix "IRCDWATCH_".  please
+  refer to the config.h file for more information on the parameter
+  settings. most of the defaults should be okay if you want to  use
+  ircdwatch though.
+
+
+ADMINISTRATIVIA
+===============
+  ircdwatch was written by Bjorn Borud <borud@guardian.no> and is
+  Copyright (C) 1998 Bjorn Borud <borud@guardian.no>
+
+  the program is released under the GNU General Public License
+
+  the current maintainer can be reached at: <borud@guardian.no>
+
+  please report bugs to <ircd-users@stealth.net>
+  improvements are welcome.

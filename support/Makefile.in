@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.20 1998/05/05 23:30:28 kalt Exp $
+#*   $Id: Makefile.in,v 1.21 1998/06/12 22:57:41 kalt Exp $
 #*
 #*/
 
@@ -90,7 +90,7 @@ CHKCONF = chkconf
 
 all: server client
 
-server: $(SERVER) $(CHKCONF) mkpasswd
+server: $(SERVER) $(CHKCONF) mkpasswd ircdwatch
 
 client: $(CLIENT)
 
@@ -109,6 +109,10 @@ $(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 	$(CC) $(LDFLAGS) -o $@ $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS) $(LIBS)
 
 # stuff in contrib/
+
+ircdwatch: ircdwatch.o
+	$(RM) ircdwatch
+	$(CC) -o $@ $<
 
 mkpasswd: mkpasswd.o
 	$(RM) ircd-mkpasswd
@@ -140,10 +144,12 @@ install-server: server
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(CHKCONF) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) ircd-mkpasswd $(server_bin_dir)
+	$(INSTALL_PROGRAM) -m $(ircd_mode) ircdwatch $(server_bin_dir)
 	$(RM) $(ircd_dir)/ircd.m4
 	../ircd/buildm4 $(ircd_dir)
 	(cd ../doc; $(INSTALL_DATA) ircd.8 $(server_man_dir))
-	(cd ../doc; $(INSTALL_DATA) example.conf $(ircd_dir))
+	(cd ../contrib/ircdwatch; $(INSTALL_DATA) ircdwatch.8 $(server_man_dir)) 
+	(cd ../../doc; $(INSTALL_DATA) example.conf $(ircd_dir))
 	@echo "installation of server done."
 
 clbsd.o: ../common/bsd.c setup.h config.h
@@ -305,11 +311,14 @@ chkconf.o: ../ircd/chkconf.c setup.h config.h
 
 # stuff in contrib/
 
+ircdwatch.o: ../contrib/ircdwatch/ircdwatch.c
+	$(CC) $(CC_CFLAGS) -DSERVER_BIN_DIR="\"$(server_bin_dir)\"" -DDPATH="\"$(ircd_dir)\"" -c -o $@ $<
+
 mkpasswd.o: ../contrib/mkpasswd/mkpasswd.c
 	$(CC) $(CC_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c
 
 clean:
-	$(RM) $(CLIENT) $(SERVER) $(CHKCONF) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
+	$(RM) $(CLIENT) $(SERVER) $(CHKCONF) ircd-mkpasswd ircdwatch *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
 
 distclean:
 	@echo "To make distclean, just delete the current directory."

@@ -44,6 +44,40 @@
 				     this) */
 
 /*
+ *  ircdwatch configuration options.
+ *
+ *  make sure SPATH has a fully qualified path or that the IRC server binary
+ *  is within the directory specified in server_bin_dir (see Makefile) if
+ *  you plan to let ircdwatch find the server binary. 
+ *
+ */
+
+/* file within DPATH that holds the pid of ircdwatch */
+#define IRCDWATCH_PID_FILENAME      "ircdwatch.pid"
+
+/* how often (in seconds) should we check that ircd runs? */
+#define IRCDWATCH_POLLING_INTERVAL  30
+
+/* 
+ * should we check for config file changes and HUP the server
+ * if a change is detected?
+*/
+#undef IRCDWATCH_HUP_ON_CONFIG_CHANGE
+
+/* 
+ * although you may not want to log ircd-messages to syslog you
+ * may want to log when ircdwatch reloads the config or when
+ * ircd croaks and ircdwatch has to restart it
+ */
+#define IRCDWATCH_USE_SYSLOG
+#ifdef IRCDWATCH_USE_SYSLOG
+# define IRCDWATCH_SYSLOG_IDENT     "ircdwatch"
+# define IRCDWATCH_SYSLOG_OPTIONS   (LOG_PID)
+# define IRCDWATCH_SYSLOG_FACILITY  LOG_DAEMON
+#endif
+
+
+/*
  * Pathnames and defaults of irc system's support files. Please note that
  * these are only the recommened names and paths. Change as needed.
  * You must define these to something, even if you don't really want them.
