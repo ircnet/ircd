@@ -818,6 +818,11 @@
 #undef TKLINE_MAXTIME
 #endif
 
+/* Hard limit tkline time (more than 3 years) */
+#if !defined(TKLINE_MAXTIME) || (TKLINE_MAXTIME > 99999999)
+#define TKLINE_MAXTIME 99999999
+#endif
+
 #if !defined(SCH_TKILL)
 #define SCH_TKILL SCH_NOTICE
 #endif
