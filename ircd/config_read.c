@@ -108,6 +108,7 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 			{
 				char	file[FILEMAX + 1];
 				char	*filep = file;
+				char	*savefilep;
 				aConfig	*ret;
 
 				*filep = '\0';
@@ -133,13 +134,14 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 					goto eatline;
 				}
 				start++;
+				savefilep = filep;
 				memcpy(filep, start, end - start);
 				filep += end - start;
 				*filep = '\0';
 				if ((fd = open(file, O_RDONLY)) < 0)
 				{
 					config_error(CF_ERR, curfile, linenum,
-						"cannot open \"%s\"", file);
+						"cannot open \"%s\"", savefilep);
 					goto eatline;
 				}
 				ret = config_read(fd, depth + 1,
