@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.44 2001/12/25 23:53:23 q Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.45 2002/01/06 02:18:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -52,7 +52,7 @@ static	int	sentalong[MAXCONNECTIONS];
 ** dead_link
 **	An error has been detected. The link *must* be closed,
 **	but *cannot* call ExitClient (m_bye) from here.
-**	Instead, mark it with FLAGS_DEADSOCKET. This should
+**	Instead, mark it with FLAGS_DEADSOCK. This should
 **	generate ExitClient from the main loop.
 **
 **	If 'notice' is not NULL, it is assumed to be a format
@@ -67,7 +67,7 @@ static	int	dead_link(to, notice)
 aClient *to;
 char	*notice;
 {
-	to->flags |= FLAGS_DEADSOCKET;
+	SetDead(to);
 	/*
 	 * If because of BUFFERPOOL problem then clean dbufs now so that
 	 * notices don't hurt operators below.

@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.50 2001/12/31 01:21:24 chopin Exp $
+ *   $Id: struct_def.h,v 1.51 2002/01/06 02:18:32 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -143,41 +143,43 @@ typedef struct        LineItem aExtData;
 #define	SetLog(x)		((x)->status = STAT_LOG)
 #define	SetService(x)		((x)->status = STAT_SERVICE)
 
-#define	FLAGS_PINGSENT   0x0001	/* Unreplied ping sent */
-#define	FLAGS_DEADSOCKET 0x0002	/* Local socket is dead--Exiting soon */
-#define	FLAGS_KILLED     0x0004	/* Prevents "QUIT" from being sent for this */
-#define	FLAGS_BLOCKED    0x0008	/* socket is in a blocked condition [unused] */
-#define	FLAGS_UNIX	 0x0010	/* socket is in the unix domain, not inet */
-#define	FLAGS_CLOSING    0x0020	/* set when closing to suppress errors */
-#define	FLAGS_LISTEN     0x0040 /* used to mark clients which we listen() on */
-#define	FLAGS_XAUTHDONE  0x0080 /* iauth is finished with this client */
-#define	FLAGS_DOINGDNS	 0x0100 /* client is waiting for a DNS response */
-#define	FLAGS_AUTH	 0x0200 /* client is waiting on rfc931 response */
-#define	FLAGS_WRAUTH	 0x0400	/* set if we havent writen to ident server */
-#define	FLAGS_LOCAL	 0x0800 /* set for local clients */
-#define	FLAGS_GOTID	 0x1000	/* successful ident lookup achieved */
-#define	FLAGS_XAUTH	 0x2000	/* waiting on external authentication */
-#define	FLAGS_WXAUTH	 0x4000	/* same as above, but also prevent parsing */
-#define	FLAGS_NONL	 0x8000 /* No \n in buffer */
-#define	FLAGS_CBURST	0x10000	/* set to mark connection burst being sent */
-#define FLAGS_RILINE    0x20000 /* Restricted i-line [unused?] */
-#define FLAGS_QUIT      0x40000 /* QUIT :comment shows it's not a split */
-#define FLAGS_SPLIT     0x80000 /* client QUITting because of a netsplit */
-#define FLAGS_HIDDEN   0x100000 /* netsplit is behind a hostmask */
-#define	FLAGS_UNKCMD   0x200000	/* has sent an unknown command */
-#define	FLAGS_ZIP      0x400000 /* link is zipped */
-#define	FLAGS_ZIPRQ    0x800000 /* zip requested */
-#define	FLAGS_ZIPSTART 0x1000000 /* start of zip (ignore any CRLF) */
-
-#define	FLAGS_OPER       0x0001	/* Operator */
-#define	FLAGS_LOCOP      0x0002 /* Local operator -- SRB */
-#define	FLAGS_WALLOP     0x0004 /* send wallops to them */
-#define	FLAGS_INVISIBLE  0x0008 /* makes user invisible */
-#define FLAGS_RESTRICTED 0x0010 /* Restricted user */
-#define FLAGS_AWAY       0x0020 /* user is away */
+#define	FLAGS_PINGSENT	0x0000001 /* Unreplied ping sent */
+#define	FLAGS_DEADSOCK	0x0000002 /* Local socket is dead--Exiting soon */
+#define	FLAGS_KILLED	0x0000004 /* Prevents "QUIT" from being sent for this */
+#define	FLAGS_BLOCKED	0x0000008 /* socket is in blocked condition [unused] */
+#define	FLAGS_UNIX	0x0000010 /* socket is in the unix domain, not inet */
+#define	FLAGS_CLOSING	0x0000020 /* set when closing to suppress errors */
+#define	FLAGS_LISTEN	0x0000040 /* used to mark clients which we listen() on */
+#define	FLAGS_XAUTHDONE	0x0000080 /* iauth is finished with this client */
+#define	FLAGS_DOINGDNS	0x0000100 /* client is waiting for a DNS response */
+#define	FLAGS_AUTH	0x0000200 /* client is waiting on rfc931 response */
+#define	FLAGS_WRAUTH	0x0000400 /* set if we havent writen to ident server */
+#define	FLAGS_LOCAL	0x0000800 /* set for local clients */
+#define	FLAGS_GOTID	0x0001000 /* successful ident lookup achieved */
+#define	FLAGS_XAUTH	0x0002000 /* waiting on external authentication */
+#define	FLAGS_WXAUTH	0x0004000 /* same as above, but also prevent parsing */
+#define	FLAGS_NONL	0x0008000 /* No \n in buffer */
+#define	FLAGS_CBURST	0x0010000 /* set to mark connection burst being sent */
+#define	FLAGS_RILINE	0x0020000 /* Restricted i-line [unused?] */
+#define	FLAGS_QUIT	0x0040000 /* QUIT :comment shows it's not a split */
+#define	FLAGS_SPLIT	0x0080000 /* client QUITting because of a netsplit */
+#define	FLAGS_HIDDEN	0x0100000 /* netsplit is behind a hostmask */
+#define	FLAGS_UNKCMD	0x0200000 /* has sent an unknown command */
+#define	FLAGS_ZIP	0x0400000 /* link is zipped */
+#define	FLAGS_ZIPRQ	0x0800000 /* zip requested */
+#define	FLAGS_ZIPSTART	0x1000000 /* start of zip (ignore any CRLF) */
+#define	FLAGS_SQUIT	0x2000000 /* This is set when we send the last
+				  ** server, so we know we have to send
+				  ** a SQUIT. */
+#define	FLAGS_OPER	0x0001 /* Operator */
+#define	FLAGS_LOCOP	0x0002 /* Local operator -- SRB */
+#define	FLAGS_WALLOP	0x0004 /* send wallops to them */
+#define	FLAGS_INVISIBLE	0x0008 /* makes user invisible */
+#define FLAGS_RESTRICT	0x0010 /* Restricted user */
+#define FLAGS_AWAY	0x0020 /* user is away */
 
 #define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP|FLAGS_AWAY)
-#define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP|FLAGS_RESTRICTED)
+#define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP|FLAGS_RESTRICT)
 
 /*
  * flags macros.
@@ -186,7 +188,7 @@ typedef struct        LineItem aExtData;
 #define	IsLocOp(x)		((x)->user && (x)->user->flags & FLAGS_LOCOP)
 #define	IsInvisible(x)		((x)->user->flags & FLAGS_INVISIBLE)
 #define IsRestricted(x)         ((x)->user && \
-				 (x)->user->flags & FLAGS_RESTRICTED)
+				 (x)->user->flags & FLAGS_RESTRICT)
 #define	IsAnOper(x)		((x)->user && \
 				 (x)->user->flags & (FLAGS_OPER|FLAGS_LOCOP))
 #define	IsPerson(x)		((x)->user && IsClient(x))
@@ -195,14 +197,14 @@ typedef struct        LineItem aExtData;
 #define	IsUnixSocket(x)		((x)->flags & FLAGS_UNIX)
 #define	IsListening(x)		((x)->flags & FLAGS_LISTEN)
 #define	IsLocal(x)		(MyConnect(x) && (x)->flags & FLAGS_LOCAL)
-#define	IsDead(x)		((x)->flags & FLAGS_DEADSOCKET)
+#define	IsDead(x)		((x)->flags & FLAGS_DEADSOCK)
+#define	SetDead(x)		((x)->flags |= FLAGS_DEADSOCK)
 #define	CBurst(x)		((x)->flags & FLAGS_CBURST)
-
 #define	SetOper(x)		((x)->user->flags |= FLAGS_OPER)
-#define	SetLocOp(x)    		((x)->user->flags |= FLAGS_LOCOP)
+#define	SetLocOp(x)		((x)->user->flags |= FLAGS_LOCOP)
 #define	SetInvisible(x)		((x)->user->flags |= FLAGS_INVISIBLE)
-#define SetRestricted(x)        ((x)->user->flags |= FLAGS_RESTRICTED)
-#define	SetWallops(x)  		((x)->user->flags |= FLAGS_WALLOP)
+#define SetRestricted(x)	((x)->user->flags |= FLAGS_RESTRICT)
+#define	SetWallops(x)		((x)->user->flags |= FLAGS_WALLOP)
 #define	SetUnixSock(x)		((x)->flags |= FLAGS_UNIX)
 #define	SetDNS(x)		((x)->flags |= FLAGS_DOINGDNS)
 #define	SetDoneXAuth(x)		((x)->flags |= FLAGS_XAUTHDONE)
@@ -215,7 +217,7 @@ typedef struct        LineItem aExtData;
 
 #define	ClearOper(x)		((x)->user->flags &= ~FLAGS_OPER)
 #define	ClearInvisible(x)	((x)->user->flags &= ~FLAGS_INVISIBLE)
-#define ClearRestricted(x)      ((x)->user->flags &= ~FLAGS_RESTRICTED)
+#define ClearRestricted(x)      ((x)->user->flags &= ~FLAGS_RESTRICT)
 #define	ClearWallops(x)		((x)->user->flags &= ~FLAGS_WALLOP)
 #define	ClearDNS(x)		((x)->flags &= ~FLAGS_DOINGDNS)
 #define	ClearAuth(x)		((x)->flags &= ~FLAGS_AUTH)
@@ -377,7 +379,7 @@ struct	User	{
 
 struct	Server	{
 	anUser	*user;		/* who activated this connection */
-	aClient	*up;	/* uplink for this server */
+	aClient	*up;		/* uplink for this server */
 	aConfItem *nline;	/* N-line pointer for this server */
 	int	version;        /* version id for local client */
 	int	snum;
@@ -385,22 +387,25 @@ struct	Server	{
 		ltok;		/* Are we still using this one? */
 	int	refcnt;		/* Number of times this block is referenced
 				** from anUser (field servp), aService (field
-				** servp) and aClient (field serv)
-				*/
+				** servp) and aClient (field serv) */
 	struct	Server	*nexts, *prevs, *shnext;
 	aClient	*bcptr;
+	aClient	*maskedby;	/* Pointer to server masking this server.
+				** Self if not masked, *NEVER* NULL. */
 	char	by[NICKLEN+1];
 	char	tok[6];		/* This is the prepared token we'll be
 				** sending to 2.10 servers.
 				** Note: The size of this depends on the 
-				** on idtol(), with n set to SIDLEN.
-				*/
+				** on idtol(), with n set to SIDLEN. */
 	char	sid[SIDLEN + 1];/* The Server ID. */
+	char	verstr[11];	/* server version, PATCHLEVEL format */
 	u_int	sidhashv;	/* Raw hash value. */
 	aServer	*sidhnext;	/* Next server in the sid hash. */
 	time_t	lastload;	/* penalty like counters, see s_serv.c
-				** should be in the local part, but..
-				*/
+				** should be in the local part, but.. */
+	int	servers;	/* Number of downlinks of this server. */
+	aClient	*left, *right;	/* Left and right nodes in server tree. */
+	aClient	*down;		/* Ptr to first downlink of this server. */
 };
 
 struct	Service	{
@@ -685,10 +690,12 @@ struct Channel	{
 				  x->prev->service->servp == x->serv)))
 
 #define	HasUID(x)		(x->user && x->user->uid[0])
+#define	IsMasked(x)		(x && x->serv && x->serv->maskedby != x)
 
 typedef	struct	{
 	u_long	is_user[2];	/* users, non[0] invis and invis[1] */
 	u_long	is_serv;	/* servers */
+	u_long	is_masked;	/* masked servers. */
 	u_long	is_service;	/* services */
 	u_long	is_chan;	/* channels */
 	u_long	is_chanmem;

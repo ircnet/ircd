@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.107 2001/12/31 05:46:44 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.108 2002/01/06 02:18:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -39,7 +39,7 @@ static int user_modes[]	     = { FLAGS_OPER, 'o',
 				 FLAGS_LOCOP, 'O',
 				 FLAGS_INVISIBLE, 'i',
 				 FLAGS_WALLOP, 'w',
-				 FLAGS_RESTRICTED, 'r',
+				 FLAGS_RESTRICT, 'r',
 				 FLAGS_AWAY, 'a',
 				 0, 0 };
 
@@ -2057,7 +2057,7 @@ aClient	*cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-#define	UFLAGS	(FLAGS_INVISIBLE|FLAGS_WALLOP|FLAGS_RESTRICTED)
+#define	UFLAGS	(FLAGS_INVISIBLE|FLAGS_WALLOP|FLAGS_RESTRICT)
 	char	*username, *host, *server, *realname;
 	anUser	*user;
 
@@ -2147,7 +2147,7 @@ char	*parv[];
 	SetInvisible(sptr);
 #endif
 	if (sptr->flags & FLAGS_RILINE)
-		sptr->user->flags |= FLAGS_RESTRICTED;
+		SetRestricted(sptr->user);
 	sptr->user->flags |= (UFLAGS & atoi(host));
 	strncpyzt(user->host, host, sizeof(user->host));
 	user->server = find_server_string(me.serv->snum);
@@ -3029,8 +3029,8 @@ char	*parv[];
 			ClearOper(sptr);
 		if (!(setflags & FLAGS_LOCOP) && IsLocOp(sptr))
 			sptr->user->flags &= ~FLAGS_LOCOP;
-		if ((setflags & FLAGS_RESTRICTED) &&
-		    !(sptr->user->flags & FLAGS_RESTRICTED))
+		if ((setflags & FLAGS_RESTRICT) &&
+		    !IsRestricted(sptr->user))
 		    {
 			sendto_one(sptr, replies[ERR_RESTRICTED], ME, BadTo(parv[0]));
 			SetRestricted(sptr);
