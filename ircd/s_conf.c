@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.86 2004/03/04 21:05:10 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.87 2004/03/04 21:15:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -254,7 +254,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 	char	ipname[HOSTLEN+USERLEN+2];
 	int	ulen = strlen(cptr->username) + 1; /* for '@' */
 	int	i, hostnum;
-	int	retval = -2;
+	int	retval = -2; /* EXITC_NOILINE in register_user() */
 
 	if (hp)
 	{
@@ -382,7 +382,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 			{
 				sendto_one(cptr, replies[ERR_PASSWDMISMATCH],
 					ME, BadTo(cptr->name));
-				retval = -8;
+				retval = -8; /* EXITC_BADPASS */
 				break;
 			}
 		}
@@ -519,6 +519,7 @@ static	int	is_attached(aConfItem *aconf, aClient *cptr)
 **	client (this is the one which used in accepting the
 **	connection). Note, that this automaticly changes the
 **	attachment if there was an old one...
+**	Non-zero return value is used in register_user().
 */
 int	attach_conf(aClient *cptr, aConfItem *aconf)
 {
@@ -527,13 +528,13 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 	if (is_attached(aconf, cptr))
 		return 1;
 	if (IsIllegal(aconf))
-		return -1;
+		return -1; /* EXITC_FAILURE, hmm */
 	if ((aconf->status & (CONF_LOCOP | CONF_OPERATOR | CONF_CLIENT |
 			      CONF_RCLIENT)))
 	    {
 		if (aconf->clients >= ConfMaxLinks(aconf) &&
 		    ConfMaxLinks(aconf) > 0)
-			return -3;    /* Use this for printing error message */
+			return -3;    /* EXITC_YLINEMAX */
 	    }
 
 	if ((aconf->status & (CONF_CLIENT | CONF_RCLIENT)))
@@ -579,23 +580,23 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 					if (ConfMaxUHLocal(aconf) > 0 &&
 					    ucnt >= ConfMaxUHLocal(aconf))
 					{
-						return -5;
+						return -5; /* EXITC_LUHMAX */
 					}
 	
 					if (ConfMaxHLocal(aconf) > 0 &&
 					    hcnt >= ConfMaxHLocal(aconf))
 					{
-						return -4;
+						return -4; /* EXITC_LHMAX */
 					}
 					if (ConfMaxUHGlobal(aconf) > 0 &&
 					    gucnt >= ConfMaxUHGlobal(aconf))
 					{
-						return -7;
+						return -7; /* EXITC_GUHMAX */
 					}
 					if (ConfMaxHGlobal(aconf) > 0 &&
 					     ghcnt >= ConfMaxHGlobal(aconf))
 					{
-						return -6;
+						return -6; /* EXITC_GHMAX */
 					}
 				}
 			}
