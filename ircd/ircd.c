@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.132 2004/05/16 16:05:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.133 2004/05/16 16:20:38 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -64,6 +64,7 @@ time_t	nextping = 1;		/* same as above for check_pings() */
 time_t	nextdnscheck = 0;	/* next time to poll dns to force timeouts */
 time_t	nextexpire = 1;		/* next expire run on the dns cache */
 time_t	nextiarestart = 1;	/* next time to check if iauth is alive */
+time_t	nextpreference = 1;	/* time for next calculate_preference call */
 
 RETSIGTYPE s_die(int s)
 {
@@ -200,7 +201,6 @@ void	server_reboot()
 */
 static	time_t	try_connections(time_t currenttime)
 {
-	static	time_t	lastsort = 0;
 	Reg	aConfItem *aconf;
 	Reg	aClient *cptr;
 	aConfItem **pconf;
@@ -208,8 +208,6 @@ static	time_t	try_connections(time_t currenttime)
 	time_t	next = 0;
 	aClass	*cltmp;
 	aConfItem *con_conf = NULL;
-	double	f, f2;
-	aCPing	*cp;
 	int	allheld = 1;
 
 	Debug((DEBUG_NOTICE,"Connection check at   : %s",
@@ -307,31 +305,40 @@ static	time_t	try_connections(time_t currenttime)
 		next = 0;
 	}
 	Debug((DEBUG_NOTICE,"Next connection check : %s", myctime(next)));
-	/*
-	 * calculate preference value based on accumulated stats.
-	 */
-	if (!lastsort || lastsort < currenttime)
-	    {
-		for (aconf = conf; aconf; aconf = aconf->next)
-			if (!(cp = aconf->ping) || !cp->seq || !cp->recvd)
-				aconf->pref = -1;
-			else
-			    {
-				f = (double)cp->recvd / (double)cp->seq;
-				f2 = pow(f, (double)20.0);
-				if (f2 < (double)0.001)
-					f = (double)0.001;
-				else
-					f = f2;
-				f2 = (double)cp->ping / (double)cp->recvd;
-				f = f2 / f;
-				if (f > 100000.0)
-					f = 100000.0;
-				aconf->pref = (u_int) (f * (double)100.0);
-			    }
-		lastsort = currenttime + 60;
-	    }
 	return (next);
+}
+
+/*
+ * calculate preference value based on accumulated stats.
+ */
+time_t calculate_preference(time_t currenttime)
+{
+	aConfItem *aconf;
+	aCPing	*cp;
+	double	f, f2;
+
+	for (aconf = conf; aconf; aconf = aconf->next)
+	{
+		if (!(cp = aconf->ping) || !cp->seq || !cp->recvd)
+		{
+			aconf->pref = -1;
+		}
+		else
+		{
+			f = (double)cp->recvd / (double)cp->seq;
+			f2 = pow(f, (double)20.0);
+			if (f2 < (double)0.001)
+				f = (double)0.001;
+			else
+				f = f2;
+			f2 = (double)cp->ping / (double)cp->recvd;
+			f = f2 / f;
+			if (f > 100000.0)
+				f = 100000.0;
+			aconf->pref = (u_int) (f * (double)100.0);
+		}
+	}
+	return currenttime + 60;
 }
 
 /* Checks all clients against KILL lines. (And remove them, if found.)
@@ -1056,6 +1063,8 @@ static	void	io_loop(void)
 	static	time_t	delay = 0;
 	int maxs = 4;
 
+	if (timeofday >= nextpreference)
+		nextpreference = calculate_preference(timeofday);
 	/*
 	** We only want to connect if a connection is due,
 	** not every time through.  Note, if there are no
@@ -1097,6 +1106,7 @@ static	void	io_loop(void)
 #endif
 	delay = MIN(nextdnscheck, delay);
 	delay = MIN(nextexpire, delay);
+	delay = MIN(nextpreference, delay);
 	delay -= timeofday;
 	/*
 	** Adjust delay to something reasonable [ad hoc values]
