@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.36 2004/03/03 16:08:45 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.37 2004/03/05 16:36:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -322,8 +322,7 @@ void	inithashtables()
 	Reg int i;
 
 	clear_client_hash_table((_HASHSIZE) ? _HASHSIZE : HASHSIZE);
-	_UIDSIZE = _HASHSIZE;
-	clear_uid_hash_table(_UIDSIZE);
+	clear_uid_hash_table((_UIDSIZE) ? _UIDSIZE : UIDSIZE);
 	clear_channel_hash_table((_CHANNELHASHSIZE) ? _CHANNELHASHSIZE
                                  : CHANNELHASHSIZE);
 	clear_server_hash_table((_SERVERSIZE) ? _SERVERSIZE : SERVERSIZE);

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.110 2004/02/12 21:43:21 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.111 2004/03/05 16:36:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1342,9 +1342,9 @@ void ircd_writetune(char *filename)
 	(void)truncate(filename, 0);
 	if ((fd = open(filename, O_CREAT|O_WRONLY, 0600)) >= 0)
 	    {
-		(void)sprintf(buf, "%d\n%d\n%d\n%d\n%d\n%d\n", ww_size,
+		(void)sprintf(buf, "%d\n%d\n%d\n%d\n%d\n%d\n%d\n", ww_size,
 			       lk_size, _HASHSIZE, _CHANNELHASHSIZE,
-			       _SERVERSIZE, poolsize);
+			       _SERVERSIZE, poolsize, _UIDSIZE);
 		if (write(fd, buf, strlen(buf)) == -1)
 			sendto_flag(SCH_ERROR,
 				    "Failed (%d) to write tune file: %s.",
@@ -1364,16 +1364,16 @@ void ircd_writetune(char *filename)
  */
 void ircd_readtune(char *filename)
 {
-	int fd, t_data[6];
+	int fd, t_data[7];
 	char buf[100];
 
 	memset(buf, 0, sizeof(buf));
 	if ((fd = open(filename, O_RDONLY)) != -1)
 	    {
 		read(fd, buf, 100);	/* no panic if this fails.. */
-		if (sscanf(buf, "%d\n%d\n%d\n%d\n%d\n%d\n", &t_data[0],
+		if (sscanf(buf, "%d\n%d\n%d\n%d\n%d\n%d\n%d\n", &t_data[0],
                            &t_data[1], &t_data[2], &t_data[3],
-                           &t_data[4], &t_data[5]) != 6)
+                           &t_data[4], &t_data[5], &t_data[6]) != 7)
 		    {
 			close(fd);
 			if (bootopt & BOOT_BADTUNE)
@@ -1399,6 +1399,7 @@ void ircd_readtune(char *filename)
 		_CHANNELHASHSIZE = t_data[3];
 		_SERVERSIZE = t_data[4];
 		poolsize = t_data[5];
+		_UIDSIZE = t_data[6];
 
 		/*
 		** the lock array only grows if the whowas array grows,

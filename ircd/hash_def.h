@@ -31,4 +31,5 @@ typedef	struct	hashentry {
 #define	CHANNELHASHSIZE	((int)(((float)MAXCONNECTIONS*1.75)/2.0))
 #define	SERVERSIZE	(MAXCONNECTIONS/10)
 #define HOSTNAMEHASHSIZE ((int)((float)MAXCONNECTIONS*1.75))
+#define	UIDSIZE	((int)((float)MAXCONNECTIONS*1.75))
 
