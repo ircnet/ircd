@@ -1,3 +1,11 @@
+2002-07-04  Jakub Vlasek
+
+	* hash.c/m_hash(): rewritten to support all hashes.
+	* send.c/sendto_ops_butone(): Rewritten to use local[] instead
+	  of client linked list.
+	* s_sev.c/m_close(): Send message about closing to SCH_NOTICE too.
+	* parse.c/find_userhost(): Enclose with CLIENT_COMPILE.
+	
 2002-06-11  Piotr Kucharski
 
 	* channel.c/m_njoin(): use ->uid if HasUID, not ->name (from Zobo).
