@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.10 1997/08/08 14:50:29 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.11 1997/09/09 19:14:24 kalt Exp $
 
 This is a development version of the package,
 
@@ -9,6 +9,12 @@ This is a development version of the package,
 2.9.4 doesn't support 2.8 links anymore.  A 2.8.x server cannot
 be directly linked to a 2.9.4 server.  They can however coexist
 on the same IRC network.
+
+------
+
+Configuration changes between 2.9.3 and 2.9.4:
+
+	* The format for B lines has slightly changed.
 
 ===============================================================================
 

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.11 1997/09/03 17:49:39 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.12 1997/09/09 19:14:23 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.4.
 </abstract>
@@ -1073,9 +1073,9 @@ S-lines with much care.</bf>
 <descrip>
 <tag/Introduction/ This provides you a way to bounce clients
 to another server.  This information is provided to clients
-which are denied connection because a limit is reached.  It
-is NOT used when client is not normally authorized to
-connect to server.
+which are denied connection, either because their connection
+class is full, or the server is full, or they are not
+authorized to connect.
 <tag/Format/<verb>B:&lt;Class|Host Mask&gt;::&lt;Server Name&gt;:&lt;Port&gt;:</verb>
 <tag/B/ This specifies a Bounce record.
 <tag/Class|Host Name/ This field specifies to which client
@@ -1087,7 +1087,7 @@ When the server is completely full, it rejects clients with
 the ``All connections in use'' message.  In this case, the
 server doesn't process the connections at all, and has no
 knowledge of the client's host name, or class number.  For
-these cases, this must field contain ``-1''.
+these cases, this field must be empty.
 <tag/Server Name/ This specifies the IRC server hostname
 that the client should use.
 <tag/Port/ This specifies the IRC server port that the
@@ -1102,7 +1102,7 @@ B:*.fi::irc.funet.fi:6667:
 Finnish client should use irc.funet.fi when they cannot be
 taken anymore.
 <p>
-B:-1::irc2.stealth.net:6667:
+B:::irc2.stealth.net:6667:
 <p>
 When the server is completely full, clients should use the
 secondary server.
