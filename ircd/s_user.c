@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.155 2003/08/08 19:13:30 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.156 2003/08/08 19:16:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -760,6 +760,7 @@ char	*parv[];
 	int	delayed = 0;
 	char	nick[NICKLEN+2], *s, *user, *host;
 	Link	*lp = NULL;
+	int	donickname;
 
 	if (IsService(sptr))
    	    {
@@ -821,7 +822,10 @@ badparamcountkills:
 		else
 			user = host = "";
 	}
-	
+
+	/* do_nick_name() can change "nick" (like: drop scandinavian
+	** origin, so it is needed before ":old NICK old" type. --B. */
+	donickname = do_nick_name(nick, IsServer(cptr));
 	if (MyPerson(sptr))
 	{
 		if (!strcmp(sptr->name, nick))
@@ -856,9 +860,9 @@ badparamcountkills:
 	 * if do_nick_name() returns a null name OR if the server sent a nick
 	 * name and do_nick_name() changed it in some way (due to rules of nick
 	 * creation) then reject it. If from a server and we reject it,
-	 * and KILL it. -avalon 4/4/92
+	 * we have to KILL it. -avalon 4/4/92
 	 */
-	if (do_nick_name(nick, IsServer(cptr)) == 0 ||
+	if (donickname == 0 ||
 	    (IsServer(cptr) && strcmp(nick, parv[1])))
 	    {
 		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, BadTo(parv[0]),
