@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.240 2004/10/04 23:05:06 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.241 2004/10/05 22:59:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2460,7 +2460,6 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 	
 	sendto_one(sptr, replies[RPL_LUSERCLIENT], ME, BadTo(parv[0]),
-		   c_count + i_count, v_count, s_count,
 		   c_count + i_count, v_count, s_count);
 	if (o_count)
 	{
@@ -2476,11 +2475,13 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		   istat.is_chan);
 	
 	sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]), m_clients,
-		   m_services, m_servers, m_clients,
 		   m_services, m_servers);
-        sendto_one(sptr, replies[RPL_LUSERMAX], ME, BadTo(parv[0]),
-			istat.is_m_myclnt, istat.is_m_users,
-			istat.is_m_myclnt, istat.is_m_users);
+        sendto_one(sptr, replies[RPL_LOCALUSERS], ME, BadTo(parv[0]),
+			m_clients, istat.is_m_myclnt,
+			m_clients, istat.is_m_myclnt);
+        sendto_one(sptr, replies[RPL_GLOBALUSERS], ME, BadTo(parv[0]),
+			c_count + i_count, istat.is_m_users,
+			c_count + i_count, istat.is_m_users);
 	return 2;
 }
 

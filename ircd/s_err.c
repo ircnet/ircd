@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_err.c,v 1.56 2004/10/01 20:22:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_err.c,v 1.57 2004/10/05 22:59:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -279,11 +279,11 @@ char *	replies[] = {
 /* 248 RPL_STATSDEFINE */	(char *)NULL,
 /* 249 RPL_STATSDEBUG */	(char *)NULL,
 /* 250 RPL_STATSDLINE */	":%s 250 %s %c %s %s %s %d %d",
-/* 251 RPL_LUSERCLIENT */	":%s 251 %s %d %d %d :global %d users, %d services, %d servers",
+/* 251 RPL_LUSERCLIENT */	":%s 251 %s :There are %d users and %d services on %d servers",
 /* 252 RPL_LUSEROP */	":%s 252 %s %d :operators online",
 /* 253 RPL_LUSERUNKNOWN */	":%s 253 %s %d :unknown connections",
 /* 254 RPL_LUSERCHANNELS */	":%s 254 %s %d :channels formed",
-/* 255 RPL_LUSERME */	":%s 255 %s %d %d %d :local %d users, %d services, %d servers",
+/* 255 RPL_LUSERME */	":%s 255 %s :I have %d users, %d services and %d servers",
 /* 256 RPL_ADMINME */	":%s 256 %s :Administrative info about %s",
 /* 257 RPL_ADMINLOC1 */	":%s 257 %s :%s",
 /* 258 RPL_ADMINLOC2 */	":%s 258 %s :%s",
@@ -293,8 +293,8 @@ char *	replies[] = {
 /* 262 RPL_TRACEEND */	":%s 262 %s %s %s.%s :End of TRACE",
 /* 263 RPL_TRYAGAIN */	":%s 263 %s %s :Please wait a while and try again.",
 /* 264 */ (char *)NULL,
-/* 265 RPL_LUSERMAX */	":%s 265 %s %d %d :max %d local users, %d global users",
-/* 266 */ (char *)NULL,
+/* 265 RPL_LOCALUSERS */	":%s 265 %s %d %d :Current local users %d, max %d",
+/* 266 RPL_GLOBALUSERS */	":%s 266 %s %d %d :Current global users %d, max %d",
 /* 267 */ (char *)NULL,
 /* 268 */ (char *)NULL,
 /* 269 */ (char *)NULL,
