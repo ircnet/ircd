@@ -49,4 +49,8 @@ EXTERN aClient *find_userhost (char *user, char *host, aClient *cptr,
 EXTERN aClient *find_person (char *name, aClient *cptr);
 EXTERN int parse (aClient *cptr, char *buffer, char *bufend);
 EXTERN char *getfield (char *irc_newline);
+EXTERN int m_ignore(aClient *, aClient *, int, char **);
+EXTERN int m_noprivileges(aClient *, aClient *, int, char **);
+EXTERN int m_unregistered(aClient *, aClient *, int, char **);
+EXTERN int m_registered(aClient *, aClient *, int, char **);
 #undef EXTERN

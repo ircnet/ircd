@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.67 2004/06/12 02:31:58 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.68 2004/06/12 02:46:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -958,3 +958,25 @@ static	void	remove_unknown(aClient *cptr, char *sender)
 			    sender, get_client_name(cptr, FALSE));
 }
 
+int	m_ignore(aClient *cptr, aClient *sptr, int parc, char **parv)
+{
+	return 1;
+}
+
+int	m_noprivileges(aClient *cptr, aClient *sptr, int parc, char **parv)
+{
+	sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, parv[0]);
+	return 1;
+}
+
+int	m_unregistered(aClient *cptr, aClient *sptr, int parc, char **parv)
+{
+	sendto_one(sptr, replies[ERR_NOTREGISTERED], ME, "*");
+	return -1;
+}
+
+int	m_registered(aClient *cptr, aClient *sptr, int parc, char **parv)
+{
+	sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, parv[0]);
+	return 1;
+}
