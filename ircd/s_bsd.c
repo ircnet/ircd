@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.32 1998/08/05 01:41:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.33 1998/08/05 21:43:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1174,10 +1174,7 @@ aClient *cptr;
 	if ((i = cptr->fd) >= 0)
 	    {
 #if defined(USE_IAUTH)
-		char buf[20];
-
-		sprintf(buf, "%d D\n", cptr->fd);
-		sendto_iauth(buf);
+		sendto_iauth("%d D", cptr->fd);
 #endif
 		flush_connections(i);
 		if (IsServer(cptr) || IsListening(cptr))
@@ -1238,8 +1235,7 @@ aClient *cptr;
 				while (!local[highest_fd])
 					highest_fd--;
 #if defined(USE_IAUTH)
-				sprintf(buf, "%d R %d\n", j, i);
-				sendto_iauth(buf);
+				sendto_iauth("%d R %d", j, i);
 #endif
 			    }
 		    }
@@ -1533,22 +1529,13 @@ add_con_refuse:
 #if defined(USE_IAUTH)
 	if (!isatty(fd) && !DoingDNS(acptr))
 	    {
-		char buf[BUFSIZ];
 		int i = 0;
 		
 		while (acptr->hostp->h_aliases[i])
-		    {   
-			sprintf(buf, "%d A %s\n",
-				acptr->fd,
-				acptr->hostp->h_aliases[i++]);
-			sendto_iauth(buf);
-		    }
+			sendto_iauth("%d A %s", acptr->fd,
+				     acptr->hostp->h_aliases[i++]);
 		if (acptr->hostp->h_name)
-		    {   
-			sprintf(buf, "%d N %s\n",
-				acptr->fd, acptr->hostp->h_name);
-			sendto_iauth(buf);
-		    }
+			sendto_iauth("%d N %s",acptr->fd,acptr->hostp->h_name);
 	    }
 #endif
 	return acptr;
@@ -2970,22 +2957,15 @@ static	void	do_dns_async()
 #if defined(USE_IAUTH)
 				if (hp)
 				    {
-					char buf[BUFSIZ];
 					int i = 0;
 
 					while (hp->h_aliases[i])
-					    {
-						sprintf(buf, "%d A %s\n",
-							cptr->fd,
+						sendto_iauth("%d A %s",
+							     cptr->fd,
 							hp->h_aliases[i++]);
-						sendto_iauth(buf);
-					    }
 					if (hp->h_name)
-					    {
-						sprintf(buf, "%d N %s\n",
+						sendto_iauth("%d N %s",
 							cptr->fd, hp->h_name);
-						sendto_iauth(buf);
-					    }
 				    }
 #endif
 			    }

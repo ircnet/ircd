@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.8 1998/08/05 01:41:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.9 1998/08/05 21:43:32 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -34,13 +34,27 @@ static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.8 1998/08/05 01:41:07 kalt Exp $";
  *	Send the buffer to the authentication slave process.
  *	Return 0 if everything went well, -1 otherwise.
  */
+#if ! USE_STDARG
 int
-sendto_iauth(buf)
-char *buf;
+sendto_iauth(pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
+char    *pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10;
+#else
+int
+vsendto_iauth(char *pattern, va_list va)
+#endif
 {
+    static char abuf[BUFSIZ];
+
+#if ! USE_STDARG
+    sprintf(abuf, pattern, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+#else   
+    vsprintf(abuf, pattern, va);
+#endif  
+    strcat(abuf, "\n");
+
     if (adfd < 0)
 	    return -1;
-    if (write(adfd, buf, strlen(buf)) != strlen(buf))
+    if (write(adfd, abuf, strlen(abuf)) != strlen(abuf))
 	{
 	    sendto_flag(SCH_AUTH, "Aiiie! lost slave authentication process");
 	    close(adfd);
@@ -54,6 +68,20 @@ char *buf;
 	}
     return 0;
 }
+
+# if USE_STDARG
+int
+sendto_iauth(char *pattern, ...)
+{
+	int i;
+
+        va_list va;
+        va_start(va, pattern);
+        i = vsendto_iauth(pattern, va);
+        va_end(va);
+	return i;
+}
+# endif
 
 /*
  * read_iauth

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.47 1998/07/19 19:37:32 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.48 1998/08/05 21:43:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1763,12 +1763,7 @@ user_finish:
 	strncpyzt(sptr->info, realname, sizeof(sptr->info));
 #if defined(USE_IAUTH)
 	if (MyConnect(sptr))
-	    {
-		char buf[USERLEN+20];
-
-		sprintf(buf, "%d U %.*s\n", sptr->fd, USERLEN+1, username);
-		sendto_iauth(buf);
-	    }
+		sendto_iauth("%d U %.*s", sptr->fd, USERLEN+1, username);
 #endif
 	if (sptr->name[0]) /* NICK already received, now we have USER... */
 	    {

@@ -29,7 +29,12 @@
 #define EXTERN
 #endif /* S_AUTH_C */
 # if defined(USE_IAUTH)
-EXTERN int sendto_iauth __P((char *));
+#  if ! USE_STDARG
+EXTERN int sendto_iauth();
+#  else /* USE_STDARG */
+EXTERN int vsendto_iauth (char *pattern, va_list va);
+EXTERN int sendto_iauth (char *pattern, ...);
+#  endif
 EXTERN void read_iauth();
 # endif
 EXTERN void start_auth __P((Reg aClient *cptr));

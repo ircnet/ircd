@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.24 1998/08/04 15:28:24 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.25 1998/08/05 21:43:31 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -418,11 +418,7 @@ time_t	currenttime;
 				ClearAuth(cptr);
 #if defined(USE_IAUTH)
 				if (DoingDNS(cptr) || DoingXAuth(cptr))
-				    {
-					char buf[80];
-					sprintf(buf, "%d T\n", cptr->fd);
-					sendto_iauth(buf);
-				    }
+					sendto_iauth("%d T", cptr->fd);
 #endif
 				ClearDNS(cptr);
 				ClearXAuth(cptr);
