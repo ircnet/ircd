@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.33 2002/03/13 00:54:49 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.34 2002/05/20 21:09:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -243,8 +243,8 @@ char *	replies[] = {
 /* 212 RPL_STATSCOMMANDS */	":%s 212 %s %s %u %u %u",
 /* 213 RPL_STATSCLINE */	":%s 213 %s %c %s %s %s %d %d",
 /* 214 RPL_STATSNLINE */	":%s 214 %s %c %s %s %s %d %d",
-/* 215 RPL_STATSILINE */	":%s 215 %s %c %s %s %s %d %d (%u)",
-/* 216 RPL_STATSKLINE */	":%s 216 %s %c %s %s %s %d %d (%u)",
+/* 215 RPL_STATSILINE */	":%s 215 %s %c %s %s %s %d %d",
+/* 216 RPL_STATSKLINE */	":%s 216 %s %c %s %s %s %d %d",
 /* 217 RPL_STATSQLINE */	":%s 217 %s %c %s %s %s %d %d",
 /* 218 RPL_STATSYLINE */	":%s 218 %s %c %d %d %d %d %ld %d.%d %d.%d",
 /* 219 RPL_ENDOFSTATS */	":%s 219 %s %c :End of STATS report",
