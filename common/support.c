@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.34 2004/01/01 14:13:50 q Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.35 2004/01/01 16:22:18 q Exp $";
 #endif
 
 #include "os.h"
@@ -779,7 +779,7 @@ char	**make_isupport(void)
 		"RFC2812 PREFIX=(ov)@+ CHANTYPES=#&!+ MODES=%d "
 		"CHANLIMIT=#!+:%d,&: "
 		"NICKLEN=%d TOPICLEN=%d KICKLEN=%d MAXLIST=beI:%d "
-		"CHANNELLEN=%d CHIDLEN=%d CHANMODES=beIR,k,l,imnpstaqr",
+		"CHANNELLEN=%d IDCHAN=!:%d CHANMODES=beIR,k,l,imnpstaqr",
 		MAXMODEPARAMS, MAXCHANNELSPERUSER,
 		ONICKLEN, TOPICLEN, TOPICLEN, MAXBANS, CHANNELLEN, CHIDLEN);
 

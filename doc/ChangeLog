@@ -11,6 +11,7 @@
                 instead of not counting +q channels.
 	* channel.c: m_join(): Allow joining &-channels even when
 		MAXCHANNELSPERUSER already reached.
+	* support.c/make_isupport(): Replace CHIDLEN by IDCHAN.
 
 2003-12-24  Kurt Roeckx
 
