@@ -32,6 +32,8 @@ extern int init_resolver __P((int op));
 EXTERN time_t timeout_query_list __P((time_t now));
 EXTERN void del_queries __P((char *cp));
 EXTERN struct hostent *gethost_byname __P((char *name, Link *lp));
+EXTERN struct hostent *gethost_byname_type __P((char *name, Link *lp, 
+						int type));
 EXTERN struct hostent *gethost_byaddr __P((char *addr, Link *lp));
 EXTERN struct hostent *get_res __P((char *lp));
 EXTERN time_t expire_cache __P((time_t now));

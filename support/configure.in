@@ -6,6 +6,23 @@ dnl ---------
 dnl new tests
 dnl ---------
 
+AC_DEFUN(IRC_MATHLIB, [
+	AC_MSG_CHECKING(library containing pow)
+	AC_CACHE_VAL(irc_cv_mathlib, [
+		irc_cv_mathlib=""
+		AC_TRY_LINK(,pow(1.0, 1.0), MATHLIBS=, 
+			irc_save_LIBS="$LIBS"
+			irc_cv_mathlib="-lm"
+			LIBS="-lm $LIBS"
+			AC_TRY_LINK(, pow(1.0, 1.0), MATHLIBS=-lm)
+			LIBS=$irc_save_LIBS
+		)
+	])
+	MATHLIBS=$irc_cv_mathlib
+	AC_SUBST(MATHLIBS)
+	AC_MSG_RESULT($MATHLIBS)
+])
+
 AC_DEFUN(IRC_PATH_ZLIB,
 [AC_MSG_CHECKING(for zlib package)
 AC_ARG_WITH(zlib, [  --with-zlib             checks for zlib; if found, enables compressed links])
@@ -267,6 +284,8 @@ AC_DEFUN(IRC_DECL_SYS_ERRLIST,
   irc_cv_decl_sys_errlist=yes, irc_cv_decl_sys_errlist=no)])
 if test $irc_cv_decl_sys_errlist = yes; then
   AC_DEFINE(SYS_ERRLIST_DECLARED)
+elif test $ac_cv_func_strerror != yes; then
+  AC_MSG_WARN([Neither strerror() nor sys_errlist found.])
 fi
 ])
 
@@ -429,9 +448,6 @@ fi])
 if test "$irc_cv_select_poll" = "poll"; then
   AC_MSG_RESULT(poll)
   AC_DEFINE(USE_POLL)
-  if test ! "$irc_cv_linux" = "no"; then
-    AC_MSG_WARN([Aiiie.. This is linux.  poll() is known to be broken for some releases (2.0.x with libc6?).  You may want to edit setup.h to undefine USE_POLL])
-  fi
 else
   AC_MSG_RESULT(select)
 fi
@@ -740,60 +756,42 @@ if test "x$enable_ip6" != x; then
   dnl be smart about it
   AC_MSG_CHECKING([IPv6 system type])
   AC_CACHE_VAL(irc_cv_v6type, [
-    if test -d /usr/inet6; then
-      irc_cv_v6type=linux
-    else
-      AC_EGREP_CPP(yes, [dnl
-#include <netinet/in.h>
-#ifdef IPV6_INRIA_VERSION
-yes
-#endif], irc_cv_v6type=inria,
+    AC_TRY_COMPILE([
+#include <unistd.h>
+#include <netinet/in.h>], [struct in6_addr addr],
+        irc_cv_v6type=native)
+
+    if test "x$irc_cv_v6type" = x; then
+      if test -d /usr/inet6; then
         AC_EGREP_CPP(yes, [dnl
-#include <netinet/in.h>
-#ifdef __KAME__
+#include "/usr/inet6/include/netinet/in.h"
+#ifdef _INET6APPS_NETINET_IN_H
 yes
-#endif], irc_cv_v6type=kame,
-          AC_EGREP_CPP(yes, [dnl
-#include <sys/param.h>
-#ifdef _TOSHIBA_INET6
-yes
-#endif], irc_cv_v6type=toshiba,
-            AC_EGREP_CPP(yes, [dnl
-#include </usr/local/v6/include/sys/types.h>
-#ifdef __V6D__
-yes
-#endif], irc_cv_v6type=v6d,
-              AC_EGREP_CPP(yes, [dnl
-#include <sys/param.h>
-#ifdef _ZETA_MINAMI_INET6
-yes
-#endif], irc_cv_v6type=zeta)))))
-    fi])
+#endif], irc_cv_v6type=linux)
+      fi
+    fi
+
+    if test "x$irc_cv_v6type" = x; then
+	irc_cv_v6type=unknown
+    fi
+  ])	
+
   AC_MSG_RESULT($irc_cv_v6type)
+
+  if test "x$irc_cv_v6type" = x; then
+     AC_MSG_WARN([You have an unknown IPv6 system. You will probably need to change the Makefile manually, or #undef INET6 in setup.h])
+  fi
 
   dnl eventually update LIBS
   case $irc_cv_v6type in
-	kame)
-		LIBS="-L/usr/local/v6/lib -linet6 $LIBS"
-		CFLAGS="$CFLAGS -I/usr/local/v6/include"
-		;;
 	linux)
 		LIBS="-L/usr/inet6/lib -linet6 $LIBS"
 		CFLAGS="$CFLAGS -I/usr/inet6/include"
 		;;
-	toshiba)
-		LIBS="-L/usr/local/v6/lib -linet6 $LIBS"
-		CFLAGS="$CFLAGS -I/usr/local/v6/include"
-		;;
-	v6d)
-		LIBS="-L/usr/local/v6/lib -lv6 $LIBS"
-		CFLAGS="$CFLAGS -I/usr/local/v6/include"
-		;;
-	zeta)
-		LIBS="-L/usr/local/v6/lib -linet6 $LIBS"
-		CFLAGS="$CFLAGS -I/usr/local/v6/include"
-		;;
 	esac
+
+  dnl RFC 2553 check
+  AC_CHECK_FUNCS(getipnodebyname)
 
   dnl /etc/resolv.conf check
   AC_MSG_CHECKING(for IPv6 name server addresses in resolv.conf ($irc_cv_path_resconf))
@@ -1435,7 +1433,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.47 1999/09/20 00:02:53 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.48 2001/10/20 17:57:31 q Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1446,7 +1444,7 @@ IRC_PROG_CC
 AC_PROG_CPP
 AC_PROG_AWK
 IRC_PROG_INSTALL
-AC_PATH_PROGS(SUM, md5sum sum cksum, true)
+AC_PATH_PROGS(SUM, md5sum md5 sum cksum, true)
 AC_PROG_GCC_TRADITIONAL
 
 IRC_AIX
@@ -1460,8 +1458,7 @@ IRC_CYGWIN
 
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(stdio.h stdlib.h sys/types.h sys/bitypes.h stddef.h stdarg.h unistd.h ctype.h memory.h ncurses.h curses.h cursesX.h term.h sgtty.h errno.h sys/errno.h sys/syscall.h pwd.h math.h utmp.h fcntl.h signal.h sys/ioctl.h sys/file.h sys/filio.h sys/socket.h sys/stat.h sys/resource.h sys/select.h sys/poll.h stropts.h netdb.h netinet/in.h sys/un.h arpa/inet.h sys/param.h syslog.h sys/syslog.h string.h strings.h sys/time.h time.h sys/times.h netinet/in_systm.h netinfo/ni.h resolv.h arpa/nameser.h)
-IRC_DECL_SYS_ERRLIST
+AC_CHECK_HEADERS(stdio.h stdlib.h sys/types.h sys/bitypes.h stddef.h stdarg.h unistd.h ctype.h memory.h ncurses.h ncurses/ncurses.h curses.h cursesX.h term.h sgtty.h errno.h sys/errno.h sys/syscall.h pwd.h math.h utmp.h fcntl.h signal.h sys/ioctl.h sys/file.h sys/filio.h sys/socket.h sys/stat.h sys/resource.h sys/select.h sys/poll.h stropts.h netdb.h netinet/in.h sys/un.h arpa/inet.h sys/param.h syslog.h sys/syslog.h string.h strings.h sys/time.h time.h sys/times.h netinet/in_systm.h netinfo/ni.h resolv.h arpa/nameser.h)
 IRC_DECL_SYS_NERR
 IRC_DECL_ERRNO
 IRC_DECL_H_ERRNO
@@ -1492,6 +1489,7 @@ AC_C_CONST
 AC_CHECK_LIB(crypt, crypt)
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(nsl, socket)
+IRC_MATHLIB
 
 IRC_PATH_ZLIB
 IRC_CURSES_TERMCAP
@@ -1505,6 +1503,7 @@ dnl Note: additional tests should be performed and used inside the source code
 dnl       for the following functions:
 dnl       gethostname gettimeofday lrand48 mkdir socket
 dnl ---
+IRC_DECL_SYS_ERRLIST
 IRC_FUNC_MEMCMP
 IRC_SELECT_POLL
 

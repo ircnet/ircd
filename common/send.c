@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.41 1999/09/19 23:51:11 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.42 2001/10/20 17:57:21 q Exp $";
 #endif
 
 #include "os.h"
@@ -166,10 +166,10 @@ int	len;
 	if (IsDead(to))
 		return 0; /* This socket has already been marked as dead */
 	if (DBufLength(&to->sendQ) > get_sendq(to))
-	    {
+	{
 # ifdef HUB
 		if (CBurst(to))
-		    {
+		{
 			aConfItem	*aconf = to->serv->nline;
 
 			poolsize -= MaxSendq(aconf->class) >> 1;
@@ -179,64 +179,62 @@ int	len;
 				    "New poolsize %d. (sendq adjusted)",
 				    poolsize);
 			istat.is_dbufmore++;
-		    }
-		else if (IsServer(to) || IsService(to))
-			sendto_flag(SCH_ERROR,
+		}
+		else
+# endif
+		{
+			char ebuf[BUFSIZE];
+
+			ebuf[0] = '\0';
+			if (IsService(to) || IsServer(to))
+			{
+				SPRINTF(ebuf,
 				"Max SendQ limit exceeded for %s: %d > %d",
-			   	get_client_name(to, FALSE),
-				DBufLength(&to->sendQ), get_sendq(to));
-		if (!CBurst(to))
-		    {
+					get_client_name(to, FALSE),
+					DBufLength(&to->sendQ), get_sendq(to));
+			}
 			to->exitc = EXITC_SENDQ;
-			return dead_link(to, "Max Sendq exceeded");
-		    }
-# else /* HUB */
-		if (IsService(to) || IsServer(to))
-			sendto_flag(SCH_ERROR,
-				"Max SendQ limit exceeded for %s: %d > %d",
-			   	get_client_name(to, FALSE),
-				DBufLength(&to->sendQ), get_sendq(to));
-		to->exitc = EXITC_SENDQ;
-		return dead_link(to, "Max Sendq exceeded");
-# endif /* HUB */
-	    }
-	else
-	    {
-tryagain:
+			return dead_link(to, ebuf[0] ? ebuf :
+				"Max Sendq exceeded");
+		}
+	}
 # ifdef	ZIP_LINKS
-	        /*
-		** data is first stored in to->zip->outbuf until
-		** it's big enough to be compressed and stored in the sendq.
-		** send_queued is then responsible to never let the sendQ
-		** be empty and to->zip->outbuf not empty.
-		*/
-		if (to->flags & FLAGS_ZIP)
-			msg = zip_buffer(to, msg, &len, 0);
+	/*
+	** data is first stored in to->zip->outbuf until
+	** it's big enough to be compressed and stored in the sendq.
+	** send_queued is then responsible to never let the sendQ
+	** be empty and to->zip->outbuf not empty.
+	*/
+	if (to->flags & FLAGS_ZIP)
+		msg = zip_buffer(to, msg, &len, 0);
 
-		if (len && (i = dbuf_put(&to->sendQ, msg, len)) < 0)
+tryagain:
+	if (len && (i = dbuf_put(&to->sendQ, msg, len)) < 0)
 # else 	/* ZIP_LINKS */
-		if ((i = dbuf_put(&to->sendQ, msg, len)) < 0)
+tryagain:
+	if ((i = dbuf_put(&to->sendQ, msg, len)) < 0)
 # endif	/* ZIP_LINKS */
-			if (i == -2 && CBurst(to))
-			    {	/* poolsize was exceeded while connect burst */
-				aConfItem	*aconf = to->serv->nline;
+	{
+		if (i == -2 && CBurst(to))
+		    {	/* poolsize was exceeded while connect burst */
+			aConfItem	*aconf = to->serv->nline;
 
-				poolsize -= MaxSendq(aconf->class) >> 1;
-				IncSendq(aconf->class);
-				poolsize += MaxSendq(aconf->class) >> 1;
-				sendto_flag(SCH_NOTICE,
-					    "New poolsize %d. (reached)",
-					    poolsize);
-				istat.is_dbufmore++;
-				goto tryagain;
-			    }
-			else
-			    {
-				to->exitc = EXITC_MBUF;
-				return dead_link(to,
-					"Buffer allocation error for %s");
-			    }
-	    }
+			poolsize -= MaxSendq(aconf->class) >> 1;
+			IncSendq(aconf->class);
+			poolsize += MaxSendq(aconf->class) >> 1;
+			sendto_flag(SCH_NOTICE,
+				    "New poolsize %d. (reached)",
+				    poolsize);
+			istat.is_dbufmore++;
+			goto tryagain;
+		    }
+		else
+		    {
+			to->exitc = EXITC_MBUF;
+			return dead_link(to,
+				"Buffer allocation error for %s");
+		    }
+	}
 	/*
 	** Update statistics. The following is slightly incorrect
 	** because it counts messages even if queued, but bytes
@@ -606,6 +604,12 @@ int	sendto_one(aClient *to, char *pattern, ...)
 }
 #endif
 
+/*
+ * sendto_channel_butone
+ *
+ * Send a message to all members of a channel that are connected to this
+ * server except client 'one'.
+ */
 #ifndef CLIENT_COMPILE
 #if ! USE_STDARG
 /*VARARGS*/
@@ -633,7 +637,7 @@ void	sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr, char *p
 
 	if (one != from && MyConnect(from) && IsRegisteredUser(from))
 	    {
-		/* useless junk? */
+		/* useless junk? */ /* who said that and why? --B. */
 #if ! USE_STDARG
 		sendto_prefix_one(from, from, pattern, p1, p2, p3, p4,
 				  p5, p6, p7, p8, p9, p10, p11);
@@ -912,13 +916,13 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
 				continue;
 			if (IsAnonymous(channels->value.chptr))
 				continue;
-			for (lp=channels->value.chptr->members;lp;
+			for (lp=channels->value.chptr->clist;lp;
 			     lp=lp->next)
 			    {
 				cptr = lp->value.cptr;
 				if (user == cptr)
 					continue;
-				if (!MyConnect(cptr) || sentalong[cptr->fd])
+				if (!cptr->user || sentalong[cptr->fd])
 					continue;
 				sentalong[cptr->fd]++;
 #ifndef DEBUGMODE
@@ -989,7 +993,7 @@ void	sendto_channel_butserv(aChannel *chptr, aClient *from, char *pattern, ...)
 		lfrm = &anon;
 	    }
 
-	for (lp = chptr->members; lp; lp = lp->next)
+	for (lp = chptr->clist; lp; lp = lp->next)
 		if (MyClient(acptr = lp->value.cptr) && acptr != from)
 		    {
 			if (!len)
@@ -1460,101 +1464,121 @@ void	sendto_flag(u_int chan, char *pattern, ...)
 	return;
 }
 
+static int userlog;
+static int connlog;
+
+void
+logfiles_open()
+{
+#ifdef  FNAME_USERLOG
+	userlog = open(FNAME_USERLOG, O_WRONLY|O_APPEND|O_NDELAY);
+#else
+	userlog = -1;
+#endif
+#ifdef  FNAME_CONNLOG
+	connlog = open(FNAME_CONNLOG, O_WRONLY|O_APPEND|O_NDELAY);
+#else
+	connlog = -1;
+#endif
+}
+
+void
+logfiles_close()
+{
+#ifdef FNAME_USERLOG
+	if (userlog != -1)
+	{
+		(void)close(userlog);
+	}
+#endif
+#ifdef FNAME_CONNLOG
+	if (connlog != -1)
+	{
+		(void)close(connlog);
+	}
+#endif
+}
+
 /*
  * sendto_flog
  *	cptr		used for firsttime, auth, exitc, send/received M/K
- *	msg		replaces duration if duration is 0
- *	duration	only used if non 0
+ *	msg		if this contains a message, it means rejected client,
+ *			hence we will log it in connlog; otherwise it's client
+ *			quitting, so it ends up in userlog --Beeth
  *	username	can't get it from cptr
  *	hostname	i.e.
  */
-void	sendto_flog(cptr, msg, duration, username, hostname)
+void	sendto_flog(cptr, msg, username, hostname)
 aClient	*cptr;
 char	*msg, *username, *hostname;
-time_t	duration;
 {
-	char	linebuf[1024]; /* auth reply might be long.. */
+	/* 
+	** One day we will rewrite linebuf to malloc()s, but for now
+	** we are lazy. The longest linebuf I saw during last year
+	** was 216. Max auth reply can be 1024, see rfc931_work() and
+	** if iauth is disabled, read_authports() makes it max 513.
+	** And the rest... just count, I got 154 --Beeth
+	*/
+	char	linebuf[1500];
+	/*
+	** This is a potential buffer overflow.
+	** I mean, when you manage to keep ircd
+	** running for almost 12 years ;-) --B.
+	*/
+	char	buf[12];
 	int	logfile;
 
+	logfile = msg ? connlog : userlog;
+
+#if !defined(USE_SERVICES) && !( defined(USE_SYSLOG) && \
+	(defined(SYSLOG_USERS) || defined(SYSLOG_CONN)) )
+	if (logfile == -1)
+	{
+		return;
+	}
+#endif
+	if (!msg)
+	{
+		time_t	duration;
+
+		duration = timeofday - cptr->firsttime + 1;
+		(void)sprintf(buf, "%3d:%02d:%02d",
+			(int) (duration / 3600),
+			(int) ((duration % 3600) / 60),
+			(int) (duration % 60));
+	}
+
+	/*
+	** Aha, cptr->firsttime is time when user connected,
+	** so we syslog() it anyway. I'm waving big
+	** "rewrite log format" flag --Beeth.
+	*/
+	(void)sprintf(linebuf,
+		"%s (%s): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
+		myctime(cptr->firsttime), msg ? msg : buf,
+		username, hostname, cptr->auth,
+		cptr->exitc, cptr->sendM, cptr->sendK,
+		cptr->receiveM, cptr->receiveK);
+
+#if defined(USE_SYSLOG) && (defined(SYSLOG_USERS) || defined(SYSLOG_CONN))
+	syslog(LOG_NOTICE, "%s", linebuf);
+#endif
+
 #ifdef	USE_SERVICES
-	if (duration)
-	    {
-		(void)sprintf(linebuf,
-	      "%s (%3d:%02d:%02d): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
-			      myctime(cptr->firsttime),
-			      (int) (duration / 3600),
-			      (int) ((duration % 3600) / 60),
-			      (int) (duration % 60),
-			      username, hostname, cptr->auth,
-			      cptr->exitc, cptr->sendM, cptr->sendK,
-			      cptr->receiveM, cptr->receiveK);
+	if (!msg)
+	{
 		check_services_butone(SERVICE_WANT_USERLOG, NULL, &me,
 				      "USERLOG :%s", linebuf);
-	    }
+	}
 	else
-	    {
-		(void)sprintf(linebuf,
-			      "%s (%s): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
-			      myctime(cptr->firsttime), msg, username,
-			      hostname, cptr->auth,
-			      cptr->exitc, cptr->sendM, cptr->sendK,
-			      cptr->receiveM, cptr->receiveK);
+	{
 		check_services_butone(SERVICE_WANT_CONNLOG, NULL, &me,
 				      "CONNLOG :%s", linebuf);
-	    }
+	}
 #endif
-	/*
-	 * This conditional makes the logfile active only after
-	 * it's been created, thus logging can be turned off by
-	 * removing the file.
-	 *
-	 * stop NFS hangs...most systems should be able to
-	 * file in 3 seconds. -avalon (curtesy of wumpus)
-	 */
-	(void)alarm(3);
-	if (
-#ifdef	FNAME_USERLOG
-	    (duration && 
-	     (logfile = open(FNAME_USERLOG, O_WRONLY|O_APPEND)) != -1)
-# ifdef	FNAME_CONNLOG
-	    ||
-# endif
-#endif
-#ifdef	FNAME_CONNLOG
-	    (!duration && 
-	     (logfile = open(FNAME_CONNLOG, O_WRONLY|O_APPEND)) != -1)
-#else
-# ifndef	FNAME_USERLOG
-	    0
-# endif
-#endif
-	   )
-	    {
-		(void)alarm(0);
-#ifndef	USE_SERVICES
-		if (duration)
-			(void)sprintf(linebuf,
-	      "%s (%3d:%02d:%02d): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
-				      myctime(cptr->firsttime),
-				      (int) (duration / 3600),
-				      (int) ((duration % 3600) / 60),
-				      (int) (duration % 60),
-				      username, hostname, cptr->auth,
-				      cptr->exitc, cptr->sendM, cptr->sendK,
-				      cptr->receiveM, cptr->receiveK);
-		else
-			(void)sprintf(linebuf,
-			      "%s (%s): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
-				      myctime(cptr->firsttime), msg, username,
-				      hostname, cptr->auth,
-                                      cptr->exitc, cptr->sendM, cptr->sendK,
-                                      cptr->receiveM, cptr->receiveK);
-#endif
-		(void)alarm(3);
+	if (logfile != -1)
+	{
 		(void)write(logfile, linebuf, strlen(linebuf));
-		(void)alarm(0);
-		(void)close(logfile);
-	    }
-	(void)alarm(0);
+	}
 }
 #endif /* CLIENT_COMPILE */

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_numeric.c,v 1.3 1997/09/03 17:45:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: c_numeric.c,v 1.4 2001/10/20 17:57:27 q Exp $";
 #endif
  
 #include "os.h"
@@ -103,7 +103,7 @@ char	*parv[];
 	    case ERR_NONICKNAMEGIVEN:
 		sprintf(mybuf, "*** Error: %s: No nickname given", parv[0]);
 		break;
-	    case ERR_ERRONEUSNICKNAME:
+	    case ERR_ERRONEOUSNICKNAME:
 		sprintf(mybuf,
 			"*** Error: %s: Some special characters cannot %s",
 			parv[0], "be used in nicknames");

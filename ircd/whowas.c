@@ -24,7 +24,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: whowas.c,v 1.7 1999/09/20 22:39:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: whowas.c,v 1.8 2001/10/20 17:57:30 q Exp $";
 #endif
 
 #include "os.h"
@@ -38,22 +38,27 @@ int	ww_index = 0, ww_size = MAXCONNECTIONS*2;
 static	aLock	*locked;
 int	lk_index = 0, lk_size = MAXCONNECTIONS*2;
 
-static	void	grow_history()
+static	void	grow_whowas()
 {
 	int	osize = ww_size;
 
-	Debug((DEBUG_ERROR, "Whowas/grow_history ww:%d, lk:%d, #%d, %#x/%#x",
+	Debug((DEBUG_ERROR, "grow_whowas ww:%d, lk:%d, #%d, %#x/%#x",
 			    ww_size, lk_size, numclients, was, locked));
 	ww_size = (int)((float)numclients * 1.1);
 	was = (aName *)MyRealloc((char *)was, sizeof(*was) * ww_size);
 	bzero((char *)(was + osize), sizeof(*was) * (ww_size - osize));
-	lk_size = (int)((float)numclients * 1.1);
-	locked = (aLock *)MyRealloc((char *)locked, sizeof(*locked) * lk_size);
-	bzero((char *)(locked + osize), sizeof(*locked) * (lk_size - osize));
-	Debug((DEBUG_ERROR, "Whowas/grow_history %#x/%#x", was, locked));
+	Debug((DEBUG_ERROR, "grow_whowas %#x", was));
 	ircd_writetune(tunefile);
 }
 
+static	void	grow_locked()
+{
+	int	osize = lk_size;
+
+	lk_size = ww_size;
+	locked = (aLock *)MyRealloc((char *)locked, sizeof(*locked) * lk_size);
+	bzero((char *)(locked + osize), sizeof(*locked) * (lk_size - osize));
+}
 
 /*
 ** add_history
@@ -153,8 +158,12 @@ Reg	aClient	*cptr, *nodelay;
 			 ** This nickname has to be locked, thus copy it to the
 			 ** lock[] array.
 			 */
-			strncpyzt(locked[lk_index].nick, np->ww_nick, NICKLEN);
+			strcpy(locked[lk_index].nick, np->ww_nick);
 			locked[lk_index++].logout = np->ww_logout;
+			if ((lk_index == lk_size) && (lk_size != ww_size))
+			{
+				grow_locked();
+			}
 			if (lk_index >= lk_size)
 				lk_index = 0;
 		    }
@@ -189,7 +198,7 @@ Reg	aClient	*cptr, *nodelay;
 
 	ww_index++;
 	if ((ww_index == ww_size) && (numclients > ww_size))
-		grow_history();
+		grow_whowas();
 	if (ww_index >= ww_size)
 		ww_index = 0;
 	return;
@@ -206,31 +215,41 @@ char	*nick;
 time_t	timelimit;
 {
 	Reg	aName	*wp, *wp2;
-	Reg	int	i = 0;
 
 	wp = wp2 = &was[ww_index];
 	timelimit = timeofday - timelimit;
 
-	do {
-		if (!mycmp(nick, wp->ww_nick) && wp->ww_logout >= timelimit)
-			break;
-		wp++;
-		if (wp == &was[ww_size])
-			i = 1, wp = was;
+	do
+	{
+		if (wp == was)
+		{
+			wp = was + ww_size;
+		}
+		wp--;
+		if (wp->ww_logout < timelimit)
+		{
+			/* no point in checking more, only old or unused 
+			 * entry's left. */
+			return NULL;
+		}
+		if (wp->ww_online == &me)
+		{
+			/* This one is offline */
+			continue;
+		}
+		if (wp->ww_online && !mycmp(nick, wp->ww_nick))
+		{
+			return wp->ww_online;
+		}
 	} while (wp != wp2);
 
-	if (wp != wp2 || !i)
-		if (wp->ww_online == &me)
-			return (NULL);
-		else
-			return (wp->ww_online);
 	return (NULL);
 }
 
 /*
 ** find_history
 **      Returns 1 if a user was using the given nickname within
-**   the timelimit. Returns 0, if none found...
+**   the timelimit and it's locked. Returns 0, if none found...
 */
 int	find_history(nick, timelimit)
 char  *nick;
@@ -247,29 +266,42 @@ time_t        timelimit;
 	timelimit = timeofday - timelimit;
 #endif
 	
-	do {
-		if (!mycmp(nick, wp->ww_nick) &&
-		    (wp->ww_logout >= timelimit) && (wp->ww_online == NULL))
-			break;
-		wp++;
-		if (wp == &was[ww_size])
-			i = 1, wp = was;
+	do
+	{
+		if (wp == was)
+		{
+			wp = was + ww_size;
+		}
+		wp--;
+		if (wp->ww_logout < timelimit)
+		{
+			return 0;
+		}
+		/* wp->ww_online == NULL means it's locked */
+		if ((!wp->ww_online) && (!mycmp(nick, wp->ww_nick)))
+		{
+			return 1;
+		}
 	} while (wp != wp2);
-	if ((wp != wp2 || !i) && (wp->ww_online == NULL))
-		return (1);
 
 	lp = lp2 = &locked[lk_index];
 	i = 0;
-	do {
-		if (!myncmp(nick, lp->nick, NICKLEN) &&
-		    (lp->logout >= timelimit))
-			break;
-		lp++;
-		if (lp == &locked[lk_size])
-			i = 1, lp = locked;
+	do
+	{
+		if (lp == locked)
+		{
+			lp = locked + lk_size;
+		}
+		lp--;
+		if (lp->logout < timelimit)
+		{
+			return 0;
+		}
+		if (!mycmp(nick, lp->nick))
+		{
+			return 1;
+		}
 	} while (lp != lp2);
-	if (lp != lp2 || !i)
-		return (1);
 
 	return (0);
 }
@@ -373,11 +405,10 @@ char	*parv[];
 
 	for (s = parv[1]; (nick = strtoken(&p, s, ",")); s = NULL)
 	    {
-		wp = wp2 = &was[ww_index - 1];
+		wp = wp2 = &was[(ww_index ? ww_index : ww_size) - 1];
+		j = 0;
 
 		do {
-			if (wp < was)
-				wp = &was[ww_size - 1];
 			if (mycmp(nick, wp->ww_nick) == 0)
 			    {
 				up = wp->ww_user;
@@ -387,24 +418,25 @@ char	*parv[];
 				sendto_one(sptr, replies[RPL_WHOISSERVER],
 					   ME, BadTo(parv[0]), wp->ww_nick, up->server,
 					   myctime(wp->ww_logout));
-				if (up->away)
-					sendto_one(sptr, replies[RPL_AWAY],
-						   ME, BadTo(parv[0]),
-						   wp->ww_nick, up->away);
 				j++;
 			    }
 			if (max > 0 && j >= max)
 				break;
-			wp--;
+			if (wp == was)
+				wp = &was[ww_size - 1];
+			else
+				wp--;
 		} while (wp != wp2);
 
 		if (up == NULL)
 		    {
-			if (strlen(parv[1]) > (size_t) NICKLEN)
-				parv[1][NICKLEN] = '\0';
+			if (strlen(nick) > (size_t) NICKLEN)
+				nick[NICKLEN] = '\0';
 			sendto_one(sptr, replies[ERR_WASNOSUCHNICK], ME, BadTo(parv[0]),
-				   parv[1]);
+				   nick);
 		    }
+		else
+			up = NULL;
 
 		if (p)
 			p[-1] = ',';

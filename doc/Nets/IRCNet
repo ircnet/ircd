@@ -4,14 +4,18 @@ The IRC Net Mailing List is meant for discussion about issues concerning the
 IRC Net network. It is currently an open mailing list and you can subscribe
 by typing the following in a shell:
 
-	echo subscribe ircnet | mail majordodo@modeemi.cs.tut.fi
-
-And to see who is on the mailing list you just need to type the following:
-
-	echo who ircnet | mail majordodo@modeemi.cs.tut.fi
+	echo subscribe ircnet | mail majordomo@irc.org
 
 All messages to the mailing list itself are to be sent to:
 
-	ircnet@modeemi.cs.tut.fi
+	ircnet@irc.org
 
-http://www.irc.at/bic/
+For further help, use that command:
+
+	echo help | mail majordomo@irc.org
+
+We also have a web page:
+
+	http://www.irc.org/
+
+Go there for a current news and infos.

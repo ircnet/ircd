@@ -1,4 +1,4 @@
-$Id: README,v 1.5 1998/11/09 22:56:34 borud Exp $
+$Id: README,v 1.6 2001/10/20 17:57:23 q Exp $
 
 DESCRIPTION
 ===========
@@ -51,6 +51,6 @@ ADMINISTRATIVIA
 
   the current maintainer can be reached at: <borud@guardian.no>
 
-  please report bugs to <ircd-users@stealth.net>
+  please report bugs to <ircd-users@irc.org>
   improvements are welcome.
 

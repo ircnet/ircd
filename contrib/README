@@ -1,10 +1,11 @@
-$Id: README,v 1.6 1999/03/13 23:06:15 kalt Exp $
+$Id: README,v 1.7 2001/10/20 17:57:23 q Exp $
 
-This directory contains ircd related contributions.  Most of them fall
- in one of the following categories:
-	* small side utility
-	* code sample
-	* service
+**********************************************************************
+DISCLAIMER:
+This directory contains programs or patches that have been contributed
+by other people and/or are not suitable for including in IRCD program.
+IRCD team bears no responsibility for bugs in these programs.
+**********************************************************************
 
 Each contribution lives in its own directory under contrib/ and has a
 README file.  For those which need to be compiled, this can be done in

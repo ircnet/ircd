@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: packet.c,v 1.8 1999/04/19 22:26:22 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: packet.c,v 1.9 2001/10/20 17:57:21 q Exp $";
 #endif
 
 #include "os.h"
@@ -68,6 +68,11 @@ Reg	int	length;
 #endif
  
 	me.receiveB += length; /* Update bytes received */
+	if (me.receiveB > 1023)
+	    {
+		me.receiveK += (me.receiveB >> 10);
+		me.receiveB &= 0x03ff;
+	    }
 	cptr->receiveB += length;
 	if (cptr->receiveB > 1023)
 	    {
@@ -82,11 +87,6 @@ Reg	int	length;
 			acpt->receiveK += (acpt->receiveB >> 10);
 			acpt->receiveB &= 0x03ff;
 		    }
-	    }
-	else if (me.receiveB > 1023)
-	    {
-		me.receiveK += (me.receiveB >> 10);
-		me.receiveB &= 0x03ff;
 	    }
 
 	bufptr = cptr->buffer;
@@ -170,11 +170,13 @@ Reg	int	length;
 			** Socket is dead so exit (which always returns with
 			** FLUSH_BUFFER here).  - avalon
 			*/
-			if (cptr->flags & FLAGS_DEADSOCKET)
+			if (IsDead(cptr))
 			    {
 				if (cptr->exitc == EXITC_REG)
 					cptr->exitc = EXITC_DEAD;
 				return exit_client(cptr, cptr, &me,
+						   (cptr->exitc == EXITC_SENDQ) ?
+						   "Max SendQ exceeded" :
 						   "Dead Socket");
 			    }
 			/*

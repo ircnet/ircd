@@ -30,5 +30,5 @@ typedef struct aname {
 
 typedef struct alock {
 	time_t	logout;
-	char	nick[NICKLEN];
+	char	nick[NICKLEN + 1];
 } aLock;

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.21 1999/07/11 22:11:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.22 2001/10/20 17:57:24 q Exp $";
 #endif
 
 #include "os.h"
@@ -91,7 +91,15 @@ char *cfile;
 	Mlist[Mcnt] = NULL;
 
 	cfh = fopen((cfile) ? cfile : IAUTHCONF_PATH, "r");
-	if (cfh)
+	if (!cfh)
+	    {
+		if (cfile)
+		    {
+			perror("Couldn't open config file");
+			exit(0);
+		    }
+	    }
+	else
 	    {
 		while (fgets(buffer, 160, cfh))
 		    {
@@ -162,7 +170,11 @@ char *cfile;
 					continue;
 				    }
 				*ch++ = '\0';
+# if defined(RTLD_NOW)
 				mod_handle = dlopen(ch, RTLD_NOW);
+# else
+				mod_handle = dlopen(ch, RTLD_LAZY);
+# endif
 				if (mod_handle == NULL)
 				    {
 					conf_err(lnnb, dlerror(), cfile);
@@ -354,12 +366,9 @@ char *cfile;
 
 			last = &((*last)->nexti);
 		    }
+		fclose(cfh);
 	    }
-	else if (cfile)
-	    {
-		perror("fopen");
-		exit(0);
-	    }
+
 	if (ident == NULL)
 	    {
 		ident = *last = (AnInstance *) malloc(sizeof(AnInstance));
@@ -369,6 +378,9 @@ char *cfile;
 		(*last)->hostname = NULL;
 		(*last)->address = NULL;
 		(*last)->timeout = DEFAULT_TIMEOUT;
+		(*last)->in = icount;
+		(*last)->popt = NULL;
+		(*last)->address = NULL;
 	    }
 	ident->timeout = MAX(DEFAULT_TIMEOUT, ident->timeout);
 

@@ -55,7 +55,7 @@
 
 /*
  *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id: resolv_def.h,v 1.5 1999/01/20 01:33:08 kalt Exp $
+ *	$Id: resolv_def.h,v 1.6 2001/10/20 17:57:28 q Exp $
  */
 
 /*
@@ -118,7 +118,9 @@ struct __res_state {
 #define	RES_INSECURE1	0x00000400	/* type 1 security disabled */
 #define	RES_INSECURE2	0x00000800	/* type 2 security disabled */
 #define	RES_NOALIASES	0x00001000	/* shuts off HOSTALIASES feature */
+#ifndef HAVE_GETIPNODEBYNAME
 #define	RES_USE_INET6	0x00002000	/* use/map IPv6 in gethostbyname() */
+#endif
 
 #define RES_DEFAULT	(RES_RECURSE | RES_DEFNAMES | RES_DNSRCH)
 

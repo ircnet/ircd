@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_log.c,v 1.6 1999/02/21 00:33:45 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_log.c,v 1.7 2001/10/20 17:57:25 q Exp $";
 #endif
 
 #include "os.h"
@@ -35,12 +35,15 @@ init_filelogs()
 #if defined(IAUTH_DEBUG)
 	if (debug)
 		fclose(debug);
-	debug = fopen(IAUTHDBG_PATH, "w");
+	if (debuglevel)
+	{
+		debug = fopen(IAUTHDBG_PATH, "w");
 # if defined(USE_SYSLOG)
-	if (!debug)
-		syslog(LOG_ERR, "Failed to open \"%s\" for writing",
-		       IAUTHDBG_PATH);
+		if (!debug)
+			syslog(LOG_ERR, "Failed to open \"%s\" for writing",
+			       IAUTHDBG_PATH);
 # endif
+	}
 #endif /* IAUTH_DEBUG */
 	if (authlog)
 		fclose(authlog);
@@ -81,7 +84,7 @@ vsendto_log(int flags, int slflag, char *pattern, va_list va)
 
 #if defined(USE_SYSLOG)
 	if (slflag)
-		syslog(slflag, logbuf+1);
+		syslog(slflag, "%s", logbuf+1);
 #endif
 
 	strcat(logbuf, "\n");
@@ -89,7 +92,7 @@ vsendto_log(int flags, int slflag, char *pattern, va_list va)
 #if defined(IAUTH_DEBUG)
 	if ((flags & ALOG_DALL) && (flags & debuglevel) && debug)
 	    {
-		fprintf(debug, logbuf+1);
+		fprintf(debug, "%s", logbuf+1);
 		fflush(debug);
 	    }
 #endif

@@ -1,6 +1,15 @@
-# @(#)$Id: RELEASE_NOTES,v 1.34 1999/08/13 17:55:01 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.35 2001/10/20 17:57:24 q Exp $
 
 This is version 2.10.3 of the IRC software.
+===============================================================================
+
+Important changes in 2.10.3p2 (since 2.10.3):
+	* u@h limits in Y:lines now default to 1.1, not 0.0
+	* WHO ** is not special anymore (may break clients depending on it)
+	* CIDR support in O:lines
+	* no need to use :ffff: mapped IPv4 addresses anymore
+	* now ircd reopens logfiles only upon HUP; this means it is not enough
+	  to remove (or rename) logfile to stop logging (but we gain a lot!)
 
 ===============================================================================
 

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.67 1999/09/20 22:39:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.68 2001/10/20 17:57:29 q Exp $";
 #endif
 
 #include "os.h"
@@ -710,27 +710,22 @@ Reg	aClient	*cptr;
 	    }
 
 #ifdef CRYPT_LINK_PASSWORD
-	/* use first two chars of the password they send in as salt */
+	/* pass whole aconf->passwd as salt, let crypt() deal with it */
 
-	/* passwd may be NULL. Head it off at the pass... */
 	if (*cptr->passwd)
 	    {
-		char    salt[3];
 		extern  char *crypt();
 
-		/* Determine if MD5 or DES */
-                if (strncmp(aconf->passwd, "$1$", 3))
+		encr = crypt(cptr->passwd, aconf->passwd);
+		if (encr == NULL)
 		    {
-			salt[0] = aconf->passwd[0];
-			salt[1] = aconf->passwd[1];
+			ircstp->is_ref++;
+			sendto_one(cptr, "ERROR :No Access (crypt failed) %s",
+			  	inpath);
+			sendto_flag(SCH_ERROR,
+			    	"Access denied (crypt failed) %s", inpath);
+			return exit_client(cptr, cptr, &me, "Bad Password");
 		    }
-		else
-		    {
-			salt[0] = aconf->passwd[3];
-			salt[1] = aconf->passwd[4];
-		    }
-		salt[2] = '\0';
-		encr = crypt(cptr->passwd, salt);
 	    }
 	else
 		encr = "";
@@ -1381,13 +1376,13 @@ char	*parv[];
 	aClient	*acptr;
 	char	stat = parc > 1 ? parv[1][0] : '\0';
 	Reg	int	i;
-	int	doall = 0, wilds = 0;
-	char	*name = NULL, *cm = NULL;
+	int	wilds, doall;
+	char	*name, *cm;
 
 	if (IsServer(cptr) &&
 	    (stat != 'd' && stat != 'p' && stat != 'q' && stat != 's' &&
 	     stat != 'u' && stat != 'v') &&
-	    !(stat == 'o' && IsOper(sptr)))
+	    !((stat == 'o' || stat == 'c') && IsOper(sptr)))
 	    {
 		if (check_link(cptr))
 		    {
@@ -1402,31 +1397,17 @@ char	*parv[];
 				2, parc, parv) != HUNTED_ISME)
 			return 5;
 	    }
-	else if (parc == 4)
+	else if (parc >= 3)
 	    {
 		if (hunt_server(cptr, sptr, ":%s STATS %s %s %s",
 				2, parc, parv) != HUNTED_ISME)
 			return 5;
 	    }
 
-	if (parc > 2)
-	    {
-		name = parv[2];
-		if (!mycmp(name, ME))
-			doall = 2;
-		else if (match(name, ME) == 0)
-			doall = 1;
-		if (index(name, '*') || index(name, '?'))
-			wilds = 1;
-		if (parc > 3)
-		    {
-			cm = parv[3];
-			if (!index(cm, '*') && !index(cm, '?'))
-				wilds = 0, doall = 0;
-		    }
-	    }
-	else
-		name = ME;
+	name = (parc > 2) ? parv[2] : ME;
+	cm = (parc > 3) ? parv[3]: name;
+	doall = !match(name, ME) && !match(cm, ME);
+	wilds = index(cm, '*') || index(cm, '?');
 
 	switch (stat)
 	{
@@ -1437,34 +1418,39 @@ char	*parv[];
 		 * are invisible not being visible to 'foreigners' who use
 		 * a wild card based search to list it.
 		 */
-		for (i = 0; i <= highest_fd; i++)
+		if (doall || wilds)
 		    {
-			if (!(acptr = local[i]))
-				continue;
-#if 0
-			if (IsPerson(acptr) && IsInvisible(acptr) &&
-			    (doall || wilds) && !(MyConnect(sptr) &&
-			     IsLocal(sptr) && IsOper(sptr)) &&
-			    !IsAnOper(acptr) && acptr != sptr)
-#endif
-			if (IsPerson(acptr) &&
-			    (doall || wilds) &&
-			    !(MyConnect(sptr) && IsAnOper(sptr)) &&
-			    acptr != sptr)
-				continue;
-			if (!doall && wilds && match(name, acptr->name))
-				continue;
-			if (!(doall || wilds) &&
-			    ((!cm && mycmp(name, acptr->name)) ||
-			     (cm && match(cm, acptr->name))))
-				continue;
-			sendto_one(cptr, Lformat, ME,
-				   RPL_STATSLINKINFO, parv[0],
-				   get_client_name(acptr, isupper(stat)),
-				   (int)DBufLength(&acptr->sendQ),
-				   (int)acptr->sendM, (int)acptr->sendK,
-				   (int)acptr->receiveM, (int)acptr->receiveK,
-				   timeofday - acptr->firsttime);
+			for (i = 0; i <= highest_fd; i++)
+			    {
+				if (!(acptr = local[i]))
+					continue;
+				if (IsPerson(acptr) && !(MyConnect(sptr) 
+				    && IsAnOper(sptr)) && acptr != sptr)
+					continue;
+				if (wilds && match(cm, acptr->name))
+					continue;
+				sendto_one(cptr, Lformat, ME,
+					RPL_STATSLINKINFO, parv[0],
+					get_client_name(acptr, isupper(stat)),
+					(int)DBufLength(&acptr->sendQ),
+					(int)acptr->sendM, (int)acptr->sendK,
+					(int)acptr->receiveM, 
+					(int)acptr->receiveK,
+					timeofday - acptr->firsttime);
+			    }
+		    }
+		else
+		    {
+			if ((acptr = find_client(cm, NULL)))
+				sendto_one(cptr, Lformat, ME,
+					RPL_STATSLINKINFO, parv[0],
+					get_client_name(acptr, isupper(stat)),
+					(int)DBufLength(&acptr->sendQ),
+					(int)acptr->sendM, (int)acptr->sendK,
+					(int)acptr->receiveM,
+					(int)acptr->receiveK,
+					timeofday - acptr->firsttime);
+			
 		    }
 		break;
 #if defined(USE_IAUTH)
@@ -1847,7 +1833,7 @@ char	*parv[];
 	if (!aconf)
 	    {
 	      sendto_one(sptr,
-			 "NOTICE %s :Connect: Host %s not listed in irc.conf",
+			 "NOTICE %s :Connect: Host %s not listed in ircd.conf",
 			 parv[0], parv[1]);
 	      return 0;
 	    }
@@ -2037,6 +2023,7 @@ char	*parv[];
 	char	killer[HOSTLEN * 2 + USERLEN + 5];
 
 	strcpy(killer, get_client_name(sptr, TRUE));
+	SPRINTF(buf, "RESTART by %s", get_client_name(sptr, TRUE));
 	for (i = 0; i <= highest_fd; i++)
 	    {
 		if (!(acptr = local[i]))
@@ -2058,7 +2045,6 @@ char	*parv[];
 	    }
 	flush_connections(me.fd);
 
-	SPRINTF(buf, "RESTART by %s", get_client_name(sptr, TRUE));
 	restart(buf);
 	/*NOT REACHED*/
 	return 0;
@@ -2162,7 +2148,7 @@ char	*parv[];
 		case STAT_ME:
 			break;
 		case STAT_UNKNOWN:
-			if (IsAnOper(sptr) || MyClient(sptr))
+			if (IsAnOper(sptr) || (MyPerson(sptr) && SendWallops(sptr)))
 				sendto_one(sptr,
 					   replies[RPL_TRACEUNKNOWN], ME, BadTo(parv[0]),
 					   class, name);
@@ -2171,15 +2157,6 @@ char	*parv[];
 			/* Only opers see users if there is a wildcard
 			 * but anyone can see all the opers.
 			 */
-/*
-			if (IsOper(sptr)  &&
-			    (MyClient(sptr) || !(dow && IsInvisible(acptr)))
-			    || !dow || IsAnOper(acptr))
-			    {
-			if (IsOper(sptr) && !(dow || IsInvisible(acptr)) ||
-			    (IsOper(sptr) && IsLocal(sptr)) ||
-			    !dow || IsAnOper(acptr))
-*/
 			if (IsAnOper(acptr))
 				sendto_one(sptr,
 					   replies[RPL_TRACEOPERATOR], ME, BadTo(parv[0]),
@@ -2188,17 +2165,6 @@ char	*parv[];
 				sendto_one(sptr,
 					   replies[RPL_TRACEUSER], ME, BadTo(parv[0]),
 					   class, name);
-/*
-			    {
-				if (IsAnOper(acptr))
-					sendto_one(sptr,
-						   replies[RPL_TRACEOPERATOR],
-						   ME, BadTo(parv[0]), class, name);
-				else
-					sendto_one(sptr, replies[RPL_TRACEUSER],
-						   ME, BadTo(parv[0]), class, name);
-			    }
-*/
 			break;
 		case STAT_SERVER:
 			if (acptr->serv->user)

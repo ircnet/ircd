@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static char rcsid[] = "$Id: res_init.c,v 1.10 1999/01/20 01:33:08 kalt Exp $";
+static char rcsid[] = "$Id: res_init.c,v 1.11 2001/10/20 17:57:28 q Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -451,7 +451,9 @@ ircd_res_setoptions(options, source)
 			printf(";;\tdebug\n");
 #endif
 		} else if (!strncmp(cp, "inet6", sizeof("inet6") - 1)) {
+#ifndef HAVE_GETIPNODEBYNAME
 			ircd_res.options |= RES_USE_INET6;
+#endif
 		} else {
 			/* XXX - print a warning here? */
 		}

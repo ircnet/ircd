@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.16 1999/07/11 20:56:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.17 2001/10/20 17:57:26 q Exp $";
 #endif
 
 #include "os.h"
@@ -30,7 +30,7 @@ static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.16 1999/07/11 20:56:25 chopin 
 #define OPT_PROTOCOL	0x1
 #define OPT_LAZY	0x2
 
-struct _data
+struct _instance_data
 {
 	u_char	options;
 	u_int	tried;
@@ -53,10 +53,10 @@ char *
 rfc931_init(self)
 AnInstance *self;
 {
-	struct _data *dt;
+	struct _instance_data *dt;
 
-	dt = (struct _data *) malloc(sizeof(struct _data));
-	bzero((char *) dt, sizeof(struct _data));
+	dt = (struct _instance_data *) malloc(sizeof(struct _instance_data));
+	bzero((char *) dt, sizeof(struct _instance_data));
 	self->data = (void *) dt;
 
 	/* undocumented option */
@@ -85,7 +85,7 @@ void
 rfc931_release(self)
 AnInstance *self;
 {
-	struct _data *st = self->data;
+	struct _instance_data *st = self->data;
 	free(st);
 }
 
@@ -98,7 +98,7 @@ void
 rfc931_stats(self)
 AnInstance *self;
 {
-	struct _data *st = self->data;
+	struct _instance_data *st = self->data;
 
 	sendto_ircd("S rfc931 connected %u unix %u other %u bad %u out of %u",
 		    st->connected, st->unx, st->other, st->bad, st->tried);
@@ -123,7 +123,7 @@ u_int cl;
 {
 	char *error;
 	int fd;
-	struct _data *st = cldata[cl].instance->data;
+	struct _instance_data *st = cldata[cl].instance->data;
 
 	if (st->options & OPT_LAZY && cldata[cl].state & A_DENY)
 	    {
@@ -167,7 +167,7 @@ int
 rfc931_work(cl)
 u_int cl;
 {
-	struct _data *st = cldata[cl].instance->data;
+	struct _instance_data *st = cldata[cl].instance->data;
 
     	DebugLog((ALOG_D931, 0, "rfc931_work(%d): %d %d buflen=%d", cl,
 		  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
@@ -327,7 +327,7 @@ void
 rfc931_clean(cl)
 u_int cl;
 {
-	struct _data *st = cldata[cl].instance->data;
+	struct _instance_data *st = cldata[cl].instance->data;
 
 	st->clean += 1;
 	DebugLog((ALOG_D931, 0, "rfc931_clean(%d): cleaning up", cl));
@@ -354,7 +354,7 @@ int
 rfc931_timeout(cl)
 u_int cl;
 {
-	struct _data *st = cldata[cl].instance->data;
+	struct _instance_data *st = cldata[cl].instance->data;
 
 	st->timeout += 1;
 	DebugLog((ALOG_D931, 0, "rfc931_timeout(%d): calling rfc931_clean ",

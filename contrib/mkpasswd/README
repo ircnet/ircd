@@ -1,64 +1,44 @@
-/************************************************************************
- *   IRC - Internet Relay Chat, ircd/crypt/README
- *   Copyright (C) 1991 Nelson Minar
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 1, or (at your option)
- *   any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *   $Id: README,v 1.1 1998/04/07 21:20:59 kalt Exp $
- *
- */
+mkpasswd.c documentation
+$Id: README,v 1.2 2001/10/20 17:57:23 q Exp $
 
-The change implemented here is that the operator password in irc.conf
-is no longer stored in plaintext form, but is encrypted the same way
-that user passwords are encrypted on normal UNIX systems. Ie, instead
-of having
+This is documentation for the mkpasswd.c included in ircd-hybrid-7.
 
-	O:*:goodboy:Nelson
+This version of mkpasswd can create both DES and MD5 passwords, with
+either randomly generated or user provided salts.  
 
-in your ircd.conf file, you have
+Options:
+-m - Create an MD5 password
+-d - Create a DES password
+-l - Specify the length of a random MD5 salt
+-p - Specify the plaintext password at the command line
+-s - Specify the salt at the command line
+-h - Get help
 
-	O:*:sCnvYRmbFJ7oI:Nelson
+Without the presence of any parameters, it'll behave like the old mkpasswd,
+creating a DES password with a randomly generated salt and prompting for
+the password (without echo).
 
-You still type "/oper Nelson goodboy" to become operator. However, if
-someone gets ahold of your irc.conf file, they can no longer figure
-out what the password is from reading it.  There are still other
-security holes, namely server-server passwords, but this closes one
-obvious problem.
+A DES salt is a pair of alphanumeric characters ('.' and '/' are permitted
+as well), such as 'a4' or 'Td'.
 
-So how do you generate these icky looking strings for passwords?
-There's a simple program called mkpasswd to do that for you.  Just run
-mkpasswd, and at the prompt type in your plaintext password.  It will
-spit out the encrypted password, which you should then just copy into
-the irc.conf file. This should be done only when adding new passwords
-to your irc.conf file. To change over your irc.conf file to use
-encrypted passwords, define CRYPT_OPER_PASSWORD in config.h. You will
-need to recompile your server if you already compiled it with this
-feature disabled. Once compiled, edit the Makefile in this directory
-and chang "IRCDCONF" to your irc.conf file. Then "make install" in this
-directory to replace all the operator passwords in your irc.conf file
-with the encrypted format.
+An MD5 salt consists of up to 16 alphanumeric characters (plus '.' and '/'),
+such as 'tGd' or 'J6d4dfG'.
 
-Choose your passwords carefully. Do not choose something in a
-dictionary, make sure its at least 5 characters. Anything past 8
-characters is ignored.
+Known bugs:
+Blowfish (on OpenBSD) is not yet supported
+The encryption algorithms supported depend on your system's crypt()
+  implementation.
+The maximum length of an MD5 salt is limited to your systems crypt()
+  implementation, typically 8.
 
-One thing to note about crypt() passwords - for every plaintext, there
-are 4096 different passwords. Some valid encryptions of "goodboy"
-include t1Ub2RhRQHd4g sCnvYRmbFJ7oI and Xr4Z.Kg5tcdy6. The first
-two characters (the "salt") determine which of the 4096 passwords
-you will get. mkpasswd chooses the salt randomly, or alternately
-will let you specify one on the command line.
+Supported Platforms (Known and tested):
+Linux glibc (DES and MD5)
+FreeBSD 3.x (DES (MD5 maybe))
+FreeBSD 4.x (DES and MD5)
+Solaris 2.5-2.6 (DES only)
+Cygwin 1.1.4 (DES only)
+Prior Cygwin with the MD5 libcrypt (MD5 only)
+OpenBSD 2.7 (don't link with -crypt) (DES and MD5, no Blowfish support)
+Mac OS-X (Darwin) (don't link with -crypt) (DES only)
 
-see also - crypt(3)
+Other systems probably work, but they haven't been amply tested.

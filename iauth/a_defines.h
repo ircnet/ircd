@@ -21,7 +21,7 @@
     definitions used by the authentication process.
  */
 
-#define IAUTH_DEBUG	1
+#undef IAUTH_DEBUG
 
 #include "config.h"
 #include "patchlevel.h"
@@ -29,7 +29,7 @@
 #include "dbuf_def.h"	/* needed for struct_def.h, sigh */
 #include "class_def.h"	/* needed for struct_def.h, sigh */
 #include "struct_def.h"
-#if INET6
+#ifdef INET6
 # include "../ircd/nameser_def.h"
 #endif
 #include "support_def.h"

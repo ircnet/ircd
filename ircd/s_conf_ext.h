@@ -47,6 +47,7 @@ EXTERN aConfItem *attach_confs_host __P((aClient *cptr, char *host,
 					 int statmask));
 EXTERN aConfItem *find_conf_exact __P((char *name, char *user, char *host,
 				       int statmask));
+EXTERN aConfItem *find_Oline __P((char *name, aClient *cptr));
 EXTERN aConfItem *find_conf_name __P((char *name, int statmask));
 EXTERN aConfItem *find_conf __P((Link *lp, char *name, int statmask));
 EXTERN aConfItem *find_conf_host __P((Reg Link *lp, char *host,
@@ -63,4 +64,7 @@ EXTERN int find_conf_flags __P((char *name, char *key, int stat));
 EXTERN int find_restrict __P((aClient *cptr));
 EXTERN void find_bounce __P((aClient *cptr, int class, int fd));
 EXTERN aConfItem *find_denied __P((char *name, int class));
+# ifdef	INET6
+EXTERN char *ipv6_convert __P((char *orig));
+# endif
 #undef EXTERN

@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.46 1999/09/20 00:03:45 kalt Exp $
+#*   $Id: Makefile.in,v 1.47 2001/10/20 17:57:30 q Exp $
 #*
 #*/
 
@@ -42,7 +42,7 @@ O_CFLAGS = @CFLAGS@ -I. -I../common -DCONTRIB_COMPILE
 LDFLAGS = @LDFLAGS@
 # required libraries, except zlib and curses/termcap
 LIBS = @LIBS@
-MATHLIBS = -lm
+MATHLIBS = @MATHLIBS@
 # zlib, eventually
 ZLIBS = @IRC_ZLIB_LIBRARY@
 # for DSM support (dlopen(), dlsym(), dlclose())
@@ -209,7 +209,7 @@ $(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 
 $(IRCDWATCH): ircdwatch.o clsupport.o clmatch.o
 	$(RM) $(IRCDWATCH)
-	$(CC) -o $(IRCDWATCH) clsupport.o clmatch.o ircdwatch.o
+	$(CC) $(LDFLAGS) -o $(IRCDWATCH) clsupport.o clmatch.o ircdwatch.o $(LIBS)
 
 ircd-mkpasswd: mkpasswd.o
 	$(RM) ircd-mkpasswd

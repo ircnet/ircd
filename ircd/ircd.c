@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.64 2001/02/26 20:25:45 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.65 2001/10/20 17:57:28 q Exp $";
 #endif
 
 #include "os.h"
@@ -84,7 +84,9 @@ int s;
 {
 #ifdef	USE_SYSLOG
 	(void)syslog(LOG_CRIT, "Server Killed By SIGTERM");
+	(void)closelog();
 #endif
+	logfiles_close();
 	ircd_writetune(tunefile);
 	flush_connections(me.fd);
 	exit(-1);
@@ -171,6 +173,7 @@ void	server_reboot()
 #ifdef USE_SYSLOG
 	(void)closelog();
 #endif
+	logfiles_close();
 	for (i = 3; i < MAXCONNECTIONS; i++)
 		(void)close(i);
 	if (!(bootopt & (BOOT_TTY|BOOT_DEBUG)))
@@ -185,7 +188,7 @@ void	server_reboot()
 #ifdef USE_SYSLOG
 		/* Have to reopen since it has been closed above */
 		
-		openlog(myargv[0], LOG_PID|LOG_NDELAY, LOG_FACILITY);
+		openlog(mybasename(myargv[0]), LOG_PID|LOG_NDELAY, LOG_FACILITY);
 		syslog(LOG_CRIT, "execv(%s,%s) failed: %m\n", IRCD_PATH,
 		       myargv[0]);
 		closelog();
@@ -356,7 +359,11 @@ time_t	currenttime;
 		 * K and R lines once per minute, max.  This is the max.
 		 * granularity in K-lines anyway (with time field).
 		 */
-		if ((currenttime - lkill > 60) || rehashed)
+		if (
+#if defined(TIMEDKLINES) || ( defined(R_LINES) && defined(R_LINES_OFTEN) )
+			(currenttime - lkill > TIMEDKLINES) || 
+#endif /* TIMEDKLINES */
+			rehashed)
 		    {
 			if (IsPerson(cptr))
 			    {
@@ -635,7 +642,14 @@ char	*argv[];
 
 #ifdef	CHROOTDIR
 	ircd_res_init();
-	if (chroot(ROOT_PATH))
+	if (chdir(ROOT_PATH)!=0)
+	{
+		perror("chdir");
+		(void)fprintf(stderr,"%s: Cannot chdir: %s.\n", IRCD_PATH,
+			ROOT_PATH);
+		exit(5);
+	}
+	if (chroot(ROOT_PATH)!=0)
 	    {
 		perror("chroot");
 		(void)fprintf(stderr,"%s: Cannot chroot: %s.\n", IRCD_PATH,
@@ -858,9 +872,10 @@ char	*argv[];
 	open_debugfile();
 	timeofday = time(NULL);
 	(void)init_sys();
+	logfiles_open();
 
 #ifdef USE_SYSLOG
-	openlog(myargv[0], LOG_PID|LOG_NDELAY, LOG_FACILITY);
+	openlog(mybasename(myargv[0]), LOG_PID|LOG_NDELAY, LOG_FACILITY);
 #endif
 	timeofday = time(NULL);
 	if (initconf(bootopt) == -1)
@@ -887,7 +902,10 @@ char	*argv[];
 			acptr = NULL;
 		    }
 		/* exit if there is nothing to listen to */
-		if (acptr == NULL)
+		if (acptr == NULL && !(bootopt & BOOT_INETD))
+			exit(-1);
+		/* Is there an M-line? */
+		if (!find_me())
 			exit(-1);
 	    }
 
@@ -1030,7 +1048,6 @@ void	io_loop()
 		** Timed out (e.g. *NO* traffic at all).
 		** Try again but also check to empty sendQ's for all clients.
 		*/
-		sendto_flag(SCH_DEBUG, "read_message(RO) -> 0 [%d]", delay);
 		(void)read_message(delay - 1, &fdall, 0);
 	    }
 	timeofday = time(NULL);
@@ -1245,7 +1262,7 @@ char *filename;
 	int fd, t_data[6];
 	char buf[100];
 
-	buf[0] = '\0';
+	memset(buf, 0, sizeof(buf));
 	if ((fd = open(filename, O_RDONLY)) != -1)
 	    {
 		read(fd, buf, 100);	/* no panic if this fails.. */

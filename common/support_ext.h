@@ -42,6 +42,7 @@ EXTERN char *myctime __P((time_t value));
 EXTERN char *mybasename __P((char *));
 #ifdef INET6
 EXTERN char *inetntop(int af, const void *in, char *local_dummy, size_t the_size);
+EXTERN int inetpton(int af, const char *src, void *dst);
 #endif
 #if ! HAVE_INET_NTOA
 EXTERN char *inetntoa __P((char *in));

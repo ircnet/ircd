@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.13 1999/03/11 23:40:12 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.14 2001/10/20 17:57:27 q Exp $";
 #endif
 
 #include "os.h"
@@ -131,6 +131,7 @@ int	opt;
 	char	line[512], *tmp, c[80], *s;
 	int	ccount = 0, ncount = 0, dh, flags = 0;
 	aConfItem *aconf = NULL, *ctop = NULL;
+	int	mandatory_found = 0, valid = 1;
 
 	(void)fprintf(stderr, "initconf(): ircd.conf = %s\n", configfile);
 	if ((fd = openconf()) == -1)
@@ -146,11 +147,11 @@ int	opt;
 	    {
 		if (aconf)
 		    {
-			if (aconf->host)
+			if (aconf->host && (aconf->host != nullfield))
 				(void)free(aconf->host);
-			if (aconf->passwd)
+			if (aconf->passwd && (aconf->passwd != nullfield))
 				(void)free(aconf->passwd);
-			if (aconf->name)
+			if (aconf->name && (aconf->name != nullfield))
 				(void)free(aconf->name);
 		    }
 		else
@@ -210,10 +211,9 @@ int	opt;
 		    {
                         (void)fprintf(stderr, "ERROR: Bad config line (%s)\n",
 				line);
-			if (IRCDCONF_DELIMITER != ':')
-				(void)fprintf(stderr,
-				      "\tWrong delimiter? (should be %c)\n",
-					      IRCDCONF_DELIMITER);
+			(void)fprintf(stderr,
+			      "\tWrong delimiter? (should be %c)\n",
+				      IRCDCONF_DELIMITER);
                         continue;
                     }
 
@@ -235,6 +235,7 @@ int	opt;
 			case 'A': /* Name, e-mail address of administrator */
 			case 'a': /* of this server. */
 				aconf->status = CONF_ADMIN;
+				mandatory_found |= CONF_ADMIN;
 				break;
 			case 'B': /* bounce line */
 			case 'b':
@@ -256,6 +257,7 @@ int	opt;
 			case 'I': /* Just plain normal irc client trying  */
 			case 'i': /* to connect me */
 				aconf->status = CONF_CLIENT;
+				mandatory_found |= CONF_CLIENT;
 				break;
 			case 'K': /* Kill user line on irc.conf           */
 			case 'k':
@@ -272,6 +274,7 @@ int	opt;
 			case 'M':
 			case 'm':
 				aconf->status = CONF_ME;
+				mandatory_found |= CONF_ME;
 				break;
 			case 'N': /* Server where I should NOT try to     */
 			case 'n': /* connect in case of lp failures     */
@@ -289,6 +292,7 @@ int	opt;
 			case 'P': /* listen port line */
 			case 'p':
 				aconf->status = CONF_LISTEN_PORT;
+				mandatory_found |= CONF_LISTEN_PORT;
 				break;
 			case 'Q': /* a server that you don't want in your */
 			case 'q': /* network. USE WITH CAUTION! */
@@ -493,6 +497,36 @@ print_confline:
 #ifdef	M4_PREPROC
 	(void)wait(0);
 #endif
+
+	if (!(mandatory_found & CONF_ME))
+	    {
+	        fprintf(stderr, "No M-line found (mandatory)\n");
+		valid = 0;
+	    }
+
+	if (!(mandatory_found & CONF_ADMIN))
+	    {
+		fprintf(stderr, "No A-line found (mandatory)\n");
+		valid = 0;
+	    }
+
+	if (!(mandatory_found & CONF_LISTEN_PORT))
+	    {
+		fprintf(stderr, "No P-line found (mandatory)\n");
+		valid = 0;
+	    }
+
+	if (!(mandatory_found & CONF_CLIENT))
+	    {
+		fprintf(stderr, "No I-line found (mandatory)\n");
+		valid = 0;
+	    }
+
+	if (!valid)
+	    {
+		return NULL;
+	    }
+
 	return ctop;
 }
 
@@ -671,7 +705,7 @@ aConfItem *top;
 	u_int	otype = 0, valid = 0;
 
 	if (!top)
-		return 0;
+		return -1;
 
 	for (aconf = top; aconf; aconf = aconf->next)
 	    {

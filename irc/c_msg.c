@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_msg.c,v 1.3 1999/02/21 00:14:59 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: c_msg.c,v 1.4 2001/10/20 17:57:27 q Exp $";
 #endif
  
 #include "os.h"
@@ -153,6 +153,8 @@ char	*parv[];
 	sprintf(mybuf,"*** %s <%s> joined channel %s", 
 		parv[0], userhost, parv[1]);
 	putline(mybuf);
+	free(querychannel);
+	querychannel = mystrdup(parv[1]);
   return 0;
 }
 

@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.8,v 1.4 1998/11/09 20:07:12 kalt Exp $
-.TH IAUTH 8 "$Date: 1998/11/09 20:07:12 $"
+.\" @(#)$Id: iauth.8,v 1.5 2001/10/20 17:57:24 q Exp $
+.TH IAUTH 8 "$Date: 2001/10/20 17:57:24 $"
 .SH NAME
 iauth \- The Internet Relay Chat Authentication Program
 .SH SYNOPSIS
@@ -13,8 +13,8 @@ iauth \- The Internet Relay Chat Authentication Program
 .SH DESCRIPTION
 .LP
 \fIiauth\fP is a slave process used by the \fIircd\fP program to perform
-the authentication of incoming connections.  The \fIircd\fP program starts
-\fIiauth\fP upon startup.
+the authentication of incoming TCP connections.  The \fIircd\fP program
+starts \fIiauth\fP upon startup.
 
 \fIiauth\fP will close and reopen the log file whenever it receives a user
 signal 2, SIGUSR2.  This is useful to rotate the log file.

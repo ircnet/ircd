@@ -20,7 +20,7 @@
 #if defined(IAUTH_DEBUG)
 # define DebugLog(x)	sendto_log x
 #else
-# define DebugLog(x)	;
+# define DebugLog(x)
 #endif
 
 #define	ALOG_FLOG	0x01	/* file log */

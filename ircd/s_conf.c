@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.43 1999/09/20 22:39:56 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.44 2001/10/20 17:57:29 q Exp $";
 #endif
 
 #include "os.h"
@@ -83,30 +83,82 @@ int	mask;
 
 /*
  * Match address by #IP bitmask (10.11.12.128/27)
+ * Now should work for IPv6 too.
+ * returns -1 on error, 0 on match, 1 when NO match.
  */
 int    match_ipmask(mask, cptr)
 char   *mask;
 aClient *cptr;
 {
-        int i1, i2, i3, i4, m;
-        u_long lmask, baseip;
-	char *at;
- 
-	if (at = index(mask, '@'))
-		mask = at + 1;
-        if (sscanf(mask, "%d.%d.%d.%d/%d", &i1, &i2, &i3, &i4, &m) != 5 ||
-           m < 1 || m > 31) {
-               sendto_flag(SCH_LOCAL, "Ignoring bad mask: %s", mask);
-                return -1;
-        }
-        lmask = htonl((u_long)0xffffffffL << (32 - m)); /* /24->0xffffff00ul */
-        baseip = htonl(i1 * 0x1000000 + i2 * 0x10000 + i3 * 0x100 + i4);
-#ifdef INET6
-	return 1;
-/*        return ((cptr->ip.s6_addr & lmask) == baseip) ? 0 : 1;*/
-#else
-        return ((cptr->ip.s_addr & lmask) == baseip) ? 0 : 1;
+	int	m;
+	char	*p;
+	struct  IN_ADDR addr;
+	char	dummy[128];
+	u_long	lmask;
+#ifdef	INET6
+	int	j;
 #endif
+ 
+	strncpyzt(dummy, mask, sizeof(dummy));
+	mask = dummy;
+	if ((p = index(mask, '@')))
+	{
+		*p = '\0';
+		if (match(mask, cptr->username))
+			return 1;
+		mask = p + 1;
+	}
+	if (!(p = index(mask, '/')))
+		goto badmask;
+	*p = '\0';
+	
+	if (sscanf(p + 1, "%d", &m) != 1)
+	{
+		goto badmask;
+	}
+#ifndef	INET6
+	if (m < 0 || m > 32)
+		goto badmask;
+	if (!m)
+		return 0;       /* x.x.x.x/0 always matches */
+	lmask = htonl((u_long)0xffffffffL << (32 - m));
+	addr.s_addr = inetaddr(mask);
+	return ((addr.s_addr ^ cptr->ip.s_addr) & lmask) ? 1 : 0;
+#else
+	if (m < 0 || m > 128)
+		goto badmask;
+
+	if (inetpton(AF_INET6, mask, (void *)addr.s6_addr) != 1)
+	{
+		return -1;
+	}
+
+	/* Make sure that the ipv4 notation still works. */
+	if (IN6_IS_ADDR_V4MAPPED(&addr) && m < 96)
+	{
+		m += 96;
+	}
+
+	j = m & 0x1F;	/* number not mutliple of 32 bits */
+	m >>= 5;	/* number of 32 bits */
+
+	if (m && memcmp((void *)(addr.s6_addr), 
+		(void *)(cptr->ip.s6_addr), m << 2))
+		return 1;
+
+	if (j)
+	{
+		lmask = htonl((u_long)0xffffffffL << (32 - j));
+		if ((((u_int32_t *)(addr.s6_addr))[m] ^
+			((u_int32_t *)(cptr->ip.s6_addr))[m]) & lmask)
+			return 1;
+	}
+
+	return 0;
+#endif
+badmask:
+	sendto_flag(SCH_ERROR, "Ignoring bad mask: %s", mask);
+	return -1;
 }
 
 /*
@@ -497,6 +549,48 @@ int	statmask;
 	return NULL;
 }
 
+/*
+ * find an O-line which matches the hostname and has the same "name".
+ */
+aConfItem *find_Oline(name, cptr)
+char	*name;
+aClient	*cptr;
+{
+	Reg	aConfItem *tmp;
+	char	userhost[USERLEN+HOSTLEN+3];
+	char	userip[USERLEN+HOSTLEN+3];
+
+	SPRINTF(userhost, "%s@%s", cptr->username, cptr->sockhost);
+	SPRINTF(userip, "%s@%s", cptr->username, 
+#ifdef INET6
+		(char *)inetntop(AF_INET6, (char *)&cptr->ip, mydummy,
+			MYDUMMY_SIZE)
+#else
+		(char *)inetntoa((char *)&cptr->ip)
+#endif
+	);
+
+
+	for (tmp = conf; tmp; tmp = tmp->next)
+	    {
+		if (!(tmp->status & (CONF_OPS)) || !tmp->name || !tmp->host ||
+			mycmp(tmp->name, name))
+			continue;
+		/*
+		** Accept if the *real* hostname matches the host field or
+		** the ip does.
+		*/
+		if (match(tmp->host, userhost) && match(tmp->host, userip) &&
+			(!strchr(tmp->host, '/') 
+			|| match_ipmask(tmp->host, cptr)))
+			continue;
+		if (tmp->clients < MaxLinks(Class(tmp)))
+			return tmp;
+	    }
+	return NULL;
+}
+
+
 aConfItem *find_conf_name(name, statmask)
 char	*name;
 int	statmask;
@@ -657,6 +751,8 @@ int	sig;
 	    {
 		sendto_flag(SCH_NOTICE,
 			    "Got signal SIGHUP, reloading ircd.conf file");
+		logfiles_close();
+		logfiles_open();
 #ifdef	ULTRIX
 		if (fork() > 0)
 			exit(0);
@@ -674,7 +770,7 @@ int	sig;
 			 * this....-avalon
 			 */
 			acptr->hostp = NULL;
-#if defined(R_LINES_REHASH) && !defined(R_LINES_OFTEN)
+#if defined(R_LINES) && ( defined(R_LINES_REHASH) && !defined(R_LINES_OFTEN) )
 			if (find_restrict(acptr))
 			    {
 				sendto_flag(SCH_NOTICE,
@@ -726,7 +822,7 @@ int	sig;
 	for (cltmp = NextClass(FirstClass()); cltmp; cltmp = NextClass(cltmp))
 		MaxLinks(cltmp) = -1;
 
-	if (sig != 2)
+	if (sig == 2)
 		flush_cache();
 	(void) initconf(0);
 	close_listeners();
@@ -796,6 +892,69 @@ int	openconf()
 	return open(configfile, O_RDONLY);
 #endif
 }
+
+/*
+** char *ipv6_convert(char *orig)
+** converts the original ip address to an standard form
+** returns a pointer to a string.
+*/
+
+#ifdef	INET6
+char	*ipv6_convert(orig)
+char	*orig;
+{
+	char	*s, *t, *buf = NULL;
+	int	i, j;
+	int	len = 1;	/* for the '\0' in case of no @ */
+	struct	in6_addr addr;
+	char	dummy[MYDUMMY_SIZE];
+
+	if ((s = strchr(orig, '@')))
+	    {
+		*s = '\0';
+		len = strlen(orig) + 2;	/* +2 for '@' and '\0' */
+		buf = (char *)MyMalloc(len);
+		(void *)strcpy(buf, orig);
+		buf[len - 2] = '@';
+		buf[len - 1] = '\0'; 
+		*s = '@';
+		orig = s + 1;
+	    }
+
+	if ((s = strchr(orig, '/')))
+	    {
+		*s = '\0';
+		s++;
+	    }
+
+	i = inetpton(AF_INET6, orig, addr.s6_addr);
+
+	if (i > 0)
+	    {
+		t = inetntop(AF_INET6, addr.s6_addr, dummy, MYDUMMY_SIZE);
+	    }
+	
+	j = len - 1;
+	if (!((i > 0) && t))
+		t = orig;
+
+	len += strlen(t);
+	buf = (char *)MyRealloc(buf, len);
+	strcpy(buf + j, t);
+
+	if (s)
+	    {
+		*(s-1) = '/'; /* put the '/' back, not sure it's needed tho */ 
+		j = len;
+		len += strlen(s) + 1;
+		buf = (char *)MyRealloc(buf, len);
+		buf[j - 1] = '/';
+		strcpy(buf + j, s);
+	    }
+
+	return buf;
+}
+#endif
 
 /*
 ** initconf() 
@@ -993,7 +1152,22 @@ int	opt;
 		    {
 			if ((tmp = getfield(NULL)) == NULL)
 				break;
+#ifdef	INET6
+			if (aconf->status & 
+				(CONF_CONNECT_SERVER|CONF_ZCONNECT_SERVER
+				|CONF_CLIENT|CONF_RCLIENT|CONF_KILL
+				|CONF_OTHERKILL|CONF_NOCONNECT_SERVER
+				|CONF_OPERATOR|CONF_LOCOP|CONF_LISTEN_PORT
+# ifdef R_LINES
+				|CONF_RESTRICT
+# endif
+				|CONF_SERVICE))
+				aconf->host = ipv6_convert(tmp);
+			else
+				DupString(aconf->host, tmp);
+#else
 			DupString(aconf->host, tmp);
+#endif
 			if ((tmp = getfield(NULL)) == NULL)
 				break;
 			DupString(aconf->passwd, tmp);
@@ -1033,32 +1207,24 @@ int	opt;
                 ** for it and make the conf_line illegal and delete it.
                 */
 		if (aconf->status & CONF_CLASS)
-		    {
+		{
 			if (atoi(aconf->host) >= 0)
 				add_class(atoi(aconf->host),
 					  atoi(aconf->passwd),
 					  atoi(aconf->name), aconf->port,
 					  tmp ? atoi(tmp) : 0,
-/*					  tmp3 ? atoi(tmp3) : 0,
-**					  tmp3 && index(tmp3, '.') ?
-**					  atoi(index(tmp3, '.') + 1) : 0,
-** the next 3 lines should be replaced by the previous sometime in the
-** future.  It is only kept for "backward" compatibility and not needed,
-** but I'm in good mood today -krys
-*/
-					  tmp3 ? atoi(tmp3) : (atoi(aconf->name) > 0) ? atoi(aconf->name) : 0,
-					  tmp3 && index(tmp3, '.') ?
-					  atoi(index(tmp3, '.') + 1) : (atoi(aconf->name) < 0) ? -1 * atoi(aconf->name) : 0,
-/* end of backward compatibility insanity */
- 					  tmp4 ? atoi(tmp4) : 0,
-					  tmp4 && index(tmp4, '.') ?
-					  atoi(index(tmp4, '.') + 1) : 0);
+					  tmp3 ? atoi(tmp3) : 1,
+					  (tmp3 && index(tmp3, '.')) ?
+					  atoi(index(tmp3, '.') + 1) : 1,
+ 					  tmp4 ? atoi(tmp4) : 1,
+					  (tmp4 && index(tmp4, '.')) ?
+					  atoi(index(tmp4, '.') + 1) : 1);
 			continue;
-		    }
+		}
 		/*
-                ** associate each conf line with a class by using a pointer
-                ** to the correct class record. -avalon
-                */
+		** associate each conf line with a class by using a pointer
+		** to the correct class record. -avalon
+		*/
 		if (aconf->status & (CONF_CLIENT_MASK|CONF_LISTEN_PORT))
 		    {
 			if (Class(aconf) == 0)
@@ -1216,24 +1382,30 @@ Reg	aConfItem	*aconf;
 	ln.value.aconf = aconf;
 	ln.flags = ASYNC_CONF;
 
-	if (isdigit(*s))
 #ifdef INET6
-		if(!inet_pton(AF_INET6, s, aconf->ipnum.s6_addr))
-			bcopy(minus_one, aconf->ipnum.s6_addr, IN6ADDRSZ);
+	if(inetpton(AF_INET6, s, aconf->ipnum.s6_addr))
+		;
 #else
+	if (isdigit(*s))
 		aconf->ipnum.s_addr = inetaddr(s);
 #endif
 	else if ((hp = gethost_byname(s, &ln)))
 		bcopy(hp->h_addr, (char *)&(aconf->ipnum),
 			sizeof(struct IN_ADDR));
+#ifdef	INET6
+	else
+	{
+		bcopy(minus_one, aconf->ipnum.s6_addr, IN6ADDRSZ);
+		goto badlookup;
+	}
 
-#ifdef INET6
-	if (AND16(aconf->ipnum.s6_addr) == 255)
 #else
 	if (aconf->ipnum.s_addr == -1)
-#endif
 		goto badlookup;
+#endif
+
 	return 0;
+
 badlookup:
 #ifdef INET6
 	if (AND16(aconf->ipnum.s6_addr) == 255)
@@ -1598,9 +1770,9 @@ int	class, fd;
 					aconf->name, aconf->port);
 				strcat(rpl, "\r\n");
 #ifdef INET6
-				sendto(class, rpl, strlen(rpl), 0, 0, 0);
+				sendto(fd, rpl, strlen(rpl), 0, 0, 0);
 #else
-				send(class, rpl, strlen(rpl), 0);
+				send(fd, rpl, strlen(rpl), 0);
 #endif
 				return;
 			    }

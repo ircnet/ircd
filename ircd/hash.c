@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.16 1999/08/15 21:00:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.17 2001/10/20 17:57:27 q Exp $";
 #endif
 
 #include "os.h"
@@ -63,9 +63,7 @@ int	_SERVERSIZE = 0;
  *
  * A - GOPbot, B - chang, C - hanuaway, D - *.mu.OZ.AU
  *
- * The order shown above is just one instant of the server.  Each time a
- * lookup is made on an entry in the hash table and it is found, the entry
- * is moved to the top of the chain.
+ * The order shown above is just one instant of the server.
  */
 
 /*
@@ -85,14 +83,15 @@ int	*store;
 
 	for (; (ch = *name); name++)
 	{
-		hash <<= 1;
+		hash <<= 4;
 		hash += hashtab[(int)ch];
 	}
 	/*
 	if (hash < 0)
 		hash = -hash;
 	*/
-	*store = hash;
+	if (store)
+		*store = hash;
 	hash %= _HASHSIZE;
 	return (hash);
 }
@@ -143,10 +142,11 @@ int	*store;
 		name += 1 + CHIDLEN;
 	for (; (ch = *name) && --i; name++)
 	{
-		hash <<= 1;
+		hash <<= 4;
 		hash += hashtab[(u_int)ch] + (i << 1);
 	}
-	*store = hash;
+	if (store)
+		*store = hash;
 	hash %= _CHANNELHASHSIZE;
 	return (hash);
 }
@@ -175,7 +175,7 @@ int	size;
 	    {
 		failure = 0;
 		sq = (int)sqrt((double)size);
-		for (trial = 2; trial <= sq ; trial++)
+		for (trial = 3; trial <= sq ; trial += 2)
 		    {
 			if ((size % trial) == 0)
 			    {
@@ -200,6 +200,7 @@ int	size;
 	_HASHSIZE = bigger_prime(size);
 	clhits = 0;
 	clmiss = 0;
+	clsize = 0;
 	if (!clientTable)
 		clientTable = (aHashEntry *)MyMalloc(_HASHSIZE *
 						     sizeof(aHashEntry));
@@ -227,6 +228,7 @@ int	size;
 	_CHANNELHASHSIZE = bigger_prime(size);
 	chmiss = 0;
 	chhits = 0;
+	chsize = 0;
 	if (!channelTable)
 		channelTable = (aHashEntry *)MyMalloc(_CHANNELHASHSIZE *
 						     sizeof(aHashEntry));
@@ -239,6 +241,7 @@ static	void	clear_server_hash_table(size)
 int	size;
 {
 	_SERVERSIZE = bigger_prime(size);
+	svsize = 0;
 	if (!serverTable)
 		serverTable = (aHashEntry *)MyMalloc(_SERVERSIZE *
 						     sizeof(aHashEntry));
@@ -292,7 +295,7 @@ int	new;
 		size, osize, table, new));
 
 	*size = new;
-	MyFree((char *)table);
+	ircd_writetune(tunefile);
 	table = (aHashEntry *)MyMalloc(sizeof(*table) * new);
 	bzero((char *)table, sizeof(*table) * new);
 
@@ -300,19 +303,20 @@ int	new;
 	    {
 		Debug((DEBUG_ERROR, "Channel Hash Table from %d to %d (%d)",
 			    osize, new, chsize));
+		sendto_flag(SCH_HASH, "Channel Hash Table from %d to %d (%d)",
+			osize, new, chsize);
 		chmiss = 0;
 		chhits = 0;
 		chsize = 0;
 		channelTable = table;
 		for (chptr = channel; chptr; chptr = chptr->nextch)
-			chptr->hnextch = NULL;
-		for (chptr = channel; chptr; chptr = chptr->nextch)
 			(void)add_to_channel_hash_table(chptr->chname, chptr);
-		sendto_flag(SCH_HASH, "Channel Hash Table from %d to %d (%d)",
-			    osize, new, chsize);
+		MyFree(otab);
 	    }
 	else if (otab == clientTable)
 	    {
+		int	i;
+		aClient	*next;
 		Debug((DEBUG_ERROR, "Client Hash Table from %d to %d (%d)",
 			    osize, new, clsize));
 		sendto_flag(SCH_HASH, "Client Hash Table from %d to %d (%d)",
@@ -321,10 +325,18 @@ int	new;
 		clhits = 0;
 		clsize = 0;
 		clientTable = table;
-		for (cptr = client; cptr; cptr = cptr->next)
-			cptr->hnext = NULL;
-		for (cptr = client; cptr; cptr = cptr->next)
-			(void)add_to_client_hash_table(cptr->name, cptr);
+
+		for (i = 0; i < osize; i++)
+		    {
+			for (cptr = (aClient *)otab[i].list; cptr;
+				cptr = next)
+			    {
+				next = cptr->hnext;
+				(void)add_to_client_hash_table(cptr->name, 
+					cptr);
+			    }
+		    }
+		MyFree(otab);
 	    }
 	else if (otab == uidTable)
 	    {
@@ -342,6 +354,7 @@ int	new;
 		for (cptr = client; cptr; cptr = cptr->next)
 			if (cptr->user)
 				add_to_uid_hash_table(cptr->user->uid, cptr);
+		MyFree(otab);
 	    }
 	else if (otab == serverTable)
 	    {
@@ -352,11 +365,9 @@ int	new;
 		svsize = 0;
 		serverTable = table;
 		for (sptr = svrtop; sptr; sptr = sptr->nexts)
-			sptr->shnext = NULL;
-		for (sptr = svrtop; sptr; sptr = sptr->nexts)
 			(void)add_to_server_hash_table(sptr, sptr->bcptr);
+		MyFree(otab);
 	    }
-	ircd_writetune(tunefile);
 	return;
 }
 
@@ -643,6 +654,7 @@ aClient	*cptr;
 			 * block of code is also used for channels and
 			 * servers for the same performance reasons.
 			 */
+			/* I think this is useless concern --Beeth
 			if (prv)
 			    {
 				aClient *tmp2;
@@ -652,6 +664,7 @@ aClient	*cptr;
 				prv->hnext = tmp->hnext;
 				tmp->hnext = tmp2;
 			    }
+			*/
 			return (tmp);
 		    }
 	clmiss++;
@@ -728,6 +741,7 @@ aClient *cptr;
 		if (hv == tmp->hashv && mycmp(server, tmp->name) == 0)
 		    {
 			clhits++;
+			/*
 			if (prv)
 			    {
 				aClient *tmp2;
@@ -737,10 +751,11 @@ aClient *cptr;
 				prv->hnext = tmp->hnext;
 				tmp->hnext = tmp2;
 			    }
+			*/
 			return (tmp);
 		    }
 	    }
-	t = ((char *)server + strlen(server));
+	t = ((char *)server + strlen(server)) - 1;
 	/*
 	 * Whats happening in this next loop ? Well, it takes a name like
 	 * foo.bar.edu and proceeds to search for *.edu and then *.bar.edu.
@@ -749,11 +764,12 @@ aClient *cptr;
 	 */
 	for (;;)
 	    {
+		while (t > server && (*t != '.'))
+			t--;
+		if (t == server)
+			break;
 		t--;
-		for (; t >= server; t--)
-			if (*(t+1) == '.')
-				break;
-		if (t < server || *t == '*')
+		if (*t == '*')
 			break;
 		ch = *t;
 		*t = '*';
@@ -790,6 +806,7 @@ aChannel *chptr;
 		if (hv == tmp->hashv && mycmp(name, tmp->chname) == 0)
 		    {
 			chhits++;
+			/*
 			if (prv)
 			    {
 				register aChannel *tmp2;
@@ -799,6 +816,7 @@ aChannel *chptr;
 				prv->hnextch = tmp->hnextch;
 				tmp->hnextch = tmp2;
 			    }
+			*/
 			return (tmp);
 		    }
 	chmiss++;

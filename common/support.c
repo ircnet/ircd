@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.17 1999/06/25 15:36:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.18 2001/10/20 17:57:22 q Exp $";
 #endif
 
 #include "os.h"
@@ -169,6 +169,7 @@ char *path;
 #ifdef INET6
 /*
  * inetntop: return the : notation of a given IPv6 internet number.
+ *	     or the dotted-decimal notation for IPv4
  *           make sure the compressed representation (rfc 1884) isn't used.
  */
 char *inetntop(af, in, out, the_size)
@@ -179,7 +180,26 @@ size_t the_size;
 {
 	static char local_dummy[MYDUMMY_SIZE];
 
-	inet_ntop(af, in, local_dummy, the_size);
+	if (!inet_ntop(af, in, local_dummy, the_size))
+	{
+		/* good that every function calling this one
+		 * checks the return value ... NOT */
+		return NULL;
+	}	
+	/* quick and dirty hack to give ipv4 just ipv4 instead of
+	 * ::ffff:ipv4 - Q */
+	if (af == AF_INET6 && IN6_IS_ADDR_V4MAPPED((struct in6_addr *)in))
+	{
+		char	*p;
+
+		if (!(p = strstr(local_dummy, ":ffff:")) &&
+			!(p = strstr(local_dummy, ":FFFF:")))
+		{
+			return NULL;	/* crash and burn */
+		}
+		strcpy(out, p + 6);
+		return out;
+	}
 	if (strstr(local_dummy, "::"))
 	    {
 		char cnt = 0, *cp = local_dummy, *op = out;
@@ -217,12 +237,37 @@ size_t the_size;
 		    }
 		if (*(op-1)==':') *op++ = '0';
 		*op = '\0';
+#ifndef	CLIENT_COMPILE
 		Debug((DEBUG_DNS,"Expanding `%s' -> `%s'", local_dummy,
 		       out));
+#endif
 	    }
 	else
 		bcopy(local_dummy, out, 64);
 	return out;
+}
+
+/* inetpton(af, src, dst)
+**
+** This is a wrapper for inet_pton(), so we can use ipv4 addresses with an
+** af of AF_INET6, and that it gets converted to ipv4 mapped ipv6.
+*/
+int	inetpton(int af, const char *src, void *dst)
+{
+	int	i;
+
+	/* an empty string should listen to all */
+	if (af == AF_INET6 && *src && !strchr(src, ':'))
+	    {
+		i = inet_pton(AF_INET, src, dst);
+
+		/* ugly hack */
+		memcpy(dst + 12, dst, 4);
+		memset(dst, 0, 10);
+		memset(dst + 10, 0xff, 2);
+		return i;
+	    }
+	return inet_pton(af, src, dst);
 }
 #endif
 
@@ -465,7 +510,7 @@ size_t	x;
 	    }
 	bzero(ret, (int)x + SZ_EX);
 	bcopy((char *)&ret, ret, SZ_CH);
-	bcopy((char *)&x, ret + SZ_ST, SZ_ST);
+	bcopy((char *)&x, ret + SZ_CH, SZ_ST);
 	bcopy("VAVA", ret + SZ_CHST + (int)x, 4);
 	Debug((DEBUG_MALLOC, "MyMalloc(%ld) = %#x", x, ret + SZ_CHST));
 	for(i = 0, s = marray; *s && i < mindex; i++, s++)

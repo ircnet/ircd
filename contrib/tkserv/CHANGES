@@ -1,37 +1,53 @@
 1.0.0b8 : Ported TkServ to C.
 1.0.0b8 : It is now possible to QUIT the service via SQUERY.
-1.0.0b9 : Added default expiration if no time value was specified (koopal)
-1.0.0b9 : It is now possible to remove existing tklines "manually" (koopal)
-1.0.0b10: the pwd of the service went to the cmd line (koopal)
-1.0.0   : Official release of TkServ
-1.0.1	: Applied some fixes to make TkServ work under BSDI (primetime)
-1.0.1	: no address of a local var is returned anymore :) (primetime)
-1.0.2	: Added forgotten tkserv.access.example to the package (primetime)
-1.0.2	: IP masks (x.x.x.*) are now also be recognized as IPs (primetime)
-1.0.2	: hostnames are now also possible in the restriction field (primetime)
+1.0.0b9 : Added default expiration if no time value was specified. (koopal)
+1.0.0b9 : It is now possible to remove existing tklines "manually". (koopal)
+1.0.0b10: The pwd of the service went to the cmd line. (koopal)
+1.0.0   : Official release of TkServ.
+1.0.1	: Applied some fixes to make TkServ work under BSDI. (primetime)
+1.0.1	: No address of a local var is returned anymore :). (primetime)
+1.0.1	: Release of TkServ v1.0.1.
+1.0.2	: Added forgotten tkserv.access.example to the package. (primetime)
+1.0.2	: IP masks (x.x.x.*) are now also be recognized as IPs. (primetime)
+1.0.2	: Hostnames are now also possible in the restriction field. (primetime)
+1.0.2	: Release of TkServ v1.0.2.
 1.0.3	: DEBUGGING is now functional and displays all service<->server 
-          traffic to the standard output
-1.0.3	: TkServ should now also compile under Irix (Szern)
+          traffic to the standard output.
+1.0.3	: TkServ should now also compile under Irix. (Szern)
 1.0.3	: IP restrictions are now also possible in the access file 
-          - wildcards are allowed (Szern)
+          - wildcards are allowed. (Szern)
 1.0.3	: Wildcards do now also work in the oper u@h field of the access
-          file (Szern)
-1.0.3	: Replaced FNM_CASEFOLD by FNM_NOESCAPE
-1.0.4	: ':' is not allowed anymore in the TKLINE cmd line (Eumel)
-1.0.4	: Fixed lame bug which kept tklines active altho already expired (Eumel)
+          file. (Szern)
+1.0.3	: Replaced FNM_CASEFOLD by FNM_NOESCAPE.
+1.0.3	: Release of TkServ v1.0.3.
+1.0.4	: ':' is not allowed anymore in the TKLINE cmd line. (Eumel)
+1.0.4	: Fixed lame bug which kept tklines active altho already expired. (Eumel)
+1.0.4	: Release of TkServ v1.0.4.
 1.0.5	: TkServ should now also compile under Redhat Linux. (Tero)
-1.0.5	: a few changes for ircd/contrib compliancy
-1.0.5	: the semantics for the access file have changed (check out README)
-1.0.5	: it is now possible to disallow tklining of specific hosts (tumble)
-1.0.6	: Added leading colons for the /squery commands (tumble)
-1.0.6	: Added a hint concerning the distribution to the README
-1.0.6	: it's now possible to decide whether a user needs to be opered or
-          not when accessing TkServ
-1.0.7	: TkServ won't crash anymore if a bad lifetime is given (Tero)
+1.0.5	: A few changes for ircd/contrib compliancy.
+1.0.5	: The semantics for the access file have changed. (check out README)
+1.0.5	: It is now possible to disallow tklining of specific hosts. (tumble)
+1.0.5	: Release of TkServ v1.0.5.
+1.0.6	: Added leading colons for the /squery commands. (tumble)
+1.0.6	: Added a hint concerning the distribution to the README.
+1.0.6	: It's now possible to decide whether a user needs to be opered or
+          not when accessing TkServ.
+1.0.6	: Release of TkServ v1.0.6.
+1.0.7	: TkServ won't crash anymore if a bad lifetime is given. (Tero)
+1.0.7	: Release of TkServ v1.0.7.
 1.0.8	: A few changes to make TkServ fit better into ircd/contrib.
-1.0.8	: TkServ now sends out a hint when it receives an unknown cmd
+1.0.8	: TkServ now sends out a hint when it receives an unknown cmd.
           (Fusion & viha)
-1.0.9	: renamed the function logf due to a conflict in *BSD? (Virginie)
+1.0.8	: Release of TkServ v1.0.8.
+1.0.9	: Renamed the function logf due to a conflict in *BSD?. (Virginie)
 1.0.9	: General rename of some tkserv functions
+1.0.9	: Release of TkServ v1.0.9.
 1.2	: Password migration from cmd line to conf file (Earthpig)
 1.2	: TkServ now daemonizes itself. (Earthpig)
+1.2	: Release of TkServ v1.2.
+1.3.0	: Cosmetic changes to the code + more comments.
+1.3.0	: Documentation updated.
+1.3.0	: Improved lifetime check.
+1.3.0	: Removed the default lifetime. A lifetime is now mandatory.
+1.3.0	: Changed the error handling a bit.
+1.3.0	: Release of TkServ v1.3.0.

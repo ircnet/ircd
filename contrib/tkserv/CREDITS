@@ -55,6 +55,13 @@ to the development of TkServ:
 - Christophe 'syrk' Kalt and Vesa 'Vesa' Ruokonen
   + for giving me the impulse to this kind of service :)
 
+- Gael 'Gael' Martinez
+  + encrypted passwords.
+
+- Marc 'mro' Roger
+  + ipv6 related fixes.
+  + unix domain socket fix.
+
 
 And finally thanks to all the Linux people out there for contributing 
 to the world's best OS! :-)

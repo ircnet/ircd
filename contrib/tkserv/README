@@ -48,22 +48,16 @@ sending a request]:
 - it is possible to allow an authorized user to only tkline given hostnames
   or TLDs
 
-Especially the third point equals to strong security, because: Could you
-imagine any cracker who has gained O: on some server, wasting his time on
-trying to get access to a remote server's temp k-line list instead of
-playing around with his O: ? See, neither could i. ;-)
-
 
 III) Installation
 -----------------
 
 A) Precondition
    
-   The only thing you need in order to run TkServ is an "ircd.conf" file,
-   an "ircd.pid" file and an IRC server which has been compiled with
-   USE_SERVICES #define'd in the config.h file (!).
+  The only thing you need in order to be able to run TkServ is a properly
+  installed irc server compiled with USE_SERVICES #define'd.
 
-B) Editing the configuration file (config.h)
+B) Editing the configuration file (tkconf.h)
 
    You have to change the following entries in the config file:
 
@@ -75,90 +69,96 @@ B) Editing the configuration file (config.h)
    TKSERV_DESC (a neato description :)
    TKSERV_DIST (the distribution of the service)
 
-|  A few words to the distribution of the service. Here are the pros &
-|  contras of a global TkServ from my point of view:
-|
-|  [contra] It makes the /servlist become unnecessarily big and less handy
-|  [contra] You can detect also local services by /trace'ing a server
-|  [contra] You can access a local TkServ by setting up a special client
-|           on the concerned server (maybe with a special I: line)
-|
-|  [pro]    A global TkServ is more comfortable to use for remote users.
-|  [pro]    If you want to see which server is running one (for e.g. to
-|           request access to it), you do only have to do a /servlist.
+   A few words to the distribution of the service. Here are the pros &
+   contras of a global TkServ from my point of view:
+ 
+   [contra] It makes the /servlist become unnecessarily big and less handy
+   [contra] You can detect also local services by /trace'ing a server
+   [contra] You can access a local TkServ by setting up a special client
+            on the concerned server (maybe with a special I: line)
+ 
+   [pro]    A global TkServ is more comfortable to use for remote users.
+   [pro]    If you want to see which server is running one (for e.g. to
+            request access to it), you do only have to do a /servlist.
 
-   TKSERV_PATH (the abs. path to your ircd.conf, no trailing slash please!)
-   TKSERV_LOGFILE (the abs. path to your tkserv logfile, no trailing slash)
-   TKSERV_ACCESSFILE (the abs. path to your tkserv access file, ditto)
-   
-   TKSERV_DEBUG (for debugging only, displayes traffic to standard output)
-   
+   TKSERV_PASSWORD (The password for the service. Must match the one from
+                   the S: line of the irc server's config.h file.)
+
+   TKSERV_DEBUG (for debugging only, displays traffic to standard output)
+
+   TKSERV_IRCD_CONFIG_BAK (the suffix after CPATH for the backup file 
+                          of the ircd.conf file)
+
+   TKSERV_IRCD_CONFIG_TMP (the suffix after CPATH for the temporary copy
+                          of the ircd.conf file) 
+  
 C) Compiling the source
 
-TkServ will be compiled along with the irc server.
+TkServ will can be compiled along with the irc server. Type "make" in the
+appropriate irc server directory to see all possible options.
 
 D) Setting up the access file: tkserv.access
 
    If anyone should be authorized to use TkServ on your server, he/she has
    to figure in the access file. The format of it is:
 
-|   [!]<user@host.domain.tld><SPACE><password><SPACE>[<FQDN || IP>]<RETURN>
-|
-|   Which means:
-|   [!]<user@host.domain.tld> <password> [<FQDN || IP>]
-|
-|   A '!' before the u@h means that the specified user doesn't need to be
-|   opered when accessing TkServ. Before the FQDN/IP, it means that the user
-|   is not allowed to tkline that given FQDN/IP. See below.
-|
-|   Examples:
-|   (1) foo@bar.com foo-pass
-|   (2) some@user.on.the.net some.passw1 *.net,207.128.*
-|       another@user.foo.com Akfdsv.df *netcom.com,*.ca
-|       you@get.the.picture.org ditto. *.org,dialup*.lamer.net,194.44.44.*
-|       oper@dialup*.dialup.net pwd1.2 *dialup.net,145.44.*,*.fr
-|   (3) !luser@doesnt.need.to.be.opered.org bleh !elite.org,*.org
-|   (4) !~luser@no.ident.no.oper.com yo *.com
-|
-|   (1) Any oper who is running identd and whose userhost equals to
-|       foo@bar.com can tkline everyone if supplied password equals
-|       foo-pass.
-|   (2) Any oper with identd whose u@h equals to some@user.on.the.net
-|       can tkline everyone whose TLD is ".net" or who is IRCing within
-|       the IP subnet 207.128.*, if correct password is given.
-|   (3) Any luser (no need to be opered) whose u@h/passwd equals can tkline
-|       everyone whose TLD is ".org" except the host "elite.org"
-|       ("*@elite.org").
-|
-|   Generally, you should be aware of the fact that if you put something
-|   in the FQDN/IP field, then you automatically restrict the access.
-|   Therefore, you must then also indicate all the allowed FQDNs/IPs.
-|
-|   The access routines are pretty flexible. So pay attention in what order
-|   you allow/disallow what. :)
-|
-|   Other examples:
-|   !foo@bar.com foo-pass !*.net,*.com,!*.com
-|   some@user.on.the.net some.passw1 *.net,207.128.*,!127.0.0.*
-|   another@user.foo.com Akfdsv.df *netcom.com,!*trends.ca,*.ca
-|
-|   Notice that if you allow "*.de" and after it you forbid "blah.de",
-|   this won't work. The oper will still be able to tkline blah.de since
-|   "*.de" appears before "!blah.de" in the access field.
-|
-|   Are we confused, yet? ;-)
+    [!]<user@host.domain.tld><SPACE><password><SPACE>[<FQDN || IP>]<RETURN>
+ 
+    Which means:
+    [!]<user@host.domain.tld> <password> [<FQDN || IP>]
+ 
+    A '!' before the u@h means that the specified user doesn't need to be
+    opered when accessing TkServ. Before the FQDN/IP, it means that the user
+    is not allowed to tkline that given FQDN/IP. See below.
+ 
+    Examples:
+    (1) foo@bar.com foo-pass
+    (2) some@user.on.the.net some.passw1 *.net,207.128.*
+        another@user.foo.com Akfdsv.df *netcom.com,*.ca
+        you@get.the.picture.org ditto. *.org,dialup*.lamer.net,194.44.44.*
+        oper@dialup*.dialup.net pwd1.2 *dialup.net,145.44.*,*.fr
+    (3) !luser@doesnt.need.to.be.opered.org bleh !elite.org,*.org
+    (4) !~luser@no.ident.no.oper.com yo *.com
+ 
+    (1) Any oper who is running identd and whose userhost equals to
+        foo@bar.com can tkline everyone if supplied password equals
+        foo-pass.
+    (2) Any oper with identd whose u@h equals to some@user.on.the.net
+        can tkline everyone whose TLD is ".net" or who is IRCing within
+        the IP subnet 207.128.*, if correct password is given.
+    (3) Any luser (no need to be opered) whose u@h/passwd equals can tkline
+        everyone whose TLD is ".org" except the host "elite.org"
+        ("*@elite.org").
+ 
+    Generally, you should be aware of the fact that if you put something
+    in the FQDN/IP field, then you automatically restrict the access.
+    Therefore, you must then also indicate all the allowed FQDNs/IPs.
+ 
+    The access routines are pretty flexible. So pay attention in what order
+    you allow/disallow what. :)
+ 
+    Other examples:
+    !foo@bar.com foo-pass !*.net,*.com,!*.com
+    some@user.on.the.net some.passw1 *.net,207.128.*,!127.0.0.*
+    another@user.foo.com Akfdsv.df *netcom.com,!*trends.ca,*.ca
+ 
+    Notice that if you allow "*.de" and after it you forbid "blah.de",
+    this won't work. The oper will still be able to tkline blah.de since
+    "*.de" appears before "!blah.de" in the access field.
+ 
+    Are we confused, yet? ;-)
 
    For some other examples, refer to the tkserv.access.example file, which
    is included in the package.
 
    The u@h field for the user can also contain wildcards, as you can see.
 
-|   If you specify an FQDN (or several of them in a comma-separated 
-|   list), the concerned user will only be allowed to tkline users from 
-|   that FQDN(s). Everything is done via 'wildcard-matching' (if any).
-|   I.e. that "home.blah.de" matches only "*@home.blah.de". If you want
-|   to allow a whole TLD, you have to do this by putting "*.tld" in the
-|   access field.
+   If you specify an FQDN (or several of them in a comma-separated
+   list), the concerned user will only be allowed to tkline users from 
+   that FQDN(s). Everything is done via 'wildcard-matching' (if any).
+   I.e. that "home.blah.de" matches only "*@home.blah.de". If you want
+   to allow a whole TLD, you have to do this by putting "*.tld" in the
+   access field.
 
 ! An empty FQDN/IP field means that the concerned user can tkline everyone. !
   [Except *@* that is.]
@@ -197,36 +197,32 @@ F) Starting TkServ
 G) Adding temp k-klines (TKLINE)
 
    Provided that TkServ recognizes you, you can add temporary k-lines via
-   the TKLINE command, which has three different variants:
+   the TKLINE command, which has two different variants:
 
    (1) :TKLINE <password> <lifetime in hours> <user@host> <reason>
-   (2) :TKLINE <password> <user@host> <reason>
-   (3) :TKLINE <password> -1 <user@host>
+   (2) :TKLINE <password> -1 <user@host>
 
    (1) adds a tkline for <u@h> with an expire time of <lifetime> hours and
        with the reason <reason>.
-   (2) adds a tkline for <u@h> with the default expire time (2 hours) and
-       with the reason <reason>.
-   (3) removes any existing tklines found for <user@host>.   
+   (2) removes any existing tklines found for <user@host>.   
 
    Examples:
 
    (1) :TKLINE my.pass 5 lamer@lamers.org dont flood
-   (2) :TKLINE blah. *@foo.com stop spamming
-   (3) :TKLINE my.pass -1 lamer@lamers.org
+   (2) :TKLINE my.pass -1 lamer@lamers.org
 
-   <lifetime> must be > 0 and < 168.
+   <lifetime> must be > 0 and < 168 for adding tklines.
 
-|   [If your client doesn't support SQUERY, the entire cmd line has to be:
-|   "/quote squery <name of tkserv> :tkline ...". If it does support it,
-|   then "/squery <name of tkserv> tkline ..." should do it.]
-|
-|   [And yes, ircII-EPIC4 supports SQUERY and SERVLIST! ;-)]
-|
-|   If a non-opered user tries to use TKLINE without having a matching entry
-|   in the access file, he gets "Only IRC-Operators may use this command" as
-|   an error message. This is not correct anymore, but i didn't bother to
-|   change it (since it may prevent kids from playing around with TkServ :).
+    [If your client doesn't support SQUERY, the entire cmd line has to be:
+    "/quote squery <name of tkserv> :tkline ...". If it does support it,
+    then "/squery <name of tkserv> tkline ..." should do it.]
+ 
+    [And yes, ircII-EPIC4 supports SQUERY and SERVLIST! ;-)]
+ 
+    If a non-opered user tries to use TKLINE without having a matching entry
+    in the access file, he gets "Only IRC-Operators may use this command" as
+    an error message. This is not correct anymore, but i didn't bother to
+    change it (since it may prevent kids from playing around with TkServ :).
 
 H) Online help/info
 
@@ -244,7 +240,7 @@ Be aware that anyone who knows that password can make your TkServ quit.
 
 J) Debugging
 
-If you #define TKSERV_DEBUG in the config.h file, everything which is sent
+If you #define TKSERV_DEBUG in the tkconf.h file, everything which is sent
 to the server from the service and from the server to the service will be
 displayed to the standard output.
 
@@ -260,7 +256,7 @@ The latter will contain most of the error messages (in case something goes
 wrong - what we all don't hope ;) as well as logs of successful TKLINE 
 requests.
 
-The tkserv.access file has to be in the directory specified in the config.h
+The tkserv.access file has to be in the same directory as the ircd.conf
 file. If no tkserv.access file is found, no one will be able to add temp 
 k-lines.
 
@@ -282,9 +278,9 @@ VII) The TkServ-mailinglist
 
 There's now a mailinglist for TkServ out there. It is used for general
 announcements (bugs, new releases, etc.) concerning TkServ. Since it's a
-read-only mailinglist, it doesn't have much traffic. You can subscribe to
-it by sending a mail to tkserv@kl.Snafu.DE with "subscribe" in the subject
-or in the body of the mail.
+read-only mailinglist, it doesn't have much traffic (actually, there is
+almost no traffic). You can subscribe to it by sending a mail to 
+kl@kl.Snafu.DE with "subscribe" in the subject or in the body of the mail.
 
 
 Enjoy, -Kasi

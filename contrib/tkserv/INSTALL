@@ -1,20 +1,14 @@
 How to install TkServ
 ---------------------
 
-Yes, there isn't any configure yet. That's why the compilation on some
-machines could be difficult because you may have to include one or two
-libraries by hand. I'll try to create a configure file in the future.
+(This installation procedure assumes that you have already installed the
+irc server.)
 
-Up to now, i've only compiled TkServ on Linux, Solaris and Irix. I hope you
-won't get into trouble when trying to compile on another OS. But everyone
-should be running Linux anyway. :-)
-
-So here we go:
-
-1. Unpack and untar the archive. (which you might already have done :)
-2. RTFM. :->
-3. run "./configure" (if you haven't already done so)
-3. Edit the tkconf.h file.
-4. "make tkserv"
+1. RTFM (the README).
+2. Edit tkconf.h.
+3. Type "make install-tkserv" in the appropriate directory.
+   (Type "make" for all possible options.)
+3. Edit the TkServ configuration file.
+4. Start up TkServ.
 
 Good luck, Kasi

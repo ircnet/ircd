@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_comp.c	8.1 (Berkeley) 6/4/93";
-static char rcsid[] = "$Id: res_comp.c,v 1.6 1999/03/08 20:51:58 kalt Exp $";
+static char rcsid[] = "$Id: res_comp.c,v 1.7 2001/10/20 17:57:28 q Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -555,7 +555,7 @@ ns_name_unpack(msg, eom, src, dst, dstsiz)
 {
 	const u_char *srcp, *dstlim;
 	u_char *dstp;
-	int n, c, len, checked;
+	int n, len, checked;
 
 	len = -1;
 	checked = 0;
