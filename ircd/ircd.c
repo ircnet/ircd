@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.90 2002/12/29 22:43:06 jv Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.91 2003/07/28 17:16:38 jv Exp $";
 #endif
 
 #include "os.h"
@@ -347,6 +347,7 @@ time_t	currenttime;
 	static	time_t	lkill = 0;
 	Reg	aClient	*cptr;
 	Reg	int	kflag = 0;
+	aClient *bysptr = NULL;
 	int	ping = 0, i;
 	time_t	oldest = 0, timeout;
 	char	*reason;
@@ -528,9 +529,24 @@ time_t	currenttime;
 			    }
 			if (IsServer(cptr) || IsConnecting(cptr) ||
 			    IsHandshake(cptr))
+			{
+				if (cptr->serv && cptr->serv->byuid[0])
+				{
+					bysptr = find_uid(cptr->serv->byuid,
+							NULL);
+				}
+				/* we are interested only in *remote* opers */
+				if (bysptr && !MyConnect(bysptr))
+				{
+					sendto_one(bysptr, ":%s NOTICE %s :"
+						"No response from %s, closing"
+						" link", ME, bysptr->name,
+						get_client_name(cptr, FALSE));
+				}
 				sendto_flag(SCH_NOTICE,
 					    "No response from %s closing link",
 					    get_client_name(cptr, FALSE));
+			}
 			/*
 			 * this is used for KILL lines with time restrictions
 			 * on them - send a messgae to the user being killed
