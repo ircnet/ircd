@@ -1328,6 +1328,15 @@ test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 AC_SUBST(INSTALL_DATA)dnl
 ])
 
+AC_DEFUN(IRC_CYGWIN,
+[AC_CYGWIN
+if test ! -z "$CYGWIN"; then
+  if test ! -x /bin/mv || test ! -x /bin/rm || test ! -x /bin/sh; then
+    AC_MSG_ERROR([mv, rm and/or sh is missing from /bin])
+  fi
+  AC_MSG_WARN([The IRC client and the iauth program do not work under the CYGWIN environment.])
+fi
+])
 
 AC_DEFUN(IRC_PROG_CC,
 [define(AC_PROVIDE_AC_PROG_CC)
@@ -1425,7 +1434,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.45 1999/07/17 21:12:43 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.46 1999/08/13 17:18:23 kalt Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1446,6 +1455,7 @@ IRC_SGI_CC
 IRC_HPUX_CC
 IRC_SUN
 IRC_LINUX
+IRC_CYGWIN
 
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
