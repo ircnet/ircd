@@ -1,3 +1,32 @@
+Fri Oct 10 23:48:25 1997  Christophe Kalt
+
+	* s_serv.c: improved m_die() and m_restart() in case a service is
+	used for user log.
+
+	* os.h, acconfig.h, configure.in, res.c, s_bsd.c: (Alain Nissen)
+		* kludge to deal with broken hostent declaration in
+		netdb.h on some linux systems.
+		* test for sigaction & sigset functions added back; signal
+		implementation test fixed.
+
+	* s_conf.c:
+		* more explicit K line message when reason specified in
+		ircd.conf.
+		* extended I lines syntax.
+
+	* s_service_ext.h, s_service.c, s_misc.c: faster split handling is
+	possible now that 2.8.x protocol is history.
+
+	* channel.c:
+		* m_join() was unefficient on net joins.
+		* MIRC_KLUDGE would never show +ov modes.
+
+	* s_user.c:
+ 		* services can now send to channels (if the modes allow it).
+		* prefixes for restricted connections were gone.
+
+	* buildm4: missing quote.
+
 2.9.4b
 
 Wed Oct  1 21:57:45 1997  Christophe Kalt
@@ -169,8 +198,8 @@ Mon Aug 11 13:34:15 1997  Christophe Kalt
 			* added test for cursesX.
 			* added check for sys_errlist definition in sys/errno.h
 			* and more...
-		* Makefile.in: CFLAGS split in S_FLAGS, C_FLAGS and
-		CC_FLAGS (ircd, irc, chkconf).
+		* Makefile.in: CFLAGS split in S_CFLAGS, C_CFLAGS and
+		CC_CFLAGS (ircd, irc, chkconf).
 	
 Fri Aug  8 10:51:24 1997  Christophe Kalt
 
