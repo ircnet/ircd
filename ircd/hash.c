@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.7 1998/05/05 23:30:18 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.8 1998/05/12 16:47:22 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -140,7 +140,10 @@ int	size;
 	if (size < 4)
 		return size;
 
-	for ( ; ; size++)
+	if (size % 2 == 0)      /* Make sure it's odd because... */
+		size++;
+	
+	for ( ; ; size += 2)    /* ...no point checking even numbers - Core */
 	    {
 		failure = 0;
 		sq = (int)sqrt((double)size);
