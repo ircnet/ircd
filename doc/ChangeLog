@@ -1,7 +1,10 @@
+2.11.0b21
+
 2004-12-12  Piotr Kucharski
 
 	* s_user.c/m_nick(), m_user(): call exit_client with cptr, not NULL,
 	  so it returns FLUSH_BUFFER to parse().
+	* s_serv.c/report_myservers(): show version and zip.
 
 2004-12-10  Piotr Kucharski
 
