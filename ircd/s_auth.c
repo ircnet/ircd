@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.23 1999/01/13 02:14:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.24 1999/01/28 23:49:40 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -27,10 +27,11 @@ static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.23 1999/01/13 02:14:36 kalt Exp $"
 #include "s_externs.h"
 #undef S_AUTH_C
 
+#if defined(USE_IAUTH)
+
 aExtCf		*iauth_conf = NULL;
 aExtData	*iauth_stats = NULL;
 
-#if defined(USE_IAUTH)
 /*
  * sendto_iauth
  *

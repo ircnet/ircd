@@ -29,10 +29,12 @@ typedef	struct	SMode	Mode;
 typedef	struct	fdarray	FdAry;
 typedef	struct	CPing	aCPing;
 typedef	struct	Zdata	aZdata;
-#ifdef CACHED_MOTD
-typedef struct        MotdItem aMotd;
-typedef struct        MotdItem aExtCf;
-typedef struct        MotdItem aExtData;
+#if defined(CACHED_MOTD)
+typedef struct        LineItem aMotd;
+#endif
+#if defined(USE_IAUTH)
+typedef struct        LineItem aExtCf;
+typedef struct        LineItem aExtData;
 #endif
 
 #define	HOSTLEN		63	/* Length of hostname.  Updated to         */
@@ -330,13 +332,11 @@ struct Zdata {
 };
 #endif
 
-#ifdef CACHED_MOTD
-struct  MotdItem
+struct LineItem
 { 
     char    *line;
-    struct  MotdItem *next;
+    struct  LineItem *next;
 };
-#endif
 
 /*
  * Client structures
