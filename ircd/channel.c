@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.45 1998/07/19 19:37:28 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.46 1998/07/19 20:21:52 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1877,6 +1877,14 @@ char	*parv[];
 			    }
 			if (*name == '!' && *(name+1) == '#')
 			    {
+				if (!MyClient(sptr))
+				    {
+					sendto_flag(SCH_NOTICE,
+					   "Invalid !# channel from %s for %s",
+						    get_client_name(cptr,TRUE),
+						    sptr->name);
+					continue;
+				    }
 				if (get_channel(sptr, name+2, 0))
 				    {
 					sendto_one(sptr,
@@ -1912,7 +1920,9 @@ char	*parv[];
 					sendto_one(sptr,
 						   err_str(ERR_NOSUCHCHANNEL,
 							   parv[0]), name);
-				continue;
+				if (!IsServer(cptr))
+					continue;
+				/* from a server, it is legitimate */
 			    }
 			else if (chptr)
 				name = chptr->chname;
