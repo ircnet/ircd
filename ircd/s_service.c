@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.2 1997/04/14 15:04:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.3 1997/04/18 21:38:35 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -45,11 +45,11 @@ aClient	*cptr;
 
 	cptr->service = svc = (aService *)MyMalloc(sizeof(*svc));
 	bzero((char *)svc, sizeof(*svc));
+	svc->bcptr = cptr;
 	if (svctop)
 		svctop->prevs = svc;
 	svc->nexts = svctop;
-	svc->prevs = NULL;
-	svc->bcptr = cptr;
+	svc->prevs = NULL; /* useless */
 	svctop = svc;
 	return svc;
 }
@@ -67,15 +67,11 @@ aClient	*cptr;
 		if (serv->prevs)
 			serv->prevs->nexts = serv->nexts;
 		if (svctop == serv)
-		    {
 			svctop = serv->nexts;
-			serv->prevs = NULL;
-		    }
-		serv->prevs = NULL;
-		serv->nexts = NULL;
 		if (serv->servp)
 			free_server(serv->servp, cptr);
-
+		if (serv->server)
+			MyFree(serv->server);
 		MyFree((char *)serv);
 		cptr->service = NULL;
 	    }
@@ -198,7 +194,7 @@ int	type;
 **
 **	parv[0] = sender prefix
 **	parv[1] = service name
-**	parv[2] = server name
+**	parv[2] = server token
 **	parv[3] = distution code
 **	parv[4] = service type
 **	parv[5] = hopcount
@@ -216,7 +212,7 @@ char	*parv[];
 #endif
 	aServer	*sp = NULL;
 	char	*dist, *server = NULL, *info;
-	int	type, metric = 0, i/*, tok = 1*/;
+	int	type, metric = 0, i;
 
 	if (sptr->user)
 	    {
@@ -246,12 +242,23 @@ char	*parv[];
 		metric = atoi(parv[5]);
 		if (cptr->serv->version != SV_OLD)
 			sp = find_tokserver(atoi(server), cptr, NULL);
-		else if ((acptr = find_server(server, NULL))) /* uhh.. */
-			sp = acptr->serv;
-/*
-		if (sp)
-			tok = sp->ltok;
-*/
+		/* The following is to plug a hole in 2.9.1 & 2.9.2 */
+		if (!sp && (acptr = find_server(server, NULL)))
+		    {
+			sendto_flag(SCH_DEBUG,
+				    "%s uses wrong syntax for SERVICE (%s)",
+				    get_client_name(cptr, TRUE), sptr->name);
+                        sp = acptr->serv;
+		    }
+		/* it should be removed sometime in the future.. */
+		if (!sp)
+		    {
+			sendto_flag(SCH_ERROR,
+                       	    "ERROR: SERVICE:%s without SERVER:%s from %s",
+				    sptr->name, server,
+				    get_client_name(cptr, FALSE));
+			return exit_client(NULL, sptr, &me, "No Such Server");
+		    }
 	    }
 #ifndef	USE_SERVICES
 	else
@@ -326,15 +333,14 @@ char	*parv[];
 	istat.is_service++;
 	svc = make_service(sptr);
 	SetService(sptr);
-	svc->server = mystrdup(server);
+	svc->servp = sp;
+	sp->refcnt++;
+	svc->server = mystrdup(sp->bcptr->name);
 	strncpyzt(svc->dist, dist, HOSTLEN);
 	strncpyzt(sptr->info, info, REALLEN);
 	svc->wants = 0;
 	svc->type = type;
 	sptr->hopcount = metric;
-/*	SPRINTF(svc->tok, "%d", tok);*/
-	if ((svc->servp = sp)) /* why if ? */
-		sp->refcnt++;
 	(void)add_to_client_hash_table(sptr->name, sptr);
 
 #ifdef	USE_SERVICES
@@ -344,7 +350,7 @@ char	*parv[];
 #endif
 
 	for (i = fdas.highest; i >= 0; i--)
-	{
+	    {
 		if (!(acptr = local[fdas.fd[i]]) || !IsServer(acptr) ||
 		    acptr == cptr)
 			continue;
@@ -353,7 +359,7 @@ char	*parv[];
 		if (acptr->serv->version == SV_OLD)
 			continue;
 		sendto_one(acptr, "SERVICE %s %s %s %d %d :%s", sptr->name,
-			   server, dist, type, metric+1, info);
+			   sp->tok, dist, type, metric+1, info);
 	    }
 	return 0;
 }
