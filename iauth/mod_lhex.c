@@ -218,13 +218,13 @@ u_int cl;
 				 cl, och));
 
 			/* Have a go at parsing the return info */
-			id = strtoul(och, &ch, 0);
-			if(*ch != ':')
+			if(sscanf(och, "%u", &id) != 1)
 				DebugLog((ALOG_DLHEX, 0, "lhex_work(%u): "
 					 "Malformed data!", cl));
 			else
 			    {
 				struct lhex_private *d=cldata[cl].instance->data;
+				ch = index(och, ':');
 				while(isspace(*(++ch)));
 				if(!strcmp(ch,"OK"))
 				    {
