@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.27 1997/12/17 14:58:04 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.28 1997/12/18 14:12:29 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -977,7 +977,6 @@ char	*parv[];
 
 	if (IsServer(cptr) && check_link(cptr))
 	    {
-		sendto_flag(SCH_DEBUG, "dropped INFO");
 		sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
 			   "INFO");
 		return 5;
@@ -1023,7 +1022,6 @@ char	*parv[];
 	    {
 		if (!IsOper(sptr) && IsServer(cptr) && check_link(cptr))
 		    {
-			sendto_flag(SCH_DEBUG, "dropped LINKS");
 			sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
 				   "LINKS");
 			return 5;
@@ -1285,7 +1283,6 @@ char	*parv[];
 	    {
 		if (check_link(cptr))
 		    {
-			sendto_flag(SCH_DEBUG, "dropped STATS");
 			sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
 				   "STATS");
 			return 5;
@@ -2352,8 +2349,6 @@ aClient	*cptr;
     if (!IsServer(cptr))
 	    return 0;
 
-    sendto_flag(SCH_DEBUG, "check_link(%s): Sq:%d L:%d", cptr->name,
-		DBufLength(&cptr->sendQ), timeofday - cptr->firsttime);
     if ((int)DBufLength(&cptr->sendQ) > 65536) /* SendQ is already (too) high*/
 	{
 	    cptr->serv->lastload = timeofday;
