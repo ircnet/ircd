@@ -4,7 +4,7 @@
 
 <title>STATS unleashed
 <author>Piotr Kucharski
-<date>$Id: stats.sgml,v 1.1 2004/03/25 00:22:18 chopin Exp $
+<date>$Id: stats.sgml,v 1.2 2004/04/14 14:04:53 chopin Exp $
 <abstract>
 This document describes all STATS for ircd server 2.11.
 </abstract>
@@ -101,7 +101,7 @@ compiled in the server:
 <item>BS (BUFSIZE): internal buffer size
 <item>MXR (MAXRECIPIENTS): maximum number of targets (recipients) allowed in one command
 <item>MXB (MAXBANS): maximum number of all beIR modes per channel
-<item>MXBL (MAXBANLENGTH): maximum length of one beIR mode
+<item>MXBL (MAXBANLENGTH): maximum length of all beIR modes per channel
 <item>PY (MAXPENALTY): penalty points (received in various number for each command) after which client commands are not processed anymore
 <item>ZL (ZIP_LEVEL): level of compression for ziplinks (``-1'' if none)
 <item>CM (CLONE_MAX): maximum number of clients (``-1'' if none), that...
@@ -239,12 +239,12 @@ bytes recv 376478537 500907236
 time connected 844868798 367786</verb></tscreen>
 Summary of (respectively) client and server: connected amounts,
 bytes sent, bytes received and overall time connected.
-<tscreen><verb>iauth modules statistics (Wed Mar 24 22:44:05 2004)</verb></tscreen>
-<tscreen><verb>spawned: 1, current options: 3 (2.11.0a5)</verb></tscreen>
-<tscreen><verb>rfc931 connected 516946 unix 292818 other 7809 bad 205665 out of 1268450</verb></tscreen>
-<tscreen><verb>rfc931 skipped 0 aborted 83143 / 77594</verb></tscreen>
-<tscreen><verb>socks open 8/1/0 closed 0/20/0 noproxy 21655</verb></tscreen>
-<tscreen><verb>socks cache open 15 closed 2 noproxy 1110772 miss 157676 (285 <= 1029)</verb></tscreen>
+<tscreen><verb>iauth modules statistics (Wed Mar 24 22:44:05 2004)
+spawned: 1, current options: 3 (2.11.0a5)
+rfc931 connected 516946 unix 292818 other 7809 bad 205665 out of 1268450
+rfc931 skipped 0 aborted 83143 / 77594
+socks open 8/1/0 closed 0/20/0 noproxy 21655
+socks cache open 15 closed 2 noproxy 1110772 miss 157676 (285 &lt;= 1029)</verb></tscreen>
 Apart from iauth stats (start time, number of times respawned, options),
 all iauth modules statistics (if available).
 
@@ -303,7 +303,7 @@ Total amount of memory used from sbrk() call.
 
 <tag/? - connected servers info/
 <tscreen><verb>irc.example.org (4, 06:31:29) 1S 2725C 491646kB sent 30180kB recv 0kB sq</verb></tscreen>
-Server name, (days, h:m:s link uptime), servers connected, clients connected, kB sent, kB received and sendQ. There also can be "BURST" word at the end, indicating netjoin in progress.
+Server name, (days, hour:min:sec link uptime), servers connected, clients connected, kB sent, kB received and sendQ. There also can be "BURST" word at the end, indicating netjoin in progress.
 
 </descrip>
 

@@ -1,6 +1,6 @@
   STATS unleashed
   Piotr Kucharski
-  $Id: stats.txt,v 1.1 2004/03/25 00:22:18 chopin Exp $
+  $Id: stats.txt,v 1.2 2004/04/14 14:04:53 chopin Exp $
 
   This document describes all STATS for ircd server 2.11.
 
@@ -171,7 +171,8 @@
 
         +o  MXB (MAXBANS): maximum number of all beIR modes per channel
 
-        +o  MXBL (MAXBANLENGTH): maximum length of one beIR mode
+        +o  MXBL (MAXBANLENGTH): maximum length of all beIR modes per
+           channel
 
         +o  PY (MAXPENALTY): penalty points (received in various number
            for each command) after which client commands are not
@@ -189,7 +190,6 @@
 
         +o  DC (DELAY_CLOSE): seconds to keep too fast reconnecting
            clones delayed before closing their sockets (``-1'' if none)
-
         +o  AC: auto connect status
 
         +o  SS (SPLIT_SERVERS): state of split if number of servers on
@@ -453,31 +453,18 @@
 
 
           iauth modules statistics (Wed Mar 24 22:44:05 2004)
-
-
-
           spawned: 1, current options: 3 (2.11.0a5)
-
-
-
           rfc931 connected 516946 unix 292818 other 7809 bad 205665 out of 1268450
-
-
-
           rfc931 skipped 0 aborted 83143 / 77594
-
-
-
           socks open 8/1/0 closed 0/20/0 noproxy 21655
-
-
-
           socks cache open 15 closed 2 noproxy 1110772 miss 157676 (285 <= 1029)
 
 
 
      Apart from iauth stats (start time, number of times respawned,
      options), all iauth modules statistics (if available).
+
+
      Most of these are self-explanatory. Should you want more words
      about some, drop me a note.
 
@@ -539,8 +526,7 @@
      all such items use.
 
 
-
-     Dbuf blocks 40867(83205212) (> 40867 [40867]) (45 < 3575) [0]
+          Dbuf blocks 40867(83205212) (> 40867 [40867]) (45 < 3575) [0]
 
 
 
@@ -566,8 +552,7 @@
      (ch), all client related items (cl), all configuration lines (co)
      and all dbufs allocated (db).
 
-
-          TOTAL: 172842930 sbrk(0)-etext: 249755424
+     TOTAL: 172842930 sbrk(0)-etext: 249755424
 
 
 
@@ -581,9 +566,9 @@
 
 
 
-     Server name, (days, h:m:s link uptime), servers connected, clients
-     connected, kB sent, kB received and sendQ. There also can be
-     "BURST" word at the end, indicating netjoin in progress.
+     Server name, (days, hour:min:sec link uptime), servers connected,
+     clients connected, kB sent, kB received and sendQ. There also can
+     be "BURST" word at the end, indicating netjoin in progress.
 
 
 
