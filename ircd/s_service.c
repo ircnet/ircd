@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.59 2004/10/01 20:22:16 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.60 2005/01/30 13:44:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -192,8 +192,8 @@ static	void	sendnum_toone(aClient *cptr, int wants, aClient *sptr,
 			   : ".",
 			   (wants & SERVICE_WANT_USER) ? sptr->user->host :".",
 			   (wants & SERVICE_WANT_USER) ?
-			   ((wants & SERVICE_WANT_TOKEN) ?
-			    sptr->user->servp->tok : sptr->user->server) : ".",
+			   ((wants & SERVICE_WANT_SID) ?
+			    sptr->user->servp->sid : sptr->user->server) : ".",
 			   (wants & (SERVICE_WANT_UMODE|SERVICE_WANT_OPER)) ? umode : "+",
 			   (wants & SERVICE_WANT_USER) ? sptr->info : "");
 	else
@@ -217,8 +217,8 @@ static	void	sendnum_toone(aClient *cptr, int wants, aClient *sptr,
 		if (wants & SERVICE_WANT_USER)
 			sendto_one(cptr, ":%s USER %s %s %s :%s", prefix, 
 				   sptr->user->username, sptr->user->host,
-				   (wants & SERVICE_WANT_TOKEN)?
-				   sptr->user->servp->tok : sptr->user->server,
+				   (wants & SERVICE_WANT_SID)?
+				   sptr->user->servp->sid : sptr->user->server,
 				   sptr->info);
 		if (wants & (SERVICE_WANT_UMODE|SERVICE_WANT_OPER))
 			sendto_one(cptr, ":%s MODE %s %s", prefix, sptr->name,
@@ -324,7 +324,7 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aConfItem *aconf;
 #endif
 	aServer	*sp = NULL;
-	char	*dist, *server = NULL, *info, *stok;
+	char	*dist, *server = NULL, *info;
 	int	type, i;
 	char	*mlname;
 
@@ -372,12 +372,6 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{
 			acptr->hopcount = sptr->hopcount;
 			sp = sptr->serv;
-		}
-		else
-		{ /* old 2.10 protocol */
-			server = parv[2];
-			acptr->hopcount = atoi(parv[5]);
-			sp = find_tokserver(atoi(server), cptr, NULL);
 		}
 		
 		if (sp == NULL)
@@ -518,33 +512,10 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (match(dist, bcptr->name))
 			continue;
 
-		if (ST_UID(bcptr))
-		{
 			sendto_one(bcptr, ":%s SERVICE %s %s %d :%s",
 					sp->sid, acptr->name, dist, type, info);
 		}
-		else
-		{
-			mlname = my_name_for_link(ME, bcptr->serv->nline->port);
 		
-			if (*mlname == '*' && match(mlname,
-						acptr->service->server)== 0)
-			{
-				/* Me masking the service to 2.10 */
-				stok = me.serv->tok;
-			}
-			else
-			{	/* Mask masked services */
-				stok = sp->maskedby->serv->tok;
-			}
-			
-			sendto_one(bcptr, "SERVICE %s %s %s %d %d :%s",
-					acptr->name, stok, dist, type,
-					acptr->hopcount+1, info);
-
-		}
-	}
-	
 	return 0;
 }
 
@@ -638,18 +609,11 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				continue;
 			split = (MyConnect(acptr) &&
 				 mycmp(acptr->name, acptr->sockhost));
-			if (split)
-				sendto_one(sptr,":%s SERVER %s %d %s :[%s] %s",
-					   acptr->serv->up->name, acptr->name,
-					   acptr->hopcount+1,
-					   acptr->serv->tok,
-					   acptr->sockhost, acptr->info);
-			else
 				sendto_one(sptr, ":%s SERVER %s %d %s :%s",
-					   acptr->serv->up->name, acptr->name,
-					   acptr->hopcount+1,
-					   acptr->serv->tok,
-					   acptr->info);
+					acptr->serv->up->name, acptr->name,
+					acptr->hopcount+1,
+					acptr->serv->sid,
+					acptr->info);
 		    }
 	    }
 
