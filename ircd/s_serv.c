@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.111 2002/08/30 15:14:09 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.112 2002/08/30 17:44:55 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1613,7 +1613,7 @@ char *to;
 #ifdef HUB
                         for (asptr = svrtop;asptr;asptr = asptr->nexts)
                         {
-				if (IsMasked(asptr))
+				if (IsMasked(asptr->bcptr))
 				{
 					continue;
 				}
