@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.179 2004/02/28 01:08:08 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.180 2004/02/28 01:09:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -250,7 +250,8 @@ int	do_nick_name(char *nick, int server)
 	if (isdigit(*nick) && !server) /* first character in [0..9] */
 		return 0;
 
-	if (!strcasecmp(nick, "anonymous"))
+	/* since we can have longer nicks, check exactly */
+	if (nick[9] == '\0' && !strcasecmp(nick, "anonymous"))
 		return 0;
 
 	for (ch = nick; *ch && (ch - nick) < (server?NICKLEN:ONICKLEN); ch++)
