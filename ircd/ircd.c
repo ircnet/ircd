@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.40 1998/12/29 15:09:23 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.41 1999/01/23 23:01:23 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -151,7 +151,7 @@ int s;
 	(void)sigaddset(&act.sa_mask, SIGINT);
 	(void)sigaction(SIGINT, &act, NULL);
 #else
-	(void)signal(SIGHUP, s_rehash);	/* sysV -argv */
+	(void)signal(SIGHUP, SIG_DFL);	/* sysV -argv */
 #endif
 	dorestart = 1;
 }
@@ -911,7 +911,8 @@ char	*argv[];
 
 	Debug((DEBUG_NOTICE,"Server ready..."));
 #ifdef USE_SYSLOG
-	syslog(LOG_NOTICE, "Server Ready");
+	syslog(LOG_NOTICE, "Server Ready: v%s (%s #%s)", version, creation,
+	       generation);
 #endif
 	timeofday = time(NULL);
 	while (1)
