@@ -682,9 +682,8 @@ extern unsigned char minus_one[];
 char mydummy[MYDUMMY_SIZE];
 char mydummy2[MYDUMMY_SIZE];
 
-# define IRCDCONF_DELIMITER '%'
+#else /* INET6 */
 
-#else
 # define	AFINET		AF_INET
 # define	SOCKADDR_IN	sockaddr_in
 # define	SOCKADDR	sockaddr
@@ -695,7 +694,6 @@ char mydummy2[MYDUMMY_SIZE];
 # define	IN_ADDR		in_addr
 
 # define WHOSTENTP(x) (x)
-# define IRCDCONF_DELIMITER ':'
 #endif
 
 #if defined(HAVE_MMAP)

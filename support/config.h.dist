@@ -437,6 +437,16 @@
 */
 /* #undef DISABLE_DOUBLE_CONNECTS */
 
+/*
+** Define delimiter of fields in ircd.conf.
+*/
+#ifdef INET6
+# define IRCDCONF_DELIMITER '%'
+#else
+# define IRCDCONF_DELIMITER ':'
+#endif
+
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
@@ -751,4 +761,8 @@
 
 #if defined(LOGFILES_ALWAYS_CREATE) && !defined(HAVE_SYS_STAT_H)
 #error LOGFILES_ALWAYS_CREATE requires sys/stat.h
+#endif
+
+#ifndef IRCDCONF_DELIMITER
+#error IRCDCONF_DELIMITER must be defined
 #endif
