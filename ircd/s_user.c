@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.75 1999/06/07 21:01:58 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.76 1999/06/07 21:19:59 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -938,8 +938,12 @@ char	*parv[];
 nickkilldone:
 	if (IsServer(sptr))
 	    {
+		if (parc != 8)
+			sendto_flag(SCH_NOTICE,
+			    "Bad NICK param count (%d) for %s from %s via %s",
+				    parc, parv[1], sptr->name,
+				    get_client_name(cptr, FALSE));
 		/* A server introducing a new client, change source */
-
 		sptr = make_client(cptr);
 		add_client_to_list(sptr);
 		if (parc > 2)
