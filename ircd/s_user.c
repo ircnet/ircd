@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.27 1997/09/22 15:34:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.28 1997/09/22 20:22:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1274,6 +1274,8 @@ int oper;
 		for (lp = acptr->user->channel; lp; lp = lp->next)
 		    {
 			chptr = lp->value.chptr;
+			if (IsAnonymous(chptr))
+				continue;
 			member = IsMember(sptr, chptr);
 			if (isinvis && !member)
 				continue;
@@ -1480,6 +1482,8 @@ char	*parv[];
 			for (lp = user->channel; lp; lp = lp->next)
 			    {
 				chptr = lp->value.chptr;
+				if (IsAnonymous(chptr))
+					continue;
 				member = IsMember(sptr, chptr);
 				if (invis && !member)
 					continue;
