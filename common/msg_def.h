@@ -76,6 +76,7 @@
 #define	MSG_DNS      "DNS"
 #define	MSG_SMASK    "SMASK"
 #define MSG_EOB	     "EOB"
+#define MSG_EOBACK   "EOBACK"
 #define MSG_SET      "SET"
 #define MSG_MAP	     "MAP"
 #define MSG_POST     "POST"

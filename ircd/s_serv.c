@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.187 2004/05/12 16:36:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.188 2004/05/14 22:31:48 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3181,6 +3181,11 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	check_split();
 	
 	return 1;
+}
+
+int	m_eoback(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+	return 0;
 }
 
 

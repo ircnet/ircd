@@ -56,6 +56,7 @@ EXTERN int m_trace (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_motd (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_close (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_eob (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_eoback (aClient *, aClient *, int, char **);
 EXTERN int m_map (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN char *find_server_string (int snum);
 EXTERN int find_server_num (char *sname);
