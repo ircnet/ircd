@@ -1,3 +1,19 @@
+2004-09-10  Piotr Kucharski
+
+	* configure.in: logdir defaults to $(localstatedir)/log, not directly
+	  PREFIX/var/log/ircd.
+	* Makefile.in: ircd_var_dir (where .pid and .tune are kept) is again
+	  $(localstatedir)/run.
+	* Makefile.in: log file names changed from users, rejects, etc to
+	  ircd.users, ircd.rejects, ircd.etc (and "ircd" part dependable on
+	  $(IRCD) Makefile variable).
+
+2004-09-08  Piotr Kucharski
+
+	* send.c/sendto_flog(): save two function calls each log line written;
+	  also add comments about logfile contents.
+	* example.conf is installed as ircd.conf.example from now on.
+
 2004-09-07  Piotr Kucharski
 
 	* parse.c: allow HAZH without params to allow sending minihelp (noted
@@ -5,7 +21,6 @@
 	* s_id.c, res_mkquery.c: compilation warnings for strict CC (reported
 	  by Mark Visser).
 	* Makefile.in: few tiny fixes (suggested by Olafur Osvaldsson).
-	* example.conf is installed as ircd.conf.example from now on.
 	* config.h.dist: some cleanup (suggested by Core).
 
 2.11.0b12
