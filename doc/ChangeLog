@@ -1,3 +1,19 @@
+1999-07-25  Christophe Kalt  <kalt@azurite.nyc.fp.deshaw.com>
+
+	* channel.c: sanity checks to drop modes on +channels even when
+	received from servers (from Michal Svoboda).
+
+	* struct_def.h, channel.c, s_id.c: added checks to ensure !name
+	validity (from Michal Svoboda).
+
+1999-07-23  Christophe Kalt
+
+	* s_bsd.c/inetport(): fixed test for IPv6 (from KIKUCHI Takahiro).
+
+	* ircd.c:
+		* better casting for sbrk() for OSF 4.0.
+		* setup_me(): fixed syntax for IPv6.
+
 1999-07-21  Piotr Kucharski
 
 	* channel.c/set_mode(): send ERR_UNKNOWNMODE to 'mode O' issued
