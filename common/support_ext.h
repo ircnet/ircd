@@ -51,9 +51,7 @@ EXTERN u_long inetaddr __P((register const char *cp));
 EXTERN int inetaton __P((register const char *cp, struct in_addr *addr));
 #endif /* HAVE_INET_ATON */
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE)
-EXTERN void dumpcore __P((char *msg, char *p1, char *p2, char *p3, char *p4,
-			  char *p5, char *p6, char *p7, char *p8, char *p9,
-			  char *p10, char *p11));
+EXTERN void dumpcore ();
 #endif /* DEBUGMODE && !CLIENT_COMPILE */
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE) && defined(DO_DEBUG_MALLOC)
 EXTERN char *MyMalloc __P((size_t x));

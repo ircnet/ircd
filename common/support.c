@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.8 1997/09/03 17:45:18 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.9 1997/09/23 15:36:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -54,7 +54,7 @@ char	*s;
 **			of separators
 **			argv 9/90
 **
-**	$Id: support.c,v 1.8 1997/09/03 17:45:18 kalt Exp $
+**	$Id: support.c,v 1.9 1997/09/23 15:36:20 kalt Exp $
 */
 
 char *strtoken(save, str, fs)
@@ -108,7 +108,7 @@ char *str, *fs;
 **	strerror - return an appropriate system error string to a given errno
 **
 **		   argv 11/90
-**	$Id: support.c,v 1.8 1997/09/03 17:45:18 kalt Exp $
+**	$Id: support.c,v 1.9 1997/09/23 15:36:20 kalt Exp $
 */
 
 char *strerror(err_no)
@@ -138,7 +138,7 @@ int err_no;
 **			internet number (some ULTRIX don't have this)
 **			argv 11/90).
 **	inet_ntoa --	its broken on some Ultrix/Dynix too. -avalon
-**	$Id: support.c,v 1.8 1997/09/03 17:45:18 kalt Exp $
+**	$Id: support.c,v 1.9 1997/09/23 15:36:20 kalt Exp $
 */
 
 char	*inetntoa(in)
@@ -315,7 +315,7 @@ char	*msg, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 	if (!lastd)
 		lastd = now;
 	else if (now - lastd < 60 && dumps > 2)
-		(void)s_die();
+		(void)s_die(0);
 	if (now - lastd > 60)
 	    {
 		lastd = now;
@@ -335,7 +335,7 @@ char	*msg, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 	sendto_flag(SCH_ERROR, "Dumped core : core.%d", p);
 	Debug((DEBUG_FATAL, msg, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,p11));
 	sendto_flag(SCH_ERROR, msg, p1, p2, p3, p4, p5, p6, p7, p8,p9,p10,p11);
-	(void)s_die();
+	(void)s_die(0);
 }
 #endif
 
