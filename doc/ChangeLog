@@ -1,3 +1,20 @@
+2004-10-13  Piotr Kucharski
+
+	* s_serv.c/m_set(): new "SET SPLIT".
+	* config.h.dist: increased default SPLIT_SERVERS and SPLIT_USERS.
+	* s_serv.c/m_map(): swap SID and usercount.
+
+2004-10-09  Piotr Kucharski
+
+	* send.c/logfiles_close(): set fd to -1 after closing.
+	* s_send.c/esendto_channel_butone(): missing param (though function
+	  not yet used).
+
+2004-10-07  Piotr Kucharski
+
+	* s_conf.c/do_tkline(): send a notice how many tklined.
+	* s_user.c/m_ping(): revert removing unnecessary parts of code. Oops.
+
 2.11.0b14
 
 2004-10-06  Piotr Kucharski
