@@ -36,7 +36,7 @@
 */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.2 1997/04/14 15:04:04 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.3 1997/05/05 14:50:43 kalt Exp $";
 #endif
 
 /* Do not define until it is fixed. -krys
@@ -204,30 +204,28 @@ int	length;
 #endif
 	Reg	int	chunk, i, dlength;
 
-	off = (dyn->offset + dyn->length) % DBUFSIZ;
-#ifndef DBUF_TAIL
-	nbr = (dyn->offset + dyn->length) / DBUFSIZ;
-#else
-	dtail = dyn->tail;
-#endif
 	dlength = dyn->length;
+
+	off = (dyn->offset + dyn->length) % DBUFSIZ;
+#ifdef DBUF_TAIL
+	dtail = dyn->tail;
+        if (!dyn->length)
+                h = &(dyn->head);
+        else
+	    {
+		if (off)
+                        h = &(dyn->tail);
+                else
+                        h = &(dyn->tail->next);
+        }
+#else
 	/*
 	** Locate the last non-empty buffer. If the last buffer is
 	** full, the loop will terminate with 'd==NULL'. This loop
 	** assumes that the 'dyn->length' field is correctly
 	** maintained, as it should--no other check really needed.
 	*/
-#ifdef DBUF_TAIL
-        if (!dyn->length)
-                h = &(dyn->head);
-        else
-        {
-                if (off)
-                        h = &(dyn->tail);
-                else
-                        h = &(dyn->tail->next);
-        }
-#else
+	nbr = (dyn->offset + dyn->length) / DBUFSIZ;
 	for (h = &(dyn->head); (d = *h) && --nbr >= 0; h = &(d->next));
 #endif
 	/*
@@ -242,6 +240,7 @@ int	length;
 			if ((i = dbuf_alloc(&d)))
 			    {
 				if (i == -1)	/* out of memory, cleanup */
+					/* modifies dyn->tail */
 					dbuf_malloc_error(dyn);
 				else
 				/* If we run out of bufferpool, visit upper
