@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.212 2004/06/06 11:30:31 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.213 2004/06/08 21:29:48 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -291,10 +291,6 @@ static	int	del_modeid(int type, aChannel *chptr, aListItem *modeid)
 			free_link(tmp);
 			break;
 		}
-	}
-	if (modeid)
-	{
-		free_bei(modeid);
 	}
 	return 0;
 }
@@ -1763,13 +1759,15 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 					(void)strcat(upbuf, " ");
 					len++;
 					ulen++;
+					if ((whatt & MODE_DEL))
+						free_bei(lp->value.alist);
 				}
 				else
 				{
 					/* We have to free lp->value.alist
 					** allocated by make_bei, otherwise
 					** it is memleak. del_modeid always
-					** succeeds, so free_bei is there.
+					** succeeds, so it is freed above.
 					** If add_modeid succeeds, it uses
 					** pointer, if not, we free it here.
 					** This also covers all other cases,
