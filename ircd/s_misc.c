@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.39 2002/01/06 03:30:39 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.40 2002/01/06 03:43:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -307,7 +307,7 @@ Reg	int	count;
  * by a hostmask)
  * Returns the number of marked servers
  */
-int	mark_blind_servers (aClient *cptr, *aClient server)
+int	mark_blind_servers (aClient *cptr, aClient *server)
 {
 	Reg	int		i, j = 0;
 	Reg	aClient		*acptr;
