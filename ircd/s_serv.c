@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.90 2002/01/24 00:54:32 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.91 2002/03/22 21:46:47 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2745,7 +2745,11 @@ int check_servername(hostname)
 char *hostname;
 {
 	register char *ch;
-	int dots, chars, rc = 0;
+	int dots, chars, rc;
+
+	dots = 0;
+	chars = 0;
+	rc = 0;
 
 	if (strlen(hostname) > HOSTLEN)
 	{
