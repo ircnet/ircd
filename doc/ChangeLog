@@ -1,3 +1,16 @@
+2003-02-16  Jakub Vlasek
+
+        * struct_def.h: Added IsSplit() macro. Added split variables to
+          struct iconf_t.
+        * s_debug.c: Report administrative state of autoconnect and split
+          values in stats d.
+        * s_misc.c,s_misc_ext.h: Added check_split().
+        * s_misc.c/exit_client(): Added split detection.
+        * s_misc.c/initruntimeconf(): Initialise split values.
+        * s_serv.c/m_eob(), do_emulated_eob(): Call check_split().
+        * s_user.c/register_user(): Call check_split(), send split notice
+          to users upon connect.
+
 2003-02-15  Piotr Kucharski
 
 	* s_bsd.c/polludp(): sometimes garbage IP was shown in error message.
