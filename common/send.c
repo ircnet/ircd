@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.84 2004/10/26 19:20:51 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.85 2004/11/02 16:20:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1118,6 +1118,7 @@ static	SChan	svchans[SCH_MAX] = {
 #ifdef CLIENTS_CHANNEL
 	{ SCH_CLIENT,	"&CLIENTS",	NULL },
 #endif
+	{ SCH_OPER,	"&OPER",	NULL },
 };
 
 
