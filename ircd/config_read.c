@@ -52,7 +52,7 @@ aFile	*new_config_file(char *, aFile *, int);
 ** calls itself recursively for each #include directive */
 aConfig *config_read(int fd, int depth)
 {
-	int len;
+	int len, linenum;
 	struct stat fst;
 	char *i, *address;
 	aConfig *ConfigTop = NULL;
@@ -72,6 +72,7 @@ aConfig *config_read(int fd, int depth)
 	}
 
 	i = address;
+	linenum = 0;
 	while (i < address + len)
 	{
 		char *p;
@@ -81,6 +82,8 @@ aConfig *config_read(int fd, int depth)
 		/* eat empty lines first */
 		while (*i == '\n' || *i == '\r')
 		{
+			if (*i == '\n')
+				linenum++;
 			i++;
 		}
 		p = strchr(i, '\n');
@@ -89,6 +92,7 @@ aConfig *config_read(int fd, int depth)
 			/* EOF without \n, I presume */
 			p = address + len;
 		}
+		linenum++;
 
 		if (*i == '#')
 		{
@@ -181,6 +185,7 @@ eatline:
 		new->line = (char *) malloc((linelen+1) * sizeof(char));
 		memcpy(new->line, i, linelen);
 		new->line[linelen] = '\0';
+		new->linenum = linenum;
 		new->next = NULL;
 		if (ConfigCur)
 		{
