@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.35 2001/12/20 22:42:26 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.36 2001/12/27 18:47:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -254,10 +254,20 @@ Reg	aClient	*cptr;
 Reg	char	*host;
 {
 	Reg	char	*s;
+
+	if (!cptr || !host)
+	{
+		/* however unlikely this is, don't risk */
+		return;
+	}
 	if ((s = (char *)index(host, '@')))
+	{
 		s++;
+	}
 	else
+	{
 		s = host;
+	}
 	strncpyzt(cptr->sockhost, s, sizeof(cptr->sockhost));
 	Debug((DEBUG_DNS,"get_sockhost %s",s));
 }
