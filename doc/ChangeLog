@@ -5,6 +5,8 @@
 	* struct_def.h: removed unused flags, some cleanups.
 	* s_bsd.c/close_connection(): schedule quick reconnect for a good
 	  link only when cptr was aServer.
+	* doc/ cleanup.
+	* added ISO-3166-1 file as a reference for choosing SIDs.
 
 2003-06-22  Kurt Roeckx
 
