@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.90 2004/03/05 11:26:34 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.91 2004/03/05 12:34:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -301,7 +301,6 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 				if (!UHConfMatch(aconf->name, uhost, ulen))
 				{
 					namematched = 1;
-					break;
 				}
 			}
 			/* Note: here we could do else (!hp) and try to
