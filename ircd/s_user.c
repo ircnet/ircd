@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.178 2004/02/26 17:58:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.179 2004/02/28 01:08:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2440,7 +2440,7 @@ int	m_post(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	sendto_flag(SCH_LOCAL, "Denied http-post connection from %s.",
 		cptr->sockhost);
-	m_quit(cptr, sptr, parc, parv);
+	return m_quit(cptr, sptr, parc, parv);
 }
 
 /*
