@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.85 2004/04/14 18:51:52 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.86 2004/04/14 18:59:18 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -605,7 +605,8 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 			return FLUSH_BUFFER;
 		}
 		/* being here means non-local server exited */
-		if (nextconnect == 0 && find_conf_name(sptr->name, CFLAG))
+		if (nextconnect == 0 && find_conf_name(sptr->name,
+			(CONF_CONNECT_SERVER|CONF_ZCONNECT_SERVER)))
 		{
 			/* try AC */
 			nextconnect = timeofday + HANGONRETRYDELAY;
