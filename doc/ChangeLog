@@ -1,3 +1,7 @@
+2004-08-03  Jakub Vlasek
+
+	* s_misc.c/read_motd(): Do not leak FD.
+
 2004-08-02  Piotr Kucharski
 
 	* channel.c/del_modeid(): missing parens (noted by Matyas Koszik).
