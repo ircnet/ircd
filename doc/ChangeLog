@@ -1,4 +1,31 @@
-1998-12-12  Christophe Kalt
+1998-12-24  Christophe Kalt
+
+	* s_service.c: using FLAGS_CBURST for services has too many
+	implications; reverted.
+	
+	* struct_def.h, s_bsd.c, s_zip.c: removed requirement for
+	inflate() to never fill up the uncompression output buffer, an
+	unlikely situation which is now dealt with. (mostly from Q).
+
+1998-12-21  Christophe Kalt
+
+
+	* s_user.c:
+		* [RFC] suppressed an error reply for notices in m_message().
+		* server notices to +n channels were failing. (Reported by Q).
+
+	* a_defines.h: INET6 fix for OSF (from Roar Thronæs).
+
+	* os.h: INET6 fix for OSF (from Roar Thronæs).
+
+	* channel.c: added check against 'duplicate joins' in m_njoin().
+
+1998-12-14  Christophe Kalt
+
+	* channel.c:
+		* yet another +a/+r fix in set_mode().
+		* send_channel_modes() would occasionnally send duplicate
+		bans. (Reported by Robert Martin-Legene <robert@irc.ircnet.dk>)
 
 	* iauth.c, a_io.c: added nonexistant INET6 code.
 	
