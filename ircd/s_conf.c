@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.122 2004/06/30 18:04:40 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.123 2004/06/30 19:02:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -106,6 +106,12 @@ long	iline_flags_parse(char *string)
 	{
 		tmp |= CFLAG_KEXEMPT;
 	}
+#ifdef XLINE
+	if (index(string,'e'))
+	{
+		tmp |= CFLAG_XEXEMPT;
+	}
+#endif
 	if (index(string,'N'))
 	{
 		tmp |= CFLAG_NORESOLVE;
@@ -144,6 +150,12 @@ char	*iline_flags_to_string(long flags)
 	{
 		*s++ = 'E';
 	}
+#ifdef XLINE
+	if (flags & CFLAG_XEXEMPT)
+	{
+		*s++ = 'e';
+	}
+#endif
 	if (flags & CFLAG_NORESOLVE)
 	{
 		*s++ = 'N';
