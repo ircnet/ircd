@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.7 1998/08/06 02:55:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.8 1998/08/06 04:21:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -301,7 +301,7 @@ parse_ircd()
 				exit(1);
 			    }
 			/* we should really be using a pool of buffer here */
-			cldata[cl].inbuffer = malloc(INBUFSIZE);
+			cldata[cl].inbuffer = malloc(INBUFSIZE+1);
 			if (cl > cl_highest)
 				cl_highest = cl;
 			next_io(cl, NULL); /* get started */
