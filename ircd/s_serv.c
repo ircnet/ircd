@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.29 1997/12/19 13:30:27 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.30 1998/01/07 19:13:45 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2354,6 +2354,7 @@ aClient	*cptr;
     if (!IsServer(cptr))
 	    return 0;
 
+    ircstp->is_ckl++;
     if ((int)DBufLength(&cptr->sendQ) > 65536) /* SendQ is already (too) high*/
 	{
 	    cptr->serv->lastload = timeofday;
