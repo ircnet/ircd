@@ -212,6 +212,14 @@
 #undef	M4_PREPROC
 
 /*
+ * If you want to use #include <file> or #include "file" directive in ircd.conf
+ * without M4, define this. <file> reads file from dir where ircd.conf is, and
+ * "file" from dir where ircd was started from. Note that "#include" must be
+ * at the beginning of the line.
+ */ 
+#undef	CONFIG_DIRECTIVE_INCLUDE
+
+/*
  * If you wish to have the server send 'vital' messages about server
  * through syslog, define USE_SYSLOG. Only system errors and events critical
  * to the server are logged although if this is defined with FNAME_USERLOG,
@@ -697,3 +705,11 @@
  * Dubious consideration, IMO.
  */
 #undef	NO_OPER_REMOTE
+
+#if defined(CONFIG_DIRECTIVE_INCLUDE) && defined(M4_PREPROC)
+#error CONFIG_DIRECTIVE_INCLUDE and M4_PREPROC are mutually exclusive
+#endif
+
+#if defined(CONFIG_DIRECTIVE_INCLUDE) && !defined(HAVE_MMAP)
+#error CONFIG_DIRECTIVE_INCLUDE requires mmap()
+#endif

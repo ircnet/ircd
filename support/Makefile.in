@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.54 2004/03/05 20:29:04 chopin Exp $
+#*   $Id: Makefile.in,v 1.55 2004/05/07 19:29:12 chopin Exp $
 #*
 #*/
 
@@ -401,7 +401,7 @@ s_bsd.o: ../ircd/s_bsd.c setup.h config.h
 
 s_conf.o: ../ircd/s_conf.c setup.h config.h
 	$(CC) $(S_CFLAGS) -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" \
-	-DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" \
+	-DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" \
 	-DM4_PATH="\"$(M4_PATH)\"" -c -o $@ ../ircd/s_conf.c
 
 s_debug.o: ../ircd/s_debug.c setup.h config.h
