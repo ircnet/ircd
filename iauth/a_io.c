@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.9 1998/08/07 03:39:49 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.10 1998/09/12 22:54:28 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -634,17 +634,18 @@ loop_io()
 			exit(1);
 		    }
 # endif
+#endif
 		if (cldata[i].rfd <= 0 && cldata[i].wfd <= 0)
 		    {
+#if defined(USE_POLL)
 			sendto_log(ALOG_IRCD, LOG_CRIT,
 			   "io_loop(): fatal data inconsistency #%d (%d, %d)",
 				   i, cldata[i].rfd, cldata[i].wfd);
 			exit(1);
-		    }
 #else
-		if (cldata[i].rfd <= 0)
 			continue;
 #endif
+		    }
 		if (TST_READ_EVENT(cldata[i].rfd))
 		    {
 			int len;
