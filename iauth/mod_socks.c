@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.39 2004/09/13 21:06:44 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.40 2004/09/20 16:47:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -32,7 +32,7 @@ static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.39 2004/09/13 21:06:44 chopin E
 static	int	socks_start(u_int cl);
 
 #define CACHETIME 30
-#define SOCKSPORT 1080
+#define SOCKSPORT (cldata[cl].instance->port)
 
 struct proxylog
 {
@@ -538,6 +538,10 @@ static	char	*socks_init(AnInstance *self)
 	mydata->lifetime = CACHETIME;
 
 	tmpbuf[0] = txtbuf[0] = '\0';
+
+	/* for stats a */
+	sprintf(tmpbuf, "port=%d", self->port);
+
 	if (self->delayed)
 	{
 		strcat(tmpbuf, ",delayed");
@@ -612,7 +616,7 @@ static	char	*socks_init(AnInstance *self)
 	strcat(txtbuf, cbuf);
 	mydata->lifetime *= 60;
 
-	self->popt = mystrdup(tmpbuf+1);
+	self->popt = mystrdup(tmpbuf);
 	self->data = mydata;
 	return txtbuf+2;
 }
@@ -639,9 +643,11 @@ static	void	socks_stats(AnInstance *self)
 {
 	struct socks_private *mydata = self->data;
 
-	sendto_ircd("S socks open %u closed %u noproxy %u",
+	sendto_ircd("S socks:%u open %u closed %u noproxy %u",
+		self->port,
 		mydata->open, mydata->closed, mydata->noproxy);
-	sendto_ircd("S socks cache open %u closed %u noproxy %u miss %u (%u <= %u)",
+	sendto_ircd("S socks:%u cache open %u closed %u noproxy %u miss %u (%u <= %u)",
+		self->port,
 		mydata->chito, mydata->chitc, mydata->chitn,
 		mydata->cmiss, mydata->cnow, mydata->cmax);
 }
@@ -666,7 +672,7 @@ static	int	socks_start(u_int cl)
 	{
 		/* no point of doing anything */
 		DebugLog((ALOG_DSOCKS, 0,
-			"socks_start(%d): A_DENY alredy set ", cl));
+			"socks_start(%d): A_DENY already set ", cl));
 		return -1;
 	}
 
