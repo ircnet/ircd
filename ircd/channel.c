@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.56 1998/08/22 19:22:27 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.57 1998/08/22 19:38:12 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2040,7 +2040,10 @@ char	*parv[];
 		if (cptr->serv && (s = index(name, '\007')))
 			*s++ = '\0';
 		else
+		    {
+			s = NULL;
 			clean_channelname(name), s = NULL;
+		    }
 
 		if (MyConnect(sptr) &&
 		    sptr->user->joined >= MAXCHANNELSPERUSER) {
@@ -2114,13 +2117,15 @@ char	*parv[];
 #else
 		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
 						parv[0], name);
-		if (s && chptr->users != 1)
+		if (s)
 		    {
 			/* no need if user is creating the channel */
-			sendto_channel_butserv(chptr, sptr,
-					       ":%s MODE %s +%s %s %s",
-					       cptr->name, name, s, parv[0],
-					       *(s+1) == 'v' ? parv[0] : "");
+			if (chptr->users != 1)
+				sendto_channel_butserv(chptr, sptr,
+						       ":%s MODE %s +%s %s %s",
+						       cptr->name, name, s,
+						       parv[0],
+						       *(s+1)=='v'?parv[0]:"");
 			*--s = '\007';
 		    }
 #endif
