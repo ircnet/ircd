@@ -1,3 +1,19 @@
+2.11.0
+
+2004-11-02  Piotr Kucharski
+
+	* s_conf.c/m_tkline(), config.h.dist: TKLINE_MAXTIME define.
+	* s_serv.c/m_stats(), config.h.dist: DISABLE_STATSTKLINE define.
+	* s_conf.c/m_tkline(): show tkline reason in notice.
+	* send.c/svchans[], struct_def.h, channel.c/setup_server_channels():
+	  added &OPER server channel.
+	* s_serv.c/can_join(): make &OPER server channel oper only.
+	* s_conf.c/do_tkline(): send TKLINE notices to &OPER.
+	* res.c/get_res(): do not show nameserver IP in error message.
+	* s_user.c, s_user_ext.h: new function send_away() (idea from fiction).
+	* channel.c/m_invite(), s_user.c/m_message(): use send_away().
+	* config.h.dist: AWAY_MOREINFO define.
+
 2004-11-01  Piotr Kucharski
 
 	* Makefile.in: config file define for tkserv (not always ircd.conf).
