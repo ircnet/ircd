@@ -558,6 +558,9 @@
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 
+/* Don't change unless you know, what it does. */
+/* #define HELP_IRCD_GET_RID_OF_HASHTABLE_BUG */
+
 /*
 ** Accept only hostnames conforming to RFC1034/1035/1123.
 ** Conformance of the internal resolver to RFC1123.
