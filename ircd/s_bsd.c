@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.58 1999/03/07 00:26:14 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.59 1999/03/07 22:45:49 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2269,10 +2269,11 @@ deadsocket:
 			    }
 		    }
 		length = 1;	/* for fall through case */
-		if (!NoNewLine(cptr) || TST_READ_EVENT(fd)) {
-		    if (!DoingAuth(cptr))
-			    length = read_packet(cptr, TST_READ_EVENT(fd));
-		}
+		if (!NoNewLine(cptr) || TST_READ_EVENT(fd))
+		    {
+			if (!DoingAuth(cptr))
+				length = read_packet(cptr, TST_READ_EVENT(fd));
+		    }
 		readcalls++;
 		if (length == FLUSH_BUFFER)
 			continue;
