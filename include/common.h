@@ -20,6 +20,10 @@
 #ifndef	__common_include__
 #define __common_include__
 
+#ifdef _AIX
+#include <sys/types.h>
+#endif
+
 #ifdef HAVE_SYS_CDEFS_H
 #include <sys/cdefs.h>
 #else

@@ -88,7 +88,7 @@
 #undef USE_TERMCAP
 
 /* Define if the second argument of waitpid must be an "union wait *" instead
-   of an "int *". /*
+   of an "int *". */
 #undef USE_UNION_WAIT
 
 /* Define if the operating system is Solaris 2.3 (SunOS 5.3).  */
