@@ -46,6 +46,7 @@ struct Instance
     aTarget	*hostname;
     u_int	timeout;
     char	*reason;		/* reject reason */
+    u_char	delayed;		/* delayed execution mode */
 };
 
 struct Target
