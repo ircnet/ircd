@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.40 2004/03/05 15:59:49 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.41 2004/03/07 22:31:58 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -18,6 +18,7 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* I: have flags now ('F', 'R', 'I', 'E', 'N', 'D'), check INSTALL
 	  file for details.
 	* OPER_REMOTE is removed (and server behaves like it was defined).
+	* stats l/L no longer returns listeners, use stats P.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================
