@@ -1,0 +1,39 @@
+#!/bin/sh
+# trap "" 1 2 3 13 14 15 21 22
+# $Id: sums.in,v 1.1 1998/04/07 20:44:48 kalt Exp $
+trap "" 1 2 3 13 14 15 
+/bin/cp hash.c hash.c.old 2>/dev/null
+/bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
+csum=`(cd ../ircd; @SUM@ s_bsd.c) 2>/dev/null`
+sed -e "s/SUSER/[${csum}]/g" hash.c.temp > hash.c 2>/dev/null
+/bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
+csum=`(cd ../ircd; @SUM@ s_user.c) 2>/dev/null`
+sed -e "s/SSERV/[${csum}]/g" hash.c.temp > hash.c 2>/dev/null
+/bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
+csum=`(cd ../ircd; @SUM@ s_serv.c) 2>/dev/null`
+sed -e "s/SBSDC/[${csum}]/g" hash.c.temp > hash.c 2>/dev/null
+/bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
+csum=`(cd ../ircd; @SUM@ channel.c) 2>/dev/null`
+sed -e "s/CHANC/[$csum]/g" hash.c.temp > hash.c 2>/dev/null
+/bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
+csum=`(cd ../ircd; @SUM@ ircd.c) 2>/dev/null`
+sed -e "s/IRCDC/[$csum]/g" hash.c.temp > hash.c 2>/dev/null
+/bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
+csum=`(cd ../ircd; @SUM@ s_misc.c) 2>/dev/null`
+sed -e "s/SMISC/[$csum]/g" hash.c.temp > hash.c 2>/dev/null
+/bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
+csum=`@SUM@ hash.c.old 2>/dev/null`
+sed -e "s/HASHC/[$csum]/g" hash.c.temp > hash.c 2>/dev/null
+/bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
+csum=`@SUM@ version.c.SH 2>/dev/null`
+sed -e "s/VERSH/[$csum]/g" hash.c.temp > hash.c 2>/dev/null
+/bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
+csum=`(cd ../ircd; @SUM@ s_bsd.c) 2>/dev/null`
+sed -e "s/MAKEF/[$csum]/g" hash.c.temp > hash.c 2>/dev/null
+if [ -f /bin/hostid ] ; then
+	/bin/mv -f hash.c hash.c.temp 1>/dev/null 2>&1
+	csum=`hostid 2>/dev/null`
+	sed -e "s/HOSTID/[$csum]/g" hash.c.temp > hash.c 2>/dev/null
+fi
+/bin/rm -f hash.c.temp 1>/dev/null 2>&1
+
