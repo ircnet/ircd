@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.12 1997/11/13 02:14:43 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.13 1997/12/16 22:10:50 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -336,6 +336,7 @@ static	Numeric	numeric_replies[] = {
 		{ 0, (char *)NULL },
 /* 261 */	{ RPL_TRACELOG, "File %s %d" },
 /* 262 */	{ RPL_TRACEEND, "%s %s.%s :End of TRACE" },
+/* 263 */	{ RPL_TRYAGAIN, "%s :Please wait a while and try again." },
 		{ 0, (char *)NULL }
 };
 

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.25 1997/11/13 02:14:44 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.26 1997/12/16 22:10:51 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -32,6 +32,8 @@ static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.25 1997/11/13 02:14:44 kalt Exp $"
 #undef S_SERV_C
 
 static	char	buf[BUFSIZE];
+
+static	int	check_link __P((aClient *));
 
 /*
 ** m_functions execute protocol messages on this server:
@@ -973,6 +975,12 @@ char	*parv[];
 {
 	char **text = infotext;
 
+	if (IsServer(cptr) && check_link(cptr))
+	    {
+		sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
+			   "INFO");
+		return 5;
+	    }
 	if (hunt_server(cptr,sptr,":%s INFO :%s",1,parc,parv) == HUNTED_ISME)
 	    {
 		while (*text)
@@ -1012,6 +1020,12 @@ char	*parv[];
 
 	if (parc > 2)
 	    {
+		if (IsServer(cptr) && check_link(cptr))
+		    {
+			sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
+				   "LINKS");
+			return 5;
+		    }
 		if (hunt_server(cptr, sptr, ":%s LINKS %s :%s", 1, parc, parv)
 				!= HUNTED_ISME)
 			return 5;
@@ -1167,7 +1181,7 @@ char	*parv[];
 **	      it--not reversed as in ircd.conf!
 */
 
-static int report_array[16][3] = {
+static int report_array[17][3] = {
 		{ CONF_ZCONNECT_SERVER,	  RPL_STATSCLINE, 'c'},
 		{ CONF_CONNECT_SERVER,	  RPL_STATSCLINE, 'C'},
 		{ CONF_NOCONNECT_SERVER,  RPL_STATSNLINE, 'N'},
@@ -1263,6 +1277,17 @@ char	*parv[];
 	int	doall = 0, wilds = 0;
 	char	*name = NULL, *cm = NULL;
 
+	if (IsServer(cptr) &&
+	    (stat != 'd' && stat != 'p' && stat != 's' &&
+	     stat != 'u' && stat != 'v'))
+	    {
+		if (check_link(cptr))
+		    {
+			sendto_one(sptr, rpl_str(RPL_TRYAGAIN, parv[0]),
+				   "STATS");
+			return 5;
+		    }
+	    }
 	if (parc == 3)
 	    {
 		if (hunt_server(cptr, sptr, ":%s STATS %s %s",
@@ -2308,4 +2333,41 @@ char *sname;
 	  }
 	server_name[server_num] = mystrdup(sname);
 	return server_num++;
+}
+
+/*
+** check_link (added 97/12 to prevent abuse)
+**	routine which tries to find out how healthy a link is.
+**	useful to know if more strain may be imposed on the link or not.
+**
+**	returns 0 if link load is light, -1 otherwise.
+*/
+static int
+check_link(cptr)
+aClient	*cptr;
+{
+    if (!IsServer(cptr))
+	    return 0;
+
+    if ((int)DBufLength(&cptr->sendQ) > 65536) /* SendQ is already (too) high*/
+	{
+	    cptr->serv->lastload = timeofday;
+	    return -1;
+	}
+    if (timeofday - cptr->firsttime < 60) /* link is too young */
+	    return -1;
+    if (timeofday - cptr->serv->lastload > 30)
+	    /* last request more than 30 seconds ago => OK */
+	{
+	    cptr->serv->lastload = timeofday;
+	    return 0;
+	}
+    if (timeofday - cptr->serv->lastload > 15
+	&& (int)DBufLength(&cptr->sendQ) < CHREPLLEN)
+	    /* last request between 15 and 30 seconds ago, but little SendQ */
+	{
+	    cptr->serv->lastload = timeofday;
+	    return 0;
+	}
+    return -1;
 }

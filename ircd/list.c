@@ -37,7 +37,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.4 1997/09/03 17:45:51 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.5 1997/12/16 22:10:49 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -240,6 +240,7 @@ aClient	*cptr;
 		    }
 		serv->bcptr = cptr;
 		SPRINTF(serv->tok, "%d", serv->ltok);
+		serv->lastload = 0;
 	    }
 	return cptr->serv;
 }

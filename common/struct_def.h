@@ -379,6 +379,9 @@ struct	Server	{
 	aClient	*bcptr;
 	char	by[NICKLEN+1];
 	char	tok[5];
+	time_t	lastload;	/* penalty like counters, see s_serv.c
+				** should be in the local part, but..
+				*/
 };
 
 struct	Service	{

@@ -323,3 +323,4 @@
 
 #define	RPL_TRACELOG         261
 #define	RPL_TRACEEND         262
+#define	RPL_TRYAGAIN         263
