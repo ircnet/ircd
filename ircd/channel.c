@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.42 1998/05/31 18:19:50 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.43 1998/06/12 22:59:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1956,7 +1956,8 @@ char	*parv[];
 			   if already joined MAXCHANNELSPERUSER times. */
 			sendto_one(sptr, err_str(ERR_TOOMANYCHANNELS,
 				   parv[0]), name);
-			return 2;
+			/* can't return, need to send the info everywhere */
+			continue;
 		}
 
 		chptr = get_channel(sptr, name, CREATE);
