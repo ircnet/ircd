@@ -116,7 +116,7 @@
 #define	OPER_REHASH
 #undef	OPER_RESTART
 #define	OPER_DIE
-#undef	OPER_SET
+#define OPER_SET
 #undef	LOCOP_REHASH
 #undef	LOCOP_RESTART
 #undef	LOCOP_DIE
