@@ -1,6 +1,6 @@
 2002-05-19  Jakub Vlasek
 	
-	* s_user.c/who_find(): Initialise myoper to 1, show +i user
+	* s_user.c/who_find(): Initialise myoper to 0, show +i user
 	  to himself (from BitKoenig).
 	* s_serv.c/m_trace(): Fixed condition causing wrong users being
 	  shown, added comments (from BitKoenig).
