@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.159 2004/08/21 21:36:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.160 2004/10/01 16:18:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1854,6 +1854,25 @@ static	void	read_listener(aClient *cptr)
 			(void)close(fdnew);
 			continue;
 		    }
+
+		/* Can cptr->confs->value.aconf be NULL? --B. */
+		if ((iconf.caccept == 0 ||
+			(iconf.caccept == 2 && iconf.split == 1))
+			&& cptr->confs->value.aconf != NULL
+			&& IsConfDelayed(cptr->confs->value.aconf))
+		{
+			/* Should we bother sendto_flag(SCH_ERROR...? --B. */
+#ifdef CACCEPT_DELAYED_CLOSE
+			nextdelayclose = delay_close(fdnew);
+			ircstp->is_ref++;
+#else
+			(void)send(fdnew, "ERROR :All client connections are "
+				"temporarily refused.\r\n", 56, 0);
+			(void)close(fdnew);
+#endif
+			continue;
+		}
+
 #ifdef	UNIXPORT
 		if (IsUnixSocket(cptr))
 			acptr = add_unixconnection(cptr, fdnew);
