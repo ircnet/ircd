@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.80 2002/06/01 22:11:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.81 2002/06/02 00:31:24 q Exp $";
 #endif
 
 #include "os.h"
@@ -44,9 +44,9 @@ int	serverbooting = 1;
 char	*debugmode = "";		/*  -"-    -"-   -"-   -"- */
 char	*sbrk0;				/* initial sbrk(0) */
 char	*tunefile = IRCDTUNE_PATH;
-static	int	dorehash = 0,
-		dorestart = 0,
-		restart_iauth = 0;
+volatile static	int	dorehash = 0,
+			dorestart = 0,
+			restart_iauth = 0;
 
 time_t	nextconnect = 1;	/* time for next try_connections call */
 time_t	nextgarbage = 1;        /* time for next collect_channel_garbage call*/
