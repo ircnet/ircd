@@ -1,6 +1,9 @@
 #!/bin/sh
 # $XConsortium: mkdirhier.sh,v 1.7 94/03/24 15:46:34 gildea Exp $
 # Courtesy of Paul Eggert
+#
+# $Id: mkdirhier,v 1.2 1997/07/22 12:40:10 kalt Exp $
+#
 
 newline='
 '

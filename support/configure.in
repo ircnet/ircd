@@ -240,9 +240,10 @@ fi
 
 
 AC_DEFUN(IRC_DECL_SYS_ERRLIST,
-[AC_CACHE_CHECK([for sys_errlist declaration in errno.h],
+[AC_CACHE_CHECK([for sys_errlist declaration in stdio.h or errno.h],
   irc_cv_decl_sys_errlist,
 [AC_TRY_COMPILE([#include <sys/types.h>
+#include <stdio.h>
 #include <errno.h>],
 [char *msg = sys_errlist[0];],
   irc_cv_decl_sys_errlist=yes, irc_cv_decl_sys_errlist=no)])
@@ -261,6 +262,22 @@ yes
 if test x$CC = xcc; then
   AC_MSG_RESULT(yes)
   CC="$CC -cckr"
+else
+  AC_MSG_RESULT(no)
+fi,
+AC_MSG_RESULT(no))
+])
+
+
+AC_DEFUN(IRC_AIX_CC,
+[AC_MSG_CHECKING([for AIX's cc])
+AC_EGREP_CPP(yes,
+[#ifdef _AIX
+yes
+#endif],
+if test x$CC = xcc; then
+  AC_MSG_RESULT(yes)
+  CFLAGS="$CFLAGS -O3 -qstrict"
 else
   AC_MSG_RESULT(no)
 fi,
@@ -894,11 +911,79 @@ AC_DIVERT_POP()dnl to NORMAL
 ])
 
 
+AC_DEFUN(IRC_PROG_INSTALL,
+[AC_REQUIRE([AC_CONFIG_AUX_DIR_DEFAULT])dnl
+# Find a good install program.  We prefer a C program (faster),
+# so one script is as good as another.  But avoid the broken or
+# incompatible versions:
+# SysV /etc/install, /usr/sbin/install
+# SunOS /usr/etc/install
+# IRIX /sbin/install
+# AIX /bin/install
+# AIX v4 /usr/bin/installbsd, which does not work if the user is not root
+# AFS /usr/afsws/bin/install, which mishandles nonexistent args
+# SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
+# ./install, which can be erroneously created by make from ./install.sh.
+AC_MSG_CHECKING(for a BSD compatible install)
+if test -z "$INSTALL"; then
+AC_CACHE_VAL(ac_cv_path_install,
+[  IFS="${IFS= 	}"; ac_save_IFS="$IFS"; IFS="${IFS}:"
+  for ac_dir in $PATH; do
+    # Account for people who put trailing slashes in PATH elements.
+    case "$ac_dir/" in
+    /|./|.//|/etc/*|/usr/sbin/*|/usr/etc/*|/sbin/*|/usr/afsws/bin/*|/usr/ucb/*) ;;
+    *)
+      # OSF1 and SCO ODT 3.0 have their own names for install.
+      for ac_prog in ginstall installbsd scoinst install; do
+        if test -f $ac_dir/$ac_prog; then
+	  if test $ac_prog = install &&
+            grep dspmsg $ac_dir/$ac_prog >/dev/null 2>&1; then
+	    # AIX install.  It has an incompatible calling convention.
+	    # OSF/1 installbsd also uses dspmsg, but is usable.
+	    :
+	  elif test $ac_prog = installbsd -a "x`uname -sv 2>/dev/null`" = "xAIX 4"; then
+            # AIX v4 installbsd. Does not work if the user is not root.
+            :
+          else
+	    ac_cv_path_install="$ac_dir/$ac_prog -c"
+	    break 2
+	  fi
+	fi
+      done
+      ;;
+    esac
+  done
+  IFS="$ac_save_IFS"
+])dnl
+  if test "${ac_cv_path_install+set}" = set; then
+    INSTALL="$ac_cv_path_install"
+  else
+    # As a last resort, use the slow shell script.  We don't cache a
+    # path for INSTALL within a source directory, because that will
+    # break other packages using the cache if that directory is
+    # removed, or if the path is relative.
+    INSTALL="$ac_install_sh"
+  fi
+fi
+dnl We do special magic for INSTALL instead of AC_SUBST, to get
+dnl relative paths right.
+AC_MSG_RESULT($INSTALL)
+
+# Use test -z because SunOS4 sh mishandles braces in ${var-val}.
+# It thinks the first close brace ends the variable substitution.
+test -z "$INSTALL_PROGRAM" && INSTALL_PROGRAM='${INSTALL}'
+AC_SUBST(INSTALL_PROGRAM)dnl
+
+test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
+AC_SUBST(INSTALL_DATA)dnl
+])
+
+
 dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id configure.in,v 1.2 1995/01/07 01:50:18 mrg Exp$])
+AC_REVISION([$Id configure.in,v 1.2 1995/01/07 01:50:18 mrg Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../include/setup.h.in)
@@ -906,7 +991,8 @@ AC_CONFIG_AUX_DIR(../support)
 
 AC_PROG_CC
 AC_PROG_CPP
-AC_PROG_INSTALL
+define([AC_PROVIDE_AC_PROG_INSTALL])
+IRC_PROG_INSTALL
 AC_PATH_PROGS(SUM, sum cksum, true)
 AC_PROG_GCC_TRADITIONAL
 
@@ -914,6 +1000,7 @@ AC_AIX
 AC_ISC_POSIX
 AC_MINIX
 IRC_SGI_CC
+IRC_AIX_CC
 IRC_SOLARIS_2
 
 AC_HEADER_STDC

@@ -1,3 +1,5 @@
+/* $Id: acconfig.h,v 1.3 1997/07/22 12:40:06 kalt Exp $ */
+
 /* Define if zlib package must be used for compilation/linking. */
 #undef USE_ZLIB
 
@@ -20,7 +22,7 @@
 /* Define if the operating system is Solaris 2.2 (SunOS 5.2).  */
 #undef SOLARIS_2_2
 
-/* Define if sys_errlist is declared in errno.h. */
+/* Define if sys_errlist is declared in stdio.h or errno.h. */
 #undef SYS_ERRLIST_DECLARED
 
 /* Define if the system provides POSIX sigaction. */
