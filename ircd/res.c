@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.34 2004/02/09 16:04:41 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.35 2004/03/05 15:08:07 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -710,11 +710,26 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 			       inetntoa((char *)adr),
 			       hostbuf));
 #endif
-			if (!hp->h_name && len < HOSTLEN)
-			    {
-				hp->h_name =(char *)MyMalloc(len+1);
-				(void)strcpy(hp->h_name, hostbuf);
-			    }
+			if(len < HOSTLEN)
+			{
+				/* if we have no hostname currently,
+				 * now we have one, else we have just
+				 * another alias. -- BitKoenig */
+				if(!hp->h_name)
+				{
+					hp->h_name = (char *)MyMalloc(len+1);
+					(void)strcpy(hp->h_name, hostbuf);
+			    	}
+				else
+				/* don't keep it if we already have it */
+				if(strcasecmp(hp->h_name, hostbuf) &&
+					alias < &(hp->h_aliases[MAXALIASES-1]))
+				{
+					*alias = (char *)MyMalloc(len + 1);
+					(void)strcpy(*alias++, hostbuf);
+					*alias = NULL;
+				}
+			}
 			ans++;
 			adr++;
 			cp += dlen;
@@ -764,9 +779,14 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 				return -1; /* a break would be enough here */
 			if (alias >= &(hp->h_aliases[MAXALIASES-1]))
 				break;
-			*alias = (char *)MyMalloc(len + 1);
-			(void)strcpy(*alias++, hostbuf);
-			*alias = NULL;
+			/* if we already have this alias as hostname,
+			 * don't keep it twice --BitKoenig */
+			if(hp->h_name && strcasecmp(hp->h_name, hostbuf))
+			{
+				*alias = (char *)MyMalloc(len + 1);
+				(void)strcpy(*alias++, hostbuf);
+				*alias = NULL;
+			}
 			ans++;
 			break;
 		default :
@@ -927,7 +947,7 @@ struct	hostent	*get_res(char *lp)
 			rptr->he.h_name, inetntoa((char *)&rptr->he.h_addr)));
 #endif
 		/*
-		 * Lookup the 'authoritive' name that we were given for the
+		 * Lookup the 'authoritative' name that we were given for the
 		 * ip#.  By using this call rather than regenerating the
 		 * type we automatically gain the use of the cache with no
 		 * extra kludges.
@@ -952,8 +972,12 @@ struct	hostent	*get_res(char *lp)
 		 * If name wasn't found, a request has been queued and it will
 		 * be the last one queued.  This is rather nasty way to keep
 		 * a host alias with the query. -avalon
+		 * We also need 'authoritative' name to be kept --BitKoenig
 		 */
-		if (!hp2 && rptr->he.h_aliases[0])
+		if (!hp2)
+		{
+			last->he.h_name = rptr->he.h_name;
+			rptr->he.h_name = NULL;
 			for (a = 0; rptr->he.h_aliases[a]; a++)
 			    {
 				Debug((DEBUG_DNS, "Copied CNAME %s for %s",
@@ -962,6 +986,7 @@ struct	hostent	*get_res(char *lp)
 				last->he.h_aliases[a] = rptr->he.h_aliases[a];
 				rptr->he.h_aliases[a] = NULL;
 			    }
+		}
 
 		rem_request(rptr);
 		return hp2;
