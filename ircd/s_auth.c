@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.41 1999/06/17 12:39:46 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.42 1999/06/17 12:40:52 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -54,7 +54,7 @@ aClient *cptr;
 	if (index(cptr->auth, '[') || index(cptr->auth, '@') ||
 	    strlen(cptr->auth) > USERLEN)
 		dirty = 1;
-	else if (cptr->auth[0] = ':')
+	else if (cptr->auth[0] == ':')
 	    {
 		dirty = 1;
 		s += 1;
