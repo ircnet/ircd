@@ -97,13 +97,14 @@
  */
 #define	OPER_CONNECT
 #define	OPER_DIE
-#define	OPER_KILL
-#define	LOCAL_KILL_ONLY
 #define	OPER_REHASH
 #define	OPER_RESTART
 #define	OPER_SET
 #define	OPER_SQUIT
 #define	OPER_TKLINE
+/* In a perfect world these two (or at least second) would be undefined. */
+#define	OPER_KILL
+#define	OPER_KILL_REMOTE
 
 /*
  * Maximum number of network connections your server will allow.  This must

@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.136 2004/08/21 21:36:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.137 2004/09/12 21:13:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -309,7 +309,7 @@ long	oline_flags_parse(char *string)
 	if (tmp & ACL_LOCOP)
 		tmp &= ~ACL_ALL_REMOTE;
 #ifdef OPER_KILL
-# ifdef LOCAL_KILL_ONLY
+# ifndef OPER_KILL_REMOTE
 	tmp &= ~ACL_KILLREMOTE;
 # endif
 #else
@@ -1282,7 +1282,7 @@ int	openconf(void)
 		if (serverbooting)
 		{
 			fprintf(stderr,
-			"Fatal Error: Can not open configuration file %s (%s)",
+			"Fatal Error: Can not open configuration file %s (%s)\n",
 			configfile,strerror(errno));
 		}
 	}
