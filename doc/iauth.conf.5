@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.8 1999/03/10 00:30:16 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1999/03/10 00:30:16 $"
+.\" @(#)$Id: iauth.conf.5,v 1.9 1999/03/11 15:16:18 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1999/03/11 15:16:18 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -41,9 +41,11 @@ syntax using the \fIiauth\fP program to avoid later problems.
 .B required
 By specifying this keyword, the IRC server is told not to accept new user
 connections unless the authentication is handled by iauth.
+.TP
 .B notimeout
 By specifying this keyword, the IRC server is told not to accept new user
 connections if iauth hasn't finished its work in time.
+.TP
 .B shared <name> <mod_name.so>
 If iauth was compiled with Dynamically Shared Module support, it can be
 told to dynamically load a module using this option.  The module can then
@@ -96,17 +98,6 @@ module socks
         option = log,reject
 
 module rfc931
-.fi
-.RE
-
-The following file will cause the IRC daemon to only attempt an ident
-lookup for connections originating from a host which has an internet
-address.
-
-.RS
-.nf
-module rfc931
-        host = *
 .fi
 .RE
 .SH COPYRIGHT
