@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.27 1998/09/09 14:53:30 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.28 1998/09/11 20:12:56 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.5.
 </abstract>
@@ -179,7 +179,7 @@ used.  Values above 5 will noticeably increase the CPU used
 by the server.
 <p>
 The zlib package may be found at <url
-url="http://quest.jpl.nasa.gov/zlib/">. The data format used
+url="http://www.cdrom.com/pub/infozip/zlib/">. The data format used
 by the zlib library is described by RFCs (Request for
 Comments) 1950 to 1952 in the files <url
 url="ftp://ds.internic.net/rfc/rfc1950.txt"> (zlib format),
