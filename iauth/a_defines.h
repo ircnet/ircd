@@ -32,6 +32,7 @@
 #if INET6
 # include "../ircd/nameser_def.h"
 #endif
+#include "support_def.h"
 
 #include "a_conf_def.h"
 #include "a_struct_def.h"
