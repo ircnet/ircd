@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.12 1997/09/03 17:45:47 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.13 1997/09/11 03:28:27 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -450,33 +450,43 @@ aClient	*mp;
 		MODE_QUIET;
 
 	chptr = get_channel(mp, "&ERRORS", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: server errors");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&NOTICES", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: warnings and notices");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&KILLS", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: operator and server kills");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&CHANNEL", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: fake modes");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&NUMERICS", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: numerics received");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&SERVERS", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: servers joining and leaving");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&HASH", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: hash tables growth");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&LOCAL", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: notices about local connections");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&SERVICES", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: services joining and leaving");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode;
 	chptr = get_channel(mp, "&DEBUG", CREATE);
+	strcpy(chptr->topic, "SERVER MESSAGES: debug messages [you shouldn't be here! ;)]");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
 	chptr->mode.mode = smode|MODE_PRIVATE;
 
