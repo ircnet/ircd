@@ -544,7 +544,7 @@ extern struct hostent *_switch_gethostbyname_r __P((const char *name,
 #endif
 
 #if defined(HAVE_POLL)
-# define USE_POLL
+# define USE_POLL 1
 #endif
 
 /*  select portability problems - some systems do not define FD_... macros; on
