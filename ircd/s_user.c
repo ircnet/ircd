@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.33 1998/01/07 20:44:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.34 1998/01/23 13:36:43 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -899,13 +899,20 @@ nickkilldone:
 		** on that channel. Propagate notice to other servers.
 		*/
 		sendto_common_channels(sptr, ":%s NICK :%s", parv[0], nick);
-		if (sptr->user)
+		if (sptr->user) /* should always be true.. */
+		    {
 			add_history(sptr, sptr);
-		sendto_serv_butone(cptr, ":%s NICK :%s", parv[0], nick);
 #ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_NICK, sptr->user->server,
-				      sptr, ":%s NICK :%s", parv[0], nick);
+			check_services_butone(SERVICE_WANT_NICK,
+					      sptr->user->server, sptr,
+					      ":%s NICK :%s", parv[0], nick);
 #endif
+		    }
+		else
+			sendto_flag(SCH_NOTICE,
+				    "Illegal NICK change: %s -> %s from %s",
+				    parv[0], nick, get_client_name(cptr,TRUE));
+		sendto_serv_butone(cptr, ":%s NICK :%s", parv[0], nick);
 		if (sptr->name[0])
 			(void)del_from_client_hash_table(sptr->name, sptr);
 		(void)strcpy(sptr->name, nick);
