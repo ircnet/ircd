@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.143 2002/11/25 21:40:49 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.144 2003/02/13 21:17:09 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2128,9 +2128,22 @@ int	parc;
 char	*parv[];
 {
 #define	UFLAGS	(FLAGS_INVISIBLE|FLAGS_WALLOP|FLAGS_RESTRICT)
+	struct umodes_arr_s
+	{
+		char umode;
+		int flag;
+	} umodes_arr[] =
+	{ {'i', FLAGS_INVISIBLE},
+	  {'r', FLAGS_RESTRICT},
+	  {'w', FLAGS_WALLOP},
+	  {'\0', 0}
+	};
+
 	char	*username, *host, *server, *realname;
 	anUser	*user;
 	char	ipbuf[BUFSIZE];
+	int	what,i;
+	char 	*s;
 
 	/* Reject new USER */
 	if (IsServer(sptr) || IsService(sptr) || sptr->user)
@@ -2236,9 +2249,52 @@ char	*parv[];
 #ifndef	NO_DEFAULT_INVISIBLE
 	SetInvisible(sptr);
 #endif
+	/* parse desired user modes sent in USER */
+	/* old behaviour - bits */
+	if ((i = atoi(host)))
+	{
+		/* allows only umodes specified in UFLAGS - see above */
+		sptr->user->flags |= (UFLAGS & atoi(host));
+	}
+	else
+	{
+		what = 0;
+		for (s = host; *s; s++)
+		{
+			switch (*s)
+			{
+				case '+':
+					what = MODE_ADD;
+					continue;
+				case '-':
+					what = MODE_DEL;
+					continue;
+				default:
+					break;
+			}
+			for (i = 0; umodes_arr[i].umode != '\0'; i++)
+			{
+				if (*s == umodes_arr[i].umode)
+				{
+					if (what == MODE_ADD)
+					{
+						sptr->user->flags |=
+							umodes_arr[i].flag;
+					}
+					if (what == MODE_DEL)
+					{
+						sptr->user->flags &=
+							~(umodes_arr[i].flag);
+					}
+				}
+			}
+
+		}
+		
+	}
+	/* *MUST* be after parse of user specified umodes */
 	if (sptr->flags & FLAGS_RILINE)
 		SetRestricted(sptr);
-	sptr->user->flags |= (UFLAGS & atoi(host));
 	strncpyzt(user->host, host, sizeof(user->host));
 	user->server = find_server_string(me.serv->snum);
 	
