@@ -7,6 +7,7 @@
 	* channel.c/set_mode(): get rid of make_nick_user_host(), use alist.
 	* channel.c/make_nick_user_host(): removed whole function.
 	* channel.c/set_mode(): possible tiny memleak fixed.
+	* channel.c/make_bei(): alloc & strcpy minimal possible number of bytes.
 
 2004-06-02  Piotr Kucharski
 
