@@ -78,7 +78,7 @@
  */
 /* This is either full path or file within "server_bin_dir" (see Makefile) */
 #define	SPATH	"ircd"		/* daemon path */
-/* These are either full paths or files within "irc_dir" (see Makefile) */
+/* These are either full paths or files within "ircd_dir" (see Makefile) */
 #define	CPATH	"ircd.conf"	/* configuration file */
 #define	MPATH	"ircd.motd"	/* motd file */
 #define	LPATH	"ircd.log"	/* debugging log */
@@ -99,7 +99,7 @@
  *	FNAME_USERLOG just logs user connections,
  *	FNAME_OPERLOG logs every successful use of /oper.
  *	FNAME_CONNLOG logs every user rejected or uncomplete connection
- * These are either full paths or files within "irc_dir" (see Makefile).
+ * These are either full paths or files within "ircd_dir" (see Makefile).
  */
 #define FNAME_USERLOG "users" /* */
 #define FNAME_OPERLOG "opers" /* */

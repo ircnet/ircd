@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.5 1997/07/15 20:32:44 kalt Exp $
+#*   $Id: Makefile.in,v 1.6 1997/07/18 03:13:04 kalt Exp $
 #*
 #*/
 
@@ -51,10 +51,10 @@ client_man_dir = @mandir@/man1
 server_man_dir = @mandir@/man8
 
 # Directory where most files will be
-irc_dir = @libdir@
+ircd_dir = @libdir@
 
 # Access mode for irc.
-irc_mode = 711
+irc_mode = 755
 
 # Access mode for ircd.
 ircd_mode = 711
@@ -121,13 +121,13 @@ install-server: server
 	-@if [ ! -d $(server_man_dir) ]; then \
 	$(MKDIRHIER) $(server_man_dir); \
 	fi
-	-@if [ ! -d $(irc_dir) ]; then \
-	$(MKDIRHIER) $(irc_dir); \
+	-@if [ ! -d $(ircd_dir) ]; then \
+	$(MKDIRHIER) $(ircd_dir); \
 	fi
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
 	$(INSTALL_PROGRAM) -m $(ircd_mode) $(CHKCONF) $(server_bin_dir)
 	(cd ../doc; $(INSTALL_DATA) ircd.8 $(server_man_dir))
-	(cd ../doc; $(INSTALL_DATA) example.conf $(irc_dir))
+	(cd ../doc; $(INSTALL_DATA) example.conf $(ircd_dir))
 	@echo "installation of server done."
 
 clbsd.o: ../common/bsd.c setup.h config.h
@@ -221,7 +221,7 @@ hash.o: ../ircd/hash.c setup.h config.h
 	$(CC) $(CFLAGS) -c -o $@ ../ircd/hash.c
 
 ircd.o: ../ircd/ircd.c setup.h config.h Makefile
-	$(CC) $(CFLAGS) -DDPATH="\"$(irc_dir)\"" -c -o $@ ../ircd/ircd.c
+	$(CC) $(CFLAGS) -DDPATH="\"$(ircd_dir)\"" -c -o $@ ../ircd/ircd.c
 
 list.o: ../ircd/list.c setup.h config.h
 	$(CC) $(CFLAGS) -c -o $@ ../ircd/list.c
@@ -278,7 +278,7 @@ res_mkquery.o: ../ircd/res_mkquery.c setup.h config.h
 	$(CC) $(CFLAGS) -c -o $@ ../ircd/res_mkquery.c
 
 chkconf.o: ../ircd/chkconf.c setup.h config.h Makefile
-	$(CC) $(CFLAGS) -DDPATH="\"$(irc_dir)\"" -c -o $@ ../ircd/chkconf.c
+	$(CC) $(CFLAGS) -DDPATH="\"$(ircd_dir)\"" -c -o $@ ../ircd/chkconf.c
 
 version.o: version.c
 	$(CC) $(CFLAGS) -c -o $@ version.c
