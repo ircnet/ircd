@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.26 2001/10/20 17:57:26 q Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.27 2002/07/07 17:55:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -30,7 +30,7 @@ static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.26 2001/10/20 17:57:26 q Exp $"
 /****************************** PRIVATE *************************************/
 
 #define CACHETIME 30
-
+#define BROKEN_PROXIES 1
 #define SOCKSPORT 1080
 
 struct proxylog
@@ -335,7 +335,11 @@ char *strver;
     
     if (cldata[cl].mod_status == ST_V4)
 	{
-	    if (cldata[cl].inbuffer[0] == 0)
+	    if (cldata[cl].inbuffer[0] == 0
+#ifdef BROKEN_PROXIES
+		|| cldata[cl].inbuffer[0] == 4
+#endif
+		)
 		{
 		    if (cldata[cl].inbuffer[1] < 90 ||
 			cldata[cl].inbuffer[1] > 93)
