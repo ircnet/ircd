@@ -36,6 +36,6 @@ extern int writecalls, writeb[];
 #else /* BSD_C */
 #define EXTERN
 #endif /* BSD_C */
-EXTERN RETSIGTYPE dummy __P((int s));
-EXTERN int deliver_it __P((aClient *cptr, char *str, int len));
+EXTERN RETSIGTYPE dummy (int s);
+EXTERN int deliver_it (aClient *cptr, char *str, int len);
 #undef EXTERN

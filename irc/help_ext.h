@@ -36,5 +36,5 @@ extern char helpbuf[];
 #else /* HELP_C */
 #define EXTERN
 #endif /* HELP_C */
-EXTERN void do_help __P((char *ptr, char *temp));
+EXTERN void do_help (char *ptr, char *temp);
 #undef EXTERN

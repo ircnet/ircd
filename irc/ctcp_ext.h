@@ -28,6 +28,6 @@
 #else /* CTCP_C */
 #define EXTERN
 #endif /* CTCP_C */
-EXTERN void check_ctcp __P((aClient *cptr, aClient *sptr, int parc,
-			    char *parv[]));
+EXTERN void check_ctcp (aClient *cptr, aClient *sptr, int parc,
+			    char *parv[]);
 #undef EXTERN

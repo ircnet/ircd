@@ -28,34 +28,34 @@
 #else /* S_USER_C */
 #define EXTERN
 #endif /* S_USER_C */
-EXTERN aClient *next_client __P((Reg aClient *next, Reg char *ch));
-EXTERN int hunt_server __P((aClient *cptr, aClient *sptr, char *command,
-			    int server, int parc, char *parv[]));
-EXTERN int do_nick_name __P((char *nick, int server));
-EXTERN int register_user __P((aClient *, aClient *, char *, char *));
-EXTERN char *canonize __P((char *buffer));
-EXTERN int m_nick __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_unick __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_private __P((aClient *cptr, aClient *sptr, int parc,
-			  char *parv[]));
-EXTERN int m_notice __P((aClient *cptr, aClient *sptr, int parc,
-			 char *parv[]));
-EXTERN int m_who __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_whois __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_user __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_quit __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_kill __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_away __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_ping __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_pong __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_oper __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_pass __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_userhost __P((aClient *cptr, aClient *sptr, int parc,
-			   char *parv[]));
-EXTERN int m_ison __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_umode __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN void send_umode __P((aClient *cptr, aClient *sptr, int old,
-			    int sendmask, char *umode_buf));
-EXTERN void send_umode_out __P((aClient *cptr, aClient *sptr, int old));
-EXTERN int m_save __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
+EXTERN aClient *next_client (Reg aClient *next, Reg char *ch);
+EXTERN int hunt_server (aClient *cptr, aClient *sptr, char *command,
+			    int server, int parc, char *parv[]);
+EXTERN int do_nick_name (char *nick, int server);
+EXTERN int register_user (aClient *, aClient *, char *, char *);
+EXTERN char *canonize (char *buffer);
+EXTERN int m_nick (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_unick (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_private (aClient *cptr, aClient *sptr, int parc,
+			  char *parv[]);
+EXTERN int m_notice (aClient *cptr, aClient *sptr, int parc,
+			 char *parv[]);
+EXTERN int m_who (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_whois (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_user (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_quit (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_kill (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_away (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_ping (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_pong (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_oper (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_pass (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_userhost (aClient *cptr, aClient *sptr, int parc,
+			   char *parv[]);
+EXTERN int m_ison (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_umode (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN void send_umode (aClient *cptr, aClient *sptr, int old,
+			    int sendmask, char *umode_buf);
+EXTERN void send_umode_out (aClient *cptr, aClient *sptr, int old);
+EXTERN int m_save (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 #undef EXTERN

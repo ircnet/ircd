@@ -38,23 +38,23 @@ extern struct tm motd_tm;
 #else /* S_MISC_C */
 #define EXTERN
 #endif /* S_MISC_C */
-EXTERN char *date __P((time_t clock));
-EXTERN int check_registered_user __P((aClient *sptr));
-EXTERN int check_registered __P((aClient *sptr));
-EXTERN int check_registered_service __P((aClient *sptr));
-EXTERN char *get_client_name __P((aClient *sptr, int showip));
-EXTERN char *get_client_host __P((aClient *cptr));
-EXTERN void get_sockhost __P((Reg aClient *cptr, Reg char *host));
-EXTERN char *my_name_for_link __P((char *name, Reg int count));
-EXTERN int mark_blind_servers __P((aClient *cptr, aClient *server));
-EXTERN int exit_client __P((aClient *cptr, aClient *sptr, aClient *from,
-			    char *comment));
+EXTERN char *date (time_t clock);
+EXTERN int check_registered_user (aClient *sptr);
+EXTERN int check_registered (aClient *sptr);
+EXTERN int check_registered_service (aClient *sptr);
+EXTERN char *get_client_name (aClient *sptr, int showip);
+EXTERN char *get_client_host (aClient *cptr);
+EXTERN void get_sockhost (Reg aClient *cptr, Reg char *host);
+EXTERN char *my_name_for_link (char *name, Reg int count);
+EXTERN int mark_blind_servers (aClient *cptr, aClient *server);
+EXTERN int exit_client (aClient *cptr, aClient *sptr, aClient *from,
+			    char *comment);
 EXTERN void checklist(void);
 EXTERN void initstats(void);
 EXTERN void initruntimeconf(void);
-EXTERN void tstats __P((aClient *cptr, char *name));
+EXTERN void tstats (aClient *cptr, char *name);
 #ifdef  CACHED_MOTD
-EXTERN void read_motd __P((char *filename));
+EXTERN void read_motd (char *filename);
 #endif /* CACHED_MOTD */
 EXTERN void check_split(void);
 #undef EXTERN

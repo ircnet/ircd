@@ -34,6 +34,6 @@ extern char c_bsd_id[];
 #else /* C_BSD_C */
 #define EXTERN
 #endif /* C_BSD_C */
-EXTERN int client_init __P((char *host, int portnum, aClient *cptr));
-EXTERN void client_loop __P((int sock));
+EXTERN int client_init (char *host, int portnum, aClient *cptr);
+EXTERN void client_loop (int sock);
 #undef EXTERN

@@ -28,17 +28,17 @@
 #else /* RES_COMP_C */
 #define EXTERN
 #endif /* RES_COMP_C */
-EXTERN int ircd_dn_expand __P((const u_char *msg, const u_char *eomorig,
+EXTERN int ircd_dn_expand (const u_char *msg, const u_char *eomorig,
 			       const u_char *comp_dn, char *exp_dn,
-			       int length));
-EXTERN int ircd_dn_comp __P((const char *exp_dn, u_char *comp_dn, int length,
-			     u_char **dnptrs, u_char **lastdnptr));
-EXTERN int __ircd_dn_skipname __P((const u_char *comp_dn, const u_char *eom));
-EXTERN u_int16_t ircd_getshort __P((register const u_char *msgp));
-EXTERN u_int32_t ircd_getlong __P((register const u_char *msgp));
-EXTERN void ircd__putshort __P((register u_int16_t s, register u_char *msgp));
-EXTERN void ircd__putlong __P((register u_int32_t l, register u_char *msgp));
+			       int length);
+EXTERN int ircd_dn_comp (const char *exp_dn, u_char *comp_dn, int length,
+			     u_char **dnptrs, u_char **lastdnptr);
+EXTERN int __ircd_dn_skipname (const u_char *comp_dn, const u_char *eom);
+EXTERN u_int16_t ircd_getshort (register const u_char *msgp);
+EXTERN u_int32_t ircd_getlong (register const u_char *msgp);
+EXTERN void ircd__putshort (register u_int16_t s, register u_char *msgp);
+EXTERN void ircd__putlong (register u_int32_t l, register u_char *msgp);
 #ifdef  NEXT
-EXTERN u_int16_t res_getshort __P((register const u_char *msgp));
+EXTERN u_int16_t res_getshort (register const u_char *msgp);
 #endif /* NEXT */
 #undef EXTERN

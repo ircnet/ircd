@@ -28,6 +28,6 @@
 #else /* S_NUMERIC_C */
 #define EXTERN
 #endif /* S_NUMERIC_C */
-EXTERN int do_numeric __P((int numeric, aClient *cptr, aClient *sptr, int parc,
-			   char *parv[]));
+EXTERN int do_numeric (int numeric, aClient *cptr, aClient *sptr, int parc,
+			   char *parv[]);
 #undef EXTERN

@@ -38,11 +38,11 @@ extern u_int iauth_spawn;
 EXTERN int vsendto_iauth (char *pattern, va_list va);
 EXTERN int sendto_iauth (char *pattern, ...);
 EXTERN void read_iauth(void);
-EXTERN void report_iauth_conf __P((aClient *, char *));
-EXTERN void report_iauth_stats __P((aClient *, char *));
+EXTERN void report_iauth_conf (aClient *, char *);
+EXTERN void report_iauth_stats (aClient *, char *);
 #endif
-EXTERN void start_auth __P((Reg aClient *cptr));
-EXTERN void send_authports __P((aClient *cptr));
-EXTERN void read_authports __P((Reg aClient *cptr));
+EXTERN void start_auth (Reg aClient *cptr);
+EXTERN void send_authports (aClient *cptr);
+EXTERN void read_authports (Reg aClient *cptr);
 
 #undef EXTERN

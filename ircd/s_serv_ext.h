@@ -28,46 +28,46 @@
 #else /* S_SERV_C */
 #define EXTERN
 #endif /* S_SERV_C */
-EXTERN int m_version __P((aClient *cptr, aClient *sptr, int parc,
-			  char *parv[]));
-EXTERN int m_squit __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int check_version __P((aClient *cptr));
-EXTERN int m_smask __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_server __P((aClient *cptr, aClient *sptr, int parc,
-			 char *parv[]));
-EXTERN int m_server_estab __P((aClient *cptr, char *sid, char *versionbuf));
-EXTERN int m_info __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_links __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_summon __P((aClient *cptr, aClient *sptr, int parc,
-			 char *parv[]));
-EXTERN int m_stats __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_users __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_error __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_help __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_lusers __P((aClient *cptr, aClient *sptr, int parc,
-			 char *parv[]));
-EXTERN int m_connect __P((aClient *cptr, aClient *sptr, int parc,
-			  char *parv[]));
-EXTERN int m_wallops __P((aClient *cptr, aClient *sptr, int parc,
-			  char *parv[]));
-EXTERN int m_time __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_admin __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_trace __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_motd __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_close __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN int m_eob __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN char *find_server_string __P((int snum));
-EXTERN int find_server_num __P((char *sname));
+EXTERN int m_version (aClient *cptr, aClient *sptr, int parc,
+			  char *parv[]);
+EXTERN int m_squit (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int check_version (aClient *cptr);
+EXTERN int m_smask (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_server (aClient *cptr, aClient *sptr, int parc,
+			 char *parv[]);
+EXTERN int m_server_estab (aClient *cptr, char *sid, char *versionbuf);
+EXTERN int m_info (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_links (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_summon (aClient *cptr, aClient *sptr, int parc,
+			 char *parv[]);
+EXTERN int m_stats (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_users (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_error (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_help (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_lusers (aClient *cptr, aClient *sptr, int parc,
+			 char *parv[]);
+EXTERN int m_connect (aClient *cptr, aClient *sptr, int parc,
+			  char *parv[]);
+EXTERN int m_wallops (aClient *cptr, aClient *sptr, int parc,
+			  char *parv[]);
+EXTERN int m_time (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_admin (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_trace (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_motd (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_close (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_eob (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN char *find_server_string (int snum);
+EXTERN int find_server_num (char *sname);
 #if defined(OPER_REHASH) || defined(LOCOP_REHASH)
-EXTERN int m_rehash __P((aClient *cptr, aClient *sptr, int parc,
-			 char *parv[]));
+EXTERN int m_rehash (aClient *cptr, aClient *sptr, int parc,
+			 char *parv[]);
 #endif /* OPER_REHASH || LOCOP_REHASH */
 #if defined(OPER_RESTART) || defined(LOCOP_RESTART)
-EXTERN int m_restart __P((aClient *cptr, aClient *sptr, int parc,
-			  char *parv[]));
+EXTERN int m_restart (aClient *cptr, aClient *sptr, int parc,
+			  char *parv[]);
 #endif /* OPER_RESTART || LOCOP_RESTART */
 #if defined(OPER_DIE) || defined(LOCOP_DIE)
-EXTERN int m_die __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
+EXTERN int m_die (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 #endif /* OPER_DIE || LOCOP_DIE */
 #if defined(OPER_SET) || defined(LOCOP_SET)
 EXTERN int m_set(aClient *cptr, aClient *sptr, int parc, char *parv[]);

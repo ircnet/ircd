@@ -34,21 +34,21 @@ extern	aService	*svctop;
 #else /* S_SERVICE_C */
 #define EXTERN
 #endif /* S_SERVICE_C */
-EXTERN aService *make_service __P((aClient *cptr));
-EXTERN void free_service __P((aClient *cptr));
+EXTERN aService *make_service (aClient *cptr);
+EXTERN void free_service (aClient *cptr);
 #ifdef	USE_SERVICES
-EXTERN void check_services_butone __P((long action, char *server,
-				       aClient *cptr, char *fmt, ...));
-EXTERN void check_services_num __P((aClient *sptr, char *umode));
-EXTERN aConfItem *find_conf_service __P((aClient *cptr, int type,
-					 aConfItem *aconf));
-EXTERN int m_servset __P((aClient *cptr, aClient *sptr, int parc,
-			  char *parv[]));
+EXTERN void check_services_butone (long action, char *server,
+				       aClient *cptr, char *fmt, ...);
+EXTERN void check_services_num (aClient *sptr, char *umode);
+EXTERN aConfItem *find_conf_service (aClient *cptr, int type,
+					 aConfItem *aconf);
+EXTERN int m_servset (aClient *cptr, aClient *sptr, int parc,
+			  char *parv[]);
 #endif /* USE_SERVICES */
-EXTERN int m_service __P((aClient *cptr, aClient *sptr, int parc,
-			  char *parv[]));
-EXTERN int m_servlist __P((aClient *cptr, aClient *sptr, int parc,
-			   char *parv[]));
-EXTERN int m_squery __P((aClient *cptr, aClient *sptr, int parc,
-			 char *parv[]));
+EXTERN int m_service (aClient *cptr, aClient *sptr, int parc,
+			  char *parv[]);
+EXTERN int m_servlist (aClient *cptr, aClient *sptr, int parc,
+			   char *parv[]);
+EXTERN int m_squery (aClient *cptr, aClient *sptr, int parc,
+			 char *parv[]);
 #undef EXTERN

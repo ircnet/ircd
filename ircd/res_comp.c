@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_comp.c	8.1 (Berkeley) 6/4/93";
-static char rcsid[] = "$Id: res_comp.c,v 1.7 2001/10/20 17:57:28 q Exp $";
+static char rcsid[] = "$Id: res_comp.c,v 1.8 2003/10/17 21:28:18 q Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -64,17 +64,17 @@ static char rcsid[] = "$Id: res_comp.c,v 1.7 2001/10/20 17:57:28 q Exp $";
 #include "s_externs.h"
 #undef RES_COMP_C
 
-static int	ns_name_ntop __P((const u_char *, char *, size_t));
-static int	ns_name_pton __P((const char *, u_char *, size_t));
-static int	ns_name_unpack __P((const u_char *, const u_char *,
-				    const u_char *, u_char *, size_t));
-static int	ns_name_pack __P((const u_char *, u_char *, int,
-				  const u_char **, const u_char **));
-static int	ns_name_uncompress __P((const u_char *, const u_char *,
-					const u_char *, char *, size_t));
-static int	ns_name_compress __P((const char *, u_char *, size_t,
-				      const u_char **, const u_char **));
-static int	ns_name_skip __P((const u_char **, const u_char *));
+static int	ns_name_ntop (const u_char *, char *, size_t);
+static int	ns_name_pton (const char *, u_char *, size_t);
+static int	ns_name_unpack (const u_char *, const u_char *,
+				    const u_char *, u_char *, size_t);
+static int	ns_name_pack (const u_char *, u_char *, int,
+				  const u_char **, const u_char **);
+static int	ns_name_uncompress (const u_char *, const u_char *,
+					const u_char *, char *, size_t);
+static int	ns_name_compress (const char *, u_char *, size_t,
+				      const u_char **, const u_char **);
+static int	ns_name_skip (const u_char **, const u_char *);
 
 /*
  * Expand compressed domain name 'comp_dn' to full domain name.
@@ -333,11 +333,11 @@ static char		digits[] = "0123456789";
 
 /* Forward. */
 
-static int		special __P((int));
-static int		printable __P((int));
-static int		dn_find __P((const u_char *, const u_char *,
+static int		special (int);
+static int		printable (int);
+static int		dn_find (const u_char *, const u_char *,
 				     const u_char * const *,
-				     const u_char * const *));
+				     const u_char * const *);
 
 /* Public. */
 

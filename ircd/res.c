@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.31 2003/10/13 23:49:44 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.32 2003/10/17 21:28:18 q Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -37,24 +37,24 @@ static	CacheTable	hashtable[ARES_CACSIZE];
 static	aCache	*cachetop = NULL;
 static	ResRQ	*last, *first;
 
-static	void	rem_cache __P((aCache *));
-static	void	rem_request __P((ResRQ *));
-static	int	do_query_name __P((Link *, char *, ResRQ *, int));
-static	int	do_query_number __P((Link *, struct IN_ADDR *, ResRQ *));
-static	void	resend_query __P((ResRQ *));
-static	int	proc_answer __P((ResRQ *, HEADER *, char *, char *));
-static	int	query_name __P((char *, int, int, ResRQ *));
-static	aCache	*make_cache __P((ResRQ *)), *rem_list __P((aCache *));
-static	aCache	*find_cache_name __P((char *));
-static	aCache	*find_cache_number __P((ResRQ *, char *));
-static	int	add_request __P((ResRQ *));
-static	ResRQ	*make_request __P((Link *));
-static	int	send_res_msg __P((char *, int, int));
-static	ResRQ	*find_id __P((int));
-static	int	hash_number __P((unsigned char *));
-static	void	update_list __P((ResRQ *, aCache *));
-static	int	hash_name __P((char *));
-static	int	bad_hostname __P((char *, int));
+static	void	rem_cache (aCache *);
+static	void	rem_request (ResRQ *);
+static	int	do_query_name (Link *, char *, ResRQ *, int);
+static	int	do_query_number (Link *, struct IN_ADDR *, ResRQ *);
+static	void	resend_query (ResRQ *);
+static	int	proc_answer (ResRQ *, HEADER *, char *, char *);
+static	int	query_name (char *, int, int, ResRQ *);
+static	aCache	*make_cache (ResRQ *), *rem_list (aCache *);
+static	aCache	*find_cache_name (char *);
+static	aCache	*find_cache_number (ResRQ *, char *);
+static	int	add_request (ResRQ *);
+static	ResRQ	*make_request (Link *);
+static	int	send_res_msg (char *, int, int);
+static	ResRQ	*find_id (int);
+static	int	hash_number (unsigned char *);
+static	void	update_list (ResRQ *, aCache *);
+static	int	hash_name (char *);
+static	int	bad_hostname (char *, int);
 
 static	struct cacheinfo {
 	int	ca_adds;

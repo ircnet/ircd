@@ -34,16 +34,16 @@ extern aClass *classes;
 #else /* CLASS_C */
 #define EXTERN
 #endif /* CLASS_C */
-EXTERN int get_conf_class __P((aConfItem *aconf));
-EXTERN int get_client_class __P((aClient *acptr));
-EXTERN int get_client_ping __P((aClient *acptr));
-EXTERN int get_con_freq __P((aClass *clptr));
-EXTERN void add_class __P((int class, int ping, int confreq, int maxli,
+EXTERN int get_conf_class (aConfItem *aconf);
+EXTERN int get_client_class (aClient *acptr);
+EXTERN int get_client_ping (aClient *acptr);
+EXTERN int get_con_freq (aClass *clptr);
+EXTERN void add_class (int class, int ping, int confreq, int maxli,
 			   int sendq, int hlocal, int uhlocal,
-			   int hglobal, int uhglobal));
-EXTERN aClass *find_class __P((int cclass));
+			   int hglobal, int uhglobal);
+EXTERN aClass *find_class (int cclass);
 EXTERN void check_class(void);
 EXTERN void initclass(void);
-EXTERN void report_classes __P((aClient *sptr, char *to));
-EXTERN int get_sendq __P((aClient *cptr));
+EXTERN void report_classes (aClient *sptr, char *to);
+EXTERN int get_sendq (aClient *cptr);
 #undef EXTERN

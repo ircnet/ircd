@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.104 2003/10/17 19:46:23 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.105 2003/10/17 21:28:19 q Exp $";
 #endif
 
 #include "os.h"
@@ -55,15 +55,15 @@ time_t	timeofday;
 static	struct	SOCKADDR_IN	mysk;
 static	void	polludp(void);
 
-static	struct	SOCKADDR *connect_inet __P((aConfItem *, aClient *, int *));
-static	int	completed_connection __P((aClient *));
-static	int	check_init __P((aClient *, char *));
-static	int	check_ping __P((char *, int));
-static	void	do_dns_async __P((void));
-static	int	set_sock_opts __P((int, aClient *));
+static	struct	SOCKADDR *connect_inet (aConfItem *, aClient *, int *);
+static	int	completed_connection (aClient *);
+static	int	check_init (aClient *, char *);
+static	int	check_ping (char *, int);
+static	void	do_dns_async (void);
+static	int	set_sock_opts (int, aClient *);
 #ifdef	UNIXPORT
-static	struct	SOCKADDR *connect_unix __P((aConfItem *, aClient *, int *));
-static	void	add_unixconnection __P((aClient *, int));
+static	struct	SOCKADDR *connect_unix (aConfItem *, aClient *, int *);
+static	void	add_unixconnection (aClient *, int);
 static	char	unixpath[256];
 #endif
 static	char	readbuf[READBUF_SIZE];

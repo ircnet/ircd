@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.159 2003/10/15 19:55:49 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.160 2003/10/17 21:28:18 q Exp $";
 #endif
 
 #include "os.h"
@@ -49,22 +49,22 @@ static	char	asterix[2]="*";
 
 aChannel *channel = NullChn;
 
-static	void	add_invite __P((aClient *, aClient *, aChannel *));
-static	int	can_join __P((aClient *, aChannel *, char *));
-void	channel_modes __P((aClient *, char *, char *, aChannel *));
-static	int	check_channelmask __P((aClient *, aClient *, char *));
-static	aChannel *get_channel __P((aClient *, char *, int));
-static	int	set_mode __P((aClient *, aClient *, aChannel *, int *, 
-			int, char **));
-static	void	free_channel __P((aChannel *));
+static	void	add_invite (aClient *, aClient *, aChannel *);
+static	int	can_join (aClient *, aChannel *, char *);
+void	channel_modes (aClient *, char *, char *, aChannel *);
+static	int	check_channelmask (aClient *, aClient *, char *);
+static	aChannel *get_channel (aClient *, char *, int);
+static	int	set_mode (aClient *, aClient *, aChannel *, int *, 
+			int, char **);
+static	void	free_channel (aChannel *);
 
-static	int	add_modeid __P((int, aClient *, aChannel *, aListItem *));
-static	int	del_modeid __P((int, aChannel *, aListItem *));
-static	Link	*match_modeid __P((int, aClient *, aChannel *));
-static  void    names_channel __P((aClient *,aClient *,char *,aChannel *,int));
-static	void	convert_scandinavian __P((Reg char *cn, aClient *));
-static	void	free_bei __P((aListItem *bei));
-static	aListItem	*make_bei __P((char *nick, char *user, char *host));
+static	int	add_modeid (int, aClient *, aChannel *, aListItem *);
+static	int	del_modeid (int, aChannel *, aListItem *);
+static	Link	*match_modeid (int, aClient *, aChannel *);
+static  void    names_channel (aClient *,aClient *,char *,aChannel *,int);
+static	void	convert_scandinavian (Reg char *cn, aClient *);
+static	void	free_bei (aListItem *bei);
+static	aListItem	*make_bei (char *nick, char *user, char *host);
 
 
 static	char	*PartFmt = ":%s PART %s :%s";

@@ -28,16 +28,16 @@
 #else /* RES_C */
 #define EXTERN
 #endif /* RES_C */
-extern int init_resolver __P((int op));
-EXTERN time_t timeout_query_list __P((time_t now));
-EXTERN void del_queries __P((char *cp));
-EXTERN struct hostent *gethost_byname __P((char *name, Link *lp));
-EXTERN struct hostent *gethost_byname_type __P((char *name, Link *lp, 
-						int type));
-EXTERN struct hostent *gethost_byaddr __P((char *addr, Link *lp));
-EXTERN struct hostent *get_res __P((char *lp));
-EXTERN time_t expire_cache __P((time_t now));
+extern int init_resolver (int op);
+EXTERN time_t timeout_query_list (time_t now);
+EXTERN void del_queries (char *cp);
+EXTERN struct hostent *gethost_byname (char *name, Link *lp);
+EXTERN struct hostent *gethost_byname_type (char *name, Link *lp, 
+						int type);
+EXTERN struct hostent *gethost_byaddr (char *addr, Link *lp);
+EXTERN struct hostent *get_res (char *lp);
+EXTERN time_t expire_cache (time_t now);
 EXTERN void flush_cache(void);
-EXTERN int m_dns __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN u_long cres_mem __P((aClient *sptr, char *nick));
+EXTERN int m_dns (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN u_long cres_mem (aClient *sptr, char *nick);
 #undef EXTERN

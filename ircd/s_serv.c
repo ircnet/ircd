@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.128 2003/10/17 17:58:07 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.129 2003/10/17 21:28:20 q Exp $";
 #endif
 
 #include "os.h"
@@ -33,10 +33,10 @@ static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.128 2003/10/17 17:58:07 q Exp $";
 
 static	char	buf[BUFSIZE];
 
-static	int	check_link __P((aClient *));
-static	int	get_version __P((char *version, char *id));
-static	void	trace_one __P((aClient *sptr, aClient *acptr));
-static	int	check_servername __P((char *hostname));
+static	int	check_link (aClient *);
+static	int	get_version (char *version, char *id);
+static	void	trace_one (aClient *sptr, aClient *acptr);
+static	int	check_servername (char *hostname);
 const	char	*check_servername_errors[3][2] = {
 	{ "too long", "Bogus servername - too long" },
 	{ "invalid", "Bogus servername - invalid hostname" },

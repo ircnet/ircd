@@ -35,11 +35,11 @@ extern int insert;
 #else /* SCREEN_C */
 #define EXTERN
 #endif /* SCREEN_C */
-EXTERN int get_char __P((int pos));
-EXTERN void set_char __P((int pos, int ch));
-EXTERN int get_yank_char __P((int pos));
-EXTERN void set_yank_char __P((int pos, int ch));
-EXTERN void set_position __P((int disp, int from));
+EXTERN int get_char (int pos);
+EXTERN void set_char (int pos, int ch);
+EXTERN int get_yank_char (int pos);
+EXTERN void set_yank_char (int pos, int ch);
+EXTERN void set_position (int disp, int from);
 EXTERN int get_position(void);
 EXTERN void toggle_ins(void);
 EXTERN int in_insert_mode(void);
@@ -52,5 +52,5 @@ EXTERN void previous_in_history(void);
 EXTERN void kill_whole_line(void);
 EXTERN void yank(void);
 EXTERN int tulosta_viimeinen_rivi(void);
-EXTERN int get_disp __P((int paikka));
+EXTERN int get_disp (int paikka);
 #undef EXTERN

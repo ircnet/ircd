@@ -40,26 +40,26 @@ extern int _HOSTNAMEHASHSIZE;
 #define EXTERN
 #endif /* HASH_C */
 EXTERN void inithashtables(void);
-EXTERN int add_to_client_hash_table __P((char *name, aClient *cptr));
-EXTERN int add_to_uid_hash_table __P((char *uid, aClient *cptr));
-EXTERN int add_to_channel_hash_table __P((char *name, aChannel *chptr));
-EXTERN int add_to_server_hash_table __P((aServer *sptr, aClient *cptr));
-EXTERN int add_to_sid_hash_table __P((char *sid, aClient *cptr));
-EXTERN int add_to_hostname_hash_table __P((char *hostname, anUser *user));
-EXTERN int del_from_client_hash_table __P((char *name, aClient *cptr));
-EXTERN int del_from_uid_hash_table __P((char *uid, aClient *cptr));
-EXTERN int del_from_channel_hash_table __P((char *name, aChannel *chptr));
-EXTERN int del_from_server_hash_table __P((aServer *sptr, aClient *cptr));
-EXTERN int del_from_sid_hash_table __P((aServer *sptr));
-EXTERN int del_from_hostname_hash_table __P((char *hostname, anUser *user));
-EXTERN aClient *hash_find_client __P((char *name, aClient *cptr));
-EXTERN aClient *hash_find_uid __P((char *uid, aClient *cptr));
-EXTERN aClient *hash_find_server __P((char *server, aClient *cptr));
-EXTERN aChannel *hash_find_channel __P((char *name, aChannel *chptr));
-EXTERN aChannel *hash_find_channels __P((char *name, aChannel *chptr));
-EXTERN aServer *hash_find_stoken __P((int tok, aClient *cptr, void *dummy));
-EXTERN aClient *hash_find_sid __P((char *sid, aClient *cptr));
-EXTERN anUser *hash_find_hostname __P((char *hostname, anUser *user));
-EXTERN int m_hash __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
+EXTERN int add_to_client_hash_table (char *name, aClient *cptr);
+EXTERN int add_to_uid_hash_table (char *uid, aClient *cptr);
+EXTERN int add_to_channel_hash_table (char *name, aChannel *chptr);
+EXTERN int add_to_server_hash_table (aServer *sptr, aClient *cptr);
+EXTERN int add_to_sid_hash_table (char *sid, aClient *cptr);
+EXTERN int add_to_hostname_hash_table (char *hostname, anUser *user);
+EXTERN int del_from_client_hash_table (char *name, aClient *cptr);
+EXTERN int del_from_uid_hash_table (char *uid, aClient *cptr);
+EXTERN int del_from_channel_hash_table (char *name, aChannel *chptr);
+EXTERN int del_from_server_hash_table (aServer *sptr, aClient *cptr);
+EXTERN int del_from_sid_hash_table (aServer *sptr);
+EXTERN int del_from_hostname_hash_table (char *hostname, anUser *user);
+EXTERN aClient *hash_find_client (char *name, aClient *cptr);
+EXTERN aClient *hash_find_uid (char *uid, aClient *cptr);
+EXTERN aClient *hash_find_server (char *server, aClient *cptr);
+EXTERN aChannel *hash_find_channel (char *name, aChannel *chptr);
+EXTERN aChannel *hash_find_channels (char *name, aChannel *chptr);
+EXTERN aServer *hash_find_stoken (int tok, aClient *cptr, void *dummy);
+EXTERN aClient *hash_find_sid (char *sid, aClient *cptr);
+EXTERN anUser *hash_find_hostname (char *hostname, anUser *user);
+EXTERN int m_hash (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 
 #undef EXTERN

@@ -34,6 +34,6 @@ extern char str_id[];
 #else /* STR_C */
 #define EXTERN
 #endif /* STR_C */
-EXTERN char *center __P((char *buf, char *str, int len));
-EXTERN char *real_name __P((struct passwd *user));
+EXTERN char *center (char *buf, char *str, int len);
+EXTERN char *real_name (struct passwd *user);
 #undef EXTERN

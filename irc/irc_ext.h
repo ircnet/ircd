@@ -54,31 +54,31 @@ extern struct itmlst null_list[];
 #define EXTERN
 #endif /* IRC_C */
 EXTERN void intr(void);
-EXTERN void myloop __P((int sock));
-EXTERN void do_cmdch __P((char *ptr, char *temp));
-EXTERN void do_quote __P((char *ptr, char *temp));
-EXTERN void do_query __P((char *ptr, char *temp));
-EXTERN void do_mypriv __P((char *buf1, char *buf2));
-EXTERN void do_myqpriv __P((char *buf1, char *buf2));
-EXTERN void do_mytext __P((char *buf1, char *temp));
-EXTERN void do_unkill __P((char *buf, char *temp));
-EXTERN void do_bye __P((char *buf, char *tmp));
-EXTERN void do_kill __P((char *buf1, char *tmp));
-EXTERN void do_kick __P((char *buf1, char *tmp));
-EXTERN void do_away __P((char *buf1, char *tmp));
-EXTERN void do_server __P((char *buf, char *tmp));
-EXTERN void sendit __P((char *line));
-EXTERN char *mycncmp __P((char *str1, char *str2));
-EXTERN void do_clear __P((char *buf, char *temp));
-EXTERN void putline __P((char *line));
+EXTERN void myloop (int sock);
+EXTERN void do_cmdch (char *ptr, char *temp);
+EXTERN void do_quote (char *ptr, char *temp);
+EXTERN void do_query (char *ptr, char *temp);
+EXTERN void do_mypriv (char *buf1, char *buf2);
+EXTERN void do_myqpriv (char *buf1, char *buf2);
+EXTERN void do_mytext (char *buf1, char *temp);
+EXTERN void do_unkill (char *buf, char *temp);
+EXTERN void do_bye (char *buf, char *tmp);
+EXTERN void do_kill (char *buf1, char *tmp);
+EXTERN void do_kick (char *buf1, char *tmp);
+EXTERN void do_away (char *buf1, char *tmp);
+EXTERN void do_server (char *buf, char *tmp);
+EXTERN void sendit (char *line);
+EXTERN char *mycncmp (char *str1, char *str2);
+EXTERN void do_clear (char *buf, char *temp);
+EXTERN void putline (char *line);
 EXTERN int unixuser(void);
-EXTERN void do_log __P((char *ptr, char *temp));
-EXTERN char *last_to_me __P((char *sender));
-EXTERN char *last_from_me __P((char *recipient));
+EXTERN void do_log (char *ptr, char *temp);
+EXTERN char *last_to_me (char *sender);
+EXTERN char *last_from_me (char *recipient);
 #ifdef GETPASS
-EXTERN do_oper __P((char *ptr, char *xtra));
+EXTERN do_oper (char *ptr, char *xtra);
 #endif
-EXTERN void do_channel __P((char *ptr, char *xtra));
+EXTERN void do_channel (char *ptr, char *xtra);
 EXTERN void write_statusline(void);
-EXTERN RETSIGTYPE quit_intr __P((int s));
+EXTERN RETSIGTYPE quit_intr (int s);
 #undef EXTERN

@@ -55,7 +55,7 @@
 
 /*
  *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id: resolv_def.h,v 1.6 2001/10/20 17:57:28 q Exp $
+ *	$Id: resolv_def.h,v 1.7 2003/10/17 21:28:19 q Exp $
  */
 
 /*
@@ -152,19 +152,19 @@ struct __res_state {
 typedef enum { res_goahead, res_nextns, res_modified, res_done, res_error }
 	res_sendhookact;
 
-typedef res_sendhookact (*res_send_qhook)__P((struct SOCKADDR_IN * const *ns,
+typedef res_sendhookact (*res_send_qhook)(struct SOCKADDR_IN * const *ns,
 					      const u_char **query,
 					      int *querylen,
 					      u_char *ans,
 					      int anssiz,
-					      int *resplen));
+					      int *resplen);
 
-typedef res_sendhookact (*res_send_rhook)__P((const struct SOCKADDR_IN *ns,
+typedef res_sendhookact (*res_send_rhook)(const struct SOCKADDR_IN *ns,
 					      const u_char *query,
 					      int querylen,
 					      u_char *ans,
 					      int anssiz,
-					      int *resplen));
+					      int *resplen);
 #endif
 
 struct res_sym {

@@ -34,6 +34,6 @@ extern char c_numeric_id[];
 #else /* C_NUMERIC_C */
 #define EXTERN
 #endif /* C_NUMERIC_C */
-EXTERN int do_numeric __P((int numeric, aClient *cptr, aClient *sptr, int parc,
-			   char *parv[]));
+EXTERN int do_numeric (int numeric, aClient *cptr, aClient *sptr, int parc,
+			   char *parv[]);
 #undef EXTERN

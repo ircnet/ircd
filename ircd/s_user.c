@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.161 2003/10/13 23:14:56 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.162 2003/10/17 21:28:20 q Exp $";
 #endif
 
 #include "os.h"
@@ -31,7 +31,7 @@ static  char rcsid[] = "@(#)$Id: s_user.c,v 1.161 2003/10/13 23:14:56 chopin Exp
 #include "s_externs.h"
 #undef S_USER_C
 
-static void	save_user __P((aClient *, aClient *, char *));
+static void	save_user (aClient *, aClient *, char *);
 
 static char buf[BUFSIZE], buf2[BUFSIZE];
 

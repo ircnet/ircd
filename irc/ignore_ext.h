@@ -36,8 +36,8 @@ extern char ibuf[];
 #else /* IGNORE_C */
 #define EXTERN
 #endif /* IGNORE_C */
-EXTERN void do_ignore __P((char *user, char *temp));
-EXTERN anIgnore *find_ignore __P((char *user, anIgnore *para, char *fromhost));
-EXTERN int kill_ignore __P((anIgnore *iptr));
-EXTERN int add_ignore __P((char *ch, int status, char *fromhost));
+EXTERN void do_ignore (char *user, char *temp);
+EXTERN anIgnore *find_ignore (char *user, anIgnore *para, char *fromhost);
+EXTERN int kill_ignore (anIgnore *iptr);
+EXTERN int add_ignore (char *ch, int status, char *fromhost);
 #undef EXTERN

@@ -36,10 +36,10 @@ extern aModule Module_rfc931;
 #endif /* MOD_RFC931_C */
 
 /*
-EXTERN int rfc931_start __P((u_int));
-EXTERN int rfc931_work __P((u_int));
-EXTERN int rfc931_timeout __P((u_int));
-EXTERN void rfc931_clean __P((u_int));
+EXTERN int rfc931_start (u_int);
+EXTERN int rfc931_work (u_int);
+EXTERN int rfc931_timeout (u_int);
+EXTERN void rfc931_clean (u_int);
 */
 
 #undef EXTERN

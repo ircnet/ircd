@@ -34,18 +34,18 @@
 #else /* S_ID_C */
 #define EXTERN
 #endif /* S_ID_C */
-EXTERN char *get_chid __P((void));
-EXTERN int close_chid __P((char *));
-EXTERN void cache_chid __P((aChannel *));
-EXTERN int check_chid __P((char *));
-EXTERN void collect_chid __P((void));
+EXTERN char *get_chid (void);
+EXTERN int close_chid (char *);
+EXTERN void cache_chid (aChannel *);
+EXTERN int check_chid (char *);
+EXTERN void collect_chid (void);
 
-EXTERN void init_sid __P((char *));
-EXTERN char *next_uid __P((void));
-EXTERN int check_uid __P((char *));
-EXTERN char *ltoid __P((long l, int n));
-EXTERN long idtol __P((char *id, int n));
-EXTERN int sid_valid __P((char *sid));
-EXTERN int cid_ok __P((char *name, int n));
+EXTERN void init_sid (char *);
+EXTERN char *next_uid (void);
+EXTERN int check_uid (char *);
+EXTERN char *ltoid (long l, int n);
+EXTERN long idtol (char *id, int n);
+EXTERN int sid_valid (char *sid);
+EXTERN int cid_ok (char *name, int n);
 
 #undef EXTERN

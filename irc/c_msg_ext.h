@@ -38,39 +38,39 @@ extern char mybuf[];
 #define EXTERN
 #endif /* C_MSG_C */
 EXTERN void m_die(void);
-EXTERN int m_mode __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN int m_wall __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN int m_wallops __P((aClient *sptr, aClient *cptr, int parc,
-			  char *parv[]));
-EXTERN int m_ping __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN int m_pong __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN int m_nick __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN void m_away __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN int m_server __P((aClient *sptr, aClient *cptr, int parc,
-			 char *parv[]));
-EXTERN int m_topic __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN int m_join __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN int m_part __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN void m_version __P((aClient *sptr, aClient *cptr, int parc,
-			   char *parv[]));
+EXTERN int m_mode (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN int m_wall (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN int m_wallops (aClient *sptr, aClient *cptr, int parc,
+			  char *parv[]);
+EXTERN int m_ping (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN int m_pong (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN int m_nick (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN void m_away (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN int m_server (aClient *sptr, aClient *cptr, int parc,
+			 char *parv[]);
+EXTERN int m_topic (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN int m_join (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN int m_part (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN void m_version (aClient *sptr, aClient *cptr, int parc,
+			   char *parv[]);
 EXTERN void m_bye(void);
-EXTERN int m_quit __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN int m_kill __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
-EXTERN void m_info __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN void m_squit __P((aClient *sptr, aClient *cptr, int parc,
-			 char *parv[]));
-EXTERN void m_newwhoreply __P((char *channel, char *username, char *host,
-			       char *nickname, char *away, char *realname));
-EXTERN void m_newnamreply __P((aClient *sptr, aClient *cptr, int parc,
-			       char *parv[]));
-EXTERN void m_linreply __P((aClient *sptr, aClient *cptr, int parc,
-			    char *parv[]));
-EXTERN int m_private __P((aClient *sptr, aClient *cptr, int parc,
-			  char *parv[]));
-EXTERN int m_kick __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN int m_notice __P((aClient *sptr, aClient *cptr, int parc,
-			 char *parv[]));
-EXTERN int m_invite __P((aClient *sptr, aClient *cptr, int parc,
-			 char *parv[]));
-EXTERN int m_error __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
+EXTERN int m_quit (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN int m_kill (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN void m_info (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN void m_squit (aClient *sptr, aClient *cptr, int parc,
+			 char *parv[]);
+EXTERN void m_newwhoreply (char *channel, char *username, char *host,
+			       char *nickname, char *away, char *realname);
+EXTERN void m_newnamreply (aClient *sptr, aClient *cptr, int parc,
+			       char *parv[]);
+EXTERN void m_linreply (aClient *sptr, aClient *cptr, int parc,
+			    char *parv[]);
+EXTERN int m_private (aClient *sptr, aClient *cptr, int parc,
+			  char *parv[]);
+EXTERN int m_kick (aClient *sptr, aClient *cptr, int parc, char *parv[]);
+EXTERN int m_notice (aClient *sptr, aClient *cptr, int parc,
+			 char *parv[]);
+EXTERN int m_invite (aClient *sptr, aClient *cptr, int parc,
+			 char *parv[]);
+EXTERN int m_error (aClient *sptr, aClient *cptr, int parc, char *parv[]);
 #undef EXTERN

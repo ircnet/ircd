@@ -38,16 +38,16 @@ extern int irc_lines, irc_columns, scroll_ok, scroll_status;
 #define EXTERN
 #endif /* SWEAR_C */
 #ifdef DOTERMCAP
-EXTERN void tcap_putch __P((int row, int col, char ch));
-EXTERN void tcap_move __P((int row, int col));
-EXTERN void clear_to_eol __P((int row, int col));
+EXTERN void tcap_putch (int row, int col, char ch);
+EXTERN void tcap_move (int row, int col);
+EXTERN void clear_to_eol (int row, int col);
 EXTERN void clearscreen();
-EXTERN int io_on __P((int flag));
+EXTERN int io_on (int flag);
 EXTERN int io_off();
 EXTERN void scroll_ok_off();
 EXTERN void scroll_ok_on();
-EXTERN void put_insflag __P((int flag));
+EXTERN void put_insflag (int flag);
 EXTERN void put_statusline();
-EXTERN void tcap_putline __P((char *line));
+EXTERN void tcap_putline (char *line);
 #endif
 #undef EXTERN

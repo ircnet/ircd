@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.49 2003/10/15 19:55:48 q Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.50 2003/10/17 21:28:16 q Exp $";
 #endif
 
 #include "os.h"
@@ -148,12 +148,12 @@ char	userhost[USERLEN+HOSTLEN+2];
 #define	timeofday	time(NULL)
 #else
 static	char	sender[HOSTLEN+1];
-static	int	cancel_clients __P((aClient *, aClient *, char *));
-static	void	remove_unknown __P((aClient *, char *));
+static	int	cancel_clients (aClient *, aClient *, char *);
+static	void	remove_unknown (aClient *, char *);
 #endif
 
-static	int	find_sender __P((aClient *cptr, aClient **sptr, char *sender,
-			char *buffer));
+static	int	find_sender (aClient *cptr, aClient **sptr, char *sender,
+			char *buffer);
 
 /*
 **  Find a client (server or user) by name.
