@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.53 2002/06/02 00:45:55 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.54 2002/07/06 03:13:12 jv Exp $";
 #endif
 
 #include "os.h"
@@ -63,6 +63,73 @@ static	int	lookup_confhost __P((aConfItem *));
 aConfItem	*conf = NULL;
 aConfItem	*kconf = NULL;
 char		*networkname = NULL;
+
+/* Parse I-lines flags from string.
+ * D - Restricted, if no DNS
+ * I - Restricted, if no ident
+ * R - Restricted.
+ * E - Kline exempt
+ */
+long iline_flags_parse(char *string)
+{
+	long tmp = 0;
+	
+	if (!string)
+	{
+		return 0;
+	}
+	
+	if (index(string,'D'))
+	{
+		tmp |= CFLAG_RNODNS;
+	}
+	if (index(string,'I'))
+	{
+		tmp |= CFLAG_RNOIDENT;
+	}
+	if (index(string,'R'))
+	{
+		tmp |= CFLAG_RESTRICTED;
+	}
+	
+	if (index(string,'E'))
+	{
+		tmp |= CFLAG_KEXEMPT;
+	}
+
+	return tmp;
+}
+
+/* convert iline flags to human readable string */
+char *iline_flags_to_string(long flags)
+{
+	static char ifsbuf[BUFSIZE];
+	char *s = ifsbuf;
+	
+	if (flags & CFLAG_RNODNS)
+	{
+		*s++ = 'D';
+	}
+
+	if (flags & CFLAG_RNOIDENT)
+	{
+		*s++ = 'I';
+	}
+	
+	if (flags & CFLAG_RESTRICTED)
+	{
+		*s++ = 'R';
+	}
+
+	if (flags & CFLAG_KEXEMPT)
+	{
+		*s++ = 'E';
+	}
+	*s++ = '\0';
+	
+	return ifsbuf;
+}
+
 /*
  * remove all conf entries from the client except those which match
  * the status field mask.
@@ -228,7 +295,28 @@ char	*sockhost;
 		    }
 attach_iline:
 		if (aconf->status & CONF_RCLIENT)
+		{
 			SetRestricted(cptr);
+		}
+		
+		if (IsConfRestricted(aconf))
+		{
+			SetRestricted(cptr);
+		}
+		
+		if (!hp && IsConfRNoDNS(aconf))
+		{
+			SetRestricted(cptr);
+		}
+		
+		if (IsConfKlineExempt(aconf))
+		{
+			SetKlineExempt(cptr);
+		}
+		if (!(cptr->flags & FLAGS_GOTID) && IsConfRNoIdent(aconf))
+		{
+			SetRestricted(cptr);
+		}
 		get_sockhost(cptr, uhost);
 		if ((i = attach_conf(cptr, aconf)) < -1)
 			find_bounce(cptr, ConfClass(aconf), -1);
@@ -1286,10 +1374,9 @@ int	opt;
 			if (MaxLinks(Class(aconf)) < 0)
 				Class(aconf) = find_class(0);
 		    }
-		if (aconf->status & (CONF_LISTEN_PORT|CONF_CLIENT))
+		if (aconf->status & (CONF_LISTEN_PORT|CONF_CLIENT|CONF_RCLIENT))
 		    {
 			aConfItem *bconf;
-
 			if ((bconf = find_conf_entry(aconf, aconf->status)))
 			    {
 				delist_conf(bconf);
@@ -1307,6 +1394,19 @@ int	opt;
 				 aconf->status == CONF_LISTEN_PORT)
 				(void)add_listener(aconf);
 		    }
+		if ((aconf->status & (CONF_CLIENT|CONF_RCLIENT)))
+		{
+			/* Parse I-line flags */
+			if (tmp3)
+			{
+				aconf->flags = iline_flags_parse(tmp3);
+			}
+			else
+			{
+				aconf->flags = 0L;
+			}
+		}
+		
 		if (aconf->status & CONF_SERVICE)
 			aconf->port &= SERVICE_MASK_ALL;
 		if (aconf->status & (CONF_SERVER_MASK|CONF_SERVICE))
@@ -1500,6 +1600,11 @@ char	**comment;
 
 	if (!cptr->user)
 		return 0;
+	
+	if (IsKlineExempt(cptr))
+	{
+		return 0;
+	}
 
 	host = cptr->sockhost;
 #ifdef INET6
