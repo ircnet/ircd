@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.20 2002/03/14 23:15:17 jv Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.21 2002/03/17 20:45:11 jv Exp $";
 #endif
 
 #include "os.h"
@@ -864,6 +864,7 @@ char *make_version()
 	return mystrdup(ver);
 }
 
+#ifndef CLIENT_COMPILE
 /* Make RPL_ISUPPORT (055) numeric contens */
 char **make_isupport()
 {
@@ -892,6 +893,8 @@ char **make_isupport()
 
 	return tis;
 }
+#endif
+
 #ifndef HAVE_TRUNCATE
 /* truncate: set a file to a specified length
  * I don't know of any UNIX that doesn't have truncate, but CYGWIN32 beta18
