@@ -3,6 +3,8 @@
 	* s_service.c/m_service(): removed metric variable; moved filling
 	  hopcount earlier, so it does not break later in free_client(),
 	  where it is used for local client check (noted by jv).
+	* s_service.c/m_service(): changed !sp to sp==NULL, as the former
+	  breaks in DEBUGMODE.
 
 2003-07-28  Jakub Vlasek
 
