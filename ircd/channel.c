@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.233 2004/10/06 20:15:06 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.234 2004/10/30 15:29:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3132,45 +3132,52 @@ int	m_topic(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	parv[1] = canonize(parv[1]);
 
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
-	    {
-		if (!UseModes(name))
-		    {
-			sendto_one(sptr, replies[ERR_NOCHANMODES], ME, BadTo(parv[0]),
-				   name);
+	{
+		if (!IsChannelName(name))
+		{
+			sendto_one(sptr, replies[ERR_NOTONCHANNEL], ME,
+				parv[0], name);
 			continue;
-		    }
+		}
+		if (!UseModes(name))
+		{
+			sendto_one(sptr, replies[ERR_NOCHANMODES], ME, 
+				parv[0], name);
+			continue;
+		}
 		convert_scandinavian(name, cptr);
-		if (parc > 1 && IsChannelName(name))
-		    {
-			chptr = find_channel(name, NullChn);
-			if (!chptr || !IsMember(sptr, chptr))
-			    {
-				sendto_one(sptr, replies[ERR_NOTONCHANNEL],
-					   ME, BadTo(parv[0]), name);
-				continue;
-			    }
-			if (parc > 2)
-				topic = parv[2];
-		    }
-
+		chptr = find_channel(name, NullChn);
 		if (!chptr)
-		    {
-			sendto_one(sptr, replies[RPL_NOTOPIC], ME, BadTo(parv[0]), name);
+		{
+			sendto_one(sptr, replies[ERR_NOSUCHCHANNEL], ME,
+				parv[0], name);
 			return penalty;
-		    }
+		}
+		if (!IsMember(sptr, chptr))
+		{
+			sendto_one(sptr, replies[ERR_NOTONCHANNEL], ME,
+				parv[0], name);
+			continue;
+		}
 
+		/* should never be true at this point --B. */
 		if (check_channelmask(sptr, cptr, name))
 			continue;
 	
+		if (parc > 2)
+			topic = parv[2];
+
 		if (!topic)  /* only asking  for topic  */
-		    {
+		{
 			if (chptr->topic[0] == '\0')
-				sendto_one(sptr, replies[RPL_NOTOPIC], ME, BadTo(parv[0]),
-					   chptr->chname);
+			{
+				sendto_one(sptr, replies[RPL_NOTOPIC], ME,
+					parv[0], chptr->chname);
+			}
 			else
 			{
-				sendto_one(sptr, replies[RPL_TOPIC], ME, BadTo(parv[0]),
-					   chptr->chname, chptr->topic);
+				sendto_one(sptr, replies[RPL_TOPIC], ME,
+					parv[0], chptr->chname, chptr->topic);
 #ifdef TOPIC_WHO_TIME
 				if (chptr->topic_t > 0)
 				sendto_one(sptr, replies[RPL_TOPIC_WHO_TIME],
@@ -3180,10 +3187,10 @@ int	m_topic(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					chptr->topic_nuh, chptr->topic_t);
 #endif
 			}
-		    } 
+		}
 		else if ((chptr->mode.mode & MODE_TOPICLIMIT) == 0 ||
 			 is_chan_op(sptr, chptr))
-		    {	/* setting a topic */
+		{	/* setting a topic */
 			strncpyzt(chptr->topic, topic, sizeof(chptr->topic));
 #ifdef TOPIC_WHO_TIME
 			sprintf(chptr->topic_nuh, "%s!%s@%s", sptr->name,
@@ -3203,11 +3210,11 @@ int	m_topic(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					      chptr->topic);
 #endif
 			penalty += 2;
-		    }
+		}
 		else
 		      sendto_one(sptr, replies[ERR_CHANOPRIVSNEEDED], ME, BadTo(parv[0]),
 				 chptr->chname);
-	    }
+	}
 	return penalty;
 }
 
