@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.54 2002/12/28 21:21:45 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.55 2003/02/15 19:25:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -331,7 +331,7 @@ int	mark_blind_servers (aClient *cptr, aClient *server)
 			!match(my_name_for_link(ME, aconf->port), server->name)
 			|| (IsMasked(server) &&
 			server->serv->maskedby == cptr->serv->maskedby
-			&& !ST_UID(acptr)
+			&& ST_NOTUID(acptr)
 			))
 		{
 			acptr->flags |= FLAGS_HIDDEN;
@@ -676,7 +676,7 @@ char	*comment;
 				** to a 2.11. */
 				continue;
 			}
-			if ((acptr->flags & FLAGS_HIDDEN) && !ST_UID(acptr))
+			if ((acptr->flags & FLAGS_HIDDEN) && ST_NOTUID(acptr))
 			{
 				/* A 2.10 can't see this server, so don't send
 				** the SQUIT.

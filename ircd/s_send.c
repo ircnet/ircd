@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_send.c,v 1.2 2001/12/25 23:53:25 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_send.c,v 1.3 2003/02/15 19:25:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -238,7 +238,7 @@ esendto_serv_butone(aClient *orig, aClient *dest, char *dname, char *imsg,
 		{
 		    if (newplen == 0 && ST_UID(acptr))
 			    build_new_prefix(orig, imsg, dest, dname);
-		    if (oldplen == 0 && (!ST_UID(acptr) || newplen <= 0))
+		    if (oldplen == 0 && (ST_NOTUID(acptr) || newplen <= 0))
 			    build_old_prefix(orig, imsg, dest, dname);
 		    if (slen == 0)
 			{
@@ -283,7 +283,7 @@ esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 		    /* to servers */
 		    if (newplen == 0 && ST_UID(acptr))
 			    build_new_prefix(orig, imsg, NULL, chptr->chname);
-		    if (oldplen == 0 && (!ST_UID(acptr) || newplen <= 0))
+		    if (oldplen == 0 && (ST_NOTUID(acptr) || newplen <= 0))
 			    build_old_prefix(orig, imsg, NULL, chptr->chname);
 		}
 
@@ -331,7 +331,7 @@ esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr, char *fmt, ...)
 		    continue;
 	    if (newplen == 0 && ST_UID(cptr))
 		    build_new_prefix(orig, imsg, NULL, chptr->chname);
-	    if (oldplen == 0 && (!ST_UID(cptr) || newplen <= 0))
+	    if (oldplen == 0 && (ST_NOTUID(cptr) || newplen <= 0))
 		    build_old_prefix(orig, imsg, NULL, chptr->chname);
 	    if (slen == 0)
 		{

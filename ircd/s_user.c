@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.146 2003/02/15 19:14:09 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.147 2003/02/15 19:25:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -683,7 +683,7 @@ char	*nick, *username;
 				   (*buf) ? buf : "+",
 				   sptr->info);
 		else
-			if (!ST_UID(acptr) && (aconf = acptr->serv->nline) &&
+			if (ST_NOTUID(acptr) && (aconf = acptr->serv->nline) &&
 			    !match(my_name_for_link(ME, aconf->port),
 				   user->server))
 				sendto_one(acptr, "NICK %s %d %s %s %s %s :%s",
