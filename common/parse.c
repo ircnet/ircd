@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.32 2001/12/23 05:50:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.33 2001/12/23 14:50:49 q Exp $";
 #endif
 
 #include "os.h"
@@ -172,18 +172,6 @@ Reg	aClient *cptr;
 
 	if (uid && isdigit(*uid))
 		acptr = hash_find_uid(uid, cptr);
-
-	return acptr;
-    }
-
-aClient *find_sid(sid, cptr)
-char	*sid;
-Reg	aClient *cptr;
-    {
-	aClient *acptr = cptr;
-
-	if (uid && isdigit(*sid))
-		acptr = hash_find_sid(sid, cptr);
 
 	return acptr;
     }
