@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.78 1999/06/17 01:16:40 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.79 1999/06/25 13:58:02 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -945,31 +945,34 @@ char	*parv[];
 nickkilldone:
 	if (IsServer(sptr))
 	    {
+		char	*pv[7];
+
 		if (parc != 8)
+		    {
 			sendto_flag(SCH_NOTICE,
 			    "Bad NICK param count (%d) for %s from %s via %s",
 				    parc, parv[1], sptr->name,
 				    get_client_name(cptr, FALSE));
+			sendto_one(cptr, ":%s KILL %s :%s (Bad NICK %d)",
+				   ME, nick, ME, parc);
+			return 0;
+		    }
 		/* A server introducing a new client, change source */
 		sptr = make_client(cptr);
 		add_client_to_list(sptr);
 		if (parc > 2)
 			sptr->hopcount = atoi(parv[2]);
 		(void)strcpy(sptr->name, nick);
-		if (parc == 8 && cptr->serv)
-		    {
-			char	*pv[7];
 
-			pv[0] = sptr->name;
-			pv[1] = parv[3];
-			pv[2] = parv[4];
-			pv[3] = parv[5];
-			pv[4] = parv[7];
-			pv[5] = parv[6];
-			pv[6] = NULL;
-			(void)add_to_client_hash_table(nick, sptr);
-			return m_user(cptr, sptr, 6, pv);
-		    }
+		pv[0] = sptr->name;
+		pv[1] = parv[3];
+		pv[2] = parv[4];
+		pv[3] = parv[5];
+		pv[4] = parv[7];
+		pv[5] = parv[6];
+		pv[6] = NULL;
+		(void)add_to_client_hash_table(nick, sptr);
+		return m_user(cptr, sptr, 6, pv);
 	    }
 	else if (sptr->name[0])		/* NICK received before, changing */
 	    {
