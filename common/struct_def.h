@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.103 2004/06/19 17:19:18 chopin Exp $
+ *   $Id: struct_def.h,v 1.104 2004/06/22 22:05:27 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -143,7 +143,7 @@ typedef enum Status {
 #define	SetMe(x)		((x)->status = STAT_ME)
 #define	SetUnknown(x)		((x)->status = STAT_UNKNOWN)
 #define	SetServer(x)		((x)->status = STAT_SERVER)
-#define	SetClient(x)		((x)->status = STAT_CLIENT)
+#define	SetClient(x)		((x)->status = IsAnOper((x)) ? STAT_OPER : STAT_CLIENT)
 #define	SetService(x)		((x)->status = STAT_SERVICE)
 
 #define	FLAGS_PINGSENT	0x0000001 /* Unreplied ping sent */
