@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info20556tmp2.
+input file /tmp/sgml2info28240tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.19 1997/12/16 22:11:54 kalt Exp $
+     $Id: INSTALL.info,v 1.20 1997/12/17 14:32:07 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.4.
 
@@ -318,19 +318,21 @@ configuration options.  The record types are as follows:
 
   9. Server connections      (C,c,N)
 
- 10. Hub connections         (H)
+ 10. Deny auto-connections   (D)
 
- 11. Leaf connections        (L)
+ 11. Hub connections         (H)
 
- 12. Version limitations     (V)
+ 12. Leaf connections        (L)
 
- 13. Excluded machines       (Q)
+ 13. Version limitations     (V)
 
- 14. Service connections     (S)
+ 14. Excluded machines       (Q)
 
- 15. Bounce server           (B)
+ 15. Service connections     (S)
 
- 16. Default local server    (U)
+ 16. Bounce server           (B)
+
+ 17. Default local server    (U)
 
    Except for types "M" and "A", you are allowed to have multiple
 records of the same type.  In some cases, you can have concurrent
@@ -349,6 +351,7 @@ connections).
 * Restrict connections::
 * Excluded accounts::
 * Server connections::
+* Deny auto-connections::
 * Hub connections::
 * Leaf connections::
 * Version limitations::
@@ -1002,7 +1005,7 @@ Excluded accounts
      "192.11.35.*" and which didn't resolve to login to the ircd.
 
 
-File: INSTALL.info,  Node: Server connections,  Next: Hub connections,  Prev: Excluded accounts,  Up: The ircd-conf file
+File: INSTALL.info,  Node: Server connections,  Next: Deny auto-connections,  Prev: Excluded accounts,  Up: The ircd-conf file
 
 Server connections
 ==================
@@ -1210,7 +1213,50 @@ format as the "C" entries.
      of countries and other large areas with common domain.
 
 
-File: INSTALL.info,  Node: Hub connections,  Next: Leaf connections,  Prev: Server connections,  Up: The ircd-conf file
+File: INSTALL.info,  Node: Deny auto-connections,  Next: Hub connections,  Prev: Server connections,  Up: The ircd-conf file
+
+Deny auto-connections
+=====================
+
+`Introduction'
+     D lines were implemented to give server administrators more
+     control on how auto connections are done.  This will most likely
+     only be useful for big networks which have complex configurations.
+
+`Format'
+     D:<Denied Server Mask>:Denied Class:<Server Name>:Server Class:
+
+`Denied Server Mask'
+     This field is matched against all servers currently present on the
+     network.
+
+`Denied Class'
+     If this field contains a class number, it will match if any server
+     in that class is currently present on the network.  Note that this
+     can be true for any server, even the ones not directly connected.
+
+`Server Mask'
+     This field is matched against the server name that the server
+     wants to auto connect to.
+
+`Server Class'
+     This field is used to match against the class to which belong the
+     servers for which an autoconnect is set.
+
+`Examples'
+     D:*.edu::*.fi::
+
+     Don't auto-connect to any "*.fi" server if any server present on
+     the network matches "*.edu".
+
+     D::2:eff.org:3:
+
+     Do now auto-connect to "eff.org", or any server in class "3" if a
+     server defined to be in class "2" is currently present on the
+     network.
+
+
+File: INSTALL.info,  Node: Hub connections,  Next: Leaf connections,  Prev: Deny auto-connections,  Up: The ircd-conf file
 
 Hub connections
 ===============
@@ -1539,22 +1585,23 @@ Node: CLONE_CHECK9503
 Node: Other #define's9843
 Node: Editing the Makefile and compiling10168
 Node: The ircd-conf file10804
-Node: Machine information12776
-Node: Administrative info14872
-Node: Port connections16907
-Node: Connection Classes19117
-Node: Client connections24568
-Node: Operator priviliges30040
-Node: Restrict connections32160
-Node: Excluded accounts33475
-Node: Server connections37333
-Node: Hub connections45766
-Node: Leaf connections46979
-Node: Version limitations49062
-Node: Excluded machines50301
-Node: Service connections51608
-Node: Bounce server53201
-Node: Default local server (for local clients) `*OBSOLETED*'54824
-Node: Related resources55707
+Node: Machine information12836
+Node: Administrative info14932
+Node: Port connections16967
+Node: Connection Classes19177
+Node: Client connections24628
+Node: Operator priviliges30100
+Node: Restrict connections32220
+Node: Excluded accounts33535
+Node: Server connections37393
+Node: Deny auto-connections45832
+Node: Hub connections47205
+Node: Leaf connections48421
+Node: Version limitations50504
+Node: Excluded machines51743
+Node: Service connections53050
+Node: Bounce server54643
+Node: Default local server (for local clients) `*OBSOLETED*'56266
+Node: Related resources57149
 
 End Tag Table

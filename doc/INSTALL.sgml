@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.19 1997/12/16 22:11:55 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.20 1997/12/17 14:32:07 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.4.
 </abstract>
@@ -227,6 +227,7 @@ configuration options.  The record types are as follows:
 <item>Restrict lines          (R)
 <item>Excluded accounts       (K,k)
 <item>Server connections      (C,c,N)
+<item>Deny auto-connections   (D)
 <item>Hub connections         (H)
 <item>Leaf connections        (L)
 <item>Version limitations     (V)
@@ -993,6 +994,38 @@ backbones of countries and other large areas with common
 domain.
 </descrip>
 <p>
+
+<sect1>Deny auto-connections
+<p>
+<descrip>
+<tag/Introduction/ D lines were implemented to give server
+administrators more control on how auto connections are
+done.  This will most likely only be useful for big networks
+which have complex configurations.
+<tag/Format/<verb>D:&lt;Denied Server Mask&gt;:Denied Class:&lt;Server Name&gt;:Server Class:
+</verb>
+<tag/Denied Server Mask/ This field is matched against all
+servers currently present on the network.
+<tag/Denied Class/  If this field contains a class number,
+it will match if any server in that class is currently
+present on the network.  Note that this can be true for any
+server, even the ones not directly connected.
+<tag/Server Mask/ This field is matched against the server
+name that the server wants to auto connect to.
+<tag/Server Class/ This field is used to match against the
+class to which belong the servers for which an autoconnect
+is set.
+<tag/Examples/D:*.edu::*.fi::
+<p>
+Don't auto-connect to any ``*.fi'' server if any server
+present on the network matches ``*.edu''.
+<p>
+D::2:eff.org:3:
+<p>
+Do now auto-connect to ``eff.org'', or any server in class
+``3'' if a server defined to be in class ``2'' is currently
+present on the network.
+</descrip>
 
 <sect1>Hub connections
 <p>

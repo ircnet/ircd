@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.19 1997/12/16 22:11:55 kalt Exp $
+  $Id: INSTALL.txt,v 1.20 1997/12/17 14:32:08 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.4.
 
@@ -243,25 +243,28 @@
   9. Server connections      (C,c,N)
 
   10.
-     Hub connections         (H)
+     Deny auto-connections   (D)
 
   11.
-     Leaf connections        (L)
+     Hub connections         (H)
 
   12.
-     Version limitations     (V)
+     Leaf connections        (L)
 
   13.
-     Excluded machines       (Q)
+     Version limitations     (V)
 
   14.
-     Service connections     (S)
+     Excluded machines       (Q)
 
   15.
-     Bounce server           (B)
+     Service connections     (S)
 
   16.
+     Bounce server           (B)
+  17.
      Default local server    (U)
+
   Except for types ``M'' and ``A'', you are allowed to have multiple
   records of the same type.  In some cases, you can have concurrent
   records.  IItt iiss iimmppoorrttaanntt ttoo nnoottee tthhaatt tthhee llaasstt mmaattcchhiinngg rreeccoorrdd wwiillll
@@ -325,9 +328,6 @@
 
         This line reads: My Hosts name is ``orion.cair.du.edu'' and my
         site is located in ``Denver Colorado, USA''.
-
-
-
   44..22..  AAddmmiinniissttrraattiivvee iinnffoo
 
 
@@ -1170,7 +1170,54 @@
 
 
 
-  44..1100..  HHuubb ccoonnnneeccttiioonnss
+  44..1100..  DDeennyy aauuttoo--ccoonnnneeccttiioonnss
+
+
+     IInnttrroodduuccttiioonn
+        D lines were implemented to give server administrators more
+        control on how auto connections are done.  This will most likely
+        only be useful for big networks which have complex
+        configurations.
+
+     FFoorrmmaatt
+
+        D:<Denied Server Mask>:Denied Class:<Server Name>:Server Class:
+
+
+
+
+     DDeenniieedd SSeerrvveerr MMaasskk
+        This field is matched against all servers currently present on
+        the network.
+
+     DDeenniieedd CCllaassss
+        If this field contains a class number, it will match if any
+        server in that class is currently present on the network.  Note
+        that this can be true for any server, even the ones not directly
+        connected.
+
+     SSeerrvveerr MMaasskk
+        This field is matched against the server name that the server
+        wants to auto connect to.
+
+     SSeerrvveerr CCllaassss
+        This field is used to match against the class to which belong
+        the servers for which an autoconnect is set.
+
+     EExxaammpplleess
+        D:*.edu::*.fi::
+
+        Don't auto-connect to any ``*.fi'' server if any server present
+        on the network matches ``*.edu''.
+
+        D::2:eff.org:3:
+
+        Do now auto-connect to ``eff.org'', or any server in class ``3''
+        if a server defined to be in class ``2'' is currently present on
+        the network.
+
+
+  44..1111..  HHuubb ccoonnnneeccttiioonnss
 
 
      IInnttrroodduuccttiioonn
@@ -1224,7 +1271,7 @@
 
 
 
-  44..1111..  LLeeaaff ccoonnnneeccttiioonnss
+  44..1122..  LLeeaaff ccoonnnneeccttiioonnss
 
 
      IInnttrroodduuccttiioonn
@@ -1271,7 +1318,7 @@
         this new server.
 
 
-  44..1122..  VVeerrssiioonn lliimmiittaattiioonnss
+  44..1133..  VVeerrssiioonn lliimmiittaattiioonnss
 
 
      IInnttrroodduuccttiioonn
@@ -1321,7 +1368,7 @@
         is allowed.
 
 
-  44..1133..  EExxcclluuddeedd mmaacchhiinneess
+  44..1144..  EExxcclluuddeedd mmaacchhiinneess
 
   Disallowing SERVERS in your irc net.
 
@@ -1348,7 +1395,7 @@
         polite). The first field is unused, so leave it empty.
 
 
-  44..1144..  SSeerrvviiccee ccoonnnneeccttiioonnss
+  44..1155..  SSeerrvviiccee ccoonnnneeccttiioonnss
 
 
      IInnttrroodduuccttiioonn
@@ -1383,7 +1430,6 @@
         service. Be very careful in the types you allow.  The types can
         be found in include/service.h
 
-
      CCllaassss
         The class field should refer to an existing class.
 
@@ -1396,7 +1442,7 @@
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
 
 
-  44..1155..  BBoouunnccee sseerrvveerr
+  44..1166..  BBoouunnccee sseerrvveerr
 
 
      IInnttrroodduuccttiioonn
@@ -1404,7 +1450,6 @@
         This information is provided to clients which are denied
         connection, either because their connection class is full, or
         the server is full, or they are not authorized to connect.
-
      FFoorrmmaatt
 
         B:<Class|Host Mask>::<Server Name>:<Port>:
@@ -1449,8 +1494,7 @@
         secondary server.
 
 
-
-  44..1166..  DDeeffaauulltt llooccaall sseerrvveerr ((ffoorr llooccaall cclliieennttss)) **OOBBSSOOLLEETTEEDD**
+  44..1177..  DDeeffaauulltt llooccaall sseerrvveerr ((ffoorr llooccaall cclliieennttss)) **OOBBSSOOLLEETTEEDD**
 
 
      IInnttrroodduuccttiioonn
@@ -1472,7 +1516,6 @@
         U:128.214.5.6::tolsun.oulu.fi:6667
 
         U:tolsun.oulu.fi::tolsun.oulu.fi
-
         If the port number is omitted, irc will default to using 6667.
 
 
@@ -1495,6 +1538,29 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
