@@ -1,3 +1,9 @@
+2005-02-07  Piotr Kucharski
+
+	* struct_def.h: removed HasUID macro.
+	* channel.c, hash.c, s_bsd.c, s_misc.c, s_serv.c, s_service.c, s_user.c:
+	  change HasUID to (x)->user.
+
 2005-02-06  Piotr Kucharski
 
 	* channel.c/set_mode(): allow -r on all channels.
