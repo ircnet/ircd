@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info9852tmp2.
+input file /tmp/sgml2info11344tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.12 1997/09/09 19:14:59 kalt Exp $
+     $Id: INSTALL.info,v 1.13 1997/09/12 02:09:29 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.4.
 
@@ -546,8 +546,8 @@ Connection Classes
      `BEFORE' it is used in any other way.
 
 `Format'
-     Y:<Class>:<Ping Frequency>:<Connect freq|Max IP>:<Max
-     Links>:<Sendq>
+     Y:<Class>:<Ping Frequency>:<Connect freq>:<Max
+     Links>:<Sendq>:<Local Limit>:<Global Limit>
 
 `Y'
      This specifies a Class record.
@@ -562,22 +562,12 @@ Connection Classes
      still alive.  Unless you are sure of what you are doing, use the
      default value which is in your config.h file.
 
-`Connect Frequency|Max IP'
-     This field has a different meaning depending on the use of the Y
-     line:
-        * For servers: By changing this number, you change how often
-          your server checks to see if it can connect to this server.
-          If you want to check very occasionally, use a large value,
-          but if it is an important connection, you might want a
-          smaller value so that you connect to it as soon as possible.
-
-        * For clients:
-             *  Positive value: defines the maximum number of clients
-               from the same host (IP) will be allowed.
-
-             *  Negative value: defines the maximum number of clients
-               from the same user@host (IP) will be allowed.  Read note
-               below.
+`Connect Frequency'
+     By changing this number, you change how often your server checks
+     to see if it can connect to this server. If you want to check very
+     occasionally, use a large value, but if it is an important
+     connection, you might want a smaller value so that you connect to
+     it as soon as possible.
 
 `Max Links'
      This field defines the maximum number of links this class will
@@ -586,38 +576,60 @@ Connection Classes
      in this class (I/O lines).
 
 `Sendq'
-     This field defines the "sendq" value for this class.  If thisfield
-     is not present, the default (from config.h) is assigned.
+     This field defines the "sendq" value for this class.  If this
+     field is not present, the default (from config.h) is assigned.
+
+`Local limit'
+     This field is used to limit the number of local concurrent
+     connections:
+        *  Positive value: defines the maximum number of clients from
+          the same host (IP) will be allowed.
+
+        *  Negative value: defines the maximum number of clients from
+          the same user@host (IP) will be allowed.  Read note below.
+
+`Global limit'
+     This field has the same use as the "Local limit" field.  But, the
+     connection counts are done for all clients present on the net
+     instead of only counting local clients.
 
 `Note'
      leaving any of the fields out means their value is 0 (ZERO)!!
 
 `Note'
-     If you plan to use the user@host limit, please read the following
-     very carefully.  The "user" value is the ident reply for the
-     connection.  If no reply was given then it defaults to "unknown"
-     and thus the effective limit will be per host, not per user@host.
-     Also, some ident servers return encrypted data which changes for
-     every connection making the limit void.
+     If you plan to use the local user@host limit, please read the
+     following very carefully.  The "user" value is the ident reply for
+     the connection.  If no reply was given then it defaults to
+     "unknown" and thus the effective limit will be per host, not per
+     user@host. Also, some ident servers return encrypted data which
+     changes for every connection making the limit void.
+
+`Note'
+     Only the local limitation is accurate.
 
 `Example'
-     Y:23:120:300:5:
+     Y:23:120:300:5:100000:0:0: (server class)
 
      This defines class 23 to allow 5 auto-connections, which are
      checked every 300 seconds.  The connection is allowed to remain
      silent for 120 seconds before a PING is sent.  NOTE: fields 3 & 4
-     are in seconds.
-
-     You may also give I lines a class (again the sixth field to define
-     which class).  This is only usefull (currently) for redefining the
-     ping frequency.  It can also be useful as a diagnostic to see how
-     much each I line is used when combined with the TRACE output.
+     are in seconds.  The SendQ is set to 100000 bytes.
 
      Another feature of connection class is the ability to do automatic
      routing by using the class as a "priority".  If you are connected
      to a server which has a class lower than one of the servers that
      is "behind" it, the server will disconnect the lower class one and
      schedule a "new" connection for the higher class server.
+
+     Y:1:60:0:50:20000:2:5: (client class)
+
+     In case of a client class, the fields are interpreted a bit
+     differently.  This class (number 1) can be used by up to 50 users.
+     The connections are allowed to remain silent for 60 seconds
+     before a PING is set.  The SendQ is set to 20000 bytes.  A new
+     connection in this class will only be allowed if there aren't more
+     than 2 other local connections fom the same IP address, or more
+     than 5 other connections on the net from the same hostname.
 
 
 File: INSTALL.info,  Node: Client connections,  Next: Operator priviliges,  Prev: Connection Classes,  Up: The ircd-conf file
@@ -1407,39 +1419,39 @@ Related resources
 
 
 Tag Table:
-Node: Top122
-Node: Installing IRC-609
-Node: The config-h file2173
-Node: Define what type of UNIX your machine uses-2839
-Node: DEBUGMODE3239
-Node: SPATH CPATH MPATH LPATH PPATH TPATH3897
-Node: CACHED_MOTD5106
-Node: CHROOTDIR5576
-Node: ENABLE_SUMMON ENABLE_USERS5900
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6436
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY7119
-Node: ZIP_LINKS ZIP_LEVEL7751
-Node: SLOW_ACCEPT8762
-Node: CLONE_CHECK9380
-Node: Other #define's9720
-Node: Editing the Makefile and compiling10045
-Node: The ircd-conf file10681
-Node: Machine information12365
-Node: Administrative info14461
-Node: Port connections16496
-Node: Connection Classes18706
-Node: Client connections22629
-Node: Operator priviliges25914
-Node: Restrict connections28034
-Node: Excluded accounts29349
-Node: Server connections32649
-Node: Hub connections41082
-Node: Leaf connections42295
-Node: Version limitations44378
-Node: Excluded machines45617
-Node: Service connections46924
-Node: Bounce server48517
-Node: Default local server (for local clients) `*OBSOLETED*'50140
-Node: Related resources51023
+Node: Top123
+Node: Installing IRC-610
+Node: The config-h file2174
+Node: Define what type of UNIX your machine uses-2840
+Node: DEBUGMODE3240
+Node: SPATH CPATH MPATH LPATH PPATH TPATH3898
+Node: CACHED_MOTD5107
+Node: CHROOTDIR5577
+Node: ENABLE_SUMMON ENABLE_USERS5901
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6437
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY7120
+Node: ZIP_LINKS ZIP_LEVEL7752
+Node: SLOW_ACCEPT8763
+Node: CLONE_CHECK9381
+Node: Other #define's9721
+Node: Editing the Makefile and compiling10046
+Node: The ircd-conf file10682
+Node: Machine information12366
+Node: Administrative info14462
+Node: Port connections16497
+Node: Connection Classes18707
+Node: Client connections23121
+Node: Operator priviliges26406
+Node: Restrict connections28526
+Node: Excluded accounts29841
+Node: Server connections33141
+Node: Hub connections41574
+Node: Leaf connections42787
+Node: Version limitations44870
+Node: Excluded machines46109
+Node: Service connections47416
+Node: Bounce server49009
+Node: Default local server (for local clients) `*OBSOLETED*'50632
+Node: Related resources51515
 
 End Tag Table

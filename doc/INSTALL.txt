@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.12 1997/09/09 19:15:00 kalt Exp $
+  $Id: INSTALL.txt,v 1.13 1997/09/12 02:09:30 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.4.
 
@@ -470,7 +470,7 @@
 
      FFoorrmmaatt
 
-        Y:<Class>:<Ping Frequency>:<Connect freq|Max IP>:<Max Links>:<Sendq>
+        Y:<Class>:<Ping Frequency>:<Connect freq>:<Max Links>:<Sendq>:<Local Limit>:<Global Limit>
 
 
 
@@ -487,23 +487,12 @@
         is still alive.  Unless you are sure of what you are doing, use
         the default value which is in your config.h file.
 
-     CCoonnnneecctt FFrreeqquueennccyy||MMaaxx IIPP
-        This field has a different meaning depending on the use of the Y
-        line:
-
-     +o  For servers: By changing this number, you change how often your
-        server checks to see if it can connect to this server. If you
-        want to check very occasionally, use a large value, but if it is
-        an important connection, you might want a smaller value so that
-        you connect to it as soon as possible.
-
-     +o  For clients:
-
-     +o  Positive value: defines the maximum number of clients from the
-        same host (IP) will be allowed.
-
-     +o  Negative value: defines the maximum number of clients from the
-        same user@host (IP) will be allowed.  Read note below.
+     CCoonnnneecctt FFrreeqquueennccyy
+        By changing this number, you change how often your server checks
+        to see if it can connect to this server. If you want to check
+        very occasionally, use a large value, but if it is an important
+        connection, you might want a smaller value so that you connect
+        to it as soon as possible.
 
      MMaaxx LLiinnkkss
         This field defines the maximum number of links this class will
@@ -512,33 +501,45 @@
         users in this class (I/O lines).
 
      SSeennddqq
-        This field defines the ``sendq'' value for this class.  If
-        thisfield is not present, the default (from config.h) is
-        assigned.
+        This field defines the ``sendq'' value for this class.  If this
+        field is not present, the default (from config.h) is assigned.
+
+     LLooccaall lliimmiitt
+        This field is used to limit the number of local concurrent
+        connections:
+
+     +o  Positive value: defines the maximum number of clients from the
+        same host (IP) will be allowed.
+
+     +o  Negative value: defines the maximum number of clients from the
+        same user@host (IP) will be allowed.  Read note below.
+
+     GGlloobbaall lliimmiitt
+        This field has the same use as the ``Local limit'' field.  But,
+        the connection counts are done for all clients present on the
+        net instead of only counting local clients.
 
      NNoottee
         leaving any of the fields out means their value is 0 (ZERO)!!
 
      NNoottee
-        If you plan to use the user@host limit, please read the
+        If you plan to use the local user@host limit, please read the
         following very carefully.  The ``user'' value is the ident reply
         for the connection.  If no reply was given then it defaults to
         ``unknown'' and thus the effective limit will be per host, not
         per user@host. Also, some ident servers return encrypted data
         which changes for every connection making the limit void.
+
+     NNoottee
+        Only the local limitation is accurate.
+
      EExxaammppllee
-        Y:23:120:300:5:
+        Y:23:120:300:5:100000:0:0: (server class)
 
         This defines class 23 to allow 5 auto-connections, which are
         checked every 300 seconds.  The connection is allowed to remain
         silent for 120 seconds before a PING is sent.  NOTE: fields 3 &
-        4 are in seconds.
-
-        You may also give I lines a class (again the sixth field to
-        define which class).  This is only usefull (currently) for
-        redefining the ping frequency.  It can also be useful as a
-        diagnostic to see how much each I line is used when combined
-        with the TRACE output.
+        4 are in seconds.  The SendQ is set to 100000 bytes.
 
         Another feature of connection class is the ability to do
         automatic routing by using the class as a ``priority''.  If you
@@ -546,6 +547,17 @@
         the servers that is ``behind'' it, the server will disconnect
         the lower class one and schedule a ``new'' connection for the
         higher class server.
+
+        Y:1:60:0:50:20000:2:5: (client class)
+
+        In case of a client class, the fields are interpreted a bit
+        differently.  This class (number 1) can be used by up to 50
+        users.  The connections are allowed to remain silent for 60
+        seconds before a PING is set.  The SendQ is set to 20000 bytes.
+        A new connection in this class will only be allowed if there
+        aren't more than 2 other local connections fom the same IP
+        address, or more than 5 other connections on the net from the
+        same hostname.
 
 
   44..55..  CClliieenntt ccoonnnneeccttiioonnss
@@ -592,6 +604,7 @@
 
         Allow clients from a machine with that IP number to connect.
         Numeric match is enough, name is not required anymore.
+
         I:x:secret:*.tut.fi::1
 
         Allow clients from machines matching *.tut.fi to connect with
@@ -644,8 +657,6 @@
      FFoorrmmaatt
 
         O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>
-
-
 
      OO  Speficies Operator record. If you use capital letter (``O'') in
         it, it specifies a global operator. Small letter (``o'')
@@ -709,6 +720,7 @@
      FFoorrmmaatt
 
         R:<Target Host Name>:<Program>:<User>:::
+
 
 
 
@@ -910,7 +922,6 @@
         separated by a . In this case, the first port is used when auto-
         connecting, the second port is used for the UDP pings to the
         targer server.
-
      CCllaassss
         The class field should refer to an existing class and determines
         the maximum number of simultaneous uses of the C-line allowable
@@ -987,7 +998,6 @@
      don't expect login password.  The connecting host should identify
      itself as ``garfield.mit.edu''.
 
-
      NN  ``N'' corresponds to a server Noconnect option.
 
      TTAARRGGEETT HHoosstt AAddddrr
@@ -1044,13 +1054,9 @@
         be ``*.fi''. Note that with wildcard name ``*.fi'' you could NOT
         connect to ``nic.funet.fi'' because that would result in a
         server name ccoolllliissiioonn (*.fi matches nic.funet.fi).
-
         I advice you to not to use wildcard servers before you know for
         sure how they are used, they are mostly beneficial for backbones
         of countries and other large areas with common domain.
-
-
-
 
 
 
@@ -1186,6 +1192,7 @@
 
      EExxaammpplleess
         V:020901*::*::
+
         Disallows any server which version is 2.9.1* to connect.
 
         V:020901*:D:*::
@@ -1244,6 +1251,7 @@
 
      FFoorrmmaatt
 
+
         S:<TARGET Host Mask>:<Password>:<Service Name>:<Service Type>:<Class>
 
 
@@ -1252,6 +1260,7 @@
         The host mask should be set to match the host(s) from which the
         service will be connecting from. This may be either an IP# or
         full name (prefered).
+
      PPaasssswwoorrdd
         This is the password which must be passed in the SERVICE
         command.
@@ -1318,6 +1327,7 @@
 
         Rejected clients in class 2 are advised to use
         ``irc.stealth.net'' on port 6660.
+
         B:*.fi::irc.funet.fi:6667:
 
         Finnish client should use irc.funet.fi when they cannot be taken
@@ -1374,6 +1384,62 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

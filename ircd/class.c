@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: class.c,v 1.3 1997/09/03 17:45:48 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: class.c,v 1.4 1997/09/12 02:09:32 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -133,8 +133,8 @@ aClass	*clptr;
  * if no present entry is found, then create a new one and add it in
  * immeadiately after the first one (class 0).
  */
-void	add_class(class, ping, confreq, maxli, sendq)
-int	class, ping, confreq, maxli;
+void	add_class(class, ping, confreq, maxli, sendq, local, global)
+int	class, ping, confreq, maxli, local, global;
 long	sendq;
 {
 	aClass *t, *p;
@@ -151,14 +151,16 @@ long	sendq;
 	else
 		p = t;
 	Debug((DEBUG_DEBUG,
-		"Add Class %d: p %x t %x - cf: %d pf: %d ml: %d sq: %l",
-		class, p, t, confreq, ping, maxli, QUEUELEN));
+	"Add Class %d: p %x t %x - cf: %d pf: %d ml: %d sq: %l ml: %d mg: %d",
+		class, p, t, confreq, ping, maxli, QUEUELEN, local, global));
 	Class(p) = class;
 	ConFreq(p) = confreq;
 	PingFreq(p) = ping;
 	MaxLinks(p) = maxli;
 	if (sendq)
 		MaxSendq(p) = sendq;
+	MaxLocal(p) = local;
+	MaxGlobal(p) = global;
 	if (p != t)
 		Links(p) = 0;
 }
@@ -223,7 +225,8 @@ char	*to;
 	for (cltmp = FirstClass(); cltmp; cltmp = NextClass(cltmp))
 		sendto_one(sptr, rpl_str(RPL_STATSYLINE, to), 'Y',
 			   Class(cltmp), PingFreq(cltmp), ConFreq(cltmp),
-			   MaxLinks(cltmp), MaxSendq(cltmp));
+			   MaxLinks(cltmp), MaxSendq(cltmp),
+			   MaxLocal(cltmp), MaxGlobal(cltmp));
 }
 
 long	get_sendq(cptr)

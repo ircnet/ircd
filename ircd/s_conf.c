@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.15 1997/09/10 21:56:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.16 1997/09/12 02:09:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -147,7 +147,7 @@ attach_iline:
 		return i;
 	    }
 	find_bounce(cptr, 0, -2);
-	return -1;
+	return -2; /* used in register_user() */
 }
 
 /*
@@ -249,37 +249,94 @@ aClient *cptr;
 	if ((aconf->status & (CONF_LOCOP | CONF_OPERATOR | CONF_CLIENT |
 			      CONF_RCLIENT)))
 	    {
+		int	hcnt = 0, ucnt = 0;
+
 		if (aconf->clients >= ConfMaxLinks(aconf) &&
 		    ConfMaxLinks(aconf) > 0)
 			return -3;    /* Use this for printing error message */
-		if (ConfConFreq(aconf) > 0)	/* special limit per host */
-		    {
+
+		/* check on local/global limits per host and per user@host */
+
+		/*
+		** local limits first to save CPU if any is hit.
+		**	host check is done on the IP address.
+		**	user check is done on the IDENT reply.
+		*/
+		if (ConfMaxLocal(aconf) > 0) {
+			/* special limit per host */
 			Reg	aClient	*acptr;
 			Reg	int	i, cnt = 0;
+			int	sz = sizeof(cptr->ip);
 
 			for (i = highest_fd; i >= 0; i--)
 				if ((acptr = local[i]) && (cptr != acptr) &&
 				    !bcmp((char *)&cptr->ip,
-					  (char *)&acptr->ip,
-					  sizeof(cptr->ip)))
+					  (char *)&acptr->ip, sz))
 					cnt++;
-			if (cnt >= ConfConFreq(aconf))
+			if (cnt >= ConfMaxLocal(aconf))
 				return -4;	/* for error message */
+			hcnt = cnt;
 		    }
-		if (ConfConFreq(aconf) < 0) { /* special limit per user@host */
+		else if (ConfMaxLocal(aconf) < 0) {
+			/** special limit per user@host */
 			Reg     aClient *acptr;
 			Reg     int     i, cnt = 0;
+			int	sz = sizeof(cptr->ip);
 
 			for (i = highest_fd; i >= 0; i--)
 				if ((acptr = local[i]) && (cptr != acptr) &&
 				    !bcmp((char *)&cptr->ip,(char *)&acptr->ip,
-					  sizeof(cptr->ip))
-				    && !strncasecmp(acptr->auth,
-						    cptr->auth, USERLEN))
-					cnt--;
-			if (cnt <= ConfConFreq(aconf))
+					  sizeof(cptr->ip)))
+				    {
+					hcnt++;
+					if (!strncasecmp(acptr->auth,
+							 cptr->auth, USERLEN))
+						cnt--;
+				    }
+			if (cnt <= ConfMaxLocal(aconf))
 				return -5;      /* for error message */
+			ucnt = cnt;
 		}
+		/*
+		** Global limits
+		**	host check is done on the hostname (IP if unresolved)
+		**	user check is done on username
+		*/
+		if (ConfMaxGlobal(aconf) > 0) {
+			/* special limit per host */
+			Reg	aClient	*acptr;
+			Reg	int	cnt = hcnt;
+
+			for (acptr = client; acptr; acptr = acptr->next)
+			    {
+				if (!IsPerson(acptr))
+					continue;
+				if (MyConnect(acptr) && ConfMaxLocal(aconf)==0)
+					continue;
+				if (!strcmp(cptr->sockhost, acptr->user->host))
+					if (++cnt >= ConfMaxGlobal(aconf))
+						return -6;
+			    }
+		    }
+		else if (ConfMaxGlobal(aconf) < 0)
+		    {
+			/** special limit per user@host */
+			Reg     aClient *acptr;
+			Reg     int     cnt = ucnt;
+
+			for (acptr = client; acptr; acptr = acptr->next)
+			    {
+				if (!IsPerson(acptr))
+					continue;
+				if (MyConnect(acptr) && ConfMaxLocal(aconf)>=0)
+					continue;
+				if (!strcmp(cptr->sockhost, acptr->user->host)
+				    && !strcmp(cptr->user->username,
+					       acptr->user->username))
+					if (--cnt <= ConfMaxGlobal(aconf))
+						return -7;
+			    }
+		    }
 	    }
 
 	lp = make_link();
@@ -735,7 +792,7 @@ int	opt;
 					{'\\', '\\'}, { 0, 0}};
 	Reg	char	*tmp, *s;
 	int	fd, i;
-	char	line[512], c[80], *tmp2 = NULL;
+	char	line[512], c[80], *tmp2 = NULL, *tmp3 = NULL;
 	int	ccount = 0, ncount = 0;
 	aConfItem *aconf = NULL;
 
@@ -801,7 +858,9 @@ int	opt;
 
 		if (tmp2)
 			MyFree(tmp2);
-		tmp2 = NULL;
+		if (tmp3)
+			MyFree(tmp3);
+		tmp2 = tmp3 = NULL;
 		tmp = getfield(line);
 		if (!tmp)
 			continue;
@@ -926,6 +985,10 @@ int	opt;
 			if ((tmp = getfield(NULL)) == NULL)
 				break;
 			Class(aconf) = find_class(atoi(tmp));
+			/* the following are only used for Y: */
+			if ((tmp2 = getfield(NULL)) == NULL)
+				break;
+			tmp3 = getfield(NULL);
 			break;
 		    }
 		istat.is_confmem += aconf->host ? strlen(aconf->host)+1 : 0;
@@ -947,7 +1010,14 @@ int	opt;
 				add_class(atoi(aconf->host),
 					  atoi(aconf->passwd),
 					  atoi(aconf->name), aconf->port,
-					  tmp ? atoi(tmp) : 0);
+					  tmp ? atoi(tmp) : 0,
+/*					  tmp2 ? atoi(tmp2) : 0,
+** the next line should be replaced by the previous sometime in the
+** future.  It is only kept for "backward" compatibility and not needed,
+** but I'm in good mood today -krys
+*/
+					  tmp2 ? atoi(tmp2) :atoi(aconf->name),
+					  tmp3 ? atoi(tmp3) : 0);
 			continue;
 		    }
 		/*

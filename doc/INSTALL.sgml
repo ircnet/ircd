@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.12 1997/09/09 19:14:23 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.13 1997/09/12 02:09:30 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.4.
 </abstract>
@@ -398,7 +398,7 @@ ping frequency, connection frequency (for servers) and
 maximum number of links that class should have.
 <p>Currently, the Y: line <bf>MUST</bf> appear in the
 ircd.conf file <bf>BEFORE</bf> it is used in any other way.
-<tag/Format/<verb>Y:&lt;Class&gt;:&lt;Ping Frequency&gt;:&lt;Connect freq|Max IP&gt;:&lt;Max Links&gt;:&lt;Sendq&gt;</verb>
+<tag/Format/<verb>Y:&lt;Class&gt;:&lt;Ping Frequency&gt;:&lt;Connect freq&gt;:&lt;Max Links&gt;:&lt;Sendq&gt;:&lt;Local Limit&gt;:&lt;Global Limit&gt;</verb>
 <tag/Y/ This specifies a Class record.
 <tag/Class/ This is the class number which gains the following
 attributes and should match that which is on the end of the
@@ -408,16 +408,22 @@ the connection remain ``silent'' before sending a PING message
 to make sure it is still alive.  Unless you are sure of what
 you are doing, use the default value which is in your
 config.h file.
-<tag/Connect Frequency|Max IP/ This field has a different meaning
-depending on the use of the Y line:
-<itemize>
-<item>For servers:
-By changing this number, you change how often your server
-checks to see if it can connect to this server. If you want
-to check very occasionally, use a large value, but if it is
-an important connection, you might want a smaller value so
-that you connect to it as soon as possible.
-<item>For clients:
+<tag/Connect Frequency/ By changing this number, you change
+how often your server checks to see if it can connect to
+this server. If you want to check very occasionally, use a
+large value, but if it is an important connection, you might
+want a smaller value so that you connect to it as soon as
+possible.
+<tag/Max Links/ This field defines the maximum number of
+links this class will allow from automatic connections (C
+lines).  Using /CONNECT overrides this feature.  Also
+defines the maximum number of users in this class (I/O
+lines).
+<tag/Sendq/ This field defines the ``sendq'' value for this
+class.  If this field is not present, the default (from
+config.h) is assigned.
+<tag/Local limit/  This field is used to limit the number
+of local concurrent connections:
 <itemize>
 <item> Positive value: defines the maximum number of clients
 from the same host (IP) will be allowed.
@@ -425,35 +431,26 @@ from the same host (IP) will be allowed.
 from the same user@host (IP) will be allowed.  Read note
 below.
 </itemize>
-</itemize>
-<tag/Max Links/ This field defines the maximum number of
-links this class will allow from automatic connections (C
-lines).  Using /CONNECT overrides this feature.  Also
-defines the maximum number of users in this class (I/O
-lines).
-<tag/Sendq/ This field defines the ``sendq'' value for this
-class.  If thisfield is not present, the default (from
-config.h) is assigned.
+<tag/Global limit/  This field has the same use as the
+``Local limit'' field.  But, the connection counts are done
+for all clients present on the net instead of only counting
+local clients.
 <tag/Note/ leaving any of the fields out means their value is 0 (ZERO)!!
-<tag/Note/ If you plan to use the user@host limit, please
-read the following very carefully.  The ``user'' value is
-the ident reply for the connection.  If no reply was given
-then it defaults to ``unknown'' and thus the effective limit
-will be per host, not per user@host. Also, some ident
-servers return encrypted data which changes for every
-connection making the limit void.
-<tag/Example/ Y:23:120:300:5:
+<tag/Note/ If you plan to use the local user@host limit,
+please read the following very carefully.  The ``user''
+value is the ident reply for the connection.  If no reply
+was given then it defaults to ``unknown'' and thus the
+effective limit will be per host, not per user@host. Also,
+some ident servers return encrypted data which changes for
+every connection making the limit void.
+<tag/Note/ Only the local limitation is accurate.
+<tag/Example/ Y:23:120:300:5:100000:0:0: (server class)
 <p>
 This defines class 23 to allow 5 auto-connections, which are
 checked every 300 seconds.  The connection is allowed to
 remain silent for 120 seconds before a PING is sent.  NOTE:
-fields 3 & 4 are in seconds.
-<p>
-You may also give I lines a class (again the sixth field to
-define which class).  This is only usefull (currently) for
-redefining the ping frequency.  It can also be useful as a
-diagnostic to see how much each I line is used when combined
-with the TRACE output.
+fields 3 & 4 are in seconds.  The SendQ is set to 100000
+bytes.
 <p>
 Another feature of connection class is the ability to do
 automatic routing by using the class as a ``priority''.  If
@@ -461,6 +458,17 @@ you are connected to a server which has a class lower than
 one of the servers that is ``behind'' it, the server will
 disconnect the lower class one and schedule a ``new''
 connection for the higher class server.
+<p>
+Y:1:60:0:50:20000:2:5: (client class)
+<p>
+In case of a client class, the fields are interpreted a bit
+differently.  This class (number 1) can be used by up to 50
+users.  The connections are allowed to remain silent for 60
+seconds before a PING is set.  The SendQ is set to 20000
+bytes.  A new connection in this class will only be allowed
+if there aren't more than 2 other local connections fom the
+same IP address, or more than 5 other connections on the net
+from the same hostname.
 </descrip>
 
 <sect1>Client connections

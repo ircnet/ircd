@@ -1,3 +1,44 @@
+Thu Sep 11 21:43:20 1997  Christophe Kalt
+
+	* class_def.h, class_ext.h, class.c, s_bsd.c, s_conf.c, s_err.c,
+	s_user.c: added 2 fields to Y lines and implemented [u@]h global
+	limits.
+
+	* service_def.h, channel.c, s_service.c: added SERVICE_WANT_VCHANNEL.
+
+	* channel.c: server channels now have a topic.
+
+	* s_conf.c: negative class numbers are now forbidden.
+
+	* s_conf_ext.h, s_conf.c, s_bsd.c: new B lines format.
+
+Sun Sep  7 20:02:50 1997  Christophe Kalt
+
+	* s_conf.c: B lines now catch "unauthorized connections".
+	
+	* s_user.c: m_who() limit wasn't coded. fixed this and rewrote
+	m_who() because recursivity and penalty don't go together.
+	
+	* s_err.c: REPL_SERVLIST type field is now in hexa.
+
+	* service_def.h, send.c, s_misc.c, s_user.c: extended services
+	capabilities so they can do logging.
+
+	* s_serv.c, s_user.c: added MD5 support for crypt() (from Urvos Juvan).
+
+	* res.c: hostnames containing * or ? are now rejected.
+
+	* s_conf.c: service type field stripped from optional bits (in S
+	lines).
+
+	* s_serv.c: server token wasn't sent to services in m_server_estab().
+
+	* s_service.c: SERVICE_WANT_PREFIX wasn't honored by m_squery().
+
+	* struct_def.h, parse.c, s_serv.c, s_user.c:
+               * added MyService() macro and updated several tests.
+               * next_client() was ignoring services.
+
 Tue Aug 19 08:38:54 1997  Christophe Kalt
 
 	* channel.c: m_names() could still have a truncated reply.

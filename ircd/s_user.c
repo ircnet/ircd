@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.23 1997/09/08 00:20:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.24 1997/09/12 02:09:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -340,48 +340,12 @@ char	*nick, *username;
 	    {
 		char *reason = NULL;
 
-		if ((i = check_client(sptr)))
-		    {
-			ircstp->is_ref++;
-			sptr->exitc = EXITC_REF;
-			sendto_flag(SCH_LOCAL, "%s from %s.", (i == -5) ?
-				    "Too many user connections" : (i == -4) ?
-				    "Too many host connections" :
-				    (i == -3) ? "Too many connections" :
-			 	    "Unauthorized connection",
-				    get_client_host(sptr));
-#if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
-			syslog(LOG_NOTICE, "%s ( %s ): <none>@%s [%s] %c\n",
-			       myctime(sptr->firsttime),
-			       (i == -5) ? " u@h max " :
-			       (i == -4) ? " IP  max " : (i == -3) ? 
-			       " No more " : " No Auth ",
-			       (IsUnixSocket(sptr)) ? me.sockhost :
-			       ((sptr->hostp) ? sptr->hostp->h_name :
-				sptr->sockhost), sptr->auth, sptr->exitc);
-#endif		    
-#if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
-			sendto_flog(sptr, (i == -5) ? " u@h max " :
-				    (i == -4) ? " IP  max " : (i == -3) ? 
-				    " No more " : " No Auth ", 0, "<none>",
-				    (IsUnixSocket(sptr)) ? me.sockhost :
-				    ((sptr->hostp) ? sptr->hostp->h_name :
-				    sptr->sockhost));
-#endif
-			return exit_client(cptr, sptr, &me,
-				(i == -5) ?
-					"No more connections from you" :
-				(i == -4) ?
-					"No more connections from your host" :
-				(i == -3) ? "No more connections" :
-					    "No Authorization");
-		    }
-		aconf = sptr->confs->value.aconf;
-		if (IsUnixSocket(sptr))
-			strncpyzt(user->host, me.sockhost, HOSTLEN+1);
-		else
-			strncpyzt(user->host, sptr->sockhost, HOSTLEN+1);
-
+		/*
+		** the following insanity used to be after check_client()
+		** but check_client()->attach_Iline() now needs to know the
+		** username for global u@h limits.
+		** moving this shit here shouldn't be a problem. -krys
+		*/
 #ifndef	NO_PREFIX
 		/*
 		** ident is fun.. ahem
@@ -427,6 +391,49 @@ char	*nick, *username;
 		else
 			strncpy(user->username, buf2, USERLEN+1);
 		user->username[USERLEN] = '\0';
+		/* eos */
+
+		if ((i = check_client(sptr)))
+		    {
+			struct msg_set { char *shortm; char *longm; };
+			    
+			static struct msg_set exit_msg[7] = {
+			{ "G u@h max", "Too many user connections (global)" },
+			{ "G IP  max", "Too many host connections (global)" },
+			{ "L u@h max", "Too many user connections (local)" },
+			{ "L IP  max", "Too many host connections (local)" },
+			{ "   max   ", "Too many connections" },
+			{ " No Auth ", "Unauthorized connection" },
+			{ " Failure ", "Connect failure" } };
+
+			i += 7;
+			if (i < 0 || i > 6) /* in case.. */
+				i = 6;
+
+			ircstp->is_ref++;
+			sptr->exitc = EXITC_REF;
+			sendto_flag(SCH_LOCAL, "%s from %s.",
+				    exit_msg[i].longm, get_client_host(sptr));
+#if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
+			syslog(LOG_NOTICE, "%s ( %s ): <none>@%s [%s] %c\n",
+			       myctime(sptr->firsttime), exit_msg[i].shortm,
+			       (IsUnixSocket(sptr)) ? me.sockhost :
+			       ((sptr->hostp) ? sptr->hostp->h_name :
+				sptr->sockhost), sptr->auth, sptr->exitc);
+#endif		    
+#if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
+			sendto_flog(sptr, exit_msg[i].shortm, 0, "<none>",
+				    (IsUnixSocket(sptr)) ? me.sockhost :
+				    ((sptr->hostp) ? sptr->hostp->h_name :
+				    sptr->sockhost));
+#endif
+			return exit_client(cptr, sptr, &me, exit_msg[i].longm);
+		    }
+		aconf = sptr->confs->value.aconf;
+		if (IsUnixSocket(sptr))
+			strncpyzt(user->host, me.sockhost, HOSTLEN+1);
+		else
+			strncpyzt(user->host, sptr->sockhost, HOSTLEN+1);
 
 		if (!BadPtr(aconf->passwd) &&
 		    !StrEq(sptr->passwd, aconf->passwd))
