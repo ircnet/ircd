@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.26 2002/07/04 20:42:39 jv Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.27 2002/07/06 13:25:47 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1354,6 +1354,13 @@ char	*parv[];
 		{0, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
 	};
 	
+	if (!IsAnOper(sptr))
+	{
+		sendto_one(sptr, replies[ERR_NOPRIVILEGES], ME, BadTo(parv[0]));
+
+		return 2;
+	}
+	
 	if (parc < 2)
 	{
 		sendto_one(sptr, ":%s NOTICE %s: Syntax: HASH <hash> [command]"
@@ -1379,8 +1386,6 @@ char	*parv[];
 				" number if given", ME, sptr->name);
 		
 #endif
-
-	
 
 		return 2;
 	}
