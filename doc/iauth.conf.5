@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.22 2004/12/06 16:09:21 chopin Exp $
-.TH IAUTH.CONF 5 "$Date: 2004/12/06 16:09:21 $"
+.\" @(#)$Id: iauth.conf.5,v 1.23 2004/12/16 16:14:06 chopin Exp $
+.TH IAUTH.CONF 5 "$Date: 2004/12/16 16:14:06 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -22,12 +22,13 @@ module\ \fImodule-name\fP
 [TAB]ip = \fIip-address\fP
 [TAB]timeout = \fIvalue\fP
 [TAB]port = \fIvalue\fP
+[TAB]reason = \fIstring\fP
 
 .fi
 .RE
 The section ends with an empty line.  The \fImodule-name\fP defines which
 module the section applies to.  A particular module may be used in several
-sections.  A \fIstring\fP of undefined format may be specified, it will
+sections.  An option \fIstring\fP of undefined format may be specified, it will
 then be passed to the module upon initialization, see the MODULES section
 to find out if a module accepts any option.
 
@@ -40,6 +41,8 @@ Port is mandatory for socks and webproxy modules and not used in others.
 It tells module what port it should connect to to do its work.
 
 If no host nor ip entry is specified, then the module will always be used.
+
+Reason is text to send to clients rejected by given module.
 
 When writing a configuration file, one should \fBalways\fP verify the
 syntax using the \fIiauth\fP program to avoid later problems.
@@ -76,6 +79,7 @@ client should be removed, message is sent to ircd and client removed.
 If iauth was compiled with Dynamically Shared Module support, it can be
 told to dynamically load a module using this option.  The module can then
 be loaded.
+
 .SH MODULES
 .TP
 .B pipe
@@ -124,8 +128,6 @@ positive answer as valid.
 to check only socks v4.
 .B v5only
 to check only socks v5.
-.B reason
-text to send to rejected clients
 .TP
 .B rfc931
 This module is for authentication TCP connections using the protocol
@@ -156,8 +158,6 @@ to make sure that we connected to our own ircd; without
 this parameter, module will accept any "HTTP/1.? 200" with an exception
 of servers sending "Date:" header along (which is common with some
 Apache+PHP configurations).
-.B reason
-text to send to rejected clients
 
 .SH EXAMPLE
 The following file will cause the IRC daemon to reject all connections
