@@ -38,7 +38,7 @@
 
 /* options */
 #define	SERVICE_WANT_PREFIX	0x00010000 /* to receive n!u@h instead of n */
-#define	SERVICE_WANT_TOKEN	0x00020000 /* use serv token instead of name */
+#define	SERVICE_WANT_SID	0x00020000 /* use serv token instead of name */
 #define	SERVICE_WANT_EXTNICK	0x00040000 /* user extended NICK syntax */
 #define	SERVICE_WANT_UID	0x00080000 /* user extended UID syntax */
 
