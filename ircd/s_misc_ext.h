@@ -39,7 +39,6 @@ extern struct tm motd_tm;
 #define EXTERN
 #endif /* S_MISC_C */
 EXTERN char *date __P((time_t clock));
-EXTERN char *myctime __P((time_t value));
 EXTERN int check_registered_user __P((aClient *sptr));
 EXTERN int check_registered __P((aClient *sptr));
 EXTERN int check_registered_service __P((aClient *sptr));

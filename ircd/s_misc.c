@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.22 1998/08/02 17:29:30 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.23 1998/08/03 14:09:23 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -80,31 +80,6 @@ time_t	clock;
 		weekdays[lt->tm_wday], months[lt->tm_mon],lt->tm_mday,
 		lt->tm_year + 1900, lt->tm_hour, lt->tm_min,
 		plus, minswest/60, minswest%60);
-
-	return buf;
-}
-
-/**
- ** myctime()
- **   This is like standard ctime()-function, but it zaps away
- **   the newline from the end of that string. Also, it takes
- **   the time value as parameter, instead of pointer to it.
- **   Note that it is necessary to copy the string to alternate
- **   buffer (who knows how ctime() implements it, maybe it statically
- **   has newline there and never 'refreshes' it -- zapping that
- **   might break things in other places...)
- **
- **/
-
-char	*myctime(value)
-time_t	value;
-{
-	static	char	buf[28];
-	Reg	char	*p;
-
-	(void)strcpy(buf, ctime(&value));
-	if ((p = (char *)index(buf, '\n')) != NULL)
-		*p = '\0';
 
 	return buf;
 }

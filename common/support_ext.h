@@ -38,6 +38,7 @@ EXTERN char *strtok __P((char *str, char *fs));
 #if ! HAVE_STRERROR
 EXTERN char *strerror __P((int err_no));
 #endif /* HAVE_STRERROR */
+EXTERN char *myctime __P((time_t value));
 #if ! HAVE_INET_NTOA
 EXTERN char *inetntoa __P((char *in));
 #endif /* HAVE_INET_NTOA */
