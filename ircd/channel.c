@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.134 2002/11/22 21:19:25 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.135 2003/02/10 02:39:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -295,13 +295,36 @@ aChannel *chptr;
 
 		if (strcmp(ip, cptr->user->host))
 		    {
+			int mask;
+
 			s = make_nick_user_host(cptr->name,
 						cptr->user->username, ip);
 	    
 			for (tmp = chptr->mlist; tmp; tmp = tmp->next)
-				if (tmp->flags == type &&
-				    match(tmp->value.cp, s) == 0)
-					break;
+				if (tmp->flags == type)
+				{
+					if (match(tmp->value.cp, s) == 0)
+						break;
+#ifndef INET6
+					/* depending on popularity of CIDR bans,
+					   we could move the whole block before
+					   checking @IP ban */
+					buf[0]='\0';
+					/* perhaps if (strrchr(tmp->value.cp, '/')
+					   before sscanf would give us some speed */
+					if (sscanf(tmp->value.cp, "%*[^@]@%[0-9.]/%d",
+						buf, &mask) == 2)
+					{
+						mask=32-mask;
+						if (ntohl(cptr->ip.s_addr)
+							>> mask ==
+							ntohl(inet_addr(buf))
+							>> mask)
+							/* CIDR match */
+							break;
+					}
+#endif
+				}
 		    }
 	  }
 
