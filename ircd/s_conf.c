@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.124 2004/06/30 19:05:31 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.125 2004/07/02 10:07:17 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2213,41 +2213,55 @@ void	find_bounce(aClient *cptr, int class, int fd)
 */
 aConfItem	*find_denied(char *name, int class)
 {
-    aConfItem	*aconf;
+	aConfItem	*aconf;
 
-    for (aconf = conf; aconf; aconf = aconf->next)
+	for (aconf = conf; aconf; aconf = aconf->next)
 	{
-	    if (aconf->status != CONF_DENY)
-		    continue;
-	    if (!aconf->name)
-		    continue;
-	    if (match(aconf->name, name) && aconf->port != class)
-		    continue;
-	    if (isdigit(*aconf->passwd))
+		if (aconf->status != CONF_DENY)
+			continue;
+		if (!aconf->name)
+			continue;
+		if (match(aconf->name, name) && aconf->port != class)
+			continue;
+		if (isdigit(*aconf->passwd))
 		{
-		    aConfItem	*aconf2;
-		    int		ck = atoi(aconf->passwd);
+			aConfItem	*aconf2;
+			int		ck = atoi(aconf->passwd);
 
-		    for (aconf2 = conf; aconf2; aconf2 = aconf2->next)
+			for (aconf2 = conf; aconf2; aconf2 = aconf2->next)
 			{
-			    if (aconf2->status != CONF_NOCONNECT_SERVER)
-				    continue;
-			    if (!aconf2->class || ConfClass(aconf2) != ck)
-				    continue;
-			    if (find_client(aconf2->name, NULL))
-				    return aconf2;
+				if (aconf2->status != CONF_NOCONNECT_SERVER)
+					continue;
+				if (!aconf2->class || ConfClass(aconf2) != ck)
+					continue;
+				if (find_client(aconf2->name, NULL))
+					return aconf2;
 			}
 		}
-	    if (aconf->host)
+		if (aconf->host)
 		{
-		    aServer	*asptr;
+			aServer	*asptr;
+			char	*host = aconf->host;
+			int	reversed = 0;
 
-		    for (asptr = svrtop; asptr; asptr = asptr->nexts)
-			    if (!match(aconf->host, asptr->bcptr->name))
-				    return aconf;
+			if (*host == '!')
+			{
+				host++;
+				reversed = 1;
+			}
+			for (asptr = svrtop; asptr; asptr = asptr->nexts)
+				if (!match(host, asptr->bcptr->name))
+					break;
+
+			if (!reversed && asptr)
+				return aconf;
+			if (reversed && !asptr)
+				/* anything but NULL; tho using it may give
+				** funny results in calling function */
+				return conf;
 		}
 	}
-    return NULL;
+	return NULL;
 }
 
 #ifdef TKLINE
