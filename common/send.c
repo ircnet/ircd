@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.24 1998/05/05 23:30:09 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.25 1998/05/31 18:19:49 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1124,7 +1124,7 @@ void	sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
 			continue;
-		if (*chptr->chname == '-' && !(cptr->serv->version & SV_NJOIN))
+		if (*chptr->chname == '!' && !(cptr->serv->version & SV_NJOIN))
 			continue;
 		if (!len)
 		    {
