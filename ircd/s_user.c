@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.110 2002/01/06 05:55:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.111 2002/01/07 02:08:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -692,7 +692,7 @@ char	*nick, *username;
 				sendto_one(acptr, "NICK %s %d %s %s %s %s :%s",
 					   nick, sptr->hopcount+1, 
 					   user->username, user->host, 
-					   user->servp->tok, 
+					   user->servp->maskedby->serv->tok, 
 					   (*buf) ? buf : "+", sptr->info);
 	    }	/* for(my-leaf-servers) */
 #ifdef	USE_SERVICES

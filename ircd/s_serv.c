@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.87 2002/01/06 09:04:54 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.88 2002/01/07 02:08:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -579,20 +579,27 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	strncpyzt(acptr->name, sptr->name, sizeof(acptr->name));
 	acptr->info = mystrdup("Masked Server");
 	acptr->serv->up = sptr;
-	acptr->serv->stok = sptr->serv->maskedby->serv->stok;
-	strcpy(acptr->serv->tok, sptr->serv->maskedby->serv->tok);
 	acptr->serv->snum = sptr->serv->maskedby->serv->snum;
 	strncpyzt(acptr->serv->verstr, parv[2], sizeof(acptr->serv->verstr));
 	acptr->serv->version = get_version(parv[2], NULL);
 	acptr->serv->maskedby = sptr->serv->maskedby;
-	strncpyzt(acptr->serv->sid, parv[1], SIDLEN + 1);
 	SetServer(acptr);
 	istat.is_masked++;
 
 	/* We add this server to client list, but *only* to SID hash. */
 	add_client_to_list(acptr);
-	if (*parv[1] != '$')
+
+	if (*parv[1] == '$')
 	{
+		acptr->serv->stok = idtol(parv[1] + 1, SIDLEN - 1);
+		SPRINTF(acptr->serv->sid, "$%s",
+			ltoid(acptr->serv->ltok, SIDLEN - 1));
+		add_to_server_hash_table(acptr->serv, cptr);
+	}
+	else
+	{
+		acptr->serv->stok = idtol(parv[3], SIDLEN);
+		strncpyzt(acptr->serv->sid, parv[1], SIDLEN + 1);
 		add_to_sid_hash_table(parv[1], acptr);
 	}
 
