@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.20 1997/12/16 17:18:32 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.21 1997/12/19 13:42:24 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2102,7 +2102,7 @@ char	*parv[];
 	if (!BadPtr(para))
 	    {
 		s = index(para, ',');
-		if (s && MyConnect(sptr))
+		if (s && MyConnect(sptr) && s != para)
 		    {
 			parv[1] = ++s;
 			(void)m_names(cptr, sptr, parc, parv);
