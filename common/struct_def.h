@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.113 2004/06/29 23:52:00 chopin Exp $
+ *   $Id: struct_def.h,v 1.114 2004/06/30 14:35:28 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -187,7 +187,9 @@ typedef enum Status {
 #define FLAGS_RESTRICT	0x0010 /* restricted user */
 #define FLAGS_AWAY	0x0020 /* user is away */
 #define FLAGS_EXEMPT    0x0040 /* user is exempted from k-lines */
-	
+#ifdef XLINE
+#define FLAGS_XLINED	0x0100	/* X-lined client */
+#endif
 #define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP|FLAGS_AWAY)
 #define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP|FLAGS_RESTRICT)
 
@@ -339,7 +341,9 @@ struct	ListItem	{
 #define	CONF_TKILL		0x200000
 #define	CONF_TOTHERKILL		0x400000
 #endif
-
+#ifdef XLINE
+#define CONF_XLINE		0x800000
+#endif
 #define	CONF_OPS		CONF_OPERATOR
 #define	CONF_SERVER_MASK	(CONF_CONNECT_SERVER | CONF_NOCONNECT_SERVER |\
 				 CONF_ZCONNECT_SERVER)
@@ -364,6 +368,13 @@ struct	ListItem	{
 
 #define PFLAG_DELAYED		0x00001
 #define PFLAG_SERVERONLY	0x00002
+
+#ifdef XLINE
+#define XFLAG_WHOLE		0x00001
+#define IsConfXlineWhole(x)	((x)->flags & XFLAG_WHOLE)
+#define IsXlined(x)		((x)->user && (x)->user->flags & FLAGS_XLINED)
+#define SetXlined(x)		((x)->user->flags |= FLAGS_XLINED)
+#endif
 
 #define IsConfDelayed(x)	((x)->flags & PFLAG_DELAYED)
 #define IsConfServeronly(x)	((x)->flags & PFLAG_SERVERONLY)
@@ -922,6 +933,9 @@ typedef enum ServerChannels {
 #define EXITC_AREFQ	'u'	/* Unauthorized by iauth, be quiet */
 #define EXITC_VIRUS	'v'	/* joined a channel used by PrettyPark virus */
 #define EXITC_YLINEMAX	'Y'	/* Y:line max clients limit */
+#ifdef XLINE
+#define EXITC_XLINE	'X'	/* Forbidden GECOS */
+#endif
 
 /* eXternal authentication slave OPTions */
 #define	XOPT_REQUIRED	0x01	/* require authentication be done by iauth */
