@@ -4,7 +4,7 @@
 
 <title>IRC Services
 <author>Christophe Kalt
-<date>$Id: SERVICE.sgml,v 1.5 1997/09/09 19:13:56 kalt Exp $
+<date>$Id: SERVICE.sgml,v 1.6 1999/04/15 21:55:52 kalt Exp $
 <abstract>
 The IRC protocol described in RFC 1459 defines two types of
 connections (client, and server).  A third type was
@@ -131,6 +131,8 @@ SERVICE_WANT_RQUIT      0x00000800 /* regular user QUITs (these which
 				   are also sent between servers) */
 SERVICE_WANT_MODE       0x00001000 /* channel modes (not +ov) */
 SERVICE_WANT_CHANNEL    0x00002000 /* channel creations/destructions */
+SERVICE_WANT_VCHANNEL   0x00004000 /* channel joins/parts */
+SERVICE_WANT_TOPIC      0x00008000 /* channel topics */
 
 SERVICE_WANT_ERRORS	0x01000000 /* &amp;ERRORS */
 SERVICE_WANT_NOTICES	0x02000000 /* &amp;NOTICES */
