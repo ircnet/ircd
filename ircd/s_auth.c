@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.46 2002/07/30 00:14:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.47 2002/09/28 21:03:27 jv Exp $";
 #endif
 
 #include "os.h"
@@ -423,6 +423,18 @@ read_iauth()
 		      }
 		    else
 			{
+			    char *reason;
+
+			    /* Copy kill reason received from iauth */
+			    reason = strstr(start, " :");
+			    if (reason && (reason + 2 != '\0'))
+			    {
+				    if (cptr->reason)
+				    {
+					    MyFree(cptr->reason);
+				    }
+				    cptr->reason = mystrdup(reason + 2);
+			    }
 			    /*
 			    ** mark for kill, because it cannot be killed
 			    ** yet: we don't even know if this is a server
