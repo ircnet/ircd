@@ -140,9 +140,6 @@
 /* Define if h_errno is declared in errno.h or netdb.h. */
 #undef H_ERRNO_DECLARED
 
-/* Define if poll(2) must be used instead of select(2). */
-#undef USE_POLL
-
 /* Define if the system provides POSIX sigaction. */
 #undef POSIX_SIGNALS
 
@@ -209,6 +206,9 @@
 
 /* Define if you have the memset function.  */
 #undef HAVE_MEMSET
+
+/* Define if you have the poll function.  */
+#undef HAVE_POLL
 
 /* Define if you have the rindex function.  */
 #undef HAVE_RINDEX

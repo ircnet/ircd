@@ -543,6 +543,10 @@ extern struct hostent *_switch_gethostbyname_r __P((const char *name,
 # define HAVE_GETRUSAGE 1
 #endif
 
+#if defined(HAVE_POLL)
+# define USE_POLL
+#endif
+
 /*  select portability problems - some systems do not define FD_... macros; on
  *  some systems (for example HPUX), select uses an int * instead of an
  *  fd_set * for its 2nd, 3rd and 4th arguments.

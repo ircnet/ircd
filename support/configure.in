@@ -1314,7 +1314,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.23 1998/08/08 20:40:41 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.24 1998/09/20 19:36:16 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1375,14 +1375,15 @@ IRC_CURSES_TERMCAP
 AC_FUNC_SETPGRP
 AC_FUNC_SETVBUF_REVERSED
 AC_FUNC_VFORK
-AC_CHECK_FUNCS(setpgrp strchr strrchr memcmp memset memmove memcpy index rindex bcmp bcopy bzero select inet_ntoa inet_aton inet_addr inet_netof getrusage times strerror strtoken strtok sigaction sigset truncate)
+AC_CHECK_FUNCS(setpgrp strchr strrchr memcmp memset memmove memcpy index rindex bcmp bcopy bzero select inet_ntoa inet_aton inet_addr inet_netof getrusage times strerror strtoken strtok sigaction sigset truncate poll)
 dnl ---
 dnl Note: additional tests should be performed and used inside the source code
 dnl       for the following functions:
 dnl       gethostname gettimeofday lrand48 mkdir socket
 dnl ---
 IRC_FUNC_MEMCMP
-IRC_SELECT_POLL
+dnl following now done using AC_CHECK_FUNCS
+dnl IRC_SELECT_POLL
 
 IRC_SIGNAL_IMPLEMENTATION
 IRC_NON_BLOCKING_SYSTEM
