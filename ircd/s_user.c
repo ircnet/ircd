@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.76 1999/06/07 21:19:59 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.77 1999/06/07 21:26:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -395,15 +395,22 @@ char	*nick, *username;
 		if (!DoneXAuth(sptr) && (iauth_options & XOPT_REQUIRED))
 		    {
 			time_t last = 0;
+			char *reason;
 
-			if (timeofday - last > 300)
+			if (iauth_options & XOPT_NOTIMEOUT)
 			    {
-				sendto_flag(SCH_AUTH, 
+				if (timeofday - last > 300)
+				    {
+					sendto_flag(SCH_AUTH, 
 			    "iauth not running! (refusing new connections)");
-				last = timeofday;
+					last = timeofday;
+				    }
+				reason = "No iauth!";
 			    }
+			else
+				reason = "iauth t/o";
 			sptr->exitc = EXITC_AUTHFAIL;
-			return ereject_user(cptr, "No iauth!",
+			return ereject_user(cptr, reason,
 					    "Authentication failure!");
 		    }
 
