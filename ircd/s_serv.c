@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.204 2004/06/19 18:02:33 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.205 2004/06/19 18:43:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1846,7 +1846,7 @@ void	count_servers_users(aClient *cptr, int *servers, int *users)
 **	      it--not reversed as in ircd.conf!
 */
 
-static int report_array[16][3] = {
+static int report_array[18][3] = {
 		{ CONF_ZCONNECT_SERVER,	  RPL_STATSCLINE, 'c'},
 		{ CONF_CONNECT_SERVER,	  RPL_STATSCLINE, 'C'},
 		{ CONF_NOCONNECT_SERVER,  RPL_STATSNLINE, 'N'},
@@ -1865,6 +1865,8 @@ static int report_array[16][3] = {
 #ifdef TKLINE
 		{ CONF_TOTHERKILL,	  RPL_STATSKLINE, 'k'},
 		{ CONF_TKILL,		  RPL_STATSKLINE, 'K'},
+#else
+		{ 0, 0, 0}, { 0, 0, 0},
 #endif
 		{ 0, 0, 0}
 	};
