@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.12 1998/01/23 22:38:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.13 1998/04/02 19:58:54 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -553,7 +553,12 @@ char	*buffer, *bufend;
 		if ((mptr->flags & MSG_LAG) &&
 		    !(IsServer(cptr) || IsService(cptr)))
 		    {	/* Flood control partly migrated into penalty */
-			cptr->since += (1 + i / 100);
+#ifndef	BIG_NET
+			if (ircstp->is_bignet == 0)
+				cptr->since = timeofday;
+			else
+#endif
+				cptr->since += (1 + i / 100);
 			/* Allow only 1 msg per 2 seconds
 			 * (on average) to prevent dumping.
 			 * to keep the response rate up,
@@ -660,7 +665,7 @@ char	*buffer, *bufend;
         ** Add penalty score for sucessfully parsed command if issued by
 	** a LOCAL user client.
 	*/
-	if ((ret > 0) && IsRegisteredUser(cptr))
+	if ((ret > 0) && IsRegisteredUser(cptr) && ircstp->is_bignet)
 	    {
 		cptr->since += ret;
 /* only to lurk

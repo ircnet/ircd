@@ -457,6 +457,7 @@ struct Client	{
  * statistics structures
  */
 struct	stats {
+	u_short	is_bignet; /* see config.h */
 	u_int	is_cl;	/* number of client connections */
 	u_int	is_sv;	/* number of server connections */
 	u_int	is_ni;	/* connection but no idea who it was

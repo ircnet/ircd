@@ -391,6 +391,16 @@
  */
 #undef	CLONE_CHECK
 
+/*
+ * As main IRC networks grew, several features were added to the server to
+ * make it more robust against user abuse.  Most of these features are truly
+ * annoying and don't need to be used on small networks, especially if the
+ * users are trusted.
+ * Undefine the following if you run ircd in a standalone mode, or a small
+ * network and/or the users are trustworthy.
+ */
+#define	BIG_NET
+
 /* For broken mirc (win/pc) client. Enables old features:
  * 1) Send start-of-list numeric before LIST reply
  * 2) Revert combined "n JOIN #^Go" -> "n JOIN #" "MODE # o n"

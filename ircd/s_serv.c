@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.35 1998/03/31 21:52:27 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.36 1998/04/02 19:58:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2366,6 +2366,8 @@ check_link(cptr)
 aClient	*cptr;
 {
     if (!IsServer(cptr))
+	    return 0;
+    if (!ircstp->is_bignet)
 	    return 0;
 
     ircstp->is_ckl++;

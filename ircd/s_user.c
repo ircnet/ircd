@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.39 1998/03/22 00:28:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.40 1998/04/02 19:58:58 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -735,6 +735,9 @@ char	*parv[];
 	*/
 	if (!(acptr = find_client(nick, NULL)) &&
 	    (IsServer(cptr) ||
+#ifndef	BIG_NET
+	     !ircstp->is_bignet ||
+#endif
 	     !(delayed = find_history(nick, (long)DELAYCHASETIMELIMIT))))
 		goto nickkilldone;  /* No collisions, all clear... */
 	/*
