@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.152 2004/11/14 14:45:02 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.153 2004/11/16 16:56:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -717,11 +717,11 @@ static	void	setup_me(aClient *mp)
 **	This is called when the commandline is not acceptable.
 **	Give error message and exit without starting anything.
 */
-static	int	bad_command(void)
+static	void	bad_command(void)
 {
   (void)printf(
 	 "Usage: ircd [-a] [-b] [-c]%s [-h servername] [-q] [-i]"
-	 "[-T tunefile] [-p (strict|on|off)] [-s] [-v] [-t] %s\n",
+	 "[-T [tunefile]] [-p (strict|on|off)] [-s] [-v] [-t] %s\n",
 #ifdef CMDLINE_CONFIG
 	 " [-f config]",
 #else
@@ -861,8 +861,6 @@ int	main(int argc, char *argv[])
 			bootopt |= BOOT_TTY;
 			break;
 		    case 'T':
-			if (*p == '\0')
-				bad_command();
 			tunefile = p;
 			break;
 		    case 'v':
@@ -1403,6 +1401,9 @@ void ircd_writetune(char *filename)
 {
 	int fd;
 	char buf[100];
+
+	if (!filename || !*filename)
+		return;
 
 	(void)truncate(filename, 0);
 	if ((fd = open(filename, O_CREAT|O_WRONLY, 0600)) >= 0)
