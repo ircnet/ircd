@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.14 1998/08/03 14:09:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.15 1998/12/13 00:02:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -53,8 +53,6 @@ char	*s;
 ** 	strtoken.c --  	walk through a string of tokens, using a set
 **			of separators
 **			argv 9/90
-**
-**	$Id: support.c,v 1.14 1998/08/03 14:09:17 kalt Exp $
 */
 
 char *strtoken(save, str, fs)
@@ -108,7 +106,6 @@ char *str, *fs;
 **	strerror - return an appropriate system error string to a given errno
 **
 **		   argv 11/90
-**	$Id: support.c,v 1.14 1998/08/03 14:09:17 kalt Exp $
 */
 
 char *strerror(err_no)
@@ -154,6 +151,66 @@ time_t	value;
 	return buf;
 }
 
+#ifdef INET6
+/*
+ * inetntop: return the : notation of a given IPv6 internet number.
+ *           make sure the compressed representation (rfc 1884) isn't used.
+ */
+char *inetntop(af, in, out, the_size)
+int af;
+const void *in;
+char *out;
+size_t the_size;
+{
+	static char local_dummy[MYDUMMY_SIZE];
+
+	inet_ntop(af, in, local_dummy, the_size);
+	if (strstr(local_dummy, "::"))
+	    {
+		char cnt = 0, *cp = local_dummy, *op = out;
+
+		while (*cp)
+		    {
+			if (*cp == ':')
+				cnt += 1;
+			if (*cp++ == '.')
+			    {
+				cnt += 1;
+				break;
+			    }
+		    }
+		cp = local_dummy;
+		while (*cp)
+		    {
+			*op++ = *cp++;
+			if (*(cp-1) == ':' && *cp == ':')
+			    {
+				if ((cp-1) == local_dummy)
+				    {
+					op--;
+					*op++ = '0';
+					*op++ = ':';
+				    }
+
+				*op++ = '0';
+				while (cnt++ < 7)
+				    {
+					*op++ = ':';
+					*op++ = '0';
+				    }
+			    }
+		    }
+		if (*(op-1)==':') *op++ = '0';
+		*op = '\0';
+		Debug((DEBUG_DNS,"Expanding `%s' -> `%s'", local_dummy,
+		       out));
+	    }
+	else
+		bcopy(local_dummy, out, 64);
+	return out;
+}
+#endif
+
 #if ! HAVE_INET_NTOA
 /*
 **	inetntoa  --	changed name to remove collision possibility and
@@ -163,7 +220,6 @@ time_t	value;
 **			internet number (some ULTRIX don't have this)
 **			argv 11/90).
 **	inet_ntoa --	its broken on some Ultrix/Dynix too. -avalon
-**	$Id: support.c,v 1.14 1998/08/03 14:09:17 kalt Exp $
 */
 
 char	*inetntoa(in)

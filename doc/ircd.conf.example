@@ -1,9 +1,9 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.9 1997/12/19 12:29:53 kalt Exp $
+# $Id: ircd.conf.example,v 1.10 1998/12/13 00:02:34 kalt Exp $
 #
-# some changes for 294 and cleaning, delta, Fri Dec 19 05:56:07 MEZ 1997
+# some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -410,6 +410,26 @@ H:*::cs-ftp.bu.edu::
 # Example, permit irc-2.mit.edu to allow any MIT servers behind it to
 # connect: 
 H:*.mit.edu::irc-2.mit.edu::
+#
+#
+############################
+# D: [OPTIONAL]. Control how auto connections are done. This will be mostly 
+#                useful for networks with complex configurations.
+#
+# D:<Denied Server Mask>:<Denied Class>:<Server Mask>:<Server Class>:
+#   1                    2              3             4
+#
+# If a server matching <Denied Server Mask> or a server in <Denied Class>
+# is present ircd won't auto connect to any server matching <Server Mask>
+# or being in <Server Class> although auto connect for those is active.
+#
+# Example, don't auto connect to *.fi if some server of *.edu is already
+# linked
+D:*.edu::*.fi::
+#
+# Example, don't auto connect to *.fi or any server in class '3'  if a
+# server from our class '2' is already present
+D::2:*.fi:3:
 #
 #
 ############################

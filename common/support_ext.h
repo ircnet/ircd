@@ -39,6 +39,9 @@ EXTERN char *strtok __P((char *str, char *fs));
 EXTERN char *strerror __P((int err_no));
 #endif /* HAVE_STRERROR */
 EXTERN char *myctime __P((time_t value));
+#ifdef INET6
+EXTERN char *inetntop(int af, const void *in, char *local_dummy, size_t the_size);
+#endif
 #if ! HAVE_INET_NTOA
 EXTERN char *inetntoa __P((char *in));
 #endif /* HAVE_INET_NTOA */

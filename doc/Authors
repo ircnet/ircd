@@ -159,6 +159,7 @@ Magnus Tjernstrom <d92-mtm@oook.campus.luth.se>
 Olivier Galibert <Olivier.Galibert@mines.u-nancy.fr>: service code testing
 Alain Nissen <Alain.Nissen@ulg.ac.be>: source tree restructuration, many
 portability issues, new configure.in
+Roar Thronæs <roart@nvg.ntnu.no> added IPv6 support.
 
 The version 2.10 release was coordinated by Christophe Kalt.
 
@@ -171,6 +172,7 @@ Various modifications, bugreports, cleanups and testing by:
 Helmut Springer <delta@RUS.Uni-Stuttgart.DE>
 Michael 'Eumel' Neumayer <eumel@42.org>
 Kurt Roeckx <Q@ping.be>
+Roar Thronæs <roart@nvg.ntnu.no> for IPv6 changes.
 
 Thanks go to those persons not mentioned here who have added their advice,
 opinions, and code to IRC.

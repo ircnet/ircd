@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.51 1998/11/12 11:44:52 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.52 1998/12/13 00:02:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1320,8 +1320,8 @@ char	*to;
 			else
 				(void)strcpy(buf, tmp->name);
 			sendto_one(sptr, rpl_str(RPL_STATSPING, to),
-				   buf, cp->lseq, cp->lrecv,
-				   cp->ping / (cp->recv ? cp->recv : 1),
+				   buf, cp->lseq, cp->lrecvd,
+				   cp->ping / (cp->recvd ? cp->recvd : 1),
 				   tmp->pref);
 			sendto_flag(SCH_DEBUG, "%s: %d", buf, cp->seq);
 		    }

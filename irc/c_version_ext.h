@@ -28,5 +28,5 @@ extern char *intro;
 extern char *version;
 extern char *infotext[];
 extern char *HEADEROLD;
-extern char *HEADER;
+extern char *IRCHEADER;
 #endif /* C_VERSION_C */

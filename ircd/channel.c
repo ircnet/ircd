@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.79 1998/12/12 23:48:16 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.80 1998/12/13 00:02:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -269,7 +269,12 @@ aChannel *chptr;
 		char *ip = NULL;
 
 		if (MyConnect(cptr))
+#ifdef 	INET6
+			ip = (char *) inetntop(AF_INET6, (char *)&cptr->ip,
+					       mydummy, MYDUMMY_SIZE);
+#else
 			ip = (char *) inetntoa((char *)&cptr->ip);
+#endif
 
 		if (ip == NULL || strcmp(ip, cptr->user->host))
 		    {

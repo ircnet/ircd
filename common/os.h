@@ -217,6 +217,15 @@
 # include <zlib.h>
 #endif
 
+#if defined(INET6) && defined(CLIENT_COMPILE)
+# if (defined(linux) || defined(__NetBSD__)) && HAVE_RESOLV_H
+#  include <resolv.h>
+# endif
+# if HAVE_ARPA_NAMESER_H
+#  include <arpa/nameser.h>
+# endif
+#endif
+
 /*  Some special include files for a special OS. :)
  */
 
@@ -685,4 +694,59 @@ extern int errno;
 
 #if ! H_ERRNO_DECLARED
 extern int h_errno;
+#endif
+
+/*
+ *  IPv4 or IPv6 structures?
+ */
+
+#ifdef INET6
+
+# define AND16(x) ((x)[0]&(x)[1]&(x)[2]&(x)[3]&(x)[4]&(x)[5]&(x)[6]&(x)[7]&(x)[8]&(x)[9]&(x)[10]&(x)[11]&(x)[12]&(x)[13]&(x)[14]&(x)[15])
+static unsigned char minus_one[]={ 255, 255, 255, 255, 255, 255, 255, 255, 255,
+					255, 255, 255, 255, 255, 255, 255, 0};
+# define WHOSTENTP(x) ((x)[0]|(x)[1]|(x)[2]|(x)[3]|(x)[4]|(x)[5]|(x)[6]|(x)[7]|(x)[8]|(x)[9]|(x)[10]|(x)[11]|(x)[12]|(x)[13]|(x)[14]|(x)[15])
+
+# define	AFINET		AF_INET6
+# define	SOCKADDR_IN	sockaddr_in6
+# define	SOCKADDR	sockaddr_in6
+# define	SIN_FAMILY	sin6_family
+# define	SIN_PORT	sin6_port
+# define	SIN_ADDR	sin6_addr
+# define	S_ADDR		s6_addr
+# define	IN_ADDR		in6_addr
+
+# ifndef uint32_t
+#  define uint32_t __u32
+# endif
+
+# define MYDUMMY_SIZE 128
+char mydummy[MYDUMMY_SIZE];
+char mydummy2[MYDUMMY_SIZE];
+
+# if defined(linux) || defined(__NetBSD__)
+#  ifndef s6_laddr
+#   define s6_laddr        s6_addr32
+#  endif
+# endif
+
+# if defined(linux)
+static const struct in6_addr in6addr_any={ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+						0, 0, 0, 0, 0};
+# endif
+
+# define IRCDCONF_DELIMITER '%'
+
+#else
+# define	AFINET		AF_INET
+# define	SOCKADDR_IN	sockaddr_in
+# define	SOCKADDR	sockaddr
+# define	SIN_FAMILY	sin_family
+# define	SIN_PORT	sin_port
+# define	SIN_ADDR	sin_addr
+# define	S_ADDR		s_addr
+# define	IN_ADDR		in_addr
+
+# define WHOSTENTP(x) (x)
+# define IRCDCONF_DELIMITER ':'
 #endif

@@ -1,4 +1,24 @@
-1998-12-12  Christophe Kalt  <kalt@azurite>
+1998-09-25  Christophe Kalt
+	* configure.in: Check for IPv6 system type and update $LIBS (from
+	KIKUCHI Takahiro <kick@kyoto.wide.ad.jp>)
+
+	* bsd.c, os.h, parse.c, struct_def.h, support.c, support_ext.h,
+	c_bsd.c, c_version.c, c_version_ext.h, irc.c, swear.c, channel.c,
+	chkconf.c, ircd.c, nameser_def.h, res.c, res_def.h, res_init.c,
+	resolv_def.h, s_auth.c, s_bsd.c, s_conf.c, s_debug.c, s_misc.c,
+	s_serv.c, s_user.c, acconfig.h, configure.in: merged 2.9.5+IPv6.
+
+1998-04-12  Christophe Kalt
+
+	* configure.in, s_debug.c: vsyslog() isn't necessarely available
+	even if USE_STDARG is defined. (Digital Unix)
+
+1998-04-04  Christophe Kalt
+
+	* c_version_ext.h, c_version.c, irc.c, swear.c: Digital Unix 4.0B
+	port (Roar Thronæs <roart@nvg.ntnu.no>)
+
+1998-12-12  Christophe Kalt
 
 	* channel.c: +a/+r fix for !channels.
 

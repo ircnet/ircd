@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static char rcsid[] = "$Id: res_init.c,v 1.8 1998/09/20 19:22:23 kalt Exp $";
+static char rcsid[] = "$Id: res_init.c,v 1.9 1998/12/13 00:02:36 kalt Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -97,7 +97,11 @@ static void ircd_res_setoptions __P((char *, char *));
 #ifdef RESOLVSORT
 static const char sort_mask[] = "/&";
 #define ISSORTMASK(ch) (strchr(sort_mask, ch) != NULL)
+#ifdef INET6
 static u_int32_t ircd_net_mask __P((struct in_addr));
+#else
+static u_int32_t ircd_net_mask __P((struct in_addr));
+#endif
 #endif
 
 #if !defined(isascii)	/* XXX - could be a function */
@@ -186,6 +190,7 @@ ircd_res_init()
 	if (!ircd_res.id)
 		ircd_res.id = ircd_res_randomid();
 
+/*ifdef INET6 not, because of IPv4 DNS serving */
 #ifdef USELOOPBACK
 	ircd_res.nsaddr.sin_addr = inet_makeaddr(IN_LOOPBACKNET, 1);
 #else

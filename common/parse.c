@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.22 1998/11/09 20:06:00 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.23 1998/12/13 00:02:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -697,7 +697,7 @@ char	*irc_newline;
 		return(NULL);
 
 	field = line;
-	if ((end = (char *)index(line,':')) == NULL)
+	if ((end = (char *)index(line, IRCDCONF_DELIMITER)) == NULL)
 	    {
 		line = NULL;
 		if ((end = (char *)index(field,'\n')) == NULL)

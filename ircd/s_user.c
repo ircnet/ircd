@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.60 1998/12/12 23:48:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.61 1998/12/13 00:02:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2301,7 +2301,13 @@ char	*parv[];
 	if (!(aconf = find_conf_exact(name, sptr->username, sptr->sockhost,
 				      CONF_OPS)) &&
 	    !(aconf = find_conf_exact(name, sptr->username,
+#ifdef INET6
+				      (char *)inetntop(AF_INET6,
+						       (char *)&cptr->ip,
+						       mydummy, MYDUMMY_SIZE),
+#else
 				      (char *)inetntoa((char *)&cptr->ip),
+#endif
 				      CONF_OPS)))
 	    {
 		sendto_one(sptr, err_str(ERR_NOOPERHOST, parv[0]));
@@ -2366,7 +2372,11 @@ char	*parv[];
 			name, encr,
 		       parv[0], sptr->user->username, sptr->user->host,
 		       sptr->auth, IsUnixSocket(sptr) ? sptr->sockhost :
+#ifdef INET6
+                       inet_ntop(AF_INET6, (char *)&sptr->ip), mydummy, MYDUMMY_SIZE);
+#else
                        inetntoa((char *)&sptr->ip));
+#endif
 #endif
 #ifdef FNAME_OPERLOG
 	      {
@@ -2389,7 +2399,12 @@ char	*parv[];
 			  myctime(timeofday), name, encr,
 			  parv[0], sptr->user->username, sptr->user->host,
 			  sptr->auth, IsUnixSocket(sptr) ? sptr->sockhost :
+#ifdef INET6
+			  inetntop(AF_INET6, (char *)&sptr->ip, mydummy,
+				   MYDUMMY_SIZE));
+#else
 			  inetntoa((char *)&sptr->ip));
+#endif
 		  (void)alarm(3);
 		  (void)write(logfile, buf, strlen(buf));
 		  (void)alarm(0);

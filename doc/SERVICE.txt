@@ -1,6 +1,6 @@
   IRC Services
   Christophe Kalt
-  $Id: SERVICE.txt,v 1.5 1997/09/09 19:15:00 kalt Exp $
+  $Id: SERVICE.txt,v 1.6 1998/12/13 00:02:34 kalt Exp $
 
   The IRC protocol described in RFC 1459 defines two types of connec-
   tions (client, and server).  A third type was introduced with version

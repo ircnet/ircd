@@ -248,14 +248,14 @@ struct	CPing	{
 	u_long	ping;
 	u_long	seq;		/* # sent still in the "window" */
 	u_long	lseq;		/* sequence # of last sent */
-	u_long	recv;		/* # received still in the "window" */
-	u_long	lrecv;		/* # received */
+	u_long	recvd;		/* # received still in the "window" */
+	u_long	lrecvd;		/* # received */
 };
 
 struct	ConfItem	{
 	u_int	status;		/* If CONF_ILLEGAL, delete when no clients */
 	int	clients;	/* Number of *LOCAL* clients using this */
-	struct	in_addr ipnum;	/* ip number of host field */
+	struct	IN_ADDR ipnum;	/* ip number of host field */
 	char	*host;
 	char	*passwd;
 	char	*name;
@@ -448,7 +448,7 @@ struct Client	{
 	int	priority;	/* priority for selection as active */
 	u_short	ract;		/* no fear about this. */
 	u_short	port;		/* and the remote port# too :-) */
-	struct	in_addr	ip;	/* keep real ip# too */
+	struct	IN_ADDR	ip;	/* keep real ip# too */
 	struct	hostent	*hostp;
 	char	sockhost[HOSTLEN+1]; /* This is the host name from the socket
 				  ** and after which the connection was
@@ -792,7 +792,7 @@ typedef	struct	{
 #define	UTMP		"/etc/utmp"
 #define	COMMA		","
 
-#define	SAP	struct sockaddr *
+#define	SAP	struct SOCKADDR *
 
 /* IRC client structures */
 

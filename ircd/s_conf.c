@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.35 1998/09/22 11:26:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.36 1998/12/13 00:02:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -100,7 +100,12 @@ aClient *cptr;
         }
         lmask = htonl((u_long)0xffffffffL << (32 - m)); /* /24->0xffffff00ul */
         baseip = htonl(i1 * 0x1000000 + i2 * 0x10000 + i3 * 0x100 + i4);
+#ifdef INET6
+	return 1;
+/*        return ((cptr->ip.s6_addr & lmask) == baseip) ? 0 : 1;*/
+#else
         return ((cptr->ip.s_addr & lmask) == baseip) ? 0 : 1;
+#endif
 }
 
 /*
@@ -585,7 +590,7 @@ int	statmask;
 			continue;
 		    }
 		*s = '@';
-		if (!bcmp((char *)&tmp->ipnum, ip, sizeof(struct in_addr)))
+		if (!bcmp((char *)&tmp->ipnum, ip, sizeof(struct IN_ADDR)))
 			return tmp;
 	    }
 	return NULL;
@@ -857,7 +862,7 @@ int	opt;
 		    line[0] == ' ' || line[0] == '\t')
 			continue;
 		/* Could we test if it's conf line at all?	-Vesa */
-		if (line[1] != ':')
+		if (line[1] != IRCDCONF_DELIMITER)
 		    {
                         Debug((DEBUG_ERROR, "Bad config line: %s", line));
                         continue;
@@ -1193,17 +1198,30 @@ Reg	aConfItem	*aconf;
 	ln.flags = ASYNC_CONF;
 
 	if (isdigit(*s))
+#ifdef INET6
+		if(!inet_pton(AF_INET6, s, aconf->ipnum.s6_addr))
+			bcopy(minus_one, aconf->ipnum.s6_addr, IN6ADDRSZ);
+#else
 		aconf->ipnum.s_addr = inetaddr(s);
+#endif
 	else if ((hp = gethost_byname(s, &ln)))
 		bcopy(hp->h_addr, (char *)&(aconf->ipnum),
-			sizeof(struct in_addr));
+			sizeof(struct IN_ADDR));
 
+#ifdef INET6
+	if (AND16(aconf->ipnum.s6_addr) == 255)
+#else
 	if (aconf->ipnum.s_addr == -1)
+#endif
 		goto badlookup;
 	return 0;
 badlookup:
+#ifdef INET6
+	if (AND16(aconf->ipnum.s6_addr) == 255)
+#else
 	if (aconf->ipnum.s_addr == -1)
-		bzero((char *)&aconf->ipnum, sizeof(struct in_addr));
+#endif
+		bzero((char *)&aconf->ipnum, sizeof(struct IN_ADDR));
 	Debug((DEBUG_ERROR,"Host/server name error: (%s) (%s)",
 		aconf->host, aconf->name));
 	return -1;
@@ -1223,7 +1241,12 @@ char	**comment;
 		return 0;
 
 	host = cptr->sockhost;
+#ifdef INET6
+	ip = (char *) inetntop(AF_INET6, (char *)&cptr->ip, mydummy,
+			       MYDUMMY_SIZE);
+#else
 	ip = (char *) inetntoa((char *)&cptr->ip);
+#endif
 	if (!strcmp(host, ip))
 		ip = NULL; /* we don't have a name for the ip# */
 	name = cptr->user->username;
@@ -1550,7 +1573,11 @@ int	class, fd;
 				SPRINTF(rpl, rpl_str(RPL_BOUNCE,"unknown"),
 					aconf->name, aconf->port);
 				strcat(rpl, "\r\n");
+#ifdef INET6
+				sendto(class, rpl, strlen(rpl), 0, 0, 0);
+#else
 				send(class, rpl, strlen(rpl), 0);
+#endif
 				return;
 			    }
 			else

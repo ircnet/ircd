@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: bsd.c,v 1.2 1997/09/03 17:45:11 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: bsd.c,v 1.3 1998/12/13 00:02:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -105,7 +105,11 @@ char	*str;
 #ifndef	NOWRITEALARM
 	(void)alarm(WRITEWAITDELAY);
 #endif
+#ifdef INET6
+	retval = sendto(cptr->fd, str, len, 0, 0, 0);
+#else
 	retval = send(cptr->fd, str, len, 0);
+#endif
 	/*
 	** Convert WOULDBLOCK to a return of "0 bytes moved". This
 	** should occur only if socket was non-blocking. Note, that

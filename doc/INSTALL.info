@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info21206tmp2.
+input file /tmp/sgml2info22618tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.31 1998/11/09 20:04:31 kalt Exp $
+     $Id: INSTALL.info,v 1.32 1998/12/13 00:02:34 kalt Exp $
 
    This document describes how to install, and configure IRC 2.10.
 
@@ -33,6 +33,7 @@ Installing IRC-
 
 * The configure script::
 * Notes for Cygwin32 users::
+* Notes concerning IPv6 support::
 
 
 File: INSTALL.info,  Node: The configure script,  Next: Notes for Cygwin32 users,  Up: Installing IRC-
@@ -91,8 +92,11 @@ default behaviour:
      tells "configure" not to look for the zlib.  Defining this will
      keep you from using server link compression.
 
+`--enable-ip6'
+     Enable IPv6 support (See notes below)
+
 
-File: INSTALL.info,  Node: Notes for Cygwin32 users,  Prev: The configure script,  Up: Installing IRC-
+File: INSTALL.info,  Node: Notes for Cygwin32 users,  Next: Notes concerning IPv6 support,  Prev: The configure script,  Up: Installing IRC-
 
 Notes for Cygwin32 users
 ========================
@@ -111,6 +115,27 @@ will need to make sure that the following files exist: `/bin/cp.exe',
    Also, the IRC server needs a `resolv.conf' file in order to
 initialize the resolver.  This file can be anywhere (see configure
 options), and is typically in `/etc' on UNIX systems.
+
+
+File: INSTALL.info,  Node: Notes concerning IPv6 support,  Prev: Notes for Cygwin32 users,  Up: Installing IRC-
+
+Notes concerning IPv6 support
+=============================
+
+   This version of the IRC software has support for IPv6 systems.
+However this is considered to be beta quality.  For this reason, it is
+recommended that if you wish to run the server on an IPv6 system, you
+have prior experience with this software.
+
+   The only part of the software that doesn't use IPv6 is the server
+internal resolver.  It relies on the name servers defined in
+"/etc/resolv.conf" to be IPv4 addresses.
+
+   This version was tested on the following IPv6 systems: Digital Unix,
+Linux, NetBSD+INRIA.
+
+   Because IPv6 numeric addresses contain ":" characters, `the
+separator for the server configuration file was changed to "%"'.
 
 
 File: INSTALL.info,  Node: The config-h file,  Next: Editing the Makefile and compiling,  Prev: Installing IRC-,  Up: Top
@@ -1686,43 +1711,44 @@ forwarded to the appropriate mailing list.
 Tag Table:
 Node: Top123
 Node: Installing IRC-629
-Node: The configure script820
-Node: Notes for Cygwin32 users2820
-Node: The config-h file3712
-Node: Define what type of UNIX your machine uses-4384
-Node: DEBUGMODE4784
-Node: CPATH MPATH LPATH PPATH TPATH QPATH OPATH5448
-Node: CACHED_MOTD6676
-Node: CHROOTDIR7152
-Node: ENABLE_SUMMON ENABLE_USERS7476
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE8012
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY8695
-Node: ZIP_LINKS ZIP_LEVEL9327
-Node: SLOW_ACCEPT10338
-Node: CLONE_CHECK10956
-Node: Other #define's11296
-Node: Editing the Makefile and compiling11621
-Node: The ircd-conf file12261
-Node: Machine information14293
-Node: Administrative info16389
-Node: Port connections18424
-Node: Connection Classes20634
-Node: Client connections26085
-Node: Operator priviliges31598
-Node: Restrict connections33718
-Node: Excluded accounts35033
-Node: Server connections38999
-Node: Deny auto-connections47438
-Node: Hub connections48811
-Node: Leaf connections50027
-Node: Version limitations52110
-Node: Excluded machines53826
-Node: Service connections55133
-Node: Bounce server56726
-Node: Default local server (for local clients) `*OBSOLETED*'58428
-Node: Related resources59311
-Node: Reporting a bug60249
-Node: How to report a bug60509
-Node: Where to send a bug report61522
+Node: The configure script854
+Node: Notes for Cygwin32 users2913
+Node: Notes concerning IPv6 support3843
+Node: The config-h file4664
+Node: Define what type of UNIX your machine uses-5336
+Node: DEBUGMODE5736
+Node: CPATH MPATH LPATH PPATH TPATH QPATH OPATH6400
+Node: CACHED_MOTD7628
+Node: CHROOTDIR8104
+Node: ENABLE_SUMMON ENABLE_USERS8428
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE8964
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY9647
+Node: ZIP_LINKS ZIP_LEVEL10279
+Node: SLOW_ACCEPT11290
+Node: CLONE_CHECK11908
+Node: Other #define's12248
+Node: Editing the Makefile and compiling12573
+Node: The ircd-conf file13213
+Node: Machine information15245
+Node: Administrative info17341
+Node: Port connections19376
+Node: Connection Classes21586
+Node: Client connections27037
+Node: Operator priviliges32550
+Node: Restrict connections34670
+Node: Excluded accounts35985
+Node: Server connections39951
+Node: Deny auto-connections48390
+Node: Hub connections49763
+Node: Leaf connections50979
+Node: Version limitations53062
+Node: Excluded machines54778
+Node: Service connections56085
+Node: Bounce server57678
+Node: Default local server (for local clients) `*OBSOLETED*'59380
+Node: Related resources60263
+Node: Reporting a bug61201
+Node: How to report a bug61461
+Node: Where to send a bug report62474
 
 End Tag Table

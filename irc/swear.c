@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: swear.c,v 1.3 1997/10/18 13:41:12 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: swear.c,v 1.4 1998/12/13 00:02:35 kalt Exp $";
 #endif
  
 /* Curses replacement routines. Uses termcap */
@@ -159,7 +159,7 @@ void put_statusline()
     cls = codes;
     tgetstr("mr",&cls);
     printf("%s",codes);
-  printf(HEADER, version);
+  printf(IRCHEADER, version);
     cls = codes;
     tgetstr("me",&cls);
     printf("%s",codes);

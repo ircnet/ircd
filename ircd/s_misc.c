@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.24 1998/08/05 02:39:04 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.25 1998/12/13 00:02:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -164,6 +164,7 @@ aClient	*sptr;
 **	to internal buffer (nbuf). *NEVER* use the returned pointer
 **	to modify what it points!!!
 */
+
 char	*get_client_name(sptr, showip)
 aClient *sptr;
 int	showip;
@@ -188,7 +189,13 @@ int	showip;
 					sptr->name, USERLEN,
 					(!(sptr->flags & FLAGS_GOTID)) ? "" :
 					sptr->auth,
+#ifdef INET6 
+					      inetntop(AF_INET6,
+						       (char *)&sptr->ip,
+						       mydummy, MYDUMMY_SIZE));
+#else
 					      inetntoa((char *)&sptr->ip));
+#endif
 			else
 			    {
 				if (mycmp(sptr->name, sptr->sockhost))
@@ -243,6 +250,7 @@ Reg	char	*host;
 	else
 		s = host;
 	strncpyzt(cptr->sockhost, s, sizeof(cptr->sockhost));
+	Debug((DEBUG_DNS,"get_sockhost %s",s));
 }
 
 /*

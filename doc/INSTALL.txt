@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.31 1998/11/09 20:04:32 kalt Exp $
+  $Id: INSTALL.txt,v 1.32 1998/12/13 00:02:34 kalt Exp $
 
   This document describes how to install, and configure IRC 2.10.
 
@@ -60,8 +60,8 @@
         tells ``configure'' not to look for the zlib.  Defining this
         will keep you from using server link compression.
 
-
-
+     ----eennaabbllee--iipp66
+        Enable IPv6 support (See notes below)
 
 
   11..22..  NNootteess ffoorr CCyyggwwiinn3322 uusseerrss
@@ -80,6 +80,24 @@
   Also, the IRC server needs a rreessoollvv..ccoonnff file in order to initialize
   the resolver.  This file can be anywhere (see configure options), and
   is typically in //eettcc on UNIX systems.
+
+
+  11..33..  NNootteess ccoonncceerrnniinngg IIPPvv66 ssuuppppoorrtt
+
+  This version of the IRC software has support for IPv6 systems.
+  However this is considered to be beta quality.  For this reason, it is
+  recommended that if you wish to run the server on an IPv6 system, you
+  have prior experience with this software.
+
+  The only part of the software that doesn't use IPv6 is the server
+  internal resolver.  It relies on the name servers defined in
+  ``/etc/resolv.conf'' to be IPv4 addresses.
+
+  This version was tested on the following IPv6 systems: Digital Unix,
+  Linux, NetBSD+INRIA.
+
+  Because IPv6 numeric addresses contain ``:'' characters, tthhee sseeppaarraattoorr
+  ffoorr tthhee sseerrvveerr ccoonnffiigguurraattiioonn ffiillee wwaass cchhaannggeedd ttoo ````%%''''.
 
 
   22..  TThhee ccoonnffiigg..hh ffiillee
@@ -109,6 +127,9 @@
   pprroodduuccttiioonn sseerrvveerr..
 
 
+
+
+
   22..33..  CCPPAATTHH,, MMPPAATTHH,, LLPPAATTHH,, PPPPAATTHH,, TTPPAATTHH,, QQPPAATTHH,, OOPPAATTHH
 
   Define CPATH to be the directory path to the ``ircd.conf'' file. This
@@ -130,6 +151,7 @@
   Define QPATH to be the directory path to the ``iauth.conf'' file. This
   path is usually /usr/local/lib/ircd/iauth.conf.  The format of this
   file is described by a manual page.
+
   The OPATH #define should be set to ``/dev/null'' unless you plan to
   debug the iauth program.  Note that the logfile grows very quickly.
 
@@ -169,6 +191,9 @@
   report the number of invisible users to all people and not just
   operators.  The NO_DEFAULT_INVISIBLE define is used to toggle whether
   clients are automatically made invisible when they register.
+
+
+
 
 
   22..88..  OOPPEERR__KKIILLLL,, OOPPEERR__RREEHHAASSHH,, OOPPEERR__RREESSTTAARRTT,, LLOOCCAALL__KKIILLLL__OONNLLYY
@@ -236,6 +261,7 @@
   Now to build the package, type ``make all''.  If everything goes will,
   you can then install it by typing ``make install''.
 
+
   If you have trouble compiling ircd, copy Makefile.in to Makefile and
   edit Makefile as appropriate.
 
@@ -301,7 +327,6 @@
   records.  IItt iiss iimmppoorrttaanntt ttoo nnoottee tthhaatt tthhee llaasstt mmaattcchhiinngg rreeccoorrdd wwiillll
   bbee uusseedd.  This is especially useful when setting up I records (client
   connections).
-
 
   44..11..  MMaacchhiinnee iinnffoorrmmaattiioonn
 
@@ -369,7 +394,6 @@
         The ``A'' line is used for administrative information about a
         site. The e-mail address of the person running the server should
         be included here in case problems arise.
-
      FFoorrmmaatt
 
         A:<Your Name/Location>:<Your Electronic Mailing Addr>:<other>::
@@ -460,6 +484,7 @@
      is decoded and compared segment by segment. Thus
 
      P:::128.2*.1.2:6664:
+
      will not match 128.20.1.2.
 
      PPoorrtt
@@ -501,7 +526,6 @@
         Each line for a server should have the same number as the sixth
         field.  If it is absent, the server deaults it to 0, using the
         defaults from the config.h file.
-
         To define a connection class, you need to include a Y: line in
         the ircd.conf file.  This enables you to define the ping
         frequency, connection frequency (for servers) and maximum number
@@ -658,6 +682,7 @@
         ident server be the same as the one given before the ``@''.
         Wildcards are permitted unless using a bitmask (e.g.
         1.2.3.0/24).
+
      PPaasssswwoorrdd
         The password that must be given by the client to be allowed on
         the server.
@@ -699,7 +724,6 @@
         connect to your server, you would add this entry to the file:
 
         I:x::tolsun.oulu.fi::1
-
         If you wanted to let remote clients connect, you could add the
         following lines:
 
@@ -765,7 +789,6 @@
         line will have a restricted connection. (no nick/mode change, no
         kick). Such users will have their username prefixed by +, = or -
         depending on the ident reply.
-
 
   44..66..  OOppeerraattoorr pprriivviilliiggeess
 
@@ -854,7 +877,6 @@
         connecting from.  If you wanted to restrict connects to IRC from
         ``orion.cair.du.edu'' then you would want to enter
         ``orion.cair.du.edu''.
-
 
      PPrrooggrraamm
         This is the external program to run to know if the user is
@@ -966,7 +988,6 @@
         access to your server between 8 and 12am, 2 and 7pm. Users get
         kicked off if they're already signed on when the line becomes
         active (they'll get a warning 5 minutes before).
-
         K:192.11.35.*::*:0:
 
         This line disallows all hosts whose IP address matches
@@ -1054,6 +1075,7 @@
         it.  If you were connecting to nic.funet.fi you would receive
         ``nic.funet.fi'' and that is what you should place in this
         field.
+
      TTAARRGGEETT PPOORRTT
         The INTERNET Port that you want to connect to on the TARGET
         machine. Most of the time this will be set to ``6667''.  If this
@@ -1163,6 +1185,7 @@
      DDoommaaiinn MMaasskk
         Domain masking, see below.
 
+
      CCllaassss
         The class field should refer to an existing class.
 
@@ -1228,6 +1251,7 @@
         that this can be true for any server, even the ones not directly
         connected.
 
+
      SSeerrvveerr MMaasskk
         This field is matched against the server name that the server
         wants to auto connect to.
@@ -1247,9 +1271,6 @@
         Do now auto-connect to ``eff.org'', or any server in class ``3''
         if a server defined to be in class ``2'' is currently present on
         the network.
-
-
-
 
 
   44..1111..  HHuubb ccoonnnneeccttiioonnss
@@ -1361,6 +1382,7 @@
         their version and on compile time options.
 
      FFoorrmmaatt
+
 
         V:<Version Mask>:<Flags>:<Server Mask>::
 
@@ -1491,6 +1513,9 @@
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
 
 
+
+
+
   44..1166..  BBoouunnccee sseerrvveerr
 
 
@@ -1555,6 +1580,7 @@
         define this command to connect to your own host.  If your site
         is not running a server then this command should contain the
         TARGET host's connection information and password (if any).
+
 
      FFoorrmmaatt
 
@@ -1639,6 +1665,46 @@
 
   Reports should be sent to ircd-bugs@irc.org.  Your report will be
   reviewed and forwarded to the appropriate mailing list.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

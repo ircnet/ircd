@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: irc.c,v 1.5 1998/11/20 23:28:57 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: irc.c,v 1.6 1998/12/13 00:02:35 kalt Exp $";
 #endif
  
 #include "os.h"
@@ -632,7 +632,7 @@ char	*buf, *temp;
 
 	if (termtype == CURSES_TERM) {
 		apu = 0;
-		sprintf(header,HEADER,version, me.name, currserver);
+		sprintf(header, IRCHEADER ,version, me.name, currserver);
 		clear();
 		standout();
 		mvaddstr(LINES - 2, 0, header);
@@ -717,7 +717,7 @@ char *line;
 				refresh();
 				apu -= 4;
 				/* redraw status line */
-				sprintf(header,HEADER,version,
+				sprintf(header, IRCHEADER, version,
 					me.name, currserver);
 				standout();
 				mvaddstr(LINES - 2, 0, header);
@@ -883,7 +883,7 @@ void write_statusline()
 	char	header[HEADERLEN];
 
 	if (termtype == CURSES_TERM) {
-		sprintf(header, HEADER, version, me.name, currserver);
+		sprintf(header, IRCHEADER, version, me.name, currserver);
 		standout();
 		mvaddstr(LINES - 2, 0, header);
 		standend();

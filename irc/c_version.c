@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_version.c,v 1.2 1997/09/03 17:45:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: c_version.c,v 1.3 1998/12/13 00:02:35 kalt Exp $";
 #endif
  
 #include "os.h"
@@ -41,6 +41,6 @@ char *infotext[] =
 char *HEADEROLD = 
 "*Internet Relay Chat* Type /help to get help * Client v%s *                 ";
 
-char *HEADER =
+char *IRCHEADER =
 " *IRC Client v%s* %10.10s on %10.10s */help for help*      ";
 

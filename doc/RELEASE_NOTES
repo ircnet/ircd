@@ -1,6 +1,10 @@
-# @(#)$Id: RELEASE_NOTES,v 1.27 1998/11/12 14:11:19 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.28 1998/12/13 00:02:34 kalt Exp $
 
-This is version 2.10.1 of the IRC software.
+This is a development version of the IRC software.
+
+===============================================================================
+
+This version of the software adds support for IPv6.
 
 ===============================================================================
 
