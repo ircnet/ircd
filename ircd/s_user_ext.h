@@ -31,7 +31,7 @@
 EXTERN aClient *next_client __P((Reg aClient *next, Reg char *ch));
 EXTERN int hunt_server __P((aClient *cptr, aClient *sptr, char *command,
 			    int server, int parc, char *parv[]));
-EXTERN int do_nick_name __P((char *nick));
+EXTERN int do_nick_name __P((char *nick, int server));
 EXTERN char *canonize __P((char *buffer));
 EXTERN int m_nick __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN int m_private __P((aClient *cptr, aClient *sptr, int parc,

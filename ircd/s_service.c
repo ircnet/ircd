@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.25 1998/12/24 16:26:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.26 1999/01/14 01:19:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -385,7 +385,7 @@ char	*parv[];
 		metric = 0;
 		server = ME;
 		sp = me.serv;
-		if (!do_nick_name(parv[1]))
+		if (!do_nick_name(parv[1], 0))
 		    {
 			sendto_one(sptr, err_str(ERR_ERRONEUSNICKNAME,
 				   parv[0]));

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.64 1999/01/04 20:46:28 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.65 1999/01/14 01:19:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -238,12 +238,16 @@ int	server, parc;
 **	result if only few servers allowed it...
 */
 
-int	do_nick_name(nick)
+int	do_nick_name(nick, server)
 char	*nick;
+int	server;
 {
 	Reg	char	*ch;
 
-	if (*nick == '-' || isdigit(*nick)) /* first character in [0..9-] */
+	if (*nick == '-') /* first character '-' */
+		return 0;
+
+	if (isdigit(*nick) && !server) /* first character in [0..9] */
 		return 0;
 
 	if (!strcasecmp(nick, "anonymous"))
@@ -729,7 +733,7 @@ char	*parv[];
 	 * creation) then reject it. If from a server and we reject it,
 	 * and KILL it. -avalon 4/4/92
 	 */
-	if (do_nick_name(nick) == 0 ||
+	if (do_nick_name(nick, IsServer(cptr)) == 0 ||
 	    (IsServer(cptr) && strcmp(nick, parv[1])))
 	    {
 		sendto_one(sptr, err_str(ERR_ERRONEUSNICKNAME, parv[0]),
