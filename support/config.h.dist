@@ -558,13 +558,6 @@
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 
-/* 
-** We have some weird and rare-occuring bug in hash tables. Please define
-** this, so ircd will abort() when adding loop hash. If abort() happens,
-** contact ircd-bugs@irc.org for assistance. Thank you!
-*/
-/* #define HELP_IRCD_GET_RID_OF_HASHTABLE_BUG */
-
 /*
 ** Accept only hostnames conforming to RFC1034/1035/1123.
 ** Conformance of the internal resolver to RFC1123.

@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.46 2004/11/03 13:51:53 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.47 2004/11/03 13:57:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -492,12 +492,6 @@ int	add_to_client_hash_table(char *name, aClient *cptr)
 	Reg	u_int	hashv;
 
 	hashv = hash_nick_name(name, &cptr->hashv);
-#ifdef HELP_IRCD_GET_RID_OF_HASHTABLE_BUG
-	if (clientTable[hashv].list == cptr)
-	{
-		abort();
-	}
-#endif
 	cptr->hnext = (aClient *)clientTable[hashv].list;
 	clientTable[hashv].list = (void *)cptr;
 	clientTable[hashv].links++;
@@ -516,12 +510,6 @@ int	add_to_uid_hash_table(char *uid, aClient *cptr)
 	Reg	u_int	hashv;
 
 	hashv = hash_uid(uid, &cptr->user->hashv);
-#ifdef HELP_IRCD_GET_RID_OF_HASHTABLE_BUG
-	if (uidTable[hashv].list == cptr)
-	{
-		abort();
-	}
-#endif
 	cptr->user->uhnext = (aClient *)uidTable[hashv].list;
 	uidTable[hashv].list = (void *)cptr;
 	uidTable[hashv].links++;
@@ -540,12 +528,6 @@ int	add_to_channel_hash_table(char *name, aChannel *chptr)
 	Reg	u_int	hashv;
 
 	hashv = hash_channel_name(name, &chptr->hashv, 0);
-#ifdef HELP_IRCD_GET_RID_OF_HASHTABLE_BUG
-	if (channelTable[hashv].list == chptr)
-	{
-		abort();
-	}
-#endif
 	chptr->hnextch = (aChannel *)channelTable[hashv].list;
 	channelTable[hashv].list = (void *)chptr;
 	channelTable[hashv].links++;
@@ -567,12 +549,6 @@ int	add_to_server_hash_table(aServer *sptr, aClient *cptr)
 		sptr->bcptr->name, sptr->stok, sptr->ltok, sptr->tok, cptr));
 	hashv = sptr->stok * 15053;
 	hashv %= _SERVERSIZE;
-#ifdef HELP_IRCD_GET_RID_OF_HASHTABLE_BUG
-	if (serverTable[hashv].list == sptr)
-	{
-		abort();
-	}
-#endif
 	sptr->shnext = (aServer *)serverTable[hashv].list;
 	serverTable[hashv].list = (void *)sptr;
 	serverTable[hashv].links++;
@@ -591,12 +567,6 @@ int	add_to_sid_hash_table(char *sid, aClient *cptr)
 	Reg	u_int	hashv;
 
 	hashv = hash_sid(sid, &cptr->serv->sidhashv);
-#ifdef HELP_IRCD_GET_RID_OF_HASHTABLE_BUG
-	if (sidTable[hashv].list == cptr->serv)
-	{
-		abort();
-	}
-#endif
 	cptr->serv->sidhnext = (aServer *)sidTable[hashv].list;
 	sidTable[hashv].list = (void *)cptr->serv;
 	sidTable[hashv].links++;
@@ -617,12 +587,6 @@ int	add_to_hostname_hash_table(char *hostname, anUser *user)
 	Reg	u_int	hashv;
 
 	hashv = hash_host_name(hostname, &user->hhashv);
-#ifdef HELP_IRCD_GET_RID_OF_HASHTABLE_BUG
-	if (hostnameTable[hashv].list == user)
-	{
-		abort();
-	}
-#endif
 	user->hhnext = (anUser *)hostnameTable[hashv].list;
 	hostnameTable[hashv].list = (void *)user;
 	hostnameTable[hashv].links++;
