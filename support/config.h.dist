@@ -383,25 +383,6 @@
  */
 #undef	CLONE_CHECK
 
-/*
- * Server ID used for the UIDs. 
- *
- * If you are part of IRCnet, ask your IRC coordinator for assignment,
- * he should know better. Else you must pick it yourself wisely.
- * Remember, the key is: unique network-wide.
- *
- * Note: This must be a string.  It must be SIDLEN (default 3) chars long.
- * The first char must be in the range of [0-9], the rest must be in
- * [0-9A-Z] (case insensitive).
- */
-/* #define SERVER_ID "think" */
-
-/*
- * Network name.
- * Defines name of your network which is sent in 005 numerics upon connecting.
- */
-#define NETWORK_NAME "IRCNet"
-
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
@@ -580,10 +561,6 @@
 # if (MAXCONNECTIONS > FD_SETSIZE)
 #error FD_SETSIZE must be bigger than MAXCONNECTIONS
 # endif
-#endif
-
-#ifndef SERVER_ID
-#error SERVER_ID not defined, edit config.h properly!
 #endif
 
 /*
