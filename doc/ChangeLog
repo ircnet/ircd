@@ -1,4 +1,14 @@
-Fri Sep 26 10:50:54 1997  Christophe Kalt  <kalt@millennium.stealth.net>
+2.9.4b
+
+Wed Oct  1 21:57:45 1997  Christophe Kalt
+
+	* chkconf.c: added knowledge of B lines.
+
+	* s_debug.c: more info on dbufs for better tuning.
+
+	* channel.c: bans on IP are now matched against resolving clients.
+
+	* s_conf.c: K lines on IP can now be matched against resolving clients.
 
 	* buildm4: update for Y and K line macros, and added macros for
 	B,V,i and k lines (Mario Holbe).

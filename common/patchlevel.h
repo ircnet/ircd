@@ -17,6 +17,6 @@
  */
 
 #ifndef	PATCHLEVEL
-#define PATCHLEVEL "0209030600"		/* for server identification */
-#define DEVLEVEL 'a'
+#define PATCHLEVEL "0209030700"		/* for server identification */
+#define DEVLEVEL 'b'
 #endif
