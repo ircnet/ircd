@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.79 2001/12/31 19:12:45 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.80 2002/01/03 23:53:52 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -976,7 +976,7 @@ Reg	aClient	*cptr;
 			if (cptr->serv->version & SV_UID && *acptr->user->uid)
 				sendto_one(cptr,
 					   ":%s UNICK %s %s %s %s %s %s :%s",
-					   me.serv->sid,
+					   acptr->user->servp->sid,
 					   acptr->name, acptr->user->uid,
 					   acptr->user->username,
 					   acptr->user->host,
