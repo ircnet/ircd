@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.190 2004/05/18 22:53:54 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.191 2004/05/18 23:13:38 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2599,11 +2599,8 @@ int	m_wallops(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (!IsServer(sptr))
 	    {
-		pv[0] = parv[0];
-		pv[1] = "+wallops";
-		pv[2] = message;
-		pv[3] = NULL;
-		return m_private(cptr, sptr, 3, pv);
+		sendto_flag(SCH_ERROR, "User WALLOP from %s", sptr->name);
+		return 2;
 	    }
 	sendto_ops_butone(IsServer(cptr) ? cptr : NULL, parv[0], "%s", message);
 #ifdef	USE_SERVICES
