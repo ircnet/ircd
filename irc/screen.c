@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: screen.c,v 1.2 1997/09/03 17:45:42 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: screen.c,v 1.3 2003/10/18 15:31:28 q Exp $";
 #endif
  
 #include "os.h"
@@ -45,16 +45,14 @@ static	int	pos_in_history = 0;
 int	insert = 1;	/* default to insert mode */
 			/* I want insert mode, thazwhat emacs does ! //jkp */
 
-int get_char(pos)
-int pos;
+int	get_char(int pos)
 {
     if (pos>=SBUFSIZ || pos<0)
 	return 0;
     return (int)last_line[pos];
 }
 
-void set_char(pos, ch)
-int pos, ch;
+void	set_char(int pos, int ch)
 {
     if (pos<0 || pos>=SBUFSIZ)
 	return;
@@ -63,16 +61,14 @@ int pos, ch;
     last_line[pos]=(char)ch;
 }
 
-int get_yank_char(pos)
-int pos;
+int	get_yank_char(int pos)
 {
     if (pos>=SBUFSIZ || pos<0)
 	return 0;
     return (int)yank_buffer[pos];
 }
 
-void set_yank_char(pos, ch)
-int pos, ch;
+void	set_yank_char(int pos, int ch)
 {
     if (pos<0 || pos>=SBUFSIZ)
 	return;
@@ -81,8 +77,7 @@ int pos, ch;
     yank_buffer[pos]=(char)ch;
 }
 
-void set_position(disp, from)
-int disp, from;
+void	set_position(int disp, int from)
 {
     int i1;
 
@@ -103,12 +98,12 @@ int disp, from;
     }
 }
 
-int get_position()
+int	get_position(void)
 {
     return position;
 }
 
-void toggle_ins()
+void	toggle_ins(void)
 {
     insert = !insert;
 #ifdef DOCURSES
@@ -127,12 +122,12 @@ void toggle_ins()
 #endif
 }
 
-int in_insert_mode()
+int	in_insert_mode(void)
 {
     return insert;
 }
 
-void send_this_line()
+void	send_this_line(void)
 {
     record_line();
     sendit(last_line);
@@ -145,7 +140,7 @@ void send_this_line()
 #endif
 }
 
-void record_line()
+void	record_line(void)
 {
     static int place=0;
     int i1;
@@ -158,7 +153,7 @@ void record_line()
     pos_in_history=place;
 }
     
-void clear_last_line()
+void	clear_last_line(void)
 {
     int i1;
 
@@ -166,7 +161,7 @@ void clear_last_line()
 	set_char(i1,(int)'\0');
 }
 
-void kill_eol()
+void	kill_eol(void)
 {
     int i1, i2, i3;
 
@@ -182,7 +177,7 @@ void kill_eol()
     set_position(i1, FROM_START);
 }
 
-void next_in_history()
+void	next_in_history(void)
 {
     int i1;
 
@@ -197,7 +192,7 @@ void next_in_history()
     set_position(0, FROM_START);
 }
 
-void previous_in_history()
+void	previous_in_history(void)
 {
     int i1;
 
@@ -211,13 +206,13 @@ void previous_in_history()
     set_position(0, FROM_START);
 }
 
-void kill_whole_line()
+void	kill_whole_line(void)
 {
     clear_last_line();
     set_position(0, FROM_START);
 }
 
-void yank()
+void	yank(void)
 {
     int i1, i2, i3;
     
@@ -232,7 +227,7 @@ void yank()
 	set_char(i1+i3, get_yank_char(i3));
 }
 
-int tulosta_viimeinen_rivi()
+int	tulosta_viimeinen_rivi(void)
 {
     static int paikka=0;
     int i1, i2, i3;
@@ -276,8 +271,7 @@ int tulosta_viimeinen_rivi()
     return (i1-get_disp(paikka));
 }
 
-int get_disp(paikka)
-int paikka;
+int	get_disp(int paikka)
 {
     static int place[]={0,55,110,165,220};
 
@@ -285,3 +279,4 @@ int paikka;
 	return 0;
     return place[paikka];
 }
+

@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.160 2003/10/17 21:28:18 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.161 2003/10/18 15:31:24 q Exp $";
 #endif
 
 #include "os.h"
@@ -95,10 +95,7 @@ Reg	Link	*lp;
 **	message (NO SUCH NICK) is generated. If the client was found
 **	through the history, chasing will be 1 and otherwise 0.
 */
-static	aClient *find_chasing(sptr, user, chasing)
-aClient *sptr;
-char	*user;
-Reg	int	*chasing;
+static	aClient	*find_chasing(aClient *sptr, char *user, int *chasing)
 {
 	Reg	aClient *who = find_client(user, (aClient *)NULL);
 
@@ -121,8 +118,7 @@ Reg	int	*chasing;
  * string marker (`\-`).  returns the 'fixed' string or "*" if the string
  * was NULL length or a NULL pointer.
  */
-static	char	*check_string(s)
-Reg	char *s;
+static	char	*check_string(char *s)
 {
 	static	char	star[2] = "*";
 	char	*str = s;
@@ -144,8 +140,7 @@ Reg	char *s;
  * create a string of form "foo!bar@fubar" given foo, bar and fubar
  * as the parameters.  If NULL, they become "*".
  */
-static	char *make_nick_user_host(nick, name, host)
-Reg	char	*nick, *name, *host;
+static	char *make_nick_user_host(char *nick, char *name, char *host)
 {
 	static	char	namebuf[NICKLEN+USERLEN+HOSTLEN+6];
 	Reg	char	*s = namebuf;
@@ -227,11 +222,8 @@ aListItem	*make_bei(char *nick, char *user, char *host)
  *  (belongs to cptr)
  */
 
-static	int	add_modeid(type, cptr, chptr, modeid)
-int type;
-aClient	*cptr;
-aChannel *chptr;
-aListItem	*modeid;
+static	int	add_modeid(int type, aClient *cptr, aChannel *chptr,
+			aListItem *modeid)
 {
 	Reg	Link	*mode;
 	Reg	int	cnt = 0, len = 0;
@@ -302,10 +294,7 @@ aListItem	*modeid;
  * del_modeid - delete an id belonging to chptr
  * if modeid is null, delete all ids belonging to chptr.
  */
-static	int	del_modeid(type, chptr, modeid)
-int type;
-aChannel *chptr;
-aListItem *modeid;
+static	int	del_modeid(int type, aChannel *chptr, aListItem *modeid)
 {
 	Reg	Link	**mode;
 	Reg	Link	*tmp;
@@ -331,10 +320,7 @@ aListItem *modeid;
 /*
  * match_modeid - returns a pointer to the mode structure if matching else NULL
  */
-static	Link	*match_modeid(type, cptr, chptr)
-int type;
-aClient *cptr;
-aChannel *chptr;
+static	Link	*match_modeid(int type, aClient *cptr, aChannel *chptr)
 {
 	Reg	Link	*tmp;
 
@@ -391,10 +377,7 @@ aChannel *chptr;
  * adds a user to a channel by adding another link to the channels member
  * chain.
  */
-static	void	add_user_to_channel(chptr, who, flags)
-aChannel *chptr;
-aClient *who;
-int	flags;
+static	void	add_user_to_channel(aChannel *chptr, aClient *who, int flags)
 {
 	Reg	Link *ptr;
 	Reg	int sz = sizeof(aChannel) + strlen(chptr->chname);
@@ -463,9 +446,7 @@ int	flags;
 	    }
 }
 
-void	remove_user_from_channel(sptr, chptr)
-aClient *sptr;
-aChannel *chptr;
+void	remove_user_from_channel(aClient *sptr, aChannel *chptr)
 {
 	Reg	Link	**curr;
 	Reg	Link	*tmp, *tmp2;
@@ -534,9 +515,7 @@ aChannel *chptr;
 	istat.is_chanusers--;
 }
 
-static	void	change_chan_flag(lp, chptr)
-Link	*lp;
-aChannel *chptr;
+static	void	change_chan_flag(Link *lp, aChannel *chptr)
 {
 	Reg	Link *tmp;
 	aClient	*cptr = lp->value.cptr;
@@ -567,9 +546,7 @@ aChannel *chptr;
 	    }
 }
 
-int	is_chan_op(cptr, chptr)
-aClient *cptr;
-aChannel *chptr;
+int	is_chan_op(aClient *cptr, aChannel *chptr)
 {
 	Reg	Link	*lp;
 	int	chanop = 0;
@@ -585,9 +562,7 @@ aChannel *chptr;
 	return chanop;
 }
 
-int	has_voice(cptr, chptr)
-aClient *cptr;
-aChannel *chptr;
+int	has_voice(aClient *cptr, aChannel *chptr)
 {
 	Reg	Link	*lp;
 
@@ -598,9 +573,7 @@ aChannel *chptr;
 	return 0;
 }
 
-int	can_send(cptr, chptr)
-aClient *cptr;
-aChannel *chptr;
+int	can_send(aClient *cptr, aChannel *chptr)
 {
 	Reg	Link	*lp;
 	Reg	int	member;
@@ -623,9 +596,7 @@ aChannel *chptr;
 	return 0;
 }
 
-aChannel *find_channel(chname, chptr)
-Reg	char	*chname;
-Reg	aChannel *chptr;
+aChannel	*find_channel(char *chname, aChannel *chptr)
 {
 	aChannel *achptr = chptr;
 
@@ -634,8 +605,7 @@ Reg	aChannel *chptr;
 	return achptr;
 }
 
-void	setup_server_channels(mp)
-aClient	*mp;
+void	setup_server_channels(aClient *mp)
 {
 	aChannel	*chptr;
 	int	smode;
@@ -703,10 +673,7 @@ aClient	*mp;
  * write the "simple" list of channel modes for channel chptr onto buffer mbuf
  * with the parameters in pbuf.
  */
-void	channel_modes(cptr, mbuf, pbuf, chptr)
-aClient	*cptr;
-Reg	char	*mbuf, *pbuf;
-aChannel *chptr;
+void	channel_modes(aClient *cptr, char *mbuf, char *pbuf, aChannel *chptr)
 {
 	*mbuf++ = '+';
 	if (chptr->mode.mode & MODE_SECRET)
@@ -743,11 +710,8 @@ aChannel *chptr;
 	return;
 }
 
-static	void	send_mode_list(cptr, chname, top, mask, flag)
-aClient	*cptr;
-Link	*top;
-int	mask;
-char	flag, *chname;
+static	void	send_mode_list(aClient *cptr, char *chname, Link *top, 
+			int mask, char flag)
 {
 	Reg	Link	*lp;
 	Reg	char	*cp, *name;
@@ -836,9 +800,7 @@ char	flag, *chname;
 /*
  * send "cptr" a full list of the modes for channel chptr.
  */
-void	send_channel_modes(cptr, chptr)
-aClient *cptr;
-aChannel *chptr;
+void	send_channel_modes(aClient *cptr, aChannel *chptr)
 {
 
 	if (check_channelmask(&me, cptr, chptr->chname))
@@ -889,9 +851,7 @@ aChannel *chptr;
  * send "cptr" a full list of the channel "chptr" members and their
  * +ov status, using NJOIN
  */
-void	send_channel_members(cptr, chptr)
-aClient *cptr;
-aChannel *chptr;
+void	send_channel_members(aClient *cptr, aChannel *chptr)
 {
 	Reg	Link	*lp;
 	Reg	aClient *c2ptr;
@@ -955,11 +915,7 @@ aChannel *chptr;
  * parv[n] - optional parameters
  */
 
-int	m_mode(cptr, sptr, parc, parv)
-aClient *cptr;
-aClient *sptr;
-int	parc;
-char	*parv[];
+int	m_mode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	int	mcount = 0;
 	int	penalty = 0;
@@ -1022,11 +978,8 @@ char	*parv[];
  * the client cptr to channel chptr.
  * Also sends it to everybody that should get it.
  */
-static	int	set_mode(cptr, sptr, chptr, penalty, parc, parv)
-Reg	aClient *cptr, *sptr;
-aChannel *chptr;
-int	parc, *penalty;
-char	*parv[];
+static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr, 
+			int *penalty, int parc, char *parv[])
 {
 	static	Link	chops[MAXMODEPARAMS+3];
 	static	int	flags[] = {
@@ -1817,10 +1770,7 @@ char	*parv[];
 	return ischop ? count : -count;
 }
 
-static	int	can_join(sptr, chptr, key)
-aClient	*sptr;
-Reg	aChannel *chptr;
-char	*key;
+static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 {
 	invLink	*lp = NULL;
 	Link	*banned;
@@ -1887,8 +1837,7 @@ char	*key;
 ** Remove bells and commas from channel name
 */
 
-void	clean_channelname(cn)
-Reg	char *cn;
+void	clean_channelname(char *cn)
 {
 	for (; *cn; cn++)
 		if (*cn == '\007' || *cn == ' ' || *cn == ',')
@@ -1933,9 +1882,7 @@ void   convert_scandinavian(Reg char *cn, aClient *cptr)
 /*
 ** Return -1 if mask is present and doesnt match our server name.
 */
-static	int	check_channelmask(sptr, cptr, chname)
-aClient	*sptr, *cptr;
-char	*chname;
+static	int	check_channelmask(aClient *sptr, aClient *cptr, char *chname)
 {
 	Reg	char	*s, *t;
 
@@ -1966,11 +1913,8 @@ char	*chname;
 **  Get Channel block for i (and allocate a new channel
 **  block, if it didn't exists before).
 */
-static	aChannel *get_channel(cptr, chname, flag)
-aClient *cptr;
-char	*chname;
-int	flag;
-    {
+static	aChannel *get_channel(aClient *cptr, char *chname, int flag)
+{
 	Reg	aChannel *chptr;
 	int	len;
 
@@ -1999,12 +1943,15 @@ int	flag;
 		(void)add_to_channel_hash_table(chname, chptr);
 	    }
 	return chptr;
-    }
+}
 
-static	void	add_invite(sptr, cptr, chptr)
-aClient *sptr;		/* who invites */
-aClient *cptr;		/* who gets invitation */
-aChannel *chptr;	/* what channel */
+/*
+ * add_invite():
+ * 	sptr:	who invites
+ *	cptr	who gets invitation
+ *	chptr	what channel
+ */
+static	void	add_invite(aClient *sptr, aClient *cptr, aChannel *chptr)
 {
 
 	/*
@@ -2061,9 +2008,7 @@ aChannel *chptr;	/* what channel */
 /*
  * Delete Invite block from channel invite list and client invite list
  */
-void	del_invite(cptr, chptr)
-aClient *cptr;
-aChannel *chptr;
+void	del_invite(aClient *cptr, aChannel *chptr)
 {
 	{
 		Reg	Link	**inv, *tmp;
@@ -2101,8 +2046,7 @@ aChannel *chptr;
 **  The last user has left the channel, free data in the channel block,
 **  and eventually the channel block itself.
 */
-static	void	free_channel(chptr)
-aChannel *chptr;
+static	void	free_channel(aChannel *chptr)
 {
 	Reg	Link *tmp;
 	Link	*obtmp;
@@ -2155,10 +2099,7 @@ aChannel *chptr;
 **	parv[1] = channel
 **	parv[2] = channel password (key)
 */
-int	m_join(cptr, sptr, parc, parv)
-Reg	aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	static	char	jbuf[BUFSIZE];
 	Reg	Link	*lp;
@@ -2517,10 +2458,7 @@ char	*parv[];
 **	parv[1] = channel
 **	parv[2] = channel members and modes
 */
-int	m_njoin(cptr, sptr, parc, parv)
-Reg	aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char nbuf[BUFSIZE], *q, *name, *target, mbuf[MAXMODEPARAMS + 1];
 	char uidbuf[BUFSIZE], *u;
@@ -2734,11 +2672,8 @@ char	*parv[];
 **	parv[0] = sender prefix
 **	parv[1] = channel
 */
-int	m_part(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	Reg	aChannel *chptr;
 	char	*p = NULL, *name, *comment = "";
 
@@ -2798,7 +2733,7 @@ char	*parv[];
 	if (*buf)
 		sendto_serv_butone(cptr, PartFmt, parv[0], buf, comment);
 	return 4;
-    }
+}
 
 /*
 ** m_kick
@@ -2807,10 +2742,7 @@ char	*parv[];
 **	parv[2] = client to kick
 **	parv[3] = kick comment
 */
-int	m_kick(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *who;
 	aChannel *chptr;
@@ -2925,11 +2857,8 @@ char	*parv[];
 **	parv[1] = channels list
 **	parv[2] = topic text
 */
-int	m_topic(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_topic(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	aChannel *chptr = NullChn;
 	char	*topic = NULL, *name, *p = NULL;
 	int	penalty = 1;
@@ -3021,7 +2950,7 @@ char	*parv[];
 				 chptr->chname);
 	    }
 	return penalty;
-    }
+}
 
 /*
 ** m_invite
@@ -3029,10 +2958,7 @@ char	*parv[];
 **	parv[1] - user to invite
 **	parv[2] - channel number
 */
-int	m_invite(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	aChannel *chptr;
@@ -3120,11 +3046,8 @@ char	*parv[];
 **      parv[0] = sender prefix
 **      parv[1] = channel
 */
-int	m_list(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_list(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	aChannel *chptr;
 	char	*name, *p = NULL;
 	int	rlen = 0;
@@ -3419,10 +3342,7 @@ static void names_channel(aClient *cptr, aClient *sptr, char *to,
 **	parv[0] = sender prefix
 **	parv[1] = channel
 */
-int	m_names(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_names(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aChannel *chptr;
 	Reg	aClient *acptr;
@@ -3559,10 +3479,7 @@ char	*parv[];
 
 #define CHECKFREQ	300
 /* consider reoping an opless !channel */
-static int
-reop_channel(now, chptr)
-time_t now;
-aChannel *chptr;
+static int	reop_channel(time_t now, aChannel *chptr)
 {
     Link *lp, op;
 
@@ -3687,8 +3604,7 @@ aChannel *chptr;
  *
  * The history stamp is set when a remote user with channel op exits.
  */
-time_t	collect_channel_garbage(now)
-time_t	now;
+time_t	collect_channel_garbage(time_t now)
 {
 	static	u_int	max_nb = 0; /* maximum of live channels */
 	static	u_char	split = 0;
@@ -3781,3 +3697,4 @@ time_t	now;
 	/* Check again after CHECKFREQ seconds */
 	return (time_t) (now + CHECKFREQ);
 }
+

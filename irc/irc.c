@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: irc.c,v 1.7 2001/10/20 17:57:27 q Exp $";
+static  char rcsid[] = "@(#)$Id: irc.c,v 1.8 2003/10/18 15:31:27 q Exp $";
 #endif
  
 #include "os.h"
@@ -139,9 +139,7 @@ struct itmlst
 	       &persname, &perslength}};
 #endif
 
-int main(argc, argv)
-int	argc;
-char	*argv[];
+int	main(int argc, char *argv[])
 {
   static char usage[] =
     "Usage: %s [-c channel] [-k passwd] [-p port] [-i] [-w] [-s] [nickname [server]]\n";
@@ -363,7 +361,7 @@ char	*argv[];
 	exit(0);
 }
 
-void intr()
+void	intr(void)
 {
 	if (logfile)
 		do_log(NULL, NULL);
@@ -382,8 +380,7 @@ void intr()
 	exit(0);
 }
 
-void myloop(sock)
-int	sock;
+void	myloop(int sock)
 {
 	write_statusline();
 #ifdef DOTERMCAP
@@ -398,8 +395,7 @@ int	sock;
 static	char	cmdch = '/';
 static	char	queryuser[QUERYLEN+2] = "";
 
-void	do_cmdch(ptr, temp)
-char	*ptr, *temp;
+void	do_cmdch(char *ptr, char *temp)
 {
 	if (BadPtr(ptr)) {
 		putline("Error: Command character not changed");
@@ -408,8 +404,7 @@ char	*ptr, *temp;
 	cmdch = *ptr;
 }
 
-void	do_quote(ptr, temp)
-char	*ptr, *temp;
+void	do_quote(char *ptr, char *temp)
 {
 	if (BadPtr(ptr)) {
 		putline("*** Error: Empty command");
@@ -418,8 +413,7 @@ char	*ptr, *temp;
 	sendto_one(&me,"%s", ptr);
 }
 
-void	do_query(ptr, temp)
-char	*ptr, *temp;
+void	do_query(char *ptr, char *temp)
 {
 	if (BadPtr(ptr)) {
 		sprintf(buf, "*** Ending a private chat with %s", queryuser);
@@ -433,8 +427,7 @@ char	*ptr, *temp;
 	}
 }
 
-void	do_mypriv(buf1, buf2)
-char	*buf1, *buf2;
+void	do_mypriv(char *buf1, char *buf2)
 {
 	char	*tmp = index(buf1, ' ');
 
@@ -465,8 +458,7 @@ char	*buf1, *buf2;
 	}
 }
 
-void	do_myqpriv(buf1, buf2)
-char	*buf1, *buf2;
+void	do_myqpriv(char *buf1, char *buf2)
 {
 	if (BadPtr(buf1)) {
 		putline("*** Error: Empty message not sent");
@@ -478,16 +470,14 @@ char	*buf1, *buf2;
 	putline(buf);
 }
 
-void	do_mytext(buf1, temp)
-char	*buf1, *temp;
+void	do_mytext(char *buf1, char *temp)
 {
 	sendto_one(&me, "PRIVMSG %s :%s", querychannel, buf1);
 	sprintf(buf,"%s> %s", querychannel, buf1);
 	putline(buf);
 }
 
-void	do_unkill(buf, temp)
-char	*buf, *temp;
+void	do_unkill(char *buf, char *temp)
 {
 	if (unkill_flag)
 		unkill_flag = 0;
@@ -499,16 +489,14 @@ char	*buf, *temp;
 	putline(buf);
 }
 
-void	do_bye(buf, tmp)
-char	*buf, *tmp;
+void	do_bye(char *buf, char *tmp)
 {
 	unkill_flag = 0;
 	sendto_one(&me, "%s :%s", tmp, buf);
 }
 
 /* KILL, PART, SQUIT, TOPIC	"CMD PARA1 [:PARA2]" */
-void do_kill(buf1, tmp)
-char    *buf1, *tmp;
+void	do_kill(char *buf1, char *tmp)
 {
 	char *b2;
 
@@ -528,8 +516,7 @@ char    *buf1, *tmp;
 }
 
 /* "CMD PARA1 PARA2 [:PARA3]" */
-void do_kick(buf1, tmp)
-char    *buf1, *tmp;
+void	do_kick(char *buf1, char *tmp)
 {
 	char *b2, *b3 = NULL;
 
@@ -546,14 +533,12 @@ char    *buf1, *tmp;
 }
 
 /* "CMD :PARA1" */
-void do_away(buf1, tmp)
-char    *buf1, *tmp;
+void	do_away(char *buf1, char *tmp)
 {
 	sendto_one(&me, "%s :%s", tmp, buf1);
 }
 
-void do_server(buf, tmp)
-char	*buf, *tmp;
+void	do_server(char *buf, char *tmp)
 {
 	strncpyzt(currserver, buf, HOSTLEN);
 	unkill_flag -= 2;
@@ -562,8 +547,7 @@ char	*buf, *tmp;
 	QuitFlag = 1;
 }
 
-void sendit(line)
-char	*line;
+void	sendit(char *line)
 {
 	char	*ptr = NULL;
 	struct	Command	*cmd = commands;
@@ -602,8 +586,7 @@ char	*line;
 	}
 }
 
-char	*mycncmp(str1, str2)
-char	*str1, *str2;
+char	*mycncmp(char *str1, char *str2)
 {
 	int	flag = 0;
 	char	*s1;
@@ -626,8 +609,7 @@ char	*str1, *str2;
 		return s1;
 }
 
-void do_clear(buf, temp)
-char	*buf, *temp;
+void	do_clear(char *buf, char *temp)
 {
 #ifdef DOCURSES
 	char	header[HEADERLEN];
@@ -648,9 +630,7 @@ char	*buf, *temp;
 #endif
 }
 
-void putline(line)
-char *line;
-
+void	putline(char *line)
 {
 	char *ptr, *ptr2;
 
@@ -750,13 +730,12 @@ char *line;
 #endif
 }
 
-int	unixuser()
+int	unixuser(void)
 {
 	return(!StrEq(me.sockhost,"OuluBox"));
 }
 
-void do_log(ptr, temp)
-char	*ptr, *temp;
+void	do_log(char *ptr, char *temp)
 {
 	time_t	tloc;
 	char	buf[150];
@@ -809,8 +788,7 @@ char	*ptr, *temp;
 /* remember the commas */
 #define LASTKEEPLEN (MAXRECIPIENTS * (NICKLEN+1)) 
 
-char	*last_to_me(sender)
-char	*sender;
+char	*last_to_me(char *sender)
 {
 	static	char	name[LASTKEEPLEN+1] = ",";
 
@@ -820,8 +798,7 @@ char	*sender;
 	return (name);
 }
 
-char	*last_from_me(recipient)
-char	*recipient;
+char	*last_from_me(char *recipient)
 {
 	static	char	name[LASTKEEPLEN+1] = ".";
 
@@ -836,8 +813,7 @@ char	*recipient;
  */
 
 #ifdef GETPASS
-do_oper(ptr, xtra)
-char	*ptr, *xtra;
+void	do_oper(char *ptr, xchar *tra)
 {
 	extern char *getmypass();
 
@@ -850,8 +826,7 @@ char	*ptr, *xtra;
 
 /* Fake routine (it's only in server...) */
 
-void do_channel(ptr, xtra)
-char *ptr, *xtra;
+void	do_channel(char *ptr, char *xtra)
 {
 	char *p1;
 
@@ -879,7 +854,7 @@ char *ptr, *xtra;
 	sendto_one(&me, "%s %s", xtra, ptr);
 }
 
-void write_statusline()
+void	write_statusline(void)
 {
 #ifdef DOCURSES
 	char	header[HEADERLEN];
@@ -893,8 +868,7 @@ void write_statusline()
 #endif
 }
 
-RETSIGTYPE quit_intr(s)
-int s;
+RETSIGTYPE	quit_intr(int s)
 {
 	signal(SIGINT, SIG_IGN);
 #ifdef DOCURSES
@@ -908,3 +882,4 @@ int s;
 #endif
 	exit(0);
 }
+

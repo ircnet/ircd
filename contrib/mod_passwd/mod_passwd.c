@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_passwd.c,v 1.1 1999/03/13 23:06:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_passwd.c,v 1.2 2003/10/18 15:31:29 q Exp $";
 #endif
 
 #include "os.h"
@@ -32,9 +32,7 @@ static  char rcsid[] = "@(#)$Id: mod_passwd.c,v 1.1 1999/03/13 23:06:15 kalt Exp
  *	Returns NULL if everything went fine,
  *	an error message otherwise.
  */
-char *
-passwd_init(self)
-AnInstance *self;
+char	*passwd_init(AnInstance *self)
 {
 	return NULL;
 }
@@ -44,9 +42,7 @@ AnInstance *self;
  *
  *	This procedure is called when a particular module is unloaded.
  */
-void
-passwd_release(self)
-AnInstance *self;
+void	passwd_release(AnInstance *self)
 {
 }
 
@@ -55,9 +51,7 @@ AnInstance *self;
  *
  *	This procedure is called regularly to update statistics sent to ircd.
  */
-void
-passwd_stats(self)
-AnInstance *self;
+void	passwd_stats(AnInstance *self)
 {
 }
 
@@ -73,9 +67,7 @@ AnInstance *self;
  *	In case of failure, it's responsible for cleaning up (e.g. passwd_clean
  *	will NOT be called)
  */
-int
-passwd_start(cl)
-u_int cl;
+int	passwd_start(u_int cl)
 {
 	if (cldata[cl].authuser &&
 	    cldata[cl].authfrom < cldata[cl].instance->in)
@@ -126,9 +118,7 @@ u_int cl;
  *
  *	It is responsible for sending error messages where appropriate.
  */
-int
-passwd_work(cl)
-u_int cl;
+int	passwd_work(u_int cl)
 {
 	return -1;
 }
@@ -140,9 +130,7 @@ u_int cl;
  *	It is responsible for cleaning up any allocated data, and in particular
  *	closing file descriptors.
  */
-void
-passwd_clean(cl)
-u_int cl;
+void	passwd_clean(u_int cl)
 {
 }
 
@@ -154,9 +142,7 @@ u_int cl;
  *
  *	Returns 0 if things are okay, -1 if authentication was aborted.
  */
-int
-passwd_timeout(cl)
-u_int cl;
+int	passwd_timeout(u_int cl)
 {
 }
 
@@ -169,3 +155,4 @@ passwd_load()
 {
 	return &Module_passwd;
 }
+

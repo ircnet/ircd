@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.60 2003/10/17 21:28:20 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.61 2003/10/18 15:31:26 q Exp $";
 #endif
 
 #include "os.h"
@@ -57,8 +57,7 @@ static	char	*weekdays[] = {
  */
 struct	stats	ircst, *ircstp = &ircst;
 
-char	*date(clock) 
-time_t	clock;
+char	*date(time_t clock) 
 {
 	static	char	buf[80], plus;
 	Reg	struct	tm *lt, *gm;
@@ -115,8 +114,7 @@ time_t	clock;
 ** error message should be restricted to local clients and some
 ** other thing generated for remotes...
 */
-int	check_registered_user(sptr)
-aClient	*sptr;
+int	check_registered_user(aClient *sptr)
 {
 	if (!IsRegisteredUser(sptr))
 	    {
@@ -131,8 +129,7 @@ aClient	*sptr;
 ** registered (e.g. we don't know yet whether a server
 ** or user)
 */
-int	check_registered(sptr)
-aClient	*sptr;
+int	check_registered(aClient *sptr)
 {
 	if (!IsRegistered(sptr))
 	    {
@@ -146,8 +143,7 @@ aClient	*sptr;
 ** check_registered_service cancels message, if 'x' is not
 ** a registered service.
 */
-int	check_registered_service(sptr)
-aClient	*sptr;
+int	check_registered_service(aClient *sptr)
 {
 	if (!IsService(sptr))
 	    {
@@ -182,9 +178,7 @@ aClient	*sptr;
 **	to modify what it points!!!
 */
 
-char	*get_client_name(sptr, showip)
-aClient *sptr;
-int	showip;
+char	*get_client_name(aClient *sptr, int showip)
 {
 	static char nbuf[HOSTLEN * 2 + USERLEN + 5];
 
@@ -234,8 +228,7 @@ int	showip;
 	return sptr->name;
 }
 
-char	*get_client_host(cptr)
-aClient	*cptr;
+char	*get_client_host(aClient *cptr)
 {
 	static char nbuf[HOSTLEN * 2 + USERLEN + 5];
 
@@ -257,9 +250,7 @@ aClient	*cptr;
  * Form sockhost such that if the host is of form user@host, only the host
  * portion is copied.
  */
-void	get_sockhost(cptr, host)
-Reg	aClient	*cptr;
-Reg	char	*host;
+void	get_sockhost(aClient *cptr, char *host)
 {
 	Reg	char	*s;
 
@@ -284,9 +275,7 @@ Reg	char	*host;
  * Return wildcard name of my server name according to given config entry
  * --Jto
  */
-char	*my_name_for_link(name, count)
-char	*name;
-Reg	int	count;
+char	*my_name_for_link(char *name, int count)
 {
 	static	char	namebuf[HOSTLEN];
 	Reg	char	*start = name;
@@ -362,8 +351,8 @@ int	mark_blind_servers (aClient *cptr, aClient *server)
 **	comment: The original comment for the SQUIT. (Only for cptr itself.)
 **	comment2: The comment for (S)QUIT reasons for the rest.
 */
-void	exit_server(aClient *cptr, aClient *acptr, char *comment, char
-		*comment2)
+void	exit_server(aClient *cptr, aClient *acptr, char *comment,
+		char *comment2)
 {
 	aClient	*acptr2;
 	int	flags;
@@ -938,7 +927,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 	return;
 }
 
-void	checklist()
+void	checklist(void)
 {
 	Reg	aClient	*acptr;
 	Reg	int	i,j;
@@ -960,7 +949,7 @@ void	checklist()
 	return;
 }
 
-void	initstats()
+void	initstats(void)
 {
 	bzero((char *)&istat, sizeof(istat));
 	istat.is_serv = 1;
@@ -971,7 +960,7 @@ void	initstats()
 	bzero((char *)&ircst, sizeof(ircst));
 }
 
-void	initruntimeconf()
+void	initruntimeconf(void)
 {
 	memset((char *)&iconf, 0, sizeof(iconf));
 	iconf.aconnect = 1; /* default to ON */
@@ -981,9 +970,7 @@ void	initruntimeconf()
 	iconf.split_minusers = SPLIT_USERS;
 }
 
-void	tstats(cptr, name)
-aClient	*cptr;
-char	*name;
+void	tstats(aClient *cptr, char *name)
 {
 	Reg	aClient	*acptr;
 	Reg	int	i;
@@ -1070,8 +1057,7 @@ char	*name;
 aMotd		*motd = NULL;
 struct tm	motd_tm;
 
-void read_motd(filename)
-char *filename;
+void	read_motd(char *filename)
 {
 	int fd;
 	register aMotd *temp, *last;
@@ -1117,7 +1103,7 @@ char *filename;
 }
 #endif
 
-void check_split()
+void	check_split(void)
 {
 	/* -1 for this server  */
 	if (istat.is_eobservers < iconf.split_minservers  - 1 ||
@@ -1142,3 +1128,4 @@ void check_split()
 		iconf.split = 0;
 	}
 }
+

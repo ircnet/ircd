@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.80 2003/10/13 22:17:43 q Exp $
+ *   $Id: struct_def.h,v 1.81 2003/10/18 15:31:28 q Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -575,7 +575,7 @@ struct	SMode	{
 
 struct	Message	{
 	char	*cmd;
-	int	(* func)();
+	int	(*func)(aClient *cptr, aClient *sptr, int parc, char *parv[]);
 	int	parameters;
 	u_int	flags;
 		/* bit 0 set means that this command is allowed to be used

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_numeric.c,v 1.4 2001/10/20 17:57:27 q Exp $";
+static  char rcsid[] = "@(#)$Id: c_numeric.c,v 1.5 2003/10/18 15:31:27 q Exp $";
 #endif
  
 #include "os.h"
@@ -37,12 +37,9 @@ static  char rcsid[] = "@(#)$Id: c_numeric.c,v 1.4 2001/10/20 17:57:27 q Exp $";
 **		terminated list (parv[parc] == NULL).
 */
 
-int	do_numeric(numeric, cptr, sptr, parc, parv)
-int	numeric;
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
+		char *parv[])
+{
 	char *tmp;
 	int i;
 	time_t l;		/* ctime(&l) on STATS L */
@@ -411,3 +408,4 @@ char	*parv[];
 	  putline(mybuf);
 	return 0;
 }
+

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.25 2003/10/14 20:40:09 q Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.26 2003/10/18 15:31:29 q Exp $";
 #endif
 
 #include "os.h"
@@ -38,15 +38,13 @@ static char		iobuf[IOBUFSIZE+1];
 static char		rbuf[IOBUFSIZE+1];	/* incoming ircd stream */
 static int		iob_len = 0, rb_len = 0;
 
-void
-init_io()
+void	init_io(void)
 {
     bzero((char *) cldata, sizeof(cldata));
 }
 
 /* sendto_ircd() functions */
-void
-vsendto_ircd(char *pattern, va_list va)
+void	vsendto_ircd(char *pattern, va_list va)
 {
 	char	ibuf[4096];
 
@@ -61,8 +59,7 @@ vsendto_ircd(char *pattern, va_list va)
 	    }
 }
 
-void
-sendto_ircd(char *pattern, ...)
+void	sendto_ircd(char *pattern, ...)
 {
         va_list va;
         va_start(va, pattern);
@@ -75,10 +72,7 @@ sendto_ircd(char *pattern, ...)
  *
  *	given an entry, look for the next module instance to start
  */
-static void
-next_io(cl, last)
-int cl;
-AnInstance *last;
+static	void	next_io(int cl, AnInstance *last)
 {
     DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): last=%s state=0x%X", cl, last,
 	      (last) ? last->mod->name : "", cldata[cl].state));
@@ -198,8 +192,7 @@ AnInstance *last;
  *
  *	parses data coming from ircd (doh ;-)
  */
-static void
-parse_ircd()
+static	void	parse_ircd(void)
 {
 	char *ch, *chp, *buf = iobuf;
 	int cl = -1, ncl;
@@ -480,8 +473,7 @@ parse_ircd()
  *
  *	select()/poll() loop
  */
-void
-loop_io()
+void	loop_io(void)
 {
     /* the following is from ircd/s_bsd.c */
 #if ! USE_POLL
@@ -735,11 +727,7 @@ loop_io()
 /*
  * set_non_blocking (ripped from ircd/s_bsd.c)
  */
-static void
-set_non_blocking(fd, ip, port)
-int fd;
-char *ip;
-u_short port;
+static	void	set_non_blocking(int fd, char *ip, u_short port)
 {
 	int     res, nonb = 0;
 
@@ -775,10 +763,7 @@ u_short port;
  *
  *	Returns the fd
  */
-int
-tcp_connect(ourIP, theirIP, port, error)
-char *ourIP, *theirIP, **error;
-u_short port;
+int	tcp_connect(char *ourIP, char *theirIP, u_short port, char **error)
 {
 	int fd;
 	static char errbuf[BUFSIZ];
@@ -830,3 +815,4 @@ u_short port;
 	*error = NULL;
 	return fd;
 }
+

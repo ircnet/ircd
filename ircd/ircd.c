@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.96 2003/10/17 19:49:38 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.97 2003/10/18 15:31:24 q Exp $";
 #endif
 
 #include "os.h"
@@ -65,8 +65,7 @@ int	dk_tocheck = 0;		/* # clients we have to check */
 int	dk_lastfd = 0;		/* last fd we checked */
 #endif
 
-RETSIGTYPE s_die(s)
-int s;
+RETSIGTYPE s_die(int s)
 {
 #ifdef	USE_SYSLOG
 	(void)syslog(LOG_CRIT, "Server Killed By SIGTERM");
@@ -96,8 +95,7 @@ static	RETSIGTYPE	s_slave(int s)
 }
 #endif
 
-static RETSIGTYPE s_rehash(s)
-int s;
+static RETSIGTYPE s_rehash(int s)
 {
 #if POSIX_SIGNALS
 	struct	sigaction act;
@@ -113,8 +111,7 @@ int s;
 	dorehash = 1;
 }
 
-void	restart(mesg)
-char	*mesg;
+void	restart(char *mesg)
 {
 #ifdef	USE_SYSLOG
 	(void)syslog(LOG_WARNING, "Restarting Server because: %s (%u)", mesg,
@@ -125,8 +122,7 @@ char	*mesg;
 	server_reboot();
 }
 
-RETSIGTYPE s_restart(s)
-int s;
+RETSIGTYPE s_restart(int s)
 {
 #if POSIX_SIGNALS
 	struct	sigaction act;
@@ -202,8 +198,7 @@ void	server_reboot()
 **	function should be made latest. (No harm done if this
 **	is called earlier or later...)
 */
-static	time_t	try_connections(currenttime)
-time_t	currenttime;
+static	time_t	try_connections(time_t currenttime)
 {
 	static	time_t	lastsort = 0;
 	Reg	aConfItem *aconf;
@@ -319,8 +314,7 @@ time_t	currenttime;
 	return (next);
 }
 
-static	time_t	check_pings(currenttime)
-time_t	currenttime;
+static	time_t	check_pings(time_t currenttime)
 {
 	static	time_t	lkill = 0;
 	Reg	aClient	*cptr;
@@ -604,8 +598,7 @@ ping_timeout:
 }
 
 
-static	void	setup_me(mp)
-aClient	*mp;
+static	void	setup_me(aClient *mp)
 {
 	struct	passwd	*p;
 
@@ -694,9 +687,7 @@ static	int	bad_command()
   exit(-1);
 }
 
-int	main(argc, argv)
-int	argc;
-char	*argv[];
+int	main(int argc, char *argv[])
 {
 	uid_t	uid, euid;
 
@@ -1363,8 +1354,7 @@ static	void	setup_signals()
  * Called from bigger_hash_table(), s_die(), server_reboot(),
  * main(after initializations), grow_history(), rehash(io_loop) signal.
  */
-void ircd_writetune(filename)
-char *filename;
+void ircd_writetune(char *filename)
 {
 	int fd;
 	char buf[100];
@@ -1392,8 +1382,7 @@ char *filename;
 /*
  * Called only from main() at startup.
  */
-void ircd_readtune(filename)
-char *filename;
+void ircd_readtune(char *filename)
 {
 	int fd, t_data[6];
 	char buf[100];
@@ -1441,3 +1430,4 @@ char *filename;
 		close(fd);
 	    }
 }
+

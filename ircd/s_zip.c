@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_zip.c,v 1.8 2002/10/09 21:23:20 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_zip.c,v 1.9 2003/10/18 15:31:27 q Exp $";
 #endif
 
 #include "os.h"
@@ -74,8 +74,7 @@ static	char	zipbuf[ZIP_BUFFER_SIZE];
 **	Initialize compression structures for a server.
 **	If failed, zip_free() has to be called.
 */
-int	zip_init(cptr)
-aClient	*cptr;
+int	zip_init(aClient *cptr)
 {
 	cptr->zip  = (aZdata *) MyMalloc(sizeof(aZdata));
 	cptr->zip->outcount = 0;
@@ -108,8 +107,7 @@ aClient	*cptr;
 /*
 ** zip_free
 */
-void	zip_free(cptr)
-aClient	*cptr;
+void	zip_free(aClient *cptr)
 {
 	cptr->flags &= ~FLAGS_ZIP;
 	if (cptr->zip)
@@ -132,10 +130,7 @@ aClient	*cptr;
 **	will return the uncompressed buffer, length will be updated.
 **	if a fatal error occurs, length will be set to -1
 */
-char *	unzip_packet(cptr, buffer, length)
-aClient	*cptr;
-char	*buffer;
-int	*length;
+char	*unzip_packet(aClient *cptr, char *buffer, int *length)
 {
 	Reg	z_stream *zin = cptr->zip->in;
 	int	r;
@@ -210,10 +205,7 @@ int	*length;
 **	will return the uncompressed buffer, length will be updated.
 **	if a fatal error occurs, length will be set to -1
 */
-char *	zip_buffer(cptr, buffer, length, flush)
-aClient	*cptr;
-char	*buffer;
-int	*length, flush;
+char	*zip_buffer(aClient *cptr, char *buffer, int *length, int flush)
 {
 	Reg	z_stream *zout = cptr->zip->out;
 	int	r;
@@ -259,3 +251,4 @@ int	*length, flush;
 }
 
 #endif	/* ZIP_LINKS */
+

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.23 2003/10/17 17:58:07 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.24 2003/10/18 15:31:26 q Exp $";
 #endif
 
 #include "os.h"
@@ -64,7 +64,7 @@ static unsigned int alphabet_id[256] =
 ** dropped if it's longer.
 ** Returns a pointer to a static string, or NULL.
 */
-char *ltoid(long l, int n)
+char	*ltoid(long l, int n)
 {
 static	char	idrpl[UIDLEN+1]; /* Currently nothing longer should be used. */
 	int	i = n - 1;
@@ -90,7 +90,7 @@ static	char	idrpl[UIDLEN+1]; /* Currently nothing longer should be used. */
 ** base 36 -> base 10 conversion
 ** Converts the first n char from string id, to a number, and return that.
 */
-long idtol(char *id, int n)
+long	idtol(char *id, int n)
 {
 	long	l = 0;
 
@@ -109,16 +109,13 @@ long idtol(char *id, int n)
 }
 
 /* get_chid: give the current id */
-char *
-get_chid()
+char	*get_chid(void)
 {
-    return ltoid((long)time(NULL), CHIDLEN);
+	return ltoid((long)time(NULL), CHIDLEN);
 }
 
 /* close_chid: is the ID in the close future? (written for CHIDLEN == 5) */
-int
-close_chid(id)
-char *id;
+int	close_chid(char *id)
 {
     static time_t last = 0;
     static char current;
@@ -141,9 +138,7 @@ char *id;
 aChannel *idcache = NULL;
 
 /* cache_chid: add a channel to the list of cached names */
-void
-cache_chid(chptr)
-aChannel *chptr;
+void	cache_chid(aChannel *chptr)
 {
     /*
     ** caching should be limited to the minimum,
@@ -167,9 +162,7 @@ aChannel *chptr;
 /* check_chid: checks if a (short) channel name is in the cache
  *	returns: 0 if not, 1 if yes
  */
-int
-check_chid(name)
-char *name;
+int	check_chid(char *name)
 {
     aChannel *chptr = idcache;
 
@@ -183,8 +176,7 @@ char *name;
 }
 
 /* collect_chid: remove expired entries from the cache */	    
-void
-collect_chid()
+void	collect_chid(void)
 {
     aChannel **chptr = &idcache, *del;
 
@@ -210,7 +202,7 @@ collect_chid()
 ** char is a '!', and for UID's, where the first char should be a number.
 ** returns 1 when it's valid, 0 when not.
 */
-int cid_ok(char *name, int n)
+int	cid_ok(char *name, int n)
 {
 	int	i;
 
@@ -250,7 +242,7 @@ int	sid_valid(char *sid)
 /* we don't need it */
 static char sid[SIDLEN+1];
 
-void init_sid(char *conf)
+void	init_sid(char *conf)
 {
 	if (!conf || (strlen(conf) != SIDLEN) || !sid_valid(conf))
 	{
@@ -260,7 +252,7 @@ void init_sid(char *conf)
 }
 #endif
 
-char * next_uid()
+char	*next_uid(void)
 {
 static	char	uid[UIDLEN+1+5];	/* why +5? --Beeth */
 static	long	curr_cid = 0;
@@ -299,9 +291,7 @@ static	int	needfinduid = 0;
  *	various sanity checks to ensure that a UID is valid.
  * returns 1 when it's valid, 0 when not.
  */
-int
-check_uid(uid)
-char *uid;
+int	check_uid(char *uid)
 {
 	if (isdigit(uid[0]) && strlen(uid) == UIDLEN)
 	{
@@ -314,3 +304,4 @@ char *uid;
 	 */
 	return 0;
 }
+

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.25 2003/10/14 20:19:54 q Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.26 2003/10/18 15:31:29 q Exp $";
 #endif
 
 #include "os.h"
@@ -35,10 +35,7 @@ u_int	debuglevel = 0;
 
 AnInstance *instances = NULL;
 
-static void
-conf_err(nb, msg, chk)
-u_int nb;
-char *msg, *chk;
+static	void	conf_err(u_int nb, char *msg, char *chk)
 {
 	if (chk)
 		printf("configuration error line %d: %s\n", nb, msg);
@@ -51,10 +48,7 @@ char *msg, *chk;
 /*
  * Match address by #IP bitmask (10.11.12.128/27)
  */
-static int
-match_ipmask(mask, ipaddr)
-aTarget	*mask;
-char	*ipaddr;
+static	int	match_ipmask(aTarget *mask, char *ipaddr)
 {
 #ifdef INET6
 	return 1;
@@ -70,9 +64,7 @@ char	*ipaddr;
 }
 
 /* conf_read: read the configuration file, instanciate modules */
-char *
-conf_read(cfile)
-char *cfile;
+char	*conf_read(char *cfile)
 {
 	AnInstance *ident = NULL; /* make sure this module is used */
 	u_char needh = 0; /* do we need hostname information for any host? */
@@ -512,10 +504,7 @@ char *cfile;
    Returns -1: no match, and never will
             0: got a match, doIt[tm]
 	    1: no match, but might be later so ask again */
-int
-conf_match(cl, inst)
-u_int cl;
-AnInstance *inst;
+int	conf_match(u_int cl, AnInstance *inst)
 {
 	aTarget *ttmp;
 
@@ -573,8 +562,7 @@ AnInstance *inst;
 }
 
 /* conf_ircd: send the configuration to the ircd daemon */
-void
-conf_ircd()
+void	conf_ircd(void)
 {
 	AnInstance *itmp = instances;
 	aTarget *ttmp;
@@ -607,3 +595,4 @@ conf_ircd()
 		itmp = itmp->nexti;
 	    }
 }
+

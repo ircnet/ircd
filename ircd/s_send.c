@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_send.c,v 1.5 2003/10/13 21:48:53 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_send.c,v 1.6 2003/10/18 15:31:26 q Exp $";
 #endif
 
 #include "os.h"
@@ -42,9 +42,7 @@ static	int	maxplen, lastmax;
 **	Wrapper for send_message() that deals with the multiple buffers
 **	we now have to deal with UIDs.
 */
-static void
-esend_message(to)
-aClient	*to;
+static	void	esend_message(aClient *to)
 {
 	if (maxplen != lastmax)
 	{
@@ -234,8 +232,7 @@ static void	build_suffix(char *format, va_list va)
 ** esendto_one()
 **	send a message to a single client
 */
-void
-esendto_one(aClient *orig, aClient *dest, char *imsg, char *fmt, ...)
+void	esendto_one(aClient *orig, aClient *dest, char *imsg, char *fmt, ...)
 {
 	va_list va;
 
@@ -258,9 +255,8 @@ esendto_one(aClient *orig, aClient *dest, char *imsg, char *fmt, ...)
 ** esendto_serv_butone
 ** 	send message to all connected servers except 'one'
 */
-void
-esendto_serv_butone(aClient *orig, aClient *dest, char *dname, char *imsg,
-		    aClient *one, char *fmt, ...)
+void	esendto_serv_butone(aClient *orig, aClient *dest, char *dname,
+		char *imsg, aClient *one, char *fmt, ...)
 {
 	int	i;
 	aClient *acptr;
@@ -291,8 +287,7 @@ esendto_serv_butone(aClient *orig, aClient *dest, char *dname, char *imsg,
 ** esendto_channel_butone
 ** 	send message to all connected servers except 'one'
 */
-void
-esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
+void	esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 		       aChannel *chptr, char *fmt, ...)
 {
 	Link	*lp;
@@ -354,8 +349,8 @@ esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 **	send to all servers which match the mask at the end of a channel name
 **	(if there is a mask present) or to all if no mask.
 */
-void
-esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr, char *fmt, ...)
+void	esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr,
+		char *fmt, ...)
 {
 	int	i;
 	aClient	*cptr;
@@ -408,3 +403,4 @@ esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr, char *fmt, ...)
 		esend_message(cptr);
 	}
 }
+

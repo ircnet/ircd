@@ -20,7 +20,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_numeric.c,v 1.5 2002/04/05 03:05:53 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_numeric.c,v 1.6 2003/10/18 15:31:26 q Exp $";
 #endif
 
 #include "os.h"
@@ -46,11 +46,8 @@ static char buffer[1024];
 **	sending back a neat error message -- big danger of creating
 **	a ping pong error message...
 */
-int	do_numeric(numeric, cptr, sptr, parc, parv)
-int	numeric;
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
+	char *parv[])
 {
 	aClient *acptr = NULL;
 	aChannel *chptr;
@@ -131,3 +128,4 @@ char	*parv[];
 	    }
 	return 1;
 }
+

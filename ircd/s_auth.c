@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.49 2003/10/13 21:48:52 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.50 2003/10/18 15:31:25 q Exp $";
 #endif
 
 #include "os.h"
@@ -41,9 +41,7 @@ static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.49 2003/10/13 21:48:52 q Exp $";
  *				and because it's used from attached_Iline()
  *		[		/trace parsing is impossible
  */
-static void
-set_clean_username(cptr)
-aClient *cptr;
+static	void	set_clean_username(aClient *cptr)
 {
 	int i = 0, dirty = 0;
 	char *s;
@@ -105,8 +103,7 @@ static aExtData	*iauth_stats = NULL;
  *	Send the buffer to the authentication slave process.
  *	Return 0 if everything went well, -1 otherwise.
  */
-int
-vsendto_iauth(char *pattern, va_list va)
+int	vsendto_iauth(char *pattern, va_list va)
 {
 	static char abuf[BUFSIZ], *p;
 	int	i, len;
@@ -144,8 +141,7 @@ vsendto_iauth(char *pattern, va_list va)
 	return 0;
 }
 
-int
-sendto_iauth(char *pattern, ...)
+int	sendto_iauth(char *pattern, ...)
 {
 	int i;
 
@@ -161,8 +157,7 @@ sendto_iauth(char *pattern, ...)
  *
  *	read and process data from the authentication slave process.
  */
-void
-read_iauth()
+void	read_iauth(void)
 {
     static char obuf[READBUF_SIZE+1], last = '?';
     static int olen = 0, ia_dbg = 0;
@@ -479,10 +474,7 @@ read_iauth()
  *
  * called from m_stats(), this is the reply to /stats a
  */
-void
-report_iauth_conf(sptr, to)
-aClient *sptr;
-char *to;
+void	report_iauth_conf(aClient *sptr, char *to)
 {
 	aExtCf *ectmp = iauth_conf;
 
@@ -501,10 +493,7 @@ char *to;
  *
  * called from m_stats(), this is part of the reply to /stats t
  */
-void
-report_iauth_stats(sptr, to)
-aClient *sptr;
-char *to;
+void	report_iauth_stats(aClient *sptr, char *to)
 {
 	aExtData *ectmp = iauth_stats;
 
@@ -526,8 +515,7 @@ char *to;
  * identifing process fail, it is aborted and the user is given a username
  * of "unknown".
  */
-void	start_auth(cptr)
-Reg	aClient	*cptr;
+void	start_auth(aClient *cptr)
 {
 #ifndef	NO_IDENT
 	struct	SOCKADDR_IN	us, them;
@@ -685,8 +673,7 @@ Reg	aClient	*cptr;
  * problem since the socket should have a write buffer far greater than
  * this message to store it in should problems arise. -avalon
  */
-void	send_authports(cptr)
-aClient	*cptr;
+void	send_authports(aClient *cptr)
 {
 	struct	SOCKADDR_IN	us, them;
 
@@ -741,8 +728,7 @@ authsenderr:
  * The actual read processijng here is pretty weak - no handling of the reply
  * if it is fragmented by IP.
  */
-void	read_authports(cptr)
-Reg	aClient	*cptr;
+void	read_authports(aClient *cptr)
 {
 	Reg	char	*s, *t;
 	Reg	int	len;
@@ -826,3 +812,4 @@ Reg	aClient	*cptr;
 	Debug((DEBUG_INFO, "got username [%s]", ruser));
 	return;
 }
+

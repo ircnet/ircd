@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.64 2003/10/14 20:35:15 q Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.65 2003/10/18 15:31:28 q Exp $";
 #endif
 
 #include "os.h"
@@ -61,9 +61,7 @@ static	int	sentalong[MAXCONNECTIONS];
 **	Also, the notice is skipped for "uninteresting" cases,
 **	like Persons and yet unknown connections...
 */
-static	int	dead_link(to, notice)
-aClient *to;
-char	*notice;
+static	int	dead_link(aClient *to, char *notice)
 {
 	SetDead(to);
 	/*
@@ -85,8 +83,7 @@ char	*notice;
 ** flush_fdary
 **      Used to empty all output buffers for connections in fdary.
 */
-void    flush_fdary(fdp)
-FdAry   *fdp;
+void    flush_fdary(FdAry *fdp)
 {
         int     i;
         aClient *cptr;
@@ -111,8 +108,7 @@ FdAry   *fdp;
 **	client and try to send it. if we can't send it, it goes into the sendQ
 **	-avalon
 */
-void	flush_connections(fd)
-int	fd;
+void	flush_connections(int fd)
 {
 	Reg	int	i;
 	Reg	aClient *cptr;
@@ -135,11 +131,10 @@ int	fd;
 **	needed.
 **	if ZIP_LINKS is defined, the message will eventually be compressed,
 **	anything stored in the sendQ is compressed.
+**
+**	If msg is a null pointer, we are flushing connection
 */
-int	send_message(to, msg, len)
-aClient	*to;
-char	*msg;	/* if msg is a null pointer, we are flushing connection */
-int	len;
+int	send_message(aClient *to, char *msg, int len)
 #if !defined(CLIENT_COMPILE)
 {
 	int i;
@@ -290,8 +285,7 @@ tryagain:
 **	when there is a chance the some output would be possible. This
 **	attempts to empty the send queue as far as possible...
 */
-int	send_queued(to)
-aClient *to;
+int	send_queued(aClient *to)
 {
 	char	*msg;
 	int	len, rlen, more = 0;
@@ -536,7 +530,8 @@ int	sendto_one(aClient *to, char *pattern, ...)
  * server except client 'one'.
  */
 #ifndef CLIENT_COMPILE
-void	sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr, char *pattern, ...)
+void	sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr,
+		char *pattern, ...)
 {
 	Reg	Link	*lp;
 	Reg	aClient *acptr, *lfrm = from;
@@ -613,8 +608,7 @@ void	sendto_serv_butone(aClient *one, char *pattern, ...)
 	return;
 }
 
-int
-sendto_serv_v(aClient *one, int ver, char *pattern, ...)
+int	sendto_serv_v(aClient *one, int ver, char *pattern, ...)
 {
 	Reg	int	i, len=0, rc=0;
 	Reg	aClient *cptr;
@@ -646,8 +640,7 @@ sendto_serv_v(aClient *one, int ver, char *pattern, ...)
 	return rc;
 }
 
-int
-sendto_serv_notv(aClient *one, int ver, char *pattern, ...)
+int	sendto_serv_notv(aClient *one, int ver, char *pattern, ...)
 {
 	Reg	int	i, len=0, rc=0;
 	Reg	aClient *cptr;
@@ -839,10 +832,7 @@ void	sendto_channel_butserv(aChannel *chptr, aClient *from, char *pattern, ...)
 ** addition -- Armin, 8jun90 (gruner@informatik.tu-muenchen.de)
 */
 
-static	int	match_it(one, mask, what)
-aClient *one;
-char	*mask;
-int	what;
+static	int	match_it(aClient *one, char *mask, int what)
 {
 	switch (what)
 	{
@@ -894,9 +884,8 @@ void	sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 	    }
 }
 
-int
-sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
-		     char *format, ...)
+int	sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
+		char *format, ...)
 {
 	Reg	int	i, len=0, rc=0;
 	Reg	aClient	*cptr;
@@ -936,9 +925,8 @@ sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
 	return rc;
 }
 
-int
-sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
-			char *format, ...)
+int	sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
+		char *format, ...)
 {
 	Reg	int	i, len=0, rc=0;
 	Reg	aClient	*cptr;
@@ -987,7 +975,8 @@ sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
  * are covered by sendto_match_butone_old() and upper function takes care
  * of calling both with properly formatted parameters.
  */
-void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char *pattern, ...)
+void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what,
+		char *pattern, ...)
 {
 	int	i;
 	aClient *cptr,
@@ -1052,7 +1041,8 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what, char
  * NOTE: we send it only to old servers (pre-2.11). The rest is
  * covered by sendto_match_butone()
  */
-void	sendto_match_butone_old(aClient *one, aClient *from, char *mask, int what, char *pattern, ...)
+void	sendto_match_butone_old(aClient *one, aClient *from, char *mask,
+		int what, char *pattern, ...)
 {
 	int	i;
 	aClient *cptr,
@@ -1163,7 +1153,8 @@ void	sendto_prefix_one(aClient *to, aClient *from, char *pattern, ...)
 	return;
 }
 
-static void	vsendto_prefix_one(aClient *to, aClient *from, char *pattern, va_list va)
+static	void	vsendto_prefix_one(aClient *to, aClient *from, char *pattern,
+		va_list va)
 {
 	int	len;
 
@@ -1192,7 +1183,7 @@ static	SChan	svchans[SCH_MAX] = {
 };
 
 
-void	setup_svchans()
+void	setup_svchans(void)
 {
 	int	i;
 	SChan	*shptr;
@@ -1250,8 +1241,7 @@ void	sendto_flag(u_int chan, char *pattern, ...)
 static int userlog;
 static int connlog;
 
-void
-logfiles_open()
+void	logfiles_open(void)
 {
 #ifdef  FNAME_USERLOG
 	userlog = open(FNAME_USERLOG, O_WRONLY|O_APPEND|O_NDELAY);
@@ -1265,8 +1255,7 @@ logfiles_open()
 #endif
 }
 
-void
-logfiles_close()
+void	logfiles_close(void)
 {
 #ifdef FNAME_USERLOG
 	if (userlog != -1)
@@ -1289,9 +1278,7 @@ logfiles_close()
  *	username	sometimes can't get it from cptr
  *	hostname	i.e.
  */
-void	sendto_flog(cptr, msg, username, hostname)
-aClient	*cptr;
-char	msg, *username, *hostname;
+void	sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 {
 	/* 
 	** One day we will rewrite linebuf to malloc()s, but for now
@@ -1415,3 +1402,4 @@ char	msg, *username, *hostname;
 	}
 }
 #endif /* CLIENT_COMPILE */
+

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: packet.c,v 1.10 2002/06/01 22:11:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: packet.c,v 1.11 2003/10/18 15:31:28 q Exp $";
 #endif
 
 #include "os.h"
@@ -54,10 +54,7 @@ static  char rcsid[] = "@(#)$Id: packet.c,v 1.10 2002/06/01 22:11:01 chopin Exp 
 **	with cptr of "local" variation, which contains all the
 **	necessary fields (buffer etc..)
 */
-int	dopacket(cptr, buffer, length)
-Reg	aClient *cptr;
-char	*buffer;
-Reg	int	length;
+int	dopacket(aClient *cptr, char *buffer, int length)
 {
 	Reg	char	*ch1;
 	Reg	char	*ch2, *bufptr;
@@ -182,3 +179,4 @@ Reg	int	length;
 	cptr->count = ch1 - bufptr;
 	return r;
 }
+

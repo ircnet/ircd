@@ -17,7 +17,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ctcp.c,v 1.2 1997/09/03 17:45:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ctcp.c,v 1.3 2003/10/18 15:31:27 q Exp $";
 #endif
  
 #include "os.h"
@@ -28,10 +28,7 @@ static  char rcsid[] = "@(#)$Id: ctcp.c,v 1.2 1997/09/03 17:45:36 kalt Exp $";
 
 #define	CTCP_CHAR	0x1
 
-void check_ctcp(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+void	check_ctcp(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char	*front = NULL, *back = NULL;
 
@@ -48,3 +45,4 @@ char	*parv[];
 			  CTCP_CHAR, version, CTCP_CHAR);
 	*back = CTCP_CHAR;
 }
+

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: match.c,v 1.10 2003/08/08 00:33:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: match.c,v 1.11 2003/10/18 15:31:28 q Exp $";
 #endif
 
 #include "os.h"
@@ -180,8 +180,7 @@ unsigned char char_atribs[] = {
 ** Written by Douglas A Lewis (dalewis@acsu.buffalo.edu)
 */
 
-int	match(mask, name)
-char	*mask, *name;
+int	match(char *mask, char *name)
 {
 	Reg	u_char	*m = (u_char *)mask, *n = (u_char *)name;
 	char	*ma = mask, *na = name;
@@ -261,8 +260,7 @@ char	*mask, *name;
 ** This particular version is "in place", so that it changes the pattern
 ** which is to be reduced to a "minimal" size.
 */
-char	*collapse(pattern)
-char	*pattern;
+char	*collapse(char *pattern)
 {
 	Reg	char	*s = pattern, *s1, *t;
 
@@ -300,10 +298,8 @@ char	*pattern;
 **		<0, if s1 lexicographically less than s2
 **		>0, if s1 lexicographically greater than s2
 */
-int	mycmp(s1, s2)
-char	*s1;
-char	*s2;
-    {
+int	mycmp(char *s1, char *s2)
+{
 	Reg	unsigned char	*str1 = (unsigned char *)s1;
 	Reg	unsigned char	*str2 = (unsigned char *)s2;
 	Reg	int	res;
@@ -316,14 +312,11 @@ char	*s2;
 		str2++;
 	    }
 	return (res);
-    }
+}
 
 
-int	myncmp(str1, str2, n)
-char	*str1;
-char	*str2;
-int	n;
-    {
+int	myncmp(char *str1, char *str2, int n)
+{
 	Reg	unsigned char	*s1 = (unsigned char *)str1;
 	Reg	unsigned char	*s2 = (unsigned char *)str2;
 	Reg	int		res;
@@ -335,13 +328,13 @@ int	n;
 			return 0;
 	    }
 	return (res);
-    }
+}
 
 /*
 ** Checks if all chars of username are valid.
 ** Returns 1 if ok, 0 if invalid.
 */
-int isvalidusername(char *username)
+int	isvalidusername(char *username)
 {
 	Reg char	*ch;
 	int	an=0;
@@ -377,3 +370,4 @@ int isvalidusername(char *username)
 	}
 	return 1;
 }
+

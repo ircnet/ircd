@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.51 2003/10/17 22:06:15 jv Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.52 2003/10/18 15:31:28 q Exp $";
 #endif
 
 #include "os.h"
@@ -165,31 +165,27 @@ static	int	find_sender (aClient *cptr, aClient **sptr, char *sender,
 **	string and the search is the for server and user.
 */
 #ifndef CLIENT_COMPILE
-aClient *find_client(name, cptr)
-char	*name;
-Reg	aClient *cptr;
-    {
+aClient	*find_client(char *name, aClient *cptr)
+{
 	aClient *acptr = cptr;
 
 	if (name && *name)
 		acptr = hash_find_client(name, cptr);
 
 	return acptr;
-    }
+}
 
-aClient *find_uid(uid, cptr)
-char	*uid;
-Reg	aClient *cptr;
-    {
+aClient	*find_uid(char *uid, aClient *cptr)
+{
 	aClient *acptr = cptr;
 
 	if (uid && isdigit(*uid))
 		acptr = hash_find_uid(uid, cptr);
 
 	return acptr;
-    }
+}
 
-aClient *find_sid(char *sid, aClient *cptr)
+aClient	*find_sid(char *sid, aClient *cptr)
 {
 	if (sid && isdigit(*sid))
 	{
@@ -199,18 +195,16 @@ aClient *find_sid(char *sid, aClient *cptr)
 	return cptr;
 }
 
-aClient *find_service(name, cptr)
-char	*name;
-Reg	aClient *cptr;
-    {
+aClient	*find_service(char *name, aClient *cptr)
+{
 	aClient *acptr = cptr;
 
 	if (index(name, '@'))
 		acptr = hash_find_client(name, cptr);
 	return acptr;
-    }
+}
 
-aClient *find_matching_client(char *mask)
+aClient	*find_matching_client(char *mask)
 {
 	aClient *acptr;
 	aServer *asptr;
@@ -271,10 +265,8 @@ aClient *find_matching_client(char *mask)
 }
 #else /* CLIENT_COMPILE */
 
-aClient *find_client(name, cptr)
-char *name;
-aClient *cptr;
-    {
+aClient	*find_client(char *name, aClient *cptr)
+{
 	Reg	aClient	*c2ptr = cptr;
 
 	if (!name || !*name)
@@ -284,7 +276,7 @@ aClient *cptr;
 		if (mycmp(name, c2ptr->name) == 0)
 			return c2ptr;
 	return cptr;
-    }
+}
 #endif /* CLIENT_COMPILE */
 #ifndef CLIENT_COMPILE
 /*
@@ -295,11 +287,8 @@ aClient *cptr;
 **	the old. 'name' is now assumed to be a null terminated
 **	string and the search is the for server and user.
 */
-aClient *find_userhost(user, host, cptr, count)
-char	*user, *host;
-aClient *cptr;
-int	*count;
-    {
+aClient	*find_userhost(char *user, char *host, aClient *cptr, int *count)
+{
 	Reg	aClient	*c2ptr;
 	Reg	aClient	*res = cptr;
 
@@ -348,7 +337,9 @@ int	*count;
 	    }
 	}
 	return res;
-    }
+}
+
+
 /*
 **  Find server by name.
 **
@@ -366,9 +357,7 @@ int	*count;
 /*
 ** Find a server from hash table, given its name
 */
-aClient *find_server(name, cptr)
-char	*name;
-Reg	aClient *cptr;
+aClient	*find_server(char *name, aClient *cptr)
 {
 	aClient *acptr = cptr;
 
@@ -381,9 +370,7 @@ Reg	aClient *cptr;
 ** Given a server name, find the server mask behind which the server
 ** is hidden.
 */
-aClient *find_mask(name, cptr)
-char	*name;
-aClient *cptr;
+aClient	*find_mask(char *name, aClient *cptr)
 {
 	static	char	servermask[HOSTLEN+1];
 	Reg	aClient	*c2ptr = cptr;
@@ -412,9 +399,7 @@ aClient *cptr;
 /*
 ** Find a server from hash table, given its token
 */
-aServer	*find_tokserver(token, cptr, c2ptr)
-int	token;
-aClient	*cptr, *c2ptr;
+aServer	*find_tokserver(int token, aClient *cptr, aClient *c2ptr)
 {
 	return hash_find_stoken(token, cptr, c2ptr);
 }
@@ -423,9 +408,7 @@ aClient	*cptr, *c2ptr;
 ** Find a server, given its name (which might contain *'s, in which case
 ** the first match will be return [not the best one])
 */
-aClient *find_name(name, cptr)
-char	*name;
-aClient *cptr;
+aClient	*find_name(char *name, aClient *cptr)
 {
 	Reg	aClient	*c2ptr = cptr;
 	Reg	aServer	*sp = NULL;
@@ -452,9 +435,7 @@ aClient *cptr;
 	return (sp ? sp->bcptr : cptr);
 }
 #else
-aClient	*find_server(name, cptr)
-char	*name;
-aClient	*cptr;
+aClient	*find_server(char *name, aClient *cptr)
 {
 	Reg	aClient *c2ptr = cptr;
 
@@ -476,10 +457,8 @@ aClient	*cptr;
 /*
 **  Find person by (nick)name.
 */
-aClient *find_person(name, cptr)
-char	*name;
-aClient *cptr;
-    {
+aClient	*find_person(char *name, aClient *cptr)
+{
 	Reg	aClient	*c2ptr = cptr;
 
 	c2ptr = find_client(name, c2ptr);
@@ -488,7 +467,7 @@ aClient *cptr;
 		return c2ptr;
 	else
 		return cptr;
-    }
+}
 
 /*
 ** find_sender(): 
@@ -612,7 +591,7 @@ static	int	find_sender(aClient *cptr, aClient **sptr, char *sender,
 **  name - name of the client to be searched
 **  cptr - originating socket
 */
-aClient *find_target(char *name,aClient *cptr)
+aClient	*find_target(char *name, aClient *cptr)
 {
 	aClient *acptr = NULL;
 	
@@ -666,10 +645,8 @@ aClient *find_target(char *name,aClient *cptr)
  *
  * NOTE: parse() should not be called recusively by any other fucntions!
  */
-int	parse(cptr, buffer, bufend)
-aClient *cptr;
-char	*buffer, *bufend;
-    {
+int	parse(aClient *cptr, char *buffer, char *bufend)
+{
 	aClient *from = cptr;
 	Reg	char	*ch, *s;
 	Reg	int	len, i, numeric = 0, paramcount;
@@ -933,8 +910,7 @@ char	*buffer, *bufend;
 /*
  * field breakup for ircd.conf file.
  */
-char	*getfield(irc_newline)
-char	*irc_newline;
+char	*getfield(char *irc_newline)
 {
 	static	char *line = NULL;
 	char	*end, *field;
@@ -992,9 +968,7 @@ char	*irc_newline;
 }
 
 #ifndef	CLIENT_COMPILE
-static	int	cancel_clients(cptr, sptr, cmd)
-aClient	*cptr, *sptr;
-char	*cmd;
+static	int	cancel_clients(aClient *cptr, aClient *sptr, char *cmd)
 {
 	/*
 	 * kill all possible points that are causing confusion here,
@@ -1031,9 +1005,7 @@ char	*cmd;
 	return exit_client(cptr, cptr, &me, "Fake prefix");
 }
 
-static	void	remove_unknown(cptr, sender)
-aClient	*cptr;
-char	*sender;
+static	void	remove_unknown(aClient *cptr, char *sender)
 {
 	if (!IsRegistered(cptr) || IsClient(cptr))
 		return;
@@ -1068,3 +1040,4 @@ char	*sender;
 			    sender, get_client_name(cptr, FALSE));
 }
 #endif
+

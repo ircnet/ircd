@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.44 2003/10/17 17:58:07 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.45 2003/10/18 15:31:26 q Exp $";
 #endif
 
 #include "os.h"
@@ -33,8 +33,7 @@ static  char rcsid[] = "@(#)$Id: s_service.c,v 1.44 2003/10/17 17:58:07 q Exp $"
 
 aService	*svctop = NULL;
 
-aService	*make_service(cptr)
-aClient	*cptr;
+aService	*make_service(aClient *cptr)
 {
 	Reg	aService	*svc = cptr->service;
 
@@ -53,8 +52,7 @@ aClient	*cptr;
 }
 
 
-void	free_service(cptr)
-aClient	*cptr;
+void	free_service(aClient *cptr)
 {
 	Reg	aService	*serv;
 
@@ -76,9 +74,7 @@ aClient	*cptr;
 }
 
 
-static	aClient *best_service(name, cptr)
-char	*name;
-aClient *cptr;
+static	aClient *best_service(char *name, aClient *cptr)
 {
 	Reg	aClient	*acptr = NULL;
 	Reg	aClient	*bcptr;
@@ -158,10 +154,8 @@ void	check_services_butone(long action, char *server, aClient *cptr,
 ** sendnum_toone
 **	send the NICK + USER + UMODE for sptr to cptr according to wants
 */
-static void	sendnum_toone (cptr, wants, sptr, umode)
-aClient *cptr, *sptr;
-char   *umode;
-int	wants;
+static	void	sendnum_toone(aClient *cptr, int wants, aClient *sptr,
+			char *umode)
 {
 
 	if (!*umode)
@@ -239,10 +233,7 @@ void	check_services_num(aClient *sptr, char *umode)
 }
 
 
-aConfItem *find_conf_service(cptr, type, aconf)
-aClient	*cptr;
-aConfItem *aconf;
-int	type;
+aConfItem	*find_conf_service(aClient *cptr, int type, aConfItem *aconf)
 {
 	static	char	uhost[HOSTLEN+USERLEN+3];
 	Reg	aConfItem *tmp;
@@ -294,10 +285,7 @@ int	type;
 **	parv[5] = hopcount
 **	parv[6] = info
 */
-int	m_service(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aClient	*acptr = NULL;
 	Reg	aService *svc;
@@ -481,10 +469,7 @@ char	*parv[];
 ** parv[1] - string to match names against
 ** parv[2] - type of service
 */
-int	m_servlist(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_servlist(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aService *sp;
 	Reg	aClient *acptr;
@@ -512,10 +497,7 @@ char	*parv[];
 **      parv[1] = data requested
 **      parv[2] = burst requested (optional)
 */
-int	m_servset(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	int burst = 0;
@@ -666,10 +648,7 @@ char	*parv[];
 ** parv[1] - string to match name against
 ** parv[2] - string to send to service
 */
-int	m_squery(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_squery(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 
@@ -696,3 +675,4 @@ char	*parv[];
 		sendto_one(sptr, replies[ERR_NOSUCHSERVICE], ME, BadTo(parv[0]), parv[1]);
 	return 2;
 }
+

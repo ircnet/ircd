@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.26 2003/10/17 17:58:06 q Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.27 2003/10/18 15:31:24 q Exp $";
 #endif
 
 #include "os.h"
@@ -108,8 +108,7 @@ void	checklists()
 **			associated with the client defined by
 **			'from'). ('from' is a local client!!).
 */
-aClient	*make_client(from)
-aClient	*from;
+aClient	*make_client(aClient *from)
 {
 	Reg	aClient *cptr = NULL;
 	Reg	unsigned size = CLIENT_REMOTE_SIZE;
@@ -160,8 +159,7 @@ aClient	*from;
 	return (cptr);
 }
 
-void	free_client(cptr)
-aClient	*cptr;
+void	free_client(aClient *cptr)
 {
 	if (cptr->info != DefInfo)
 		MyFree(cptr->info);
@@ -188,9 +186,7 @@ aClient	*cptr;
 ** if it was not previously allocated.
 ** iplen is lenght of the IP we want to allocate.
 */
-anUser	*make_user(cptr, iplen)
-aClient *cptr;
-int	iplen;
+anUser	*make_user(aClient *cptr, int iplen)
 {
 	Reg	anUser	*user;
 
@@ -283,9 +279,7 @@ aServer	*make_server(aClient *cptr)
 **	Decrease user reference count by one and realease block,
 **	if count reaches 0
 */
-void	free_user(user, cptr)
-Reg	anUser	*user;
-aClient	*cptr;
+void	free_user(anUser *user, aClient *cptr)
 {
 	aServer *serv;
 
@@ -335,9 +329,7 @@ aClient	*cptr;
 	    }
 }
 
-void	free_server(serv, cptr)
-aServer	*serv;
-aClient	*cptr;
+void	free_server(aServer *serv, aClient *cptr)
 {
 	if (--serv->refcnt <= 0)
 	    {
@@ -368,8 +360,7 @@ aClient	*cptr;
  * remove client **AND** _related structures_ from lists,
  * *free* them too. -krys
  */
-void	remove_client_from_list(cptr)
-Reg	aClient	*cptr;
+void	remove_client_from_list(aClient *cptr)
 {
 	checklist();
 	if (cptr->hopcount == 0) /* is there another way, at this point? */
@@ -441,8 +432,7 @@ Reg	aClient	*cptr;
 /*
  * move the client aClient struct before its server's
  */
-void	reorder_client_in_list(cptr)
-aClient	*cptr;
+void	reorder_client_in_list(aClient *cptr)
 {
     if (cptr->user == NULL && cptr->service == NULL)
 	    return;
@@ -486,8 +476,7 @@ aClient	*cptr;
  * in this file, shouldnt they ?  after all, this is list.c, isnt it ?
  * -avalon
  */
-void	add_client_to_list(cptr)
-aClient	*cptr;
+void	add_client_to_list(aClient *cptr)
 {
 	/*
 	 * since we always insert new clients to the top of the list,
@@ -513,9 +502,7 @@ aClient	*cptr;
 /*
  * Look for ptr in the linked listed pointed to by link.
  */
-Link	*find_user_link(lp, ptr)
-Reg	Link	*lp;
-Reg	aClient *ptr;
+Link	*find_user_link(Link *lp, aClient *ptr)
 {
 	if (ptr)
 		for (; lp; lp = lp->next)
@@ -524,9 +511,7 @@ Reg	aClient *ptr;
 	return NULL;
 }
 
-Link  *find_channel_link(lp, ptr)
-Reg   Link    *lp;
-Reg   aChannel *ptr; 
+Link  *find_channel_link(Link *lp, aChannel *ptr)
 { 
 	if (ptr)
 		for (; lp; lp = lp->next)
@@ -559,8 +544,7 @@ invLink	*make_invlink()
 	return lp;
 }
 
-void	free_link(lp)
-Reg	Link	*lp;
+void	free_link(Link *lp)
 {
 	MyFree(lp);
 #ifdef	DEBUGMODE
@@ -568,8 +552,7 @@ Reg	Link	*lp;
 #endif
 }
 
-void	free_invlink(lp)
-Reg	invLink	*lp;
+void	free_invlink(invLink *lp)
 {
 	MyFree(lp);
 #ifdef	DEBUGMODE
@@ -588,8 +571,7 @@ aClass	*make_class()
 	return tmp;
 }
 
-void	free_class(tmp)
-Reg	aClass	*tmp;
+void	free_class(aClass *tmp)
 {
 	MyFree(tmp);
 #ifdef	DEBUGMODE
@@ -622,8 +604,7 @@ aConfItem	*make_conf()
 	return (aconf);
 }
 
-void	delist_conf(aconf)
-aConfItem	*aconf;
+void	delist_conf(aConfItem *aconf)
 {
 	if (aconf == conf)
 		conf = conf->next;
@@ -638,8 +619,7 @@ aConfItem	*aconf;
 	aconf->next = NULL;
 }
 
-void	free_conf(aconf)
-aConfItem *aconf;
+void	free_conf(aConfItem *aconf)
 {
 	del_queries((char *)aconf);
 
@@ -667,9 +647,7 @@ aConfItem *aconf;
 }
 
 #ifdef	DEBUGMODE
-void	send_listinfo(cptr, name)
-aClient	*cptr;
-char	*name;
+void	send_listinfo(aClient *cptr, char *name)
 {
 	int	inuse = 0, mem = 0, tmp = 0;
 
@@ -713,9 +691,7 @@ char	*name;
 #endif
 
 
-void	add_fd(fd, ary)
-int	fd;
-FdAry	*ary;
+void	add_fd(int fd, FdAry *ary)
 {
 	Debug((DEBUG_DEBUG,"add_fd(%d,%#x)", fd, ary));
 	if (fd >= 0)
@@ -723,9 +699,7 @@ FdAry	*ary;
 }
 
 
-int	del_fd(fd, ary)
-int	fd;
-FdAry	*ary;
+int	del_fd(int fd, FdAry *ary)
 {
 	int	i;
 
@@ -745,3 +719,4 @@ FdAry	*ary;
 	ary->highest--;
 	return 0;
 }
+

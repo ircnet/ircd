@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.33 2003/10/15 19:55:49 q Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.34 2003/10/18 15:31:29 q Exp $";
 #endif
 
 #include "os.h"
@@ -82,7 +82,7 @@ struct socks_private
  *
  *	Found an open proxy for cl: deal with it!
  */
-static void socks_open_proxy(int cl, char *strver)
+static	void	socks_open_proxy(int cl, char *strver)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
 	char *reason = cldata[cl].instance->reason;
@@ -111,7 +111,7 @@ static void socks_open_proxy(int cl, char *strver)
  *
  *	Add an entry to the cache.
  */
-static void socks_add_cache(int cl, int state)
+static	void	socks_add_cache(int cl, int state)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
 	struct proxylog *next;
@@ -178,7 +178,7 @@ static void socks_add_cache(int cl, int state)
  *
  *	Check cache for an entry.
  */
-static int socks_check_cache(u_int cl)
+static	int	socks_check_cache(u_int cl)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
 	struct proxylog **last, *pl;
@@ -235,7 +235,7 @@ static int socks_check_cache(u_int cl)
 	return 0;
 }
 
-static int socks_write(u_int cl, char *strver)
+static	int	socks_write(u_int cl, char *strver)
 {
 #ifdef	INET6
 	struct socks_private *mydata = cldata[cl].instance->data;
@@ -358,7 +358,7 @@ static int socks_write(u_int cl, char *strver)
 	return 0;
 }
 
-static int socks_read(u_int cl, char *strver)
+static	int	socks_read(u_int cl, char *strver)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
 	u_char state = PROXY_CLOSE;

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_log.c,v 1.9 2003/10/14 20:35:16 q Exp $";
+static  char rcsid[] = "@(#)$Id: a_log.c,v 1.10 2003/10/18 15:31:29 q Exp $";
 #endif
 
 #include "os.h"
@@ -32,8 +32,7 @@ static FILE	*debug = NULL;
 #endif
 static FILE	*authlog = NULL;
 
-void
-init_filelogs()
+void	init_filelogs(void)
 {
 #if defined(IAUTH_DEBUG)
 	if (debug)
@@ -58,16 +57,14 @@ init_filelogs()
 #endif
 }
 
-void
-init_syslog()
+void	init_syslog(void)
 {
 #if defined(USE_SYSLOG)
 	openlog("iauth", LOG_PID|LOG_NDELAY, LOG_FACILITY);
 #endif
 }
 
-void
-vsendto_log(int flags, int slflag, char *pattern, va_list va)
+void	vsendto_log(int flags, int slflag, char *pattern, va_list va)
 {
 	char	logbuf[4096];
 
@@ -106,11 +103,11 @@ vsendto_log(int flags, int slflag, char *pattern, va_list va)
 	    }
 }
 
-void
-sendto_log(int flags, int slflag, char *pattern, ...)
+void	sendto_log(int flags, int slflag, char *pattern, ...)
 {
         va_list va;
         va_start(va, pattern);
         vsendto_log(flags, slflag, pattern, va);
         va_end(va);
 }
+

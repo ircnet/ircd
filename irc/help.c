@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: help.c,v 1.2 1997/09/03 17:45:38 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: help.c,v 1.3 2003/10/18 15:31:27 q Exp $";
 #endif
  
 #include "os.h"
@@ -180,8 +180,7 @@ struct Help helplist[] = {
 
 char helpbuf[80];
 
-void do_help(ptr, temp)
-char *ptr, *temp;
+void	do_help(char *ptr, char *temp)
 {
   struct Help *hptr;
   int count;

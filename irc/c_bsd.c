@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_bsd.c,v 1.6 2001/10/20 17:57:26 q Exp $";
+static  char rcsid[] = "@(#)$Id: c_bsd.c,v 1.7 2003/10/18 15:31:27 q Exp $";
 #endif
 
 #include "os.h"
@@ -39,10 +39,7 @@ static  char rcsid[] = "@(#)$Id: c_bsd.c,v 1.6 2001/10/20 17:57:26 q Exp $";
 
 #define	STDINBUFSIZE (0x80)
 
-int	client_init(host, portnum, cptr)
-char	*host;
-int	portnum;
-aClient	*cptr;
+int	client_init(char *host, int portnum, aClient *cptr)
 {
 	int	sock;
 	static	struct	hostent *hp;
@@ -108,8 +105,7 @@ aClient	*cptr;
 	return(sock);
 }
 
-void client_loop(sock)
-int	sock;
+void	client_loop(int sock)
 {
 	int	i = 0, size, pos;
 	char	apubuf[STDINBUFSIZE+1];
@@ -163,3 +159,4 @@ int	sock;
 #endif /* AUTOMATON */
 	} while (1);
 }
+

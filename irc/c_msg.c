@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_msg.c,v 1.4 2001/10/20 17:57:27 q Exp $";
+static  char rcsid[] = "@(#)$Id: c_msg.c,v 1.5 2003/10/18 15:31:27 q Exp $";
 #endif
  
 #include "os.h"
@@ -30,77 +30,67 @@ static  char rcsid[] = "@(#)$Id: c_msg.c,v 1.4 2001/10/20 17:57:27 q Exp $";
 
 char	mybuf[513];
 
-void m_die() {
-  exit(-1);
-}
-
-int m_mode(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+void	m_die(void)
 {
-  strcpy(mybuf, "*** Mode change ");
-  while (parc--) {
-    strcat(mybuf, parv[0]);
-    strcat(mybuf, " ");
-    parv++;
-  }
-  putline(mybuf);
-  return 0;
+	exit(-1);
 }
 
-int m_wall(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+int	m_mode(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf, "*** #%s# %s", parv[0], parv[1]);
-  putline(mybuf);
-  return 0;
+	strcpy(mybuf, "*** Mode change ");
+	while (parc--)
+	{
+		strcat(mybuf, parv[0]);
+		strcat(mybuf, " ");
+		parv++;
+	}
+	putline(mybuf);
+	return 0;
 }
 
-int m_wallops(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+int	m_wall(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf, "*** =%s= %s %s", parv[0], parv[1],
-                                BadPtr(parv[2]) ? "" : parv[2]);
-  putline(mybuf);
-  return 0;
+	sprintf(mybuf, "*** #%s# %s", parv[0], parv[1]);
+	putline(mybuf);
+	return 0;
 }
 
-int m_ping(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+int	m_wallops(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  if (parv[2] && *parv[2])
-    sendto_one(client, "PONG %s@%s %s", client->user->username,
-	       client->sockhost, parv[2]);
-  else
-    sendto_one(client, "PONG %s@%s", client->user->username, client->sockhost);
-  return 0;
+	sprintf(mybuf, "*** =%s= %s %s", parv[0], parv[1],
+		BadPtr(parv[2]) ? "" : parv[2]);
+	putline(mybuf);
+	return 0;
 }
 
-int m_pong(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+int	m_ping(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf, "*** Received PONG message: %s %s from %s",
-	  parv[1], (parv[2]) ? parv[2] : "", parv[0]);
-  putline(mybuf);
-  return 0;
+	if (parv[2] && *parv[2])
+	{
+		sendto_one(client, "PONG %s@%s %s", client->user->username,
+			client->sockhost, parv[2]);
+	}
+	else
+	{
+		sendto_one(client, "PONG %s@%s", client->user->username,
+			client->sockhost);
+	}
+	return 0;
 }
 
-int	m_nick(sptr, cptr, parc, parv)
-aClient	*sptr, *cptr;
-int	parc;
-char	*parv[];
+int	m_pong(aClient *sptr, aClient *cptr, int parc, char *parv[])
+{
+	sprintf(mybuf, "*** Received PONG message: %s %s from %s",
+		parv[1], (parv[2]) ? parv[2] : "", parv[0]);
+	putline(mybuf);
+	return 0;
+}
+
+int	m_nick(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
 	sprintf(mybuf,"*** Change: %s is now known as %s", parv[0], parv[1]);
-	if (!mycmp(me.name, parv[0])) {
+	if (!mycmp(me.name, parv[0]))
+	{
 		strcpy(me.name, parv[1]);
 		write_statusline();
 	}
@@ -108,43 +98,31 @@ char	*parv[];
 #ifdef AUTOMATON
 	a_nick(parv[0], parv[1]);
 #endif
-  return 0;
+	return 0;
 }
 
-void m_away(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+void	m_away(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf,"*** %s is away: \"%s\"",parv[0], parv[1]);
-  putline(mybuf);
+	sprintf(mybuf,"*** %s is away: \"%s\"",parv[0], parv[1]);
+	putline(mybuf);
 }
 
-int m_server(sptr, cptr, parc, parv)
-aClient *cptr, *sptr;
-int parc;
-char *parv[];
+int	m_server(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf,"*** New server: %s", parv[1]);
-  putline(mybuf);
-  return 0;
+	sprintf(mybuf,"*** New server: %s", parv[1]);
+	putline(mybuf);
+	return 0;
 }
 
-int m_topic(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+int	m_topic(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf, "*** %s changed the topic on %s to: %s",
-	  parv[0], parv[1], parv[2]);
-  putline(mybuf);
-  return 0;
+	sprintf(mybuf, "*** %s changed the topic on %s to: %s",
+		parv[0], parv[1], parv[2]);
+	putline(mybuf);
+	return 0;
 }
 
-int	m_join(sptr, cptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_join(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
 	char *tmp = index(parv[1], '\007');	/* Find o/v mode in 2.9 */
 
@@ -155,150 +133,133 @@ char	*parv[];
 	putline(mybuf);
 	free(querychannel);
 	querychannel = mystrdup(parv[1]);
-  return 0;
+	return 0;
 }
 
-int m_part(sptr, cptr, parc, parv)
-aClient *cptr, *sptr;
-int parc;
-char *parv[];
+int	m_part(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf,"*** Change: %s has left channel %s (%s)", 
-	  parv[0], parv[1], BadPtr(parv[2]) ? parv[1] : parv[2]);
-  putline(mybuf);
-  return 0;
+	sprintf(mybuf,"*** Change: %s has left channel %s (%s)", 
+		parv[0], parv[1], BadPtr(parv[2]) ? parv[1] : parv[2]);
+	putline(mybuf);
+	return 0;
 }
 
-void m_version(sptr, cptr, parc, parv)
-aClient *cptr, *sptr;
-int parc;
-char *parv[];
+void	m_version(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf,"*** Version: %s", parv[1]);
-  putline(mybuf);
+	sprintf(mybuf,"*** Version: %s", parv[1]);
+	putline(mybuf);
 }
 
-void m_bye()
+void	m_bye(void)
 {
 #if defined(DOCURSES) && !defined(AUTOMATON) && !defined(VMSP)
-  echo();
-  nocrmode();
-  clear();
-  refresh();
+	echo();
+	nocrmode();
+	clear();
+	refresh();
 #endif
-  exit(-1);    
+	exit(-1);    
 }
 
-int m_quit(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+int	m_quit(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf,"*** Signoff: %s (%s)", parv[0], parv[1]);
-  putline(mybuf);
+	sprintf(mybuf,"*** Signoff: %s (%s)", parv[0], parv[1]);
+	putline(mybuf);
 #ifdef AUTOMATON
-  a_quit(sender);
+	a_quit(sender);
 #endif
-  return 0;
+	return 0;
 }
 
-int m_kill(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int parc;
-char *parv[];
+int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-  sprintf(mybuf,"*** Kill: %s (%s)", parv[0], parv[2]);
-  putline(mybuf);
-  return 0;
+	sprintf(mybuf,"*** Kill: %s (%s)", parv[0], parv[2]);
+	putline(mybuf);
+	return 0;
 }
 
-void m_info(sptr, cptr, parc, parv)
-aClient *cptr, *sptr;
-int parc;
-char *parv[];
+void	m_info(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf,"*** Info: %s", parv[1]);
-  putline(mybuf);
+	sprintf(mybuf,"*** Info: %s", parv[1]);
+	putline(mybuf);
 }
 
-void m_squit(sptr, cptr, parc, parv)
-aClient *cptr, *sptr;
-int parc;
-char *parv[];
+void	m_squit(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf,"*** Server %s has died. Snif.", parv[1]);
-  putline(mybuf);
+	sprintf(mybuf,"*** Server %s has died. Snif.", parv[1]);
+	putline(mybuf);
 }
 
-void m_newwhoreply(channel, username, host, nickname, away, realname)
-char *channel, *username, *host, *nickname, *away, *realname;
+void	m_newwhoreply(char *channel, char *username, char *host,
+		char *nickname, char *away, char *realname)
 {
-  /* ...dirty hack, just assume all parameters present.. --msa */
+	/* ...dirty hack, just assume all parameters present.. --msa */
 
-  if (*away == 'S')
-    sprintf(mybuf, "  %-13s    %s %-42s %s",
-	"Nickname", "Chan", "Name", "<User@Host>");
-  else {
-    int i;
-    char uh[USERLEN + HOSTLEN + 1];
-    if (!realname)
-      realname = "";
-    if (!username)
-      username = "";
-    i = 50-strlen(realname)-strlen(username);
+	if (*away == 'S')
+	{
+		sprintf(mybuf, "  %-13s    %s %-42s %s",
+			"Nickname", "Chan", "Name", "<User@Host>");
+	}
+	else
+	{
+		int i;
+		char uh[USERLEN + HOSTLEN + 1];
 
-    if (channel[0] == '*')
-	channel = "";
+		if (!realname)
+			realname = "";
+		if (!username)
+			username = "";
+		i = 50-strlen(realname)-strlen(username);
 
-    if (strlen(host) > (size_t) i)       /* kludge --argv */
-	host += strlen(host) - (size_t) i;
+		if (channel[0] == '*')
+			channel = "";
 
-    sprintf(uh, "%s@%s", username, host);
+		if (strlen(host) > (size_t) i)       /* kludge --argv */
+			host += strlen(host) - (size_t) i;
 
-    sprintf(mybuf, "%c %s%s %*s %s %*s",
-	away[0], nickname, away+1,
-	(int)(21-strlen(nickname)-strlen(away)), channel,
-	realname,
-	(int)(53-strlen(realname)), uh);
-  }
+		sprintf(uh, "%s@%s", username, host);
+
+		sprintf(mybuf, "%c %s%s %*s %s %*s",
+			away[0], nickname, away+1,
+			(int)(21-strlen(nickname)-strlen(away)), channel,
+			realname,
+			(int)(53-strlen(realname)), uh);
+	}
 }
 
-void m_newnamreply(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+void	m_newnamreply(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  if (parv[2]) {
-    switch (parv[2][0]) {
-      case '*':
-	sprintf(mybuf,"Prv: %-3s %s", parv[3], parv[4]);
-	break;
-      case '=':
-	sprintf(mybuf,"Pub: %-3s %s", parv[3], parv[4]);
-	break;
-      case '@':
-	sprintf(mybuf,"Sec: %-3s %s", parv[3], parv[4]);
-	break;
-      default:
-	sprintf(mybuf,"???: %s %s %s", parv[3], parv[4], parv[5]);
-	break;
-    }
-  } else
-    sprintf(mybuf, "*** Internal Error: namreply");
+	if (parv[2])
+	{
+		switch (parv[2][0])
+		{
+		case '*':
+			sprintf(mybuf,"Prv: %-3s %s", parv[3], parv[4]);
+			break;
+		case '=':
+			sprintf(mybuf,"Pub: %-3s %s", parv[3], parv[4]);
+			break;
+		case '@':
+			sprintf(mybuf,"Sec: %-3s %s", parv[3], parv[4]);
+			break;
+		default:
+			sprintf(mybuf,"???: %s %s %s", parv[3], parv[4],
+				parv[5]);
+			break;
+		}
+	}
+	else
+	{
+		sprintf(mybuf, "*** Internal Error: namreply");
+	}
 }
 
-void m_linreply(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+void	m_linreply(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf,"*** Server: %s (%s) %s", parv[2], parv[3], parv[4]);
+	sprintf(mybuf,"*** Server: %s (%s) %s", parv[2], parv[3], parv[4]);
 }
 
-int	m_private(sptr, cptr, parc, parv)
-aClient	*sptr, *cptr;
-int	parc;
-char	*parv[];
+int	m_private(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
 	anIgnore *iptr;
 
@@ -330,29 +291,25 @@ char	*parv[];
 }
 
 
-int m_kick(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+int	m_kick(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
 	sprintf(mybuf,"*** %s kicked %s off channel %s (%s)",
 		(parv[0]) ? parv[0] : "*Unknown*",
 		(parv[2]) ? parv[2] : "*Unknown*",
 		(parv[1]) ? parv[1] : "*Unknown*",
 		parv[3]);
-	if (!mycmp(me.name, parv[2])) {
+	if (!mycmp(me.name, parv[2]))
+	{
 		free(querychannel);
 		querychannel = (char *)malloc(strlen(me.name) + 1);
 		strcpy(querychannel, me.name);  /* Kludge? */
 	}
 	putline(mybuf);
-  return 0;
+
+	return 0;
 }
 
-int	m_notice(sptr, cptr, parc, parv)
-aClient	*sptr, *cptr;
-int	parc;
-char	*parv[];
+int	m_notice(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
         anIgnore *iptr;
 
@@ -379,31 +336,28 @@ char	*parv[];
   return 0;
 }
 
-int m_invite(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+int	m_invite(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  anIgnore *iptr;
-  if ((iptr = find_ignore(parv[0], (anIgnore *)NULL, userhost)) &&
-      (iptr->flags & IGNORE_PRIVATE))
-	return 0;
+	anIgnore *iptr;
+
+	if ((iptr = find_ignore(parv[0], (anIgnore *)NULL, userhost)) &&
+		(iptr->flags & IGNORE_PRIVATE))
+	{
+		return 0;
+	}
 #ifdef AUTOMATON
-  a_invite(parv[0], parv[2]);
+	a_invite(parv[0], parv[2]);
 #else
-  sprintf(mybuf,"*** %s Invites you to channel %s", parv[0], parv[2]);
-  putline(mybuf);
+	sprintf(mybuf,"*** %s Invites you to channel %s", parv[0], parv[2]);
+	putline(mybuf);
 #endif
-  return 0;
+	return 0;
 }
 
-int m_error(sptr, cptr, parc, parv)
-aClient *sptr, *cptr;
-int parc;
-char *parv[];
+int	m_error(aClient *sptr, aClient *cptr, int parc, char *parv[])
 {
-  sprintf(mybuf,"*** Error: %s %s", parv[1], (parv[2]) ? parv[2] : "");
-  putline(mybuf);
-  return 0;
+	sprintf(mybuf,"*** Error: %s %s", parv[1], (parv[2]) ? parv[2] : "");
+	putline(mybuf);
+	return 0;
 }
 

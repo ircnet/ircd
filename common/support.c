@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.30 2003/10/17 20:41:30 q Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.31 2003/10/18 15:31:28 q Exp $";
 #endif
 
 #include "os.h"
@@ -35,8 +35,7 @@ static  char rcsid[] = "@(#)$Id: support.c,v 1.30 2003/10/17 20:41:30 q Exp $";
 #endif
 #undef SUPPORT_C
 
-char	*mystrdup(s)
-char	*s;
+char	*mystrdup(char *s)
 {
 	/* Portable strdup(), contributed by mrg, thanks!  -roy */
 
@@ -55,9 +54,7 @@ char	*s;
 **			argv 9/90
 */
 
-char *strtoken(save, str, fs)
-char **save;
-char *str, *fs;
+char	*strtoken(char **save, char *str, char *fs)
 {
     char *pos = *save;	/* keep last position across calls */
     Reg char *tmp;
@@ -91,12 +88,11 @@ char *str, *fs;
 ** NOT encouraged to use!
 */
 
-char *strtok(str, fs)
-char *str, *fs;
+char	*strtok(char *str, char *fs)
 {
-    static char *pos;
+	static char *pos;
 
-    return strtoken(&pos, str, fs);
+	return strtoken(&pos, str, fs);
 }
 
 #endif /* HAVE_STRTOK */
@@ -108,8 +104,7 @@ char *str, *fs;
 **		   argv 11/90
 */
 
-char *strerror(err_no)
-int err_no;
+char	*strerror(int err_no)
 {
 	static	char	buff[40];
 	char	*errp;
@@ -138,8 +133,7 @@ int err_no;
  **
  **/
 
-char	*myctime(value)
-time_t	value;
+char	*myctime(time_t value)
 {
 	static	char	buf[28];
 	Reg	char	*p;
@@ -155,9 +149,7 @@ time_t	value;
 ** mybasename()
 **	removes path from a filename
 */
-char *
-mybasename(path)
-char *path;
+char	*mybasename(char *path)
 {
 	char *lastslash;
 
@@ -174,11 +166,7 @@ char *path;
  *	     or the dotted-decimal notation for IPv4
  *           make sure the compressed representation (rfc 1884) isn't used.
  */
-char *inetntop(af, in, out, the_size)
-int af;
-const void *in;
-char *out;
-size_t the_size;
+char	*inetntop(int af, const void *in, char *out, size_t the_size)
 {
 	static char local_dummy[MYDUMMY_SIZE];
 
@@ -290,8 +278,7 @@ int	inetpton(int af, const char *src, void *dst)
 **	inet_ntoa --	its broken on some Ultrix/Dynix too. -avalon
 */
 
-char	*inetntoa(in)
-char	*in;
+char	*inetntoa(char *in)
 {
 	static	char	buf[16];
 	Reg	u_char	*s = (u_char *)in;
@@ -312,8 +299,7 @@ char	*in;
 **	inet_netof --	return the net portion of an internet number
 **			argv 11/90
 */
-int inetnetof(in)
-struct in_addr in;
+int inetnetof(struct in_addr in)
 {
     register u_long i = ntohl(in.s_addr);
     
@@ -334,9 +320,7 @@ struct in_addr in;
  * Ascii internet address interpretation routine.
  * The value returned is in network order.
  */
-u_long
-inetaddr(cp)
-	register const char *cp;
+u_long	inetaddr(const char *cp)
 {
 	struct in_addr val;
 
@@ -354,10 +338,7 @@ inetaddr(cp)
  * This replaces inet_addr, the return value from which
  * cannot distinguish between failure and a local broadcast address.
  */
-int
-inetaton(cp, addr)
-	register const char *cp;
-	struct in_addr *addr;
+int	inetaton(const char *cp, struct in_addr *addr)
 {
 	register u_long val;
 	register int base, n;
@@ -502,8 +483,7 @@ static	int	mindex = 0;
 #define	SZ_CH	(sizeof(char *))
 #define	SZ_ST	(sizeof(size_t))
 
-char	*MyMalloc(x)
-size_t	x;
+char	*MyMalloc(size_t x)
 {
 	register int	i;
 	register char	**s;
@@ -534,12 +514,10 @@ size_t	x;
 			mindex++;
 	    }
 	return ret + SZ_CHST;
-    }
+}
 
-char    *MyRealloc(x, y)
-char	*x;
-size_t	y;
-    {
+char    *MyRealloc(char *x, size_t y)
+{
 	register int	l;
 	register char	**s;
 	char	*ret, *cp;
@@ -585,7 +563,7 @@ size_t	y;
 			mindex++;
 	    }
 	return ret + SZ_CHST;
-    }
+}
 
 void	MyFree(void *p)
 {
@@ -620,8 +598,7 @@ void	MyFree(void *p)
 		Debug((DEBUG_MALLOC, "%#x !found", x));
 }
 #else
-char	*MyMalloc(x)
-size_t	x;
+char	*MyMalloc(size_t x)
 {
 	char *ret = (char *)malloc(x);
 
@@ -637,10 +614,8 @@ size_t	x;
 	return	ret;
 }
 
-char	*MyRealloc(x, y)
-char	*x;
-size_t	y;
-    {
+char	*MyRealloc(char *x, size_t y)
+{
 	char *ret = (char *)realloc(x, y);
 
 	if (!ret)
@@ -653,7 +628,7 @@ size_t	y;
 # endif
 	    }
 	return ret;
-    }
+}
 #endif
 
 
@@ -669,9 +644,7 @@ size_t	y;
 **	dgets(x,y,0);
 ** to mark the buffer as being empty.
 */
-int	dgets(fd, buf, num)
-int	fd, num;
-char	*buf;
+int	dgets(int fd, char *buf, int num)
 {
 	static	char	dgbuf[8192];
 	static	char	*head = dgbuf, *tail = dgbuf;
@@ -770,7 +743,7 @@ dgetsreturnbuf:
 /*
  * Make 'readable' version string.
  */
-char *make_version()
+char	*make_version(void)
 {
 	int ve, re, mi, dv, pl;
 	char ver[15];
@@ -790,7 +763,7 @@ char *make_version()
 
 #ifndef CLIENT_COMPILE
 /* Make RPL_ISUPPORT (005) numeric contents */
-char **make_isupport()
+char	**make_isupport(void)
 {
 	char **tis;
 	
@@ -826,9 +799,7 @@ char **make_isupport()
  * doesn't have it.  -krys
  * Replacement version from Dave Miller.
  */
-int truncate(path, length)
-const char *path;
-off_t length;
+int	truncate(const char *path, off_t length)
 {
 	int fd, res;
 	fd = open(path, O_WRONLY);
@@ -848,8 +819,7 @@ off_t length;
  */
 #define HBUFSIZE 4096
 
-struct hostent *solaris_gethostbyname(name)
-     const char *name;
+struct hostent	*solaris_gethostbyname(const char *name)
 {
   static struct hostent hp;
   static char buf[HBUFSIZE];
@@ -913,9 +883,7 @@ typedef unsigned char byte;
 #ifdef  __GNUC__
 __inline
 #endif
-static int
-memcmp_bytes (a, b)
-     op_t a, b;
+static int	memcmp_bytes(op_t a, op_t b)
 {
   long int srcp1 = (long int) &a;
   long int srcp2 = (long int) &b;
@@ -939,11 +907,8 @@ memcmp_bytes (a, b)
 #ifdef	__GNUC__
 __inline
 #endif
-static int
-memcmp_common_alignment (srcp1, srcp2, len)
-     long int srcp1;
-     long int srcp2;
-     size_t len;
+static int	memcmp_common_alignment(long int srcp1, long int srcp2,
+			size_t len)
 {
   op_t a0, a1;
   op_t b0, b1;
@@ -1026,11 +991,8 @@ memcmp_common_alignment (srcp1, srcp2, len)
 #ifdef	__GNUC__
 __inline
 #endif
-static int
-memcmp_not_common_alignment (srcp1, srcp2, len)
-     long int srcp1;
-     long int srcp2;
-     size_t len;
+static int	memcmp_not_common_alignment(long int srcp1, long int srcp2,
+		size_t len)
 {
   op_t a0, a1, a2, a3;
   op_t b0, b1, b2, b3;
@@ -1128,11 +1090,7 @@ memcmp_not_common_alignment (srcp1, srcp2, len)
   return 0;
 }
 
-int
-irc_memcmp (s1, s2, len)
-     const __ptr_t s1;
-     const __ptr_t s2;
-     size_t len;
+int	irc_memcmp(const __ptr_t s1, const __ptr_t s2, size_t len)
 {
   op_t a0;
   op_t b0;
@@ -1189,3 +1147,4 @@ irc_memcmp (s1, s2, len)
   return 0;
 }
 #endif /* HAVE_MEMCMP && MEMCMP_BROKEN */
+

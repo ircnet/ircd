@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.66 2003/10/17 21:28:19 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.67 2003/10/18 15:31:25 q Exp $";
 #endif
 
 #include "os.h"
@@ -74,7 +74,7 @@ char		*networkname = NULL;
  * N - Do not resolve hostnames (show as IP).
  * F - Fallthrough to next I:line when password not matched
  */
-long iline_flags_parse(char *string)
+long	iline_flags_parse(char *string)
 {
 	long tmp = 0;
 	
@@ -112,7 +112,7 @@ long iline_flags_parse(char *string)
 }
 
 /* convert iline flags to human readable string */
-char *iline_flags_to_string(long flags)
+char	*iline_flags_to_string(long flags)
 {
 	static char ifsbuf[BUFSIZE];
 	char *s = ifsbuf;
@@ -150,9 +150,7 @@ char *iline_flags_to_string(long flags)
  * remove all conf entries from the client except those which match
  * the status field mask.
  */
-void	det_confs_butmask(cptr, mask)
-aClient	*cptr;
-int	mask;
+void	det_confs_butmask(aClient *cptr, int mask)
 {
 	Reg	Link	*tmp, *tmp2;
 
@@ -169,10 +167,7 @@ int	mask;
  * Now should work for IPv6 too.
  * returns -1 on error, 0 on match, 1 when NO match.
  */
-int    match_ipmask(mask, cptr, maskwithusername)
-char   *mask;
-aClient *cptr;
-int	maskwithusername;
+int    match_ipmask(char *mask, aClient *cptr, int maskwithusername)
 {
 	int	m;
 	char	*p;
@@ -249,10 +244,7 @@ badmask:
 /*
  * find the first (best) I line to attach.
  */
-int	attach_Iline(cptr, hp, sockhost)
-aClient *cptr;
-Reg	struct	hostent	*hp;
-char	*sockhost;
+int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 {
 	Reg	aConfItem	*aconf;
 	Reg	char	*hname;
@@ -363,8 +355,7 @@ attach_iline:
  * Find the single N line and return pointer to it (from list).
  * If more than one then return NULL pointer.
  */
-aConfItem	*count_cnlines(lp)
-Reg	Link	*lp;
+aConfItem	*count_cnlines(Link *lp)
 {
 	Reg	aConfItem	*aconf, *cline = NULL, *nline = NULL;
 
@@ -387,9 +378,7 @@ Reg	Link	*lp;
 **	Disassociate configuration from the client.
 **      Also removes a class from the list if marked for deleting.
 */
-int	detach_conf(cptr, aconf)
-aClient *cptr;
-aConfItem *aconf;
+int	detach_conf(aClient *cptr, aConfItem *aconf)
 {
 	Reg	Link	**lp, *tmp;
 	aConfItem **aconf2,*aconf3;
@@ -441,9 +430,7 @@ aConfItem *aconf;
 	return -1;
 }
 
-static	int	is_attached(aconf, cptr)
-aConfItem *aconf;
-aClient *cptr;
+static	int	is_attached(aConfItem *aconf, aClient *cptr)
 {
 	Reg	Link	*lp;
 
@@ -461,9 +448,7 @@ aClient *cptr;
 **	connection). Note, that this automaticly changes the
 **	attachment if there was an old one...
 */
-int	attach_conf(cptr, aconf)
-aConfItem *aconf;
-aClient *cptr;
+int	attach_conf(aClient *cptr, aConfItem *aconf)
 {
 	Reg	Link	*lp;
 
@@ -558,8 +543,8 @@ aClient *cptr;
 }
 
 
-aConfItem *find_admin()
-    {
+aConfItem	*find_admin(void)
+{
 	Reg	aConfItem	*aconf;
 
 	for (aconf = conf; aconf; aconf = aconf->next)
@@ -567,17 +552,17 @@ aConfItem *find_admin()
 			break;
 	
 	return (aconf);
-    }
+}
 
-aConfItem *find_me()
-    {
+aConfItem	*find_me(void)
+{
 	Reg	aConfItem	*aconf;
 	for (aconf = conf; aconf; aconf = aconf->next)
 		if (aconf->status & CONF_ME)
 			break;
 	
 	return (aconf);
-    }
+}
 
 /*
  * attach_confs
@@ -585,10 +570,7 @@ aConfItem *find_me()
  * the conf file (for non-C/N lines) or is an exact match (C/N lines
  * only).  The difference in behaviour is to stop C:*::* and N:*::*.
  */
-aConfItem *attach_confs(cptr, name, statmask)
-aClient	*cptr;
-char	*name;
-int	statmask;
+aConfItem	*attach_confs(aClient *cptr, char *name, int statmask)
 {
 	Reg	aConfItem	*tmp;
 	aConfItem	*first = NULL;
@@ -619,10 +601,7 @@ int	statmask;
 /*
  * Added for new access check    meLazy
  */
-aConfItem *attach_confs_host(cptr, host, statmask)
-aClient *cptr;
-char	*host;
-int	statmask;
+aConfItem	*attach_confs_host(aClient *cptr, char *host, int statmask)
 {
 	Reg	aConfItem *tmp;
 	aConfItem *first = NULL;
@@ -654,9 +633,8 @@ int	statmask;
 /*
  * find a conf entry which matches the hostname and has the same name.
  */
-aConfItem *find_conf_exact(name, user, host, statmask)
-char	*name, *host, *user;
-int	statmask;
+aConfItem	*find_conf_exact(char *name, char *user, char *host, 
+		int statmask)
 {
 	Reg	aConfItem *tmp;
 	char	userhost[USERLEN+HOSTLEN+3];
@@ -693,9 +671,7 @@ int	statmask;
 /*
  * find an O-line which matches the hostname and has the same "name".
  */
-aConfItem *find_Oline(name, cptr)
-char	*name;
-aClient	*cptr;
+aConfItem	*find_Oline(char *name, aClient *cptr)
 {
 	Reg	aConfItem *tmp;
 	char	userhost[USERLEN+HOSTLEN+3];
@@ -732,9 +708,7 @@ aClient	*cptr;
 }
 
 
-aConfItem *find_conf_name(name, statmask)
-char	*name;
-int	statmask;
+aConfItem	*find_conf_name(char *name, int statmask)
 {
 	Reg	aConfItem *tmp;
  
@@ -753,10 +727,7 @@ int	statmask;
 	return NULL;
 }
 
-aConfItem *find_conf(lp, name, statmask)
-char	*name;
-Link	*lp;
-int	statmask;
+aConfItem	*find_conf(Link *lp, char *name, int statmask)
 {
 	Reg	aConfItem *tmp;
 	int	namelen = name ? strlen(name) : 0;
@@ -782,10 +753,7 @@ int	statmask;
 /*
  * Added for new access check    meLazy
  */
-aConfItem *find_conf_host(lp, host, statmask)
-Reg	Link	*lp;
-char	*host;
-Reg	int	statmask;
+aConfItem	*find_conf_host(Link *lp, char *host, int statmask)
 {
 	Reg	aConfItem *tmp;
 	int	hostlen = host ? strlen(host) : 0;
@@ -811,10 +779,7 @@ Reg	int	statmask;
  * Find a conf line using the IP# stored in it to search upon.
  * Added 1/8/92 by Avalon.
  */
-aConfItem *find_conf_ip(lp, ip, user, statmask)
-char	*ip, *user;
-Link	*lp;
-int	statmask;
+aConfItem	*find_conf_ip(Link *lp, char *ip, char *user, int statmask)
 {
 	Reg	aConfItem *tmp;
 	Reg	char	*s;
@@ -845,9 +810,7 @@ int	statmask;
  *
  * - looks for a match on all given fields.
  */
-aConfItem *find_conf_entry(aconf, mask)
-aConfItem *aconf;
-u_int	mask;
+aConfItem	*find_conf_entry(aConfItem *aconf, u_int mask)
 {
 	Reg	aConfItem *bconf;
 
@@ -886,9 +849,7 @@ u_int	mask;
  * as a result of an operator issuing this command, else assume it has been
  * called as a result of the server receiving a HUP signal.
  */
-int	rehash(cptr, sptr, sig)
-aClient	*cptr, *sptr;
-int	sig;
+int	rehash(aClient *cptr, aClient *sptr, int sig)
 {
 	Reg	aConfItem **tmp = &conf, *tmp2 = NULL;
 	Reg	aClass	*cltmp;
@@ -991,7 +952,7 @@ int	sig;
  * configuration file from.  This may either be the file direct or one end
  * of a pipe from m4.
  */
-int	openconf()
+int	openconf(void)
 {
 	int ret;
 #ifdef	M4_PREPROC
@@ -1063,8 +1024,7 @@ int	openconf()
 */
 
 #ifdef	INET6
-char	*ipv6_convert(orig)
-char	*orig;
+char	*ipv6_convert(char *orig)
 {
 	char	*s, *t, *buf = NULL;
 	int	i, j;
@@ -1129,8 +1089,7 @@ char	*orig;
 
 #define MAXCONFLINKS 150
 
-int 	initconf(opt)
-int	opt;
+int 	initconf(int opt)
 {
 	static	char	quotes[9][2] = {{'b', '\b'}, {'f', '\f'}, {'n', '\n'},
 					{'r', '\r'}, {'t', '\t'}, {'v', '\v'},
@@ -1541,8 +1500,7 @@ int	opt;
  *   Do (start) DNS lookups of all hostnames in the conf line and convert
  * an IP addresses in a.b.c.d number for to IP#s.
  */
-static	int	lookup_confhost(aconf)
-Reg	aConfItem	*aconf;
+static	int	lookup_confhost(aConfItem *aconf)
 {
 	Reg	char	*s;
 	Reg	struct	hostent *hp;
@@ -1604,10 +1562,7 @@ badlookup:
 	return -1;
 }
 
-int	find_kill(cptr, doall, comment)
-aClient	*cptr;
-int	doall;
-char	**comment;
+int	find_kill(aClient *cptr, int doall, char **comment)
 {
 	static char	reply[256];
 	char		*host, *ip, *name, *ident, *check;
@@ -1734,9 +1689,7 @@ char	**comment;
  * For type stat, check if both name and host masks match.
  * Return -1 for match, 0 for no-match.
  */
-int	find_two_masks(name, host, stat)
-char	*name, *host;
-int	stat;
+int	find_two_masks(char *name, char *host, int stat)
 {
 	aConfItem *tmp;
 
@@ -1753,9 +1706,7 @@ int	stat;
  * to chars in passwd field.
  * Return -1 for match, 0 for no-match.
  */
-int	find_conf_flags(name, key, stat)
-char	*name, *key;
-int	stat;
+int	find_conf_flags(char *name, char *key, int stat)
 {
 	aConfItem *tmp;
 	int l;
@@ -1777,8 +1728,7 @@ int	stat;
 ** check against a set of time intervals
 */
 
-static	int	check_time_interval(interval, reply)
-char	*interval, *reply;
+static	int	check_time_interval(char *interval, char *reply)
 {
 	struct tm *tptr;
  	char	*p;
@@ -1842,9 +1792,7 @@ char	*interval, *reply;
 **	fd == -1 : not fd, class is a class number.
 **	fd == -2 : not fd, class isn't a class number.
 */
-void	find_bounce(cptr, class, fd)
-aClient *cptr;
-int	class, fd;
+void	find_bounce(aClient *cptr, int class, int fd)
 {
 	Reg	aConfItem	*aconf;
 
@@ -1920,10 +1868,7 @@ int	class, fd;
 **	for a given server name, make sure no D line matches any of the
 **	servers currently present on the net.
 */
-aConfItem *
-find_denied(name, class)
-    char *name;
-    int class;
+aConfItem	*find_denied(char *name, int class)
 {
     aConfItem	*aconf;
 
@@ -1962,3 +1907,4 @@ find_denied(name, class)
 	}
     return NULL;
 }
+

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: swear.c,v 1.4 1998/12/13 00:02:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: swear.c,v 1.5 2003/10/18 15:31:28 q Exp $";
 #endif
  
 /* Curses replacement routines. Uses termcap */
@@ -42,17 +42,14 @@ static char *irc_termname;
 static int currow = 0;
 int irc_lines, irc_columns, scroll_ok = 0, scroll_status = 0;
 
-void tcap_putch(row, col, ch)
-int row, col;
-char ch;
+void	tcap_putch(int row, int col, char ch)
 {
   tcap_move(row, col);
   putchar(ch);
   fflush(stdout);
 }
 
-void tcap_move(row, col)
-int row, col;
+void	tcap_move(int row, int col)
 {
   cls = codes;
   tgetstr("cm",&cls);
@@ -63,8 +60,7 @@ int row, col;
   fflush(stdout);
 }
 
-void clear_to_eol(row, col)
-int row, col;
+void	clear_to_eol(int row, int col)
 {
   tcap_move(row, col);
   cls = codes;
@@ -73,7 +69,7 @@ int row, col;
   fflush(stdout);
 }
 
-void clearscreen()
+void	clearscreen(void)
 {
   cls = codes;
   tgetstr("cl",&cls);
@@ -82,9 +78,7 @@ void clearscreen()
   currow = 0;
 }
   
-int
-io_on(flag)
-int flag;
+int	io_on(int flag)
 {
 /*  if (ioctl(0, TIOCGETP, &oldtty) == -1) {
     perror("ioctl");
@@ -105,8 +99,7 @@ int flag;
   return(0);
 }
 
-int
-io_off()
+int	io_off(void)
 {
   if (scroll_ok)
     scroll_ok_off();
@@ -115,7 +108,7 @@ io_off()
   return(0);
 }
 
-void scroll_ok_off()
+void	scroll_ok_off(void)
 {
   cls = codes;
   tgetstr("cs",&cls);
@@ -124,7 +117,7 @@ void scroll_ok_off()
   scroll_ok = 0;
 }
 
-void scroll_ok_on()
+void	scroll_ok_on(void)
 {
   cls = codes;
   tgetstr("cm",&cls);
@@ -138,8 +131,7 @@ void scroll_ok_on()
   scroll_ok = scroll_status = 1;
 }
 
-void put_insflag(flag)
-int flag;
+void	put_insflag(int flag)
 {
   flag = insert;
   tcap_move(-2, irc_columns - 5);
@@ -153,7 +145,7 @@ int flag;
   fflush(stdout);
 }
   
-void put_statusline()
+void	put_statusline(void)
 {
   tcap_move (-2, 0);
     cls = codes;
@@ -166,8 +158,7 @@ void put_statusline()
   fflush(stdout);
 }
 
-void tcap_putline(line)
-char *line;
+void	tcap_putline(char *line)
 {
   char *ptr = line, *ptr2, *newl;
   char ch='\0';
@@ -214,3 +205,4 @@ char *line;
 }
 
 #endif /* DO_TERMCAP */
+

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: edit.c,v 1.2 1997/09/03 17:45:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: edit.c,v 1.3 2003/10/18 15:31:27 q Exp $";
 #endif
  
 #include "os.h"
@@ -35,8 +35,7 @@ static  char rcsid[] = "@(#)$Id: edit.c,v 1.2 1997/09/03 17:45:37 kalt Exp $";
 static int esc=0;
 static int literal=0;
 
-int do_char(ch)
-char ch;
+int	do_char(char ch)
 {
 	static	int	first_time=0;
 
@@ -141,28 +140,28 @@ char ch;
 	return tulosta_viimeinen_rivi();
 }
 
-void bol()
+void	bol(void)
 {
 	set_position(0, FROM_START);
 }
 
-void eol()
+void	eol(void)
 {
 	set_position(0, FROM_END);
 	set_position(1, RELATIVE);
 }
 
-void back_ch()
+void	back_ch(void)
 {
 	set_position(-1, RELATIVE);
 }
 
-void forw_ch()
+void	forw_ch(void)
 {
 	set_position(1, RELATIVE);
 }
 
-void rev_line()
+void	rev_line(void)
 {
 	int	i1, i2, i3, i4;
 
@@ -173,14 +172,15 @@ void rev_line()
 	i1 = get_position()-i1;
 	set_position(i4, FROM_START);
 
-	for (i2 = 0; i2 > i1/2; i2++) {
+	for (i2 = 0; i2 > i1/2; i2++)
+	{
 		i3 = get_char(i2);
 		set_char(i2, get_char(i1-i2-1));
 		set_char(i1-i2-1, i3);
 	}
 }
 
-void del_ch_right()
+void	del_ch_right(void)
 {
 	int	i1, i2, i3;
 
@@ -196,7 +196,7 @@ void del_ch_right()
 	set_position(i1, FROM_START);
 }
 
-void del_ch_left()
+void	del_ch_left(void)
 {
 	int	i1, i2, i3;
 
@@ -213,8 +213,7 @@ void del_ch_left()
 	set_position(-1, RELATIVE);
 }
 
-RETSIGTYPE suspend_irc(s)
-int s;
+RETSIGTYPE	suspend_irc(int s)
 {
 #ifdef SIGTSTP
 	signal(SIGTSTP, suspend_irc);
@@ -254,15 +253,15 @@ int s;
 #endif /* || */
 }
 
-void got_esc()
+void	got_esc(void)
 {
 	esc = 1;
 }
 
-void do_after_esc(ch)
-char ch;
+void	do_after_esc(char ch)
 {
-	if (literal) {
+	if (literal)
+	{
 		literal = 0;
 		add_ch(ch);
 		return;
@@ -290,7 +289,7 @@ char ch;
 	}
 }
 
-void refresh_screen()
+void	refresh_screen(void)
 {
 #ifdef DOCURSES
 	if (termtype == CURSES_TERM) {
@@ -300,12 +299,12 @@ void refresh_screen()
 #endif
 }
 
-void add_ch(ch)
-int	ch;
+void	add_ch(int ch)
 {
 	int	i1, i2, i3;
 
-	if (in_insert_mode()) {
+	if (in_insert_mode())
+	{
 		i1 = get_position();
 		set_position(0, FROM_END);
 		i2 = get_position();
@@ -314,7 +313,9 @@ int	ch;
 		set_char(i1, ch);
 		set_position(i1, FROM_START);
 		set_position(1, RELATIVE);
-	} else {
+	}
+	else
+	{
 		i1 = get_position();
 		set_char(i1, ch);
 		set_position(i1, FROM_START);
@@ -322,13 +323,13 @@ int	ch;
 	}
 }
 
-void literal_next()
+void	literal_next(void)
 {
 	got_esc();
 	literal=1;
 }
 
-void word_forw()
+void	word_forw(void)
 {
 	int	i1,i2;
 
@@ -349,7 +350,7 @@ void word_forw()
 	set_position(i1, FROM_START);
 }
 
-void word_back()
+void	word_back(void)
 {
 	int	i1,i2;
 
@@ -376,7 +377,7 @@ void word_back()
 	set_position(i1, FROM_START);
 }
 
-void del_word_left()
+void	del_word_left(void)
 {
 	int	i1, i2, i3, i4;
 
@@ -392,7 +393,7 @@ void del_word_left()
 	set_position(i2, FROM_START);
 }
 
-void del_word_right()
+void	del_word_right(void)
 {
 	int	i1, i2, i3, i4;
 

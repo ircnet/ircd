@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.162 2003/10/17 21:28:20 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.163 2003/10/18 15:31:27 q Exp $";
 #endif
 
 #include "os.h"
@@ -108,11 +108,13 @@ static int user_modes[]	     = { FLAGS_OPER, 'o',
 **
 **	for (x = client; x = next_client(x,mask); x = x->next)
 **		HandleMatchingClient;
+**
+** Parameters:
+**	aClient *next	First client to check
+**	char	*ch	Search string (may include wilds)
 **	      
 */
-aClient *next_client(next, ch)
-Reg	aClient *next;	/* First client to check */
-Reg	char	*ch;	/* search string (may include wilds) */
+aClient	*next_client(aClient *next, char *ch)
 {
 	Reg	aClient	*tmp = next;
 
@@ -148,11 +150,9 @@ Reg	char	*ch;	/* search string (may include wilds) */
 **
 **	returns: (see #defines)
 */
-int	hunt_server(cptr, sptr, command, server, parc, parv)
-aClient	*cptr, *sptr;
-char	*command, *parv[];
-int	server, parc;
-    {
+int	hunt_server(aClient *cptr, aClient *sptr, char *command, int server,
+		int parc, char *parv[])
+{
 	aClient *acptr;
 
 	/*
@@ -216,7 +216,7 @@ int	server, parc;
 	    } 
 	sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), parv[server]);
 	return(HUNTED_NOSUCH);
-    }
+}
 
 /*
 ** 'do_nick_name' ensures that the given parameter (nick) is
@@ -240,9 +240,7 @@ int	server, parc;
 **	result if only few servers allowed it...
 */
 
-int	do_nick_name(nick, server)
-char	*nick;
-int	server;
+int	do_nick_name(char *nick, int server)
 {
 	Reg	char	*ch;
 
@@ -281,8 +279,7 @@ int	server;
 ** reduce a string of duplicate list entries to contain only the unique
 ** items.  Unavoidably O(n^2).
 */
-char	*canonize(buffer)
-char	*buffer;
+char	*canonize(char *buffer)
 {
 	static	char	cbuf[BUFSIZ];
 	Reg	char	*s, *t, *cp = cbuf;
@@ -342,10 +339,7 @@ char	*buffer;
 **	   nick from local user or kill him/her...
 */
 
-int	register_user(cptr, sptr, nick, username)
-aClient	*cptr;
-aClient	*sptr;
-char	*nick, *username;
+int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 {
 	Reg	aConfItem *aconf;
 	aClient	*acptr;
@@ -757,10 +751,7 @@ char	*nick, *username;
 **	parv[6] = users mode
 **	parv[7] = users real name info
 */
-int	m_nick(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	int	delayed = 0;
@@ -1216,10 +1207,7 @@ nickkilldone:
 **	parv[6] = users mode
 **	parv[7] = users real name info
 */
-int	m_unick(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	char	*uid, nick[NICKLEN+2], *user, *host, *realname;
@@ -1424,10 +1412,8 @@ char	*parv[];
 **
 */
 
-static	int	m_message(cptr, sptr, parc, parv, notice)
-aClient *cptr, *sptr;
-char	*parv[];
-int	parc, notice;
+static	int	m_message(aClient *cptr, aClient *sptr, int parc,
+		char *parv[], int notice)
 {
 	Reg	aClient	*acptr;
 	Reg	char	*s;
@@ -1684,10 +1670,7 @@ int	parc, notice;
 **	parv[2] = message text
 */
 
-int	m_private(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_private(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	return m_message(cptr, sptr, parc, parv, 0);
 }
@@ -1699,10 +1682,7 @@ char	*parv[];
 **	parv[2] = notice text
 */
 
-int	m_notice(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_notice(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	return m_message(cptr, sptr, parc, parv, 1);
 }
@@ -1711,10 +1691,8 @@ char	*parv[];
 ** who_one
 **	sends one RPL_WHOREPLY to sptr concerning acptr & repchan
 */
-static	void	who_one(sptr, acptr, repchan, lp)
-aClient *sptr, *acptr;
-aChannel *repchan;
-Link *lp;
+static	void	who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
+		Link *lp)
 {
 	char	status[5];
 	int	i = 0;
@@ -1877,10 +1855,7 @@ static	void	who_find(aClient *sptr, char *mask, int oper)
 **	parv[1] = nickname mask list
 **	parv[2] = additional selection flag, only 'o' for now.
 */
-int	m_who(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aChannel *chptr;
 	int	oper = parc > 2 ? (*parv[2] == 'o' ): 0; /* Show OPERS only */
@@ -2005,9 +1980,7 @@ char	*parv[];
 }
 
 /* send_whois() is used by m_whois() to send whois reply to sptr, for acptr */
-static void
-send_whois(sptr, acptr)
-aClient	*sptr, *acptr;
+static	void	send_whois(aClient *sptr, aClient *acptr)
 {
 	static anUser UnknownUser =
 	    {
@@ -2099,10 +2072,7 @@ aClient	*sptr, *acptr;
 **	parv[0] = sender prefix
 **	parv[1] = nickname masklist
 */
-int	m_whois(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_whois(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Link	*lp;
 	aClient *acptr;
@@ -2231,10 +2201,7 @@ char	*parv[];
 **	parv[5] = users mode (is only used internally by the server,
 **		  NULL otherwise)
 */
-int	m_user(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 #define	UFLAGS	(FLAGS_INVISIBLE|FLAGS_WALLOP|FLAGS_RESTRICT)
 	struct umodes_arr_s
@@ -2447,11 +2414,8 @@ user_finish:
 **	parv[0] = sender prefix
 **	parv[1] = comment
 */
-int	m_quit(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_quit(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	static	char	quitc[] = "I Quit";
 	register char *comment = (parc > 1 && parv[1]) ? parv[1] : quitc;
 
@@ -2462,7 +2426,7 @@ char	*parv[];
 	if (strlen(comment) > (size_t) TOPICLEN)
 		comment[TOPICLEN] = '\0';
 	return IsServer(sptr) ? 0 : exit_client(cptr, sptr, sptr, comment);
-    }
+}
 
 /*
 ** m_kill
@@ -2470,10 +2434,7 @@ char	*parv[];
 **	parv[1] = kill victim
 **	parv[2] = kill path
 */
-int	m_kill(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr = NULL;
 	char	*inpath = cptr->name;
@@ -2673,10 +2634,7 @@ char	*parv[];
 **	parv[0] = sender prefix
 **	parv[1] = away message
 */
-int	m_away(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	char	*away, *awy2 = parv[1];
 	int	len;
@@ -2750,10 +2708,7 @@ char	*parv[];
 **	parv[1] = origin
 **	parv[2] = destination
 */
-int	m_ping(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_ping(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	char	*origin, *destination;
@@ -2795,10 +2750,7 @@ char	*parv[];
 **	parv[1] = origin
 **	parv[2] = destination
 */
-int	m_pong(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_pong(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	char	*origin, *destination;
@@ -2856,10 +2808,7 @@ char	*parv[];
 **	parv[1] = oper name
 **	parv[2] = oper password
 */
-int	m_oper(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aConfItem *aconf;
 	char	*name, *password, *encr;
@@ -3043,11 +2992,8 @@ char	*parv[];
 **	parv[3] = server id & options (server only)
 **	parv[4] = (optional) link options (server only)                  
 */
-int	m_pass(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_pass(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	char *password = parc > 1 ? parv[1] : NULL;
 
 	if (BadPtr(password))
@@ -3075,17 +3021,14 @@ char	*parv[];
 	    }
 	strncpyzt(cptr->passwd, password, sizeof(cptr->passwd));
 	return 1;
-    }
+}
 
 /*
  * m_userhost added by Darren Reed 13/8/91 to aid clients and reduce
  * the need for complicated requests like WHOIS. It returns user/host
  * information only (no spurious AWAY labels or channels).
  */
-int	m_userhost(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_userhost(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char	*p = NULL;
 	aClient	*acptr;
@@ -3146,10 +3089,7 @@ char	*parv[];
  * ISON :nicklist
  */
 
-int	m_ison(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_ison(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aClient *acptr;
 	Reg	char	*s, **pav = parv;
@@ -3188,10 +3128,7 @@ char	*parv[];
  * parv[1] - username to change mode for
  * parv[2] - modes to change
  */
-int	m_umode(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	int	flag;
 	Reg	int	*s;
@@ -3390,10 +3327,8 @@ char	*parv[];
  * send the MODE string for user (user) to connection cptr
  * -avalon
  */
-void	send_umode(cptr, sptr, old, sendmask, umode_buf)
-aClient *cptr, *sptr;
-int	old, sendmask;
-char	*umode_buf;
+void	send_umode(aClient *cptr, aClient *sptr, int old, int sendmask,
+		char *umode_buf)
 {
 	Reg	int	*s, flag;
 	Reg	char	*m;
@@ -3443,9 +3378,7 @@ char	*umode_buf;
 /*
  * added Sat Jul 25 07:30:42 EST 1992
  */
-void	send_umode_out(cptr, sptr, old)
-aClient *cptr, *sptr;
-int	old;
+void	send_umode_out(aClient *cptr, aClient *sptr, int old)
 {
 	Reg	int	i;
 	Reg	aClient	*acptr;
@@ -3484,10 +3417,7 @@ int	old;
 ** It will adjust the path, to include the link we got the SAVE message from.
 ** For internal calls, set cptr to NULL.
 */
-static void
-save_user(cptr, sptr, path)
-aClient *cptr, *sptr;
-char *path;
+static	void	save_user(aClient *cptr, aClient *sptr, char *path)
 {
 	if (MyConnect(sptr))
 	{
@@ -3541,3 +3471,4 @@ int	m_save(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	return 0;
 }
+

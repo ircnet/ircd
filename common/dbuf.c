@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.9 2003/10/18 13:02:25 jv Exp $";
+static  char rcsid[] = "@(#)$Id: dbuf.c,v 1.10 2003/10/18 15:31:28 q Exp $";
 #endif
 
 /*
@@ -56,7 +56,7 @@ dbufbuf	*freelist = NULL;
    mika@cs.caltech.edu 6/24/95
 */
 
-void dbuf_init()
+void	dbuf_init(void)
 {
 	dbufbuf *dbp;
 	int i = 0, nb;
@@ -84,8 +84,7 @@ void dbuf_init()
 ** creates a new one.
 ** Return: 0 on success, -1 on fatal alloc error, -2 on pool exceeding
 */
-static int dbuf_alloc(dbptr)
-dbufbuf **dbptr;
+static	int	dbuf_alloc(dbufbuf **dbptr)
 {
 #ifndef	CLIENT_COMPILE
 	if (istat.is_dbufuse++ == istat.is_dbufmax)
@@ -122,8 +121,7 @@ dbufbuf **dbptr;
 /*
 ** dbuf_free - return a dbufbuf structure to the freelist
 */
-static	void	dbuf_free(ptr)
-Reg	dbufbuf	*ptr;
+static	void	dbuf_free(dbufbuf *ptr)
 {
 #ifndef	CLIENT_COMPILE
 	istat.is_dbufuse--;
@@ -139,9 +137,8 @@ Reg	dbufbuf	*ptr;
 ** there is no reason to continue this buffer...). After this
 ** the "dbuf" has consistent EMPTY status... ;)
 */
-int dbuf_malloc_error(dyn)
-dbuf *dyn;
-    {
+int dbuf_malloc_error(dbuf *dyn)
+{
 	dbufbuf *p;
 
 	dyn->length = 0;
@@ -155,7 +152,7 @@ dbuf *dyn;
 	dyn->tail = dyn->head;
 #endif
 	return -1;
-    }
+}
 
 
 /*
@@ -166,11 +163,14 @@ dbuf *dyn;
 **
 **	returns	> 0, if operation successfull
 **		< 0, if failed (due memory allocation problem)
+**
+** Parameters:
+**	dbuf	*dyn		Dynamic buffer header
+**	char	*buf		Pointer to data to be stored
+**	int	length		Number of bytes to store
+**
 */
-int	dbuf_put(dyn, buf, length)
-dbuf	*dyn;          /* Dynamic buffer header */
-char	*buf;          /* Pointer to data to be stored */
-int	length;        /* Number of bytes to store */
+int	dbuf_put(dbuf *dyn, char *buf, int length)
 {
 	Reg	dbufbuf	**h;
 	dbufbuf *d;
@@ -277,11 +277,15 @@ int	length;        /* Number of bytes to store */
 **
 **	Note: 	delete can be used alone, there is no real binding
 **		between map and delete functions...
+**
+** Parameters:
+**
+**	dbuf	*dyn		Dynamic buffer header
+**	int	*length		Return number of bytes accessible
+**
 */
-char	*dbuf_map(dyn,length)
-dbuf	*dyn;                   /* Dynamic buffer header */
-int	*length;                /* Return number of bytes accessible */
-    {
+char	*dbuf_map(dbuf *dyn, int *length)
+{
 	if (dyn->head == NULL)
 	    {
 #ifdef DBUF_TAIL
@@ -294,12 +298,16 @@ int	*length;                /* Return number of bytes accessible */
 	if (*length > dyn->length)
 		*length = dyn->length;
 	return (dyn->head->data + dyn->offset);
-    }
+}
 
-int	dbuf_delete(dyn,length)
-dbuf	*dyn;                  /* Dynamic buffer header */
-int	length;                /* Number of bytes to delete */
-    {
+/*
+** Parameters:
+**
+**	dbuf	*dyn		Dynamic buffer header
+**	int	length		Number of bytes to delete
+*/
+int	dbuf_delete(dbuf *dyn, int length)
+{
 	dbufbuf *d;
 	int chunk;
 
@@ -334,7 +342,7 @@ int	length;                /* Number of bytes to delete */
 	}
 #endif
 	return 0;
-    }
+}
 
 /*
 ** dbuf_get
@@ -350,12 +358,15 @@ int	length;                /* Number of bytes to delete */
 **
 **		Negative return values indicate some unspecified
 **		error condition, rather fatal...
+**
+**  Parameters:
+**
+**	dbuf	*dyn		Dynamic buffer header
+**	char	*buf		Pointer to buffer to receive the data
+**	int	length		Max amount of bytes that can be received
 */
-int	dbuf_get(dyn, buf, length)
-dbuf	*dyn;            /* Dynamic buffer header */
-char	*buf;            /* Pointer to buffer to receive the data */
-int	length;          /* Max amount of bytes that can be received */
-    {
+int	dbuf_get(dbuf *dyn, char *buf, int length)
+{
 	int	moved = 0;
 	int	chunk;
 	char	*b;
@@ -371,13 +382,10 @@ int	length;          /* Max amount of bytes that can be received */
 		moved += chunk;
 	    }
 	return moved;
-    }
+}
 
 /*
-int	dbuf_copy(dyn, buf, length)
-dbuf	*dyn;
-register char	*buf;
-int	length;
+int	dbuf_copy(dbuf *dyn, char *buf, int length)
 {
 	register dbufbuf	*d = dyn->head;
 	register char	*s;
@@ -417,10 +425,7 @@ int	length;
 ** either a \r or \n prsent.  If so, copy as much as possible (determined by
 ** length) into buf and return the amount copied - else return 0.
 */
-int	dbuf_getmsg(dyn, buf, length)
-dbuf	*dyn;
-char	*buf;
-register int	length;
+int	dbuf_getmsg(dbuf *dyn, char *buf, int length)
 {
 	dbufbuf	*d;
 	register char	*s;
@@ -489,3 +494,4 @@ getmsg_init:
 
 	return i;
 }
+

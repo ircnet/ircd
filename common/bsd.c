@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: bsd.c,v 1.7 2003/10/18 13:01:51 jv Exp $";
+static  char rcsid[] = "@(#)$Id: bsd.c,v 1.8 2003/10/18 15:31:28 q Exp $";
 #endif
 
 #include "os.h"
@@ -39,8 +39,7 @@ static  char rcsid[] = "@(#)$Id: bsd.c,v 1.7 2003/10/18 13:01:51 jv Exp $";
 #ifdef DEBUGMODE
 int	writecalls = 0, writeb[10] = {0,0,0,0,0,0,0,0,0,0};
 #endif
-RETSIGTYPE dummy(s)
-int s;
+RETSIGTYPE	dummy(int s)
 {
 #ifndef HAVE_RELIABLE_SIGNALS
 	(void)signal(SIGALRM, dummy);
@@ -91,11 +90,8 @@ int s;
 **		work equally well whether blocking or non-blocking
 **		mode is used...
 */
-int	deliver_it(cptr, str, len)
-aClient *cptr;
-int	len;
-char	*str;
-    {
+int	deliver_it(aClient *cptr, char *str, int len)
+{
 	int	retval;
 	aClient	*acpt = cptr->acpt;
 
@@ -162,3 +158,4 @@ char	*str;
 	    }
 	return(retval);
 }
+

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: iauth.c,v 1.13 2003/10/15 19:55:48 q Exp $";
+static  char rcsid[] = "@(#)$Id: iauth.c,v 1.14 2003/10/18 15:31:29 q Exp $";
 #endif
 
 #include "os.h"
@@ -132,9 +132,7 @@ static	void	init_signals()
 #endif
 }
 
-int	main(argc, argv)
-int	argc;
-char	*argv[];
+int	main(int argc, char *argv[])
 {
 	time_t	nextst = time(NULL) + 90;
 	char *xopt;
@@ -221,3 +219,4 @@ char	*argv[];
 		    }
 	    }
 }
+

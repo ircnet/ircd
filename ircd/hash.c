@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.30 2003/10/17 17:58:06 q Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.31 2003/10/18 15:31:24 q Exp $";
 #endif
 
 #include "os.h"
@@ -154,9 +154,7 @@ static	u_int	hash_sid(char *sid, u_int *store)
  * is little or no point hashing on a full channel name which maybe 255 chars
  * long.
  */
-static	u_int	hash_channel_name(hname, store, shortname)
-char	*hname, shortname;
-int	*store;
+static	u_int	hash_channel_name(char *hname, int *store, int shortname)
 {
 	Reg	u_char	*name = (u_char *)hname;
 	Reg	u_char	ch;
@@ -179,9 +177,7 @@ int	*store;
 /*
  * hash_host_name
  */
-static	u_int	hash_host_name(hname, store)
-char	*hname;
-int	*store;
+static	u_int	hash_host_name(char *hname, int *store)
 {
 
 	Reg	u_char	*name = (u_char *)hname;
@@ -204,8 +200,7 @@ int	*store;
  *
  * 13feb94 gbl
  */
-static	int	bigger_prime(size)
-int	size;
+static	int	bigger_prime(int size)
 {
 	int	trial, failure, sq;
 
@@ -241,8 +236,7 @@ int	size;
  *
  * Nullify the hashtable and its contents so it is completely empty.
  */
-static	void	clear_client_hash_table(size)
-int	size;
+static	void	clear_client_hash_table(int size)
 {
 	_HASHSIZE = bigger_prime(size);
 	clhits = 0;
@@ -256,8 +250,7 @@ int	size;
 		_HASHSIZE, size));
 }
 
-static	void	clear_uid_hash_table(size)
-int	size;
+static	void	clear_uid_hash_table(int size)
 {
 	_UIDSIZE = bigger_prime(size);
 	uidhits = 0;
@@ -270,8 +263,7 @@ int	size;
 	Debug((DEBUG_DEBUG, "uid Hash Table Init: %d (%d)", _UIDSIZE, size));
 }
 
-static	void	clear_channel_hash_table(size)
-int	size;
+static	void	clear_channel_hash_table(int size)
 {
 	_CHANNELHASHSIZE = bigger_prime(size);
 	chmiss = 0;
@@ -285,8 +277,7 @@ int	size;
 		_CHANNELHASHSIZE, size));
 }
 
-static	void	clear_server_hash_table(size)
-int	size;
+static	void	clear_server_hash_table(int size)
 {
 	_SERVERSIZE = bigger_prime(size);
 	svsize = 0;
@@ -312,8 +303,7 @@ static	void	clear_sid_hash_table(int size)
 	Debug((DEBUG_DEBUG, "Sid Hash Table Init: %d (%d)", _SIDSIZE, size));
 }
 
-static	void	clear_hostname_hash_table(size)
-int	size;
+static	void	clear_hostname_hash_table(int size)
 {
 	_HOSTNAMEHASHSIZE = bigger_prime(size);
 	cnhits = 0;
@@ -351,10 +341,7 @@ void	inithashtables()
 		hashtab[i] = tolower((char)i) * 109;
 }
 
-static	void	bigger_hash_table(size, table, new)
-int	*size;
-aHashEntry	*table;
-int	new;
+static	void	bigger_hash_table(int *size, aHashEntry *table, int new)
 {
 	Reg	aClient	*cptr;
 	Reg	aChannel *chptr;
@@ -500,9 +487,7 @@ int	new;
 /*
  * add_to_client_hash_table
  */
-int	add_to_client_hash_table(name, cptr)
-char	*name;
-aClient	*cptr;
+int	add_to_client_hash_table(char *name, aClient *cptr)
 {
 	Reg	u_int	hashv;
 
@@ -520,9 +505,7 @@ aClient	*cptr;
 /*
  * add_to_uid_hash_table
  */
-int	add_to_uid_hash_table(uid, cptr)
-char	*uid;
-aClient	*cptr;
+int	add_to_uid_hash_table(char *uid, aClient *cptr)
 {
 	Reg	u_int	hashv;
 
@@ -540,9 +523,7 @@ aClient	*cptr;
 /*
  * add_to_channel_hash_table
  */
-int	add_to_channel_hash_table(name, chptr)
-char	*name;
-aChannel	*chptr;
+int	add_to_channel_hash_table(char *name, aChannel *chptr)
 {
 	Reg	u_int	hashv;
 
@@ -560,9 +541,7 @@ aChannel	*chptr;
 /*
  * add_to_server_hash_table
  */
-int	add_to_server_hash_table(sptr, cptr)
-aServer	*sptr;
-aClient	*cptr;
+int	add_to_server_hash_table(aServer *sptr, aClient *cptr)
 {
 	Reg	u_int	hashv;
 
@@ -603,9 +582,7 @@ int	add_to_sid_hash_table(char *sid, aClient *cptr)
 /*
  * add_to_hostname_hash_table
  */
-int	add_to_hostname_hash_table(hostname, user)
-char	*hostname;
-anUser	*user;
+int	add_to_hostname_hash_table(char *hostname, anUser *user)
 {
 	Reg	u_int	hashv;
 
@@ -624,9 +601,7 @@ anUser	*user;
 /*
  * del_from_client_hash_table
  */
-int	del_from_client_hash_table(name, cptr)
-char	*name;
-aClient	*cptr;
+int	del_from_client_hash_table(char *name, aClient *cptr)
 {
 	Reg	aClient	*tmp, *prev = NULL;
 	Reg	u_int	hashv;
@@ -668,9 +643,7 @@ aClient	*cptr;
 /*
  * del_from_uid_hash_table
  */
-int	del_from_uid_hash_table(uid, cptr)
-char	*uid;
-aClient	*cptr;
+int	del_from_uid_hash_table(char *uid, aClient *cptr)
 {
 	Reg	aClient	*tmp, *prev = NULL;
 	Reg	u_int	hashv;
@@ -713,9 +686,7 @@ aClient	*cptr;
 /*
  * del_from_channel_hash_table
  */
-int	del_from_channel_hash_table(name, chptr)
-char	*name;
-aChannel	*chptr;
+int	del_from_channel_hash_table(char *name, aChannel *chptr)
 {
 	Reg	aChannel	*tmp, *prev = NULL;
 	Reg	u_int	hashv;
@@ -753,9 +724,7 @@ aChannel	*chptr;
 /*
  * del_from_server_hash_table
  */
-int	del_from_server_hash_table(sptr, cptr)
-aServer	*sptr;
-aClient	*cptr;
+int	del_from_server_hash_table(aServer *sptr, aClient *cptr)
 {
 	Reg	aServer	*tmp, *prev = NULL;
 	Reg	u_int	hashv;
@@ -831,9 +800,7 @@ int	del_from_sid_hash_table(aServer *sptr)
 /*
  * del_from_hostname_hash_table
  */
-int	del_from_hostname_hash_table(hostname, user)
-char	*hostname;
-anUser	*user;
+int	del_from_hostname_hash_table(char *hostname, anUser *user)
 {
 	Reg	anUser	*tmp, *prev = NULL;
 	Reg	u_int	hashv;
@@ -875,9 +842,7 @@ anUser	*user;
 /*
  * hash_find_client
  */
-aClient	*hash_find_client(name, cptr)
-char	*name;
-aClient	*cptr;
+aClient	*hash_find_client(char *name, aClient *cptr)
 {
 	Reg	aClient	*tmp;
 	Reg	aClient	*prv = NULL;
@@ -923,9 +888,7 @@ aClient	*cptr;
 /*
  * hash_find_uid
  */
-aClient	*hash_find_uid(uid, cptr)
-char	*uid;
-aClient	*cptr;
+aClient	*hash_find_uid(char *uid, aClient *cptr)
 {
 	Reg	aClient	*tmp;
 	Reg	aClient	*prv = NULL;
@@ -972,9 +935,7 @@ aClient	*cptr;
 /*
  * hash_find_server
  */
-aClient	*hash_find_server(server, cptr)
-char	*server;
-aClient *cptr;
+aClient	*hash_find_server(char *server, aClient *cptr)
 {
 	Reg	aClient	*tmp, *prv = NULL;
 	Reg	char	*t;
@@ -1042,9 +1003,7 @@ aClient *cptr;
 /*
  * hash_find_channel
  */
-aChannel	*hash_find_channel(name, chptr)
-char	*name;
-aChannel *chptr;
+aChannel	*hash_find_channel(char *name, aChannel *chptr)
 {
 	Reg	aChannel	*tmp, *prv = NULL;
 	Reg	aHashEntry	*tmp3;
@@ -1079,9 +1038,7 @@ aChannel *chptr;
  *
  * look up matches for !?????name instead of a real match.
  */
-aChannel	*hash_find_channels(name, chptr)
-char	*name;
-aChannel *chptr;
+aChannel	*hash_find_channels(char *name, aChannel *chptr)
 {
 	aChannel	*tmp;
 	u_int	hashv, hv;
@@ -1116,10 +1073,7 @@ aChannel *chptr;
 /*
  * hash_find_stoken
  */
-aServer	*hash_find_stoken(tok, cptr, dummy)
-int	tok;
-aClient *cptr;
-void	*dummy;
+aServer	*hash_find_stoken(int tok, aClient *cptr, void *dummy)
 {
 	Reg	aServer	*tmp, *prv = NULL;
 	Reg	aHashEntry	*tmp3;
@@ -1174,9 +1128,7 @@ aClient	*hash_find_sid(char *sid, aClient *cptr)
 /*
  * hash_find_hostname
  */
-anUser		*hash_find_hostname(hostname, user)
-char	*hostname;
-anUser	*user;
+anUser	*hash_find_hostname(char *hostname, anUser *user)
 {
 	Reg	anUser	*tmp, *prv = NULL;
 	Reg	aHashEntry	*tmp3;
@@ -1215,8 +1167,8 @@ struct HashTable_s
 };
 
 #if defined(DEBUGMODE) || defined(HASHDEBUG)
-static void show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables, int shash,
-			     int bucket)
+static	void	show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables,
+	int shash, int bucket)
 {
 	int j = 1;
 	aHashEntry *htab, *tab;
@@ -1321,10 +1273,7 @@ static void show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables, int 
 }
 #endif /* DEBUGMODE || HASHDEBUG */
 
-int	m_hash(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aHashEntry *hashtab = NULL, *tab;
 	int shash = -1, i, l;

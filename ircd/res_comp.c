@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_comp.c	8.1 (Berkeley) 6/4/93";
-static char rcsid[] = "$Id: res_comp.c,v 1.8 2003/10/17 21:28:18 q Exp $";
+static char rcsid[] = "$Id: res_comp.c,v 1.9 2003/10/18 15:31:25 q Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -83,13 +83,8 @@ static int	ns_name_skip (const u_char **, const u_char *);
  * 'exp_dn' is a pointer to a buffer of size 'length' for the result.
  * Return size of compressed name or -1 if there was an error.
  */
-int
-ircd_dn_expand(msg, eom, src, dst, dstsiz)
-	const u_char *msg;
-	const u_char *eom;
-	const u_char *src;
-	char *dst;
-	int dstsiz;
+int	ircd_dn_expand(const u_char *msg, const u_char *eom, const u_char *src,
+	char *dst, int dstsiz)
 {
 	int n = ns_name_uncompress(msg, eom, src, dst, (size_t)dstsiz);
 
@@ -103,13 +98,8 @@ ircd_dn_expand(msg, eom, src, dst, dstsiz)
  * Return the size of the compressed name or -1.
  * 'length' is the size of the array pointed to by 'comp_dn'.
  */
-int
-ircd_dn_comp(src, dst, dstsiz, dnptrs, lastdnptr)
-	const char *src;
-	u_char *dst;
-	int dstsiz;
-	u_char **dnptrs;
-	u_char **lastdnptr;
+int	ircd_dn_comp(const char *src, u_char *dst, int dstsiz, u_char **dnptrs,
+	u_char **lastdnptr)
 {
 	return (ns_name_compress(src, dst, (size_t)dstsiz,
 				 (const u_char **)dnptrs,
@@ -119,10 +109,7 @@ ircd_dn_comp(src, dst, dstsiz, dnptrs, lastdnptr)
 /*
  * Skip over a compressed domain name. Return the size or -1.
  */
-int
-__ircd_dn_skipname(ptr, eom)
-	const u_char *ptr;
-	const u_char *eom;
+int	__ircd_dn_skipname(const u_char *ptr, const u_char *eom)
 {
 	const u_char *saveptr = ptr;
 
@@ -157,9 +144,7 @@ __ircd_dn_skipname(ptr, eom)
 #if 0
 /* it seems that we don't need these -krys */
 
-int
-res_hnok(dn)
-	const char *dn;
+int	res_hnok(const char *dn)
 {
 	int ppch = '\0', pch = PERIOD, ch = *dn++;
 
@@ -187,9 +172,7 @@ res_hnok(dn)
  * hostname-like (A, MX, WKS) owners can have "*" as their first label
  * but must otherwise be as a host name.
  */
-int
-res_ownok(dn)
-	const char *dn;
+int	res_ownok(const char *dn)
 {
 	if (asterchar(dn[0])) {
 		if (periodchar(dn[1]))
@@ -204,9 +187,7 @@ res_ownok(dn)
  * SOA RNAMEs and RP RNAMEs can have any printable character in their first
  * label, but the rest of the name has to look like a host name.
  */
-int
-res_mailok(dn)
-	const char *dn;
+int	res_mailok(const char *dn)
 {
 	int ch, escaped = 0;
 
@@ -234,9 +215,7 @@ res_mailok(dn)
  * This function is quite liberal, since RFC 1034's character sets are only
  * recommendations.
  */
-int
-res_dnok(dn)
-	const char *dn;
+int	res_dnok(const char *dn)
 {
 	int ch;
 
@@ -251,9 +230,7 @@ res_dnok(dn)
  * Routines to insert/extract short/long's.
  */
 
-u_int16_t
-ircd_getshort(msgp)
-	register const u_char *msgp;
+u_int16_t	ircd_getshort(const u_char *msgp)
 {
 	register u_int16_t u;
 
@@ -261,9 +238,7 @@ ircd_getshort(msgp)
 	return (u);
 }
 
-u_int32_t
-ircd_getlong(msgp)
-	register const u_char *msgp;
+u_int32_t	ircd_getlong(const u_char *msgp)
 {
 	register u_int32_t u;
 
@@ -271,22 +246,12 @@ ircd_getlong(msgp)
 	return (u);
 }
 
-void
-#if __STDC__
-ircd__putshort(register u_int16_t s, register u_char *msgp)	/* must match proto */
-#else
-ircd__putshort(s, msgp)
-	register u_int16_t s;
-	register u_char *msgp;
-#endif
+void	ircd__putshort(u_int16_t s, u_char *msgp)
 {
 	PUTSHORT(s, msgp);
 }
 
-void
-ircd__putlong(l, msgp)
-	register u_int32_t l;
-	register u_char *msgp;
+void	ircd__putlong(u_int32_t l, u_char *msgp)
 {
 	PUTLONG(l, msgp);
 }
@@ -350,11 +315,7 @@ static int		dn_find (const u_char *, const u_char *,
  *	The root is returned as "."
  *	All other domains are returned in non absolute form
  */
-static int
-ns_name_ntop(src, dst, dstsiz)
-	const u_char *src;
-	char *dst;
-	size_t dstsiz;
+static	int	ns_name_ntop(const u_char *src, char *dst, size_t dstsiz)
 {
 	const u_char *cp;
 	char *dn, *eom;
@@ -435,11 +396,7 @@ ns_name_ntop(src, dst, dstsiz)
  *	Enforces label and domain length limits.
  */
 
-static int
-ns_name_pton(src, dst, dstsiz)
-	const char *src;
-	u_char *dst;
-	size_t dstsiz;
+static	int	ns_name_pton(const char *src, u_char *dst, size_t dstsiz)
 {
 	u_char *label, *bp, *eom;
 	int c, n, escaped;
@@ -545,13 +502,8 @@ ns_name_pton(src, dst, dstsiz)
  * return:
  *	-1 if it fails, or consumed octets if it succeeds.
  */
-static int
-ns_name_unpack(msg, eom, src, dst, dstsiz)
-	const u_char *msg;
-	const u_char *eom;
-	const u_char *src;
-	u_char *dst;
-	size_t dstsiz;
+static int	ns_name_unpack(const u_char *msg, const u_char *eom, 
+	const u_char *src, u_char *dst, size_t dstsiz)
 {
 	const u_char *srcp, *dstlim;
 	u_char *dstp;
@@ -635,13 +587,8 @@ ns_name_unpack(msg, eom, src, dst, dstsiz)
  *	try to compress names. If 'lastdnptr' is NULL, we don't update the
  *	list.
  */
-static int
-ns_name_pack(src, dst, dstsiz, dnptrs, lastdnptr)
-	const u_char *src;
-	u_char *dst;
-	int dstsiz;
-	const u_char **dnptrs;
-	const u_char **lastdnptr;
+static int	ns_name_pack(const u_char *src, u_char *dst, int dstsiz,
+	const u_char **dnptrs, const u_char **lastdnptr)
 {
 	u_char *dstp;
 	const u_char **cpp, **lpp, *eob, *msg;
@@ -731,13 +678,8 @@ ns_name_pack(src, dst, dstsiz, dnptrs, lastdnptr)
  * note:
  *	Root domain returns as "." not "".
  */
-static int
-ns_name_uncompress(msg, eom, src, dst, dstsiz)
-	const u_char *msg;
-	const u_char *eom;
-	const u_char *src;
-	char *dst;
-	size_t dstsiz;
+static int	ns_name_uncompress(const u_char *msg, const u_char *eom,
+	const u_char *src, char *dst, size_t dstsiz)
 {
 	u_char tmp[NS_MAXCDNAME];
 	int n;
@@ -763,13 +705,8 @@ ns_name_uncompress(msg, eom, src, dst, dstsiz)
  *	If 'dnptr' is NULL, we don't try to compress names. If 'lastdnptr'
  *	is NULL, we don't update the list.
  */
-static int
-ns_name_compress(src, dst, dstsiz, dnptrs, lastdnptr)
-	const char *src;
-	u_char *dst;
-	size_t dstsiz;
-	const u_char **dnptrs;
-	const u_char **lastdnptr;
+static int	ns_name_compress(const char *src, u_char *dst, size_t dstsiz,
+		const u_char **dnptrs, const u_char **lastdnptr)
 {
 	u_char tmp[NS_MAXCDNAME];
 
@@ -784,10 +721,7 @@ ns_name_compress(src, dst, dstsiz, dnptrs, lastdnptr)
  * return:
  *	0 on success, -1 (with errno set) on failure.
  */
-static int
-ns_name_skip(ptrptr, eom)
-	const u_char **ptrptr;
-	const u_char *eom;
+static int	ns_name_skip(const u_char **ptrptr, const u_char *eom)
 {
 	const u_char *cp;
 	u_int n;
@@ -825,9 +759,7 @@ ns_name_skip(ptrptr, eom)
  * return:
  *	boolean.
  */
-static int
-special(ch)
-	int ch;
+static int	special(int ch)
 {
 	switch (ch) {
 	case 0x22: /* '"' */
@@ -850,9 +782,7 @@ special(ch)
  * return:
  *	boolean.
  */
-static int
-printable(ch)
-	int ch;
+static int	printable(int ch)
 {
 	return (ch > 0x20 && ch < 0x7f);
 }
@@ -861,9 +791,7 @@ printable(ch)
  *	Thinking in noninternationalized USASCII (per the DNS spec),
  *	convert this character to lower case if it's upper case.
  */
-static int
-mklower(ch)
-	int ch;
+static int	mklower(int ch)
 {
 	if (ch >= 0x41 && ch <= 0x5A)
 		return (ch + 0x20);
@@ -879,12 +807,8 @@ mklower(ch)
  *	dnptrs is the pointer to the first name on the list,
  *	not the pointer to the start of the message.
  */
-static int
-dn_find(domain, msg, dnptrs, lastdnptr)
-	const u_char *domain;
-	const u_char *msg;
-	const u_char * const *dnptrs;
-	const u_char * const *lastdnptr;
+static int	dn_find(const u_char *domain, const u_char *msg, 
+		const u_char * const *dnptrs, const u_char * const *lastdnptr)
 {
 	const u_char *dn, *cp, *sp;
 	const u_char * const *cpp;
@@ -927,3 +851,4 @@ dn_find(domain, msg, dnptrs, lastdnptr)
 }
 
 /* -- From BIND 8.1.1. -- */
+

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.130 2003/10/17 22:10:04 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.131 2003/10/18 15:31:26 q Exp $";
 #endif
 
 #include "os.h"
@@ -104,10 +104,7 @@ const	char	*check_servername_errors[3][2] = {
 **	parv[0] = sender prefix
 **	parv[1] = remote server
 */
-int	m_version(cptr, sptr, parc, parv)
-aClient *sptr, *cptr;
-int	parc;
-char	*parv[];
+int	m_version(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	if (hunt_server(cptr,sptr,":%s VERSION :%s",1,parc,parv)==HUNTED_ISME)
 		sendto_one(sptr, replies[RPL_VERSION], ME, BadTo(parv[0]),
@@ -121,10 +118,7 @@ char	*parv[];
 **	parv[1] = server name
 **	parv[2] = comment
 */
-int	m_squit(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aConfItem *aconf;
 	char	*server;
@@ -316,9 +310,7 @@ char	*parv[];
 ** Tries to guess what version or, rather, what
 ** capabilities remote server has.
 */
-static int	get_version(version, id)
-char	*version;
-char	*id;
+static int	get_version(char *version, char *id)
 {
 	int result = 0;
 
@@ -374,8 +366,7 @@ char	*id;
 **	in m_pass() and processed here before the fields are natively used.
 ** Return: < 1: exit/error, > 0: no error
 */
-int	check_version(cptr)
-aClient	*cptr;
+int	check_version(aClient *cptr)
 {
 	char *id, *misc = NULL, *link = NULL;
 
@@ -455,7 +446,7 @@ aClient	*cptr;
 ** send_server()
 ** Sends server server to cptr.
 */
-static void send_server(aClient *cptr, aClient *server)
+static	void	send_server(aClient *cptr, aClient *server)
 {
 	aConfItem *aconf;
 
@@ -534,7 +525,7 @@ static void	introduce_server(aClient *cptr, aClient *server)
 ** Sends all servers I know to cptr.
 ** Acptr is the current to send.
 */
-static void send_server_burst(aClient *cptr, aClient *acptr)
+static	void	send_server_burst(aClient *cptr, aClient *acptr)
 {
 	for (; acptr; acptr = acptr->serv->right)
 	{
@@ -1522,10 +1513,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 **	parv[0] = sender prefix
 **	parv[1] = servername
 */
-int	m_info(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_info(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char **text = infotext;
 
@@ -1563,10 +1551,7 @@ char	*parv[];
 **	parv[1] = server to query 
 **      parv[2] = servername mask
 */
-int	m_links(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_links(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aServer	*asptr;
 	char	*mask;
@@ -1618,10 +1603,7 @@ char	*parv[];
 **	parv[2] = server
 **	parv[3] = channel (optional)
 */
-int	m_summon(cptr, sptr, parc, parv)
-aClient *sptr, *cptr;
-int	parc;
-char	*parv[];
+int	m_summon(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char	*host, *user, *chname;
 #ifdef	ENABLE_SUMMON
@@ -1728,7 +1710,7 @@ char	*parv[];
 }
 /* stats ? - quick info about connected servers
  */
-static void report_myservers(aClient *sptr, char *to)
+static	void	report_myservers(aClient *sptr, char *to)
 {
 	int i;
 	int timeconnected;
@@ -1827,10 +1809,7 @@ static int report_array[17][3] = {
 		{ 0, 0, 0}
 	};
 
-static	void	report_configured_links(sptr, to, mask)
-aClient *sptr;
-char	*to;
-int	mask;
+static	void	report_configured_links(aClient *sptr, char *to, int mask)
 {
 	static	char	null[] = "<NULL>";
 	aConfItem *tmp;
@@ -1885,9 +1864,7 @@ int	mask;
 	return;
 }
 
-static	void	report_ping(sptr, to)
-aClient	*sptr;
-char	*to;
+static	void	report_ping(aClient *sptr, char *to)
 {
 	aConfItem *tmp;
 	aCPing	*cp;
@@ -1944,11 +1921,8 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 		);
 }
 
-int	m_stats(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	static	char	Lformat[]  = ":%s %d %s %s %u %lu %llu %lu %llu :%u";
 	struct	Message	*mptr;
 	aClient	*acptr;
@@ -2165,17 +2139,14 @@ char	*parv[];
 	}
 	sendto_one(cptr, replies[RPL_ENDOFSTATS], ME, BadTo(parv[0]), stat);
 	return 2;
-    }
+}
 
 /*
 ** m_users
 **	parv[0] = sender prefix
 **	parv[1] = servername
 */
-int	m_users(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 #ifdef ENABLE_USERS
 	char	namebuf[10],linebuf[10],hostbuf[17];
@@ -2222,11 +2193,8 @@ char	*parv[];
 **	parv[0] = sender prefix
 **	parv[*] = parameters
 */
-int	m_error(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_error(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	Reg	char	*para;
 
 	para = (parc > 1 && *parv[1] != '\0') ? parv[1] : "<>";
@@ -2248,35 +2216,29 @@ char	*parv[];
 		sendto_flag(SCH_ERROR, "from %s via %s -- %s",
 			   sptr->name, get_client_name(cptr,FALSE), para);
 	return 2;
-    }
+}
 
 /*
 ** m_help
 **	parv[0] = sender prefix
 */
-int	m_help(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_help(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	int i;
 
 	for (i = 0; msgtab[i].cmd; i++)
 	  sendto_one(sptr,":%s NOTICE %s :%s",
 		     ME, parv[0], msgtab[i].cmd);
 	return 2;
-    }
+}
 
 /*
  * parv[0] = sender
  * parv[1] = host/server mask.
  * parv[2] = server to query
  */
-int	 m_lusers(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	int		s_count = 0,	/* server */
 			c_count = 0,	/* client (visible) */
 			u_count = 0,	/* unknown */
@@ -2401,7 +2363,7 @@ char	*parv[];
 	sendto_one(sptr, replies[RPL_GLOBALUSERS], ME, BadTo(parv[0]),
 			c_count + i_count, istat.is_m_users);
 	return 2;
-    }
+}
 
   
 /***********************************************************************
@@ -2415,11 +2377,8 @@ char	*parv[];
 **	parv[2] = port number
 **	parv[3] = remote server
 */
-int	m_connect(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	int	port, tmpport, retval;
 	aConfItem *aconf;
 	aClient *acptr;
@@ -2553,18 +2512,15 @@ char	*parv[];
 	}
 	aconf->port = tmpport;
 	return 0;
-    }
+}
 
 /*
 ** m_wallops (write to *all* opers currently online)
 **	parv[0] = sender prefix
 **	parv[1] = message text
 */
-int	m_wallops(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_wallops(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	char	*message, *pv[4];
 
 	message = parc > 1 ? parv[1] : NULL;
@@ -2591,17 +2547,14 @@ char	*parv[];
 			      ":%s WALLOP :%s", parv[0], message);
 #endif
 	return 2;
-    }
+}
 
 /*
 ** m_time
 **	parv[0] = sender prefix
 **	parv[1] = servername
 */
-int	m_time(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_time(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	if (hunt_server(cptr,sptr,":%s TIME :%s",1,parc,parv) == HUNTED_ISME)
 		sendto_one(sptr, replies[RPL_TIME], ME, BadTo(parv[0]), ME, date((long)0));
@@ -2614,11 +2567,8 @@ char	*parv[];
 **	parv[0] = sender prefix
 **	parv[1] = servername
 */
-int	m_admin(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
-    {
+int	m_admin(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	aConfItem *aconf;
 
 	if (IsRegistered(cptr) &&	/* only local query for unregistered */
@@ -2637,17 +2587,14 @@ char	*parv[];
 	else
 		sendto_one(sptr, replies[ERR_NOADMININFO], ME, BadTo(parv[0]), ME);
 	return 2;
-    }
+}
 
 #if defined(OPER_REHASH) || defined(LOCOP_REHASH)
 /*
 ** m_rehash
 **
 */
-int	m_rehash(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_rehash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	sendto_one(sptr, replies[RPL_REHASHING], ME, BadTo(parv[0]),
 		   mybasename(configfile));
@@ -2665,10 +2612,7 @@ char	*parv[];
 ** m_restart
 **
 */
-int	m_restart(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_restart(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aClient	*acptr;
 	Reg	int	i;
@@ -2703,7 +2647,7 @@ char	*parv[];
 }
 #endif
 
-void trace_one(aClient *sptr, aClient *acptr)
+void	trace_one(aClient *sptr, aClient *acptr)
 {
 	char *name;
 	int class;
@@ -2828,10 +2772,7 @@ void trace_one(aClient *sptr, aClient *acptr)
  * 	parv[0] = sender prefix
  * 	parv[1] = traced nick/server/service
  */
-int	m_trace(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	int maskedserv = 0;
@@ -2969,10 +2910,7 @@ char	*parv[];
 **	parv[0] = sender prefix
 **	parv[1] = servername
 */
-int	m_motd(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 #ifdef	CACHED_MOTD
 	register aMotd *temp;
@@ -3046,10 +2984,7 @@ char	*parv[];
 /*
 ** m_close - added by Darren Reed Jul 13 1992.
 */
-int	m_close(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_close(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aClient	*acptr;
 	Reg	int	i;
@@ -3078,10 +3013,7 @@ char	*parv[];
 ** parv[1] - optional comma separated list of servers for which this EOB
 **           is also valid.
 */
-int	m_eob(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char eobbuf[BUFSIZE];
 	char *e;	
@@ -3242,11 +3174,10 @@ char	*parv[];
 	
 	return 1;
 }
+
+
 #if defined(OPER_DIE) || defined(LOCOP_DIE)
-int	m_die(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_die(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aClient	*acptr;
 	Reg	int	i;
@@ -3402,9 +3333,7 @@ static int	server_max = 0, server_num = 0;
 ** Given an index, this will return a pointer to the corresponding
 ** (already allocated) string
 */
-char *
-find_server_string(snum)
-int snum;
+char	*find_server_string(int snum)
 {
 	if (snum < server_num && snum >= 0)
 		return server_name[snum];
@@ -3421,9 +3350,7 @@ int snum;
 ** string. This index can be used with find_server_name_from_num().
 ** If the string doesn't exist already, it will be allocated.
 */
-int
-find_server_num(sname)
-char *sname;
+int	find_server_num(char *sname)
 {
 	Reg int i = 0;
 
@@ -3455,9 +3382,7 @@ char *sname;
 **
 **	returns 0 if link load is light, -1 otherwise.
 */
-static int
-check_link(cptr)
-aClient	*cptr;
+static	int	check_link(aClient *cptr)
 {
     if (!IsServer(cptr))
 	    return 0;
@@ -3505,8 +3430,7 @@ aClient	*cptr;
 ** Returns 0 if ok, all else is some kind of error, which serves
 ** as index in check_servername_errors[] table.
 */
-int check_servername(hostname)
-char *hostname;
+int	check_servername(char *hostname)
 {
 	register char *ch;
 	int dots, chars, rc;
@@ -3609,7 +3533,7 @@ void	remove_server_from_tree(aClient *cptr)
 }
 
 /* Process emulated EOB */
-void do_emulated_eob(aClient *sptr)
+void	do_emulated_eob(aClient *sptr)
 {
 	aClient *acptr = sptr;
 
@@ -3652,7 +3576,7 @@ void do_emulated_eob(aClient *sptr)
 	return;
 }
 
-static void dump_sid_map(aClient *sptr, aClient *root, char *pbuf)
+static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf)
 {
         int i = 1;
         aClient *acptr;
@@ -3720,8 +3644,10 @@ static void dump_sid_map(aClient *sptr, aClient *root, char *pbuf)
 		i++;
 	}
 }
-static void dump_map(aClient *sptr, aClient *root, aClient **prevserver,
-		     char *pbuf)
+
+
+static	void	dump_map(aClient *sptr, aClient *root, aClient **prevserver,
+			char *pbuf)
 {
 	aClient *prev = NULL;
         aClient *acptr;
@@ -3819,3 +3745,4 @@ int	m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	sendto_one(sptr, replies[RPL_MAPEND], ME, BadTo(sptr->name));
 	return 2;
 }
+

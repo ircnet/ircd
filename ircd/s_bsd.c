@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.106 2003/10/18 13:03:06 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.107 2003/10/18 15:31:25 q Exp $";
 #endif
 
 #include "os.h"
@@ -137,9 +137,7 @@ void	add_local_domain(char *hname, size_t size)
 **	cptr	if not NULL, is the *LOCAL* client associated with
 **		the error.
 */
-void	report_error(text, cptr)
-char	*text;
-aClient *cptr;
+void	report_error(char *text, aClient *cptr)
 {
 	Reg	int	errtmp = errno; /* debug may change 'errno' */
 	Reg	char	*host;
@@ -198,10 +196,7 @@ aClient *cptr;
  * Connections are accepted to this socket depending on the IP# mask given
  * by 'ipmask'.  Returns the fd of the socket created or -1 on error.
  */
-int	inetport(cptr, ip, ipmask, port)
-aClient	*cptr;
-char	*ipmask, *ip;
-int	port;
+int	inetport(aClient *cptr, char *ip, char *ipmask, int port)
 {
 	static	struct SOCKADDR_IN server;
 	int	ad[4];
@@ -318,8 +313,7 @@ int	port;
  * Create a new client which is essentially the stub like 'me' to be used
  * for a socket that is passive (listen'ing for connections to be accepted).
  */
-int	add_listener(aconf)
-aConfItem *aconf;
+int	add_listener(aConfItem *aconf)
 {
 	aClient	*cptr;
 
@@ -365,10 +359,7 @@ aConfItem *aconf;
  * file which is 'forced' to rwxrwxrwx (different OS's have different need of
  * modes so users can connect to the socket).
  */
-int	unixport(cptr, path, port)
-aClient	*cptr;
-char	*path;
-int	port;
+int	unixport(aClient *cptr, char *path, int port)
 {
 	struct sockaddr_un un;
 
@@ -420,7 +411,7 @@ int	port;
  * and in a state where they can accept connections.  Unix sockets have
  * the path to the socket unlinked for cleanliness.
  */
-void	close_listeners()
+void	close_listeners(void)
 {
 	Reg	aClient	*cptr;
 	Reg	int	i;
@@ -453,9 +444,7 @@ void	close_listeners()
 	    }
 }
 
-void
-start_iauth(rcvdsig)
-int rcvdsig;
+void	start_iauth(int rcvdsig)
 {
 #if defined(USE_IAUTH)
 	static time_t last = 0;
@@ -550,7 +539,7 @@ int rcvdsig;
 /*
  * init_sys
  */
-void	init_sys()
+void	init_sys(void)
 {
 	Reg	int	fd;
 
@@ -619,7 +608,7 @@ void	init_sys()
 	}
 }
 
-void	daemonize()
+void	daemonize(void)
 {
 	int fd;
 
@@ -661,7 +650,9 @@ init_dgram:
 	start_iauth(0);
 
 }
-void	write_pidfile()
+
+
+void	write_pidfile(void)
 {
 	int fd;
 	char buff[20];
@@ -690,9 +681,7 @@ void	write_pidfile()
  * from either the server's sockhost (if client fd is a tty or localhost)
  * or from the ip# converted into a string. 0 = success, -1 = fail.
  */
-static	int	check_init(cptr, sockn)
-Reg	aClient	*cptr;
-Reg	char	*sockn;
+static	int	check_init(aClient *cptr, char *sockn)
 {
 	struct	SOCKADDR_IN sk;
 	SOCK_LEN_TYPE len = sizeof(struct SOCKADDR_IN);
@@ -745,8 +734,7 @@ Reg	char	*sockn;
  * -1 = Bad socket.
  * -2 = Access denied
  */
-int	check_client(cptr)
-Reg	aClient	*cptr;
+int	check_client(aClient *cptr)
 {
 	static	char	sockname[HOSTLEN+1];
 	Reg	struct	hostent *hp = NULL;
@@ -838,8 +826,7 @@ Reg	aClient	*cptr;
  * -1 = Access denied
  * -2 = Bad socket.
  */
-int	check_server_init(cptr)
-aClient	*cptr;
+int	check_server_init(aClient *cptr)
 {
 	Reg	char	*name;
 	Reg	aConfItem *c_conf = NULL, *n_conf = NULL;
@@ -919,10 +906,8 @@ aClient	*cptr;
 	return check_server(cptr, hp, c_conf, n_conf);
 }
 
-int	check_server(cptr, hp, c_conf, n_conf)
-aClient	*cptr;
-Reg	aConfItem	*n_conf, *c_conf;
-Reg	struct	hostent	*hp;
+int	check_server(aClient *cptr, struct hostent *hp,
+		aConfItem *c_conf, aConfItem *n_conf)
 {
 	Reg	char	*name;
 	char	abuff[HOSTLEN+USERLEN+2];
@@ -1081,8 +1066,7 @@ check_serverback:
 **	Return	TRUE, if successfully completed
 **		FALSE, if failed and ClientExit
 */
-static	int completed_connection(cptr)
-aClient	*cptr;
+static	int completed_connection(aClient *cptr)
 {
 	aConfItem *aconf;
 
@@ -1136,8 +1120,7 @@ aClient	*cptr;
 **	Close the physical connection. This function must make
 **	MyConnect(cptr) == FALSE, and set cptr->from == NULL.
 */
-void	close_connection(cptr)
-aClient *cptr;
+void	close_connection(aClient *cptr)
 {
 	Reg	aConfItem *aconf;
 	Reg	int	i;
@@ -1258,9 +1241,7 @@ aClient *cptr;
 /*
 ** set_sock_opts
 */
-static	int	set_sock_opts(fd, cptr)
-int	fd;
-aClient	*cptr;
+static	int	set_sock_opts(int fd, aClient *cptr)
 {
 	int	opt, ret = 0;
 #ifdef SO_REUSEADDR
@@ -1342,8 +1323,7 @@ aClient	*cptr;
 	return ret;
 }
 
-int	get_sockerr(cptr)
-aClient	*cptr;
+int	get_sockerr(aClient *cptr)
 {
 	int errtmp = errno, err = 0;
 	SOCK_LEN_TYPE len = sizeof(err);
@@ -1365,9 +1345,7 @@ aClient	*cptr;
 **	blocking version of IRC--not a problem if you are a
 **	lightly loaded node...)
 */
-void	set_non_blocking(fd, cptr)
-int	fd;
-aClient *cptr;
+void	set_non_blocking(int fd, aClient *cptr)
 {
 	int	res, nonb = 0;
 
@@ -1403,8 +1381,7 @@ aClient *cptr;
  * check_clones
  * adapted by jecete 4 IRC Ptnet
  */
-static  int     check_clones(cptr)
-aClient *cptr;
+static  int     check_clones(aClient *cptr)
 {
 	struct abacklog {
 		struct  IN_ADDR ip;
@@ -1461,9 +1438,7 @@ aClient *cptr;
  * The client is added to the linked list of clients but isnt added to any
  * hash tables yet since it doesnt have a name.
  */
-aClient	*add_connection(cptr, fd)
-aClient	*cptr;
-int	fd;
+aClient	*add_connection(aClient *cptr, int fd)
 {
 	Link	lin;
 	aClient *acptr;
@@ -1577,9 +1552,7 @@ add_con_refuse:
 }
 
 #ifdef	UNIXPORT
-static	void	add_unixconnection(cptr, fd)
-aClient	*cptr;
-int	fd;
+static	void	add_unixconnection(aClient *cptr, int fd)
 {
 	aClient *acptr;
 	aConfItem *aconf = NULL;
@@ -1634,9 +1607,7 @@ int	fd;
 ** Accept incoming connections, extracted from read_message() 98/12 -kalt
 ** Up to 10 connections will be accepted, unless SLOW_ACCEPT is defined.
 */
-static void
-read_listener(cptr)
-aClient *cptr;
+static	void	read_listener(aClient *cptr)
 {
 	int fdnew, max = 10;
 
@@ -1696,8 +1667,7 @@ aClient *cptr;
 ** Process data from receive buffer to client.
 ** Extracted from read_packet() 960804/291p3/Vesa
 */
-static	int	client_packet(cptr)
-Reg	aClient *cptr;
+static	int	client_packet(aClient *cptr)
 {
 	Reg	int	dolen = 0;
 
@@ -1763,9 +1733,7 @@ Reg	aClient *cptr;
 ** Do some tricky stuff for client connections to make sure they don't do
 ** any flooding >:-) -avalon
 */
-static	int	read_packet(cptr, msg_ready)
-Reg	aClient *cptr;
-int	msg_ready;
+static	int	read_packet(aClient *cptr, int msg_ready)
 {
 	Reg	int	length = 0, done;
 
@@ -1846,14 +1814,12 @@ int	msg_ready;
  * Check all connections for new connections and input data that is to be
  * processed. Also check for connections with data queued and whether we can
  * write it out.
+ * 
+ * Don't ever use ZERO for delay, unless you mean to poll and then
+ * you have to have sleep/wait somewhere else in the code.--msa
+ * Actually, ZERO is NOT ZERO anymore.. see below -kalt
  */
-int	read_message(delay, fdp, ro)
-time_t	delay; /* Don't ever use ZERO here, unless you mean to poll and then
-		* you have to have sleep/wait somewhere else in the code.--msa
-		* Actually, ZERO is NOT ZERO anymore.. see below -kalt
-		*/
-FdAry	*fdp;
-int	ro;
+int	read_message(time_t delay, FdAry *fdp, int ro)
 {
 #if ! USE_POLL
 # define SET_READ_EVENT( thisfd )	FD_SET( thisfd, &read_set)
@@ -2276,10 +2242,7 @@ deadsocket:
 /*
  * connect_server
  */
-int	connect_server(aconf, by, hp)
-aConfItem *aconf;
-aClient	*by;
-struct	hostent	*hp;
+int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 {
 	Reg	struct	SOCKADDR *svp;
 	Reg	aClient *cptr, *c2ptr;
@@ -2454,10 +2417,8 @@ struct	hostent	*hp;
 	return 0;
 }
 
-static	struct	SOCKADDR *connect_inet(aconf, cptr, lenp)
-Reg	aConfItem	*aconf;
-Reg	aClient	*cptr;
-int	*lenp;
+static	struct	SOCKADDR *connect_inet(aConfItem *aconf, aClient *cptr,
+	int *lenp)
 {
 	static	struct	SOCKADDR_IN	server;
 	struct SOCKADDR_IN outip;
@@ -2566,10 +2527,8 @@ int	*lenp;
  * Build a socket structure for cptr so that it can connet to the unix
  * socket defined by the conf structure aconf.
  */
-static	struct	SOCKADDR *connect_unix(aconf, cptr, lenp)
-aConfItem	*aconf;
-aClient	*cptr;
-int	*lenp;
+static	struct	SOCKADDR *connect_unix(aConfItem *aconf, aClient *cptr,
+	int *lenp)
 {
 	static	struct	sockaddr_un	sock;
 
@@ -2599,7 +2558,7 @@ int	*lenp;
  * The following section of code performs summoning of users to irc.
  */
 #if defined(ENABLE_SUMMON) || defined(ENABLE_USERS)
-int	utmp_open()
+int	utmp_open(void)
 {
 #ifdef O_NOCTTY
 	return (open(UTMP, O_RDONLY|O_NOCTTY));
@@ -2608,9 +2567,7 @@ int	utmp_open()
 #endif
 }
 
-int	utmp_read(fd, name, line, host, hlen)
-int	fd, hlen;
-char	*name, *line, *host;
+int	utmp_read(int fd, char *name, char *line, char *host, int hlen)
 {
 	struct	utmp	ut;
 	while (read(fd, (char *)&ut, sizeof (struct utmp))
@@ -2636,16 +2593,13 @@ char	*name, *line, *host;
 	return -1;
 }
 
-int	utmp_close(fd)
-int	fd;
+int	utmp_close(int fd)
 {
 	return(close(fd));
 }
 
 #ifdef ENABLE_SUMMON
-void	summon(who, namebuf, linebuf, chname)
-aClient *who;
-char	*namebuf, *linebuf, *chname;
+void	summon(aClient *who, char *namebuf, char *linebuf, char *chname)
 {
 	static	char	wrerr[] = "NOTICE %s :Write error. Couldn't summon.";
 	int	fd;
@@ -2759,10 +2713,7 @@ Chat on\n\r");
 ** matches the server's name) and its primary IP#.  Hostname is stored
 ** in the client structure passed as a pointer.
 */
-void	get_my_name(cptr, name, len)
-aClient	*cptr;
-char	*name;
-int	len;
+void	get_my_name(aClient *cptr, char *name, int len)
 {
 	static	char tmp[HOSTLEN+1];
 	struct	hostent	*hp;
@@ -2848,8 +2799,7 @@ int	len;
 /*
 ** setup a UDP socket and listen for incoming packets
 */
-int	setup_ping(aconf)
-aConfItem	*aconf;
+int	setup_ping(aConfItem *aconf)
 {
 	struct	SOCKADDR_IN	from;
 	int	on = 1;
@@ -2913,8 +2863,7 @@ aConfItem	*aconf;
 }
 
 
-void	send_ping(aconf)
-aConfItem *aconf;
+void	send_ping(aConfItem *aconf)
 {
 	Ping	pi;
 	struct	SOCKADDR_IN	sin;
@@ -2970,9 +2919,7 @@ aConfItem *aconf;
 	(void)sendto(udpfd, (char *)&pi, sizeof(pi), 0,(SAP)&sin,sizeof(sin));
 }
 
-static	int	check_ping(buf, len)
-char	*buf;
-int	len;
+static	int	check_ping(char *buf, int len)
 {
 	Ping	pi;
 	aConfItem	*aconf;
@@ -3019,7 +2966,7 @@ int	len;
 /*
  * max # of pings set to 15/sec.
  */
-static	void	polludp()
+static	void	polludp(void)
 {
 	static	time_t	last = 0;
 	static	int	cnt = 0, mlen = 0, lasterr = 0;
@@ -3149,7 +3096,7 @@ static	void	polludp()
  * Called when the fd returned from init_resolver() has been selected for
  * reading.
  */
-static	void	do_dns_async()
+static	void	do_dns_async(void)
 {
 	static	Link	ln;
 	aClient	*cptr;
@@ -3229,3 +3176,4 @@ static	void	do_dns_async()
 			bytes = 0;
 	} while ((bytes > 0) && (pkts < 10));
 }
+

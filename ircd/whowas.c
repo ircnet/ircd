@@ -24,7 +24,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: whowas.c,v 1.8 2001/10/20 17:57:30 q Exp $";
+static  char rcsid[] = "@(#)$Id: whowas.c,v 1.9 2003/10/18 15:31:27 q Exp $";
 #endif
 
 #include "os.h"
@@ -38,7 +38,7 @@ int	ww_index = 0, ww_size = MAXCONNECTIONS*2;
 static	aLock	*locked;
 int	lk_index = 0, lk_size = MAXCONNECTIONS*2;
 
-static	void	grow_whowas()
+static	void	grow_whowas(void)
 {
 	int	osize = ww_size;
 
@@ -51,7 +51,7 @@ static	void	grow_whowas()
 	ircd_writetune(tunefile);
 }
 
-static	void	grow_locked()
+static	void	grow_locked(void)
 {
 	int	osize = lk_size;
 
@@ -68,8 +68,7 @@ static	void	grow_locked()
 **	the user structure must have been allocated).
 **	if nodelay is NULL, then the nickname will be subject to NickDelay
 */
-void	add_history(cptr, nodelay)
-Reg	aClient	*cptr, *nodelay;
+void	add_history(aClient *cptr, aClient *nodelay)
 {
 	Reg	aName	*np;
 	Reg	Link	*uwas;
@@ -210,9 +209,7 @@ Reg	aClient	*cptr, *nodelay;
 **      nickname within the timelimit. Returns NULL, if no
 **      one found...
 */
-aClient	*get_history(nick, timelimit)
-char	*nick;
-time_t	timelimit;
+aClient	*get_history(char *nick, time_t timelimit)
 {
 	Reg	aName	*wp, *wp2;
 
@@ -251,9 +248,7 @@ time_t	timelimit;
 **      Returns 1 if a user was using the given nickname within
 **   the timelimit and it's locked. Returns 0, if none found...
 */
-int	find_history(nick, timelimit)
-char  *nick;
-time_t        timelimit;
+int	find_history(char *nick, time_t timelimit)
 {
 	Reg     aName   *wp, *wp2;
 	Reg	aLock	*lp, *lp2;
@@ -313,8 +308,7 @@ time_t        timelimit;
 **	structures and it must know when they cease to exist. This
 **	also implicitly calls AddHistory.
 */
-void	off_history(cptr)
-Reg	aClient	*cptr;
+void	off_history(aClient *cptr)
 {
 	Reg	Link	*uwas;
 
@@ -354,7 +348,7 @@ Reg	aClient	*cptr;
 	return;
 }
 
-void	initwhowas()
+void	initwhowas(void)
 {
 	Reg	int	i;
 
@@ -377,10 +371,7 @@ void	initwhowas()
 **	parv[0] = sender prefix
 **	parv[1] = nickname queried
 */
-int	m_whowas(cptr, sptr, parc, parv)
-aClient	*cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_whowas(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aName	*wp, *wp2 = NULL;
 	Reg	int	j = 0;
@@ -449,9 +440,7 @@ char	*parv[];
 /*
 ** for debugging...counts related structures stored in whowas array.
 */
-void	count_whowas_memory(wwu, wwa, wwam, wwuw)
-int	*wwu, *wwa, *wwuw;
-u_long	*wwam;
+void	count_whowas_memory(int *wwu, int *wwa, u_long *wwam, int *wwuw)
 {
 	Reg	anUser	*tmp;
 	Reg	Link	*tmpl;
@@ -494,3 +483,4 @@ u_long	*wwam;
 
 	return;
 }
+
