@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.229 2004/08/13 01:23:04 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.230 2004/08/21 10:13:47 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -864,6 +864,10 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		acptr->serv->up = sptr;
 		acptr->serv->snum = find_server_num(acptr->name);
 		acptr->serv->maskedby = acptr;
+		SetServer(acptr);
+		istat.is_serv++;
+		add_client_to_list(acptr);
+		register_server(acptr);
 
 		if (ST_UID(cptr))
 		{
@@ -905,10 +909,6 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				acptr->name);
 		}
 
-		SetServer(acptr);
-		istat.is_serv++;
-		add_client_to_list(acptr);
-		register_server(acptr);
 		add_server_to_tree(acptr);
 		(void)add_to_client_hash_table(acptr->name, acptr);
 		if (ST_NOTUID(acptr))
