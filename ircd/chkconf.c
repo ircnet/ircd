@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.28 2004/06/30 14:36:10 jv Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.29 2004/07/14 23:16:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -36,7 +36,8 @@ static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.28 2004/06/30 14:36:10 jv Exp $";
 
 static	void	new_class(int);
 static	char	*getfield(char *), confchar(u_int);
-static	int	openconf(void), validate(aConfItem *);
+static	int	openconf(void);
+static	void	validate(aConfItem *);
 static	int	dgets(int, char *, int);
 static	aClass	*get_class(int, int);
 static	aConfItem	*initconf(void);
@@ -98,7 +99,8 @@ int	main(int argc, char *argv[])
 	/* If I do not use result as temporary return value
 	 * I get loops when M4_PREPROC is defined - Babar */
 	result = initconf();
-	return validate(result);
+	validate(result);
+	return 0;
 }
 
 /*
@@ -824,14 +826,14 @@ dgetsreturnbuf:
 }
 
 
-static	int	validate(aConfItem *top)
+static	void	validate(aConfItem *top)
 {
 	Reg	aConfItem *aconf, *bconf;
 	u_int	otype = 0, valid = 0;
 	struct wordcount *filelist;
 
 	if (!top)
-		return -1;
+		return;
 
 	for (aconf = top; aconf; aconf = aconf->next)
 	    {
@@ -886,8 +888,7 @@ static	int	validate(aConfItem *top)
 				confchar(aconf->status), aconf->host,
 				SHOWSTR(aconf->passwd), aconf->name);
 		    }
-  /* Return value is non-sense ... It only checks for matching c/N */
-	return valid ? 0 : -1;
+	return;
 }
 
 #ifdef M4_PREPROC
