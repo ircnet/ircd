@@ -1,3 +1,8 @@
+2004-11-14  Piotr Kucharski
+
+	* s_serv.c/m_server_estab(): send njoin dot for other server to lock
+	  empty channel; also send modes for empty !channels.
+
 2004-11-13  Piotr Kucharski
 
 	* config.h.dist: move L/DCTL to struct_def.h as they must not be ever
@@ -8,6 +13,8 @@
 	* configure.in: AC_CHECK_TYPES now also includes <sys/bitypes.h> to fix
 	  some configure/compilation errors on some platforms (problem noted by
 	  Andreas Ley).
+	* channel.c/m_njoin(): move get_channel() out of strtoken loop.
+	* channel.c/m_njoin(): njoin dot hack for locking empty channels.
 
 2004-11-11  Piotr Kucharski
 
