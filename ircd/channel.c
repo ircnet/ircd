@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.251 2005/02/09 16:17:30 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.252 2005/02/09 16:20:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2218,6 +2218,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (*name == '0' && !atoi(name))
 		{
 			(void)strcpy(jbuf, "0");
+			i = 1;
 			continue;
 		}
 		clean_channelname(name);
