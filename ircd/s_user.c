@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.21 1997/09/03 18:26:50 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.22 1997/09/03 20:33:26 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -360,7 +360,7 @@ char	*nick, *username;
 			       ((sptr->hostp) ? sptr->hostp->h_name :
 				sptr->sockhost), sptr->auth, sptr->exitc);
 #endif		    
-#ifdef FNAME_CONNLOG
+#if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
 			sendto_flog(sptr, (i == -5) ? " u@h max " :
 				    (i == -4) ? " IP  max " : (i == -3) ? 
 				    " No more " : " No Auth ", 0, "<none>",
@@ -452,7 +452,7 @@ char	*nick, *username;
 			       myctime(sptr->firsttime), user->username,
 			       user->host, sptr->auth, '-');
 #endif		    
-#ifdef FNAME_CONNLOG
+#if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
 			sendto_flog(sptr, " K lined ", 0, user->username,
 				    user->host);
 #endif
@@ -473,7 +473,7 @@ char	*nick, *username;
 			       myctime(sptr->firsttime), user->username,
 			       user->host, sptr->username, '-');
 # endif		    
-# ifdef FNAME_CONNLOG
+# if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
 			sendto_flog(sptr, " R lined ", 0, user->username,
 				    user->host);
 # endif

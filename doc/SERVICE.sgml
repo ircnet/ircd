@@ -4,7 +4,7 @@
 
 <title>IRC Services
 <author>Christophe Kalt
-<date>$Id: SERVICE.sgml,v 1.3 1997/08/08 12:46:01 kalt Exp $
+<date>$Id: SERVICE.sgml,v 1.4 1997/09/03 20:33:25 kalt Exp $
 <abstract>
 The IRC protocol described in RFC 1459 defines two types of
 connections (client, and server).  A third type was
@@ -116,21 +116,29 @@ see.  The server configuration file limits the type allowed
 for a service.  The meaning of the bits is defined in the
 service.h file coming with the IRC software:
 <verb>
-SERVICE_WANT_SERVICE    0x00001 /* other services signing on/off */
-SERVICE_WANT_OPER       0x00002 /* operators, included in umodes too */
-SERVICE_WANT_UMODE      0x00004 /* user modes, iow + local modes */
-SERVICE_WANT_AWAY       0x00008 /* away isn't propaged anymore.. */
-SERVICE_WANT_KILL       0x00010 /* KILLs */
-SERVICE_WANT_NICK       0x00020 /* all NICKs (new user, change) */
-SERVICE_WANT_USER       0x00040 /* USER signing on */
-SERVICE_WANT_QUIT       0x00080 /* all QUITs (users signing off) */
-SERVICE_WANT_SERVER     0x00100 /* servers signing on */
-SERVICE_WANT_WALLOP     0x00200 /* wallops */
-SERVICE_WANT_SQUIT      0x00400 /* servers signing off */
-SERVICE_WANT_RQUIT      0x00800 /* regular user QUITs (these which
+SERVICE_WANT_SERVICE    0x00000001 /* other services signing on/off */
+SERVICE_WANT_OPER       0x00000002 /* operators, included in umodes too */
+SERVICE_WANT_UMODE      0x00000004 /* user modes, iow + local modes */
+SERVICE_WANT_AWAY       0x00000008 /* away isn't propaged anymore.. */
+SERVICE_WANT_KILL       0x00000010 /* KILLs */
+SERVICE_WANT_NICK       0x00000020 /* all NICKs (new user, change) */
+SERVICE_WANT_USER       0x00000040 /* USER signing on */
+SERVICE_WANT_QUIT       0x00000080 /* all QUITs (users signing off) */
+SERVICE_WANT_SERVER     0x00000100 /* servers signing on */
+SERVICE_WANT_WALLOP     0x00000200 /* wallops */
+SERVICE_WANT_SQUIT      0x00000400 /* servers signing off */
+SERVICE_WANT_RQUIT      0x00000800 /* regular user QUITs (these which
 				   are also sent between servers) */
-SERVICE_WANT_MODE       0x01000 /* channel modes (not +ov) */
-SERVICE_WANT_CHANNEL    0x02000 /* channel creations/destructions */
+SERVICE_WANT_MODE       0x00001000 /* channel modes (not +ov) */
+SERVICE_WANT_CHANNEL    0x00002000 /* channel creations/destructions */
+
+SERVICE_WANT_ERRORS	0x01000000 /* &amp;ERRORS */
+SERVICE_WANT_NOTICES	0x02000000 /* &amp;NOTICES */
+SERVICE_WANT_LOCAL	0x04000000 /* &amp;LOCAL */
+SERVICE_WANT_NUMERICS	0x08000000 /* &amp;NUMERICS */
+
+SERVICE_WANT_USERLOG	0x10000000 /* FNAME_USERLOG */
+SERVICE_WANT_CONNLOG	0x20000000 /* FNAME_CONNLOG */
 </verb>
 <label id="dist">
 <tag/Distribution/  This controls the propagation of the

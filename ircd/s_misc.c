@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.10 1997/09/03 17:46:02 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.11 1997/09/03 20:33:26 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -367,7 +367,7 @@ char	*comment;	/* Reason for the exit */
 	Reg	aClient	*acptr;
 	Reg	aClient	*next;
 	Reg	aServer *asptr;
-#if defined(FNAME_USERLOG) || defined(USE_SYSLOG)
+#if defined(FNAME_USERLOG) || defined(USE_SYSLOG) || defined(USE_SERVICES)
 	time_t	on_for;
 #endif
 	char	comment1[HOSTLEN + HOSTLEN + 2];
@@ -383,7 +383,8 @@ char	*comment;	/* Reason for the exit */
 		    }
 
 		sptr->flags |= FLAGS_CLOSING;
-#if (defined(FNAME_USERLOG) || defined(FNAME_CONNLOG)) \
+#if (defined(FNAME_USERLOG) || defined(FNAME_CONNLOG) \
+     || defined(USE_SERVICES)) \
     || (defined(USE_SYSLOG) && (defined(SYSLOG_USERS) || defined(SYSLOG_CONN)))
 		if (IsPerson(sptr))
 		    {
@@ -398,7 +399,7 @@ char	*comment;	/* Reason for the exit */
 			       sptr->user->username, sptr->user->host,
 			       sptr->auth, sptr->exitc);
 # endif
-# ifdef FNAME_USERLOG
+# if defined(FNAME_USERLOG) || defined(USE_SERVICES)
 			sendto_flog(sptr, NULL, on_for, sptr->user->username,
 				    sptr->user->host);
 # endif
@@ -413,7 +414,7 @@ char	*comment;	/* Reason for the exit */
 			       ((sptr->hostp) ? sptr->hostp->h_name :
 				sptr->sockhost), sptr->auth, sptr->exitc);
 # endif
-# ifdef FNAME_CONNLOG
+# if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
 			sendto_flog(sptr, " Unknown ", 0, "<none>", 
 				    (IsUnixSocket(sptr)) ? me.sockhost :
 				    ((sptr->hostp) ? sptr->hostp->h_name :

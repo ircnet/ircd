@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.18 1997/09/03 17:45:17 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.19 1997/09/03 20:33:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1311,7 +1311,30 @@ void	sendto_flag(u_int chan, char *pattern, ...)
 		}
 #endif
 		sendto_channel_butserv(chptr, &me, ":%s NOTICE %s :%s", ME, chptr->chname, nbuf);
+
+#ifdef	USE_SERVICES
+		switch (chan)
+		    {
+		case SCH_ERROR:
+			check_services_butone(SERVICE_WANT_ERRORS, NULL, &me,
+					      "&ERRORS :%s", nbuf);
+			break;
+		case SCH_NOTICE:
+			check_services_butone(SERVICE_WANT_NOTICES, NULL, &me,
+					      "&NOTICES :%s", nbuf);
+			break;
+		case SCH_LOCAL:
+			check_services_butone(SERVICE_WANT_LOCAL, NULL, &me,
+					      "&LOCAL :%s", nbuf);
+			break;
+		case SCH_NUM:
+			check_services_butone(SERVICE_WANT_NUMERICS, NULL, &me,
+					      "&NUMERICS :%s", nbuf);
+			break;
+		    }
+#endif
 	    }
+
 	return;
 }
 
@@ -1331,6 +1354,33 @@ time_t	duration;
 	char	linebuf[1024]; /* auth reply might be long.. */
 	int	logfile;
 
+#ifdef	USE_SERVICES
+	if (duration)
+	    {
+		(void)sprintf(linebuf,
+	      "%s (%3d:%02d:%02d): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
+			      myctime(cptr->firsttime),
+			      (int) (duration / 3600),
+			      (int) ((duration % 3600) / 60),
+			      (int) (duration % 60),
+			      username, hostname, cptr->auth,
+			      cptr->exitc, cptr->sendM, cptr->sendK,
+			      cptr->receiveM, cptr->receiveK);
+		check_services_butone(SERVICE_WANT_USERLOG, NULL, &me,
+				      "USERLOG :%s", linebuf);
+	    }
+	else
+	    {
+		(void)sprintf(linebuf,
+			      "%s (%s): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
+			      myctime(cptr->firsttime), msg, username,
+			      hostname, cptr->auth,
+			      cptr->exitc, cptr->sendM, cptr->sendK,
+			      cptr->receiveM, cptr->receiveK);
+		check_services_butone(SERVICE_WANT_CONNLOG, NULL, &me,
+				      "CONNLOG :%s", linebuf);
+	    }
+#endif
 	/*
 	 * This conditional makes the logfile active only after
 	 * it's been created, thus logging can be turned off by
@@ -1359,6 +1409,7 @@ time_t	duration;
 	   )
 	    {
 		(void)alarm(0);
+#ifndef	USE_SERVICES
 		if (duration)
 			(void)sprintf(linebuf,
 	      "%s (%3d:%02d:%02d): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
@@ -1376,6 +1427,7 @@ time_t	duration;
 				      hostname, cptr->auth,
                                       cptr->exitc, cptr->sendM, cptr->sendK,
                                       cptr->receiveM, cptr->receiveK);
+#endif
 		(void)alarm(3);
 		(void)write(logfile, linebuf, strlen(linebuf));
 		(void)alarm(0);
