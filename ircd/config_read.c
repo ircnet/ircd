@@ -104,10 +104,17 @@ aConfig *config_read(int fd, int depth, aFile *curfile)
 			aConfig	*ret;
 			aFile	*tcf;
 
-			end--;			/* eat last \n */
-			if (*end == '\r')
-				end--;		/* ... and \r, if is */
+			/* eat all white chars around filename */
+			while (isspace(*end))
+			{
+				end--;
+			}
+			while (isspace(*start))
+			{
+				start++;
+			}
 
+			/* remove quotes, when they're both there */
 			if (*start == '"' && *end == '"')
 			{
 				start++;
