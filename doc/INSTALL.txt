@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.61 2004/06/22 21:19:12 chopin Exp $
+  $Id: INSTALL.txt,v 1.62 2004/06/24 18:28:03 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -789,17 +789,17 @@
      FFoorrmmaatt
 
 
-        O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>
+        O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>:<Flags>
 
 
 
      OO  Specifies Operator record.
 
      NNoottee
-        If you use small letter (``o'') in it, it specifies a global
-        operator. Capital letter (``O'') specifies a local operator.
-        Local and global operator rights can be specified and fine-tuned
-        in config.h file.
+        If you use small letter (``o'') in it, it specifies a local
+        operator. This is deprecated behaviour, use O:line flags.
+        Operator rights can be specified in config.h and fine-tuned in
+        ircd.conf.
 
      TTAARRGGEETT HHoosstt NNAAMMEE
         Tells IRC which host you have the privileges FROM.  This means
@@ -830,6 +830,44 @@
         having a lower number than that for the relevant I-line) and
         determines the maximum number of simultaneous uses of the O-line
         allowable through the max. links field in the Y-line.
+
+     FFllaaggss
+        This field contains flags of an O:line; flags are one character
+        in size, can be combined and their order does not matter.  They
+        define privileges of an operator.
+
+        +o  L - local operator (disables all remote functions)
+
+        +o  A - enables all flags (except local operator)
+
+        +o  K - allows KILL (local and remote)
+
+        +o  k - allows only local KILL
+
+        +o  S - allows SQUIT (local and remote)
+
+        +o  s - allows only local SQUIT
+
+        +o  C - allows CONNECT (local and remote)
+
+        +o  c - allows only local CONNECT
+
+        +o  l - allows CLOSE
+
+
+        +o  h - allows HAZH
+
+        +o  d - allows DNS
+
+        +o  r - allows REHASH
+
+        +o  R - allows RESTART
+
+        +o  D - allows DIE
+
+        +o  e - allows SET
+
+        +o  T - allows TKLINE
 
      EExxaammppllee
         o:orion.cair.du.edu:pyunxc:Jeff::1
@@ -881,6 +919,7 @@
 
         You can prefix an IP address, an IP mask, or IP bitmask by ``=''
         in which case only non resolving matching hosts will be banned.
+
 
      ttiimmee iinntteerrvvaall((ss))||ccoommmmeenntt
         Either leave this field empty or put a comment, then the line
@@ -948,8 +987,6 @@
         This line disallows all hosts whose IP address is from network
         ``192.11.35.0/24'' and which didn't resolve to login to the
         ircd.
-
-
   44..88..  SSeerrvveerr ccoonnnneeccttiioonnss
 
   How to connect to other servers, How other servers can connect to you
@@ -1015,6 +1052,7 @@
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
 
+
      PPaasssswwoorrdd
         The password of the other host.  A password must always be
         present for the line to be recognized.
@@ -1053,6 +1091,7 @@
      NNEEWW!!!!!!
         As of the 2.11.0 version of the server, SSoouurrccee IIPP field has been
         added.
+
   Some examples:
 
   +o  C:nic.funet.fi::nic.funet.fi:6667:1
@@ -1119,6 +1158,7 @@
      This line says: expect a Connection from host ``18.72.0.252'', and
      don't expect login password.  The connecting host should identify
      itself as ``garfield.mit.edu''.
+
      NN  ``N'' corresponds to a server Noconnect option.
 
      TTAARRGGEETT HHoosstt AAddddrr
@@ -1277,8 +1317,6 @@
         H:*.edu:*:*.bu.edu::
         H:*.au:*:*.bu.edu::
 
-
-
      is allowed as is
 
 
@@ -1343,6 +1381,7 @@
 
      FFoorrmmaatt
 
+
         V:<Version Mask>:<Flags>:<Server Mask>::
 
 
@@ -1377,7 +1416,6 @@
         V:*/0209*::::
 
         Disallows any server using the 2.9 protocol to connect.
-
 
      NNoottee
         It is possible to have and use multiple V-lines for the one
@@ -1474,6 +1512,7 @@
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
 
 
+
   44..1155..  BBoouunnccee sseerrvveerr
 
 
@@ -1538,6 +1577,7 @@
         port 6667.
 
 
+
   55..  RReellaatteedd rreessoouurrcceess
 
 
@@ -1573,7 +1613,6 @@
   report it.
 
 
-
   66..11..  HHooww ttoo rreeppoorrtt aa bbuugg
 
   To save everyone time, make sure that your e-mail contains all the
@@ -1600,6 +1639,7 @@
 
      FFiixx
         If you have a fix, don't forget to include it.
+
 
 
   66..22..  WWhheerree ttoo sseenndd aa bbuugg rreeppoorrtt

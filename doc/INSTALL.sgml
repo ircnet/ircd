@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.61 2004/06/22 21:19:12 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.62 2004/06/24 18:28:03 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -636,12 +636,11 @@ How to become the IRC administrator on your site
 <tag/Introduction/ To become an IRC Administrator, IRC must
 know who is authorized to become an operator and what their
 ``Nickname'' and ``Password'' is.
-<tag/Format/<verb>O:&lt;TARGET Host NAME&gt;:&lt;Password&gt;:&lt;Nickname&gt;:&lt;Port&gt;:&lt;Class&gt;</verb>
+<tag/Format/<verb>O:&lt;TARGET Host NAME&gt;:&lt;Password&gt;:&lt;Nickname&gt;:&lt;Port&gt;:&lt;Class&gt;:&lt;Flags&gt;</verb>
 <tag/O/ Specifies Operator record. 
 <tag/Note/If you use small letter (``o'') in it, it specifies
-a global operator. Capital letter (``O'') specifies a local operator. 
-Local and global operator rights can be specified and fine-tuned in config.h
-file.
+a local operator. This is deprecated behaviour, use O:line flags.
+Operator rights can be specified in config.h and fine-tuned in ircd.conf.
 <tag/TARGET Host NAME/ Tells IRC which host you have the
 privileges FROM.  This means that you should be logged into
 this host when you ask for the priviliges.  If you specify
@@ -664,6 +663,27 @@ class (preferably having a lower number than that for the
 relevant I-line) and determines the maximum number of
 simultaneous uses of the O-line allowable through the
 max. links field in the Y-line.
+<tag/Flags/This field contains flags of an O:line; flags are
+one character in size, can be combined and their order does not matter.
+They define privileges of an operator.
+<itemize>
+<item>L - local operator (disables all remote functions)
+<item>A - enables all flags (except local operator)
+<item>K - allows KILL (local and remote)
+<item>k - allows only local KILL
+<item>S - allows SQUIT (local and remote)
+<item>s - allows only local SQUIT
+<item>C - allows CONNECT (local and remote)
+<item>c - allows only local CONNECT
+<item>l - allows CLOSE
+<item>h - allows HAZH
+<item>d - allows DNS
+<item>r - allows REHASH
+<item>R - allows RESTART
+<item>D - allows DIE
+<item>e - allows SET
+<item>T - allows TKLINE
+</itemize>
 <tag/Example/ o:orion.cair.du.edu:pyunxc:Jeff::1
 <p>
 There is an OPERATOR at ``orion.cair.du.edu'' that can get
