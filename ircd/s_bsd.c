@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.146 2004/06/29 21:23:04 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.147 2004/07/03 16:06:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1915,7 +1915,8 @@ static	int	read_packet(aClient *cptr, int msg_ready)
 			return exit_client(cptr, cptr, &me, "dbuf_put fail");
 
 		if (IsPerson(cptr) &&
-		    DBufLength(&cptr->recvQ) > CLIENT_FLOOD)
+		    DBufLength(&cptr->recvQ) > CLIENT_FLOOD
+		    && is_allowed(cptr, ACL_CANFLOOD))
 		    {
 			cptr->exitc = EXITC_FLOOD;
 			return exit_client(cptr, cptr, &me, "Excess Flood");
