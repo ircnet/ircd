@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.25 1998/01/23 14:45:48 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.26 1998/01/23 16:35:52 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -946,6 +946,8 @@ char	*parv[], *mbuf, *pbuf;
 							*s++ &= 0x7f;
 						else
 							*s = '\0';
+					else
+						s++;
 			}
 
 			if (!**parv)
