@@ -9,6 +9,10 @@
 	* s_conf.c/iline_flags_to_string(): return '-' when no flags.
 	* s_serv.c/report_configured_links(): iline_flags_to_string() now
 	  returns '-' for no flags, no need to check it here.
+	* ircd.c/ircd_readtune(), ircd_writetune(), hash.c/inithashtables(),
+	  hash_def.h: introduce UIDSIZE (instead of using HASHSIZE).
+	* channel.c/m_kick(): don't send KICKs one by one to other servers,
+	  use one KICK per channel; also put UIDs where appropriate.
 
 2004-03-04  Piotr Kucharski
 
