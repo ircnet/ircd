@@ -1,3 +1,14 @@
+1998-10-28  Christophe Kalt  <kalt@azurite.london.deshaw.com>
+
+	* s_user.c: optimized m_whois() (pointed out by several people).
+
+	* s_user.c, channel.c: channel creator flag is now removed on -o.
+
+	* channel.c:
+		* !channel creation is now done with !! rather than !#.
+		* fixed channel counters (affects /lusers & /stats z).
+		* m_njoin(): simple optimization.
+
 Sat Oct 10 18:55:38 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* a_io.c: don't TST_* if cldata[i].?fd <= 0 in loop_io().
