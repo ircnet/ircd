@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.3 1997/04/14 20:03:48 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.4 1997/04/15 13:50:47 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1686,30 +1686,30 @@ FdAry	*fdp;
 #ifndef _DO_POLL_
 # define SET_READ_EVENT( thisfd )	FD_SET( thisfd, &read_set)
 # define SET_WRITE_EVENT( thisfd )	FD_SET( thisfd, &write_set)
-# define CLR_READ_EVENT( thisfd, thispfd )	FD_CLR( thisfd, &read_set)
-# define CLR_WRITE_EVENT( thisfd, thispfd )	FD_CLR( thisfd, &write_set)
-# define TST_READ_EVENT( thisfd, thispfd )	FD_ISSET( thisfd, &read_set)
-# define TST_WRITE_EVENT( thisfd, thispfd )	FD_ISSET( thisfd, &write_set)
+# define CLR_READ_EVENT( thisfd )	FD_CLR( thisfd, &read_set)
+# define CLR_WRITE_EVENT( thisfd )	FD_CLR( thisfd, &write_set)
+# define TST_READ_EVENT( thisfd )	FD_ISSET( thisfd, &read_set)
+# define TST_WRITE_EVENT( thisfd )	FD_ISSET( thisfd, &write_set)
 
 	fd_set	read_set, write_set;
 	int	highfd = -1;
 #else
-# define POLLSETREADFLAGS (POLLIN|POLLRDNORM)
-# define POLLREADFLAGS (POLLSETREADFLAGS|POLLHUP|POLLERR)
-# define POLLSETWRITEFLAGS (POLLOUT|POLLWRNORM)
-# define POLLWRITEFLAGS (POLLOUT|POLLWRNORM|POLLHUP|POLLERR)
+/* most of the following use pfd */
+# define POLLSETREADFLAGS	(POLLIN|POLLRDNORM)
+# define POLLREADFLAGS		(POLLSETREADFLAGS|POLLHUP|POLLERR)
+# define POLLSETWRITEFLAGS	(POLLOUT|POLLWRNORM)
+# define POLLWRITEFLAGS		(POLLOUT|POLLWRNORM|POLLHUP|POLLERR)
+
 # define SET_READ_EVENT( thisfd ){  CHECK_PFD( thisfd );\
 				   pfd->events |= POLLSETREADFLAGS;}
 # define SET_WRITE_EVENT( thisfd ){ CHECK_PFD( thisfd );\
 				   pfd->events |= POLLSETWRITEFLAGS;}
-# define CLR_READ_EVENT( thisfd, thispfd ) \
-					thispfd->revents &= ~POLLSETREADFLAGS
-# define CLR_WRITE_EVENT( thisfd, thispfd ) \
-					thispfd->revents &= ~POLLSETWRITEFLAGS
-# define TST_READ_EVENT( thisfd, thispfd ) \
-					(thispfd->revents & POLLREADFLAGS)
-# define TST_WRITE_EVENT( thisfd, thispfd ) \
-					(thispfd->revents & POLLWRITEFLAGS)
+
+# define CLR_READ_EVENT( thisfd )	pfd->revents &= ~POLLSETREADFLAGS
+# define CLR_WRITE_EVENT( thisfd )	pfd->revents &= ~POLLSETWRITEFLAGS
+# define TST_READ_EVENT( thisfd )	pfd->revents & POLLREADFLAGS
+# define TST_WRITE_EVENT( thisfd )	pfd->revents & POLLWRITEFLAGS
+
 # define CHECK_PFD( thisfd ) 			\
 	if ( pfd->fd != thisfd ) {		\
 		pfd = &poll_fdarray[nbr_pfds++];\
@@ -1816,7 +1816,7 @@ FdAry	*fdp;
 				if (DBufLength(&cptr->recvQ) && delay2 > 2)
 					delay2 = 1;
 				if (DBufLength(&cptr->recvQ) < 4088)
-					SET_READ_EVENT(fd);
+					SET_READ_EVENT( fd );
 			    }
 			
 			if (DBufLength(&cptr->sendQ) || IsConnecting(cptr) ||
@@ -1901,25 +1901,29 @@ FdAry	*fdp;
 		timeofday = time(NULL);
 	    } /* for(res=0;;) */
 	
-	if (resfd >= 0 && nfds > 0 && (
-#ifdef	_DO_POLL_
-				       res_pfd &&
+	if (nfds > 0 &&
+#ifndef	_DO_POLL_
+	    resfd >= 0
+#else
+	    (pfd = res_pfd) &&
 #endif
-				       TST_READ_EVENT(resfd, res_pfd)))
+	    TST_READ_EVENT(resfd))
 	    {
 		do_dns_async();
 		nfds--;
-		CLR_READ_EVENT(resfd, res_pfd);
+		CLR_READ_EVENT(resfd);
 	    }
-	if (udpfd >= 0 && nfds > 0 && (
-#ifdef	_DO_POLL_
-				       udp_pfd &&
+	if (nfds > 0 &&
+#ifndef	_DO_POLL_
+	    udpfd >= 0
+#else
+	    (pfd = udp_pfd) &&
 #endif
-				       TST_READ_EVENT(udpfd, udp_pfd)))
+	    TST_READ_EVENT(udpfd))
 	    {
 		polludp();
 		nfds--;
-		CLR_READ_EVENT(udpfd, udp_pfd);
+		CLR_READ_EVENT(udpfd);
 	    }
 
 #ifndef	_DO_POLL_
@@ -1956,12 +1960,12 @@ FdAry	*fdp;
 #endif
 */
 				auth--;
-				if (TST_WRITE_EVENT(cptr->authfd, pfd))
+				if (TST_WRITE_EVENT(cptr->authfd))
 				    {
 					nfds--;
 					send_authports(cptr);
 				    }
-				else if (TST_READ_EVENT(cptr->authfd, pfd))
+				else if (TST_READ_EVENT(cptr->authfd))
 				    {
 					nfds--;
 					read_authports(cptr);
@@ -1984,9 +1988,9 @@ FdAry	*fdp;
 		/*
 		 * accept connections
 		 */
-		if (TST_READ_EVENT(fd, pfd) && IsListening(cptr))
+		if (TST_READ_EVENT(fd) && IsListening(cptr))
 		    {
-			CLR_READ_EVENT(fd, pfd);
+			CLR_READ_EVENT(fd);
 			cptr->lasttime = timeofday;
 			/*
 			** There may be many reasons for error return, but
@@ -2036,7 +2040,7 @@ FdAry	*fdp;
 		    }
 		if (IsMe(cptr))
 			continue;
-		if (TST_WRITE_EVENT(fd, pfd))
+		if (TST_WRITE_EVENT(fd))
 		    {
 			int	write_err = 0;
 			/*
@@ -2049,8 +2053,8 @@ FdAry	*fdp;
 			if (IsDead(cptr) || write_err)
 			    {
 deadsocket:
-				if (TST_READ_EVENT(fd, pfd))
-					CLR_READ_EVENT(fd, pfd);
+				if (TST_READ_EVENT(fd))
+					CLR_READ_EVENT(fd);
 				cptr->exitc = EXITC_ERROR;
 				(void)exit_client(cptr, cptr, &me,
 						  strerror(get_sockerr(cptr)));
@@ -2058,11 +2062,11 @@ deadsocket:
 			    }
 		    }
 		length = 1;	/* for fall through case */
-		if (!NoNewLine(cptr) || TST_READ_EVENT(fd, pfd)) {
+		if (!NoNewLine(cptr) || TST_READ_EVENT(fd)) {
 		    if (!(DoingAuth(cptr) &&
 			  timeofday - cptr->firsttime < 5))
 			    length = read_packet(cptr,
-						 TST_READ_EVENT(fd, pfd));
+						 TST_READ_EVENT(fd));
 		}
 /*		else if (IsClient(cptr) && DBufLength(&cptr->recvQ))
 			length = client_packet(cptr);
