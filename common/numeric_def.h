@@ -126,6 +126,7 @@
 #define RPL_ISUPPORT         005
 #define	RPL_BOUNCE            10
 #define	RPL_YOURID            42
+#define RPL_SAVENICK          43
 
 /*
  * Errors are in the range from 400-599 currently and are grouped by what
