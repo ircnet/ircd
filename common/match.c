@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: match.c,v 1.7 2001/12/31 01:21:24 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: match.c,v 1.8 2002/01/02 03:12:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -338,7 +338,8 @@ int	n;
 int isvalidusername(char *username)
 {
 	Reg char	*ch;
-	int	an, nan;
+	int	an=0;
+	int	nan=0;
 
 	ch = username;
 	if (*ch == '+' || *ch == '=' || *ch == '-' ||
