@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.114 2002/11/22 21:19:26 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.115 2002/11/23 18:47:45 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1816,6 +1816,11 @@ char	*parv[];
 	cm = (parc > 3) ? parv[3]: name;
 	doall = !match(name, ME) && !match(cm, ME);
 	wilds = index(cm, '*') || index(cm, '?');
+
+	if (parc > 1 && parv[1][1] != '\0')
+	{
+		stat = '*';
+	}
 
 	switch (stat)
 	{
