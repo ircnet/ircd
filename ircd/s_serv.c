@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.173 2004/03/16 22:09:14 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.174 2004/03/18 22:48:01 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1419,17 +1419,36 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		    }
 		else if (IsService(acptr) &&
 			 match(acptr->service->dist, cptr->name) == 0)
-		    {
-			if (ST_NOTUID(cptr) && *mlname == '*' &&
-			    match(mlname, acptr->service->server) == 0)
-				stok = me.serv->tok;
+		{
+			if (ST_UID(cptr))
+			{
+				sendto_one(cptr, ":%s SERVICE %s %s %d :%s",
+						acptr->service->servp->sid,
+						acptr->name,
+						acptr->service->dist,
+						acptr->service->type,
+				   		acptr->info);
+			}
 			else
-				stok = acptr->service->servp->tok;
-			sendto_one(cptr, "SERVICE %s %s %s %d %d :%s",
-				   acptr->name, stok, acptr->service->dist,
-				   acptr->service->type, acptr->hopcount + 1,
-				   acptr->info);
-		    }
+			{
+				if (*mlname == '*' &&
+			    	    match(mlname, acptr->service->server) == 0)
+				{
+					stok = me.serv->tok;
+				}
+				else
+				{
+					stok = acptr->service->servp->maskedby->serv->tok;
+				}
+				
+				sendto_one(cptr, "SERVICE %s %s %s %d %d :%s",
+				   		acptr->name, stok,
+						acptr->service->dist,
+						acptr->service->type,
+						acptr->hopcount + 1,
+						acptr->info);
+			}
+		}
 		/* the previous if does NOT catch all services.. ! */
 	    }
 

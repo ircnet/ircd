@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.49 2004/03/11 02:48:04 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.50 2004/03/18 22:48:01 jv Exp $";
 #endif
 
 #include "os.h"
@@ -283,20 +283,29 @@ aConfItem	*find_conf_service(aClient *cptr, int type, aConfItem *aconf)
 /*
 ** m_service
 **
+**  <= 2.10 protocol:
 **	parv[0] = sender prefix
 **	parv[1] = service name
-**	parv[2] = server token
+**	parv[2] = server token (unused on pure 2.11 network)
 **	parv[3] = distribution code
 **	parv[4] = service type
 **	parv[5] = hopcount
 **	parv[6] = info
+**
+**  2.11 protocol
+**	parv[0] = sender prefix
+**	parv[1] = service name
+**	parv[2] = distribution mask
+**	parv[3] = service type
+**	parv[4]	= info
+**
 */
 int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Reg	aClient	*acptr = NULL;
-	Reg	aService *svc;
+	aClient	*acptr = NULL, *bcptr = NULL;
+	aService *svc;
 #ifdef  USE_SERVICES
-	Reg	aConfItem *aconf;
+	aConfItem *aconf;
 #endif
 	aServer	*sp = NULL;
 	char	*dist, *server = NULL, *info, *stok;
@@ -309,45 +318,68 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return 1;
 	    }
 
-	if (parc < 7 || *parv[1] == '\0' || *parv[2] == '\0' ||
-	    *parv[3] == '\0' || *parv[6] == '\0')
-	    {
+	if ((ST_NOTUID(cptr) && parc < 7) || parc < 5)
+	{
 		sendto_one(cptr, replies[ERR_NEEDMOREPARAMS], ME,
 			   BadTo(parv[0]), "SERVICE");
 		return 1;
-	    }
+	}
 
 	/* Copy parameters into better documenting variables */
+	if (ST_NOTUID(cptr))
+	{
+		dist = parv[3];
+		type = strtol(parv[4], NULL, 0);
+		info = parv[6];
+	}
+	else
+	{
+		dist = parv[2];
+		type = strtol(parv[3], NULL, 0);
+		info = parv[4];
+	}
 
 	/*
 	 * Change the sender's origin.
 	 */
 	if (IsServer(cptr))
 	    {
-		sptr = make_client(cptr);
-		svc = make_service(sptr);
-		add_client_to_list(sptr);
-		strncpyzt(sptr->service->namebuf, parv[1],
-			sizeof(sptr->service->namebuf));
-		server = parv[2];
-		sptr->hopcount = atoi(parv[5]);
-		sp = find_tokserver(atoi(server), cptr, NULL);
+		acptr = make_client(cptr);
+		svc = make_service(acptr);
+		add_client_to_list(acptr);
+		strncpyzt(acptr->service->namebuf, parv[1],
+			sizeof(acptr->service->namebuf));
+		
+		/* 2.11 protocol - :SID SERVICE ..
+		 * - we know that the sptr contains the correct server */
+		if (ST_UID(cptr))
+		{
+			acptr->hopcount = sptr->hopcount;
+			sp = sptr->serv;
+		}
+		else
+		{ /* old 2.10 protocol */
+			server = parv[2];
+			acptr->hopcount = atoi(parv[5]);
+			sp = find_tokserver(atoi(server), cptr, NULL);
+		}
+		
 		if (sp == NULL)
-		    {
+		{
 			sendto_flag(SCH_ERROR,
                        	    "ERROR: SERVICE:%s without SERVER:%s from %s",
-				    sptr->name, server,
+				    acptr->name, server,
 				    get_client_name(cptr, FALSE));
-			return exit_client(NULL, sptr, &me, "No Such Server");
-		    }
-		if (match(parv[3], ME))
-		    {
+			return exit_client(NULL, acptr, &me, "No Such Server");
+		}
+		if (match(dist, ME))
+		{
 			sendto_flag(SCH_ERROR,
-                       	    "ERROR: SERVICE:%s DIST:%s from %s", sptr->name,
-				    parv[3], get_client_name(cptr, FALSE));
-			return exit_client(NULL, sptr, &me,
+                       	    "ERROR: SERVICE:%s DIST:%s from %s", acptr->name,
+				    dist, get_client_name(cptr, FALSE));
+			return exit_client(NULL, acptr, &me,
 					   "Distribution code mismatch");
-		    }
+		}
 	    }
 #ifndef	USE_SERVICES
 	else
@@ -357,9 +389,6 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    }
 #endif
 
-	dist = parv[3];
-	type = strtol(parv[4], NULL, 0);
-	info = parv[6];
 
 #ifdef	USE_SERVICES
 	if (!IsServer(cptr))
@@ -424,51 +453,74 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		istat.is_myservice++;
 		if (istat.is_myservice > istat.is_m_myservice)
 			istat.is_m_myservice = istat.is_myservice;
+		
+		/* local service, assign to acptr so we can use it later*/
+		acptr = sptr;
 	    }
 #endif
 
 	istat.is_service++;
 	if (istat.is_service > istat.is_m_service)
 		istat.is_m_service = istat.is_service;
-	SetService(sptr);
+	SetService(acptr);
 	svc->servp = sp;
 	sp->refcnt++;
 	svc->server = mystrdup(sp->bcptr->name);
 	strncpyzt(svc->dist, dist, HOSTLEN);
-	if (sptr->info != DefInfo)
-		MyFree(sptr->info);
+	if (acptr->info != DefInfo)
+		MyFree(acptr->info);
 	if (strlen(info) > REALLEN) info[REALLEN] = '\0';
-	sptr->info = mystrdup(info);
+	acptr->info = mystrdup(info);
 	svc->wants = 0;
 	svc->type = type;
-	reorder_client_in_list(sptr);
-	(void)add_to_client_hash_table(sptr->name, sptr);
+	reorder_client_in_list(acptr);
+	(void)add_to_client_hash_table(acptr->name, sptr);
 
 #ifdef	USE_SERVICES
-	check_services_butone(SERVICE_WANT_SERVICE, NULL, sptr,
-			      "SERVICE %s %s %s %d %d :%s", sptr->name,
-			      server, dist, type, sptr->hopcount, info);
+	check_services_butone(SERVICE_WANT_SERVICE, NULL, acptr,
+			      ":%s SERVICE %s %s %d :%s",
+			      sp->sid, acptr->name, dist, type, info);
 #endif
-	sendto_flag(SCH_SERVICE, "Received SERVICE %s from %s (%s %d %s)",
-		    sptr->name, get_client_name(cptr, TRUE), dist, sptr->hopcount,
-		    info);
+	sendto_flag(SCH_SERVICE,
+			"Received SERVICE %s from %s via %s (%s %d %s)",
+			acptr->name, sptr->name, get_client_name(cptr, TRUE),
+			dist, acptr->hopcount, info);
 
 	for (i = fdas.highest; i >= 0; i--)
-	    {
-		if (!(acptr = local[fdas.fd[i]]) || !IsServer(acptr) ||
-		    acptr == cptr)
+	{
+		if (!(bcptr = local[fdas.fd[i]]) || !IsServer(bcptr) ||
+		    bcptr == cptr)
 			continue;
-		if (match(dist, acptr->name))
+		if (match(dist, bcptr->name))
 			continue;
-		mlname = my_name_for_link(ME, acptr->serv->nline->port);
-		if (ST_NOTUID(acptr) && *mlname == '*' &&
-			match(mlname, sptr->service->server)== 0)
-			stok = me.serv->tok;
+
+		if (ST_UID(bcptr))
+		{
+			sendto_one(bcptr, ":%s SERVICE %s %s %d :%s",
+					sp->sid, acptr->name, dist, type, info);
+		}
 		else
-			stok = sp->tok;
-		sendto_one(acptr, "SERVICE %s %s %s %d %d :%s", sptr->name,
-			   stok, dist, type, sptr->hopcount+1, info);
-	    }
+		{
+			mlname = my_name_for_link(ME, bcptr->serv->nline->port);
+		
+			if (*mlname == '*' && match(mlname,
+						acptr->service->server)== 0)
+			{
+				/* Me masking the service to 2.10 */
+				stok = me.serv->tok;
+			}
+			else
+			{	/* Mask masked services */
+				stok = sp->maskedby->serv->tok;
+			}
+			
+			sendto_one(bcptr, "SERVICE %s %s %s %d %d :%s",
+					acptr->name, stok, dist, type,
+					acptr->hopcount+1, info);
+
+		}
+	}
+	
 	return 0;
 }
 
