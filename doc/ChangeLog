@@ -1,15 +1,23 @@
+2002-03-23  Piotr Kucharski
+
+	* s_serv.c/check_servername(): initialize all vars (problem reported
+	  by ZZyZZ).
+
 2002-03-14  Jakub Vlasek
+
 	* ircd.c/setup_signals(): Ignore SIGTRAP on FreeBSD to prevent crash
 	  after detaching ircd in gdb.
 	* support.c: Added #ifndef CLIENT_COMPILE around make_isupport.
 
 2002-03-15  Jakub Vlasek
+
 	* support.c,s_conf.c: Read network name from ircd.conf.
 	* s_conf.c/s_conf_ext.h: Added networkname global variable.
 	* ircd.c: Added warning message about network name not being set.
 	* config.h.dist: Removed SERVER_ID and NETWORK_NAME defines.
 	
 2002-03-14  Jakub Vlasek
+
 	* s_bsd.c,s_bsd_ext.h: Moved daemonization from init_sys() into
 	  daemonize().
 	* ircd.c,ircd_ext.h,s_conf.c: Read SID from M-line instead of #define.
@@ -19,11 +27,13 @@
 	  is booting.
 
 2002-03-13  Jakub Vlasek
+
 	* numeric_def.h, s_err.c, s_user.c/save_user(): Added RPL_SAVENICK
 	  to inform user that his nick is being changed to UID after
 	  nick collision.
 
 2002-03-03  Jakub Vlasek
+
 	* support.c: added make_isupport() used for 005 numeric generation.
 	* s_user.c/register_user(): send 005 numeric.
 	* numeric_def.h, support_ext.h, ircd.c, s_err.c,version.c.SH.in,
@@ -39,6 +49,7 @@
 	  use absolute value of it.
 
 2002-01-22  Jakub Vlasek
+
 	* tkserv.c: Fixed potential overflow (from W.Campbell)
 
 2002-01-07  Piotr Kucharski
