@@ -1,3 +1,10 @@
+1999-07-20  Kurt Roeckx
+
+	* channel.c:
+		* m_njoin: send +v for uniqops in the right case
+		* send_channel_members: send +v inside njoin for ops too
+		* m_invite: send back numerics if the channel doesn't exist	
+
 1999-07-18  Piotr Kucharski
 
 	* channel.c/set_mode(), m_kick(): send ERR_NOTONCHANNEL, not 
