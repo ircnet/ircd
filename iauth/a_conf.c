@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.29 2004/09/20 16:30:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.30 2004/09/20 16:31:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -255,6 +255,7 @@ char	*conf_read(char *cfile)
 			(*last)->timeout = timeout;
 			(*last)->reason	= NULL;
 			(*last)->delayed = o_del;
+			(*last)->port = 0;
 			if (Mlist[i] == &Module_rfc931)
 				ident = *last;
 
