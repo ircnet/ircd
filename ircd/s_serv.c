@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.143 2004/02/13 01:55:21 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.144 2004/02/15 00:33:04 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2457,18 +2457,18 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		port = atoi(parv[2]);
 	}
 	
-	if (parc < 3 || !port)
+	if (parc < 3 || port == 0)
 	{
 		if (tmpport < 0)
 		{
-			port = 0 - port;
+			port = 0 - tmpport;
 		}
 		else
 		{
 			port = tmpport;
 		}
 
-		if (!port)
+		if (port == 0)
 		{
 			sendto_one(sptr,
 				":%s NOTICE %s :Connect: missing port number",
@@ -2476,7 +2476,7 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			return 0;
 		}
 	}
-	if (port < 0)
+	if (port <= 0)
 	{
 		sendto_one(sptr, "NOTICE %s :Connect: Illegal port number",
 				  parv[0]);
@@ -2488,8 +2488,8 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (!IsAnOper(cptr))
 	    {
 		sendto_ops_butone(NULL, &me,
-				  ":%s WALLOPS :Remote CONNECT %s %s from %s",
-				   ME, parv[1], parv[2] ? parv[2] : "",
+				  ":%s WALLOPS :Remote CONNECT %s %d from %s",
+				   ME, parv[1], port,
 				   get_client_name(sptr,FALSE));
 #if defined(USE_SYSLOG) && defined(SYSLOG_CONNECT)
 		syslog(LOG_DEBUG, "CONNECT From %s : %s %s", parv[0],
