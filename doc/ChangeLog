@@ -27,6 +27,10 @@
 	  used between servers.
 	* s_user.c/m_user(): find_tokserver() call removed.
 
+2005-01-27  Piotr Kucharski
+
+	* mod_webproxy.c/proxy_init(): off-by-one config parse error.
+
 2005-01-03  Kurt Roeckx
 
 	* ircd.c/check_pings(): Initialise the reason variable.  It could be
