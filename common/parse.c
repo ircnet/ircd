@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.39 2002/01/07 02:07:21 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.40 2002/04/05 03:02:46 jv Exp $";
 #endif
 
 #include "os.h"
@@ -97,6 +97,7 @@ struct Message msgtab[] = {
   { MSG_MOTD,    m_motd,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
   { MSG_CLOSE,   m_close,    MAXPARA, MSG_LAG|MSG_REGU|MSG_OP, 0, 0, 0L},
   { MSG_SERVICE, m_service,  MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
+  { MSG_EOB,     m_eob,      MAXPARA, MSG_LAG|MSG_NOU|MSG_REG, 0, 0, 0L},
 #ifdef	USE_SERVICES
   { MSG_SERVSET, m_servset,  MAXPARA, MSG_LAG|MSG_SVC, 0, 0, 0L},
 #endif
@@ -505,6 +506,53 @@ int	find_sender(aClient *cptr, aClient **sptr, char *sender, char *buffer)
 	*sptr = from;
 	return 1;
 }
+#ifndef CLIENT_COMPILE
+/* find target.
+**  name - name of the client to be searched
+**  cptr - originating socket
+*/
+aClient *find_target(char *name,aClient *cptr)
+{
+	aClient *acptr = NULL;
+	
+	if (ST_UID(cptr))
+	{
+		if (isdigit(name[0]))
+		{
+			if (name[SIDLEN] == '\0')
+			{
+				acptr = find_sid(name, NULL);
+			}
+			else
+			{
+				acptr = find_uid(name, NULL);
+			}
+		}
+		else if (name[0] == '$' && name[SIDLEN] == '\0')
+		{
+			aServer *asptr;
+			asptr = find_tokserver(idtol(name+1), cptr, NULL);
+			if (acptr)
+			{
+				acptr = asptr->bcptr;
+			}
+		}
+	}
+	if (!acptr)
+	{
+		acptr = find_client(name, NULL);
+		if (!acptr)
+		{
+			acptr = find_server(name, NULL);
+		}
+		if (!acptr && match(name, ME))
+		{
+			acptr = &me;
+		}
+	}
+	return acptr;
+}
+#endif
 
 /*
  * parse a buffer.
