@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.57 1999/02/21 00:33:46 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.58 1999/04/15 21:32:02 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -207,6 +207,12 @@ char	*parv[];
 	if (IsLocOp(sptr) && !MyConnect(acptr))
 	    {
 		sendto_one(sptr, err_str(ERR_NOPRIVILEGES, parv[0]));
+		return 1;
+	    }
+	if (!MyConnect(acptr))
+	    {
+		sendto_one(acptr->from, ":%s SQUIT %s :%s", parv[0],
+			   acptr->name, comment);
 		return 1;
 	    }
 	/*
