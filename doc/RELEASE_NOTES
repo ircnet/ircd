@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.53 2004/06/29 17:51:34 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.54 2004/06/30 19:15:25 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -13,8 +13,7 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* Channelnames created on 2.11.0 will have chars {}~\ in their name
 	  automatically converted to []^|. Sorry.
 	* I: require now both name AND addr to match. Revise your config.
-	* I: have flags now ('F', 'R', 'I', 'E', 'N', 'D', 'M'), check INSTALL
-	  file for details.
+	* I: have flags now (D, E, e, F, I, M, N, R), check INSTALL for details.
 	* OPER_REMOTE is removed (and server behaves like it was defined).
 	* stats l/L no longer returns listeners, use stats P.
 	* DNS command is oper only from now.
@@ -38,6 +37,9 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	* rehash t removes all tklines.
 	* O: have flags now, check INSTALL file for details; WARNING: no flags
 	  means no privileges at all!
+	* oper-only (access granted via O: flag) &CLIENTS channel reporting
+	  (if defined) clients connects, quits, nickchanges.
+	* new way of excluding users, X:line.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================
