@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.24 1999/01/28 23:49:40 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.25 1999/02/01 20:33:46 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -201,14 +201,18 @@ read_iauth()
 			{
 			    sendto_flag(SCH_AUTH, "Garbage from iauth [%s]",
 					start);
+			    sendto_iauth("-1 E Garbage [%s]", start);
 			    /*
 			    ** The above should never happen, but i've seen it
 			    ** occasionnally, so let's try to get more info
 			    ** about it! -kalt
 			    */
 			    sendto_flag(SCH_AUTH,
-			"last='%c' start=%x end=%x buf=%x olen=%d i=%d",
+			"last='%u' start=%x end=%x buf=%x olen=%d i=%d",
 					last, start, end, buf, olen, i);
+			    sendto_iauth(
+			 "-1 E last=%u start=%x end=%x buf=%x olen=%d i=%d",
+			 		last, start, end, buf, olen, i);
 			    start = end;
 			    continue;
 			}
