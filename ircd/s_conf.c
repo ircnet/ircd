@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.114 2004/06/22 23:01:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.115 2004/06/24 17:01:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -205,6 +205,78 @@ char *pline_flags_to_string(long flags)
 
 	*s++ = '\0';
 	return pfsbuf;
+}
+
+/* convert oline flags to human readable string */
+char	*oline_flags_to_string(long flags)
+{
+	static char ofsbuf[BUFSIZE];
+	char *s = ofsbuf;
+
+	if (flags & ACL_LOCOP)
+		*s++ = 'L';
+	if (flags & ACL_KILLREMOTE)
+		*s++ = 'K';
+	else if (flags & ACL_KILLLOCAL)
+		*s++ = 'k';
+	if (flags & ACL_SQUITREMOTE)
+		*s++ ='S';	
+	else if (flags & ACL_SQUITLOCAL)
+		*s++ ='s';	
+	if (flags & ACL_CONNECTREMOTE)
+		*s++ ='C';	
+	else if (flags & ACL_CONNECTLOCAL)
+		*s++ ='c';	
+	if (flags & ACL_CLOSE)
+		*s++ ='l';	
+	if (flags & ACL_HAZH)
+		*s++ ='h';	
+	if (flags & ACL_DNS)
+		*s++ ='d';	
+	if (flags & ACL_REHASH)
+		*s++ ='r';	
+	if (flags & ACL_RESTART)
+		*s++ ='R';	
+	if (flags & ACL_DIE)
+		*s++ ='D';	
+	if (flags & ACL_SET)
+		*s++ ='e';	
+	if (flags & ACL_TKLINE)
+		*s++ ='T';	
+	if (s == ofsbuf)
+		*s++ = '-';
+	*s++ = '\0';
+	return ofsbuf;
+}
+/* convert string from config to flags */
+long	oline_flags_parse(char *string)
+{
+	long tmp = 0;
+	char *s;
+	
+	for (s = string; *s; s++)
+	{
+		switch(*s)
+		{
+		case 'L': tmp |= ACL_LOCOP; break;
+		case 'A': tmp |= ACL_ALL_MASK; break;
+		case 'K': tmp |= ACL_KILL; break;
+		case 'k': tmp |= ACL_KILLLOCAL; break;
+		case 'S': tmp |= ACL_SQUIT; break;
+		case 's': tmp |= ACL_SQUITLOCAL; break;
+		case 'C': tmp |= ACL_CONNECT; break;
+		case 'c': tmp |= ACL_CONNECTLOCAL; break;
+		case 'l': tmp |= ACL_CLOSE; break;
+		case 'h': tmp |= ACL_HAZH; break;
+		case 'd': tmp |= ACL_DNS; break;
+		case 'r': tmp |= ACL_REHASH; break;
+		case 'R': tmp |= ACL_RESTART; break;
+		case 'D': tmp |= ACL_DIE; break;
+		case 'e': tmp |= ACL_SET; break;
+		case 'T': tmp |= ACL_TKLINE; break;
+		}
+	}
+	return tmp;
 }
 /*
  * remove all conf entries from the client except those which match
