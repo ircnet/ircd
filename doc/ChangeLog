@@ -1,3 +1,9 @@
+2005-02-09  Piotr Kucharski
+
+	* channel.c/m_join(): get rid of ^G hack; simplify, as we don't get
+	  JOIN from other servers.
+	* channel.c/m_join(): tiny bug, JOIN 0,#chan did not join #chan.
+
 2005-02-08  Piotr Kucharski
 
 	* struct_def.h: removed ST_UID and ST_NOTUID.
@@ -12,6 +18,7 @@
 	  always matching conditions and never matching conditions and code.
 	* parse.c/find_sender(), s_id.c/sid_valid(), s_serv.c/m_server(),
 	  m_server_estab(), m_trace(): sid cannot have '$' anymore.
+	* s_user.c/m_kill(): no "old" servers, no sendto_serv_notv() using.
 
 2005-02-07  Piotr Kucharski
 
