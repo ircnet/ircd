@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.232 2004/10/02 01:20:43 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.233 2004/10/06 20:15:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2345,6 +2345,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			    }
 		    }
 		if (!IsChannelName(name) ||
+		    (*name == '+' && (*(name+1) == '#' || *(name+1) == '!')) ||
 		    (*name == '!' && IsChannelName(name+1)))
 		    {
 			if (MyClient(sptr))
