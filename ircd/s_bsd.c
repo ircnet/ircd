@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.147 2004/07/03 16:06:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.148 2004/07/11 18:39:10 jv Exp $";
 #endif
 
 #include "os.h"
@@ -371,9 +371,20 @@ int	add_listener(aConfItem *aconf)
 		add_fd(cptr->fd, &fdas);
 		add_fd(cptr->fd, &fdall);
 		set_non_blocking(cptr->fd, cptr);
+		/* Add to linked list */
+		if (ListenerLL)
+		{
+			ListenerLL->prev = cptr;
+		}
+		cptr->next = ListenerLL;
+		cptr->prev = NULL;
+		ListenerLL = cptr;
 	    }
 	else
+	{
 		free_client(cptr);
+	}
+	
 	return 0;
 }
 
@@ -1340,6 +1351,24 @@ void	close_connection(aClient *cptr)
 				close_connection(cptr->acpt);
 		    }
 	    }
+	
+	/* Remove from Listener Linked list */
+	if (IsListener(cptr))
+	{
+		if (cptr->prev)
+		{
+			cptr->prev->next = cptr->next;
+		}
+		else
+		{
+			/* we were 1st */
+			ListenerLL = cptr->next;
+		}
+		if (cptr->next)
+		{
+			cptr->next->prev = cptr->prev;
+		}
+	}
 
 	det_confs_butmask(cptr, 0);
 	cptr->from = NULL; /* ...this should catch them! >:) --msa */
