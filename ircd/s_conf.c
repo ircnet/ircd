@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.152 2004/11/19 17:31:23 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.153 2004/12/06 17:07:22 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1284,7 +1284,7 @@ int	openconf(void)
 		return pi[0];
 	}
 #else
-	if ((ret = open(configfile, O_RDONLY)) == - 1)
+	if ((ret = open(configfile, O_RDONLY)) == -1)
 	{
 		if (serverbooting)
 		{
@@ -1382,6 +1382,7 @@ int 	initconf(int opt)
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
 	char	*line;
 	aConfig	*ConfigTop, *p;
+	FILE	*fdn;
 #else
 	char	line[512], c[80];
 #endif
@@ -1395,7 +1396,8 @@ int 	initconf(int opt)
 		return -1;
 	    }
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
-	ConfigTop = config_read(fd, 0, new_config_file(configfile, NULL, 0));
+	fdn = fdopen(fd, "r");
+	ConfigTop = config_read(fdn, 0, new_config_file(configfile, NULL, 0));
 	for(p = ConfigTop; p; p = p->next)
 #else
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
@@ -1809,7 +1811,11 @@ int 	initconf(int opt)
 	if (aconf)
 		free_conf(aconf);
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
+#if defined(CONFIG_DIRECTIVE_INCLUDE)
+	(void)fclose(fdn);
+#else
 	(void)close(fd);
+#endif
 #if defined(M4_PREPROC) && !defined(USE_IAUTH)
 	(void)wait(0);
 #endif

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.41 2004/11/01 14:41:19 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.42 2004/12/06 17:07:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -192,6 +192,7 @@ static	void	showconf()
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
 	aConfig *p, *p2;
 	int etclen = 0;
+	FILE *fdn;
 #else
 	int dh;
 	char	line[512], c[80], *tmp;
@@ -211,7 +212,8 @@ static	void	showconf()
 	{
 		etclen = strlen(IRCDCONF_DIR);
 	}
-	p2 = config_read(fd, 0, new_config_file(configfile, NULL, 0));
+	fdn = fdopen(fd, "r");
+	p2 = config_read(fdn, 0, new_config_file(configfile, NULL, 0));
 	for(p = p2; p; p = p->next)
 	{
 		if (debugflag)
@@ -221,6 +223,7 @@ static	void	showconf()
 		printf("%s\n", p->line);
 	}
 	config_free(p2);
+	(void)fclose(fdn);
 #else
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
 	while ((dh = dgets(fd, line, sizeof(line) - 1)) > 0)
@@ -235,8 +238,8 @@ static	void	showconf()
 			}
 		printf("%s\n", line);
 	}
-#endif
 	(void)close(fd);
+#endif
 #ifdef	M4_PREPROC
 	(void)wait(0);
 #endif
@@ -263,6 +266,7 @@ static	aConfItem 	*initconf()
 	char    *line;
 	aConfig *ConfigTop, *filelist;
 	aFile	*ftop;
+	FILE	*fdn;
 #else
 	int	dh;
 	struct wordcount *filelist = files;
@@ -280,7 +284,8 @@ static	aConfItem 	*initconf()
 
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
 	ftop = new_config_file(configfile, NULL, 0);
-	files = ConfigTop = config_read(fd, 0, ftop);
+	fdn = fdopen(fd, "r");
+	files = ConfigTop = config_read(fdn, 0, ftop);
 	for(filelist = ConfigTop; filelist; filelist = filelist->next)
 #else
 	ftop = configfile;
@@ -731,7 +736,11 @@ print_confline:
 			aconf = NULL;
 		    }
 	    }
+#if defined(CONFIG_DIRECTIVE_INCLUDE)
+	(void)fclose(fdn);
+#else
 	(void)close(fd);
+#endif
 #ifdef	M4_PREPROC
 	(void)wait(0);
 #endif
