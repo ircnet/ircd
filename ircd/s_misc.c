@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.4 1997/04/16 13:52:27 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.5 1997/04/18 21:33:29 kalt Exp $";
 #endif
 
 #include <sys/time.h>
@@ -476,6 +476,9 @@ char	*comment;	/* Reason for the exit */
 		** to test whether "sptr != acptr" in the following loops.
 		*/
 		close_connection(sptr);
+
+		if (IsServer(sptr))
+		    {
 		/*
 		** First QUIT all NON-servers which are behind this link
 		**
@@ -490,70 +493,89 @@ char	*comment;	/* Reason for the exit */
 		** together into exit_one_client() to provide some useful
 		** information about where the net is broken.      Ian 
 		*/
-		(void)strcpy(comment1, ME);
-		(void)strcat(comment1," ");
-		(void)strcat(comment1, sptr->name);
- 
- 		/* This will quit all the *users*, without checking the
-		** whole list of clients. I like it, unfortunately,
-		** there's more below..
- 		*/
- 		for (asptr = svrtop; asptr; asptr = (aServer *)next)
-		{
- 			next = (aClient *)asptr->nexts;
- 			if ((asptr->userlist == NULL)
- 			    || (asptr->bcptr == NULL)
- 			    || (asptr->bcptr->from != sptr
- 				&& asptr->bcptr != sptr))
- 				continue;
- 			/* This version doesn't need QUITs to be propagaged
-			** unless the remote server is hidden (by a hostmask)
+			(void)strcpy(comment1, ME);
+			(void)strcat(comment1," ");
+			(void)strcat(comment1, sptr->name);
+
+			/* This will quit all the *users*, without checking the
+			** whole list of clients. I like it, unfortunately,
+			** there's more below..
 			*/
- 			if (mark_blind_servers(NULL, asptr->bcptr->name))
- 				flags |= FLAGS_SPLIT | FLAGS_HIDDEN;
- 			else
- 				flags |= FLAGS_SPLIT;
- 			do
- 			{
- 				acptr = asptr->userlist->bcptr;
- 				acptr->flags |= flags;
- 				exit_one_client(NULL, acptr, &me, comment1);
- 			}
- 			while (asptr->userlist);
- 		}
- 		/* Here is more..
-		** I don't know what use this can have for now, but
-		** the above breaks the old code, which I just pasted
-		** below.
- 		** Nothing should happen here, unless there is another
- 		** remote entity than "user" (and servers) depending
- 		** on remote servers: services, it would be much smarter
-		** to only check services instead of wasting CPU - krys
- 		*/
-		for (acptr = client; acptr; acptr = next)
-		    {
-			next = acptr->next;
-			if (!IsServer(acptr) && acptr->from == sptr)
+			for (asptr = svrtop; asptr; asptr = (aServer *)next)
 			    {
-				exit_one_client(NULL, acptr, &me, comment1);
+				next = (aClient *)asptr->nexts;
+				if ((asptr->userlist == NULL)
+				    || (asptr->bcptr == NULL)
+				    || (asptr->bcptr->from != sptr
+					&& asptr->bcptr != sptr))
+					continue;
+				/* This version doesn't need QUITs to be
+				** propagaged unless the remote server is
+				** hidden (by a hostmask)
+				*/
+				if (mark_blind_servers(NULL,
+						       asptr->bcptr->name))
+					flags |= FLAGS_SPLIT | FLAGS_HIDDEN;
+				else
+					flags |= FLAGS_SPLIT;
+				do
+				    {
+					acptr = asptr->userlist->bcptr;
+					acptr->flags |= flags;
+					exit_one_client(NULL, acptr, &me,
+							comment1);
+				    }
+				while (asptr->userlist);
 			    }
-		    }
-		/*
-		** Second SQUIT all servers behind this link
-		*/
-		for (asptr = svrtop; asptr; asptr = (aServer *)next)
-		    {
-			next = (aClient *)asptr->nexts;
-			if ((acptr = asptr->bcptr) &&
-			    acptr->from == sptr)
+			/* Here is more..
+			** I don't know what use this can have for now, but
+			** the above breaks the old code, which I just pasted
+			** below.
+			** Nothing should happen here, unless there is another
+			** remote entity than "user" (and servers) depending
+			** on remote servers: services,it would be much smarter
+			** to only check services instead of wasting CPU - krys
+			*/
+			for (acptr = client; acptr; acptr = next)
 			    {
-				sendto_flag(SCH_SERVER,
-					    "Sending SQUIT %s (%s)",
-					    acptr->name, comment);
-				exit_one_client(NULL, acptr, &me, ME);
+				next = acptr->next;
+				if (!IsServer(acptr) && acptr->from == sptr)
+				    {
+					/*
+					** Let's see if things are ever wrong.
+					** Second step would be finally change
+					** this loop to go through the services
+					** list. -krys
+					*/
+					if (!IsService(acptr))
+						sendto_flag(SCH_ERROR,
+			    "lists seem corrupted: %s %#x %#x %#x (%s)",
+							    acptr->name,
+							    acptr->user,
+							    acptr->serv,
+							    acptr->service,
+							    sptr->name);
+					exit_one_client(NULL, acptr, &me,
+							comment1);
+				    }
 			    }
-		    }
-	    }
+			/*
+			** Second SQUIT all servers behind this link
+			*/
+			for (asptr = svrtop; asptr; asptr = (aServer *)next)
+			    {
+				next = (aClient *)asptr->nexts;
+				if ((acptr = asptr->bcptr) &&
+				    acptr->from == sptr)
+				    {
+					sendto_flag(SCH_SERVER,
+						    "Sending SQUIT %s (%s)",
+						    acptr->name, comment);
+					exit_one_client(NULL, acptr, &me, ME);
+				    }
+			    }
+		    } /* If (IsServer(sptr)) */
+	    } /* if (MyConnect(sptr) || (sptr->flags & FLAGS_HELD)) */
 
  	if (IsServer(sptr) && sptr->serv->userlist)
  	{
@@ -572,7 +594,7 @@ char	*comment;	/* Reason for the exit */
 		else
 			/* this is right */
 			(void)strcpy(comment1, sptr->serv->up);
- 		(void)strcat(comment1," ");
+ 		(void)strcat(comment1, " ");
  		(void)strcat(comment1, sptr->name);
 
  		do
