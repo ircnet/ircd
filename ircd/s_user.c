@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.150 2003/06/03 22:06:34 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.151 2003/07/19 12:23:52 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2325,7 +2325,7 @@ char	*parv[];
 		
 	}
 	/* *MUST* be after parse of user specified umodes */
-	if (sptr->flags & FLAGS_RILINE)
+	if (sptr->flags & FLAGS_RESTRICT)
 		SetRestricted(sptr);
 	strncpyzt(user->host, host, sizeof(user->host));
 	user->server = find_server_string(me.serv->snum);
