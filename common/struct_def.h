@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.76 2003/08/06 18:47:45 chopin Exp $
+ *   $Id: struct_def.h,v 1.77 2003/08/06 19:25:33 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -664,9 +664,6 @@ struct Channel	{
 #define	CHFL_EXCEPTION	0x0010 /* exception channel flag */
 #define	CHFL_INVITE	0x0020 /* invite channel flag */
 #define	CHFL_REOPLIST	0x0040 /* reoplist channel flag */
-#ifdef OPER_KLUDGE
-#define	CHFL_OPERS	0x1000 /* oper mode flag */
-#endif
 
 /* Channel Visibility macros */
 
