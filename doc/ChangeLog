@@ -1,3 +1,8 @@
+2002-03-13  Jakub Vlasek
+	* numeric_def.h, s_err.c, s_user.c/save_user(): Added RPL_SAVENICK
+	  to inform user that his nick is being changed to UID after
+	  nick collision.
+
 2002-03-03  Jakub Vlasek
 	* support.c: added make_isupport() used for 005 numeric generation.
 	* s_user.c/register_user(): send 005 numeric.
