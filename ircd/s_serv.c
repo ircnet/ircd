@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.206 2004/06/21 11:51:19 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.207 2004/06/24 15:55:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -126,80 +126,72 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	*server;
 	Reg	aClient	*acptr = NULL;
 	int	rsquit = 0;
-	char	*comment = (parc > 2 && parv[2]) ? parv[2] : "no reason";
+	char	*comment;
 	static char	comment2[TOPICLEN+1];
 
-	if (parc > 1)
-	{
-		server = parv[1];
-		/*
-		** To accomodate host masking, a squit for a masked server
-		** name is expanded if the incoming mask is the same as
-		** the server name for that link to the name of link.
-		*/
-		while ((*server == '*') && IsServer(cptr))
-		{
-			aconf = cptr->serv->nline;
-			if (!aconf)
-				break;
-			if (!mycmp(server,
-				   my_name_for_link(ME, aconf->port)))
-				server = cptr->name;
-			break; /* WARNING is normal here */
-		}
-		/*
-		** Find server matching (compatibility) SID
-		*/
-		if (server[0]=='$')
-		{
-			aServer *servptr;
+	if (is_allowed(sptr, ACL_SQUIT))
+		return m_nopriv(cptr, sptr, parc, parv);
 
-			servptr = find_tokserver(idtol(server + 1, SIDLEN - 1),
-				cptr, NULL);
-			if (servptr)
-			{
-				acptr = servptr->bcptr;
-			}
-		}
-		else	/* if (strlen(server)==SIDLEN) perhaps? --Beeth */
+	server = parv[1];
+	comment = parv[2];
+	/*
+	** To accomodate host masking, a squit for a masked server
+	** name is expanded if the incoming mask is the same as
+	** the server name for that link to the name of link.
+	*/
+	while ((*server == '*') && IsServer(cptr))
+	{
+		aconf = cptr->serv->nline;
+		if (!aconf)
+			break;
+		if (!mycmp(server,
+			   my_name_for_link(ME, aconf->port)))
+			server = cptr->name;
+		break; /* WARNING is normal here */
+	}
+	/*
+	** Find server matching (compatibility) SID
+	*/
+	if (server[0]=='$')
+	{
+		aServer *servptr;
+
+		servptr = find_tokserver(idtol(server + 1, SIDLEN - 1),
+			cptr, NULL);
+		if (servptr)
 		{
-			acptr = find_sid(server, NULL);
-		}
-		/*
-		** The following allows wild cards in SQUIT. Only useful
-		** when the command is issued by an oper.
-		*/
-		if (!acptr)
-		{
-			for (acptr = client;
-				(acptr = next_client(acptr, server));
-				acptr = acptr->next)
-			{
-				if (IsServer(acptr) || IsMe(acptr))
-				{
-					break;
-				}
-			}
-		}
-		if (acptr && IsMe(acptr))
-		{
-			if (MyConnect(sptr) && ST_UID(sptr))
-			{
-				/* remote server is closing it's link */
-				rsquit = 1;
-			}
-			acptr = cptr;
-			server = cptr->sockhost;
+			acptr = servptr->bcptr;
 		}
 	}
-	else
+	else	/* if (strlen(server)==SIDLEN) perhaps? --Beeth */
 	{
-		/*
-		** This is actually protocol error. But, well, closing
-		** the link is very proper answer to that...
-		*/
-		server = cptr->name;
+		acptr = find_sid(server, NULL);
+	}
+	/*
+	** The following allows wild cards in SQUIT. Only useful
+	** when the command is issued by an oper.
+	*/
+	if (!acptr)
+	{
+		for (acptr = client;
+			(acptr = next_client(acptr, server));
+			acptr = acptr->next)
+		{
+			if (IsServer(acptr) || IsMe(acptr))
+			{
+				break;
+			}
+		}
+	}
+	if (acptr && IsMe(acptr))
+	{
+		if (MyConnect(sptr) && ST_UID(sptr))
+		{
+			/* remote server is closing it's link */
+			rsquit = 1;
+		}
 		acptr = cptr;
+		server = cptr->sockhost;
 	}
 
 	/*
