@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.54 2002/07/06 03:13:12 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.55 2002/07/06 03:46:22 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1676,12 +1676,14 @@ char	**comment;
 		if ((!check || match(tmp->name, check) == 0) &&
 		    (!tmp->port || (tmp->port == cptr->acpt->port)))   
 		    {
+#ifdef TIMEDKLINES
 			now = 0;
 			if (!BadPtr(tmp->passwd) && isdigit(*tmp->passwd) &&
 			    !(now = check_time_interval(tmp->passwd, reply)))
 				continue;
 			if (now == ERR_YOUWILLBEBANNED)
 				tmp = NULL;
+#endif
 			break;
 		    }
 	    }
@@ -1870,6 +1872,7 @@ aClient	*cptr;
 #endif
 
 
+#ifdef TIMEDKLINES
 /*
 ** check against a set of time intervals
 */
@@ -1930,6 +1933,7 @@ char	*interval, *reply;
 	    }
 	return(0);
 }
+#endif /* TIMEDKLINES */
 
 /*
 ** find_bounce
