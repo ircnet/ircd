@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.92 1999/01/23 23:03:06 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.93 1999/02/19 01:05:04 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -238,7 +238,7 @@ char	*modeid;
 		        {
 			    tmp = *mode;
 			    *mode = tmp->next;
-			    istat.is_banmem -= (strlen(modeid) + 1);
+			    istat.is_banmem -= (strlen(tmp->value.cp) + 1);
 			    istat.is_bans--;
 			    MyFree(tmp->value.cp);
 			    free_link(tmp);
@@ -1695,13 +1695,13 @@ char	*key;
 				return (ERR_BANNEDFROMCHAN);
 			ckinvite = 1;
 		    }
-	if (chptr->mode.mode & MODE_INVITEONLY &&
+
+	if ((chptr->mode.mode & MODE_INVITEONLY) && !ckinvite &&
 	    !match_modeid(CHFL_INVITE, sptr, chptr))
 	    {
-		if (!ckinvite)
-			for (lp = sptr->user->invited; lp; lp = lp->next)
-				if (lp->value.chptr == chptr)
-					break;
+		for (lp = sptr->user->invited; lp; lp = lp->next)
+			if (lp->value.chptr == chptr)
+				break;
 		if (!lp)
 			return (ERR_INVITEONLYCHAN);
 		ckinvite = 1;
@@ -1710,12 +1710,12 @@ char	*key;
 	if (*chptr->mode.key && (BadPtr(key) || mycmp(chptr->mode.key, key)))
 		return (ERR_BADCHANNELKEY);
 
-	if (chptr->mode.limit && chptr->users >= chptr->mode.limit)
+	if (chptr->mode.limit && (chptr->users >= chptr->mode.limit) &&
+	    !ckinvite)
 	    {
-		if (!ckinvite)
-			for (lp = sptr->user->invited; lp; lp = lp->next)
-				if (lp->value.chptr == chptr)
-					break;
+		for (lp = sptr->user->invited; lp; lp = lp->next)
+			if (lp->value.chptr == chptr)
+				break;
 		if (!lp)
 			return (ERR_CHANNELISFULL);
 	    }
