@@ -410,6 +410,18 @@
 */
 #define CLIENTS_CHANNEL_LEVEL (CCL_CONN|CCL_QUIT)
 
+
+/*
+** This adds ability to ban users with specified realnames from
+** connecting to the server. Useful for various drones.
+** Also define the reason users as a rejection message.
+*/
+#undef XLINE
+
+#ifdef XLINE
+#define XLINE_EXIT_REASON "Too many host connections (global)"
+#endif
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
