@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.241 2004/10/05 22:59:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.242 2004/10/06 12:20:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2272,14 +2272,18 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int	m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-#ifdef ENABLE_USERS
-	char	namebuf[10],linebuf[10],hostbuf[17];
-	int	fd, flag = 0;
-#endif
+	if (parc > 1 &&
+		hunt_server(cptr,sptr,":%s USERS :%s",1,parc,parv) != HUNTED_ISME)
+	{
+		return 3;
+	}
 
-	if (hunt_server(cptr,sptr,":%s USERS :%s",1,parc,parv) == HUNTED_ISME)
+#ifdef USERS_RFC1459
 	    {
 #ifdef ENABLE_USERS
+		char	namebuf[10],linebuf[10],hostbuf[17];
+		int	fd, flag = 0;
+
 		if ((fd = utmp_open()) == -1)
 		    {
 			sendto_one(sptr, replies[ERR_FILEERROR], ME, BadTo(parv[0]),
@@ -2304,8 +2308,8 @@ int	m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[ERR_USERSDISABLED], ME, BadTo(parv[0]));
 #endif
 	    }
-	else
-		return 3;
+#else /* USERS_RFC1459 */
+#endif /* USERS_RFC1459 */
 	return 2;
 }
 

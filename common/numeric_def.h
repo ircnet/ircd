@@ -173,7 +173,9 @@
 #define	ERR_USERONCHANNEL    443
 #define ERR_NOLOGIN          444
 #define	ERR_SUMMONDISABLED   445
+#ifdef USERS_RFC1459
 #define ERR_USERSDISABLED    446
+#endif
 
 #define ERR_NOTREGISTERED    451
 
@@ -287,10 +289,12 @@
 #define RPL_NOTOPERANYMORE   385
 
 #define RPL_TIME             391
+#ifdef USERS_RFC1459
 #define	RPL_USERSSTART       392
 #define	RPL_USERS            393
 #define	RPL_ENDOFUSERS       394
 #define	RPL_NOUSERS          395
+#endif
 
 #define RPL_TRACELINK        200
 #define RPL_TRACECONNECTING  201

@@ -72,9 +72,27 @@
  * to work properly in many cases.  If you are on a machine where it
  * won't work, or simply don't want local users to be summoned, undefine
  * this.
+ * Consider its security implications before defining.
  */
 #undef	ENABLE_SUMMON	/* local summon */
-#undef	ENABLE_USERS	/* enables local /users (same as who/finger output) */
+
+/*
+ * If you want to have "USERS" output strictly RFC 1459 (showing 
+ * who/finger of your ircd or returning "USERS disabled"), define this.
+ * Undefining leads to sending RPL_LOCALUSERS and RPL_GLOBALUSERS.
+ * upon "USERS" request.
+ */
+#undef USERS_RFC1459
+
+#ifdef USERS_RFC1459
+/*
+ * Enables local USERS, which gives who/finger alike output from ircd box.
+ * Note that some boxes no longer have /etc/utmp. When undefined, it will
+ * return ERR_USERSDISABLED numeric. 
+ * Consider its security implications before defining.
+ */
+#undef	ENABLE_USERS
+#endif
 
 /* NO_DEFAULT_INVISIBLE
  *
