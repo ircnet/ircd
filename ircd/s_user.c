@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.41 1998/04/02 23:38:03 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.42 1998/04/03 14:34:47 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1971,6 +1971,7 @@ char	*parv[];
  *	      but perhaps it's worth the load it causes to net.
  *	      This requires flooding of the whole net like NICK,
  *	      USER, MODE, etc messages...  --msa
+ *          sounds like nobody likes this thing, let's kill it. --kalt
  ***********************************************************************/
 
 /*
@@ -1986,6 +1987,13 @@ char	*parv[];
 	Reg	char	*away, *awy2 = parv[1];
 	int	len;
 
+	/* This command is officially unsupported since 2.10 */
+	if (IsServer(cptr) || !MyConnect(sptr)) /* let's just be safe */
+		return 0;
+	sendto_one(cptr, ":%s %d %s AWAY :Unknown command", ME,
+		   ERR_UNKNOWNCOMMAND, sptr->name);
+	return 1;
+
 	if (!MyConnect(sptr))	/* Since 2.9 we know only local AWAY */
 		return 0;	/* "WHOIS server nick" still works */
 
@@ -2000,7 +2008,9 @@ char	*parv[];
 			MyFree(away);
 			sptr->user->away = NULL;
 		    }
-		sendto_one(sptr, rpl_str(RPL_UNAWAY, parv[0]));
+		/* sendto_serv_butone(cptr, ":%s AWAY", parv[0]); */
+		if (MyConnect(sptr))
+			sendto_one(sptr, rpl_str(RPL_UNAWAY, parv[0]));
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_AWAY, NULL, sptr,
 				      ":%s AWAY", parv[0]);
@@ -2016,6 +2026,7 @@ char	*parv[];
 		awy2[TOPICLEN] = '\0';
 	    }
 	len++;
+	/* sendto_serv_butone(cptr, ":%s AWAY :%s", parv[0], awy2); */
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_AWAY, NULL, sptr,
 			      ":%s AWAY :%s", parv[0], awy2);
@@ -2036,7 +2047,8 @@ char	*parv[];
 
 	sptr->user->away = away;
 	(void)strcpy(away, awy2);
-	sendto_one(sptr, rpl_str(RPL_NOWAWAY, parv[0]));
+	if (MyConnect(sptr))
+		sendto_one(sptr, rpl_str(RPL_NOWAWAY, parv[0]));
 	return 2;
 }
 
