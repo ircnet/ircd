@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.18 1997/11/11 19:10:45 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.19 1997/12/18 13:33:30 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -568,7 +568,7 @@ char	*parv[];
 	** distribution code is respected.
 	** service type also respected.
 	*/
-	flags |= FLAGS_CBURST;
+	cptr->flags |= FLAGS_CBURST;
 	if (burst & SERVICE_WANT_SERVER)
 	    {
 		int	split;
@@ -653,7 +653,7 @@ char	*parv[];
 			    }
 		    }
 	    }
-	flags ^= FLAGS_CBURST;
+	cptr->flags ^= FLAGS_CBURST;
 	return 0;
 }
 #endif
