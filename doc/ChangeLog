@@ -1,3 +1,14 @@
+2004-07-02  Piotr Kucharski
+
+	* s_user.c/find_denied(): added reverse D: (disable AC when server *not*
+	  found.
+	* s_user.c/save_user(): send saved nick change to &CLIENTS as well.
+
+2004-07-01  Piotr Kucharski
+
+	* class.c/get_client_class(): return last attached class, not highest.
+	* class.c/get_sendq(): use sendq of last attached class, not highest.
+
 2004-06-30  Piotr Kucharski
 
 	* channel.c/match_modeid(): drop special case for '#' matching uids.
