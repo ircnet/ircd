@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.8 1997/05/08 02:12:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.9 1997/05/15 13:49:37 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -452,20 +452,20 @@ char	*nick, *username;
 		 */
 		if (find_kill(sptr, 1, &reason))
 		    {
-			char buf[100];
+			/*char buf[100];*/
 
 			sendto_flag(SCH_LOCAL, "K-lined %s@%s.",
-				    sptr->user->username, sptr->sockhost);
+				    user->username, sptr->sockhost);
 			ircstp->is_ref++;
 			sptr->exitc = EXITC_REF;
 #if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
 			syslog(LOG_NOTICE, "%s ( K lined ): %s@%s [%s] %c\n",
-			       myctime(sptr->firsttime), sptr->user->username,
-			       sptr->user->host, sptr->auth, '-');
+			       myctime(sptr->firsttime), user->username,
+			       user->host, sptr->auth, '-');
 #endif		    
 #ifdef FNAME_CONNLOG
-			sendto_flog(sptr, " K lined ", 0, sptr->user->username,
-				    sptr->user->host);
+			sendto_flog(sptr, " K lined ", 0, user->username,
+				    user->host);
 #endif
 			if (reason)
 				sprintf(buf, "K-lined: %.80s", reason);
@@ -476,17 +476,17 @@ char	*nick, *username;
 		if (find_restrict(sptr))
 		    {
 			sendto_flag(SCH_LOCAL, "R-lined %s@%s.",
-				    sptr->user->username, sptr->sockhost);
+				    user->username, sptr->sockhost);
 			ircstp->is_ref++;
 			sptr->exitc = EXITC_REF;
 # if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
 			syslog(LOG_NOTICE, "%s ( R lined ): %s@%s [%s] %c\n",
-			       myctime(sptr->firsttime), sptr->user->username,
-			       sptr->user->host, sptr->username, '-');
+			       myctime(sptr->firsttime), user->username,
+			       user->host, sptr->username, '-');
 # endif		    
 # ifdef FNAME_CONNLOG
-			sendto_flog(sptr, " R lined ", 0, sptr->user->username,
-				    sptr->user->host);
+			sendto_flog(sptr, " R lined ", 0, user->username,
+				    user->host);
 # endif
 			return exit_client(cptr, sptr, &me , "R-lined");
 		    }
@@ -502,8 +502,9 @@ char	*nick, *username;
 	SetClient(sptr);
 	if (MyConnect(sptr))
 	    {
+		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
 		sptr->exitc = EXITC_REG;
-		sendto_one(sptr, rpl_str(RPL_WELCOME, nick), nick);
+		sendto_one(sptr, rpl_str(RPL_WELCOME, nick), buf);
 		/* This is a duplicate of the NOTICE but see below...*/
 		sendto_one(sptr, rpl_str(RPL_YOURHOST, nick),
 			   get_client_name(&me, FALSE), version);
