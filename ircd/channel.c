@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.235 2004/11/02 16:17:51 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.236 2004/11/02 16:41:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3263,9 +3263,7 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
         	        sendto_one(sptr, replies[RPL_INVITING], ME, BadTo(parv[0]),
 	                           acptr->name, parv[2]);
 			if (acptr->user->flags & FLAGS_AWAY)
-				sendto_one(sptr, replies[RPL_AWAY], ME, BadTo(parv[0]),
-					   acptr->name, (acptr->user->away) ? 
-					   acptr->user->away : "Gone");
+					send_away(sptr, acptr);
 		    }
 		return 3;
 	    }
@@ -3295,10 +3293,7 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[RPL_INVITING], ME, BadTo(parv[0]),
 			   acptr->name, ((chptr) ? (chptr->chname) : parv[2]));
 		if (acptr->user->flags & FLAGS_AWAY)
-			sendto_one(sptr, replies[RPL_AWAY], ME, BadTo(parv[0]),
-				   acptr->name,
-				   (acptr->user->away) ? acptr->user->away :
-				   "Gone");
+			send_away(sptr, acptr);
 	    }
 
 	if (MyConnect(acptr))

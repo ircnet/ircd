@@ -549,6 +549,12 @@
 */
 #undef MOTD_UNREG
 
+/*
+** For standard "Gone" away reply for remote clients, undefine this.
+** Leave defined for more helpful message.
+*/
+#define AWAY_MOREINFO
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.236 2004/10/27 00:06:45 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.237 2004/11/02 16:41:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1592,10 +1592,7 @@ static	int	m_message(aClient *cptr, aClient *sptr, int parc,
 		    {
 			if (!notice && MyConnect(sptr) &&
 			    acptr->user && (acptr->user->flags & FLAGS_AWAY))
-				sendto_one(sptr, replies[RPL_AWAY], ME, BadTo(parv[0]),
-					   acptr->name,
-					   (acptr->user->away) ? 
-					   acptr->user->away : "Gone");
+				send_away(sptr, acptr);
 			sendto_prefix_one(acptr, sptr, ":%s %s %s :%s",
 					  parv[0], cmd, acptr->name, parv[2]);
 			continue;
@@ -2185,8 +2182,7 @@ static	void	send_whois(aClient *sptr, aClient *acptr)
 		   a2cptr ? a2cptr->info:"*Not On This Net*");
 
 	if (user->flags & FLAGS_AWAY)
-		sendto_one(sptr, replies[RPL_AWAY], ME, BadTo(sptr->name), name,
-			   (user->away) ? user->away : "Gone");
+		send_away(sptr, user->bcptr);
 
 	if (IsAnOper(acptr))
 		sendto_one(sptr, replies[RPL_WHOISOPERATOR], ME, BadTo(sptr->name), name);
@@ -3661,4 +3657,28 @@ int	is_allowed(aClient *cptr, long function)
 		return 1;
 
 	return 0;
+}
+
+void send_away(aClient *sptr, aClient *acptr)
+{
+	if (acptr->user->away)
+	{
+		sendto_one(sptr, replies[RPL_AWAY], ME, sptr->name,
+			acptr->name, acptr->user->away);
+	}
+	else
+	{
+#ifdef AWAY_MOREINFO
+		/* Building buffer and using it instead of "Gone" would be
+		 * a better code, but a bit slower; just rememeber about this
+		 * one when ever changing RPL_AWAY --B. */
+		sendto_one(sptr, ":%s 301 %s %s :"
+			"Gone, for more info use WHOIS %s %s",
+			ME, sptr->name, acptr->name,
+			acptr->name, acptr->name);
+#else
+		sendto_one(sptr, replies[RPL_AWAY], ME, sptr->name,
+			acptr->name, "Gone");
+#endif
+	}
 }
