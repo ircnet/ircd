@@ -677,6 +677,19 @@
 /* #undef	NO_IDENT */
 /* #undef	NO_PREFIX */
 
+/*
+** LISTENER_DELAY, if defined, adds an artificial delay between checking
+** listeners for new connections.
+** LISTENER_MAXACCEPT defines how many clients will be accepted during one
+** listener check.
+*/
+#ifdef SLOW_ACCEPT
+#define LISTENER_DELAY 2
+#define LISTENER_MAXACCEPT 1
+#else
+#define LISTENER_MAXACCEPT 10
+#endif
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
