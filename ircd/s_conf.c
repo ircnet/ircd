@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.84 2004/03/04 13:18:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.85 2004/03/04 14:57:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -244,6 +244,9 @@ badmask:
 /*
  * find the first (best) I line to attach.
  */
+
+/* make sure no functions called in here return this. */
+#define NORETURN	42
 int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 {
 	Reg	aConfItem	*aconf;
@@ -252,9 +255,10 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 	static	char	uhost[HOSTLEN+USERLEN+3];
 	static	char	fullname[HOSTLEN+1];
 	int	namematched;
+	int	retval = NORETURN;
 
 	for (aconf = conf; aconf; aconf = aconf->next)
-	    {
+	{
 		if ((aconf->status != CONF_CLIENT) &&
 		    (aconf->status != CONF_RCLIENT))
 			continue;
@@ -349,7 +353,8 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 			{
 				sendto_one(cptr, replies[ERR_PASSWDMISMATCH],
 					ME, BadTo(cptr->name));
-				return -8;
+				retval = -8;
+				break;
 			}
 		}
 
@@ -377,11 +382,17 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		}
 		if ((i = attach_conf(cptr, aconf)) < -1)
 			find_bounce(cptr, ConfClass(aconf), -1);
-		return i;
-	    }
-	find_bounce(cptr, 0, -2);
-	return -2; /* used in register_user() */
+		retval = i;
+		break;
+	}
+	if (retval == NORETURN)
+	{
+		find_bounce(cptr, 0, -2);
+		retval = -2; /* used in register_user() */
+	}
+	return retval;
 }
+#undef NORETURN
 
 /*
  * Find the single N line and return pointer to it (from list).
