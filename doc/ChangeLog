@@ -8,6 +8,8 @@
 	  after "NICK 0".
 	* struct_def.h, s_misc.c, s_user.c: is_save statistics.
 	* channel.c/send_channel_members(): SID as source if ST_UID server.
+	* channel.c/m_join(): not only send SID as source where appropriate,
+	  but also client joining as UID, if it has one.
 
 2004-02-27  Piotr Kucharski
 
