@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.4 1997/05/14 19:52:47 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.5 1997/05/21 20:26:15 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.3.
 </abstract>
@@ -508,12 +508,6 @@ I:x::*.fi:6667:1
 <p>
 Allow clients from machines matching *.fi to connect on the
 port 6667.
-<p>
-I:*@*::*@*::1
-<p>
-Allow clients from anywhere to connect your server. If the
-client machine does not reply to your server ident query,
-the client's username will be prefixed by &tilde;
 <tag/NEW!!!/ As of the 2.7.2d version of the server, the
 server is able to accept connections on multiple
 ports. I-lines are required for each P-line to allow
@@ -1020,7 +1014,7 @@ reason, it is polite). The first field is unused, so leave
 it empty.
 </descrip>
 
-<sect1>Service connections (Not Fully Implemented Yet)
+<sect1>Service connections
 <p>
 <descrip>
 <tag/Introduction/ The Service is a special kind of IRC
@@ -1059,8 +1053,8 @@ join channels or issue certain commands although most are
 available to it. Services are rejected upon sending an
 unknown or unallowed command. Services however, are not
 affected by flood control and can be granted special
-priviledges. It is therefore wise to oversee the use of
-S-lines with much care.
+priviledges. It is therefore <bf>wise to oversee the use of
+S-lines with much care.</bf>
 <p>
 Services can be listed using the SERVLIST command, and can
 be sent messages using the SQUERY command.

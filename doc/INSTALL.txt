@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.4 1997/05/14 19:53:08 kalt Exp $
+  $Id: INSTALL.txt,v 1.5 1997/05/21 20:27:10 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.3.
 
@@ -584,12 +584,6 @@
         Allow clients from machines matching *.fi to connect on the port
         6667.
 
-        I:*@*::*@*::1
-
-        Allow clients from anywhere to connect your server. If the
-        client machine does not reply to your server ident query, the
-        client's username will be prefixed by ~
-
      NNEEWW!!!!!!
         As of the 2.7.2d version of the server, the server is able to
         accept connections on multiple ports. I-lines are required for
@@ -658,6 +652,7 @@
         having a lower number than that for the relevant I-line) and
         determines the maximum number of simultaneous uses of the O-line
         allowable through the max. links field in the Y-line.
+
      EExxaammppllee
         O:orion.cair.du.edu:pyunxc:Jeff::1
 
@@ -727,7 +722,6 @@
      FFoorrmmaatt
 
         k:<Host Name>:<time interval(s)|comment>:<Auth>:<port>:
-
 
 
      KK  ``K'' tells the IRCD that you are making a KILL USER command
@@ -856,6 +850,7 @@
      C:root@nic.funet.fi:passwd:nic.funet.fi:6667:1
 
      Each field is separated with a ":" charcter:
+
      CC  This field tells the IRC program which option is being
         configured. "C" corresponds to a server Connect option.
 
@@ -927,7 +922,6 @@
   C:garfield.mit.edu::garfield.mit.edu:6667:1
   C:irc.nada.kth.se::irc.nada.kth.se:6667:1
   C:nic.funet.fi::nic.funet.fi:6667:1
-
   Ircd will attempt to connect to nic.funet.fi first, then to irc.nada
   and finally to garfield.
 
@@ -994,7 +988,6 @@
         we take an example of such:
 
         *.de  - a domain name matching all machines in Germany.
-
         Wildcard domains are useful in that ALL SERVERS in Germany (or
         any other domain area) can be shown as one to the rest of the
         world. Imagine 100 servers in Germany, it would be incredible
@@ -1054,10 +1047,12 @@
 
         Allows a server named ``*.bu.edu'' to introduce only servers
         that match the ``*.edu'' name mask.
+
         H:*::eff.org::
 
         Allows ``eff.org'' to introduce (and act as a hub for) any
         server.
+
 
      NNoottee
         It is possible to have and use multiple H-lines (or L-lines) for
@@ -1117,15 +1112,13 @@
         this new server.
 
 
-
-
-
   44..1122..  VVeerrssiioonn lliimmiittaattiioonnss
 
 
      IInnttrroodduuccttiioonn
         V-lines are used to restrict server connecting to you based on
         their version and on compile time options.
+
 
      FFoorrmmaatt
 
@@ -1186,15 +1179,14 @@
         your server probably results in yyoouurr sseerrvveerr being left alone,
         unless other servers have agreed to have the same Q-line in
         their ircd configuration files as well.
+
      EExxaammppllee
         Q::of the security holes:foo.bar.baz::
 
         This command excludes a server named ``foo.bar.baz'', the reason
         is given to be security holes (you should give a reason, it is
         polite). The first field is unused, so leave it empty.
-
-
-  44..1144..  SSeerrvviiccee ccoonnnneeccttiioonnss ((NNoott FFuullllyy IImmpplleemmeenntteedd YYeett))
+  44..1144..  SSeerrvviiccee ccoonnnneeccttiioonnss
 
 
      IInnttrroodduuccttiioonn
@@ -1250,13 +1242,14 @@
         to it. Services are rejected upon sending an unknown or
         unallowed command. Services however, are not affected by flood
         control and can be granted special priviledges. It is therefore
-        wise to oversee the use of S-lines with much care.
+        wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
 
         Services can be listed using the SERVLIST command, and can be
         sent messages using the SQUERY command.
 
 
   44..1155..  BBoouunnccee sseerrvveerr
+
 
 
      IInnttrroodduuccttiioonn
@@ -1318,6 +1311,7 @@
         define this command to connect to your own host.  If your site
         is not running a server then this command should contain the
         TARGET host's connection information and password (if any).
+
      FFoorrmmaatt
 
         U:<TARGET Host addr>:<Password>:<TARGET Host NAME>:<Internet Port>
@@ -1353,6 +1347,12 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
+
+
+
+
+
+
 
 
 

@@ -1,3 +1,12 @@
+Wed May 21 21:17:51 1997  Christophe Kalt
+
+	* channel.c, s_service.c, service.h: finished service code (whee).
+		
+	* s_serv.c: services were incorrectly sent during burst.
+
+	* s_bsd.c: ident MUST be done before anything else is read from a
+	client.
+
 Thu May 15 16:27:13 1997  Christophe Kalt
 
 	* struct.h, s_conf.h, s_serv.c: created k: lines to be able to
