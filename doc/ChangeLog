@@ -9,6 +9,7 @@
 	* s_bsd.c, whowas.c, list_ext.h: free_user() and free_server() take
 	  only one parameter from now on.
 	* s_bsd.c/close_listeners(): Use ListenerLL.
+	* config.h.dist: Remove UPHOST. (was used by client)
 
 2004-07-26  Jakub Vlasek
 	
