@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.71 2001/12/23 20:35:41 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.72 2001/12/24 16:15:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -993,11 +993,11 @@ Reg	aClient	*cptr;
 			send_umode(NULL, acptr, 0, SEND_UMODES, buf);
 			if (cptr->serv->version & SV_UID && *acptr->user->uid)
 				sendto_one(cptr,
-					   "UNICK %s %s %d %s %s %s %s :%s",
-					   acptr->user->uid, acptr->name,
-					   acptr->hopcount + 1,
+					   UNICK %s %s %s %s %s %s :%s",
+					   acptr>name, acptr->user->uid,
 					   acptr->user->username,
-					   acptr->user->host, stok,
+					   acptr->user->host,
+					   acptr->user->ip,
 					   (*buf) ? buf : "+", acptr->info);
 			else
 				sendto_one(cptr,"NICK %s %d %s %s %s %s :%s",

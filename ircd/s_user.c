@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.93 2001/12/24 14:38:12 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.94 2001/12/24 16:15:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -616,22 +616,13 @@ char	*nick, *username;
 		if ((acptr = local[fdas.fd[i]]) == cptr || IsMe(acptr))
 			continue;
 		if ((acptr->serv->version & SV_UID) && user->uid[0])
-			if ((aconf = acptr->serv->nline) &&
-			    !match(my_name_for_link(ME, aconf->port),
-				   user->server))
-				sendto_one(acptr,
-					   "UNICK %s %s %d %s %s %s %s :%s",
-					   user->uid, nick, sptr->hopcount+1, 
-					   user->username, user->host, 
-					   me.serv->tok, (*buf) ? buf : "+",
-					   sptr->info);
-			else
-				sendto_one(acptr,
-					   "UNICK %s %s %d %s %s %s %s :%s",
-					   user->uid, nick, sptr->hopcount+1, 
-					   user->username, user->host, 
-					   user->servp->tok, 
-					   (*buf) ? buf : "+", sptr->info);
+			sendto_one(acptr,
+				   "UNICK %s %s %s %s %s %s :%s",
+				   nick, user->uid,
+				   user->username, user->host,
+					user->ip /* or sth */
+				   (*buf) ? buf : "+",
+				   sptr->info);
 		else
 			if ((aconf = acptr->serv->nline) &&
 			    !match(my_name_for_link(ME, aconf->port),
@@ -1131,14 +1122,13 @@ nickkilldone:
 /*
 ** m_unick
 **	parv[0] = sender prefix
-**	parv[1] = uid
-**	parv[2] = nickname
-**	parv[3] = hopcount
-**	parv[4] = username (login name, account)
-**	parv[5] = client host name
-**	parv[6] = server token
-**	parv[7] = users mode
-**	parv[8] = users real name info
+**	parv[1] = nickname
+**	parv[2] = uid
+**	parv[3] = username (login name, account)
+**	parv[4] = client host name
+**	parv[5] = client ip
+**	parv[6] = users mode
+**	parv[7] = users real name info
 */
 int	m_unick(cptr, sptr, parc, parv)
 aClient *cptr, *sptr;
@@ -1147,20 +1137,21 @@ char	*parv[];
 {
 	aClient *acptr;
 	int	delayed = 0;
-	char	*uid, nick[NICKLEN+2], *s, *user, *host;
+	char	*uid, nick[NICKLEN+2], *s, *user, *host, *ip;
 	Link	*lp = NULL;
 
-	if (parc < 9)
+	if (parc < 8)
 	    {
 		sendto_one(sptr, replies[ERR_NEEDMOREPARAMS], ME, BadTo(parv[0]),
 			   "UNICK");
 		return 1;
 	    }
 
-	uid = parv[1];
-	strncpyzt(nick, parv[2], NICKLEN+1);
-	user = parv[4];
-	host = parv[5];
+	strncpyzt(nick, parv[1], NICKLEN+1);
+	uid = parv[2];
+	user = parv[3];
+	host = parv[4];
+	ip = parv[5];
 
 	/*
 	 * if do_nick_name() returns a null name OR if the server sent a nick
@@ -1169,16 +1160,16 @@ char	*parv[];
 	 * and KILL it. -avalon 4/4/92
 	 */
 	do_nick_name(nick, 1);
-	if (strcmp(nick, parv[2]))
+	if (strcmp(nick, parv[1]))
 	    {
 		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, BadTo(parv[0]),
-			   parv[2]);
+			   parv[1]);
 		
 		ircstp->is_kill++;
-		sendto_flag(SCH_KILL, "Bad UNick: %s From: %s %s", parv[2],
+		sendto_flag(SCH_KILL, "Bad UNick: %s From: %s %s", parv[1],
 			    parv[0], get_client_name(cptr, FALSE));
 		sendto_one(cptr, ":%s KILL %s :%s (%s <- %s[%s])", ME, uid, ME,
-			   parv[2], nick, cptr->name);
+			   parv[1], nick, cptr->name);
 		return 2;
 	    }
 
@@ -1186,12 +1177,12 @@ char	*parv[];
 	{
 		/* Any better numeric? */
 		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, 
-			BadTo(parv[0]), parv[2]);
+			BadTo(parv[0]), parv[1]);
 		ircstp->is_kill++;
 		sendto_flag(SCH_KILL, "Bad UID: %s From: %s %s", uid,
 			    parv[0], get_client_name(cptr, FALSE));
 		sendto_one(cptr, ":%s KILL %s :%s (%s <- %s[%s])", ME, uid, ME,
-			   parv[2], nick, cptr->name);
+			   parv[1], nick, cptr->name);
 		return 2;
 	}
 
@@ -1311,23 +1302,23 @@ char	*parv[];
 		    }
 	    }
 
-	sptr = make_client(cptr);
-	add_client_to_list(sptr);
+	acptr = make_client(cptr);
+	add_client_to_list(acptr);
 	{
 	    char	*pv[7];
 	    
-	    pv[0] = nick;
+	    pv[0] = nick;  /* sender prefix in m_user? */
 	    pv[1] = user;
 	    pv[2] = host;
-	    pv[3] = parv[6];
-	    pv[4] = parv[8];
-	    pv[5] = parv[7];
+	    pv[3] = parv[2]; /* uid (used to be server token) */
+	    pv[4] = parv[7]; /* users real name info */
+	    pv[5] = parv[6]; /* users mode */
 	    pv[6] = NULL;
-	    m_user(cptr, sptr, 6, pv);
+	    m_user(cptr, acptr, 6, pv);
 	}
 	/*
-	** NOTE: sptr->name has to be set *after* calling m_user();
-	** else it will already introduce the client which doesn't
+	** NOTE: acptr->name has to be set *after* calling m_user();
+	** else it will already introduce the client which
 	** can't have the uid set yet.
 	** the extended m_nick() does things the other way around..
 	** I hope this will not cause trouble sometime later. -kalt
@@ -1335,22 +1326,23 @@ char	*parv[];
 	** stop it from making a call to register_user().
 	*/
 	/* The nick is already checked for size, and is a local var. */
-	strcpy(sptr->name, nick);
-	add_to_client_hash_table(nick, sptr);
-	sptr->hopcount = atoi(parv[3]);
+	strcpy(acptr->name, nick);
+	add_to_client_hash_table(nick, acptr);
+	/* we don't have hopcount! what to do? */
+	/* acptr->hopcount = atoi(parv[3]); */
 	/* The client is already killed if the uid is too long. */
-	strcpy(sptr->user->uid, uid);
-	add_to_uid_hash_table(uid, sptr);
+	strcpy(acptr->user->uid, uid);
+	add_to_uid_hash_table(uid, acptr);
 	{
 	    char	*pv[4];
 	    
 	    pv[0] = ME;
-	    pv[1] = sptr->name;
-	    pv[2] = parv[7];
+	    pv[1] = acptr->name;
+	    pv[2] = parv[6];
 	    pv[3] = NULL;
-	    m_umode(NULL, sptr, 3, pv);
+	    m_umode(NULL, acptr, 3, pv);
 	}
-	register_user(cptr, sptr, nick, user);
+	register_user(cptr, acptr, nick, user);
 	return 0;
 }
 
@@ -2096,7 +2088,7 @@ aClient	*cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-#define	UFLAGS	(FLAGS_INVISIBLE|FLAGS_WALLOP)
+#define	UFLAGS	(FLAGS_INVISIBLE|FLAGS_WALLOP|FLAGS_RESTRICTED)
 	char	*username, *host, *server, *realname;
 	anUser	*user;
 
