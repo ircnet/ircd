@@ -1,3 +1,13 @@
+2004-08-17  Piotr Kucharski
+
+	* channel.c/set_mode(): also allow +R from servers. :)
+
+2004-08-13  Piotr Kucharski
+
+	* channel.c/set_mode(): allow +R from opers.
+	* config.h.dist: allow undefining both SLOW_ACCEPT and CLONE_CHECK
+	  (may speed server a bit if admin is aware of consequences).
+
 2004-08-12  Piotr Kucharski
 
 	* ircd.c/try_connections(), config.h.dist: DISABLE_DOUBLE_CONNECTS to
