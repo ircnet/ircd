@@ -51,6 +51,7 @@ EXTERN int exit_client __P((aClient *cptr, aClient *sptr, aClient *from,
 			    char *comment));
 EXTERN void checklist();
 EXTERN void initstats();
+EXTERN void initruntimeconf();
 EXTERN void tstats __P((aClient *cptr, char *name));
 #ifdef  CACHED_MOTD
 EXTERN void read_motd __P((char *filename));
