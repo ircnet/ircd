@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.5 1997/05/21 20:26:15 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.6 1997/06/02 13:19:19 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.3.
 </abstract>
@@ -1019,7 +1019,11 @@ it empty.
 <descrip>
 <tag/Introduction/ The Service is a special kind of IRC
 client. It does not have the full abilities of a normal user
-but can behave in a more active manner than a normal client.
+but can behave in a more active manner than a normal
+client.
+<p>
+Services are not intended for interactive usage, and are
+better suited for automated clients.
 <tag/Format/<verb>S:&lt;TARGET Host Mask&gt;:&lt;Password&gt;:&lt;Service Name&gt;:&lt;Service Type&gt;:&lt;Class&gt;</verb>
 <tag/TARGET Host Mask/ The host mask should be set to match
 the host(s) from which the service will be connecting
@@ -1048,16 +1052,16 @@ result in a RPL_YOURESERVICE (383) being sent back to
 you. Any other reply as a result of sending service
 indicates an error has occured.
 <p>
+Services can be listed using the SERVLIST command, and can
+be sent messages using the SQUERY command.
+<p>
 A service is not a very useful sort of client, it cannot
 join channels or issue certain commands although most are
 available to it. Services are rejected upon sending an
 unknown or unallowed command. Services however, are not
 affected by flood control and can be granted special
-priviledges. It is therefore <bf>wise to oversee the use of
+privileges. It is therefore <bf>wise to oversee the use of
 S-lines with much care.</bf>
-<p>
-Services can be listed using the SERVLIST command, and can
-be sent messages using the SQUERY command.
 </descrip>
 
 <sect1>Bounce server
@@ -1083,8 +1087,7 @@ these cases, this must field contain ``-1''.
 <tag/Server Name/ This specifies the IRC server hostname
 that the client should use.
 <tag/Port/ This specifies the IRC server port that the
-client should connect to.  This defaults to 6667 if not
-specified.
+client should connect to.
 <tag/Example/B:2::irc.stealth.net:6660:
 <p>
 Rejected clients in class 2 are advised to use
