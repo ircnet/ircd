@@ -37,7 +37,7 @@ extern u_int iauth_spawn;
 #if defined(USE_IAUTH)
 EXTERN int vsendto_iauth (char *pattern, va_list va);
 EXTERN int sendto_iauth (char *pattern, ...);
-EXTERN void read_iauth();
+EXTERN void read_iauth(void);
 EXTERN void report_iauth_conf __P((aClient *, char *));
 EXTERN void report_iauth_stats __P((aClient *, char *));
 #endif

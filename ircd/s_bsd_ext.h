@@ -41,11 +41,11 @@ EXTERN void add_local_domain __P((char *hname, size_t size));
 EXTERN void report_error __P((char *text, aClient *cptr));
 EXTERN int inetport __P((aClient *cptr, char *ip, char *ipmask, int port));
 EXTERN int add_listener __P((aConfItem *aconf));
-EXTERN void close_listeners();
+EXTERN void close_listeners(void);
 EXTERN void start_iauth __P((int));
-EXTERN void init_sys();
-EXTERN void daemonize();
-EXTERN void write_pidfile();
+EXTERN void init_sys(void);
+EXTERN void daemonize(void);
+EXTERN void write_pidfile(void);
 EXTERN int check_client __P((Reg aClient *cptr));
 EXTERN int check_server_init __P((aClient *cptr));
 EXTERN int check_server __P((aClient *cptr, Reg struct hostent *hp,
@@ -61,7 +61,7 @@ EXTERN void get_my_name __P((aClient *cptr, char *name, int len));
 EXTERN int setup_ping __P((aConfItem *aconf));
 EXTERN void send_ping __P((aConfItem *aconf));
 #if defined(ENABLE_SUMMON) || defined(ENABLE_USERS)
-EXTERN int utmp_open();
+EXTERN int utmp_open(void);
 EXTERN int utmp_read __P((int fd, char *name, char *line, char *host,
 			  int hlen));
 EXTERN int utmp_close(int fd);

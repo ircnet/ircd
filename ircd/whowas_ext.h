@@ -39,7 +39,7 @@ EXTERN void add_history __P((Reg aClient *cptr, Reg aClient *nodelay));
 EXTERN aClient *get_history __P((char *nick, time_t timelimit));
 EXTERN int find_history __P((char *nick, time_t timelimit));
 EXTERN void off_history __P((Reg aClient *cptr));
-EXTERN void initwhowas();
+EXTERN void initwhowas(void);
 EXTERN int m_whowas __P((aClient *cptr, aClient *sptr, int parc,
 			 char *parv[]));
 EXTERN void count_whowas_memory __P((int *wwu, int *wwa, u_long *wwam,

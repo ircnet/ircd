@@ -37,7 +37,7 @@ EXTERN struct hostent *gethost_byname_type __P((char *name, Link *lp,
 EXTERN struct hostent *gethost_byaddr __P((char *addr, Link *lp));
 EXTERN struct hostent *get_res __P((char *lp));
 EXTERN time_t expire_cache __P((time_t now));
-EXTERN void flush_cache();
+EXTERN void flush_cache(void);
 EXTERN int m_dns __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN u_long cres_mem __P((aClient *sptr, char *nick));
 #undef EXTERN

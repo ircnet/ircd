@@ -38,7 +38,7 @@ extern dbufbuf *freelist;
 #else /* DBUF_C */
 #define EXTERN
 #endif /* DBUF_C */
-EXTERN void dbuf_init();
+EXTERN void dbuf_init(void);
 EXTERN int dbuf_malloc_error __P((dbuf *dyn));
 EXTERN int dbuf_put __P((dbuf *dyn, char *buf, int length));
 EXTERN char *dbuf_map __P((dbuf *dyn, int *length));

@@ -42,8 +42,8 @@ EXTERN void add_class __P((int class, int ping, int confreq, int maxli,
 			   int sendq, int hlocal, int uhlocal,
 			   int hglobal, int uhglobal));
 EXTERN aClass *find_class __P((int cclass));
-EXTERN void check_class();
-EXTERN void initclass();
+EXTERN void check_class(void);
+EXTERN void initclass(void);
 EXTERN void report_classes __P((aClient *sptr, char *to));
 EXTERN int get_sendq __P((aClient *cptr));
 #undef EXTERN

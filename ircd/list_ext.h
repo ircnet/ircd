@@ -37,10 +37,10 @@ extern const char *DefInfo;
 #else /* LIST_C */
 #define EXTERN
 #endif /* LIST_C */
-EXTERN void initlists();
-EXTERN void outofmemory();
+EXTERN void initlists(void);
+EXTERN void outofmemory(void);
 #ifdef	DEBUGMODE
-EXTERN void checklists();
+EXTERN void checklists(void);
 EXTERN void send_listinfo __P((aClient *cptr, char *name));
 #endif /* DEBUGMOE */
 EXTERN aClient *make_client __P((aClient *from));
@@ -54,13 +54,13 @@ EXTERN void reorder_client_in_list __P((aClient *cptr));
 EXTERN void add_client_to_list __P((aClient *cptr));
 EXTERN Link *find_user_link __P((Reg Link *lp, Reg aClient *ptr));
 EXTERN Link *find_channel_link __P((Reg Link *lp, Reg aChannel *ptr));
-EXTERN Link *make_link();
-EXTERN invLink *make_invlink();
+EXTERN Link *make_link(void);
+EXTERN invLink *make_invlink(void);
 EXTERN void free_link __P((Reg Link *lp));
 EXTERN void free_invlink __P((Reg invLink *lp));
-EXTERN aClass *make_class();
+EXTERN aClass *make_class(void);
 EXTERN void free_class __P((Reg aClass *tmp));
-EXTERN aConfItem *make_conf();
+EXTERN aConfItem *make_conf(void);
 EXTERN void delist_conf __P((aConfItem *aconf));
 EXTERN void free_conf __P((aConfItem *aconf));
 EXTERN void add_fd __P((int fd, FdAry *ary));

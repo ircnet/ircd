@@ -34,6 +34,6 @@ extern struct __res_state ircd_res;
 #else /* RES_INIT_C */
 #define EXTERN
 #endif /* RES_INIT_C */
-EXTERN int ircd_res_init();
-EXTERN u_int ircd_res_randomid();
+EXTERN int ircd_res_init(void);
+EXTERN u_int ircd_res_randomid(void);
 #undef EXTERN

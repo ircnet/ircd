@@ -49,12 +49,12 @@ EXTERN char *my_name_for_link __P((char *name, Reg int count));
 EXTERN int mark_blind_servers __P((aClient *cptr, aClient *server));
 EXTERN int exit_client __P((aClient *cptr, aClient *sptr, aClient *from,
 			    char *comment));
-EXTERN void checklist();
-EXTERN void initstats();
-EXTERN void initruntimeconf();
+EXTERN void checklist(void);
+EXTERN void initstats(void);
+EXTERN void initruntimeconf(void);
 EXTERN void tstats __P((aClient *cptr, char *name));
 #ifdef  CACHED_MOTD
 EXTERN void read_motd __P((char *filename));
 #endif /* CACHED_MOTD */
-EXTERN void check_split();
+EXTERN void check_split(void);
 #undef EXTERN

@@ -43,8 +43,8 @@ EXTERN int attach_Iline __P((aClient *cptr, Reg struct hostent *hp,
 EXTERN aConfItem *count_cnlines __P((Reg Link *lp));
 EXTERN int detach_conf __P((aClient *cptr, aConfItem *aconf));
 EXTERN int attach_conf __P((aClient *cptr, aConfItem *aconf));
-EXTERN aConfItem *find_admin();
-EXTERN aConfItem *find_me();
+EXTERN aConfItem *find_admin(void);
+EXTERN aConfItem *find_me(void);
 EXTERN aConfItem *attach_confs __P((aClient *cptr, char *name, int statmask));
 EXTERN aConfItem *attach_confs_host __P((aClient *cptr, char *host,
 					 int statmask));
@@ -59,7 +59,7 @@ EXTERN aConfItem *find_conf_ip __P((Link *lp, char *ip, char *user,
 				    int statmask));
 EXTERN aConfItem *find_conf_entry __P((aConfItem *aconf, u_int mask));
 EXTERN int rehash __P((aClient *cptr, aClient *sptr, int sig));
-EXTERN int openconf();
+EXTERN int openconf(void);
 EXTERN int initconf __P((int opt));
 EXTERN int find_kill __P((aClient *cptr, int doall, char **comment));
 EXTERN int find_two_masks __P((char *name, char *host, int stat));

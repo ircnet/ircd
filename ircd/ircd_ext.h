@@ -58,7 +58,7 @@ EXTERN RETSIGTYPE s_monitor __P((int s));
 EXTERN RETSIGTYPE s_die __P((int s));
 EXTERN void restart __P((char *mesg));
 EXTERN RETSIGTYPE s_restart __P((int s));
-EXTERN void server_reboot();
+EXTERN void server_reboot(void);
 EXTERN void ircd_writetune __P((char *filename));
 EXTERN void ircd_readtune __P((char *filename));
 #undef EXTERN

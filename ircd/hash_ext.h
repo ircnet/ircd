@@ -39,7 +39,7 @@ extern int _HOSTNAMEHASHSIZE;
 #else /* HASH_C */
 #define EXTERN
 #endif /* HASH_C */
-EXTERN void inithashtables();
+EXTERN void inithashtables(void);
 EXTERN int add_to_client_hash_table __P((char *name, aClient *cptr));
 EXTERN int add_to_uid_hash_table __P((char *uid, aClient *cptr));
 EXTERN int add_to_channel_hash_table __P((char *name, aChannel *chptr));
