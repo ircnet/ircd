@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.98 2001/12/27 19:17:19 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.99 2001/12/29 04:17:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1137,7 +1137,7 @@ char	*parv[];
 {
 	aClient *acptr;
 	int	delayed = 0;
-	char	*uid, nick[NICKLEN+2], *s, *user, *host;
+	char	*uid, nick[NICKLEN+2], *s, *user, *host, *realname;
 	Link	*lp = NULL;
 
 	if (parc < 8)
@@ -1151,6 +1151,7 @@ char	*parv[];
 	uid = parv[2];
 	user = parv[3];
 	host = parv[4];
+	realname = parv[7];
 
 	/*
 	 * if do_nick_name() returns a null name OR if the server sent a nick
@@ -1312,7 +1313,7 @@ char	*parv[];
 	/* more corrrect is this, but we don't yet have ->mask, so...
 	acptr->user->servp = find_server_name(sptr->serv->mask->serv->snum);
 	... just remember to change it one day --Beeth */
-	acptr->user->servp = find_server_name(sptr->serv->snum);
+	acptr->user->servp = sptr->serv;
 	sptr->serv->refcnt++;
 	/*
 	** shouldn't it be here strdup? let's hope refcnt will
@@ -2196,7 +2197,7 @@ char	*parv[];
 	strncpyzt(user->host, host, sizeof(user->host));
 	user->server = find_server_string(me.serv->snum);
 #ifdef INET6
-	inetntop(AF_INET6, sptr->ip.sin6_addr, user->sip, sizeof(user->sip));
+	inetntop(AF_INET6, (char *)&sptr->ip, user->sip, sizeof(user->sip));
 #else
 	strcpy(user->sip, (char *)inetntoa((char *)&sptr->ip));
 #endif
