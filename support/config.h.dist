@@ -61,6 +61,8 @@
 /* CHROOTDIR
  *
  * Define for value added security if you are a rooter.
+ * WARNING! Better to use external chroot and then run ircd without
+ * this option.
  *
  * CPATH, MPATH, LPATH, PPATH, TPATH, QPATH, OPATH, 
  * FNAME_USERLOG, FNAME_OPERLOG, FNAME_CONNLOG, FNAME_AUTHLOG
@@ -300,18 +302,15 @@
 
 /*
  * IRC_UID
+ * IRC_GID
  *
  * If you start the server as root but wish to have it run as another user,
- * define IRC_UID to that UID.  This should only be defined if you are running
- * as root and even then perhaps not.
+ * define IRC_UID to that user id (and IRC_GID to the desired group id).
+ * This should only be defined if you are running as root...
+ * and even then perhaps not.
  */
-#undef	IRC_UID
-#undef	IRC_GID
-
-#ifdef	notdef
-#define	IRC_UID	65534	/* eg for what to do to enable this feature */
-#define	IRC_GID	65534
-#endif
+/* #undef	IRC_UID	65534 */
+/* #undef	IRC_GID	65534 */
 
 /*
  * CLIENT_FLOOD
@@ -367,7 +366,7 @@
  * NOTE: Undefining this leads to a significant increase in CPU usage if
  * you reject client which keeps connecting.
  */
-#define	SLOW_ACCEPT
+#undef	SLOW_ACCEPT
 
 /*
  * Defining this will make the server check for rapid connections from a single
@@ -378,7 +377,14 @@
  *
  * IMPORTANT: This **MUST** defined if SLOW_ACCEPT is NOT defined
  */
-#undef	CLONE_CHECK
+#define	CLONE_CHECK
+
+/*
+ * Because it takes a while for IANA to delegate reverse mappings,
+ * this option allows you to resolve 2001 block using ip6.arpa.
+ * and the rest via ip6.int.
+ */
+#define SIXBONE_HACK
 
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
@@ -497,8 +503,8 @@
  * If CLONE_CHECK has been defined, these control how the checks are performed,
  * and how the alarm is triggered.
  */
-# define	CLONE_MAX	2
-# define	CLONE_PERIOD	10
+# define	CLONE_MAX	10
+# define	CLONE_PERIOD	2
 #endif
 
 /*
@@ -628,6 +634,11 @@
 */
 #define	RESTRICT_HOSTNAMES
 
+/*
+** Allow only "proper" chars in username.
+** Disallow '^', '~', '+', '=', '-' as a first char.
+** Require at least one alphanum and no more than one nonalphanum.
+*/
 #define	RESTRICT_USERNAMES
 
 /*
