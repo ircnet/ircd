@@ -16,6 +16,8 @@
  *   You should have received a copy of the GNU General Public License
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ *   $Id: struct_def.h,v 1.44 2001/12/08 00:49:16 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
