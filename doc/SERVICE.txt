@@ -1,6 +1,6 @@
   IRC Services
   Christophe Kalt
-  $Id: SERVICE.txt,v 1.6 1998/12/13 00:02:34 kalt Exp $
+  $Id: SERVICE.txt,v 1.7 1999/04/15 21:56:53 kalt Exp $
 
   The IRC protocol described in RFC 1459 defines two types of connec-
   tions (client, and server).  A third type was introduced with version
@@ -145,6 +145,8 @@
                                            are also sent between servers) */
         SERVICE_WANT_MODE       0x00001000 /* channel modes (not +ov) */
         SERVICE_WANT_CHANNEL    0x00002000 /* channel creations/destructions */
+        SERVICE_WANT_VCHANNEL   0x00004000 /* channel joins/parts */
+        SERVICE_WANT_TOPIC      0x00008000 /* channel topics */
 
         SERVICE_WANT_ERRORS     0x01000000 /* &ERRORS */
         SERVICE_WANT_NOTICES    0x02000000 /* &NOTICES */
@@ -258,8 +260,6 @@
 
      NNoottee
         The ``SERVSET'' command can only be issued once.
-
-
 
 
   44..  GGeenneerraall nnootteess ffoorr sseerrvveerr aanndd sseerrvviiccee aaddmmiinniissttrraattoorrss
