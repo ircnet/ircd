@@ -37,7 +37,7 @@ extern char mybuf[];
 #else /* C_MSG_C */
 #define EXTERN
 #endif /* C_MSG_C */
-EXTERN void m_die();
+EXTERN void m_die(void);
 EXTERN int m_mode __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
 EXTERN int m_wall __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
 EXTERN int m_wallops __P((aClient *sptr, aClient *cptr, int parc,
@@ -53,7 +53,7 @@ EXTERN int m_join __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
 EXTERN int m_part __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
 EXTERN void m_version __P((aClient *sptr, aClient *cptr, int parc,
 			   char *parv[]));
-EXTERN void m_bye();
+EXTERN void m_bye(void);
 EXTERN int m_quit __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
 EXTERN int m_kill __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 EXTERN void m_info __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));

@@ -53,7 +53,7 @@ extern struct itmlst null_list[];
 #else /* IRC_C */
 #define EXTERN
 #endif /* IRC_C */
-EXTERN void intr();
+EXTERN void intr(void);
 EXTERN void myloop __P((int sock));
 EXTERN void do_cmdch __P((char *ptr, char *temp));
 EXTERN void do_quote __P((char *ptr, char *temp));
@@ -71,7 +71,7 @@ EXTERN void sendit __P((char *line));
 EXTERN char *mycncmp __P((char *str1, char *str2));
 EXTERN void do_clear __P((char *buf, char *temp));
 EXTERN void putline __P((char *line));
-EXTERN int unixuser();
+EXTERN int unixuser(void);
 EXTERN void do_log __P((char *ptr, char *temp));
 EXTERN char *last_to_me __P((char *sender));
 EXTERN char *last_from_me __P((char *recipient));
@@ -79,6 +79,6 @@ EXTERN char *last_from_me __P((char *recipient));
 EXTERN do_oper __P((char *ptr, char *xtra));
 #endif
 EXTERN void do_channel __P((char *ptr, char *xtra));
-EXTERN void write_statusline();
+EXTERN void write_statusline(void);
 EXTERN RETSIGTYPE quit_intr __P((int s));
 #undef EXTERN

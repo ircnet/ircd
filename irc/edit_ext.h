@@ -35,21 +35,21 @@ extern char edit_id[];
 #define EXTERN
 #endif /* EDIT_C */
 EXTERN int do_char __P((char ch));
-EXTERN void bol();
-EXTERN void eol();
-EXTERN void back_ch();
-EXTERN void forw_ch();
-EXTERN void rev_line();
-EXTERN void del_ch_right();
-EXTERN void del_ch_left();
+EXTERN void bol(void);
+EXTERN void eol(void);
+EXTERN void back_ch(void);
+EXTERN void forw_ch(void);
+EXTERN void rev_line(void);
+EXTERN void del_ch_right(void);
+EXTERN void del_ch_left(void);
 EXTERN RETSIGTYPE suspend_irc __P((int s));
-EXTERN void got_esc();
+EXTERN void got_esc(void);
 EXTERN void do_after_esc __P((char ch));
-EXTERN void refresh_screen();
+EXTERN void refresh_screen(void);
 EXTERN void add_ch __P((int ch));
-EXTERN void literal_next();
-EXTERN void word_forw();
-EXTERN void word_back();
-EXTERN void del_word_left();
-EXTERN void del_word_right();
+EXTERN void literal_next(void);
+EXTERN void word_forw(void);
+EXTERN void word_back(void);
+EXTERN void del_word_left(void);
+EXTERN void del_word_right(void);
 #undef EXTERN
