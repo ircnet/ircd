@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_msg.c,v 1.2 1997/09/03 17:45:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: c_msg.c,v 1.3 1999/02/21 00:14:59 kalt Exp $";
 #endif
  
 #include "os.h"
@@ -120,13 +120,14 @@ char *parv[];
   putline(mybuf);
 }
 
-void m_server(sptr, cptr, parc, parv)
+int m_server(sptr, cptr, parc, parv)
 aClient *cptr, *sptr;
 int parc;
 char *parv[];
 {
   sprintf(mybuf,"*** New server: %s", parv[1]);
   putline(mybuf);
+  return 0;
 }
 
 int m_topic(sptr, cptr, parc, parv)

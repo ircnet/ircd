@@ -46,8 +46,8 @@ EXTERN int m_ping __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
 EXTERN int m_pong __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
 EXTERN int m_nick __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
 EXTERN void m_away __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
-EXTERN void m_server __P((aClient *sptr, aClient *cptr, int parc,
-			  char *parv[]));
+EXTERN int m_server __P((aClient *sptr, aClient *cptr, int parc,
+			 char *parv[]));
 EXTERN int m_topic __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
 EXTERN int m_join __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
 EXTERN int m_part __P((aClient *sptr, aClient *cptr, int parc, char *parv[]));
