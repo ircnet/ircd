@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.36 2004/09/13 01:40:43 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.37 2004/09/13 17:20:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -73,8 +73,7 @@ struct socks_private
 	u_char options;
 	/* stats */
 	u_int chitc, chito, chitn, cmiss, cnow, cmax;
-	u_int closed4, closed5, open4, open5, noprox;
-	u_int closed5b, open5b;
+	u_int noproxy, open, closed;
 };
 
 /*
@@ -89,7 +88,7 @@ static	void	socks_open_proxy(int cl, char *strver)
 
 	if (!reason)
 	{
-		reason = "Denied access (open SOCKS proxy found)";
+		reason = "Denied access (insecure proxy found)";
 	}
 	/* open proxy */
 	if (mydata->options & OPT_DENY)
@@ -118,37 +117,15 @@ static	void	socks_add_cache(int cl, int state)
 
 	if (state == PROXY_OPEN)
 	{
-		if (cldata[cl].mod_status == ST_V4)
-		{
-			mydata->open4 += 1;
-		}
-		else if (cldata[cl].mod_status == ST_V5)
-		{
-			mydata->open5 += 1;
-		}
-		else
-		{
-			mydata->open5b += 1;
-		}
+		mydata->open += 1;
 	}
 	else if (state == PROXY_NONE)
 	{
-		mydata->noprox += 1;
+		mydata->noproxy += 1;
 	}
-	else /* state == PROXY_CLOSE|PROXY_UNEXPECTED|PROXY_BADPROTO */
+	else
 	{
-		if (cldata[cl].mod_status == ST_V4)
-		{
-			mydata->closed4 += 1;
-		}
-		else if (cldata[cl].mod_status == ST_V5)
-		{
-			mydata->closed5 += 1;
-		}
-		else
-		{
-			mydata->closed5b += 1;
-		}
+		mydata->closed += 1;
 	}
 
 	if (mydata->lifetime == 0)
@@ -237,11 +214,9 @@ static	int	socks_check_cache(u_int cl)
 
 static	int	socks_write(u_int cl, char *strver)
 {
-#ifdef	INET6
 	struct socks_private *mydata = cldata[cl].instance->data;
-#endif
-	u_char query[22];    /* big enough to hold all queries */
-	int query_len = 13;  /* lenght of socks4 query */
+	u_char query[128];	/* big enough to hold all queries */
+	int query_len;  	/* length of query */
 #ifndef	INET6
 	u_int a, b, c, d;
 #else
@@ -305,6 +280,7 @@ static	int	socks_write(u_int cl, char *strver)
 		query[8] = 'u'; query[9] = 's';
 		query[10] = 'e'; query[11] = 'r';
 		query[12] = 0;
+		query_len = 13;
 	}
 	else 
 	{
@@ -663,10 +639,8 @@ static	void	socks_stats(AnInstance *self)
 {
 	struct socks_private *mydata = self->data;
 
-	sendto_ircd("S socks open %u/%u/%u closed %u/%u/%u noproxy %u",
-		mydata->open4, mydata->open5, mydata->open5b,
-		mydata->closed4, mydata->closed5, mydata->closed5b,
-		mydata->noprox);
+	sendto_ircd("S socks open %u closed %u noproxy %u",
+		mydata->open, mydata->closed, mydata->noproxy);
 	sendto_ircd("S socks cache open %u closed %u noproxy %u miss %u (%u <= %u)",
 		mydata->chito, mydata->chitc, mydata->chitn,
 		mydata->cmiss, mydata->cnow, mydata->cmax);
