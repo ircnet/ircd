@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.22 2002/04/07 20:00:40 jv Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.23 2002/06/02 00:27:20 q Exp $";
 #endif
 
 #include "os.h"
@@ -161,8 +161,10 @@ char *path;
 {
 	char *lastslash;
 
-	if (lastslash = rindex(path, '/'))
+	if ((lastslash = rindex(path, '/')))
+	{
 		return lastslash + 1;
+	}
 	return path;
 }
 

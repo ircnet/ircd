@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.47 2002/06/01 22:11:01 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.48 2002/06/02 00:27:20 q Exp $";
 #endif
 
 #include "os.h"
@@ -742,12 +742,14 @@ sendto_serv_v(aClient *one, int ver, char *pattern, ...)
 	Reg	aClient *cptr;
 
 	for (i = fdas.highest; i >= 0; i--)
+	{
 		if ((cptr = local[fdas.fd[i]]) &&
 		    (!one || cptr != one->from) && !IsMe(cptr))
+		{
 			if (cptr->serv->version & ver)
-			    {
+			{
 				if (!len)
-				    {
+				{
 #if ! USE_STDARG
 					len = sendprep(pattern, p1, p2, p3, p4,
 						       p5, p6, p7, p8, p9, p10,
@@ -758,11 +760,17 @@ sendto_serv_v(aClient *one, int ver, char *pattern, ...)
 					len = vsendprep(pattern, va);
 					va_end(va);
 #endif
-				    }
+				}
+
 				(void)send_message(cptr, sendbuf, len);
-			    }
+			}
 			else
+			{
 				rc = 1;
+			}
+		}
+	}
+
 	return rc;
 }
 
@@ -781,12 +789,14 @@ sendto_serv_notv(aClient *one, int ver, char *pattern, ...)
 	Reg	aClient *cptr;
 
 	for (i = fdas.highest; i >= 0; i--)
+	{
 		if ((cptr = local[fdas.fd[i]]) &&
 		    (!one || cptr != one->from) && !IsMe(cptr))
+		{
 			if ((cptr->serv->version & ver) == 0)
-			    {
+			{
 				if (!len)
-				    {
+				{
 #if ! USE_STDARG
 					len = sendprep(pattern, p1, p2, p3, p4,
 						       p5, p6, p7, p8, p9, p10,
@@ -797,11 +807,17 @@ sendto_serv_notv(aClient *one, int ver, char *pattern, ...)
 					len = vsendprep(pattern, va);
 					va_end(va);
 #endif
-				    }
+				}
+
 				(void)send_message(cptr, sendbuf, len);
-			    }
+			}
 			else
+			{
 				rc = 1;
+			}
+		}
+	}
+
 	return rc;
 }
 

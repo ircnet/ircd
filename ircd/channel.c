@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.123 2002/05/19 00:54:59 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.124 2002/06/02 00:27:21 q Exp $";
 #endif
 
 #include "os.h"
@@ -969,10 +969,16 @@ char	*parv[];
 	while (curr && *curr && count >= 0)
 	    {
 		if (compat == -1 && *curr != '-' && *curr != '+')
+		{
 			if (*curr == 'e' || *curr == 'I')
+			{
 				compat = 1;
+			}
 			else
+			{
 				compat = 0;
+			}
+		}
 		switch (*curr)
 		{
 		case '+':
@@ -1436,13 +1442,19 @@ char	*parv[];
 		 * together on the same line
 		 */
 		if (MyClient(sptr) && curr && *curr != '-' && *curr != '+')
+		{
 			if (*curr == 'e' || *curr == 'I')
-			    {
+			{
 				if (compat == 0)
+				{
 					*curr = '\0';
-			    }
+				}
+			}
 			else if (compat == 1)
+			{
 				*curr = '\0';
+			}
+		}
 	    } /* end of while loop for MODE processing */
 
 	whatt = 0;
@@ -1511,16 +1523,18 @@ char	*parv[];
 			 * make sure we have correct mode change sign
 			 */
 			if (whatt != (lp->flags & (MODE_ADD|MODE_DEL)))
+			{
 				if (lp->flags & MODE_ADD)
-				    {
+				{
 					*mbuf++ = '+';
 					whatt = MODE_ADD;
-				    }
+				}
 				else
-				    {
+				{
 					*mbuf++ = '-';
 					whatt = MODE_DEL;
-				    }
+				 }
+			}
 			len = strlen(pbuf);
 			ulen = strlen(upbuf);
 			/*
@@ -1641,9 +1655,11 @@ char	*parv[];
 				break;
 			case MODE_CHANOP : /* fall through case */
 				if (ischop && lp->value.cptr == sptr &&
-				    lp->flags == MODE_CHANOP|MODE_DEL)
+				    lp->flags == (MODE_CHANOP|MODE_DEL))
+				{
 					chptr->reop = timeofday + 
 						LDELAYCHASETIMELIMIT;
+				}
 			case MODE_UNIQOP :
 			case MODE_VOICE :
 				*mbuf++ = c;
@@ -1794,11 +1810,17 @@ char	*key;
 		if (lp->value.chptr == chptr)
 			break;
 
-	if (banned = match_modeid(CHFL_BAN, sptr, chptr))
+	if ((banned = match_modeid(CHFL_BAN, sptr, chptr)))
+	{
 		if (match_modeid(CHFL_EXCEPTION, sptr, chptr))
+		{
 			banned = NULL;
+		}
 		else if (lp == NULL)
+		{
 			return (ERR_BANNEDFROMCHAN);
+		}
+	}
 
 	if ((chptr->mode.mode & MODE_INVITEONLY)
 	    && !match_modeid(CHFL_INVITE, sptr, chptr)
@@ -2368,7 +2390,7 @@ char	*parv[];
 	char nbuf[BUFSIZE], *q, *name, *target, mbuf[MAXMODEPARAMS + 1];
 	char uidbuf[BUFSIZE], *u;
 	char *p = NULL;
-	int chop, cnt = 0, nj = 0;
+	int chop, cnt = 0;
 	aChannel *chptr = NULL;
 	aClient *acptr;
 
@@ -3012,7 +3034,8 @@ char	*parv[];
 			if (*name == '!')
 			    {
 				chptr = NULL;
-				while (chptr=hash_find_channels(name+1, chptr))
+				while ((chptr = hash_find_channels(name + 1,
+					chptr)))
 				    {
 					int scr = SecretChannel(chptr) &&
 							!IsMember(sptr, chptr);
@@ -3048,7 +3071,7 @@ static void names_channel(aClient *cptr, aClient *sptr, char *to,
 	Reg	aClient	*acptr;
 	int 	pxlen, ismember, nlen, maxlen;
 	char 	*pbuf = buf;
-	int	showusers = 1, sent = 0;
+	int	showusers = 1;
 	
 	if (!chptr->users)     /* channel in ND */
 	{
