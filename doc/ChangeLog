@@ -1,11 +1,11 @@
 2002-03-24  Jakub Vlasek
+
 	* s_user.c/m_oper(): Send +O after local oper opers and +o when global
-		             opers to services - was reversed. (reported by
-			     Olafur Osvaldsson)
-	* s_user.c/send_umode_out(): Check for service distribution. 
-			     (reported by Olafur Osvaldsson)
+	  opers to services - was reversed (reported by Olafur Osvaldsson).
+	* s_user.c/send_umode_out(): Check for service distribution
+	  (reported by Olafur Osvaldsson).
 	* s_service.c/sendnum_toone(): Send user modes to services with
-			     SERVICE_WANT_OPER (by Olafur Osvaldsson)
+	  SERVICE_WANT_OPER (by Olafur Osvaldsson).
 
 2002-03-23  Piotr Kucharski
 
