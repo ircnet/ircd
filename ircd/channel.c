@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.70 1998/10/10 10:19:41 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.71 1998/10/23 18:34:18 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -306,11 +306,14 @@ int	flags;
 		ptr->next = chptr->members;
 		chptr->members = ptr;
 		istat.is_chanusers++;
-		if (chptr->users++ == 0 && chptr->history)
+		if (chptr->users++ == 0)
 		    {
-			/* Locked channel */
 			istat.is_chan++;
 			istat.is_chanmem += sz;
+		    }
+		if (chptr->users == 1 && chptr->history)
+		    {
+			/* Locked channel */
 			istat.is_hchan--;
 			istat.is_hchanmem -= sz;
 			/*
@@ -320,9 +323,10 @@ int	flags;
 			**
 			** This can be wrong in some cases such as a netjoin
 			** which will not complete, or on a mixed net (with
-			** servers that don't do channel delay) - krys
+			** servers that don't do channel delay) - kalt
 			*/
-			bzero((char *)&chptr->mode, sizeof(Mode));
+			if (*chptr->chname != '!')
+				bzero((char *)&chptr->mode, sizeof(Mode));
 		    }
 
 #ifdef USE_SERVICES
@@ -417,7 +421,15 @@ aChannel *chptr;
 				      chptr->users-1);
 #endif
 	if (--chptr->users <= 0)
+	    {
+		u_int sz = sizeof(aChannel) + strlen(chptr->chname);
+
+		istat.is_chan--;
+		istat.is_chanmem -= sz;
+		istat.is_hchan++;
+		istat.is_hchanmem += sz;
 		free_channel(chptr);
+	    }
 	istat.is_chanusers--;
 }
 
@@ -1743,8 +1755,6 @@ int	flag;
 	if (flag == CREATE)
 	    {
 		chptr = (aChannel *)MyMalloc(sizeof(aChannel) + len);
-		istat.is_chanmem += sizeof(aChannel) + len;
-		istat.is_chan++;
 		bzero((char *)chptr, sizeof(aChannel));
 		strncpyzt(chptr->chname, chname, len+1);
 		if (channel)
@@ -1860,8 +1870,8 @@ aChannel *chptr;
 
 	if (now)
 	    {
-		istat.is_chan--;
-		istat.is_chanmem -= len;
+		istat.is_hchan--;
+		istat.is_hchanmem -= len;
 		if (chptr->prevch)
 			chptr->prevch->nextch = chptr->nextch;
 		else
