@@ -617,11 +617,6 @@
 #undef	ZIP_LINKS
 #endif
 
-/*
-** You should not want to change this. ;)
-*/
-#define	NOWRITEALARM	1
-
 #if defined(TIMEDKLINES)
 # if (TIMEDKLINES < 60)
 # error TIMEDKLINES must be bigger than 60 seconds
