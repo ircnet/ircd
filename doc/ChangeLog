@@ -1,3 +1,9 @@
+2004-07-11  Jakub Vlasek
+
+	* ircd.c, ircd_ext.h: Define ListenerLL.
+	* s_bsd.c/add_listener(), close_connection(): Use ListenerLL.
+	* s_serv.c/report_listeners(): Use ListenerLL.
+
 2004-07-07  Piotr Kucharski
 
 	* configure.in, configure: fix --with-resconf, fix detecting -lm.
