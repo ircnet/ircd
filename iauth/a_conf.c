@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.28 2004/09/20 16:14:30 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.29 2004/09/20 16:30:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -506,6 +506,9 @@ char	*conf_read(char *cfile)
 			if (itmp->timeout != DEFAULT_TIMEOUT)
 				printf("\t\ttimeout: %u seconds\n",
 				       itmp->timeout);
+			if (itmp->port != 0)
+				printf("\t\tport: %u\n",
+				       itmp->port);
 			if (itmp->mod->init)
 			    {
 				err = itmp->mod->init(itmp);
