@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.32 1999/03/13 23:14:06 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.33 1999/04/10 16:51:43 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -387,7 +387,7 @@ char *to;
 /*
  * report_iauth_stats
  *
- * called from m_stats(), this is the reply to /stats A
+ * called from m_stats(), this is part of the reply to /stats t
  */
 void
 report_iauth_stats(sptr, to)
