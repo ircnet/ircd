@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.19 1999/07/04 19:45:58 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.20 1999/07/04 20:02:25 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -41,21 +41,23 @@ struct proxylog
 	time_t expire;
 };
 
-#define OPT_LOG     	0x01
-#define OPT_DENY    	0x02
-#define OPT_PARANOID	0x04
-#define OPT_CAREFUL 	0x08
-#define OPT_V4ONLY  	0x10
-#define OPT_V5ONLY  	0x20
+#define OPT_LOG     	0x001
+#define OPT_DENY    	0x002
+#define OPT_PARANOID	0x004
+#define OPT_CAREFUL 	0x008
+#define OPT_V4ONLY  	0x010
+#define OPT_V5ONLY  	0x020
+#define OPT_PROTOCOL	0x100
 
-#define PROXY_NONE 0
-#define PROXY_OPEN 1
-#define PROXY_CLOSE 2
-#define PROXY_UNEXPECTED 4
+#define PROXY_NONE		0
+#define PROXY_OPEN		1
+#define PROXY_CLOSE		2
+#define PROXY_UNEXPECTED	3
+#define PROXY_BADPROTO		4
 
-#define ST_V4  0x01
-#define ST_V5  0x02
-#define ST_V5b 0x04
+#define ST_V4	0x01
+#define ST_V5	0x02
+#define ST_V5b	0x04
 
 struct socks_private
 {
@@ -113,7 +115,7 @@ int cl, state;
 		    mydata->open5b += 1;
     else if (state == PROXY_NONE)
 	    mydata->noprox += 1;
-    else /* state == PROXY_CLOSE|PROXY_UNEXPECTED) */
+    else /* state == PROXY_CLOSE|PROXY_UNEXPECTED|PROXY_BADPROTO */
 	    if (cldata[cl].mod_status == ST_V4)
 		    mydata->closed4 += 1;
 	    else if (cldata[cl].mod_status == ST_V5)
@@ -286,7 +288,7 @@ char *strver;
 			}
 		}
 	    else
-		    state = PROXY_UNEXPECTED;
+		    state = PROXY_BADPROTO;
 	}
     else /* ST_V5 or ST_V5b */
 	{
@@ -309,7 +311,7 @@ char *strver;
 					    state = PROXY_OPEN;
 			}
 	    else
-		    state = PROXY_UNEXPECTED;
+		    state = PROXY_BADPROTO;
 	}
     
     if (cldata[cl].mod_status == ST_V4 && state != PROXY_OPEN &&
@@ -342,6 +344,18 @@ char *strver;
 		       cldata[cl].inbuffer[0], cldata[cl].inbuffer[1],
 		       cldata[cl].host, cldata[cl].itsip);
 	    sendto_log(ALOG_IRCD, 0, "socks%s: unexpected reply: %u,%u",
+		       strver, cldata[cl].inbuffer[0],
+		       cldata[cl].inbuffer[1]);
+	    state = PROXY_CLOSE;
+	}
+    
+    if (state == PROXY_BADPROTO && (mydata->options & OPT_PROTOCOL))
+	{
+	    sendto_log(ALOG_FLOG, LOG_WARNING,
+		       "socks%s: protocol error: %u,%u %s[%s]", strver,
+		       cldata[cl].inbuffer[0], cldata[cl].inbuffer[1],
+		       cldata[cl].host, cldata[cl].itsip);
+	    sendto_log(ALOG_IRCD, 0, "socks%s: protocol error: %u,%u",
 		       strver, cldata[cl].inbuffer[0],
 		       cldata[cl].inbuffer[1]);
 	    state = PROXY_CLOSE;
@@ -423,6 +437,12 @@ AnInstance *self;
 	    mydata->options |= OPT_V5ONLY;
 	    strcat(tmpbuf, ",v5only");
 	    strcat(txtbuf, ", V5only");
+	}
+    if (strstr(self->opt, "protocol"))
+	{
+	    mydata->options |= OPT_PROTOCOL;
+	    strcat(tmpbuf, ",protocol");
+	    strcat(txtbuf, ", Protocol");
 	}
     
     if (mydata->options == 0)
