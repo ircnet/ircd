@@ -396,6 +396,12 @@
  */
 /* #define SERVER_ID "think" */
 
+/*
+ * Network name.
+ * Defines name of your network which is sent in 005 numerics upon connecting.
+ */
+#define NETWORK_NAME "IRCNet"
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
