@@ -37,6 +37,7 @@ EXTERN int sendto_one (aClient *to, char *pattern, ...);
 #endif /* USE_STDARG */
 #ifndef CLIENT_COMPILE
 EXTERN void flush_connections __P((int fd));
+EXTERN void flush_fdary __P((FdAry *));
 EXTERN void setup_svchans();
 EXTERN void sendto_flog __P((aClient *cptr, char *msg, time_t duration,
 			     char *username, char *hostname));
