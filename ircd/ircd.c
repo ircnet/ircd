@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.93 2003/10/15 19:55:49 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.94 2003/10/17 19:04:56 q Exp $";
 #endif
 
 #include "os.h"
@@ -889,14 +889,6 @@ char	*argv[];
 	if (argc > 0)
 		bad_command(); /* This exits out */
 
-#if defined(USE_IAUTH) && defined(__CYGWIN32__)
-	if ((bootopt & BOOT_NOIAUTH) == 0)
-	    {
-		bootopt |= BOOT_NOIAUTH;
-		(void)fprintf(stderr, "WARNING: Assuming -s option.\n");
-	    }
-#endif
-	
 #ifndef IRC_UID
 	if ((uid != euid) && !euid)
 	    {
