@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.38 1999/03/10 00:30:17 kalt Exp $
+#*   $Id: Makefile.in,v 1.39 1999/03/11 17:31:36 kalt Exp $
 #*
 #*/
 
@@ -262,6 +262,9 @@ install-server: server
 	$(INSTALL_DATA) ../doc/iauth.conf.5 $(conf_man_dir)
 	$(INSTALL_DATA) ../contrib/ircdwatch/ircdwatch.8 $(server_man_dir)
 	$(INSTALL_DATA) ../doc/example.conf $(ircd_conf_dir)
+	-@if [ ! -f $(IAUTHCONF_PATH) ]; then \
+		$(INSTALL_DATA) ../support/iauth.conf $(IAUTHCONF_PATH); \
+	fi
 	@echo "installation of server done."
 
 install-tkserv: $(TKSERV)

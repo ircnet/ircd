@@ -1,0 +1,15 @@
+#
+# Default iauth configuration file
+#
+# $Id: iauth.conf.example,v 1.1 1999/03/11 17:31:36 kalt Exp $
+#
+
+# Have the IRC server reject user connections if iauth is unavailable
+required
+
+# Perform ident lookups
+module rfc931
+
+# Check and reject open SOCKS proxies
+#module socks
+#	option = reject,paranoid
