@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.25 1999/02/04 23:44:16 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.26 1999/04/10 16:15:27 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -151,7 +151,7 @@ char	serveropts[] = {
 '\0'};
 
 #ifdef DEBUGMODE
-static	char	debugbuf[1024];
+static	char	debugbuf[2*READBUF_SIZE]; /* needs to be big.. */
 
 #if ! USE_STDARG
 void	debug(level, form, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
