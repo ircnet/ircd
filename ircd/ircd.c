@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.3 1997/05/05 18:27:02 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.4 1997/06/08 02:33:48 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -697,7 +697,7 @@ char	*argv[];
 		    }
 	    }
 
-#ifndef	CHROOT
+#ifndef	CHROOTDIR
 	if (chdir(dpath))
 	    {
 		perror("chdir");
