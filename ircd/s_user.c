@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.173 2004/02/17 12:02:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.174 2004/02/20 01:36:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -657,8 +657,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		strcpy(sptr->user->uid, next_uid());
 		if (nick[0] == '0' && nick[1] == '\0')
 		{
-			/* This is the only case: "NICK 0" was before USER.
-			** Hence we copy over and add to hash. */
 			strncpyzt(nick, sptr->user->uid, UIDLEN + 1);
 			(void)strcpy(sptr->name, nick);
 			(void)add_to_client_hash_table(nick, sptr);
@@ -1204,10 +1202,11 @@ nickkilldone:
 			    == FLUSH_BUFFER)
 				return FLUSH_BUFFER;
 	    }
-	/* If nick is "0" at this point, it means we haven't received USER
-	** yet, so we could not change nick to UID. Do not add "0" to hash
-	** table let register_user do it later with UID-like nick. --B. */
-	if (!(nick[0] == '0' && nick[1] == '\0'))
+	/* Nick can get changed to UID in register_user()! Check parv[1], it
+	** keeps the original nick. If it was "0", add_to_client_hash_table()
+	** in register_user() does the work after changing nick to UID, so
+	** do not add it twice to hash! --B. */
+	if (!(parv[1][0] == '0' && parv[1][1] == '\0'))
 	{
 		/* Finally set new nick name. */
 		(void)add_to_client_hash_table(nick, sptr);
