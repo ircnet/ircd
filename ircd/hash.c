@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.19 2001/12/08 01:04:17 q Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.20 2001/12/08 01:17:04 q Exp $";
 #endif
 
 #include "os.h"
@@ -124,6 +124,28 @@ int	*store;
 		*store = hash;
 	}
 	hash %= _UIDSIZE;
+	return (hash);
+}
+
+/*
+** hash_sid
+*/
+static	u_int	hash_sid(char *sid, u_int *store)
+{
+	Reg	u_char	*id = (u_char *)sid;
+	Reg	u_char	ch;
+	Reg	u_int	hash = 1;
+
+	for (; (ch = *sid); sid++)
+	{
+		hash <<= 1;
+		hash += hashtab[(int)ch];
+	}
+	if (store)
+	{
+		*store = hash;
+	}
+	hash %= _SIDSIZE;
 	return (hash);
 }
 
@@ -501,7 +523,7 @@ int	add_to_sid_hash_table(char *sid, aClient *cptr)
 {
 	Reg	u_int	hashv;
 
-	hashv = hash_uid(sid, &cptr->serv->sidhashv);
+	hashv = hash_sid(sid, &cptr->serv->sidhashv);
 	cptr->serv->sidhnext = (aServer *)sidTable[hashv].list;
 	sidTable[hashv].list = (void *)cptr->serv;
 	sidTable[hashv].links++;
@@ -1006,7 +1028,7 @@ aClient	*hash_find_sid(char *sid, aClient *cptr)
 	Reg     aHashEntry      *tmp3;
 	u_int   hashv, hv;
 
-	hashv = hash_uid(sid, &hv);
+	hashv = hash_sid(sid, &hv);
 	tmp3 = &sidTable[hashv];
 
 	for (tmp = (aServer *)tmp3->list; tmp; prv = tmp, tmp = tmp->sidhnext)
