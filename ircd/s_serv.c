@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.261 2005/01/30 16:07:33 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.262 2005/01/30 17:56:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1421,13 +1421,6 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 				sendto_one(cptr, ":%s EOB", me.serv->sid);
 			}
 		}
-	}
-	else
-	{
-		/* Send PING for EOB emulation */
-		sendto_one(cptr, ":%s PING %s :%s", mlname, mlname,
-			   cptr->name);
-	cptr->flags &= ~FLAGS_CBURST;
 	}
 #ifdef	ZIP_LINKS
  	/*
@@ -3553,50 +3546,6 @@ void	remove_server_from_tree(aClient *cptr)
 		cptr->serv->up->serv->down = cptr->serv->right;
 	}
 
-	return;
-}
-
-/* Process emulated EOB */
-void	do_emulated_eob(aClient *sptr)
-{
-	aClient *acptr = sptr;
-
-	if (IsBursting(sptr))
-	{
-		istat.is_eobservers++;
-	}
-	
-	SetEOB(sptr);
-	
-	if (MyConnect(sptr))
-	{
-		sendto_flag(SCH_SERVER,
-			"End of burst from %s after %d seconds.",
-			sptr->name, timeofday - sptr->firsttime);
-	}
-	else
-	{
-		sendto_flag(SCH_DEBUG, "EOB from %s (PONG)", sptr->name);
-	}
-	sendto_serv_v(sptr,SV_UID,":%s EOB :%s", me.serv->sid,
-		      sptr->serv->sid);
-
-	/* Try to bubble EOB up */
-	while ((acptr = acptr->serv->up) && acptr != &me)
-	{
-		if (IsBursting(acptr))
-		{
-			SetEOB(acptr);
-			istat.is_eobservers++;
-			sendto_flag(SCH_DEBUG, "EOB from %s (bubbled)",
-				acptr->name);
-				
-			sendto_serv_v(sptr, SV_UID, ":%s EOB :%s",
-				me.serv->sid, sptr->serv->sid);
-
-		}
-	}
-	check_split();
 	return;
 }
 

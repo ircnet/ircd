@@ -20,7 +20,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_numeric.c,v 1.7 2004/10/01 20:22:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_numeric.c,v 1.8 2005/01/30 17:56:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -93,11 +93,6 @@ int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
 			** with numerics which can happen with nick collisions.
 			** - Avalon
 			*/
-			if (IsMe(acptr) && IsBursting(sptr)
-			    && numeric == ERR_NOSUCHSERVER)
-			{
-				do_emulated_eob(sptr);
-			}
 			if (IsMe(acptr) || acptr->from == cptr)
 				sendto_flag(SCH_NUM,
 					    "From %s for %s: %s %d %s %s.",

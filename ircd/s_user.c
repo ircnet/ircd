@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.242 2005/01/30 14:34:44 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.243 2005/01/30 17:56:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2917,19 +2917,7 @@ int	m_pong(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			   destination);
 		return 2;	
 	}
-	if (IsMe(acptr))
-	{
-		if (IsServer(sptr) && IsBursting(sptr))
-		{
-			do_emulated_eob(sptr);
-		}
-
-#ifdef DEBUGMODE
-		Debug((DEBUG_NOTICE, "PONG: %s %s", origin,
-		      destination ? destination : "*"));
-#endif
-	}
-	else
+	if (!IsMe(acptr))
 	{
 		if (!(MyClient(sptr) && mycmp(origin, sptr->name)))
 			sendto_one(acptr,":%s PONG %s %s",
