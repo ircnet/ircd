@@ -1,3 +1,14 @@
+2004-11-13  Piotr Kucharski
+
+	* config.h.dist: move L/DCTL to struct_def.h as they must not be ever
+	  changed.
+	* a_conf.c/conf_err(): exit with code 1, not 0.
+	* configure.in, configure, setup.h.in, os.h: use newer AC_CHECK_TYPES
+	  autoconf macro and use typedef instead of defines for types.
+	* configure.in: AC_CHECK_TYPES now also includes <sys/bitypes.h> to fix
+	  some configure/compilation errors on some platforms (problem noted by
+	  Andreas Ley).
+
 2004-11-11  Piotr Kucharski
 
 	* send.c/send_message(): default define to allow increasing poolsize
