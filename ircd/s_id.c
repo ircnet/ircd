@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_id.c,v 1.2 1998/10/08 08:35:35 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_id.c,v 1.3 1998/10/08 17:35:30 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -132,6 +132,19 @@ void
 cache_chid(chptr)
 aChannel *chptr;
 {
+    /*
+    ** caching should be limited to the minimum,
+    ** for memory reasons, but most importantly for
+    ** user friendly-ness.
+    ** Is the logic here right, tho? 
+    */
+    if (chptr->history == 0 ||
+	(timeofday - chptr->history) >LDELAYCHASETIMELIMIT+DELAYCHASETIMELIMIT)
+	{
+	    MyFree((char *)chptr);
+	    return;
+	}
+
     chptr->nextch = idcache;
     idcache = chptr;
     istat.is_cchan++;
