@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.148 2003/02/16 03:54:33 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.149 2003/02/19 13:27:37 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2279,6 +2279,11 @@ char	*parv[];
 	}
 	else
 	{
+		/* 0 here is intentional. User MUST specify + or -,
+		 * as we don't want to restrict clients which send
+		 * their hostname in host field (and happen to have r there).
+		 * - jv
+		 */
 		what = 0;
 		for (s = host; *s; s++)
 		{
