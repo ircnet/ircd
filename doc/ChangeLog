@@ -5,6 +5,7 @@
 	* s_bsd.c: Removed SUN_GSO_BUG.
 	* s_debug.c: Removed SUN_GSO_BUG, VALLOC, NPATH and NOWRITELALARM
 	  from serveropts[]. (Not used anymore)
+	* s_debug.c: Added TOPIC_WHO_TIME to serveropts[].
 
 2003-10-18  Jakub Vlasek
 
