@@ -1,7 +1,14 @@
+2003-01-02  Piotr Kucharski
+
+	* reverting Kurt's changes #2 and #3 from 2003-01-01 (too much
+	  champagne?)
+	* channel.c/m_join(): allowing to join +q channels regardless
+	  of MAXCHANNELSPERUSER.
+
 2003-01-01  Jakub Vlasek
 
 	* s_serv.c/do_emulated_eob(): The value of istat.is_eobservers should
-	  have been incremented before  SetEOB().
+	  have been incremented before SetEOB().
 	
 2003-01-01  Kurt Roeckx
 
@@ -16,6 +23,10 @@
 2003-12-24  Kurt Roeckx
 
 	* config.guess, config.sub: Newer versions.
+
+2003-12-12  Piotr Kucharski
+
+	* channel.c/match_modeid(): bug in nick check (noted by fiction).
 
 2003-12-09  Piotr Kucharski
 
