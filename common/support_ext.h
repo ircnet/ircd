@@ -62,7 +62,7 @@ EXTERN void dumpcore ();
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE) && defined(DO_DEBUG_MALLOC)
 EXTERN char *MyMalloc __P((size_t x));
 EXTERN char *MyRealloc __P((char *x, size_t y));
-EXTERN void MyFree __P((char *x));
+EXTERN void MyFree __P((void *x));
 #else /* DEBUGMODE && !CLIENT_COMPILE && !DO_DEBUG_MALLOC */
 EXTERN char *MyMalloc __P((size_t x));
 EXTERN char *MyRealloc __P((char *x, size_t y));

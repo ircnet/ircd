@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.38 2002/07/30 00:15:00 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.39 2002/10/09 21:23:20 q Exp $";
 #endif
 
 #include "os.h"
@@ -70,7 +70,7 @@ aClient	*cptr;
 			free_server(serv->servp, cptr);
 		if (serv->server)
 			MyFree(serv->server);
-		MyFree((char *)serv);
+		MyFree(serv);
 		cptr->service = NULL;
 	    }
 }

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.21 2002/09/28 21:02:57 jv Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.22 2002/10/09 21:23:20 q Exp $";
 #endif
 
 #include "os.h"
@@ -181,7 +181,7 @@ aClient	*cptr;
 			MyFree(cptr->reason);
 		}
 	}
-	MyFree((char *)cptr);
+	MyFree(cptr);
 }
 
 /*
@@ -301,7 +301,7 @@ aClient	*cptr;
 		    {
 			istat.is_away--;
 			istat.is_awaymem -= (strlen(user->away) + 1);
-			MyFree((char *)user->away);
+			MyFree(user->away);
 		    }
 		/*
 		 * sanity check
@@ -328,7 +328,7 @@ aClient	*cptr;
 				    user->username, user->host, buf);
 #endif
 		    }
-		MyFree((char *)user);
+		MyFree(user);
 #ifdef	DEBUGMODE
 		users.inuse--;
 #endif
@@ -358,7 +358,7 @@ aClient	*cptr;
 				    cptr, cptr ? cptr->name : "<noname>", buf);
 #endif
 		    }
-		MyFree((char *)serv);
+		MyFree(serv);
 	    }
 }
 
@@ -562,7 +562,7 @@ invLink	*make_invlink()
 void	free_link(lp)
 Reg	Link	*lp;
 {
-	MyFree((char *)lp);
+	MyFree(lp);
 #ifdef	DEBUGMODE
 	links.inuse--;
 #endif
@@ -571,7 +571,7 @@ Reg	Link	*lp;
 void	free_invlink(lp)
 Reg	invLink	*lp;
 {
-	MyFree((char *)lp);
+	MyFree(lp);
 #ifdef	DEBUGMODE
 	links.inuse--;
 #endif
@@ -591,7 +591,7 @@ aClass	*make_class()
 void	free_class(tmp)
 Reg	aClass	*tmp;
 {
-	MyFree((char *)tmp);
+	MyFree(tmp);
 #ifdef	DEBUGMODE
 	classs.inuse--;
 #endif
@@ -653,10 +653,10 @@ aConfItem *aconf;
 	if (aconf->passwd)
 		bzero(aconf->passwd, strlen(aconf->passwd));
 	if (aconf->ping)
-		MyFree((char *)aconf->ping);
+		MyFree(aconf->ping);
 	MyFree(aconf->passwd);
 	MyFree(aconf->name);
-	MyFree((char *)aconf);
+	MyFree(aconf);
 #ifdef	DEBUGMODE
 	aconfs.inuse--;
 #endif

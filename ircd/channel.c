@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.131 2002/09/08 20:20:45 jv Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.132 2002/10/09 21:23:19 q Exp $";
 #endif
 
 #include "os.h"
@@ -2087,7 +2087,7 @@ aChannel *chptr;
 		if (*chptr->chname == '!' && close_chid(chptr->chname+1))
 			cache_chid(chptr);
 		else
-			MyFree((char *)chptr);
+			MyFree(chptr);
 	    }
 }
 
