@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.39 2004/10/03 17:13:42 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.40 2004/10/27 13:37:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -514,30 +514,56 @@ static	aConfItem 	*initconf()
 			{
 				switch (*s)
 				{
+#ifdef XLINE
+				case 'e':
+#endif
 				case 'R':
-					aconf->flags |= CFLAG_RESTRICTED;
-					break;
 				case 'D':
-					aconf->flags |= CFLAG_RNODNS;
-					break;
 				case 'I':
-					aconf->flags |= CFLAG_RNOIDENT;
-					break;
 				case 'E':
-					aconf->flags |= CFLAG_KEXEMPT;
-					break;
 				case 'N':
-					aconf->flags |= CFLAG_NORESOLVE;
-					break;
 				case 'M':
-					aconf->flags |= CFLAG_NORESOLVEMATCH;
-					break;
 				case 'F':
-					aconf->flags |= CFLAG_FALL;
 					break;
 				default:
 					config_error(CF_WARN, CK_FILE, CK_LINE,
 						"unknown I-line flag: %c", *s);
+				}
+			}
+		}
+		if ((aconf->status & CONF_OPERATOR) && tmp3)
+		{
+			/* Parse O-line flags */
+			for(s = tmp3; *s; ++s)
+			{
+				switch (*s)
+				{
+				case 'A':
+				case 'L':
+				case 'K':
+				case 'k':
+				case 'S':
+				case 's':
+				case 'C':
+				case 'c':
+				case 'l':
+				case 'h':
+				case 'd':
+				case 'r':
+				case 'R':
+				case 'D':
+				case 'e':
+				case 'T':
+#ifdef CLIENTS_CHANNEL
+				case '&':
+#endif
+				case 'p':
+				case 'P':
+				case 't':
+					break;
+				default:
+					config_error(CF_WARN, CK_FILE, CK_LINE,
+						"unknown O-line flag: %c", *s);
 				}
 			}
 		}
