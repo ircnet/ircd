@@ -1,5 +1,11 @@
 2.11.0b18
 
+2004-11-20  Piotr Kucharski
+
+	* s_serv.c/check_link(): except remote services.
+	* struct_def.h/msgtab[]: allow the same set of commands for services as
+	  2.10 allowed.
+
 2004-11-19  Piotr Kucharski
 
 	* send.c/send_queued(): use strerror, not errno.
