@@ -1,4 +1,5 @@
-$Id: README,v 1.1 1998/06/12 22:57:40 kalt Exp $
+$Id: README,v 1.2 1998/11/09 14:11:36 borud Exp $
+
 
 DESCRIPTION
 ===========
@@ -53,3 +54,4 @@ ADMINISTRATIVIA
 
   please report bugs to <ircd-users@stealth.net>
   improvements are welcome.
+
