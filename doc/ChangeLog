@@ -1,3 +1,7 @@
+1999-07-09  Christophe Kalt
+
+	* configure.in, os.h, s_bsd.c: IPv6 updates (from KIKUCHI Takahiro).
+
 1999-07-05  Christophe Kalt
 
 	* s_bsd.c/read_message(): can't use iauth_options when USE_IAUTH

@@ -749,9 +749,7 @@ if test "x$enable_ip6" != x; then
   dnl be smart about it
   AC_MSG_CHECKING([IPv6 system type])
   AC_CACHE_VAL(irc_cv_v6type, [
-    if test -f /usr/include/netinet6/in6_ifattach.h; then
-      irc_cv_v6type=hydrangea
-    else if test -d /usr/inet6; then
+    if test -d /usr/inet6; then
       irc_cv_v6type=linux
     else
       AC_EGREP_CPP(yes, [dnl
@@ -785,10 +783,6 @@ yes
 
   dnl eventually update LIBS
   case $irc_cv_v6type in
-	hydrangea)
-		LIBS="-L/usr/local/v6/lib -linet6 $LIBS"
-		CFLAGS="$CFLAGS -I/usr/local/v6/include"
-		;;
 	kame)
 		LIBS="-L/usr/local/v6/lib -linet6 $LIBS"
 		CFLAGS="$CFLAGS -I/usr/local/v6/include"
@@ -1442,7 +1436,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.39 1999/07/02 23:40:21 q Exp $])
+AC_REVISION([$Id: configure.in,v 1.40 1999/07/09 20:37:22 kalt Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)

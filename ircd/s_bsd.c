@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.70 1999/07/05 17:33:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.71 1999/07/09 20:37:22 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1513,7 +1513,11 @@ aClient *cptr;
 	    }
 	/* Now add new item to the list */
 	blptr = (struct abacklog *) MyMalloc(sizeof(struct abacklog));
+#ifdef INET6
+	bcopy(cptr->ip.s6_addr, blptr->ip.s6_addr, IN6ADDRSZ);
+#else
 	blptr->ip.s_addr = cptr->ip.s_addr;
+#endif
 	blptr->PT = timeofday;
 	blptr->next = backlog;
 	backlog = blptr;
@@ -1522,7 +1526,11 @@ aClient *cptr;
 	blptr = backlog;
 	while (blptr != NULL)
 	    {
+#ifdef INET6
+		if (bcmp(blptr->ip.s6_addr, cptr->ip.s6_addr, IN6ADDRSZ) == 0)
+#else
 		if (blptr->ip.s_addr == cptr->ip.s_addr)
+#endif
 			count++;
 		blptr = blptr->next;
 	    }
