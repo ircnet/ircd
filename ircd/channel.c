@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.219 2004/07/03 08:51:13 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.220 2004/08/02 16:26:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -281,7 +281,7 @@ static	int	del_modeid(int type, aChannel *chptr, aListItem *modeid)
         for (mode = &(chptr->mlist); *mode; mode = &((*mode)->next))
 	{
 		if (type == (*mode)->flags &&
-			modeid == NULL ? 1 : BanExact(modeid, (*mode)->value.alist))
+			(modeid == NULL ? 1 : BanExact(modeid, (*mode)->value.alist)))
 		{
 			tmp = *mode;
 			*mode = tmp->next;
