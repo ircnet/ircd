@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.35 2004/03/05 15:08:07 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.36 2004/03/15 18:19:54 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -98,10 +98,13 @@ int	init_resolver(int op)
 		    {
 			ircd_res.nscount = 1;
 #ifdef INET6
-			/* still IPv4 */
-			ircd_res.nsaddr_list[0].sin_addr.s_addr =
-			  inet_pton(AF_INET, "127.0.0.1",
-				    &ircd_res.nsaddr_list[0].sin_addr.s_addr);
+			if (!inetpton(AF_INET6, "::1",
+				    &ircd_res.nsaddr_list[0].sin6_addr.s6_addr))
+			{
+				bcopy(minus_one,
+					ircd_res.nsaddr_list[0].sin6_addr.s6_addr,
+					IN6ADDRSZ);
+			}
 #else
 			ircd_res.nsaddr_list[0].sin_addr.s_addr =
 				inetaddr("127.0.0.1");
@@ -114,8 +117,7 @@ int	init_resolver(int op)
 		int	on = 0;
 
 #ifdef INET6
-		/* still IPv4 */
-		ret = resfd = socket(AF_INET, SOCK_DGRAM, 0);
+		ret = resfd = socket(AF_INET6, SOCK_DGRAM, 0);
 #else
 		ret = resfd = socket(AF_INET, SOCK_DGRAM, 0);
 #endif
@@ -317,15 +319,14 @@ static	int	send_res_msg(char *msg, int len, int rcount)
 	for (i = 0; i < max; i++)
 	    {
 #ifdef INET6
-		/* still IPv4 */
-		ircd_res.nsaddr_list[i].sin_family = AF_INET;
+		ircd_res.nsaddr_list[i].sin6_family = AF_INET6;
 #else
 		ircd_res.nsaddr_list[i].sin_family = AF_INET;
 #endif
 #ifdef INET6
 		if (sendto(resfd, msg, len, 0,
 			   (struct sockaddr *)&(ircd_res.nsaddr_list[i]),
-			   sizeof(struct sockaddr)) == len)
+			   sizeof(struct sockaddr_in6)) == len)
 #else
 		if (sendto(resfd, msg, len, 0,
 			   (struct sockaddr *)&(ircd_res.nsaddr_list[i]),
@@ -811,7 +812,7 @@ struct	hostent	*get_res(char *lp)
 	Reg	ResRQ	*rptr = NULL;
 	aCache	*cp = NULL;
 #ifdef INET6
-	struct	sockaddr_in	sin;
+	struct	sockaddr_in6	sin;
 #else
 	struct	sockaddr_in	sin;
 #endif
@@ -859,10 +860,10 @@ struct	hostent	*get_res(char *lp)
 
 	for (a = 0; a < max; a++)
 #ifdef INET6
-		if (!ircd_res.nsaddr_list[a].sin_addr.s_addr ||
-		    !bcmp((char *)&sin.sin_addr,
-			  (char *)&ircd_res.nsaddr_list[a].sin_addr,
-			  sizeof(struct in_addr)))
+		if (!ircd_res.nsaddr_list[a].SIN_ADDR.S_ADDR ||
+		    !bcmp((char *)&sin.SIN_ADDR,
+			  (char *)&ircd_res.nsaddr_list[a].SIN_ADDR,
+			  sizeof(struct IN_ADDR)))
 #else
 		if (!ircd_res.nsaddr_list[a].sin_addr.s_addr ||
 		    !bcmp((char *)&sin.sin_addr,
@@ -914,7 +915,7 @@ struct	hostent	*get_res(char *lp)
 	if (a == -1) {
 #ifdef	INET6
 		sprintf(buffer, "Bad hostname returned from %s for %s",
-			inetntop(AF_INET, &sin.sin_addr, mydummy2, 
+			inetntop(AF_INET6, &sin.sin6_addr, mydummy2, 
 				MYDUMMY_SIZE),
 			inetntop(AF_INET6, rptr->he.h_addr.s6_addr,
 				mydummy, MYDUMMY_SIZE));

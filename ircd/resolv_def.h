@@ -55,7 +55,7 @@
 
 /*
  *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id: resolv_def.h,v 1.7 2003/10/17 21:28:19 q Exp $
+ *	$Id: resolv_def.h,v 1.8 2004/03/15 18:19:54 chopin Exp $
  */
 
 /*
@@ -85,7 +85,7 @@ struct __res_state {
 	int	retry;			/* number of times to retransmit */
 	u_long	options;		/* option flags - see below. */
 	int	nscount;		/* number of name servers */
-	struct sockaddr_in
+	struct SOCKADDR_IN
 		nsaddr_list[MAXNS];	/* address of name server */
 #define	nsaddr	nsaddr_list[0]		/* for backward compatibility */
 	u_short	id;			/* current message id */

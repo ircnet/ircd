@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static char rcsid[] = "$Id: res_init.c,v 1.13 2003/10/18 15:31:25 q Exp $";
+static char rcsid[] = "$Id: res_init.c,v 1.14 2004/03/15 18:19:54 chopin Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -189,14 +189,21 @@ int	ircd_res_init()
 	if (!ircd_res.id)
 		ircd_res.id = ircd_res_randomid();
 
-/*ifdef INET6 not, because of IPv4 DNS serving */
-#ifdef USELOOPBACK
-	ircd_res.nsaddr.sin_addr = inet_makeaddr(IN_LOOPBACKNET, 1);
+#ifdef INET6
+# ifdef USELOOPBACK
+	ircd_res.nsaddr.sin6_addr = in6addr_loopback;
+# else
+	ircd_res.nsaddr.sin6_addr = in6addr_any;
+# endif
 #else
+# ifdef USELOOPBACK
+	ircd_res.nsaddr.sin_addr = inet_makeaddr(IN_LOOPBACKNET, 1);
+# else
 	ircd_res.nsaddr.sin_addr.s_addr = INADDR_ANY;
-#endif
-	ircd_res.nsaddr.sin_family = AF_INET;
-	ircd_res.nsaddr.sin_port = htons(NAMESERVER_PORT);
+# endif
+#endif /* INET6 */
+	ircd_res.nsaddr.SIN_FAMILY = AFINET;
+	ircd_res.nsaddr.SIN_PORT = htons(NAMESERVER_PORT);
 	ircd_res.nscount = 1;
 	ircd_res.ndots = 1;
 	ircd_res.pfcode = 0;
@@ -302,21 +309,37 @@ int	ircd_res_init()
 		}
 		/* read nameservers to query */
 		if (MATCH(buf, "nameserver") && nserv < MAXNS) {
-		    struct in_addr a;
+		    struct IN_ADDR a;
+		    char *tmp;
 
 		    cp = buf + sizeof("nameserver") - 1;
 		    while (*cp == ' ' || *cp == '\t')
 			cp++;
-		    if ((*cp != '\0') && (*cp != '\n') && inetaton(cp, &a)) {
-			ircd_res.nsaddr_list[nserv].sin_addr = a;
-			ircd_res.nsaddr_list[nserv].sin_family = AF_INET;
-			ircd_res.nsaddr_list[nserv].sin_port =
+		    if ((*cp == '\0') || (*cp == '\n'))
+			continue;
+		    /* strip ending \n or inetpton fails */
+		    if ((tmp=index(cp, '\n')) || (tmp=index(cp, '\r')))
+			*tmp = '\0';
+		    if (
+#ifdef INET6
+			inetpton(AF_INET6, cp, a.s6_addr)
+#else
+			inetaton(cp, &a)
+#endif
+			)
+		    {
+			ircd_res.nsaddr_list[nserv].SIN_ADDR = a;
+			ircd_res.nsaddr_list[nserv].SIN_FAMILY = AFINET;
+			ircd_res.nsaddr_list[nserv].SIN_PORT =
 				htons(NAMESERVER_PORT);
 			nserv++;
 		    }
 		    continue;
 		}
 #ifdef RESOLVSORT
+#ifdef INET6
+#error No support for RESOLVSORT and INET6
+#endif
 		if (MATCH(buf, "sortlist")) {
 		    struct in_addr a;
 
