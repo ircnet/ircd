@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.127 2004/07/03 16:22:08 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.128 2004/07/05 15:48:20 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2525,7 +2525,7 @@ time_t	tkline_expire(int all)
 	while ((tmp = tmp2))
 	{
 		tmp2 = tmp->next;
-		if (all || tmp->hold < timeofday)
+		if (all || tmp->hold <= timeofday)
 		{
 			if (tmp == tkconf)
 				tkconf = tmp->next;
@@ -2534,7 +2534,7 @@ time_t	tkline_expire(int all)
 			free_conf(tmp);
 			continue;
 		}
-		if (tmp->hold < min)
+		if (min == 0 || tmp->hold < min)
 		{
 			min = tmp->hold;
 		}
