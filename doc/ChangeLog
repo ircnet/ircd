@@ -1,3 +1,5 @@
+2.11.0b16
+
 2004-11-03  Piotr Kucharski
 
 	* hash.c/bigger_hash_table(): fix serverTable grow bug.
