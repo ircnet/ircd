@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.118 2004/06/25 01:42:05 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.119 2004/06/29 23:40:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -220,29 +220,33 @@ char	*oline_flags_to_string(long flags)
 	else if (flags & ACL_KILLLOCAL)
 		*s++ = 'k';
 	if (flags & ACL_SQUITREMOTE)
-		*s++ ='S';	
+		*s++ ='S';
 	else if (flags & ACL_SQUITLOCAL)
-		*s++ ='s';	
+		*s++ ='s';
 	if (flags & ACL_CONNECTREMOTE)
-		*s++ ='C';	
+		*s++ ='C';
 	else if (flags & ACL_CONNECTLOCAL)
-		*s++ ='c';	
+		*s++ ='c';
 	if (flags & ACL_CLOSE)
-		*s++ ='l';	
+		*s++ ='l';
 	if (flags & ACL_HAZH)
-		*s++ ='h';	
+		*s++ ='h';
 	if (flags & ACL_DNS)
-		*s++ ='d';	
+		*s++ ='d';
 	if (flags & ACL_REHASH)
-		*s++ ='r';	
+		*s++ ='r';
 	if (flags & ACL_RESTART)
-		*s++ ='R';	
+		*s++ ='R';
 	if (flags & ACL_DIE)
-		*s++ ='D';	
+		*s++ ='D';
 	if (flags & ACL_SET)
-		*s++ ='e';	
+		*s++ ='e';
 	if (flags & ACL_TKLINE)
-		*s++ ='T';	
+		*s++ ='T';
+#ifdef CLIENTS_CHANNEL
+	if (flags & ACL_CLIENTS)
+		*s++ ='&';
+#endif
 	if (s == ofsbuf)
 		*s++ = '-';
 	*s++ = '\0';
@@ -274,6 +278,9 @@ long	oline_flags_parse(char *string)
 		case 'D': tmp |= ACL_DIE; break;
 		case 'e': tmp |= ACL_SET; break;
 		case 'T': tmp |= ACL_TKLINE; break;
+#ifdef CLIENTS_CHANNEL
+		case '&': tmp |= ACL_CLIENTS; break;
+#endif
 		}
 	}
 	return tmp;
