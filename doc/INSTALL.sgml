@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.62 2004/06/24 18:28:03 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.63 2004/06/30 00:10:34 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -683,7 +683,10 @@ They define privileges of an operator.
 <item>D - allows DIE
 <item>e - allows SET
 <item>T - allows TKLINE
+<item>&amp; - allows joining &amp;CLIENTS
 </itemize>
+``L'' flag cannot be overridden by other flags.
+Warning: If flags field is left empty, no privileges will be granted. 
 <tag/Example/ o:orion.cair.du.edu:pyunxc:Jeff::1
 <p>
 There is an OPERATOR at ``orion.cair.du.edu'' that can get

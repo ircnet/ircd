@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.62 2004/06/24 18:28:03 chopin Exp $
+  $Id: INSTALL.txt,v 1.63 2004/06/30 00:10:34 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -869,6 +869,11 @@
 
         +o  T - allows TKLINE
 
+        +o  & - allows joining &CLIENTS
+
+        ``L'' flag cannot be overridden by other flags.  Warning: If
+        flags field is left empty, no privileges will be granted.
+
      EExxaammppllee
         o:orion.cair.du.edu:pyunxc:Jeff::1
 
@@ -916,10 +921,8 @@
         If you specify an IP address, IP mask, or an IP bitmask, it will
         match clients connecting from the matching addresses, no matter
         if they resolve or not.
-
         You can prefix an IP address, an IP mask, or IP bitmask by ``=''
         in which case only non resolving matching hosts will be banned.
-
 
      ttiimmee iinntteerrvvaall((ss))||ccoommmmeenntt
         Either leave this field empty or put a comment, then the line
@@ -987,6 +990,8 @@
         This line disallows all hosts whose IP address is from network
         ``192.11.35.0/24'' and which didn't resolve to login to the
         ircd.
+
+
   44..88..  SSeerrvveerr ccoonnnneeccttiioonnss
 
   How to connect to other servers, How other servers can connect to you
@@ -1052,7 +1057,6 @@
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
 
-
      PPaasssswwoorrdd
         The password of the other host.  A password must always be
         present for the line to be recognized.
@@ -1113,6 +1117,7 @@
      This reads: do not attempt to autoconnect to ``irc.nada.kth.se'',
      but if ``irc.nada.kth.se'' requests a connection, allow it to
      connect.
+
 
   Now back to our original problem, we wanted OUR server CONNECT to 3
   hosts,  ``nic.funet.fi'', ``irc.nada.kth.se'' and ``garfield.mit.edu''
@@ -1178,6 +1183,7 @@
         it.  If you were connecting to nic.funet.fi you would receive
         ``nic.funet.fi'' and that is what you should place in this
         field.
+
 
      DDoommaaiinn MMaasskk
         Domain masking, see below.
@@ -1317,6 +1323,8 @@
         H:*.edu:*:*.bu.edu::
         H:*.au:*:*.bu.edu::
 
+
+
      is allowed as is
 
 
@@ -1372,6 +1380,7 @@
         this new server.
 
 
+
   44..1122..  VVeerrssiioonn lliimmiittaattiioonnss
 
 
@@ -1380,7 +1389,6 @@
         their version and on compile time options.
 
      FFoorrmmaatt
-
 
         V:<Version Mask>:<Flags>:<Server Mask>::
 
@@ -1436,6 +1444,7 @@
      FFllaaggss
         are not standard.  Therefore, this field sshhoouulldd aallwwaayyss contain a
         specific identification.
+
 
 
   44..1133..  EExxcclluuddeedd mmaacchhiinneess
@@ -1503,6 +1512,7 @@
      CCllaassss
         The class field should refer to an existing class.
 
+
      NNootteess
         A service is not a very useful sort of client, it cannot join
         channels or issue certain commands although most are available
@@ -1510,7 +1520,6 @@
         unallowed command. Services however, are not affected by flood
         control and can be granted special privileges. It is therefore
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
-
 
 
   44..1155..  BBoouunnccee sseerrvveerr
@@ -1570,12 +1579,10 @@
 
         When the server is completely full, clients should use the
         secondary server.
-
         B:-1::our.server.example:6667:
 
         Clients that connected to server-only port should really use
         port 6667.
-
 
 
   55..  RReellaatteedd rreessoouurrcceess
@@ -1637,9 +1644,9 @@
         (This can be done, for example, by running ``gdb'' on the core
         file, and typing ``where'').
 
+
      FFiixx
         If you have a fix, don't forget to include it.
-
 
 
   66..22..  WWhheerree ttoo sseenndd aa bbuugg rreeppoorrtt

@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-4588/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-22011/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.62 2004/06/24 18:28:02 chopin Exp $
+     $Id: INSTALL.info,v 1.63 2004/06/30 00:10:34 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -949,6 +949,11 @@ How to become the IRC administrator on your site
 
         * T - allows TKLINE
 
+        * & - allows joining &CLIENTS
+
+     "L" flag cannot be overridden by other flags.  Warning: If flags
+     field is left empty, no privileges will be granted.
+
 `Example'
      o:orion.cair.du.edu:pyunxc:Jeff::1
 
@@ -1716,41 +1721,41 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top127
-Node: Installing IRC-650
-Node: The configure script875
-Node: Notes for Cygwin32 users3161
-Node: Notes concerning IPv6 support3894
-Node: The config-h file4325
-Node: DEBUGMODE4871
-Node: CHROOTDIR5448
-Node: ENABLE_SUMMON ENABLE_USERS5817
-Node: NO_DEFAULT_INVISIBLE6328
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY6669
-Node: ZIP_LINKS ZIP_LEVEL7308
-Node: SLOW_ACCEPT8336
-Node: CLONE_CHECK8966
-Node: Other #define's9329
-Node: Editing the Makefile and compiling9651
-Node: The ircd-conf file10636
-Node: Machine information13005
-Node: Administrative info15620
-Node: Port connections17771
-Node: Connection Classes19920
-Node: Client connections25047
-Node: Operator priviliges30781
-Node: Excluded accounts33726
-Node: Server connections37638
-Node: Deny auto-connections46266
-Node: Hub connections47640
-Node: Leaf connections49128
-Node: Version limitations51212
-Node: Excluded machines52970
-Node: Service connections54275
-Node: Bounce server55869
-Node: Related resources57730
-Node: Reporting a bug58769
-Node: How to report a bug59026
-Node: Where to send a bug report60037
+Node: Top128
+Node: Installing IRC-651
+Node: The configure script876
+Node: Notes for Cygwin32 users3162
+Node: Notes concerning IPv6 support3895
+Node: The config-h file4326
+Node: DEBUGMODE4872
+Node: CHROOTDIR5449
+Node: ENABLE_SUMMON ENABLE_USERS5818
+Node: NO_DEFAULT_INVISIBLE6329
+Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY6670
+Node: ZIP_LINKS ZIP_LEVEL7309
+Node: SLOW_ACCEPT8337
+Node: CLONE_CHECK8967
+Node: Other #define's9330
+Node: Editing the Makefile and compiling9652
+Node: The ircd-conf file10637
+Node: Machine information13006
+Node: Administrative info15621
+Node: Port connections17772
+Node: Connection Classes19921
+Node: Client connections25048
+Node: Operator priviliges30782
+Node: Excluded accounts33894
+Node: Server connections37806
+Node: Deny auto-connections46434
+Node: Hub connections47808
+Node: Leaf connections49296
+Node: Version limitations51380
+Node: Excluded machines53138
+Node: Service connections54443
+Node: Bounce server56037
+Node: Related resources57898
+Node: Reporting a bug58937
+Node: How to report a bug59194
+Node: Where to send a bug report60205
 
 End Tag Table

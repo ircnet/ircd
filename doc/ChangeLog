@@ -5,6 +5,19 @@
 	* s_misc.c/exit_client(): do not log service quits to users log.
 	* send.c/sendto_flog(): revert from tabs to spaces in logs, do not
 	  write ending "\n" to syslog and services.
+	* s_bsd.c/inetport(): under Cygwin call set_non_blocking() here, not
+	  after returning to add_listener() (from Q).
+	* send.c/svchans[], struct_def.h, channel.c/setup_server_channels():
+	  added &CLIENTS server channel.
+	* struct_def.h: add ACL_CLIENTS.
+	* channel.c/can_join(): allow join &CLIENTS only if is_allowed().
+	* s_conf.c/oline_flags_to_string(), oline_flags_parse(): add '&' flag
+	  for ACL_CLIENTS.
+	* struct_def.h: CCL_mumble restrictions (for CLIENTS_CHANNEL).
+	* config.h.dist: CLIENTS_CHANNEL (undefined) and CLIENTS_CHANNEL_LEVEL.
+	* s_misc.c/exit_client(): log client quits to &CLIENTS.
+	* s_user.c/register_user(): log client connects to &CLIENTS.
+	* s_user.c/m_nick(): log client nick changes to &CLIENTS.
 
 2004-06-28  Piotr Kucharski
 
