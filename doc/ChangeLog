@@ -4,6 +4,14 @@
 	  to newly created close_client_fd().
 	* s_bsd.c/close_connection(): Do not send stop to iauth for
 	  outgoing server connections.
+	* s_bsd.c, s_bsd_ext.h: Added open_listener() and reopen_listeners().
+	* s_bsd.c/add_listener(): Moved actual listener fd related code
+	  to open_listener(), do not remove listener if binding to socket fails.
+	* s_bsd.c/close_listeners(): Close fd as soon as the listener
+	  is marked illegal.
+	* s_bsd.c/close_client_fd(): Set fd to -1 to allow inetport() work
+	  again on given cptr.
+	* s_conf.c/rehash(): Call reopen_listeners().
 
 2004-08-10  Jakub Vlasek
 
