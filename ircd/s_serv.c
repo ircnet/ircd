@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.52 1998/12/13 00:02:37 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.53 1999/01/28 23:50:17 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -838,6 +838,8 @@ Reg	aClient	*cptr;
 #endif
 	sendto_flag(SCH_SERVER, "Sending SERVER %s (%d %s)", cptr->name,
 		    1, cptr->info);
+	sendto_flag(SCH_DEBUG, "Burst to %s: %X%s", inpath,
+		    cptr->hopcount, (cptr->flags & FLAGS_ZIP) ? "z" : "");
 	/*
 	** Old sendto_serv_but_one() call removed because we now
 	** need to send different names to different servers
@@ -860,7 +862,6 @@ Reg	aClient	*cptr;
 			sendto_one(acptr,":%s SERVER %s 2 %s :%s",
 				   ME, cptr->name, stok, cptr->info);
 	    }
-
 	/*
 	** Pass on my client information to the new server
 	**
@@ -900,6 +901,9 @@ Reg	aClient	*cptr;
 				   acptr->serv->up, acptr->name,
 				   acptr->hopcount+1, stok, acptr->info);
 	    }
+
+	sendto_flag(SCH_DEBUG, "SERVER phase complete: %u",
+		    (int)DBufLength(&cptr->sendQ));
 
 	for (acptr = &me; acptr; acptr = acptr->prev)
 	    {
@@ -948,6 +952,10 @@ Reg	aClient	*cptr;
 		    }
 		/* the previous if does NOT catch all services.. ! */
 	    }
+
+	sendto_flag(SCH_DEBUG, "client phase complete: %u",
+		    (int)DBufLength(&cptr->sendQ));
+
 	/*
 	** Last, pass all channels modes
 	** only sending modes for LIVE channels.
@@ -962,6 +970,10 @@ Reg	aClient	*cptr;
 				send_channel_modes(cptr, chptr);
 			    }
 	    }
+
+	sendto_flag(SCH_DEBUG, "NJOIN/mode phase complete: %u",
+		    (int)DBufLength(&cptr->sendQ));
+
 	cptr->flags &= ~FLAGS_CBURST;
 #ifdef	ZIP_LINKS
  	/*
