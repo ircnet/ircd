@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.87 2004/03/04 21:15:28 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.88 2004/03/04 21:43:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -250,7 +250,7 @@ badmask:
 int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 {
 	Reg	aConfItem	*aconf;
-	char	*uhosts[MAXALIASES];
+	char	*uhosts[MAXALIASES+2];
 	char	ipname[HOSTLEN+USERLEN+2];
 	int	ulen = strlen(cptr->username) + 1; /* for '@' */
 	int	i, hostnum;
