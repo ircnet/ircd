@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.54 2004/06/29 17:21:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.55 2004/07/02 11:08:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -692,7 +692,8 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					   chptr->chname, chptr->topic);
 		    }
 	    }
-	/* cptr->flags ^= FLAGS_CBURST; */
+	sendto_one(sptr, "EOB");
+	cptr->flags ^= FLAGS_CBURST;
 	return 0;
 }
 #endif
