@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.13 1998/02/10 23:19:01 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.14 1998/02/18 18:41:34 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -481,7 +481,8 @@ aClient	*mp;
 	struct	passwd	*p;
 
 	p = getpwuid(getuid());
-	strncpyzt(mp->username, p->pw_name, sizeof(mp->username));
+	strncpyzt(mp->username, (p) ? p->pw_name : "unknown",
+		  sizeof(mp->username));
 	(void)get_my_name(mp, mp->sockhost, sizeof(mp->sockhost)-1);
 	if (mp->name[0] == '\0')
 		strncpyzt(mp->name, mp->sockhost, sizeof(mp->name));
@@ -504,7 +505,8 @@ aClient	*mp;
 	mp->user->flags |= FLAGS_OPER;
 	mp->serv->up = mp->name;
 	mp->user->server = find_server_string(mp->serv->snum);
-	strncpyzt(mp->user->username, p->pw_name, sizeof(mp->user->username));
+	strncpyzt(mp->user->username, (p) ? p->pw_name : "unknown",
+		  sizeof(mp->user->username));
 	(void) strcpy(mp->user->host, mp->name);
 
 	(void)add_to_client_hash_table(mp->name, mp);
