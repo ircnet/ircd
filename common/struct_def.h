@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.82 2003/11/03 19:27:29 chopin Exp $
+ *   $Id: struct_def.h,v 1.83 2004/02/08 22:48:01 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -53,7 +53,7 @@ typedef struct        LineItem aExtData;
 #define UIDLEN		9	/* must not be bigger than NICKLEN --Beeth */
 #define	USERLEN		10
 #define	REALLEN	 	50
-#define	TOPICLEN	80
+#define	TOPICLEN	160
 #define	CHANNELLEN	50
 #define	PASSWDLEN 	20
 #define	KEYLEN		23
