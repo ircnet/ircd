@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.22 2001/10/20 17:57:24 q Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.23 2002/06/01 18:26:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -41,10 +41,11 @@ u_int nb;
 char *msg, *chk;
 {
 	if (chk)
-		printf("line %d: %s\n", nb, msg);
+		printf("configuration error line %d: %s\n", nb, msg);
 	else
 		sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
 			   "Configuration error line %d: %s", nb, msg);
+	exit(0);
 }
 
 /*
