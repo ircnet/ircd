@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.36 1999/06/17 00:25:08 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.37 1999/06/17 01:00:16 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -286,7 +286,7 @@ read_iauth()
 			    start = end;
 			    continue;
 			}
-		    if (*start != 'U' && *start != 'u' &&
+		    if (*start != 'U' && *start != 'u' && *start != 'o' &&
 			*start != 'K' && *start != 'k' &&
 			*start != 'D')
 			{
@@ -379,6 +379,26 @@ read_iauth()
 			    strcpy(cptr->auth+1, start+strlen(tbuf));
 			    set_clean_username(cptr);
 			    cptr->flags |= FLAGS_GOTID;
+			}
+		    else if (start[0] == 'o')
+			{
+			    if (!WaitingXAuth(cptr))
+				{
+				    sendto_flag(SCH_AUTH,
+						"Early o message discarded!");
+				    sendto_iauth("%d E Early o [%s]", i,start);
+				    start = end;
+				    continue;
+				}
+			    if (cptr->user == NULL)
+				{
+				    /* just to be safe */
+				    sendto_flag(SCH_AUTH,
+						"Ack! cptr->user is NULL");
+				    start = end;
+				    continue;
+				}
+			    strncpyzt(cptr->user->username, tbuf, USERLEN+1);
 			}
 		    else if (start[0] == 'D')
 		      {
