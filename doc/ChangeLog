@@ -1,3 +1,32 @@
+Fri Jan 23 09:47:37 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* channel.c:
+		* bugfix from Avalon.
+		* join/invite were propagated for &channels. (reported by DLR)
+		* invite/kick were propagated beyond masks. (reported by DLR)
+		* multiple kicks could desynch channels.
+	
+	* s_user.c: stricter check on unregistered NICK changes (Avalon).
+
+	* hash.c: hash_find_server() didn't handle z.stealth.net (1
+	letter) masked by *.stealth.net (DLR).
+
+	* msg_def.h, struct_def.h, channel_ext.h, parse.c, channel.c,
+	s_serv.c: added send_channel_members() and m_njoin().
+
+	* send_ext.h, send.c: added sendto_serv_notv().
+
+	* buidm4: yet another m4 booboo. (fix from Mario)
+
+Wed Jan  7 11:40:59 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* s_user.c: strncpy() lameness.
+
+	* s_conf.c: added match_ipmask() (from Vesa).
+
+	* configure.in, send_ext.h: "checking for working stdarg" always
+	failed because of a quoting problem.
+
 Thu Dec 18 21:48:18 1997  Christophe Kalt
 
 	* channel.c: abusive usage of /names now forbidden.
