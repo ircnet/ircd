@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.155 2003/08/08 21:31:53 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.156 2003/10/12 14:10:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2158,11 +2158,11 @@ Reg	aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	static	char	jbuf[BUFSIZE], cbuf[BUFSIZE];
+	static	char	jbuf[BUFSIZE];
 	Reg	Link	*lp;
 	Reg	aChannel *chptr;
 	Reg	char	*name, *key = NULL;
-	int	i, flags = 0;
+	int	i, tmplen, flags = 0;
 	char	*p = NULL, *p2 = NULL, *s, chop[5];
 
 	if (parc < 2 || *parv[1] == '\0')
@@ -2172,7 +2172,6 @@ char	*parv[];
 	    }
 
 	*jbuf = '\0';
-	*cbuf = '\0';
 	/*
 	** Rebuild list of channels joined to be the actual result of the
 	** JOIN.  Note that "JOIN 0" is the destructive problem.
@@ -2311,10 +2310,20 @@ char	*parv[];
 					   ME, BadTo(parv[0]), name);
 			continue;
 		    }
+		tmplen = strlen(name);
+		if (i + tmplen + 2 /* comma and \0 */
+			>= sizeof(jbuf) )
+		{
+
+			break;
+
+		}
 		if (*jbuf)
-			(void)strcat(jbuf, ",");
-		(void)strncat(jbuf, name, sizeof(jbuf) - i - 1);
-		i += strlen(name)+1;
+		{
+			jbuf[i++] = ',';
+		}
+		(void)strcpy(jbuf + i, name);
+		i += tmplen;
 	    }
 
 	p = NULL;
