@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.14 1997/06/09 20:22:02 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.15 1997/07/15 20:58:00 kalt Exp $";
 #endif
 
 #include <sys/types.h>	/* HPUX requires sys/types.h for utmp.h */
@@ -1514,7 +1514,7 @@ char	*parv[];
 					if (is_chan_op(acptr, chptr))
 						*(buf + len++) = '@';
 					else if (has_voice(acptr, chptr))
-						*(buf + len++) = '!';
+						*(buf + len++) = '+';
 					if (len)
 						*(buf + len) = '\0';
 					(void)strcpy(buf + len, chptr->chname);
