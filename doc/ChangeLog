@@ -1,3 +1,7 @@
+2002-06-03  Jakub Vlasek
+
+	* parse.c/find_userhost(): use hostname hash for faster lookup.
+
 2002-06-01  Jakub Vlasek
 
 	* struct_def.h: added hhashv,hhnext to struct User (used by hostname
