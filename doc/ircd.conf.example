@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.13 2002/06/01 18:14:59 chopin Exp $
+# $Id: ircd.conf.example,v 1.14 2002/07/29 22:38:50 chopin Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -492,30 +492,6 @@ S:eep.local.net:thisisapassword:EepInfo:0:1
 # mask. This is a temporary kline service (tkserv) as you can find it in
 # contrib/tkserv :
 S:eep.local.net:thisisapassword:TkEep:0x2000000:1
-#
-#
-############################
-# R: [DISCOURAGED]. These lines restrict user access based on a more
-# stringent checking system than is available in the K: line. It looks for
-# a match (based on hostname and username) and then runs an outside
-# program (which MUST be specified using a full pathname). The output of
-# the program should be a string in the form "Y <message>" (which permits
-# access for the user) or "N <message>" (which denies access for the
-# user). If "Y <message>" is received by the server, the server ignores
-# the message and permits access for the user. If "N <message>" is
-# returned, the server tells the user that he/she is not permitted to
-# access that irc server, and gives the reason.
-#
-# Again, like K: lines, R: lines are local and thus not very effective in
-# blocking certain machines from having IRC access.
-#
-# Use of R: requires that you have defined R_LINES in config.h
-#
-# The fields are as follows:
-# R:hostmask:/full/path/to/program:username
-# you can use wildcards in either the hostmask or username portion
-#
-R:csl.bu.edu:/home/hrose/bin.sun3/sun3access:*::
 #
 #
 ############################

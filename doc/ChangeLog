@@ -1,6 +1,7 @@
 2002-07-29  Piotr Kucharski
 
 	* got rid of !STDARG from everywhere.
+	* got rid of R lines from everywhere.
 
 2002-07-06  Jakub Vlasek
 

@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.60 2002/07/06 03:11:13 jv Exp $
+ *   $Id: struct_def.h,v 1.61 2002/07/29 22:38:49 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -849,7 +849,6 @@ typedef	struct	{
 #define EXITC_MBUF	'M'	/* mem alloc error */
 #define EXITC_PING	'P'	/* ping timeout */
 #define EXITC_SENDQ	'Q'	/* send queue exceeded */
-#define EXITC_RLINE	'r'	/* R-lined */
 #define EXITC_REF	'R'	/* Refused */
 #define EXITC_AREF	'U'	/* Unauthorized by iauth */
 #define EXITC_AREFQ	'u'	/* Unauthorized by iauth, be quiet */

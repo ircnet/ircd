@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.84 2002/07/06 03:12:09 jv Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.85 2002/07/29 22:38:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -326,7 +326,7 @@ time_t	currenttime;
 	static	time_t	lkill = 0;
 	Reg	aClient	*cptr;
 	Reg	int	kflag = 0;
-	int	ping = 0, i, rflag = 0;
+	int	ping = 0, i;
 	time_t	oldest = 0, timeout;
 	char	*reason;
 
@@ -336,11 +336,11 @@ time_t	currenttime;
 			continue;
 
 		/*
-		 * K and R lines once per minute, max.  This is the max.
+		 * Check K lines once per minute.  This is the max.
 		 * granularity in K-lines anyway (with time field).
 		 */
 		if (
-#if defined(TIMEDKLINES) || ( defined(R_LINES) && defined(R_LINES_OFTEN) )
+#if defined(TIMEDKLINES)
 			(currenttime - lkill > TIMEDKLINES) || 
 #endif /* TIMEDKLINES */
 			rehashed)
@@ -348,26 +348,23 @@ time_t	currenttime;
 			if (IsPerson(cptr) && !IsKlineExempt(cptr))
 			    {
 				kflag = find_kill(cptr, rehashed, &reason);
-#ifdef R_LINES_OFTEN
-				rflag = find_restrict(cptr);
-#endif
 			    }
 			else
 			    {
-				kflag = rflag = 0;
+				kflag = 0;
 				reason = NULL;
 			    }
 		    }
 		ping = IsRegistered(cptr) ? get_client_ping(cptr) :
 					    ACCEPTTIMEOUT;
-		Debug((DEBUG_DEBUG, "c(%s) %d p %d k %d r %d a %d",
-			cptr->name, cptr->status, ping, kflag, rflag,
+		Debug((DEBUG_DEBUG, "c(%s) %d p %d k %d a %d",
+			cptr->name, cptr->status, ping, kflag,
 			currenttime - cptr->lasttime));
 		/*
 		 * Ok, so goto's are ugly and can be avoided here but this code
 		 * is already indented enough so I think its justified. -avalon
 		 */
-		if (!kflag && !rflag && IsRegistered(cptr) &&
+		if (!kflag && IsRegistered(cptr) &&
 		    (ping >= currenttime - cptr->lasttime))
 			goto ping_timeout;
 		/*
@@ -376,7 +373,7 @@ time_t	currenttime;
 		 * If the client is a user and a KILL line was found
 		 * to be active, close this connection too.
 		 */
-		if (kflag || rflag ||
+		if (kflag ||
 		    ((currenttime - cptr->lasttime) >= (2 * ping) &&
 		     (cptr->flags & FLAGS_PINGSENT)) ||
 		    (!IsRegistered(cptr) &&
@@ -457,17 +454,6 @@ time_t	currenttime;
 						  buf : "Kill line active");
 			    }
 
-#if defined(R_LINES) && defined(R_LINES_OFTEN)
-			else if (IsPerson(cptr) && rflag)
-			    {
-				sendto_flag(SCH_NOTICE,
-					   "Restricting %s, closing link.",
-					   get_client_name(cptr,FALSE));
-				cptr->exitc = EXITC_RLINE;
-				(void)exit_client(cptr, cptr, &me,
-						  "Restricting");
-			    }
-#endif
 			else
 			    {
 				cptr->exitc = EXITC_PING;

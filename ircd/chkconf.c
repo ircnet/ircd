@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.14 2001/10/20 17:57:27 q Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.15 2002/07/29 22:38:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -298,12 +298,6 @@ int	opt;
 			case 'q': /* network. USE WITH CAUTION! */
 				aconf->status = CONF_QUARANTINED_SERVER;
 				break;
-#ifdef R_LINES
-			case 'R': /* extended K line */
-			case 'r': /* Offers more options of how to restrict */
-				aconf->status = CONF_RESTRICT;
-				break;
-#endif
 			case 'S': /* Service. Same semantics as   */
 			case 's': /* CONF_OPERATOR                */
 				aconf->status = CONF_SERVICE;

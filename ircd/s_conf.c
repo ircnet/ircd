@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.55 2002/07/06 03:46:22 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.56 2002/07/29 22:38:50 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -886,18 +886,6 @@ int	sig;
 			 * this....-avalon
 			 */
 			acptr->hostp = NULL;
-#if defined(R_LINES) && ( defined(R_LINES_REHASH) && !defined(R_LINES_OFTEN) )
-			if (find_restrict(acptr))
-			    {
-				sendto_flag(SCH_NOTICE,
-					    "Restricting %s, closing lp",
-					    get_client_name(acptr,FALSE));
-				acptr->exitc = EXITC_RLINE;
-				if (exit_client(cptr,acptr,&me,"R-lined") ==
-				    FLUSH_BUFFER)
-					ret = FLUSH_BUFFER;
-			    }
-#endif
 		    }
 
 	while ((tmp2 = *tmp))
@@ -1259,12 +1247,6 @@ int	opt;
 			case 'q': /* network. USE WITH CAUTION! */
 				aconf->status = CONF_QUARANTINED_SERVER;
 				break;
-#ifdef R_LINES
-			case 'R': /* extended K line */
-			case 'r': /* Offers more options of how to restrict */
-				aconf->status = CONF_RESTRICT;
-				break;
-#endif
 			case 'S': /* Service. Same semantics as   */
 			case 's': /* CONF_OPERATOR                */
 				aconf->status = CONF_SERVICE;
@@ -1300,9 +1282,6 @@ int	opt;
 				|CONF_CLIENT|CONF_RCLIENT|CONF_KILL
 				|CONF_OTHERKILL|CONF_NOCONNECT_SERVER
 				|CONF_OPERATOR|CONF_LOCOP|CONF_LISTEN_PORT
-# ifdef R_LINES
-				|CONF_RESTRICT
-# endif
 				|CONF_SERVICE))
 				aconf->host = ipv6_convert(tmp);
 			else
@@ -1698,7 +1677,7 @@ char	**comment;
 	}
 	if (*reply)
 	{
-		/* R_LINE and TIMED_KLINE */
+		/* TIMEDKLINES */
 		sendto_one(cptr, reply, ME, now, cptr->name);
 	}
 	else if (tmp)
@@ -1755,122 +1734,6 @@ int	stat;
 			break;
  	return (tmp ? -1 : 0);
 }
-
-#ifdef R_LINES
-/* find_restrict works against host/name and calls an outside program 
- * to determine whether a client is allowed to connect.  This allows 
- * more freedom to determine who is legal and who isn't, for example
- * machine load considerations.  The outside program is expected to 
- * return a reply line where the first word is either 'Y' or 'N' meaning 
- * "Yes Let them in" or "No don't let them in."  If the first word 
- * begins with neither 'Y' or 'N' the default is to let the person on.
- * It returns a value of 0 if the user is to be let through -Hoppie
- */
-int	find_restrict(cptr)
-aClient	*cptr;
-{
-	aConfItem *tmp;
-	char	reply[80], temprpl[80];
-	char	*rplhold = reply, *host, *name, *s;
-	char	rplchar = 'Y';
-	int	pi[2], rc = 0, n;
-
-	if (!cptr->user)
-		return 0;
-	name = cptr->user->username;
-	host = cptr->sockhost;
-	Debug((DEBUG_INFO, "R-line check for %s[%s]", name, host));
-
-	for (tmp = conf; tmp; tmp = tmp->next)
-	    {
-		if (tmp->status != CONF_RESTRICT ||
-		    (tmp->host && host && match(tmp->host, host)) ||
-		    (tmp->name && name && match(tmp->name, name)))
-			continue;
-
-		if (BadPtr(tmp->passwd))
-			continue;
-
-		if (pipe(pi) == -1)
-		    {
-			report_error("Error creating pipe for R-line %s:%s",
-				     &me);
-			return 0;
-		    }
-		switch (rc = vfork())
-		{
-		case -1 :
-			report_error("Error forking for R-line %s:%s", &me);
-			return 0;
-		case 0 :
-		    {
-			Reg	int	i;
-
-			(void)close(pi[0]);
-			for (i = 2; i < MAXCONNECTIONS; i++)
-				if (i != pi[1])
-					(void)close(i);
-			if (pi[1] != 2)
-				(void)dup2(pi[1], 2);
-			(void)dup2(2, 1);
-			if (pi[1] != 2 && pi[1] != 1)
-				(void)close(pi[1]);
-			(void)execlp(tmp->passwd, tmp->passwd, name, host,
-				     cptr->username, 0);
-			_exit(-1);
-		    }
-		default :
-			(void)close(pi[1]);
-			break;
-		}
-		*reply = '\0';
-		(void)dgets(-1, NULL, 0); /* make sure buffer marked empty */
-		while ((n = dgets(pi[0], temprpl, sizeof(temprpl)-1)) > 0)
-		    {
-			temprpl[n] = '\0';
-			if ((s = (char *)index(temprpl, '\n')))
-			      *s = '\0';
-			if (strlen(temprpl) + strlen(reply) < sizeof(reply)-2)
-				SPRINTF(rplhold,"%s %s", rplhold, temprpl);
-			else
-			    {
-				sendto_flag(SCH_ERROR,
-					    "R-line %s/%s: reply too long!",
-					    name, host);
-				break;
-			    }
-		    }
-		(void)dgets(-1, NULL, 0); /* make sure buffer marked empty */
-		(void)close(pi[0]);
-		(void)kill(rc, SIGKILL); /* cleanup time */
-#if !defined(USE_IAUTH)
-		(void)wait(0);
-#endif
-
-		rc = 0;
-		while (*rplhold == ' ')
-			rplhold++;
-		rplchar = *rplhold; /* Pull out the yes or no */
-		while (*rplhold != ' ')
-			rplhold++;
-		while (*rplhold == ' ')
-			rplhold++;
-		(void)strcpy(reply,rplhold);
-		rplhold = reply;
-
-		if ((rc = (rplchar == 'n' || rplchar == 'N')))
-			break;
-	    }
-	if (rc)
-	    {
-		sendto_one(cptr, ":%s %d %s :Restriction: %s",
-			   ME, ERR_YOUREBANNEDCREEP, cptr->name, reply);
-		return -1;
-	    }
-	return 0;
-}
-#endif
-
 
 #ifdef TIMEDKLINES
 /*
