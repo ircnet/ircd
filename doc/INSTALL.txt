@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.23 1998/02/18 21:47:54 kalt Exp $
+  $Id: INSTALL.txt,v 1.24 1998/04/05 00:15:56 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.5.
 
@@ -951,7 +951,7 @@
         This disallows all users from hosts with enddomain ``oulu.fi''
         access to your server between 8 and 12am, 2 and 7pm. Users get
         kicked off if they're already signed on when the line becomes
-        active (they'll get a warning 5 minutes ago).
+        active (they'll get a warning 5 minutes before).
 
         K:192.11.35.*::*:0:
 

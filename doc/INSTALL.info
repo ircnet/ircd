@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info13260tmp2.
+input file /tmp/sgml2info24785tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.23 1998/02/18 21:47:53 kalt Exp $
+     $Id: INSTALL.info,v 1.24 1998/04/05 00:15:55 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.5.
 
@@ -1025,7 +1025,7 @@ Excluded accounts
      This disallows all users from hosts with enddomain "oulu.fi"
      access to your server between 8 and 12am, 2 and 7pm. Users get
      kicked off if they're already signed on when the line becomes
-     active (they'll get a warning 5 minutes ago).
+     active (they'll get a warning 5 minutes before).
 
      K:192.11.35.*::*:0:
 
@@ -1629,15 +1629,15 @@ Node: Client connections25733
 Node: Operator priviliges31246
 Node: Restrict connections33366
 Node: Excluded accounts34681
-Node: Server connections38644
-Node: Deny auto-connections47083
-Node: Hub connections48456
-Node: Leaf connections49672
-Node: Version limitations51755
-Node: Excluded machines52994
-Node: Service connections54301
-Node: Bounce server55894
-Node: Default local server (for local clients) `*OBSOLETED*'57596
-Node: Related resources58479
+Node: Server connections38647
+Node: Deny auto-connections47086
+Node: Hub connections48459
+Node: Leaf connections49675
+Node: Version limitations51758
+Node: Excluded machines52997
+Node: Service connections54304
+Node: Bounce server55897
+Node: Default local server (for local clients) `*OBSOLETED*'57599
+Node: Related resources58482
 
 End Tag Table
