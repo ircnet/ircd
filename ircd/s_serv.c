@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.92 2002/04/05 03:06:44 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.93 2002/04/06 05:55:42 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2656,6 +2656,7 @@ char	*parv[];
 	sendto_one(sptr, replies[RPL_CLOSEEND], ME, BadTo(parv[0]), closed);
 	return 1;
 }
+
 /* End Of Burst command
 ** parv[0] - server sending the SQUIT
 ** parv[1] - optional comma separated list of servers for which this EOB
@@ -2715,7 +2716,7 @@ char	*parv[];
 		{
 			aServer *asptr;
 			/* Fake sid (comes from EOB emulation */
-			asptr = find_tokserver(idtol(sid), cptr, NULL);
+			asptr = find_tokserver(idtol(sid + 1), cptr, NULL);
 			if (asptr)
 			{
 				acptr = asptr->bcptr;
