@@ -14,6 +14,8 @@
 	* channel.c/m_invite(), s_user.c/m_message(): use send_away().
 	* config.h.dist: AWAY_MOREINFO define.
 	* hash.c: add guardians for possible loops in hashes.
+	* s_conf.c/wdhms2sec(): !input there should be.
+	* a_conf.c/conf_read(): fix negation for ip masks.
 
 2004-11-01  Piotr Kucharski
 
