@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.44 1999/02/21 00:33:45 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.45 1999/03/05 02:05:07 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -52,6 +52,7 @@ time_t	nextgarbage = 1;        /* time for next collect_channel_garbage call*/
 time_t	nextping = 1;		/* same as above for check_pings() */
 time_t	nextdnscheck = 0;	/* next time to poll dns to force timeouts */
 time_t	nextexpire = 1;		/* next expire run on the dns cache */
+time_t	nextiarestart = 1;	/* next time to check if iauth is alive */
 
 #ifdef	PROFIL
 extern	etext();
@@ -1001,10 +1002,11 @@ void	io_loop()
 		(void)rehash(&me, &me, 1);
 		dorehash = 0;
 	    }
-	if (restart_iauth)
+	if (restart_iauth || timeofday >= nextiarestart)
 	    {
-		start_iauth(1);
+		start_iauth(restart_iauth);
 		restart_iauth = 0;
+		nextiarestart = timeofday + 15;
 	    }
 	/*
 	** Flush output buffers on all connections now if they
