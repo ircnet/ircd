@@ -1,3 +1,8 @@
+2002-11-22  Jakub Vlasek
+
+	* s_serv.c/m_stats(): Do not reply to stats requests with more than 
+	  1 char.
+
 2002-11-22  Piotr Kucharski
 
 	* numeric_def.h, channel.c/m_join(),m_topic(), s_err.c, config.h.dist,
