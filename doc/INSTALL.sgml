@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.54 2004/03/15 18:31:28 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.55 2004/03/21 17:31:35 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0.
 </abstract>
@@ -1204,6 +1204,8 @@ the ``All connections in use'' message.  In this case, the
 server doesn't process the connections at all, and has no
 knowledge of the client's host name, or class number.  For
 these cases, this field must be empty.
+<tag/Note/ Class number ``-1'' is used for rejecting clients
+that use wrong (server-only) port.
 <tag/Server Name/ This specifies the IRC server hostname
 that the client should use.
 <tag/Port/ This specifies the IRC server port that the
@@ -1222,6 +1224,10 @@ B:::irc2.stealth.net:6667:
 <p>
 When the server is completely full, clients should use the
 secondary server.
+
+B:-1::our.server.example:6667:
+
+Clients that connected to server-only port should really use port 6667.
 </descrip>
 
 <sect>Related resources

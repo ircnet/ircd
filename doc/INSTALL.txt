@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.54 2004/03/15 18:31:28 chopin Exp $
+  $Id: INSTALL.txt,v 1.55 2004/03/21 17:31:35 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0.
 
@@ -1485,6 +1485,10 @@
         the client's host name, or class number.  For these cases, this
         field must be empty.
 
+     NNoottee
+        Class number ``-1'' is used for rejecting clients that use wrong
+        (server-only) port.
+
      SSeerrvveerr NNaammee
         This specifies the IRC server hostname that the client should
         use.
@@ -1508,7 +1512,10 @@
 
         When the server is completely full, clients should use the
         secondary server.
+        B:-1::our.server.example:6667:
 
+        Clients that connected to server-only port should really use
+        port 6667.
 
 
   55..  RReellaatteedd rreessoouurrcceess
@@ -1570,9 +1577,9 @@
         (This can be done, for example, by running ``gdb'' on the core
         file, and typing ``where'').
 
+
      FFiixx
         If you have a fix, don't forget to include it.
-
 
 
   66..22..  WWhheerree ttoo sseenndd aa bbuugg rreeppoorrtt
