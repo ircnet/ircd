@@ -1,3 +1,12 @@
+Mon Jun 30 21:41:11 1997  Christophe Kalt
+
+	* dbuf.c, send.c: earlier changes broke the client.
+
+	* config.h.dist, struct.h, dbuf.h, dbuf.c: new magic formula to
+	compute BUFFERPOOL.  Added MAXSERVERS for this purpose.
+
+	* s_serv.c: buffer overflow (Chris Behrens).
+
 Thu Jun 26 19:18:24 1997  Christophe Kalt
 
 	* struct.h, channel.c, hash.c, parse.c, send.c, s_misc.c,
