@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static char rcsid[] = "$Id: res_init.c,v 1.9 1998/12/13 00:02:36 kalt Exp $";
+static char rcsid[] = "$Id: res_init.c,v 1.10 1999/01/20 01:33:08 kalt Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -145,7 +145,7 @@ ircd_res_init()
 	register FILE *fp;
 	register char *cp, **pp;
 	register int n;
-	char buf[BUFSIZ];
+	char buf[MAXDNAME];
 	int nserv = 0;    /* number of nameserver records read from file */
 	int haveenv = 0;
 	int havesearch = 0;
