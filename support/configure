@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Id: configure.in,v 1.41 1999/07/09 22:54:34 q Exp 
+# From configure.in Id: configure.in,v 1.42 1999/07/14 17:27:03 kalt Exp 
 
 # Guess values for system-dependent variables and create Makefiles.
 # Generated automatically using autoconf version 2.13 
