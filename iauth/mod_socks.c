@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.23 1999/07/11 00:04:00 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.24 1999/07/11 01:22:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -387,7 +387,7 @@ socks_init(self)
 AnInstance *self;
 {
     struct socks_private *mydata;
-    char tmpbuf[32], cbuf[32];
+    char tmpbuf[80], cbuf[32];
     static char txtbuf[80];
     
 #if defined(INET6)
