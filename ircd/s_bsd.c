@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.108 2003/10/18 17:26:35 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.109 2003/10/18 17:55:52 q Exp $";
 #endif
 
 #include "os.h"
@@ -610,7 +610,9 @@ void	init_sys(void)
 
 void	daemonize(void)
 {
+#ifdef TIOCNOTTY
 	int fd;
+#endif
 
 	if (bootopt & BOOT_TTY)	/* debugging is going to a tty */
 		goto init_dgram;
