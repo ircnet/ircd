@@ -1,4 +1,8 @@
 
+/* used in config_error() */
+#define CF_WARN 1
+#define CF_ERR  2
+
 /* max file length */
 #define FILEMAX 255
 
@@ -14,6 +18,13 @@ struct Config
 
 static aConfig	*config_read(int, int);
 static void	config_free(aConfig *);
+#ifdef CONFIG_DIRECTIVE_INCLUDE
+#define STACKTYPE char
+#else
+#define STACKTYPE char
+#endif
+void           config_error(int, STACKTYPE *, int, char *, ...);
+
 
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 /* 
@@ -187,3 +198,45 @@ void config_free(aConfig *cnf)
 	}
 }
 #endif /* CONFIG_DIRECTIVE_INCLUDE */
+
+void config_error(int level, STACKTYPE *stack, int line, char *pattern, ...)
+{
+	int len;
+	static int etclen = 0;
+	va_list va;
+	char vbuf[BUFSIZE];
+	char *filep;
+	char *filename = stack;
+
+	if (!etclen)
+	{
+		/* begs to rewrite IRCDCONF_PATH to not have ircd.conf */
+		char *etc = IRCDCONF_PATH;
+
+		filep = strrchr(IRCDCONF_PATH, '/') + 1;
+		etclen = filep - etc;
+	}
+
+	va_start(va, pattern);
+	len = vsprintf(vbuf, pattern, va);
+	va_end(va);
+
+	/* no need to show full path, if the same dir */
+	filep = filename;
+	if (0 == strncmp(filename, IRCDCONF_PATH, etclen))
+		filep += etclen;
+#ifdef CHKCONF_COMPILE
+	fprintf(stderr, "%s:%d %s%s\n", filep, line,
+		((level == CF_ERR) ? "ERROR: " : "WARNING: "), vbuf);
+#else
+	if (level != CF_ERR)
+		return;
+
+	/* for ircd &ERRORS reporting show only config file name,
+	** without full path. --B. */
+	if (filep[0] == '/')
+		filep = strrchr(filename, '/') + 1;
+	sendto_flag(SCH_ERROR, "config %s:%d %s", filep, line, vbuf);
+#endif
+	return;
+}
