@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.45 2004/11/02 22:30:30 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.46 2004/11/03 13:51:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -456,6 +456,7 @@ static	void	bigger_hash_table(int *size, aHashEntry *table, int new)
 		svsize = 0;
 		serverTable = table;
 		for (sptr = svrtop; sptr; sptr = sptr->nexts)
+			if (ST_NOTUID(sptr->bcptr))
 			(void)add_to_server_hash_table(sptr, sptr->bcptr);
 		MyFree(otab);
 	    }
