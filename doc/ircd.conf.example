@@ -1,7 +1,9 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.6 1997/09/12 02:09:31 kalt Exp $
+# $Id: ircd.conf.example,v 1.7 1997/12/16 22:11:56 kalt Exp $
+#
+# some changes for 294 and cleaning, delta, Sun Oct 19 02:36:16 MET DST 1997
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -17,7 +19,9 @@
 #   along with this program; if not, write to the Free Software
 #   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# This is an example configuration file for the IRC server
+# This is an example configuration file for the IRC server.
+# It's highly suggested that you also read INSTALL.* in doc/ and talk with
+# your uplinks if linking to an already existent IRC network.
 # 
 # You only need an ircd.conf (IRC server configuration file) if you are
 # running an IRC server. If you are running a standalone client this file
@@ -45,8 +49,6 @@
 # close-to-mandatory (that is, the server will run without it, but you are
 # highly encouraged to use these lines).
 #
-# Note that "*" in a field indicates an "unused" field.
-#
 #
 # ========================================================================
 # NOTE! this entire configuration file is read UPSIDE-DOWN! So if you have
@@ -55,124 +57,204 @@
 # ========================================================================
 #
 #
-# M: [MANDATORY]. This line sets your server's name, description.
-# Fields, in order, are: 
+####
+# M: [MANDATORY]. This line sets your server's name, description and port
+# the server listens for UDP pings (used to determine the fastest link in a
+# class when autoconnecting)
 #
 # M:<Server NAME>:<YOUR Internet IP#>:<Geographic Location>:<Port>
 #
-M:csa.bu.edu:*:Boston University Computer Science Department:6667:
+# Note that 'server name' refers to the name of the irc-server which needs 
+# not to be the same as the hostname of the machine it's running on.
 #
+# this let's ircd use the primary ip of your host to establish connections
+M:csa.bu.edu::Boston University Computer Science Department:6667
+#
+# this let's ircd use the ip 128.197.13.20 to establish connections, useful
+# if you're running virtual interfaces
+#M:csa.bu.edu:128.197.13.20:Boston University Computer Science Department:6667
+#
+#
+####
 # A: [MANDATORY]. This line lists your administrative information
 # (contact address, etc). To view this information, /admin (server) will
 # show it to you.
 #
-# The A: line has no set information, in fact, you can put arbitrary text
-# in there if you wish (it is encouraged that you put at *least* a contact
-# address for a person responsible for the irc server, however)
+# A:<Your Name/Location>:<Your Electronic Mailing Addr>:<other information>::
 #
-A:Boston University CS Department:Main Client Server:Helen Rose <hrose@cs.bu.edu>::
+A:Boston University CS Department:Helen Rose <hrose@cs.bu.edu>:Client Server::
 #
+#
+####
 # P: [MANDATORY]. This field allows the server to listen on various ports
 # for connections. Any internet domain port that is below 1024 means the
 # ircd has to be run as root, or from inetd. The server can listen to ports
 # in the UNIX domain or the internet domain. If you wish to create a port
 # in the UNIX domain you must compile with UNIXPORT defined in config.h.
 #
-# The fields are as follows::
-# P:<Internet IP#>:<*>:<Internet IP Mask>:<Port>:
+# P:<YOUR Internet IP#>:<*>:<Internet IP Mask>:<Port>:
 # P:<Directory>:<*>:<*>:<Port>:
-# for example, an internet domain socket on port 6667:
+#
+# Note that it's a good idea to open some more ports than 6667 for 
+# server-server connections and local clients in case some running wild 
+# client blocks the default 6667.
+#
+# for example, an internet domain socket on port 6667 listening on all
+# ip addresses of the machine running ircd 
 P::::6667:
+#
 # an internet domain socket listening on port 6668, for address 206.252.192.20
+# (again useful if you're running virtual interfaces)
 P:206.252.192.20:::6667:
+#
 # an internet domain socket listening on port 6669 for connections from
 # the addresses matching 147.210.18.* :
 P:::147.210.18.*:6667:
+#
 # This line is an example of a UNIX domain socket in /tmp
 P:/tmp/.ircd:*:*:6666:
 #
+#
+####
 # Y: [SUGGESTED]. These lines define connection classes. Connection
-# classes allow you to fine-tune your client and server connections. It is
-# suggested that clients and servers be placed in seperate classes, and if
-# you have lots of server connections (if you do have lots of servers you
-# shouldn't be reading this file :-) each set of servers (defined
-# arbitrarily by you) should have its own class. If you have clients
-# coming in from lots of different sites, you may want to seperate them
-# out into classes. For instance, you may want to put local users in one
-# class, with remote users in another class.
+# classes allow you to fine-tune your client and server connections.
+# Since the fields have different meanings for server and client classes
+# you shouldn't mix them, and if you have lots of server connections (if 
+# you do have lots of servers you shouldn't be reading this file :-) each 
+# set of servers (defined arbitrarily by you) should have its own class. 
+# If you have clients coming in from lots of different sites, you may want 
+# to seperate them out into classes. For instance, you may want to put 
+# local users in one class, with remote users in another class. You may also
+# want to put limits on some client classes (one client only for indials
+# for example).  In any larger network you definitely want to do this.
 #
-# The class numbers are not arbitrary. In auto-connecting servers -- that
-# is, servers that you have a port number (e.g. 6667) on the end of the C:
-# line (see below) the higher the number the higher the priority in
-# auto-connecting.
+# For SERVER CLASSES, the fields are: 
+# Y:<Class>:<Ping Frequency>:<Connect freq>:<Max Links>:<SendQ>::
+#    class number
+#      ping frequency (in seconds)
+#         connect frequency (in seconds)
+#            maximum number of links (used for auto-connecting)
+#               sendq (this overrides any MAXSENDQLENGTH set in config.h)
+#                  unused
+#                    unused
 #
-# For server classes, the fields in order are: class number, ping frequency
-# (in seconds), connect frequency (in seconds), maximum number of links
-# (used for auto-connecting and sendq (this overrides any value set in
-# config.h for #define MAXSENDQLENGTH).
+# The class numbers are not arbitrary.  In auto-connecting servers -- that is,
+# servers that you have a port number (e.g. 6667) on the end of the C: line 
+# (see below) the higher the number the higher the priority in auto-connecting.
 #
 # Note that it is a good idea to have ping frequency the same at both ends
 # of the link.
 #
-# this is a normal server connection (normal as of March, 1994)
-Y:2:90:300:1:600000
+# this is a normal server connection (normal as of October, 1997)
+# Y:<Class>:<Ping Frequencys>:<Connect freq>:<Max Links>:<SendQ>::
+Y:2:90:300:1:4000000
 #
-# For client classes, the fields in order are: class number, ping frequency
-# (in seconds), unused, maximum number of links in this class, maximum number
-# of links from this [user@]host on the server, and maximum number of
-# user on the net from this [user@]host.
+#
+# For CLIENT CLASSES, the fields are:
+# Y:<Class>:<Ping Frequency>::<Max Links>:<SendQ>:<Local Limit>:<Global Limit>
+#   class number
+#      ping frequency (in seconds)
+#         unused
+#           maximum number of links in this class (per I line)
+#              sendQ for each client
+#                maximum number of links from this [user@]host on the server
+#                   maximum number of user on the net from this [user@]host
+#
+# local and global limits have the format <x>.<y> where x defines the maximum
+# number of clients from the same host (IP) whereas y defines the maximum 
+# number of clients from the same user@host (IP) allowed to connect.  the
+# latter uses the identd replies to identify a user and will fall back to an
+# @host limit if no identd runs on the client and fail for identds generating 
+# dynamical answers.
+#
+# Note that any unset values default to zero which means 'unlimited'.
 # 
-Y:1:90:0:20:100000
+# this is a class for multiuser systems allowing 10 clients per host
+Y:10:90::100:512000:10:
 #
-Y:10:90:0:3:100000
+# this is a class for multiuser systems running a trustworthy identd
+Y:11:90::100:512000:0.1:
 #
+# this is a class for single user systems (PCs, most indials, ...)
+Y:12:90::100:512000:1:
+#
+# this is a class for remote systems you want to allow as fallback only
+# (if you run an open server in a net you might really want this)
+Y:13:90::100:512000:1:1
+#
+#
+####
 # I: [MANDATORY]. The I: lines are client-authorization lines. Without
 # these lines, no clients will be able to connect to your server.
-# Wildcards ("*") are permitted. Passwords are also permitted (clients can
-# be configured to send passwords).
+# Wildcards ("*") are permitted. Passwords are also possible (clients can
+# be configured to send passwords) but optional.  'I' allows full access,
+# 'i' sets restricted mode which forbids nick changes and channel op status.
 # 
-# Fields are as follows:
 # I:<TARGET Host Addr>:<Password>:<TARGET Hosts NAME>:<Port>:<Class>
 # i:<TARGET Host Addr>:<Password>:<TARGET Hosts NAME>:<Port>:<Class>
 #
-# With a password..... This will allow anyone from anywhere to connect
-# as long as they know the password ("foobar"). Note listing this I: line
-# first, it will be read *last*, meaning it is the "fall-through". That
-# is, anyone who doesn't match the I: lines listed below must know the
-# password ("foobar") to connect.
+# NOTE that ircd matches on the *right-most* match and doesn't stop matching 
+# after the <TARGET Hosts NAME> didn't match (see also examples below).
 #
-I:*@*:foobar:*@*::1
+# Not that if <TARGET Hosts NAME> is empty ircd will show clients matching
+# the <TARGET Host Addr> and do resolve as user@host.  if an I:-line has both
+# NAME and Addr defined and a client matches only the Addr part it will be
+# shown as user@ip-address regardless if it does resolv or not.
+#
+# this would allow access for any client reaching this line which doesn't
+# already have at least one connection to the net.  if you run an open server
+# in a net this might be the right choice, talk to your uplinks first anyway.
+# clients matching this line would be shown as user@host since there's the 
+# field <TARGET Hosts NAME> is empty.
+#i:*@*::::13
+#
+# this would allow access for any client coming from *.net, *.org, *.com or
+# other 3 char TLD
+#i:::*@*.???:13
+#
+# With a password..... This will allow anyone from any host to connect as 
+# long as they know the password ("foobar").   
+# Note listing this I: line first, it will be read *last*, meaning it is 
+# the "fall-through". That is, anyone who doesn't match the I: lines listed 
+# below must know the password ("foobar") to connect.
+# Note that I:*::*.bu.edu:10 would also allow _all_ clients regardless
+# if they're from *.bu.edu or not since ircd doesn't stop matching after the
+# <TARGET Hosts NAME> didn't match.
+I:*@*:foobar:::10
+#
 # This is a standard vanilla I: line which will permit anyone with an IP
 # address starting with 128.197 OR with a hostname ending in .bu.edu to
 # connect to the server. NOTE, the ircd matches on the *right-most* match,
 # so if I connect as hrose@csa.bu.edu (which is hrose@128.197.10.3) I will
 # show up on irc as hrose@csa.bu.edu since that is the first match it
-# found. (Even though the second match is valid).
-I:128.197.*::*.bu.edu::1
-# or (equivalent):
-I:*@128.197.*::*@*.bu.edu::1
+# found. (Even though the second match is valid). 
+#I:128.197.*::*.bu.edu::10
+# or equivalent but with ident lookup
+I:*@128.197.*::*@*.bu.edu::10
+#
 # and you can even specify just certain usernames running ident (as long
 # as the client's site is running the ident daemon):
-I:NOMATCH::hrose@csa.bu.edu::1
-# putting NOMATCH in the first field will stop the ircd from matching
-# automatically against the IP address and it will force the server to
-# match against the hostname. (the "NOMATCH" string is not mandatory, you
-# can use any arbitrary text in the first field).
+I:::hrose@csa.bu.edu::10
 # 
+# this will limit access for indials to one client per host
+I:::*@ppp*.bu.edu::12
+I:::*@indial*.bu.edu::12
 #
+#
+####
 # O: [OPTIONAL]. These lines define operator access. You do not need to
 # have an operator to run a server. A well configured leaf site should not
 # need an operator online, if it's connections are well defined, the irc
-# administrator can use kill -HUP on the ircd to reload the configuration
-# file. 
-# The fields are as follows:
-# O:hostname (ident "@" permitted):password:OperName::connection class(opt)
-# if the person in "OperName" is not coming from the hostname defined in
+# administrator can use kill -HUP on the ircd to reload the configuration file. 
+#
+# O:<TARGET Host NAME>:<Password>:<Nickname>:<Port>:<Class>
+#
+# If the person in "OperName" is not coming from the hostname defined in
 # the first field then the person will get the error message "No O: lines
 # for your host". 
-# NOTE that since Crypted Passwords are defined by default in
-# config.h this text probably will not be plaintext. See
-# ircd/crypt/README for more information.
+#
+# Note that you don't need to use 'Nickname' to become operator, if you're
+# using some other nick at that moment '/op Nickname' will do also.
 #
 O:*.bu.edu:Zaphod:Trillian::10
 #
@@ -197,29 +279,30 @@ o:*.bu.edu:ITBites:jhs::10
 #
 O:rocker@csa.bu.edu:T0eiVgHrqeKTQ:Rocker::10
 #
-# U: [NOT NECESSARY]. This line defines the default server for the IRC
-# client that ships with the server -- the default client is in irc/irc
-# You should not use U: lines but instead use the UPHOST definition in
-# config.h 
-U:csa.bu.edu:foobar:csa.bu.edu
 #
-# C: [NETWORKED]. These lines define what servers your server tries to
-# connect to. 
+####
+# c/C: [NETWORKED]. These lines define what servers your server tries to
+# connect to.  'c' means your server will support compression for this link
+# if you've compiled with zlib, 'C' will enforce an uncompressed link.
 # N: [NETWORKED]. These lines define what servers your server permits
 # connections to be initiated from. 
-# C/N lines MUST be used in pairs. You cannot have one without the other. 
 #
-# C: lines contain the following fields:
-# C:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<TARGET PORT>:<Class>
-# (connection class)
-# N: lines contain the following fields:
-# N:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<Domain Mask>:<Class>
-# (connection class)
-# "host mask" is the number of parts in *your* hostname to mask to. For
+# c/N lines MUST be used in pairs. You cannot have one without the other. 
+#
+# C:<TARGET Host Addr>:<Password>:<TARGET Server NAME>:<TARGET PORT>:<Class>
+# c:<TARGET Host Addr>:<Password>:<TARGET Server NAME>:<TARGET PORT>:<Class>
+#
+# if the target server listens on different ports you can use for <TARGET PORT>
+# <port_to_connect_to>.<port_target_server_listens_for_udp_pings>.
+# <TARGET Host Addr> can be also an ip address or CNAME.
+#
+# N:<TARGET Host Addr>:<Password>:<TARGET Server NAME>:<Domain Mask>:<Class>
+#
+# "domain mask" is the number of parts in *your* hostname to mask to. For
 # instance, with my servername being "csa.bu.edu", if I wanted to present
 # my servername to be "*.bu.edu" I would have a host-mask portion of "1". 
 #
-# it is *strongly* advised that your C/N line passwords be different for
+# it is *strongly* advised that your c/N line passwords be different for
 # security's sake.
 #
 # ident is allowed in the server's hostname part of the field.
@@ -234,20 +317,31 @@ C:irc-2.mit.edu:camelsrk00l:irc-2.mit.edu::2
 N:irc-2.mit.edu:andsoarellamas:irc-2.mit.edu:1:2
 #
 # If you have defined ZIP_LINKS and wish the connection to irc-2.mit.edu to
-# be compressed, you need to use a lowercase c.
+# be compressed, you need to use a lowercase c.  If the other server refuses
+# or doesn't support compression it will fall back to an uncompressed link.
 c:irc-2.mit.edu:camelsrk00l:irc-2.mit.edu::2
 N:irc-2.mit.edu:andsoarellamas:irc-2.mit.edu:1:2
 #
+#
+####
 # K: [OPTIONAL]. These lines define user@host patterns to be banned from
 # this particular server (with an optional time field). Note that K: lines
 # are *not* global, and if you ban a user they can still use any other IRC
 # server (unless they have specifically been banned there as well).
+# 'K' uses the the type unix reply from the client's identd if available or
+# the USER information supplied by the client if not.  'k' uses the reply from
+# the client's identd also if it's type other (it's prefixed with '-' then).
 # 
-# the fields are defined as:
-# K:<Host Name>:<time interval(s)|comment>:<User>:<port>:
+# K:<Host Name or IP>:<time interval(s)|comment>:<User>:<port>:
+# k:<Host Name or IP>:<time interval(s)|comment>:<Auth>:<port>:
 #
 # wildcards are permitted in any one of the fields, in other words, you can
 # K:*::* if you wanted (but your server wouldn't be used much ;-)
+#
+# Note that if you specify an IP address, or IP mask, it will match clients
+# connecting from the matching addresses, no matter if they resolve or not.
+# You can prefix an IP address or IP mask by '=' in which case only non 
+# resolving matching hosts will be banned.
 #
 # This K: line bans the username "FSSPR" (the wildcards are used to make
 # sure that any ident-checking character will match) on any machine from
@@ -256,8 +350,8 @@ K:*.alaska.edu::*FSSPR*:0
 #
 # This K: line bans any users from acs*.bu.edu between the hours of 8am
 # and 12pm and 1pm and 5pm (the time is always the server's local time):
-K:acs*.bu.edu:0800-1200,1300-1700:*:0
 # Note that 24 hour time is used (no "AM" or "PM").
+K:acs*.bu.edu:0800-1200,1300-1700:*:0
 #
 # This K: line bans any users from *foo.edu sending them the notice
 # "Use server irc.bar" instead of the default notice
@@ -266,8 +360,109 @@ K:*foo.edu:Use server irc.bar:*:0
 #
 # This K: line bans any users from *toto.fr from using the port 6667,
 # and tells them to use port 6666 instead.
-K:toto.fr:Use port 6666:*:6667:
+K:*toto.fr:Use port 6666:*:6667:
 #
+# This K: line bans any user from 129.69.0.0/16 as long the host doesn't run
+# identd (no matter if it replies type unix or other) from all ports.
+k:129.69.*:identd (rfc1413) required:unknown::
+#
+# This does the same but only for unresolvable clients
+k:=129.69.*:identd (rfc1413) required:unknown::
+#
+#
+####
+# L: [OPTIONAL]. These lines "Leaf" specified servers. They are only
+# useful if you are a non-leaf site yourself. There are two ways you can
+# use L: lines. The first will limit one particular site to a particular
+# tree depth (including 0, which would mean the server has to connect with
+# no servers linked behind it otherwise the connection will fail). The
+# second will allow you to be selective about which other servers you wish
+# the connecting server to behave as a leaf towards.
+#
+# The fields are as follows:
+# L:disallow connections to this hostmask::server name:depth
+# For example, this will force kaja.gi.alaska.edu to connect only as a
+# leaf (if it is not a leaf, the link will be dropped):
+L:::kaja.gi.alaska.edu::
+# This line will force cm5.eng.umd.edu to have a depth of only 1 below it
+# (that is, it is allowed to have only leaves connected to it):
+L:::cm5.eng.umd.edu:1:
+#
+# This line will prohibit anything matching *.edu to be connected behind
+# any server matching *.au:
+L:*.edu::*.au::
+#
+#
+####
+# H: [OPTIONAL]. These lines define who you permit to act as a "hub" to
+# you (that is, who you permit to connect non-leafed servers to you).
+#
+# the first field may use wildcards, the third field *must* be an exact
+# match for a server's name (NOT a server's hostname, if they differ, the
+# server's name must be used). If the servername is a wildcard (e.g. *.au)
+# that is an acceptable name for the third field. 
+#
+# The fields are as follows:
+# H:servers which are permitted entry::hub server
+#
+# Example, permit cs-ftp.bu.edu to allow any servers behind it to connect:
+H:*::cs-ftp.bu.edu::
+#
+# Example, permit irc-2.mit.edu to allow any MIT servers behind it to
+# connect: 
+H:*.mit.edu::irc-2.mit.edu::
+#
+#
+####
+# V: [OPTIONAL]. These lines define restrictions on servers connecting to
+# you.
+#
+# The first and third fields accept wildcards.  The fields are as follow:
+# V:<Version Mask>:<Flags>:<Server Mask>::
+#
+# Example, you believe 2.9.1 is a really old version, and you want your
+# peers to upgrade:
+V:020901*::*::
+#
+# If you are running a production network, you most likely don't want to
+# allow servers compiled in DEBUGMODE which is a threat for the net
+# as well as for the privacy of the users:
+V:*:D:*::
+#
+# Finally, you don't want *.edu servers to be version 2.9.2 *OR* to be
+# compiled with remote oper kills enabled:
+V:020902*:K:*.edu::
+#
+#
+####
+# B: [SUGGESTED]. These lines define the alternate servers that the users
+# will be redirected to if your server is full.
+#
+# The fiels are as follow:
+# B:<Class|Host Mask>::<Server Name>:<Port>:
+#
+# For example, if you want to redirect your users to irc.stealth.net on port
+# 6667 when your server is full, use:
+B:-1::irc.stealth.net:6667:
+#
+# To redirect *.fi users when your server cannot accept any new user with
+# a hostname matching *.fi, use:
+B:*.fi::irc.funet.fi:6667:
+#
+#
+####
+# S: [OPTIONAL]. These lines define services allowed to connect to your
+# server.  Each service needs a separate line which only allows him to
+# connect once.
+#
+# The fields are as follow:
+# S:<TARGET Host Mask>:<Password>:<Service Name>:<Service Type>:<Class>
+#
+# Example, you want to allow a local information service:
+S:eep.local.net:thisisapassword:EepInfo:0:1
+#
+#
+####
 # R: [DISCOURAGED]. These lines restrict user access based on a more
 # stringent checking system than is available in the K: line. It looks for
 # a match (based on hostname and username) and then runs an outside
@@ -290,6 +485,16 @@ K:toto.fr:Use port 6666:*:6667:
 #
 R:csl.bu.edu:/home/hrose/bin.sun3/sun3access:*::
 #
+#
+####
+# U: [NOT NECESSARY]. This line defines the default server for the IRC
+# client that ships with the server -- the default client is in irc/irc
+# You should not use U: lines but instead use the UPHOST definition in
+# config.h 
+U:csa.bu.edu:foobar:csa.bu.edu
+#
+#
+####
 # Q: [DISCOURAGED]. These lines "quarantine" specified servers.  Because
 # of the way they operates, the same Q: lines MUST be installed by
 # everyone or the net will keep breaking. I CANNOT EMPHASIZE THIS ENOUGH.
@@ -299,85 +504,3 @@ R:csl.bu.edu:/home/hrose/bin.sun3/sun3access:*::
 # Q:*:reason why quarantine is in place:servername
 #
 Q::this server is too slow and lags the net:cm5.eng.umd.edu::
-#
-# L: [OPTIONAL]. These lines "Leaf" specified servers. They are only
-# useful if you are a non-leaf site yourself. There are two ways you can
-# use L: lines. The first will limit one particular site to a particular
-# tree depth (including 0, which would mean the server has to connect with
-# no servers linked behind it otherwise the connection will fail). The
-# second will allow you to be selective about which other servers you wish
-# the connecting server to behave as a leaf towards.
-#
-# The fields are as follows:
-# L:disallow connections to this hostmask::server name:depth
-# For example, this will force kaja.gi.alaska.edu to connect only as a
-# leaf (if it is not a leaf, the link will be dropped):
-L:::kaja.gi.alaska.edu::
-# This line will force cm5.eng.umd.edu to have a depth of only 1 below it
-# (that is, it is allowed to have only leaves connected to it):
-L:::cm5.eng.umd.edu:1:
-#
-# This line will prohibit anything matching *.edu to be connected behind
-# any server matching *.au:
-L:*.edu::*.au::
-#
-# H: [OPTIONAL]. These lines define who you permit to act as a "hub" to
-# you (that is, who you permit to connect non-leafed servers to you).
-#
-# the first field may use wildcards, the third field *must* be an exact
-# match for a server's name (NOT a server's hostname, if they differ, the
-# server's name must be used). If the servername is a wildcard (e.g. *.au)
-# that is an acceptable name for the third field. 
-#
-# The fields are as follows:
-# H:servers which are permitted entry::hub server
-#
-# Example, permit cs-ftp.bu.edu to allow any servers behind it to connect:
-H:*::cs-ftp.bu.edu::
-#
-# Example, permit irc-2.mit.edu to allow any MIT servers behind it to
-# connect: 
-H:*.mit.edu::irc-2.mit.edu::
-#
-# V: [OPTIONAL]. These lines define restrictions on servers connecting to
-# you.
-#
-# The first and third fields accept wildcards.  The fields are as follow:
-# V:<Version Mask>:<Flags>:<Server Mask>::
-#
-# Example, you believe 2.9.1 is a really old version, and you want your
-# peers to upgrade:
-V:020901*::*::
-#
-# If you are running a production network, you most likely don't want to
-# allow servers compiled in DEBUGMODE which is a threat for the net
-# as well as for the privacy of the users:
-V:*:D:*::
-#
-# Finally, you don't want *.edu servers to be version 2.9.2 *OR* to be
-# compiled with remote oper kills enabled:
-V:020902*:K:*.edu::
-#
-# B: [SUGGESTED]. These lines define the alternate servers that the users
-# will be redirected to if your server is full.
-#
-# The fiels are as follow:
-# B:<Class|Host Mask>::<Server Name>:<Port>:
-#
-# For example, if you want to redirect your users to irc.stealth.net on port
-# 6667 when your server is full, use:
-B:-1::irc.stealth.net:6667:
-#
-# To redirect *.fi users when your server cannot accept any new user with
-# a hostname matching *.fi, use:
-B:*.fi::irc.funet.fi:6667:
-#
-# S: [OPTIONAL]. These lines define services allowed to connect to your
-# server.  Each service needs a separate line which only allows him to
-# connect once.
-#
-# The fields are as follow:
-# S:<TARGET Host Mask>:<Password>:<Service Name>:<Service Type>:<Class>
-#
-# Example, you want to allow a local information service:
-S:eep.local.net:thisisapassword:EepInfo:0:1

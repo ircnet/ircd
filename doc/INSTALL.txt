@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.18 1997/10/13 19:09:39 kalt Exp $
+  $Id: INSTALL.txt,v 1.19 1997/12/16 22:11:55 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.4.
 
@@ -262,6 +262,13 @@
 
   16.
      Default local server    (U)
+  Except for types ``M'' and ``A'', you are allowed to have multiple
+  records of the same type.  In some cases, you can have concurrent
+  records.  IItt iiss iimmppoorrttaanntt ttoo nnoottee tthhaatt tthhee llaasstt mmaattcchhiinngg rreeccoorrdd wwiillll
+  bbee uusseedd.  This is especially useful when setting up I records (client
+  connections).
+
+
   44..11..  MMaacchhiinnee iinnffoorrmmaattiioonn
 
 
@@ -328,6 +335,7 @@
         The ``A'' line is used for administrative information about a
         site. The e-mail address of the person running the server should
         be included here in case problems arise.
+
      FFoorrmmaatt
 
         A:<Your Name/Location>:<Your Electronic Mailing Addr>:<other>::
@@ -449,6 +457,9 @@
         You need at least one P line.
 
 
+
+
+
   44..44..  CCoonnnneeccttiioonn CCllaasssseess
 
 
@@ -460,6 +471,7 @@
         Each line for a server should have the same number as the sixth
         field.  If it is absent, the server deaults it to 0, using the
         defaults from the config.h file.
+
         To define a connection class, you need to include a Y: line in
         the ircd.conf file.  This enables you to define the ping
         frequency, connection frequency (for servers) and maximum number
@@ -498,7 +510,7 @@
         This field defines the maximum number of links this class will
         allow from automatic connections (C lines).  Using /CONNECT
         overrides this feature.  Also defines the maximum number of
-        users in this class (I/O lines).
+        users in this class for I/O lines per I/O line.
 
      SSeennddQQ
         This field defines the ``SendQ'' value for this class.  If this
@@ -724,6 +736,7 @@
         kick). Such users will have their username prefixed by +, = or -
         depending on the ident reply.
 
+
   44..66..  OOppeerraattoorr pprriivviilliiggeess
 
   How to become the IRC administrator on your site
@@ -841,6 +854,7 @@
 
 
      FFoorrmmaatt
+
 
         k:<Host Name>:<time interval(s)|comment>:<Auth>:<port>:
 
@@ -974,8 +988,6 @@
 
         C:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<TARGET PORT>:<Class>
 
-
-
      for example:
 
      C:nic.funet.fi:passwd:nic.funet.fi:6667:1
@@ -1108,7 +1120,6 @@
         The password of the other host.  A password must always be
         present for the line to be recognized. If CRYPT_LINK_PASSWORD is
         defined in config.h, this password must be crypted.
-
      TTAARRGGEETT HHoosstt NNAAMMEE
         The full hostname of the target machine. This is the name that
         the TARGET server will identify itself with when you connect to
@@ -1118,7 +1129,6 @@
 
      DDoommaaiinn MMaasskk
         Domain masking, see below.
-
 
      CCllaassss
         The class field should refer to an existing class.
@@ -1186,6 +1196,7 @@
 
      EExxaammpplleess
         H:*.edu::*.bu.edu::
+
         Allows a server named ``*.bu.edu'' to introduce only servers
         that match the ``*.edu'' name mask.
 
@@ -1372,6 +1383,7 @@
         service. Be very careful in the types you allow.  The types can
         be found in include/service.h
 
+
      CCllaassss
         The class field should refer to an existing class.
 
@@ -1437,6 +1449,7 @@
         secondary server.
 
 
+
   44..1166..  DDeeffaauulltt llooccaall sseerrvveerr ((ffoorr llooccaall cclliieennttss)) **OOBBSSOOLLEETTEEDD**
 
 
@@ -1448,7 +1461,6 @@
         TARGET host's connection information and password (if any).
 
      FFoorrmmaatt
-
 
         U:<TARGET Host addr>:<Password>:<TARGET Host NAME>:<Internet Port>
 
@@ -1483,18 +1495,6 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.18 1997/10/13 19:09:39 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.19 1997/12/16 22:11:55 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.4.
 </abstract>
@@ -235,6 +235,13 @@ configuration options.  The record types are as follows:
 <item>Bounce server           (B)
 <item>Default local server    (U)
 </enum>
+<p>
+Except for types ``M'' and ``A'', you are allowed to have
+multiple records of the same type.  In some cases, you can
+have concurrent records.  <bf>It is important to note that
+the last matching record will be used</bf>.  This is
+especially useful when setting up I records (client
+connections).
 
 <sect1>Machine information
 <p>
@@ -419,8 +426,8 @@ possible.
 <tag/Max Links/ This field defines the maximum number of
 links this class will allow from automatic connections (C
 lines).  Using /CONNECT overrides this feature.  Also
-defines the maximum number of users in this class (I/O
-lines).
+defines the maximum number of users in this class for I/O
+lines per I/O line.
 <tag/SendQ/ This field defines the ``SendQ'' value for this
 class.  If this field is not present, the default (from
 config.h) is assigned.
