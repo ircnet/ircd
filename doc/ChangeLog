@@ -1,3 +1,11 @@
+2004-07-07  Piotr Kucharski
+
+	* configure.in, configure: fix --with-resconf, fix detecting -lm.
+
+2004-07-05  Piotr Kucharski
+
+	* s_conf.c/tkline_expire(): tklines were kept past their expire time.
+
 2004-07-03  Piotr Kucharski
 
 	* channel.c/match_modeid(): introducing ACL_CONNECTREMOTE surfaced year
@@ -6,6 +14,8 @@
 	* s_conf.c/oline_flags_parse(), oline_flags_to_string(): new flags.
 	* parse.c/parse(): don't add penalty if ACL_NOPENALTY.
 	* s_bsd.c/read_packet(): don't disconnect if ACL_CANFLOOD.
+	* struct_def.h: new ACL_TRACE (t).
+	* s_serv.c/m_trace(): ACL_TRACE guard.
 
 2004-07-02  Piotr Kucharski
 
