@@ -72,6 +72,7 @@ EXTERN int irc_sprintf();
 #endif /* USE_STDARG */
 EXTERN int dgets __P((int fd, char *buf, int num));
 EXTERN char *make_version();
+EXTERN char **make_isupport();
 #if SOLARIS_2_3
 EXTERN struct hostent *solaris_gethostbyname __P((const char *name));
 #endif /* SOLARIS_2_3 */
