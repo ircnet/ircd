@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.40 1998/05/25 19:28:55 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.41 1998/05/25 20:44:20 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -654,7 +654,7 @@ void	send_channel_modes(cptr, chptr)
 aClient *cptr;
 aChannel *chptr;
 {
-	if ((*chptr->chname != '#' && *chptr->chname != '-')
+	if ((*chptr->chname != '#' && *chptr->chname != '!')
 	    || chptr->users == 0) /* channel is empty (locked), thus no mode */
 		return;
 
@@ -702,7 +702,7 @@ aChannel *chptr;
 
 	if (check_channelmask(&me, cptr, chptr->chname))
 		return;
-	if (*chptr->chname == '-' && !(cptr->serv->version & SV_NCHAN))
+	if (*chptr->chname == '!' && !(cptr->serv->version & SV_NCHAN))
 		return;
 
 	sprintf(buf, ":%s NJOIN %s :", ME, chptr->chname);
@@ -915,7 +915,7 @@ char	*parv[], *mbuf, *pbuf;
 			whatt = MODE_DEL;
 			break;
 		case 'O':
-			if (*chptr->chname == '-' && parc > 0 &&
+			if (*chptr->chname == '!' && parc > 0 &&
 			    IsMember(sptr, chptr))
 			    {
 				*penalty += 1;
@@ -940,7 +940,7 @@ char	*parv[], *mbuf, *pbuf;
 			 * is this really ever used ?
 			 * or do ^G & NJOIN do the trick?
 			 */
-			if (*chptr->chname != '-' || whatt == MODE_DEL ||
+			if (*chptr->chname != '!' || whatt == MODE_DEL ||
 			    !IsServer(sptr))
 			    {
 				*penalty += 1;
@@ -1250,7 +1250,7 @@ char	*parv[], *mbuf, *pbuf;
 			if (*ip)
 			    {
 				if (*ip == MODE_ANONYMOUS &&
-				    whatt == MODE_DEL && *chptr->chname == '-')
+				    whatt == MODE_DEL && *chptr->chname == '!')
 					sendto_one(sptr,
 					   err_str(ERR_CHANOPRIVSNEEDED,
 						   parv[0]), chptr->chname);
@@ -1540,7 +1540,7 @@ char	*key;
 	int	ckinvite = 0;
 
 	if (chptr->users == 0 && (bootopt & BOOT_PROT) && 
-	    chptr->history != 0 && *chptr->chname != '-')
+	    chptr->history != 0 && *chptr->chname != '!')
 		return (timeofday > chptr->history) ? 0 : ERR_UNAVAILRESOURCE;
 	if (banned = match_modeid(CHFL_BAN, sptr, chptr))
 		if (match_modeid(CHFL_EXCEPTION, sptr, chptr))
@@ -1839,14 +1839,14 @@ char	*parv[];
 			(void)strcpy(jbuf, "0");
 			continue;
 		    }
-		if (*name == '-')
+		if (*name == '!')
 		    {
 			chptr = NULL;
 			/*
-			** -channels are special:
-			**	-#channel is supposed to be a new channel,
+			** !channels are special:
+			**	!#channel is supposed to be a new channel,
 			**		and requires a unique name to be built.
-			**	-channel cannot be created, and must already
+			**	!channel cannot be created, and must already
 			**		exist.
 			*/
 			if (*(name+1) == '\0' ||
@@ -1858,7 +1858,7 @@ char	*parv[];
 							   parv[0]), name);
 				continue;
 			    }
-			if (*name == '-' && *(name+1) == '#')
+			if (*name == '!' && *(name+1) == '#')
 			    {
 				if (get_channel(sptr, name+2, 0))
 				    {
@@ -1901,7 +1901,7 @@ char	*parv[];
 				name = chptr->chname;
 		    }
 		if (!IsChannelName(name) ||
-		    (*name == '-' && IsChannelName(name+1)))
+		    (*name == '!' && IsChannelName(name+1)))
 		    {
 			if (MyClient(sptr))
 				sendto_one(sptr, err_str(ERR_NOSUCHCHANNEL,
@@ -1979,9 +1979,9 @@ char	*parv[];
 		chop[0] = '\0';
 		if (MyConnect(sptr) && UseModes(name) &&
 		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users &&
-		    !(chptr->history && *chptr->chname == '-'))
+		    !(chptr->history && *chptr->chname == '!'))
 		    {
-			if (*name == '-')
+			if (*name == '!')
 				strcpy(chop, "\007O");
 			else
 				strcpy(chop, "\007o");
@@ -2050,7 +2050,7 @@ char	*parv[];
 		/*
 	        ** notify other servers
 		*/
-		if (index(name, ':') || *chptr->chname == '-') /* compat */
+		if (index(name, ':') || *chptr->chname == '!') /* compat */
 			sendto_match_servs(chptr, cptr, ":%s JOIN :%s%s",
 					   parv[0], name, chop);
 		else if (*chptr->chname != '&')
@@ -2150,7 +2150,7 @@ char	*parv[];
 			*(--target) = ',';
 		strcat(nbuf, target);
 		/* send 2.9 style join to other servers */
-		if (*chptr->chname != '-')
+		if (*chptr->chname != '!')
 			sendto_serv_notv(cptr, SV_NJOIN, ":%s JOIN %s%s", name,
 					 parv[1], mbuf);
 		/* send join to local users on channel */
@@ -2264,7 +2264,7 @@ char	*parv[];
 		/*
 		**  Remove user from the old channel (if any)
 		*/
-		if (!index(name, ':') && (*chptr->chname != '-'))
+		if (!index(name, ':') && (*chptr->chname != '!'))
 		    {	/* channel:*.mask */
 			if (*name != '&')
 			    {
@@ -2365,7 +2365,7 @@ char	*parv[];
 						name, who->name, comment);
 				/* Don't send &local &kicks out */
 				if (*chptr->chname != '&' &&
-				    *chptr->chname != '-' &&
+				    *chptr->chname != '!' &&
 				    index(chptr->chname, ':') == NULL) {
 					if (*nickbuf)
 						(void)strcat(nickbuf, ",");
@@ -2849,7 +2849,7 @@ aClient	*cptr, *user;
 		chptr = lp->value.chptr;
 		if (*chptr->chname == '&')
 			continue;
-		if (*chptr->chname == '-' && !(cptr->serv->version & SV_NCHAN))
+		if (*chptr->chname == '!' && !(cptr->serv->version & SV_NCHAN))
 			/* in reality, testing SV_NCHAN here is pointless */
 			continue;
 		if ((mask = index(chptr->chname, ':')))
@@ -2982,7 +2982,7 @@ time_t	now;
 			istat.is_hchan--;
 			istat.is_hchanmem -= sizeof(aChannel) 
 				+ strlen(del_ch->chname);
-			if (*del_ch->chname == '-' &&
+			if (*del_ch->chname == '!' &&
 			    close_chid(del_ch->chname+1))
 				cache_chid(del_ch);
 			else
