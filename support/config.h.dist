@@ -517,9 +517,18 @@
 */
 #define TOPIC_WHO_TIME 1
 
-/* Define this to see local clients signon time
+/*
+** Define this to see local clients signon time
 */
 #define WHOIS_SIGNON_TIME 1
+
+/*
+** Define this to make server (more) responsive during rehash by not checking
+** all clients at once, only in small amounts. *Extremely* useful for servers
+** having clients times number of klines more than, say, 200000. Without this
+** clients on such servers will get few seconds (sometimes even minutes) lag.
+*/
+#undef DELAYED_KILLS
 
 /* ------------------------- END CONFIGURATION SECTION -------------------- */
 #ifndef ENABLE_SUMMON
@@ -592,6 +601,12 @@
 */
 #define	NOWRITEALARM	1
 
+#if defined(TIMEDKLINES)
+# if (TIMEDKLINES < 60)
+# error TIMEDKLINES must be bigger than 60 seconds
+# endif
+#endif
+
 /*
 ** Accept only hostnames conforming to RFC1034/1035/1123.
 ** Conformance of the internal resolver to RFC1123.
@@ -619,3 +634,11 @@
 ** "New highest local/global clients count" messages
 */
 #define CLCHSEC 30
+
+/* 
+** This controls how many clients will be checked by DelayedKills
+** in one sweep.
+*/
+#ifdef DELAYED_KILLS
+# define MAXDELAYEDKILLS 200
+#endif

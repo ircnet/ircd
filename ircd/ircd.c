@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.87 2002/11/22 21:19:26 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.88 2002/11/23 18:04:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -54,6 +54,11 @@ time_t	nextping = 1;		/* same as above for check_pings() */
 time_t	nextdnscheck = 0;	/* next time to poll dns to force timeouts */
 time_t	nextexpire = 1;		/* next expire run on the dns cache */
 time_t	nextiarestart = 1;	/* next time to check if iauth is alive */
+
+#ifdef DELAYED_KILLS
+int	dk_tocheck = 0;		/* # clients we have to check */
+int	dk_lastfd = 0;		/* last fd we checked */
+#endif
 
 #ifdef	PROFIL
 extern	etext();
@@ -338,32 +343,108 @@ time_t	currenttime;
 	int	ping = 0, i;
 	time_t	oldest = 0, timeout;
 	char	*reason;
+#ifdef DELAYED_KILLS
+	/* Not to hog server after rehash we check clients for kline match
+	** MAXDELAYEDKILLS fds at a time, from 0 to highest_fd; if new client
+	** gets fd we already "checked" in the meantime, it's not a big deal,
+	** since those new clients are checked upon connect anyway.
+	** No client will be missed. --Beeth */
+	static	int	dk_checked = 0;		/* # clients we checked */
+	static	int	dk_killed = 0;		/* # clients killed */
+	static	time_t	dk_rehashed = 0;	/* last time of rehash */
+	static	int	dk_rerehash = 0;	/* queue next rehash */
+	int	dk_counter = 0;
 
-	for (i = highest_fd; i >= 0; i--)
+	/* the following makes sure we don't start new rehash
+	** before previous has chance to finish */
+	if (rehashed || dk_rerehash)
+	{
+		if (dk_rehashed == 0)
+		{
+#ifdef DEBUGMODE
+			sendto_flag(SCH_DEBUG, "DelayedKills start%s",
+				dk_rerehash ? " (queued)" : "");
+#endif
+			dk_rehashed = currenttime;
+			dk_tocheck = istat.is_myclnt;
+			dk_lastfd = dk_checked = dk_killed = 0;
+			dk_rerehash = 0;
+		}
+		else if (rehashed)
+		{
+			if (dk_rerehash == 0)
+			{
+				dk_rerehash = 1;
+				sendto_flag(SCH_DEBUG,
+					"Received rehash during "
+					"DelayedKill. Queuing it.");
+			}
+#ifdef DEBUGMODE
+			else
+			{
+				sendto_flag(SCH_DEBUG,
+					"Received rehash during "
+					"DelayedKill. Already queued.");
+			}
+#endif
+		} /* rehashed */
+	}
+#endif
+
+	for (i = 0; i <= highest_fd; i++)
 	    {
 		if (!(cptr = local[i]) || IsListening(cptr) || IsLog(cptr))
 			continue;
 
-		/*
-		 * Check K lines once per minute.  This is the max.
-		 * granularity in K-lines anyway (with time field).
-		 */
-		if (
+		kflag = 0;
+		reason = NULL;
+		if (	(
+		 	/* Check K lines ... */
 #if defined(TIMEDKLINES)
-			(currenttime - lkill > TIMEDKLINES) || 
+			/*
+			* ... once per TIMEDKLINES seconds.
+			* (1 minute is minimum time in K-line field)
+		 	*/
+			(currenttime - lkill > TIMEDKLINES) ||
 #endif /* TIMEDKLINES */
-			rehashed)
-		    {
-			if (IsPerson(cptr) && !IsKlineExempt(cptr))
-			    {
-				kflag = find_kill(cptr, rehashed, &reason);
-			    }
+			/* ... or when rehashed */
+#ifdef DELAYED_KILLS
+			/* ... check only MAXDELAYEDKILLS count */
+			(dk_rehashed && dk_counter < MAXDELAYEDKILLS
+			/* ... and only those we haven't checked yet */
+				&& i > dk_lastfd)
+#else
+			rehashed
+#endif /* DELAYED_KILLS */
+			/* ... make sure it's a person, not exempted from K: */
+			) && IsPerson(cptr) && !IsKlineExempt(cptr))
+		{
+#ifdef DELAYED_KILLS
+#if defined(TIMEDKLINES)
+			if (dk_rehashed == 0)
+			{
+				/* we're here only when there was no
+				** rehash and timedklines time has come */
+				kflag = find_kill(cptr, 0, &reason);
+			}
 			else
-			    {
-				kflag = 0;
-				reason = NULL;
-			    }
-		    }
+#endif
+			{
+				/* normal rehash.
+				** check only few not to hog server */
+				if (++dk_counter >= MAXDELAYEDKILLS)
+				{
+					dk_lastfd = i;
+				}
+				dk_checked++;
+				kflag = find_kill(cptr, 1, &reason);
+				/* find_kill returns -1 if match */
+				dk_killed -= kflag;
+			}
+#else
+			kflag = find_kill(cptr, rehashed, &reason);
+#endif /* DELAYED_KILLS */
+		}
 		ping = IsRegistered(cptr) ? get_client_ping(cptr) :
 					    ACCEPTTIMEOUT;
 		Debug((DEBUG_DEBUG, "c(%s) %d p %d k %d a %d",
@@ -491,6 +572,25 @@ ping_timeout:
 		if (timeout < oldest || !oldest)
 			oldest = timeout;
 	    }
+#ifdef DELAYED_KILLS
+#ifdef DEBUGMODE
+	if (dk_rehashed && dk_checked < dk_tocheck)
+	{
+		sendto_flag(SCH_DEBUG,
+			"DelayedKills in progress (checked %d/%d, killed %d) in %d sec",
+			dk_checked, dk_tocheck, dk_killed,
+			currenttime - dk_rehashed);
+	}
+#endif
+	if (dk_rehashed && dk_checked >= dk_tocheck)
+	{
+		sendto_flag(SCH_NOTICE,
+			"DelayedKills done (checked %d/%d, killed %d) in %d sec",
+			dk_checked, dk_tocheck, dk_killed,
+			currenttime - dk_rehashed);
+		dk_rehashed = dk_checked = dk_tocheck = dk_killed = 0;
+	}
+#endif
 	if (currenttime - lkill > 60)
 		lkill = currenttime;
 	if (!oldest || oldest < currenttime)
