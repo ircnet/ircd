@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.201 2004/05/18 09:56:02 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.202 2004/05/18 21:54:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2700,7 +2700,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				parv[0], parv[1], nbuf);
 			sendto_match_servs_v(chptr, cptr, SV_UID,
 				":%s NJOIN %s :%s",
-				parv[0], parv[1], uidbuf);
+				sptr->serv->sid, parv[1], uidbuf);
 			*nbuf = '\0'; q = nbuf;
 			*uidbuf = '\0'; u = uidbuf;
 		}
@@ -2805,9 +2805,9 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (nbuf[0])
 	{
 		sendto_match_servs_notv(chptr, cptr, SV_UID, ":%s NJOIN %s :%s",
-				     parv[0], parv[1], nbuf);
+			parv[0], parv[1], nbuf);
 		sendto_match_servs_v(chptr, cptr, SV_UID, ":%s NJOIN %s :%s",
-				     parv[0], parv[1], uidbuf);
+			sptr->serv->sid, parv[1], uidbuf);
 	}
 
 	return 0;
