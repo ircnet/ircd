@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.186 2004/02/19 00:48:45 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.187 2004/02/21 19:29:15 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2927,6 +2927,10 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 				remove_user_from_channel(who,chptr);
 				penalty += 2;
+				/* Once user kicks himself out of channel,
+				** he cannot kick anymore, can he? --B. */
+				if (MyPerson(sptr) && who == sptr)
+					break;
 				if (penalty >= MAXPENALTY && MyPerson(sptr))
 					break;
 			    }
