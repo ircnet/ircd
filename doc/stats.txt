@@ -1,6 +1,6 @@
   STATS unleashed
   Piotr Kucharski
-  $Id: stats.txt,v 1.6 2004/10/27 00:30:39 chopin Exp $
+  $Id: stats.txt,v 1.7 2005/01/30 15:31:35 chopin Exp $
 
   This document describes all STATS for ircd server 2.11.
 
@@ -590,13 +590,14 @@
      ?? -- ccoonnnneecctteedd sseerrvveerrss iinnffoo
 
 
-          irc.example.org (4, 06:31:29) 1S 2725C 491646kB sent 30180kB recv 0kB sq
+          irc.example.org (4, 06:31:29) 1S 2725C 491646kB sent 30180kB recv 0kB sq V3z
 
 
 
      Server name, (days, hour:min:sec link uptime), servers connected,
-     clients connected, kB sent, kB received and sendQ. There also can
-     be "BURST" word at the end, indicating netjoin in progress.
+     clients connected, kB sent, kB received, sendQ and link version
+     ('z' for ziplink). There also can be "BURST" word at the end, indi-
+     cating netjoin in progress.
 
 
 

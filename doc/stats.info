@@ -1,5 +1,5 @@
 This is stats.info, produced by makeinfo version 4.7 from
-/tmp/linuxdoc-dir-11699/sgmltmp.stats.info.2.
+/tmp/linuxdoc-dir-4779/sgmltmp.stats.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ STATS unleashed
 ***************
 
      Piotr Kucharski
-     $Id: stats.info,v 1.5 2004/10/27 00:30:39 chopin Exp $
+     $Id: stats.info,v 1.6 2005/01/30 15:31:35 chopin Exp $
 
    This document describes all STATS for ircd server 2.11.
 
@@ -437,11 +437,12 @@ Also ending 219 numeric is omitted in whole.
      Total amount of memory used from sbrk() call.
 
 `? - connected servers info'
-          irc.example.org (4, 06:31:29) 1S 2725C 491646kB sent 30180kB recv 0kB sq
+          irc.example.org (4, 06:31:29) 1S 2725C 491646kB sent 30180kB recv 0kB sq V3z
 
      Server name, (days, hour:min:sec link uptime), servers connected,
-     clients connected, kB sent, kB received and sendQ. There also can
-     be "BURST" word at the end, indicating netjoin in progress.
+     clients connected, kB sent, kB received, sendQ and link version
+     ('z' for ziplink). There also can be "BURST" word at the end,
+     indicating netjoin in progress.
 
 
 
@@ -456,9 +457,9 @@ drop a line to `ircd-dev@irc.org'
 
 
 Tag Table:
-Node: Top124
-Node: Introduction428
-Node: STATS unleashed891
-Node: Enhancements17082
+Node: Top123
+Node: Introduction427
+Node: STATS unleashed890
+Node: Enhancements17122
 
 End Tag Table

@@ -4,7 +4,7 @@
 
 <title>STATS unleashed
 <author>Piotr Kucharski
-<date>$Id: stats.sgml,v 1.6 2004/10/27 00:30:39 chopin Exp $
+<date>$Id: stats.sgml,v 1.7 2005/01/30 15:31:35 chopin Exp $
 <abstract>
 This document describes all STATS for ircd server 2.11.
 </abstract>
@@ -316,8 +316,8 @@ allocated (db).
 Total amount of memory used from sbrk() call.
 
 <tag/? - connected servers info/
-<tscreen><verb>irc.example.org (4, 06:31:29) 1S 2725C 491646kB sent 30180kB recv 0kB sq</verb></tscreen>
-Server name, (days, hour:min:sec link uptime), servers connected, clients connected, kB sent, kB received and sendQ. There also can be "BURST" word at the end, indicating netjoin in progress.
+<tscreen><verb>irc.example.org (4, 06:31:29) 1S 2725C 491646kB sent 30180kB recv 0kB sq V3z</verb></tscreen>
+Server name, (days, hour:min:sec link uptime), servers connected, clients connected, kB sent, kB received, sendQ and link version ('z' for ziplink). There also can be "BURST" word at the end, indicating netjoin in progress.
 
 </descrip>
 

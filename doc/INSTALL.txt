@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.71 2004/09/12 21:23:33 chopin Exp $
+  $Id: INSTALL.txt,v 1.72 2005/01/30 15:31:35 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -808,8 +808,10 @@
         ``135.11.35.0/24'' to connect to the server.  If the host name
         is known, is it used as address for these clients.
 
-        tag/NEW!!!/ As of the 2.11.0 version of the server, I: line
-        flags are introduced.
+
+     NNEEWW!!!!!!
+        As of the 2.11.0 version of the server, I: line flags are
+        introduced.
 
 
   44..66..  OOppeerraattoorr pprriivviilliiggeess
@@ -851,8 +853,6 @@
         IRC know you are who you say you are!  Never tell anyone your
         password and always keep the ``ircd.conf'' file protected from
         all of the other users.
-
-
      NNiicckknnaammee
         The Nickname you usually go by - but you can make this what you
         want.
