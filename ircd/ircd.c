@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.134 2004/05/16 16:29:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.135 2004/05/16 16:37:25 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -265,6 +265,9 @@ static	time_t	try_connections(time_t currenttime)
 		{
 			con_conf = aconf;
 		}
+		/* above is my doubt: if we always choose best connection
+		** and it always fails connecting, we may never try another,
+		** even "worse"; what shall we do? --Beeth */
 	}
 	if (con_conf)
 	{
