@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.79 1999/06/25 13:58:02 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.80 1999/06/27 17:53:26 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -380,6 +380,9 @@ char	*nick, *username;
 		char *reason = NULL;
 
 #if defined(USE_IAUTH)
+		static time_t last = 0;
+		static u_int count = 0;
+
 		if (iauth_options & XOPT_EARLYPARSE && DoingXAuth(cptr))
 		    {
 			cptr->flags |= FLAGS_WXAUTH;
@@ -394,15 +397,15 @@ char	*nick, *username;
 		    }
 		if (!DoneXAuth(sptr) && (iauth_options & XOPT_REQUIRED))
 		    {
-			time_t last = 0;
 			char *reason;
 
 			if (iauth_options & XOPT_NOTIMEOUT)
 			    {
+				count += 1;
 				if (timeofday - last > 300)
 				    {
 					sendto_flag(SCH_AUTH, 
-		    "iauth may not be running! (refusing new connections)");
+	    "iauth may not be running! (refusing new user connections)");
 					last = timeofday;
 				    }
 				reason = "No iauth!";
@@ -412,6 +415,11 @@ char	*nick, *username;
 			sptr->exitc = EXITC_AUTHFAIL;
 			return ereject_user(cptr, reason,
 					    "Authentication failure!");
+		    }
+		if (timeofday - last > 300 && count)
+		    {
+			sendto_flag(SCH_AUTH, "%d users rejected.", count);
+			count = 0;
 		    }
 
 		/* this should not be needed, but there's a bug.. -kalt */
