@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.176 2004/02/13 02:45:19 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.177 2004/02/13 21:04:09 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2597,9 +2597,13 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* make sure user isn't already on channel */
 		if (IsMember(acptr, chptr))
 		    {
-			sendto_flag(SCH_ERROR, "NJOIN protocol error from %s",
-				    get_client_name(cptr, TRUE));
-			sendto_one(cptr, "ERROR :NJOIN protocol error");
+			sendto_flag(SCH_ERROR, "NJOIN protocol error from %s"
+				" (%s already on %s)",
+				    get_client_name(cptr, TRUE), acptr->name,
+				chptr->chname);
+			sendto_one(cptr, "ERROR :NJOIN protocol error"
+				" (%s already on %s)",
+				acptr->name, chptr->chname);
 			continue;
 		    }
 		/* add user to channel */
