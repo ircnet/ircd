@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.224 2004/06/30 00:04:29 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.225 2004/06/30 14:39:57 jv Exp $";
 #endif
 
 #include "os.h"
@@ -603,6 +603,14 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			return exit_client(cptr, sptr, &me, (reason) ? buf :
 					   "K-lined");
 		    }
+#ifdef XLINE
+		if (!IsKlineExempt(sptr) && IsXlined(sptr))
+		{
+			sptr->exitc = EXITC_XLINE;
+			return exit_client(cptr, sptr, &me,
+				XLINE_EXIT_REASON);
+		}
+#endif
 		sp = user->servp;
 	    }
 	else
@@ -2458,6 +2466,36 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #ifndef	NO_DEFAULT_INVISIBLE
 	SetInvisible(sptr);
 #endif
+#ifdef XLINE
+	if (MyConnect(sptr))
+	{
+		aConfItem *tmp;
+		char xbuf[BUFSIZE];
+		sprintf(xbuf, "%s %s %s %s", username, host, server, realname);
+
+		for (tmp = conf; tmp; tmp = tmp->next)
+		{
+			if (tmp->status != CONF_XLINE)
+				continue;
+
+			if (IsConfXlineWhole(tmp))
+			{
+			       if (tmp->host && !match(tmp->host, xbuf))
+			       {
+				       SetXlined(sptr);
+			       }
+			}
+			else
+			{
+				if (tmp->host && !match(tmp->host, realname))
+				{
+					SetXlined(sptr);
+				}
+			}
+               }
+       }
+#endif
+
 	/* parse desired user modes sent in USER */
 	/* rfc behaviour - bits */
 	if (isdigit(*host))
