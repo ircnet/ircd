@@ -56,5 +56,6 @@ struct AuthData
 
 #define	A_GOTU		0x0100	/* got username (from ircd) */
 #define	A_GOTH		0x0200	/* got hostname (from ircd) */
+#define	A_NOH		0x0400	/* no hostname available */
 
 #define A_UNIX		0x1000	/* authuser is suitable for use by ircd */

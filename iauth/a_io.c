@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.2 1998/08/03 11:47:25 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.3 1998/08/05 02:51:37 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -34,8 +34,8 @@ static int	fd2cl[MAXCONNECTIONS]; /* fd -> cl mapping */
 #endif
 
 #define IOBUFSIZE 4096
-static char		iobuf[IOBUFSIZE];
-static char		rbuf[IOBUFSIZE];	/* incoming ircd stream */
+static char		iobuf[IOBUFSIZE+1];
+static char		rbuf[IOBUFSIZE+1];	/* incoming ircd stream */
 static int		iob_len = 0, rb_len = 0;
 
 void
@@ -130,10 +130,11 @@ AnInstance *last;
 	{
 	    /* we got an authentication from the last module, stop here */
 	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): Stopping", cl, last));
-	    if (cldata[cl].state & A_GOTH)
+	    if (cldata[cl].state & (A_GOTH|A_NOH))
 		    /*
 		    ** we have the hostname info, so this is already the
 		    ** 2nd pass we made
+		    ** or we won't get the info, so we're done.
 		    */
 		    sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip,
 				cldata[cl].itsport);
@@ -177,9 +178,13 @@ AnInstance *last;
 	{
 	    DebugLog((ALOG_DIO, 0,
 		      "next_io(#%d, %x): no more instances to try (%X)",
-		      cl, last, cldata[cl].state & A_GOTH));
-	    if (cldata[cl].state & A_GOTH)
-		    /* this is the 2nd pass */
+		      cl, last, cldata[cl].state & (A_GOTH|A_NOH)));
+	    if (cldata[cl].state & (A_GOTH|A_NOH))
+		    /*
+		    ** this is either the 2nd pass,
+		    ** or the 1st but we already know that have no hostname
+		    ** conclusion: we're done.
+		    */
 		    sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip,
 				cldata[cl].itsport);
 	    else
@@ -230,18 +235,20 @@ parse_ircd()
 		switch (chp[0])
 		    {
 		case 'C': /* new connection */
-			if (!(cldata[cl].state & A_ACTIVE))
+		case 'O': /* old connection: do nothing, just update data */
+			if (cldata[cl].state & A_ACTIVE)
 			    {
                                 sendto_log(ALOG_IRCD, LOG_CRIT,
-			   "Entry %d [R] is already active (fatal)!", cl);
+			   "Entry %d [%c] is already active (fatal)!",
+					   chp[0], cl);
 				exit(1);
 			    }
 			if (cldata[cl].instance || cldata[cl].rfd > 0 ||
 			    cldata[cl].wfd > 0)
 			    {
 				sendto_log(ALOG_IRCD, LOG_CRIT,
-				   "Entry %d is already active! (fatal)",
-					   cl);
+				   "Entry %d [%c] is already active! (fatal)",
+					   chp[0], cl);
 				/*
 				** Ok, I don't think this is actually fatal,
 				** cleaning up already active entry and going
@@ -254,13 +261,20 @@ parse_ircd()
 			    {
 				/* shouldn't be here - hmmpf */
 				sendto_log(ALOG_IRCD|ALOG_DIO, LOG_WARNING,
-					   "Unreleased data [%d]!", cl);
+					   "Unreleased data [%c %d]!", chp[0],
+					   cl);
 				free(cldata[cl].authuser);
 				cldata[cl].authuser = NULL;
 			    }
-			cldata[cl].state = A_ACTIVE|A_START;
 			cldata[cl].best = cldata[cl].tried = NULL;
 			cldata[cl].buflen = 0;
+			if (chp[0] == 'C')
+				cldata[cl].state = A_ACTIVE|A_START;
+			else
+			    {
+				cldata[cl].state = A_ACTIVE;
+				break;
+			    }
 			if (sscanf(chp+2, "%[^ ] %hu %[^ ] %hu",
 				   cldata[cl].itsip, &cldata[cl].itsport,
 				   cldata[cl].ourip, &cldata[cl].ourport) != 4)
@@ -297,8 +311,8 @@ parse_ircd()
 					   "Entry %d [R] is not active!", cl);
 				break;
 			    }
-			ncl = atoi(buf+1);
-			if (!(cldata[ncl].state & A_ACTIVE))
+			ncl = atoi(chp+2);
+			if (cldata[ncl].state & A_ACTIVE)
 			    {
                                 sendto_log(ALOG_IRCD, LOG_CRIT,
 			   "Entry %d [R] is already active (fatal)!", ncl);
@@ -340,7 +354,7 @@ parse_ircd()
 				   "Entry %d [N] is not active! (fatal)", cl);
 				exit(1);
 			    }
-			strcpy(cldata[cl].host, buf+2);
+			strcpy(cldata[cl].host, chp+2);
 			cldata[cl].state |= A_GOTH|A_START;
 			if (cldata[cl].instance == NULL)
 				next_io(cl, NULL);
@@ -364,6 +378,18 @@ parse_ircd()
 			cldata[cl].state |= A_GOTU;
 			/* hmmpf */
 			break;
+		case 'T': /* ircd is registering the client */
+			/* what to do with this? abort/continue? */
+			break;
+		case 'd': /* DNS timeout */
+			if (!(cldata[cl].state & A_ACTIVE))
+			    {
+                                sendto_log(ALOG_IRCD, LOG_CRIT,
+				   "Entry %d [d] is not active! (fatal)", cl);
+				exit(1);
+			    }
+			cldata[cl].state |= A_NOH;
+			break;
 		default:
 			sendto_log(ALOG_IRCD, LOG_ERR, "Unexpected data [%s]",
 				   buf);
@@ -374,7 +400,7 @@ parse_ircd()
 	    }
 	rb_len = 0; iob_len = 0;
 	if (strlen(buf))
-		bcopy(iobuf, rbuf, rb_len = iob_len = strlen(buf));
+		bcopy(buf, rbuf, rb_len = strlen(buf));
 }
 
 /*
@@ -447,7 +473,8 @@ loop_io()
 #endif
 	for (i = 0; i <= cl_highest; i++)
 	    {
-		if (cldata[i].timeout && cldata[i].timeout < now)
+		if (cldata[i].timeout && cldata[i].timeout < now &&
+		    cldata[i].instance /* shouldn't be needed.. but it is */)
 		    {
 			DebugLog((ALOG_DIO, 0,
 				  "loop_io(): module %s timeout [%d]",
@@ -508,31 +535,8 @@ loop_io()
 
 	/* no matter select() or poll() this is also fd # 0 */
 	if (TST_READ_EVENT(0))
-	    {
-		/* data from the ircd.. */
-		while (1)
-		    {
-			if (rb_len)
-				bcopy(rbuf, iobuf, iob_len = rb_len);
-			if ((i=recv(0,iobuf+iob_len,IOBUFSIZE-iob_len,0)) <= 0)
-			    {
-				DebugLog((ALOG_DIO, 0, "io_loop(): recv(0) returned %d, errno = %d", i, errno));
-				break;
-			    }
-			iob_len += i;
-			DebugLog((ALOG_DIO, 0,
-				  "io_loop(): got %d bytes from ircd [%d]", i,
-				  iob_len));
-			parse_ircd();
-		    }
-		if (i == 0)
-		    {
-			sendto_log(ALOG_DMISC, LOG_NOTICE,
-				   "Daemon exiting. [r]");
-			exit(0);
-		    }
 		nfds--;
-	    }
+
 #if !defined(USE_POLL)
 	for (i = 0; i <= cl_highest && nfds; i++)
 #else
@@ -544,15 +548,15 @@ loop_io()
 # if defined(IAUTH_DEBUG)
 		if (i == -1)
 		    {
-			sendto_log(ALOG_DALL, LOG_CRIT,"loop_io(): fatal bug");
+			sendto_log(ALOG_DALL, LOG_CRIT,"io_loop(): fatal bug");
 			exit(1);
 		    }
 # endif
 		if (cldata[i].rfd <= 0 && cldata[i].wfd <= 0)
 		    {
 			sendto_log(ALOG_IRCD, LOG_CRIT,
-			   "loop_io(): fatal data inconsistency (%d, %d)",
-				   cldata[i].rfd, cldata[i].wfd);
+			   "io_loop(): fatal data inconsistency #%d (%d, %d)",
+				   i, cldata[i].rfd, cldata[i].wfd);
 			exit(1);
 		    }
 #else
@@ -585,7 +589,7 @@ loop_io()
 			    }
 			nfds--;
 		    }
-		if (TST_WRITE_EVENT(cldata[i].wfd))
+		else if (TST_WRITE_EVENT(cldata[i].wfd))
 		    {
 			if (cldata[i].instance->mod->work(i) != 0)
 				next_io(i, cldata[i].instance);
@@ -593,6 +597,41 @@ loop_io()
 			nfds--;
 		    }
 	    }
+
+	/*
+        ** no matter select() or poll() this is also fd # 0
+	** this has to be done last (for the USE_POLL version) because
+	** of R messages we may get from the server :/
+	*/
+#if defined(USE_POLL)
+	pfd = poll_fdarray;
+#endif
+	if (TST_READ_EVENT(0))
+	    {
+		/* data from the ircd.. */
+		while (1)
+		    {
+			if (rb_len)
+				bcopy(rbuf, iobuf, iob_len = rb_len);
+			if ((i=recv(0,iobuf+iob_len,IOBUFSIZE-iob_len,0)) <= 0)
+			    {
+				DebugLog((ALOG_DIO, 0, "io_loop(): recv(0) returned %d, errno = %d", i, errno));
+				break;
+			    }
+			iob_len += i;
+			DebugLog((ALOG_DIO, 0,
+				  "io_loop(): got %d bytes from ircd [%d]", i,
+				  iob_len));
+			parse_ircd();
+		    }
+		if (i == 0)
+		    {
+			sendto_log(ALOG_DMISC, LOG_NOTICE,
+				   "Daemon exiting. [r]");
+			exit(0);
+		    }
+	    }
+
 #if defined(IAUTH_DEBUG)
 	if (nfds > 0)
 		sendto_log(ALOG_DIO, 0, "loop_io(): nfds = %d !!!", nfds);
