@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.88 2005/01/03 22:34:56 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.89 2005/01/30 13:40:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -352,14 +352,6 @@ aClient	*find_mask(char *name, aClient *cptr)
 }
 
 /*
-** Find a server from hash table, given its token
-*/
-aServer	*find_tokserver(int token, aClient *cptr, aClient *c2ptr)
-{
-	return hash_find_stoken(token, cptr, c2ptr);
-}
-
-/*
 ** Find a server, given its name (which might contain *'s, in which case
 ** the first match will be return [not the best one])
 */
@@ -435,18 +427,6 @@ static	int	find_sender(aClient *cptr, aClient **sptr, char *sender,
 			{
 				/* UID */
 				from = find_uid(sender, NULL);
-			}
-		}
-		else if (*sender == '$' && strlen(sender) == SIDLEN)
-		{
-			/* Compatibility SID. */
-			aServer *servptr;
-
-			servptr = find_tokserver(idtol(sender + 1, SIDLEN - 1),
-				cptr, NULL);
-			if (servptr)
-			{
-				from = servptr->bcptr;
 			}
 		}
 	}
@@ -531,16 +511,6 @@ aClient	*find_target(char *name, aClient *cptr)
 			else
 			{
 				acptr = find_uid(name, NULL);
-			}
-		}
-		else if (name[0] == '$' && name[SIDLEN] == '\0')
-		{
-			aServer *asptr;
-			asptr = find_tokserver(idtol(name + 1, SIDLEN - 1),
-				cptr, NULL);
-			if (asptr)
-			{
-				acptr = asptr->bcptr;
 			}
 		}
 	}

@@ -40,7 +40,6 @@ EXTERN aClient *find_sid (char *sid, Reg aClient *cptr);
 EXTERN aClient *find_service (char *name, Reg aClient *cptr);
 EXTERN aClient *find_server (char *name, Reg aClient *cptr);
 EXTERN aClient *find_mask (char *name, aClient *cptr);
-EXTERN aServer *find_tokserver (int token, aClient *cptr, aClient *c2ptr);
 EXTERN aClient *find_name (char *name, aClient *cptr);
 EXTERN aClient *find_matching_client (char *mask);
 EXTERN aClient *find_target (char *name, aClient *cptr);
