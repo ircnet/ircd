@@ -1,3 +1,8 @@
+2004-03-15  Piotr Kucharski
+
+	* res_init.c/ircd_res_init(), res.c/init_resolver(), send_res_msg(),
+	  get_res(), resolv_def.h: IPv6 nameservers.
+
 2004-03-14  Piotr Kucharski
 
 	* s_bsd.c/get_my_name(): mysk.s_addr was not initialized when M: ip
