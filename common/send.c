@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.7 1997/04/24 21:50:06 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.8 1997/04/28 02:18:55 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -730,7 +730,6 @@ char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 							  p6, p7, p8, p9, p10,
 							  p11);
 				(void)send_message(cptr, psendbuf, len);
-				break;
 			    }
 		    }
 	    }
