@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.75 2004/06/29 17:21:56 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.76 2004/06/29 17:50:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1283,7 +1283,7 @@ void	sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 		(void)sprintf(buf, "%s", anyptr);
 	}
 	(void)sprintf(linebuf,
-		"%s (%s): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
+		"%s (%s): %s@%s [%s] %c %lu %luKb %lu %luKb",
 		myctime(cptr->firsttime), buf,
 		username[0] ? username : "<none>", hostname,
 		cptr->auth ? cptr->auth : "<none>",
@@ -1294,7 +1294,7 @@ void	sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 	** This is the content of loglines.
 	*/
 	(void)sprintf(linebuf,
-		"%c\t%d\t%d\t%s\t%s\t%s\t%s\t%d\t%s\t%lu\t%llu\t%lu\t%llu\n",
+		"%c %d %d %s %s %s %s %d %s %lu %llu %lu %llu",
 		cptr->exitc, (u_int) cptr->firsttime, (u_int) timeofday,
 		username, hostname, cptr->auth ? cptr->auth : "",
 		cptr->user ? cptr->user->sip :
@@ -1335,6 +1335,7 @@ void	sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 #endif
 	if (logfile != -1)
 	{
+		(void)strcat(linebuf, "\n");
 		(void)write(logfile, linebuf, strlen(linebuf));
 	}
 }
