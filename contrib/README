@@ -1,4 +1,4 @@
-$Id: README,v 1.4 1998/09/20 19:19:13 kalt Exp $
+$Id: README,v 1.5 1998/10/08 17:49:25 kalt Exp $
 
 This directory contains ircd related contributions.  Most of them fall
  in one of the following categories:
@@ -7,7 +7,7 @@ This directory contains ircd related contributions.  Most of them fall
 	* service
 
 Each contribution lives in its own directory under contrib/ and has a
-README file.  For those who need to be compiled, this can be done in
+README file.  For those which need to be compiled, this can be done in
 the same directory as you compiled irc and/or ircd.
 
 If you want to submit a package for this directory, see the RULES file.
