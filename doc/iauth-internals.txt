@@ -137,6 +137,13 @@ Categories:
 
 	2 E I am a teapot.
 
+     -	"M"
+
+	This denotes an ircd name. The information provided is sent
+	only once, at startup, and used in better proxy checks. Eg:
+
+	0 M irc.example.org
+
 IAUTH Messages:
 
 The communication protocol used to communicate from iauth to ircd is
