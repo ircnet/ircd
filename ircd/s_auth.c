@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.34 1999/06/15 01:25:06 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.35 1999/06/15 01:26:19 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -457,6 +457,7 @@ Reg	aClient	*cptr;
 		/* we probably don't need this error message -kalt */
 		report_error("getpeername for auth request %s:%s", cptr);
 		close(cptr->authfd);
+		cptr->authfd = -1;
 		return;
 	    }
 	them.SIN_FAMILY = AFINET;
