@@ -416,7 +416,11 @@
 /* Default server port, used by client. */
 #define	PORTNUM	6667
 
-/* Maximum length the queue of pending connections to one port may grow to. */ 
+/* Maximum length the queue of pending connections to one port may grow to.
+ * Note that your system limits this, too. FreeBSD, for instance, has sysctl
+ * kern.ipc.somaxconn for that. Such must be bigger than this define prior to
+ * ircd start.
+ */ 
 #define LISTENQUEUE 128
 
 /* define DEBUGMODE to enable debugging mode.*/
