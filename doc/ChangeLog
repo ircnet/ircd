@@ -1,3 +1,11 @@
+2001-12-30  Piotr Kucharski
+
+	* s_user.c/m_nick(): allow restricted users change nick from saved uid.
+	* common_def.h, match.c, struct_def.h, s_user.c, config.h.dist: add
+	  RESTRICT_USERNAME code to reject users with special chars in their
+	  usernames. Also revamp char_atribs[] table.
+	* match.c: added isvalidusername().
+
 2001-12-29  Piotr Kucharski
 
 	* s_user.c/register_user(): we assigned uid after we sent UNICK.
