@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.6 from
-/tmp/linuxdoc-dir-20267/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-22866/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.41 2004/02/22 20:28:12 chopin Exp $
+     $Id: INSTALL.info,v 1.42 2004/03/04 14:01:33 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0.
 
@@ -720,7 +720,8 @@ How to let clients connect to your IRCD.
      NAME>:<Port>:<Class>:<Flags>
 
 `Note'
-     Lower case "i" is equal to an "R" flag in plain "I".
+     Lower case "i" is equal to an "R" flag in plain "I".  Lower case
+     "i" will be removed in the next version.
 
 `TARGET Host Addr'
      Specifies the IP address(es) of the machine(s) that are allowed to
@@ -730,22 +731,24 @@ How to let clients connect to your IRCD.
      permitted unless using a bitmask (e.g. 1.2.3.0/24). Note that
      bitmask are encouraged over wildcards, as they are more accurate.
 
+     Empty field is equal to '*' (matches any).
+
 `Password'
      The password that must be given by the client to be allowed on the
      server.
 
 `TARGET Host NAME'
      Specifies the host name(s) of the machines allowed to connect to
-     the server.  If "user@" prefixes the actual IP address the server
-     will require that the remote username returned by the ident server
-     be the same as the one given before the "@".  Wildcards are
-     permitted, but `please' rather leave this field empty and use
-     bitmask in `Host Addr' field.
+     the server.  If "user@" prefixes the actual name the server will
+     require that the remote username returned by the ident server be
+     the same as the one given before the "@".  Wildcards are permitted,
+     but `please' rather leave this field empty and use bitmask in
+     `Host Addr' field.
 
-     This field can be empty, it then has a special meaning.  See below.
+     Empty field is equal to '*' (matches any).
 
      Using this field to enforce that clients have no Host Name set is
-     obsolete, see "N" `flag'.
+     not working. Use "N" `flag'.
 
 `Port'
      Specifies the port number for which this configuration line is
@@ -758,17 +761,18 @@ How to let clients connect to your IRCD.
 `Flags'
      This field contains flags of an I:line; flags are one character in
      size, can be combined and their order does not matter.
-        * R - restricted
+        * F - fall-through to next I:line if password did not match
 
-        * D - restricted, when client has no reverse DNS
+        * R - restricted
 
         * I - restricted, when client has no ident.
 
         * E - client is exempted from K: lines
 
-        * N - do not show resolved hostname (bans still match)
+        * N - disable resolved host name to be used (clients appear
+          with IP)
 
-        * F - fall-through to next I:line if password not matched
+        * D - restricted, when client has no reverse DNS
 
 `Note'
      Restricted I: line means that clients matching such I line will
@@ -777,36 +781,33 @@ How to let clients connect to your IRCD.
      = or - depending on the ident reply.
 
 `Note'
-     The server first checks if the client hostname (or any aliases)
-     matches the `TARGET Host NAME' field.  If a match is found, the
-     client is accepted.  If not, the server checks if the IP address
-     of the client matches the `TARGET Host Addr' field.  The matching
-     field is used to set the name of the client: for example, if the
-     client matches the `TARGET Host Addr' field, it will show on IRC
-     with a numerical address (even if this address is resolvable).  If
-     the `TARGET Host NAME' field is empty, then the host name is
-     always used (when available).
+     The server checks if the client hostname (or any aliases) matches
+     the `TARGET Host NAME' field.  If a match is found, server checks
+     `TARGET Host Addr' field.  If a match is found, the client is
+     accepted.  If "N" flag is not used and the host name is available,
+     it is used - either matching `TARGET Host NAME' field or, if this
+     field is empty, first returned by DNS. Using "N" flag sets the
+     name of the client to its IP.
 
 `Examples'
      For example, if you were installing IRC on tolsun.oulu.fi and you
-     wanted to allow examples sake let us assume you were making this
-     file for tolsun and you wanted to let your own clients to connect
-     to your server, you would add this entry to the file:
+     wanted to let your own clients to connect to your server, you
+     would add this entry to the file:
 
      I:::tolsun.oulu.fi::1
 
      If you wanted to let remote clients connect, you could add the
-     following lines:
+     following line:
 
      I:::*.edu.edu::1
 
-     Allow any clients from machines whose names end in ".edu.edu" to
-     connect with no password.
+     and allow any clients from machines whose names end in ".edu.edu"
+     to connect with no password.
 
      I:128.214.6.100::nic.funet.fi::1
 
-     Allow clients from a machine with that IP number to connect.
-     Numeric match is enough, name is not required anymore.
+     Allow clients from a machine with that IP number `and' that
+     hostname to connect.
 
      I::secret:*.tut.fi::1
 
@@ -815,13 +816,7 @@ How to let clients connect to your IRCD.
 
      I:::*::1
 
-     Allow anyone from anywhere to connect your server.
-
-     This is the easiest way, but it also allows people to for example
-     dump files to your server, or connect 1000 (or how many open
-     sockets per process your OS allows) clients to your machine and
-     take your network ports. Of course the same things can be done by
-     simply telnetting to your machine's SMTP port (for example).
+     Allow anyone from anywhere to connect to your server.
 
      I:::*.fi:6667:1
 
@@ -830,10 +825,20 @@ How to let clients connect to your IRCD.
 
      I:135.11.35.0/24::*.net::1
 
-     Allows clients from machines which host name matches "*.net" or
+     Allows clients from machines which host name matches "*.net" `and'
      which IP address is within block "135.11.35.0/24" to connect to
-     the server.  If the host name does not match "*.net" then the IP
-     address is used for these clients, even if the host name is known.
+     the server.
+
+     I:135.11.35.0/24::::1:N
+
+     I:135.11.35.0/24::*.net::1
+
+     This set of two I:lines allows clients from machines which host
+     name matches "*.net" `and' which IP address is within block
+     "135.11.35.0/24" to connect to the server.  If the host name does
+     not match "*.net" then another I:line is used and because of "N"
+     flag, the IP address is used for these clients, even if the host
+     name is known.
 
      I:135.11.35.0/24::::1
 
@@ -1679,19 +1684,19 @@ Node: Administrative info15960
 Node: Port connections18111
 Node: Connection Classes19942
 Node: Client connections25069
-Node: Operator priviliges30783
-Node: Excluded accounts32956
-Node: Server connections36868
-Node: Deny auto-connections45530
-Node: Hub connections46904
-Node: Leaf connections48392
-Node: Version limitations50476
-Node: Excluded machines52234
-Node: Service connections53539
-Node: Bounce server55133
-Node: Related resources56773
-Node: Reporting a bug57812
-Node: How to report a bug58069
-Node: Where to send a bug report59080
+Node: Operator priviliges30591
+Node: Excluded accounts32764
+Node: Server connections36676
+Node: Deny auto-connections45338
+Node: Hub connections46712
+Node: Leaf connections48200
+Node: Version limitations50284
+Node: Excluded machines52042
+Node: Service connections53347
+Node: Bounce server54941
+Node: Related resources56581
+Node: Reporting a bug57620
+Node: How to report a bug57877
+Node: Where to send a bug report58888
 
 End Tag Table
