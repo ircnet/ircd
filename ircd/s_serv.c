@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.99 2002/05/19 00:18:11 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.100 2002/05/22 00:45:46 jv Exp $";
 #endif
 
 #include "os.h"
@@ -687,6 +687,8 @@ char	*parv[];
 	if (IsRegistered(cptr) && ((acptr = find_name(host, NULL))
 				   || (acptr = find_mask(host, NULL))))
 	    {
+		char tbuf[BUFSIZE];
+		SPRINTF(tbuf, "Server %s Exists",host);
 		/*
 		** This link is trying feed me a server that I already have
 		** access through another path -- multiple paths not accepted
@@ -704,7 +706,7 @@ char	*parv[];
 			sendto_flag(SCH_ERROR,
 			    "Link %s cancelled, server %s already exists",
 				    get_client_name(bcptr, TRUE), host);
-			return exit_client(bcptr, bcptr, &me, "Server Exists");
+			return exit_client(bcptr, bcptr, &me, tbuf);
 		    }
 		else
 		    {
@@ -717,7 +719,7 @@ char	*parv[];
 			sendto_flag(SCH_ERROR,
 			    "Link %s cancelled, server %s reintroduced by %s",
 				    buf, host, get_client_name(cptr, TRUE));
-			(void) exit_client(bcptr, bcptr, &me, "Server Exists");
+			(void) exit_client(bcptr, bcptr, &me, tbuf);
 		    }
 	    }
 
