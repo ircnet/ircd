@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.11 1998/01/23 13:28:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.12 1998/01/23 22:38:33 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -41,7 +41,6 @@ struct Message msgtab[] = {
   { MSG_NICK,    m_nick,     MAXPARA, MSG_LAG, 0, 0, 0L},
   { MSG_NOTICE,  m_notice,   MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_JOIN,    m_join,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
-  { MSG_NJOIN,    m_njoin,   MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_MODE,    m_mode,     MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_QUIT,    m_quit,     MAXPARA, MSG_LAG, 0, 0, 0L},
   { MSG_PART,    m_part,     MAXPARA, MSG_LAG|MSG_REGU, 0, 0, 0L},
@@ -64,6 +63,7 @@ struct Message msgtab[] = {
   { MSG_ISON,    m_ison,     1,	 MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_SERVER,  m_server,   MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_SQUIT,   m_squit,    MAXPARA, MSG_LAG|MSG_REG|MSG_OP|MSG_LOP, 0,0, 0L},
+  { MSG_NJOIN,   m_njoin,    MAXPARA, MSG_LAG|MSG_NOU, 0, 0, 0L},
   { MSG_WHOIS,   m_whois,    MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_WHO,     m_who,      MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
   { MSG_WHOWAS,  m_whowas,   MAXPARA, MSG_LAG|MSG_REG, 0, 0, 0L},
