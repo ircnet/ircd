@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.260 2005/01/30 14:34:43 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.261 2005/01/30 16:07:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1427,8 +1427,8 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		/* Send PING for EOB emulation */
 		sendto_one(cptr, ":%s PING %s :%s", mlname, mlname,
 			   cptr->name);
-	}
 	cptr->flags &= ~FLAGS_CBURST;
+	}
 #ifdef	ZIP_LINKS
  	/*
  	** some stats about the connect burst,
@@ -3113,6 +3113,7 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 int	m_eoback(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
+	cptr->flags &= ~FLAGS_CBURST;
 	return 0;
 }
 
