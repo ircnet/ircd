@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.109 2004/02/10 00:34:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.110 2004/02/12 21:43:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1046,6 +1046,7 @@ int	main(int argc, char *argv[])
 		);
 
 	timeofday = time(NULL);
+	mysrand(timeofday);
 	
 	daemonize();	
 	if (!(bootopt & BOOT_OPER))
