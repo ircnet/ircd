@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.17 1998/08/07 02:04:10 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.18 1998/08/22 19:22:28 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -40,7 +40,7 @@ static	Numeric	local_replies[] = {
 /* 001 */	{ RPL_WELCOME, ":Welcome to the Internet Relay Network %s" },
 /* 002 */	{ RPL_YOURHOST, ":Your host is %s, running version %s" },
 /* 003 */	{ RPL_CREATED, ":This server was created %s" },
-/* 004 */	{ RPL_MYINFO, "%s %s oOirw abeiIklmnopqrstv" },
+/* 004 */	{ RPL_MYINFO, "%s %s aoOirw abeiIklmnopqrstv" },
 /* 005 */	{ RPL_BOUNCE, ":Try server %s, port %d" },
 		{ 0, (char *)NULL }
 };

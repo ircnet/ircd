@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.21 1998/08/08 00:21:13 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.22 1998/08/22 19:22:26 kalt Exp $
 
 This is a development version of the IRC software.
 
@@ -11,7 +11,6 @@ New features in 2.10:
 	* added channel mode +e (EFnet's exceptions to bans).
 	* added channel mode +I (invitations).
 	* /invite can now be used to override channel bans & limit.
-	* AWAY is no longer supported.
 
 ===============================================================================
 

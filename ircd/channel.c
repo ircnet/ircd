@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.55 1998/08/04 02:30:23 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.56 1998/08/22 19:22:27 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2660,9 +2660,11 @@ char	*parv[];
 	    {
 		sendto_one(sptr, rpl_str(RPL_INVITING, parv[0]),
 			   acptr->name, ((chptr) ? (chptr->chname) : parv[2]));
-		if (acptr->user->away)
+		if (acptr->user->flags & FLAGS_AWAY)
 			sendto_one(sptr, rpl_str(RPL_AWAY, parv[0]),
-				   acptr->name, acptr->user->away);
+				   acptr->name,
+				   (acptr->user->away) ? acptr->user->away :
+				   "Gone");
 	    }
 	if (MyConnect(acptr))
 		if (chptr && /* (chptr->mode.mode & MODE_INVITEONLY) && */

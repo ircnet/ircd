@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.49 1998/08/07 17:22:01 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.50 1998/08/22 19:22:28 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -38,6 +38,7 @@ static int user_modes[]	     = { FLAGS_OPER, 'o',
 				 FLAGS_INVISIBLE, 'i',
 				 FLAGS_WALLOP, 'w',
 				 FLAGS_RESTRICTED, 'r',
+				 FLAGS_AWAY, 'a',
 				 0, 0 };
 
 /*
@@ -1047,9 +1048,11 @@ int	parc, notice;
 		if ((acptr = find_person(nick, NULL)))
 		    {
 			if (!notice && MyConnect(sptr) &&
-			    acptr->user && acptr->user->away)
+			    acptr->user && (acptr->user->flags & FLAGS_AWAY))
 				sendto_one(sptr, rpl_str(RPL_AWAY, parv[0]),
-					   acptr->name, acptr->user->away);
+					   acptr->name,
+					   (acptr->user->away) ? 
+					   acptr->user->away : "Gone");
 			sendto_prefix_one(acptr, sptr, ":%s %s %s :%s",
 					  parv[0], cmd, nick, parv[2]);
 			continue;
@@ -1247,7 +1250,7 @@ Link *lp;
 	char	status[5];
 	int	i = 0;
 
-	if (acptr->user->away)
+	if (acptr->user->flags & FLAGS_AWAY)
 		status[i++] = 'G';
 	else
 		status[i++] = 'H';
@@ -1608,9 +1611,10 @@ char	*parv[];
 				   name, user->server,
 				   a2cptr?a2cptr->info:"*Not On This Net*");
 
-			if (user->away)
+			if (user->flags & FLAGS_AWAY)
 				sendto_one(sptr, rpl_str(RPL_AWAY, parv[0]),
-					   name, user->away);
+					   name, (user->away) ? user->away :
+					   "Gone");
 
 			if (IsAnOper(acptr))
 				sendto_one(sptr, rpl_str(RPL_WHOISOPERATOR,
@@ -2015,7 +2019,6 @@ char	*parv[];
  *	      but perhaps it's worth the load it causes to net.
  *	      This requires flooding of the whole net like NICK,
  *	      USER, MODE, etc messages...  --msa
- *          sounds like nobody likes this thing, let's kill it. --kalt
  ***********************************************************************/
 
 /*
@@ -2031,16 +2034,6 @@ char	*parv[];
 	Reg	char	*away, *awy2 = parv[1];
 	int	len;
 
-	/* This command is officially unsupported since 2.10 */
-	if (IsServer(cptr) || !MyConnect(sptr)) /* let's just be safe */
-		return 0;
-	sendto_one(cptr, ":%s %d %s AWAY :Unknown command", ME,
-		   ERR_UNKNOWNCOMMAND, sptr->name);
-	return 1;
-
-	if (!MyConnect(sptr))	/* Since 2.9 we know only local AWAY */
-		return 0;	/* "WHOIS server nick" still works */
-
 	away = sptr->user->away;
 
 	if (parc < 2 || !*awy2)	/* Marking as not away */
@@ -2052,6 +2045,8 @@ char	*parv[];
 			MyFree(away);
 			sptr->user->away = NULL;
 		    }
+		if (sptr->user->flags & FLAGS_AWAY)
+			sendto_serv_butone(cptr, ":%s MODE :-a", parv[0]);
 		/* sendto_serv_butone(cptr, ":%s AWAY", parv[0]); */
 		if (MyConnect(sptr))
 			sendto_one(sptr, rpl_str(RPL_UNAWAY, parv[0]));
@@ -2059,6 +2054,7 @@ char	*parv[];
 		check_services_butone(SERVICE_WANT_AWAY, NULL, sptr,
 				      ":%s AWAY", parv[0]);
 #endif
+		sptr->user->flags &= ~FLAGS_AWAY;
 		return 1;
 	    }
 
@@ -2087,12 +2083,16 @@ char	*parv[];
 		istat.is_away++;
 		istat.is_awaymem += len;
 		away = (char *)MyMalloc(len);
+		sendto_serv_butone(cptr, ":%s MODE :+a", parv[0]);
 	    }
 
-	sptr->user->away = away;
-	(void)strcpy(away, awy2);
+	sptr->user->flags |= FLAGS_AWAY;
 	if (MyConnect(sptr))
+	    {
+		sptr->user->away = away;
+		(void)strcpy(away, awy2);
 		sendto_one(sptr, rpl_str(RPL_NOWAWAY, parv[0]));
+	    }
 	return 2;
 }
 
@@ -2428,7 +2428,7 @@ char	*parv[];
 				(void)strcat(buf, " ");
 			SPRINTF(buf2, "%s%s=%c%s@%s", acptr->name,
 				IsAnOper(acptr) ? "*" : "",
-				(acptr->user->away) ? '-' : '+',
+				(acptr->user->flags & FLAGS_AWAY) ? '-' : '+',
 				acptr->user->username, acptr->user->host);
 			(void)strncat(buf, buf2, sizeof(buf) - len);
 			len += strlen(buf2);
@@ -2581,6 +2581,17 @@ char	*parv[];
 			case '\r' :
 			case '\t' :
 				break;
+			case 'a' : /* fall through case */
+				/* users should use the AWAY message */
+				if (cptr && !IsServer(cptr))
+					break;
+				if (what == MODE_DEL && sptr->user->away)
+				    {
+					istat.is_away--;
+					istat.is_awaymem -= (strlen(sptr->user->away) + 1);
+					MyFree(sptr->user->away);
+					sptr->user->away = NULL;
+				    }
 			default :
 				for (s = user_modes; (flag = *s); s += 2)
 					if (*m == (char)(*(s+1)))

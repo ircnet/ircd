@@ -141,7 +141,7 @@ typedef struct        MotdItem aExtCf;
 #define	FLAGS_PINGSENT   0x0001	/* Unreplied ping sent */
 #define	FLAGS_DEADSOCKET 0x0002	/* Local socket is dead--Exiting soon */
 #define	FLAGS_KILLED     0x0004	/* Prevents "QUIT" from being sent for this */
-#define	FLAGS_BLOCKED    0x0008	/* socket is in a blocked condition */
+#define	FLAGS_BLOCKED    0x0008	/* socket is in a blocked condition [unused] */
 #define	FLAGS_UNIX	 0x0010	/* socket is in the unix domain, not inet */
 #define	FLAGS_CLOSING    0x0020	/* set when closing to suppress errors */
 #define	FLAGS_LISTEN     0x0040 /* used to mark clients which we listen() on */
@@ -155,22 +155,23 @@ typedef struct        MotdItem aExtCf;
 #define	FLAGS_NONL	 0x4000 /* No \n in buffer */
 #define	FLAGS_HELD	 0x8000	/* connection held and reconnect try */
 #define	FLAGS_CBURST	0x10000	/* set to mark connection burst being sent */
-#define FLAGS_RILINE    0x20000 /* Restricted i-line */
+#define FLAGS_RILINE    0x20000 /* Restricted i-line [unused?] */
 #define FLAGS_QUIT      0x40000 /* QUIT :comment shows it's not a split */
 #define FLAGS_SPLIT     0x80000 /* client QUITting because of a netsplit */
 #define FLAGS_HIDDEN   0x100000 /* netsplit is behind a hostmask */
 #define	FLAGS_UNKCMD   0x200000	/* has sent an unknown command */
 #define	FLAGS_ZIP      0x400000 /* link is zipped */
 #define	FLAGS_ZIPRQ    0x800000 /* zip requested */
-#define	FLAGS_ZIPSTART 0x1000000 /* start of zip (ignore any CRLF) */
+#define	FLAGS_ZIPSTART	0x1000000 /* start of zip (ignore any CRLF) */
 
 #define	FLAGS_OPER       0x0001	/* Operator */
 #define	FLAGS_LOCOP      0x0002 /* Local operator -- SRB */
 #define	FLAGS_WALLOP     0x0004 /* send wallops to them */
 #define	FLAGS_INVISIBLE  0x0008 /* makes user invisible */
 #define FLAGS_RESTRICTED 0x0010 /* Restricted user */
+#define FLAGS_AWAY       0x0020 /* user is away */
 
-#define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP)
+#define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP|FLAGS_AWAY)
 #define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP|FLAGS_RESTRICTED)
 
 /*
@@ -352,7 +353,7 @@ struct	User	{
 				** by) and whowas array (field ww_user).
 				*/
 	int	joined;		/* number of channels joined */
-	int	flags;
+	int	flags;		/* user modes */
         struct	Server	*servp;
 				/*
 				** In a perfect world the 'server' name
