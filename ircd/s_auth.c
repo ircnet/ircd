@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.35 1999/06/15 01:26:19 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.36 1999/06/17 00:25:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -26,6 +26,69 @@ static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.35 1999/06/15 01:26:19 kalt Exp $"
 #define S_AUTH_C
 #include "s_externs.h"
 #undef S_AUTH_C
+
+/*
+ * set_clean_username
+ *
+ *	As non OTHER type of usernames retrieved via ident lookup are forced as
+ *	usernames for the user, one has to be careful not to allow potentially
+ *	damaging characters in the username.
+ *	This procedure fills up cptr->username based on cptr->auth
+ *	Characters disallowed:
+ *		leading :	for obvious reasons
+ *		spaces		for obvious reasons
+ *		@		because of how get_sockhost() is implemented,
+ *				and because it's used from attached_Iline()
+ *		[		/trace parsing is impossible
+ */
+static void
+set_clean_username(cptr)
+aClient *cptr;
+{
+	int i, dirty = 0;
+	char *s;
+
+	if (cptr->auth == NULL)
+		return;
+	s = cptr->auth;
+	if (index(cptr->auth, '[') || index(cptr->auth, '@') ||
+	    strlen(cptr->auth) > USERLEN)
+		dirty = 1;
+	else if (cptr->auth[0] = ':')
+	    {
+		dirty = 1;
+		s += 1;
+	    }
+	else
+	    {
+		char *r = cptr->auth;
+
+		while (*r)
+			if (isspace(*(r++)))
+				break;
+		if (*r)
+			dirty = 1;
+	    }
+	if (dirty)
+		cptr->username[i++] = '-';
+	while (i < USERLEN && *s)
+	    {
+		if (*s != '@' && *s != '[' && !isspace(*s))
+			cptr->username[i++] = *s;
+		s += 1;
+	    }
+	cptr->username[i] = '\0';
+	if (!strcmp(cptr->username, cptr->auth))
+	    {
+		MyFree(cptr->auth);
+		cptr->auth = cptr->username;
+	    }
+	else
+	    {
+		istat.is_authmem += sizeof(cptr->auth);
+		istat.is_auth += 1;
+	    }
+}
 
 #if defined(USE_IAUTH)
 
@@ -289,10 +352,8 @@ read_iauth()
 				    istat.is_auth -= 1;
 				    MyFree(cptr->auth);
 				}
-			    cptr->auth = cptr->username;
-			    strncpy(cptr->username, start+strlen(tbuf),
-				    USERLEN+1);
-			    cptr->username[USERLEN] = '\0';
+			    cptr->auth = mystrdup(tbuf);
+			    set_clean_username(cptr);
 			    cptr->flags |= FLAGS_GOTID;
 			}
 		    else if (start[0] == 'u')
@@ -312,16 +373,11 @@ read_iauth()
 				    istat.is_auth -= 1;
 				    MyFree(cptr->auth);
 				}
-			    cptr->username[0] = '-';
-			    strncpy(cptr->username+1, start+strlen(tbuf),
-				    USERLEN);
-			    cptr->username[USERLEN] = '\0';
 			    cptr->auth = MyMalloc(strlen(start+strlen(tbuf))
 						  + 2);
 			    *cptr->auth = '-';
 			    strcpy(cptr->auth+1, start+strlen(tbuf));
-			    istat.is_authmem += sizeof(cptr->auth);
-			    istat.is_auth += 1;
+			    set_clean_username(cptr);
 			    cptr->flags |= FLAGS_GOTID;
 			}
 		    else if (start[0] == 'D')
@@ -665,7 +721,7 @@ Reg	aClient	*cptr;
 				break;
 		strncpyzt(system, t, sizeof(system));
 		for (t = ruser; *s && (t < ruser + sizeof(ruser)); s++)
-			if (!isspace(*s) && *s != ':' && *s != '@' && *s !='[')
+			if (!isspace(*s) && *s != ':')
 				*t++ = *s;
 		*t = '\0';
 		Debug((DEBUG_INFO,"auth reply ok [%s] [%s]", system, ruser));
@@ -695,30 +751,19 @@ Reg	aClient	*cptr;
 		return;
 	    }
 	ircstp->is_asuc++;
-  	if (strncmp(system, "OTHER", 5))
- 		strncpy(cptr->username, ruser, USERLEN+1);
- 	else
+  	if (!strncmp(system, "OTHER", 5))
 	    { /* OTHER type of identifier */
- 		*cptr->username = '-';	/* -> add '-' prefix into ident */
- 		strncpy(&cptr->username[1], ruser, USERLEN);
-		if ((unsigned)strlen(ruser) > USERLEN)
+		if (cptr->auth != cptr->username)/*impossible, but...*/
 		    {
-			if (cptr->auth != cptr->username)/*impossible, but...*/
-			    {
-				istat.is_authmem -= sizeof(cptr->auth);
-				istat.is_auth -= 1;
-				MyFree(cptr->auth);
-			    }
-			cptr->auth = MyMalloc(strlen(ruser) + 2);
-			*cptr->auth = '-';
-			strcpy(cptr->auth+1, ruser);
-			istat.is_authmem += sizeof(cptr->auth);
-			istat.is_auth += 1;
+			istat.is_authmem -= sizeof(cptr->auth);
+			istat.is_auth -= 1;
+			MyFree(cptr->auth);
 		    }
-		else
-			cptr->auth = cptr->username;
+		cptr->auth = MyMalloc(strlen(ruser) + 2);
+		*cptr->auth = '-';
+		strcpy(cptr->auth+1, ruser);
 	    }
- 	cptr->username[USERLEN] = '\0';
+	set_clean_username(cptr);
  	cptr->flags |= FLAGS_GOTID;
 	Debug((DEBUG_INFO, "got username [%s]", ruser));
 	return;

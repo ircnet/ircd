@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.14 1999/03/11 19:53:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.15 1999/06/17 00:25:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -253,16 +253,6 @@ u_int cl;
 				while (ch && *ch && *ch == ' ') ch++;
 				if (ch && *ch)
 				    {
-					char *chk = ch-1;
-
-					while (*++chk)
-						if (*chk == ':' ||
-						    *chk == '@' ||
-						    *chk == '[' ||
-						    isspace(*chk))
-							break;
-					if (*chk)
-						other = 1;
 					if (cldata[cl].authuser)
 						free(cldata[cl].authuser);
 					cldata[cl].authuser = mystrdup(ch);
