@@ -112,6 +112,8 @@
  * that O-lines only become fully effective for people on the 'same network'
  * as the server.  Undefined, it increases the security of the server by
  * placing restrictions on where people can use operator powers from.
+ * OPER_SET enables SET command which can be used for fine-tuning of certain
+ * aspects of ircd behaviour during runtime.
  * The 'LOCOP_' #defines are for making the respective commands available
  * to 'local' operators. Note that the 'OPER_' #defines affect both global
  * (big O) and local (little o) operators.  Defining 'LOCOP_x' has no effect
@@ -122,10 +124,12 @@
 #define	OPER_REHASH
 #undef	OPER_RESTART
 #define	OPER_DIE
+#undef	OPER_SET
 #undef	OPER_REMOTE
 #undef	LOCOP_REHASH
 #undef	LOCOP_RESTART
 #undef	LOCOP_DIE
+#undef	LOCOP_SET
 
 /*
  * Maximum number of network connections your server will allow.  This should
