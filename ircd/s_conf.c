@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.148 2004/11/03 01:58:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.149 2004/11/10 00:08:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -785,6 +785,7 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 	lp->next = cptr->confs;
 	lp->value.aconf = aconf;
 	cptr->confs = lp;
+	cptr->ping = get_client_ping(cptr);
 	aconf->clients++;
 	if (aconf->status & CONF_CLIENT_MASK)
 		ConfLinks(aconf)++;

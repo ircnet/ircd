@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.125 2004/11/02 16:17:51 chopin Exp $
+ *   $Id: struct_def.h,v 1.126 2004/11/10 00:08:34 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -543,6 +543,7 @@ struct Client	{
 	time_t	since;		/* last time we parsed something */
 	aClient	*acpt;		/* listening client which we accepted from */
 	Link	*confs;		/* Configuration record associated */
+	int	ping;
 	int	authfd;		/* fd for rfc931 authentication */
 	char	*auth;
 	u_short	port;		/* and the remote port# too :-) */

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.150 2004/11/03 17:40:00 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.151 2004/11/10 00:08:34 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -512,8 +512,7 @@ static	time_t	check_pings(time_t currenttime)
 			kflag = find_kill(cptr, 1, &reason);
 		}
 #endif
-		ping = IsRegistered(cptr) ? get_client_ping(cptr) :
-					    ACCEPTTIMEOUT;
+		ping = IsRegistered(cptr) ? cptr->ping : ACCEPTTIMEOUT;
 		Debug((DEBUG_DEBUG, "c(%s) %d p %d k %d a %d",
 			cptr->name, cptr->status, ping, kflag,
 			currenttime - cptr->lasttime));
