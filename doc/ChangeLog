@@ -1,3 +1,16 @@
+2004-06-30  Jakub Vlasek
+
+	* struct_def.h: Added FLAGS_XLINED, CONF_XLINE, IsConfXlineWhole(),
+	  IsXlined(), SetXlined() and EXITC_XLINE.
+	* chkconf.c: Ignore X-lines.
+	* s_conf.c, s_conf_ext.h: Added xline_flags_to_string(),
+	  xline_flags_parse().
+	* s_conf.c/initconf(): Parse X-lines.
+	* s_serv.c: Added report_x_lines for stats X.
+	* s_user.c/register_user(): Exit X-lined clients.
+	* s_user.c/m_user(): Check for X-lines.
+	* config.h.dist: Added XLINE_EXIT_REASON and XLINE defines.
+
 2004-06-30  Piotr Kucharski
 
 	* channel.c/match_modeid(): drop special case for '#' matching uids.
