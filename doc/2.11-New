@@ -22,6 +22,4 @@
 	  autoconnects)
 	* LUSERS shows local and global usercount maximum.
 	* STATS ? shows quick information about connected servers.
-	* Invite overriding ban notice shows nick of client who issued the
-	  invite.
-	
+	* INVITE overriding ban shows inviter's n!u@h in channel notice.
