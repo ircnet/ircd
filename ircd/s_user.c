@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.249 2005/02/08 02:29:29 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.250 2005/02/08 02:37:52 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1575,14 +1575,6 @@ static	int	m_message(aClient *cptr, aClient *sptr, int parc,
 				{
 					syntax = MATCH_HOST;
 				}
-				else
-				{
-					syntax = MATCH_SERVER|MATCH_OLDSYNTAX;
-				}
-			}
-			else if (*nick == '#')
-			{
-				syntax = MATCH_HOST|MATCH_OLDSYNTAX;
 			}
 		}
 		if (syntax)
@@ -1602,40 +1594,11 @@ static	int	m_message(aClient *cptr, aClient *sptr, int parc,
 					ME, BadTo(parv[0]), nick);
 				continue;
 			}
-			if (syntax & MATCH_OLDSYNTAX)
-			{
-				/* Send to new servers, but add '$' in front
-				** of nick */
-				sendto_match_butone(
-					IsServer(cptr) ? cptr : NULL, 
-					sptr, nick + 1,
-					syntax - MATCH_OLDSYNTAX,
-					":%s %s $%s :%s", parv[0],
-					cmd, nick, parv[2]);
-				/* Send to old servers as is */
-				sendto_match_butone_old(
-					IsServer(cptr) ? cptr : NULL, 
-					sptr, nick + 1,
-					syntax - MATCH_OLDSYNTAX,
-					":%s %s %s :%s", parv[0],
-					cmd, nick, parv[2]);
-			}
-			else	/* new syntax, that is $$ or $# */
-			{
-				/* Send as is to new servers */
-				sendto_match_butone(
-					IsServer(cptr) ? cptr : NULL, 
-					sptr, nick + 2, syntax,
-					":%s %s %s :%s", parv[0],
-					cmd, nick, parv[2]);
-				/* Remove first '$' (nick + 1) and send
-				** it to old servers */
-				sendto_match_butone_old(
-					IsServer(cptr) ? cptr : NULL, 
-					sptr, nick + 2, syntax,
-					":%s %s %s :%s", parv[0],
-					cmd, nick + 1, parv[2]);
-			}
+			sendto_match_butone(
+				IsServer(cptr) ? cptr : NULL, 
+				sptr, nick + 2, syntax,
+				":%s %s %s :%s", parv[0],
+				cmd, nick, parv[2]);
 			continue;
 		}	/* syntax */
 
