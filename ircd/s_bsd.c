@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.152 2004/08/10 03:07:26 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.153 2004/08/10 14:11:36 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1221,36 +1221,94 @@ static	int completed_connection(aClient *cptr)
 }
 
 /*
-** close_connection
-**	Close the physical connection. This function must make
-**	MyConnect(cptr) == FALSE, and set cptr->from == NULL.
-*/
-void	close_connection(aClient *cptr)
+ * Closes FD in aClient structures.
+ */
+void close_client_fd(aClient *cptr)
 {
-	Reg	aConfItem *aconf;
-	Reg	int	i;
+	int i;
+	
 #ifdef SO_LINGER
 	struct 	linger	sockling;
 
 	sockling.l_onoff = 0;
 #endif
 
+	if (cptr->authfd >= 0)
+	{
+#ifdef	SO_LINGER
+		if (cptr->exitc == EXITC_PING)
+			if (SETSOCKOPT(cptr->authfd, SOL_SOCKET, SO_LINGER,
+				       &sockling, sockling))
+				report_error("setsockopt(SO_LINGER) %s:%s",
+					     cptr);
+#endif
+		(void)close(cptr->authfd);
+
+		cptr->authfd = -1;
+	}
+
+	if ((i = cptr->fd) >= 0)
+	{
+		flush_connections(i);
+		if (IsServer(cptr) || IsListener(cptr))
+		{	
+			del_fd(i, &fdas);
+#ifdef	ZIP_LINKS
+			/*
+			** the connection might have zip data (even if
+			** FLAGS_ZIP is not set)
+			*/
+			zip_free(cptr);
+#endif
+		}
+		else if (IsClient(cptr))
+		{
+#ifdef	SO_LINGER
+			if (cptr->exitc == EXITC_PING)
+				if (SETSOCKOPT(i, SOL_SOCKET, SO_LINGER,
+					       &sockling, sockling))
+					report_error("setsockopt(SO_LINGER) %s:%s",
+						     cptr);
+#endif
+		 }
+		del_fd(i, &fdall);
+		local[i] = NULL;
+		(void)close(i);
+
+		cptr->fd = -2;
+		DBufClear(&cptr->sendQ);
+		DBufClear(&cptr->recvQ);
+		bzero(cptr->passwd, sizeof(cptr->passwd));
+	}
+}
+
+/*
+** close_connection
+**	Close the physical connection. This function must make
+**	MyConnect(cptr) == FALSE, and set cptr->from == NULL.
+*/
+void	close_connection(aClient *cptr)
+{
+	aConfItem *aconf;
+
 	if (IsServer(cptr))
-	    {
+	{
 		ircstp->is_sv++;
 		ircstp->is_sbs += cptr->sendB;
 		ircstp->is_sbr += cptr->receiveB;
 		ircstp->is_sti += timeofday - cptr->firsttime;
-	    }
+	}
 	else if (IsClient(cptr))
-	    {
+	{
 		ircstp->is_cl++;
 		ircstp->is_cbs += cptr->sendB;
 		ircstp->is_cbr += cptr->receiveB;
 		ircstp->is_cti += timeofday - cptr->firsttime;
-	    }
+	}
 	else
+	{
 		ircstp->is_ni++;
+	}
 
 	/*
 	 * remove outstanding DNS queries.
@@ -1263,7 +1321,7 @@ void	close_connection(aClient *cptr)
 	if (IsServer(cptr) &&
 		(aconf = find_conf_exact(cptr->name, cptr->username,
 		cptr->sockhost, CFLAG)))
-	    {
+	{
 		/*
 		 * Reschedule a faster reconnect, if this was a automatically
 		 * connected configuration entry. (Note that if we have had
@@ -1275,78 +1333,49 @@ void	close_connection(aClient *cptr)
 				HANGONRETRYDELAY : ConfConFreq(aconf);
 		/* nextconnect could be 0 */
 		if (nextconnect > aconf->hold || nextconnect == 0)
+		{
 			nextconnect = aconf->hold;
-	    }
+		}
+	}
+	
 	if (nextconnect == 0 && (IsHandshake(cptr) || IsConnecting(cptr)))
 	{
 		nextconnect = timeofday + HANGONRETRYDELAY;
 	}
 
-	if (cptr->authfd >= 0)
-	    {
-#ifdef	SO_LINGER
-		if (cptr->exitc == EXITC_PING)
-			if (SETSOCKOPT(cptr->authfd, SOL_SOCKET, SO_LINGER,
-				       &sockling, sockling))
-				report_error("setsockopt(SO_LINGER) %s:%s",
-					     cptr);
-#endif
-		(void)close(cptr->authfd);
-	    }
-
-	if ((i = cptr->fd) >= 0)
-	    {
+	if (cptr->fd >= 0)
+	{
 #if defined(USE_IAUTH)
 		if (!IsListener(cptr))
 		{
-			// iauth doesn't know about listening FD
+			/* iauth doesn't know about listening FD nor
+			 * cancelled outgoing connections.
+			 */
 			sendto_iauth("%d D", cptr->fd);
 		}
 #endif
-		flush_connections(i);
-		if (IsServer(cptr) || IsListener(cptr))
-		    {
-			del_fd(i, &fdas);
-#ifdef	ZIP_LINKS
-			/*
-			** the connection might have zip data (even if
-			** FLAGS_ZIP is not set)
-			*/
-			zip_free(cptr);
-#endif
-		    }
-		else if (IsClient(cptr))
-		    {
-#ifdef	SO_LINGER
-			if (cptr->exitc == EXITC_PING)
-				if (SETSOCKOPT(i, SOL_SOCKET, SO_LINGER,
-					       &sockling, sockling))
-					report_error("setsockopt(SO_LINGER) %s:%s",
-						     cptr);
-#endif
-		    }
-		del_fd(i, &fdall);
-		local[i] = NULL;
-		(void)close(i);
-
-		cptr->fd = -2;
-		DBufClear(&cptr->sendQ);
-		DBufClear(&cptr->recvQ);
-		bzero(cptr->passwd, sizeof(cptr->passwd));
 		/*
 		 * clean up extra sockets from P-lines which have been
 		 * discarded.
 		 */
 		if ((cptr->acpt != &me) && !(IsListener(cptr)))
-		    {
+		{
 			aconf = cptr->acpt->confs->value.aconf;
+			
 			if (aconf->clients > 0)
+			{
 				aconf->clients--;
+			}
+			
 			if (!aconf->clients && IsIllegal(aconf))
+			{
 				close_connection(cptr->acpt);
-		    }
-	    }
+			}
+		}
+	}
 	
+	close_client_fd(cptr);
+
 	/* Remove from Listener Linked list */
 	if (IsListener(cptr) && cptr->confs && cptr->confs->value.aconf &&
 		IsIllegal(cptr->confs->value.aconf) &&
