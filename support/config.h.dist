@@ -633,7 +633,7 @@
 ** CLCHSEC defines minimum time in seconds between two consecutive
 ** "New highest local/global clients count" messages
 */
-#define CLCHSEC 30
+#define CLCHSEC 300
 
 /* 
 ** This controls how many clients will be checked by DelayedKills
