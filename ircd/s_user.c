@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.192 2004/03/07 21:32:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.193 2004/03/07 22:57:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -345,7 +345,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 	aClient	*acptr;
 	aServer	*sp = NULL;
 	anUser	*user = sptr->user;
-	short	oldstatus = sptr->status;
 	char	*parv[3];
 #ifndef NO_PREFIX
 	char	prefix;

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.117 2004/03/07 22:49:53 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.118 2004/03/07 22:57:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1178,7 +1178,6 @@ static	void	open_debugfile()
 {
 #ifdef	DEBUGMODE
 	int	fd;
-	aClient	*cptr;
 
 	if (debuglevel >= 0)
 	    {
