@@ -1,3 +1,13 @@
+2002-03-29  Jakub Vlasek
+
+	* channel.c/m_names(): Rewritten, channel names handling moved to 
+	  names_channel().
+	* channel.c/m_list(): Partialy rewritten, don't send +p channels
+	  user is not member of anymore.
+	* s_user.c/who_find(): Rewritten.
+	* s_user.c/m_who(): Moved colapse() down to fix bug which made 
+	  impossible to use WHO on channels with * in their name.
+
 2002-03-24  Jakub Vlasek
 
 	* s_user.c/m_oper(): Send +O after local oper opers and +o when global
