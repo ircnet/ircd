@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.14 1999/02/12 03:57:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.15 1999/06/25 21:50:01 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -102,8 +102,8 @@ int	*store;
  * is little or no point hashing on a full channel name which maybe 255 chars
  * long.
  */
-static	u_int	hash_channel_name(hname, store)
-char	*hname;
+static	u_int	hash_channel_name(hname, store, shortname)
+char	*hname, shortname;
 int	*store;
 {
 	Reg	u_char	*name = (u_char *)hname;
@@ -111,7 +111,7 @@ int	*store;
 	Reg	int	i = 30;
 	Reg	u_int	hash = 5;
 
-	if (*name == '!')
+	if (*name == '!' && shortname == 0)
 		name += 1 + CHIDLEN;
 	for (; (ch = *name) && --i; name++)
 	{
@@ -330,7 +330,7 @@ aChannel	*chptr;
 {
 	Reg	u_int	hashv;
 
-	hashv = hash_channel_name(name, &chptr->hashv);
+	hashv = hash_channel_name(name, &chptr->hashv, 0);
 	chptr->hnextch = (aChannel *)channelTable[hashv].list;
 	channelTable[hashv].list = (void *)chptr;
 	channelTable[hashv].links++;
@@ -611,7 +611,7 @@ aChannel *chptr;
 	Reg	aHashEntry	*tmp3;
 	u_int	hashv, hv;
 
-	hashv = hash_channel_name(name, &hv);
+	hashv = hash_channel_name(name, &hv, 0);
 	tmp3 = &channelTable[hashv];
 
 	for (tmp = (aChannel *)tmp3->list; tmp; prv = tmp, tmp = tmp->hnextch)
@@ -649,7 +649,7 @@ aChannel *chptr;
 	    {
 		aHashEntry	*tmp3;
 
-		hashv = hash_channel_name(name, &hv);
+		hashv = hash_channel_name(name, &hv, 1);
 		tmp3 = &channelTable[hashv];
 		chptr = (aChannel *) tmp3->list;
 	    }
@@ -823,13 +823,13 @@ char	*parv[];
 		if (parc > 2)
 			sendto_one(sptr,"NOTICE %s :%s hash to entry %d",
 				   parv[0], parv[2],
-				   hash_channel_name(parv[2]));
+				   hash_channel_name(parv[2], NULL, 0));
 		return (2);
 	case 'h' :
 		if (parc > 2)
 			sendto_one(sptr,"NOTICE %s :%s hash to entry %d",
 				   parv[0], parv[2],
-				   hash_nick_name(parv[2]));
+				   hash_nick_name(parv[2], NULL));
 		return (2);
 	case 'n' :
 	    {
