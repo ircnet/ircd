@@ -7,7 +7,7 @@
  */
 
 #ifndef lint
-char rcsid[] = "$Id: irc_sprintf.c,v 1.3 2002/08/23 16:31:32 chopin Exp $";
+char rcsid[] = "$Id: irc_sprintf.c,v 1.4 2003/07/18 16:24:25 chopin Exp $";
 #endif
 
 #define IRC_SPRINTF_C
@@ -33,12 +33,12 @@ char rcsid[] = "$Id: irc_sprintf.c,v 1.3 2002/08/23 16:31:32 chopin Exp $";
 static char	dtmpbuf[MAXDIGS];	/* scratch buffer for numbers */
 
 int irc_sprintf(aClient *target, char *buf, char *format, ...)
-#include "b_sprintf_body.c"
+#include "irc_sprintf_body.c"
 
 #define IRC_SPRINTF_V 1
 
 int irc_vsprintf(aClient *target, char *buf, char *format, va_list ap)
-#include "b_sprintf_body.c"
+#include "irc_sprintf_body.c"
 
 #if 0
 error SN version is unsafe so far, sorry
@@ -46,12 +46,12 @@ error SN version is unsafe so far, sorry
 #define IRC_SPRINTF_SN 1
 
 int irc_vsnprintf(aClient *target, char *buf, size_t size, char *format, va_list ap)
-#include "b_sprintf_body.c"
+#include "irc_sprintf_body.c"
 
 #undef IRC_SPRINTF_V
 
-int irc_snprintf(aClient *target, char *buf, size_t size, char *format, va_list ap)
-#include "b_sprintf_body.c"
+int irc_snprintf(aClient *target, char *buf, size_t size, char *format, ...)
+#include "irc_sprintf_body.c"
 
 #undef IRC_SPRINTF_SN
 

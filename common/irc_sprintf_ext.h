@@ -5,7 +5,7 @@
 
 /*  This file contains external definitions for global variables and functions
     defined in common/irc_sprintf.c.
-    $Id: irc_sprintf_ext.h,v 1.4 2002/08/23 18:46:36 chopin Exp $
+    $Id: irc_sprintf_ext.h,v 1.5 2003/07/18 16:24:25 chopin Exp $
  */
 
 /*  External definitions for global functions.
@@ -17,8 +17,13 @@
 #define EXTERN
 #endif /* IRC_SPRINTF_C */
 
-EXTERN int irc_sprintf(aClient *target, char *buf, char *format, ...)
-EXTERN int irc_vsprintf(aClient *target, char *buf, char *format, va_list ap)
+EXTERN int irc_sprintf(aClient *target, char *buf, char *format, ...);
+EXTERN int irc_vsprintf(aClient *target, char *buf, char *format, va_list ap);
+
+#if 0
+EXTERN int irc_snprintf(aClient *target, char *buf, size_t size, char *format, ...);
+EXTERN int irc_vsnprintf(aClient *target, char *buf, size_t size, char *format, va_list ap);
+#endif
 
 #ifdef IRC_SPRINTF_C
 #undef IRC_SPRINTF_SNPRINTF

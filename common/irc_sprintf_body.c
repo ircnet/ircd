@@ -1,4 +1,4 @@
-/* $Id: irc_sprintf_body.c,v 1.1 2002/08/23 16:31:32 chopin Exp $ */
+/* $Id: irc_sprintf_body.c,v 1.2 2003/07/18 16:24:25 chopin Exp $ */
 {
 #ifndef IRC_SPRINTF_V
 	va_list ap;
@@ -47,7 +47,7 @@
 	assert( buf != NULL );
 	assert( format != NULL );
 # ifdef IRC_SPRINTF_SN
-	assert( size > BUFSIZE );
+	assert( size <= BUFSIZE );
 # endif
 #endif
 
@@ -555,7 +555,7 @@ numbers:
 farend:
 		if ( count >= size )
 		{
-			bufstart[size+1] = '\0';
+			bufstart[size-1] = '\0';
 			count = size;
 			break;
 		}
@@ -573,7 +573,7 @@ farend:
 #endif
 #ifdef IRC_SPRINTF_DEBUG
 	*(bufstart+count)='\0';
-	fprintf(stderr, "output:>%f<\n", bufstart);
+	fprintf(stderr, "output:>%s<\n", bufstart);
 	fprintf(stderr, "fcount:>%d<\n", count);
 #endif
 	return count;
