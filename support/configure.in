@@ -87,7 +87,7 @@ else
     IRC_ZLIB_LIBRARY=-L$irc_zlib_library
     if test "`(uname) 2>/dev/null`" = SunOS &&
       uname -r | grep '^5' >/dev/null; then
-      IRC_ZLIB_LIBRARY="$IRC_ZLIB_LIBRARY -R$irc_zlib_library$"
+      IRC_ZLIB_LIBRARY="$IRC_ZLIB_LIBRARY -R$irc_zlib_library"
     fi
     IRC_ZLIB_LIBRARY="$IRC_ZLIB_LIBRARY -lz"
   fi
