@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.26 1998/01/27 13:03:18 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.27 1998/02/10 23:19:01 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1588,7 +1588,6 @@ find_denied(name, class)
 {
     aConfItem	*aconf;
 
-    sendto_flag(SCH_DEBUG, "find_denied(%s, %d)", name, class);
     for (aconf = conf; aconf; aconf = aconf->next)
 	{
 	    if (aconf->status != CONF_DENY)
@@ -1609,11 +1608,7 @@ find_denied(name, class)
 			    if (!aconf2->class || ConfClass(aconf2) != ck)
 				    continue;
 			    if (find_client(aconf2->host, NULL))
-				{
-				    sendto_flag(SCH_DEBUG,"class match: %d %s",
-						ck, aconf2->host);
 				    return aconf2;
-				}
 			}
 		}
 	    if (aconf->host)
@@ -1623,13 +1618,7 @@ find_denied(name, class)
 		    for (asptr = svrtop; asptr; asptr = asptr->nexts)
 			    if (aconf->host &&
 				!match(aconf->host, asptr->bcptr->name))
-				{
-				    sendto_flag(SCH_DEBUG,
-						"server match(%s,%s)",
-                                                aconf->host,
-						asptr->bcptr->name);
 				    return aconf;
-				}
 		}
 	}
     return NULL;
