@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.85 2002/07/29 22:38:50 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.86 2002/09/12 23:36:11 jv Exp $";
 #endif
 
 #include "os.h"
@@ -153,8 +153,15 @@ int s;
 	(void)sigaddset(&act.sa_mask, SIGINT);
 	(void)sigaction(SIGINT, &act, NULL);
 #else
+
 	(void)signal(SIGHUP, SIG_DFL);	/* sysV -argv */
 #endif
+	if (bootopt & BOOT_TTY)
+	{
+		fprintf(stderr, "Caught SIGINT, terminating...\n");
+		exit(-1);
+	}
+
 	dorestart = 1;
 }
 
@@ -178,8 +185,10 @@ void	server_reboot()
 	for (i = 3; i < MAXCONNECTIONS; i++)
 		(void)close(i);
 	if (!(bootopt & (BOOT_TTY|BOOT_DEBUG)))
+	{
 		(void)close(2);
-	(void)close(1);
+		(void)close(1);
+	}
 	if ((bootopt & BOOT_CONSOLE) || isatty(0))
 		(void)close(0);
 	ircd_writetune(tunefile);
@@ -567,14 +576,15 @@ aClient	*mp;
 static	int	bad_command()
 {
   (void)printf(
-	 "Usage: ircd [-a] [-b] [-c]%s [-h servername] [-q] [-o] [-i] [-T tunefile] [-p (strict|on|off)] [-s] [-v] %s\n",
+	 "Usage: ircd [-a] [-b] [-c]%s [-h servername] [-q] [-o] [-i]"
+	 "[-T tunefile] [-p (strict|on|off)] [-s] [-v] [-t] %s\n",
 #ifdef CMDLINE_CONFIG
 	 " [-f config]",
 #else
 	 "",
 #endif
 #ifdef DEBUGMODE
-	 " [-x loglevel] [-t]"
+	 " [-x loglevel]"
 #else
 	 ""
 #endif
@@ -708,7 +718,9 @@ char	*argv[];
 			bootopt |= BOOT_NOIAUTH;
 			break;
 		    case 't':
+#ifdef DEBUGMODE
                         (void)setuid((uid_t)uid);
+#endif
 			bootopt |= BOOT_TTY;
 			break;
 		    case 'T':
@@ -813,6 +825,8 @@ char	*argv[];
 
 	/* didn't set debuglevel */
 	/* but asked for debugging output to tty */
+#ifdef DEBUGMODE
+
 	if ((debuglevel < 0) &&  (bootopt & BOOT_TTY))
 	    {
 		(void)fprintf(stderr,
@@ -820,6 +834,7 @@ char	*argv[];
 		exit(-1);
 	    }
 
+#endif
 	initstats();
 	ircd_readtune(tunefile);
 	timeofday = time(NULL);
@@ -956,8 +971,14 @@ char	*argv[];
 	syslog(LOG_NOTICE, "Server Ready: v%s (%s #%s)", version, creation,
 	       generation);
 #endif
-	printf("Server %s (%s) version %s starting.\n", ME, me.serv->sid,
-		version);
+	printf("Server %s (%s) version %s starting%s%s", ME, me.serv->sid,
+		version, (bootopt & BOOT_TTY) ? " in foreground mode." : ".",
+#ifdef DEBUGMODE
+		"(DEBUGMODE)\n"
+#else
+		"\n"
+#endif
+		);
 
 	timeofday = time(NULL);
 	
