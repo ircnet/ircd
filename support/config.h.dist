@@ -393,7 +393,7 @@
  * 1) Send start-of-list numeric before LIST reply
  * 2) Revert combined "n JOIN #^Go" -> "n JOIN #" "MODE # o n"
  */
-#undef MIRC_KLUDGE
+#define MIRC_KLUDGE
 
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
