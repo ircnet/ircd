@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.38 1998/02/10 23:17:24 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.39 1998/03/22 00:28:35 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -192,6 +192,8 @@ int	server, parc;
 		    }
 	 if (acptr)
 	    {
+		if (!IsRegistered(acptr))
+			return HUNTED_ISME;
 		if (IsMe(acptr) || MyClient(acptr) || MyService(acptr))
 			return HUNTED_ISME;
 		if (match(acptr->name, parv[server]))
