@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.82 2002/01/08 04:07:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.83 2002/01/24 01:06:48 jv Exp $";
 #endif
 
 #include "os.h"
@@ -604,10 +604,8 @@ void	init_sys()
 	if (((bootopt & BOOT_CONSOLE) || isatty(0)) &&
 	    !(bootopt & (BOOT_INETD|BOOT_OPER)))
 	    {
-#ifndef __CYGWIN32__
 		if (fork())
 			exit(0);
-#endif
 #ifdef TIOCNOTTY
 		if ((fd = open("/dev/tty", O_RDWR)) >= 0)
 		    {
