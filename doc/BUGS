@@ -1,4 +1,4 @@
-# @(#)$Id: BUGS,v 1.13 1998/11/09 00:41:38 kalt Exp $
+# @(#)$Id: BUGS,v 1.14 1999/03/07 22:59:31 kalt Exp $
 
 The list is probably not as scary as it once was.
 Anyone with some free time is welcome to fix those =)
@@ -11,6 +11,3 @@ Anyone with some free time is welcome to fix those =)
   for various reasons)
 
 * The operator count showed by /LUSERS becomes incorrect (negative).
-
-* Clients may be disconnected with "Ping Timeout" message immediately
-  upon connection.
