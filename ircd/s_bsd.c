@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.143 2004/04/15 15:25:15 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.144 2004/04/17 17:27:22 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -573,19 +573,51 @@ void	start_iauth(int rcvdsig)
 	if (first)
 		first = 0;
 	else
-	    {
+	{
 		int i;
 		aClient *cptr;
+		char	abuf[BUFSIZ];	/* size of abuf in vsendto_iauth */
+		/* 20 is biggest possible ending "%d O\n\0", which means
+		** 16-digit fd -- very unlikely :> */
+		char	*e = abuf + BUFSIZ - 20;
+		char	*s = abuf;
 
+		/* Build abuf to send big buffer once (or twice) to iauth,
+		** which goes faster than many consecutive small writes.
+		** BitKoenig claims it saves metadata overhead on Linux and
+		** does not harm other systems --B. */
 		for (i = 0; i <= highest_fd; i++)
-		    {   
+		{
 			if (!(cptr = local[i]))
 				continue;
 			if (IsServer(cptr) || IsService(cptr))
 				continue;
-			sendto_iauth("%d O", i);
-		    }
-	    }
+			
+			/* if not enough room in abuf, send whatever we have
+			** now and start writing from begin of abuf again. */
+			if (s > e)
+			{
+				/* sendto_iauth() appends "\n", so we
+				** remove last one */
+				*(s - 1) = '\0';	
+				sendto_iauth(abuf);
+				s = abuf;
+			}
+			/* A little trick: we sprintf onto s and move s (which 
+			** points inside abuf) forward, at the end of s (number
+			** of bytes returned by sprintf). This makes s always 
+			** point to the end of things written on abuf, which 
+			** allows both next sprintf at the end (no strcat!) and
+			** removing last \n when needed. */
+			s += sprintf(s, "%d O\n", i);
+		}
+		/* send the rest */
+		if (s != abuf)
+		{
+			*(s - 1) = '\0';
+			sendto_iauth(abuf);
+		}
+	}
 #endif
 }
 
