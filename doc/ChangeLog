@@ -1,3 +1,15 @@
+2004-03-17  Piotr Kucharski
+
+	* channel.c/m_join(), m_njoin(): send "Fake" notice to &CHANNEL, when
+	  member of channel joins it again; when NJOIN, do it when not bursting
+	  otherwise keep sending NJOIN protocol error.
+
+2004-03-16  Piotr Kucharski
+
+	* s_serv.c/m_server_estab(): moves related to namebuf change made
+	  server name appear much earlier, thus making find_name() return
+	  this, just introduced, server; this caused wrong "Server Exists".
+
 2004-03-15  Piotr Kucharski
 
 	* res_init.c/ircd_res_init(), res.c/init_resolver(), send_res_msg(),
