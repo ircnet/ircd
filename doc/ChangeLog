@@ -1,3 +1,12 @@
+2004-03-21  Jakub Vlasek
+	
+	* ircd.c, ircd_ext.h, s_misc.c/check_split(): Added firstrejoindone
+	  variable. Set to 0 between server start and first network rejoin.
+	* s_bsd.c/inetport(): Added dolisten parameter to make possible
+	  making listeners without calling listen() on them.
+	* struct_def.h: Added IsListeningInactive(), SetListeningInactive(),
+	  ClearListenerInactive().
+
 2004-03-20  Piotr Kucharsk
 
 	* s_conf.c/find_bounce(): allow negative classes in B:lines.
