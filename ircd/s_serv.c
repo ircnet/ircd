@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.255 2004/11/14 14:07:09 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.256 2004/11/21 00:41:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3530,45 +3530,47 @@ int	find_server_num(char *sname)
 */
 static	int	check_link(aClient *cptr)
 {
-    if (MyClient(cptr))
-	    return 0;
-    /* Oh well... free opers from RPL_TRYAGAIN. */
-    if (IsOper(cptr))
-	    return 0;
-    if (!(bootopt & BOOT_PROT))
-	    return 0;
+	/* This matches opers, servers, services and local clients, so they
+	** are not subject to RPL_TRYAGAIN. --B. */
+	if (cptr->status != STAT_CLIENT || MyConnect(cptr))
+		return 0;
+	if (!(bootopt & BOOT_PROT))
+		return 0;
 
-    /* changing cptr to get link where it came from */
-    cptr = cptr->from;
-    ircstp->is_ckl++;
-    if ((int)DBufLength(&cptr->sendQ) > 65536) /* SendQ is already (too) high*/
+	/* changing cptr to get link where it came from */
+	cptr = cptr->from;
+	ircstp->is_ckl++;
+
+	/* SendQ is already (too) high */
+	if ((int)DBufLength(&cptr->sendQ) > 65536)
 	{
-	    cptr->serv->lastload = timeofday;
-	    ircstp->is_cklQ++;
-	    return -1;
+		cptr->serv->lastload = timeofday;
+		ircstp->is_cklQ++;
+		return -1;
 	}
-    if (timeofday - cptr->firsttime < 60) /* link is too young */
+	/* link is too young */
+	if (timeofday - cptr->firsttime < 60)
 	{
-	    ircstp->is_ckly++;
-	    return -1;
+		ircstp->is_ckly++;
+		return -1;
 	}
-    if (timeofday - cptr->serv->lastload > 30)
-	    /* last request more than 30 seconds ago => OK */
+	/* last request more than 30 seconds ago => OK */
+	if (timeofday - cptr->serv->lastload > 30)
 	{
-	    cptr->serv->lastload = timeofday;
-	    ircstp->is_cklok++;
-	    return 0;
+		cptr->serv->lastload = timeofday;
+		ircstp->is_cklok++;
+		return 0;
 	}
-    if (timeofday - cptr->serv->lastload > 15
-	&& (int)DBufLength(&cptr->sendQ) < CHREPLLEN)
-	    /* last request between 15 and 30 seconds ago, but little SendQ */
+	/* last request between 15 and 30 seconds ago, but little SendQ */
+	if (timeofday - cptr->serv->lastload > 15
+		&& (int)DBufLength(&cptr->sendQ) < CHREPLLEN)
 	{
-	    cptr->serv->lastload = timeofday;
-	    ircstp->is_cklq++;
-	    return 0;
+		cptr->serv->lastload = timeofday;
+		ircstp->is_cklq++;
+		return 0;
 	}
-    ircstp->is_cklno++;
-    return -1;
+	ircstp->is_cklno++;
+	return -1;
 }
 
 /*
