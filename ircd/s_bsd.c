@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.24 1998/03/26 13:59:24 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.25 1998/04/05 00:14:38 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1496,20 +1496,20 @@ Reg	aClient *cptr;
 		/*
 		** If it has become registered as a Service or Server
 		** then skip the per-message parsing below.
+		*/
 		if (IsService(cptr) || IsServer(cptr))
 		    {
 			dolen = dbuf_get(&cptr->recvQ, readbuf,
 					 sizeof(readbuf));
 			if (dolen <= 0)
 				break;
-			done = dopacket(cptr, readbuf, dolen);
-			if (done == 2 && cptr->since == cptr->lasttime)
+			dolen = dopacket(cptr, readbuf, dolen);
+			if (dolen == 2 && cptr->since == cptr->lasttime)
 				cptr->since += 5;
-			if (done)
-				return done;
+			if (dolen)
+				return dolen;
 			break;
 		    }
-clientsonly..			*/
 		dolen = dbuf_getmsg(&cptr->recvQ, readbuf,
 				    sizeof(readbuf));
 		/*

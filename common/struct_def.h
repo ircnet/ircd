@@ -157,6 +157,7 @@ typedef struct        MotdItem aMotd;
 #define	FLAGS_UNKCMD   0x200000	/* has sent an unknown command */
 #define	FLAGS_ZIP      0x400000 /* link is zipped */
 #define	FLAGS_ZIPRQ    0x800000 /* zip requested */
+#define	FLAGS_ZIPSTART 0x1000000 /* start of zip (ignore any CRLF) */
 
 #define	FLAGS_OPER       0x0001	/* Operator */
 #define	FLAGS_LOCOP      0x0002 /* Local operator -- SRB */
