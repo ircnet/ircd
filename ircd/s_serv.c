@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.245 2004/10/06 14:52:36 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.246 2004/10/06 20:11:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2169,12 +2169,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	case 'I' : case 'i' : /* I (and i) conf lines */
 		report_configured_links(cptr, parv[0], CONF_CLIENT);
 		break;
-#ifdef TKLINE
 	case 'k' : /* temporary K lines */
-		report_configured_links(cptr, parv[0],
-				(CONF_TKILL|CONF_TOTHERKILL));
-		break;
-#endif
 	case 'K' : /* K lines */
 #ifdef TXT_NOSTATSK
 		if (!IsAnOper(sptr))
@@ -2186,7 +2181,10 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		else
 #endif
 		report_configured_links(cptr, parv[0],
-					(CONF_KILL|CONF_OTHERKILL));
+#ifdef TKLINE
+			stat == 'k' ? (CONF_TKILL|CONF_TOTHERKILL) :
+#endif
+				(CONF_KILL|CONF_OTHERKILL));
 		break;
 	case 'M' : case 'm' : /* commands use/stats */
 		for (mptr = msgtab; mptr->cmd; mptr++)
