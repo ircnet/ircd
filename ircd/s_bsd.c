@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.132 2004/03/18 00:30:35 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.133 2004/03/18 00:54:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -410,7 +410,7 @@ int	unixport(aClient *cptr, char *path, int port)
 	(void)listen(cptr->fd, LISTENQUEUE);
 	(void)chmod(path, 0755);
 	(void)chmod(unixpath, 0777);
-	cptr->flags |= FLAGS_UNIX;
+	SetUnixSock(cptr);
 	cptr->port = 0;
 
 	return 0;
@@ -763,7 +763,9 @@ int	check_client(aClient *cptr)
 	if (check_init(cptr, sockname))
 		return -1;
 
+#ifdef UNIXPORT
 	if (!IsUnixSocket(cptr))
+#endif
 		hp = cptr->hostp;
 	/*
 	 * Verify that the host to ip mapping is correct both ways and that
@@ -888,7 +890,11 @@ int	check_server_init(aClient *cptr)
 	** real name, then check with it as the host. Use gethostbyname()
 	** to check for servername as hostname.
 	*/
-	if (!IsUnixSocket(cptr) && !cptr->hostp)
+	if (!cptr->hostp
+#ifdef UNIXPORT
+		&& !IsUnixSocket(cptr)
+#endif
+		)
 	    {
 		Reg	aConfItem *aconf;
 
@@ -1056,14 +1062,23 @@ check_serverback:
 		return -2;
 	}
 
+	if (
 #ifdef INET6
-	if ((AND16(c_conf->ipnum.s6_addr) == 255) && !IsUnixSocket(cptr))
+		AND16(c_conf->ipnum.s6_addr) == 255
 #else
-	if ((c_conf->ipnum.s_addr == -1) && !IsUnixSocket(cptr))
+		c_conf->ipnum.s_addr == -1
 #endif
+#ifdef UNIXPORT
+		&& !IsUnixSocket(cptr)
+#endif
+		)
+	{
 		bcopy((char *)&cptr->ip, (char *)&c_conf->ipnum,
 			sizeof(struct IN_ADDR));
+	}
+#ifdef UNIXPORT
 	if (!IsUnixSocket(cptr))
+#endif
 		get_sockhost(cptr, c_conf->host);
 
 	Debug((DEBUG_DNS,"sv_cl: access ok: %s[%s]",
@@ -1323,7 +1338,11 @@ static	int	set_sock_opts(int fd, aClient *cptr)
 	 * Method borrowed from Wietse Venema's TCP wrapper.
 	 */
 	{
-	    if (!IsUnixSocket(cptr) && !IsListening(cptr))
+	    if (!IsListening(cptr)
+#ifdef UNIXPORT
+		&& !IsUnixSocket(cptr)
+#endif
+		)
 		{
 		    u_char	opbuf[256], *t = opbuf;
 		    char	*s = readbuf;

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.68 2004/03/07 02:47:50 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.69 2004/03/18 00:54:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -468,9 +468,11 @@ static	int	vsendpreprep(aClient *to, aClient *from, char *pattern, va_list va)
 			if (!flag && MyConnect(from) && *user->host)
 			    {
 				(void)strcat(psendbuf, "@");
+#ifdef UNIXPORT
 				if (IsUnixSocket(from))
 				    (void)strcat(psendbuf, user->host);
 				else
+#endif
 				    (void)strcat(psendbuf, from->sockhost);
 			    }
 		    }

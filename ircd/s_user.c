@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.196 2004/03/11 02:38:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.197 2004/03/18 00:54:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -555,11 +555,13 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #endif
 
 		aconf = sptr->confs->value.aconf;
+#ifdef UNIXPORT
 		if (IsUnixSocket(sptr))
 		{
 			strncpyzt(user->host, me.sockhost, HOSTLEN+1);
 		}
 		else
+#endif
 		{
 			if (IsConfNoResolveMatch(aconf))
 			{
@@ -2636,9 +2638,11 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		**	...!operhost!oper
 		**	...!operhost!oper (comment)
 		*/
+#ifdef UNIXPORT
 		if (IsUnixSocket(cptr)) /* Don't use get_client_name syntax */
 			inpath = ME;
 		else
+#endif
 			inpath = cptr->sockhost;
 		if (!BadPtr(path))
 		    {
@@ -3042,7 +3046,10 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		syslog(LOG_INFO, "%sOPER (%s) by (%s!%s@%s) [%s@%s]",
 			logstring,
 			name, parv[0], sptr->user->username, sptr->user->host,
-		       sptr->auth, IsUnixSocket(sptr) ? sptr->sockhost :
+			sptr->auth,
+#ifdef UNIXPORT
+			IsUnixSocket(sptr) ? sptr->sockhost :
+#endif
 #ifdef INET6
                        inet_ntop(AF_INET6, (char *)&sptr->ip, mydummy,
 			       MYDUMMY_SIZE)
@@ -3076,7 +3083,9 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				name, parv[0],
 				sptr->user->username, sptr->user->host,
 				sptr->auth,
+#ifdef UNIXPORT
 				IsUnixSocket(sptr) ? sptr->sockhost :
+#endif
 #ifdef INET6
 				inetntop(AF_INET6, (char *)&sptr->ip,
 					mydummy, MYDUMMY_SIZE)

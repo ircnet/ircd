@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.78 2004/03/18 00:31:51 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.79 2004/03/18 00:54:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -233,9 +233,11 @@ char	*get_client_host(aClient *cptr)
 		return cptr->name;
 	if (!cptr->hostp)
 		return get_client_name(cptr, FALSE);
+#ifdef UNIXPORT
 	if (IsUnixSocket(cptr))
 		sprintf(nbuf, "%s[%s]", cptr->name, ME);
 	else
+#endif
 		(void)sprintf(nbuf, "%s[%-.*s@%-.*s]",
 			cptr->name, USERLEN,
 			(!(cptr->flags & FLAGS_GOTID)) ? "" : cptr->auth,
@@ -478,7 +480,9 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 			sendto_flog(sptr, sptr->exitc,
 				    sptr->user && sptr->user->username ?
 				    sptr->user->username : "",
+#ifdef UNIXPORT
 				    (IsUnixSocket(sptr)) ? me.sockhost :
+#endif
 				    ((sptr->hostp) ? sptr->hostp->h_name :
 				     sptr->sockhost));
 # endif

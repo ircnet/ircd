@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.91 2004/03/14 17:45:59 chopin Exp $
+ *   $Id: struct_def.h,v 1.92 2004/03/18 00:54:45 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -143,7 +143,9 @@ typedef struct        LineItem aExtData;
 #define	FLAGS_DEADSOCK	0x0000002 /* Local socket is dead--Exiting soon */
 #define	FLAGS_KILLED	0x0000004 /* Prevents "QUIT" from being sent for this */
 #define	FLAGS_BLOCKED	0x0000008 /* socket is in blocked condition [unused] */
+#ifdef UNIXPORT
 #define	FLAGS_UNIX	0x0000010 /* socket is in the unix domain, not inet */
+#endif
 #define	FLAGS_CLOSING	0x0000020 /* set when closing to suppress errors */
 #define	FLAGS_LISTEN	0x0000040 /* used to mark clients which we listen() on */
 #define	FLAGS_XAUTHDONE	0x0000080 /* iauth is finished with this client */
@@ -194,7 +196,9 @@ typedef struct        LineItem aExtData;
 #define	IsPerson(x)		((x)->user && IsClient(x))
 #define	IsPrivileged(x)		(IsServer(x) || IsAnOper(x))
 #define	SendWallops(x)		((x)->user->flags & FLAGS_WALLOP)
+#ifdef UNIXPORT
 #define	IsUnixSocket(x)		((x)->flags & FLAGS_UNIX)
+#endif
 #define	IsListening(x)		((x)->flags & FLAGS_LISTEN)
 #define	IsLocal(x)		(MyConnect(x) && (x)->flags & FLAGS_LOCAL)
 #define	IsDead(x)		((x)->flags & FLAGS_DEADSOCK)
@@ -208,7 +212,9 @@ typedef struct        LineItem aExtData;
 #define	SetInvisible(x)		((x)->user->flags |= FLAGS_INVISIBLE)
 #define SetRestricted(x)	((x)->user->flags |= FLAGS_RESTRICT)
 #define	SetWallops(x)		((x)->user->flags |= FLAGS_WALLOP)
+#ifdef UNIXPORT
 #define	SetUnixSock(x)		((x)->flags |= FLAGS_UNIX)
+#endif
 #define	SetDNS(x)		((x)->flags |= FLAGS_DOINGDNS)
 #define	SetDoneXAuth(x)		((x)->flags |= FLAGS_XAUTHDONE)
 #define	SetEOB(x)		((x)->flags |= FLAGS_EOB)
@@ -327,6 +333,7 @@ struct	ListItem	{
 #define CFLAG_NORESOLVE		0x00010
 #define CFLAG_FALL		0x00020
 #define CFLAG_NORESOLVEMATCH	0x00040
+#define CFLAG_SERVERNAME	0x00080
 
 #define IsConfRestricted(x)	((x)->flags & CFLAG_RESTRICTED)
 #define IsConfRNoDNS(x)		((x)->flags & CFLAG_RNODNS)
@@ -335,6 +342,7 @@ struct	ListItem	{
 #define IsConfNoResolve(x)	((x)->flags & CFLAG_NORESOLVE)
 #define IsConfNoResolveMatch(x)	((x)->flags & CFLAG_NORESOLVEMATCH)
 #define IsConfFallThrough(x)	((x)->flags & CFLAG_FALL)
+#define IsConfServerName(x)	((x)->flags & CFLAG_SERVERNAME)
 
 #define	IsIllegal(x)	((x)->status & CONF_ILLEGAL)
 
