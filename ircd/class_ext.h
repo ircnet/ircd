@@ -39,7 +39,8 @@ EXTERN int get_client_class __P((aClient *acptr));
 EXTERN int get_client_ping __P((aClient *acptr));
 EXTERN int get_con_freq __P((aClass *clptr));
 EXTERN void add_class __P((int class, int ping, int confreq, int maxli,
-			   long sendq, int local, int global));
+			   long sendq, int hlocal, int uhlocal,
+			   int hglobal, int uhglobal));
 EXTERN aClass *find_class __P((int cclass));
 EXTERN void check_class();
 EXTERN void initclass();

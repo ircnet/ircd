@@ -23,8 +23,10 @@ typedef struct Class {
 	int	pingFreq;
 	int	maxLinks;
 	long	maxSendq;
-	int	maxLocal;
-	int	maxGlobal;
+	int	maxHLocal;
+	int	maxUHLocal;
+	int	maxHGlobal;
+	int	maxUHGlobal;
 	int	links;
 	struct Class *next;
 } aClass;
@@ -34,8 +36,10 @@ typedef struct Class {
 #define	PingFreq(x)	((x)->pingFreq)
 #define	MaxLinks(x)	((x)->maxLinks)
 #define	MaxSendq(x)	((x)->maxSendq)
-#define	MaxLocal(x)	((x)->maxLocal)
-#define	MaxGlobal(x)	((x)->maxGlobal)
+#define	MaxHLocal(x)	((x)->maxHLocal)
+#define	MaxUHLocal(x)	((x)->maxUHLocal)
+#define	MaxHGlobal(x)	((x)->maxHGlobal)
+#define	MaxUHGlobal(x)	((x)->maxUHGlobal)
 #define	Links(x)	((x)->links)
 #define	IncSendq(x)	MaxSendq(x) = (int)((float)MaxSendq(x) * 1.1)
 
@@ -45,8 +49,10 @@ typedef struct Class {
 #define	ConfConFreq(x)	(Class(x)->conFreq)
 #define	ConfPingFreq(x)	(Class(x)->pingFreq)
 #define	ConfSendq(x)	(Class(x)->maxSendq)
-#define	ConfMaxLocal(x)	(Class(x)->maxLocal)
-#define	ConfMaxGlobal(x)	(Class(x)->maxGlobal)
+#define	ConfMaxHLocal(x)	(Class(x)->maxHLocal)
+#define	ConfMaxUHLocal(x)	(Class(x)->maxUHLocal)
+#define	ConfMaxHGlobal(x)	(Class(x)->maxHGlobal)
+#define	ConfMaxUHGlobal(x)	(Class(x)->maxUHGlobal)
 
 #define	FirstClass() 	classes
 #define	NextClass(x)	((x)->next)

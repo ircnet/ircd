@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.16 1997/09/12 02:09:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.17 1997/09/23 20:47:57 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -262,25 +262,9 @@ aClient *cptr;
 		**	host check is done on the IP address.
 		**	user check is done on the IDENT reply.
 		*/
-		if (ConfMaxLocal(aconf) > 0) {
-			/* special limit per host */
-			Reg	aClient	*acptr;
-			Reg	int	i, cnt = 0;
-			int	sz = sizeof(cptr->ip);
-
-			for (i = highest_fd; i >= 0; i--)
-				if ((acptr = local[i]) && (cptr != acptr) &&
-				    !bcmp((char *)&cptr->ip,
-					  (char *)&acptr->ip, sz))
-					cnt++;
-			if (cnt >= ConfMaxLocal(aconf))
-				return -4;	/* for error message */
-			hcnt = cnt;
-		    }
-		else if (ConfMaxLocal(aconf) < 0) {
-			/** special limit per user@host */
+		if (ConfMaxHLocal(aconf) > 0 || ConfMaxUHLocal(aconf) > 0) {
 			Reg     aClient *acptr;
-			Reg     int     i, cnt = 0;
+			Reg     int     i;
 			int	sz = sizeof(cptr->ip);
 
 			for (i = highest_fd; i >= 0; i--)
@@ -291,50 +275,40 @@ aClient *cptr;
 					hcnt++;
 					if (!strncasecmp(acptr->auth,
 							 cptr->auth, USERLEN))
-						cnt--;
+						ucnt++;
 				    }
-			if (cnt <= ConfMaxLocal(aconf))
+			if (hcnt >= ConfMaxHLocal(aconf))
+				return -4;	/* for error message */
+			if (ucnt >= ConfMaxUHLocal(aconf))
 				return -5;      /* for error message */
-			ucnt = cnt;
 		}
 		/*
 		** Global limits
 		**	host check is done on the hostname (IP if unresolved)
 		**	user check is done on username
 		*/
-		if (ConfMaxGlobal(aconf) > 0) {
-			/* special limit per host */
-			Reg	aClient	*acptr;
-			Reg	int	cnt = hcnt;
+		if (ConfMaxHGlobal(aconf) > 0 || ConfMaxUHGlobal(aconf) > 0)
+		    {
+			Reg     aClient *acptr;
+			Reg     int     ghcnt = hcnt, gucnt = ucnt;
 
 			for (acptr = client; acptr; acptr = acptr->next)
 			    {
 				if (!IsPerson(acptr))
 					continue;
-				if (MyConnect(acptr) && ConfMaxLocal(aconf)==0)
+				if (MyConnect(acptr) &&
+				    (ConfMaxHLocal(aconf) > 0 ||
+				     ConfMaxUHLocal(aconf) > 0))
 					continue;
 				if (!strcmp(cptr->sockhost, acptr->user->host))
-					if (++cnt >= ConfMaxGlobal(aconf))
+				    {
+					if (++ghcnt >= ConfMaxUHGlobal(aconf))
 						return -6;
-			    }
-		    }
-		else if (ConfMaxGlobal(aconf) < 0)
-		    {
-			/** special limit per user@host */
-			Reg     aClient *acptr;
-			Reg     int     cnt = ucnt;
-
-			for (acptr = client; acptr; acptr = acptr->next)
-			    {
-				if (!IsPerson(acptr))
-					continue;
-				if (MyConnect(acptr) && ConfMaxLocal(aconf)>=0)
-					continue;
-				if (!strcmp(cptr->sockhost, acptr->user->host)
-				    && !strcmp(cptr->user->username,
-					       acptr->user->username))
-					if (--cnt <= ConfMaxGlobal(aconf))
+					if (!strcmp(cptr->user->username,
+						    acptr->user->username) &&
+					    (++gucnt >=ConfMaxUHGlobal(aconf)))
 						return -7;
+				    }
 			    }
 		    }
 	    }
@@ -792,7 +766,7 @@ int	opt;
 					{'\\', '\\'}, { 0, 0}};
 	Reg	char	*tmp, *s;
 	int	fd, i;
-	char	line[512], c[80], *tmp2 = NULL, *tmp3 = NULL;
+	char	line[512], c[80], *tmp2 = NULL, *tmp3 = NULL, *tmp4 = NULL;
 	int	ccount = 0, ncount = 0;
 	aConfItem *aconf = NULL;
 
@@ -858,9 +832,7 @@ int	opt;
 
 		if (tmp2)
 			MyFree(tmp2);
-		if (tmp3)
-			MyFree(tmp3);
-		tmp2 = tmp3 = NULL;
+		tmp3 = tmp4 = NULL;
 		tmp = getfield(line);
 		if (!tmp)
 			continue;
@@ -986,9 +958,9 @@ int	opt;
 				break;
 			Class(aconf) = find_class(atoi(tmp));
 			/* the following are only used for Y: */
-			if ((tmp2 = getfield(NULL)) == NULL)
+			if ((tmp3 = getfield(NULL)) == NULL)
 				break;
-			tmp3 = getfield(NULL);
+			tmp4 = getfield(NULL);
 			break;
 		    }
 		istat.is_confmem += aconf->host ? strlen(aconf->host)+1 : 0;
@@ -1011,13 +983,20 @@ int	opt;
 					  atoi(aconf->passwd),
 					  atoi(aconf->name), aconf->port,
 					  tmp ? atoi(tmp) : 0,
-/*					  tmp2 ? atoi(tmp2) : 0,
-** the next line should be replaced by the previous sometime in the
+/*					  tmp3 ? atoi(tmp3) : 0,
+**					  tmp3 && index(tmp3, '.') ?
+**					  atoi(index(tmp3, '.') + 1) : 0,
+** the next 3 lines should be replaced by the previous sometime in the
 ** future.  It is only kept for "backward" compatibility and not needed,
 ** but I'm in good mood today -krys
 */
-					  tmp2 ? atoi(tmp2) :atoi(aconf->name),
-					  tmp3 ? atoi(tmp3) : 0);
+					  tmp3 ? atoi(tmp3) : (atoi(aconf->name) > 0) ? atoi(aconf->name) : 0,
+					  tmp3 && index(tmp3, '.') ?
+					  atoi(index(tmp3, '.') + 1) : (atoi(aconf->name) < 0) ? -1 * atoi(aconf->name) : 0,
+/* end of backward compatibility insanity */
+ 					  tmp4 ? atoi(tmp4) : 0,
+					  tmp4 && index(tmp4, '.') ?
+					  atoi(index(tmp4, '.') + 1) : 0);
 			continue;
 		    }
 		/*
