@@ -438,12 +438,12 @@
 #define WRITEWAITDELAY     15	/* Recommended value: 15 */
 
 /*
- * Number of seconds to wait for a connect(2) call to complete.
- * NOTE: this must be at *LEAST* 10.  When a client connects, it has
- * CONNECTTIMEOUT - 10 seconds for its host to respond to an ident lookup
- * query and for a DNS answer to be retrieved.
+ * Number of seconds to wait for DNS/authentication to complete.
+ * Note that iauth's default timeout per module is 30 seconds, so this value
+ * should be at least 30 * number of modules.  Extra time should really be
+ * given to be safe.
  */
-#define	CONNECTTIMEOUT	30	/* Recommended value: 30 */
+#define	ACCEPTTIMEOUT      90	/* Recommended value: 90 */
 
 /*
  * Max time from the nickname change that still causes KILL
