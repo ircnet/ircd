@@ -120,9 +120,6 @@ Tom Hopkins <hoppie@buengf.bu.edu> / September, October 1990:
   always works on code, so he has to have done alot more than three
   lines worth. :) 
 
-Thanks go to those persons not mentioned here who have added their advice,
-opinions, and code to IRC.
-
 Various modifications, bugreports, cleanups and testing by:
 
 Hugo Calendar <hugo@ucscb.ucsc.edu>
@@ -138,14 +135,30 @@ Eric P. Scott <eps@toaster.sfsu.edu>
 Dan Goodwin <fornax@wpi.wpi.edu>
 Noah Friedman <friedman@ai.mit.edu>
 
+The 2.9 release brought many improvements to the protocol: adaptive growth
+of sendq, hash tables, whowas table, extended NICK syntax, server tokens,
+extended JOIN syntax, restricted usermode, nick and channel delay,
+suppression of server-server QUITs during splits, suppression of usermode s..
+
 Contributions for the 2.9 release from the following people:
-Christophe Kalt <kalt@stealth.net>
-Vesa Ruokonen <ruokonen@lut.fi>
+Vesa Ruokonen <ruokonen@lut.fi>: V configuration lines, many bug fixes.
+Christophe Kalt <kalt@stealth.net>: nick and channel delay, suppressed QUITs
+during netsplits, many bug fixes.
+
+The versions 2.9.3, 2.9.4, 2.9.5 releases were coordinated by Christophe Kalt.
+
+Christophe Kalt <kalt@stealth.net>: server link compression using zlib, added
+B configuration lines, extended IP bans and K lines to work on resolved hosts,
+finished service code, virtual IP support.
 
 Various modifications, bugreports, cleanups and testing by:
 
 Chris Behrens <cbehrens@concentric.net>
-Olivier Galibert <Olivier.Galibert@mines.u-nancy.fr>
-Alain Nissen <Alain.Nissen@ulg.ac.be>
 Helmut Springer <delta@RUS.Uni-Stuttgart.DE>
 Magnus Tjernstrom <d92-mtm@oook.campus.luth.se>
+Olivier Galibert <Olivier.Galibert@mines.u-nancy.fr>: service code testing
+Alain Nissen <Alain.Nissen@ulg.ac.be>: source tree restructuration, many
+portability issues, new configure.in
+
+Thanks go to those persons not mentioned here who have added their advice,
+opinions, and code to IRC.
