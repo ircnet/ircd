@@ -16,12 +16,13 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# $Id: buildm4,v 1.2 1997/04/14 15:04:14 kalt Exp $
+# $Id: buildm4,v 1.3 1997/07/08 12:28:06 kalt Exp $
 #
 
 #
 # If only this was a perl script...*sigh*
 #
+INCLUDE=`../support/rev.sh`
 IRCDDIR=$1
 M4=$IRCDDIR/ircd.m4
 /bin/rm -f $M4
@@ -33,23 +34,28 @@ if [ -n "$DEBUG" ] ; then
 else
 	echo "undefine(DEBUGMODE)" >>$M4
 fi
-echo -n "define(HOSTNAME," >> $M4
-echo "`hostname`" | sed -e 's/\([a-zA-Z0-9\-]*\).*/\1)/' >> $M4
+HOST="`hostname | sed -e 's/\([a-zA-Z0-9\-]*\).*/\1/'`"
+echo "define(HOSTNAME,$HOST)" >> $M4
+
 echo "define(USER,$USER)" >>$M4
-echo -n 'define(PORT,' >>$M4
-PORT=`egrep '^#define[ 	]*PORT[ 	]*[0-9]*' config.h`
-echo "$PORT" | sed -e 's/[^0-9]*\([0-9]*\).*/\1)/' >> $M4
-echo -n 'define(PFREQ,' >>$M4
-PING=`egrep '^#define[ 	]*PINGFREQUENCY[ 	]*[0-9]*' config.h`
-echo "$PING" | sed -e 's/[^0-9]*\([0-9]*\).*/\1)/' >> $M4
-echo -n 'define(CFREQ,' >>$M4
-CONT=`egrep '^#define[ 	]*CONNECTFREQUENCY[ 	]*[0-9]*' config.h`
-echo "$CONT" | sed -e 's/[^0-9]*\([0-9]*\).*/\1)/' >> $M4
-echo -n "define(MAXLINKS," >>$M4
-MAXL=`egrep '^#define[ 	]*MAXIMUM_LINKS[ 	]*[0-9]* | head -1' config.h`
-echo "$MAXL" | sed -e 's/[^0-9]*\([0-9]*\).*/\1)/' >> $M4
+
+PORT=`egrep '^#define[ 	]*PORT[ 	]*[0-9]*' ../$INCLUDE/config.h | \
+	sed -e 's/[^0-9]*\([0-9]*\).*/\1/'`
+echo "define(PORT,$PORT)" >> $M4
+
+PING=`egrep '^#define[ 	]*PINGFREQUENCY[ 	]*[0-9]*' ../$INCLUDE/config.h\
+	| sed -e 's/[^0-9]*\([0-9]*\).*/\1/`
+echo "define(PFREQ,$PING)" >> $M4
+
+CONT=`egrep '^#define[ 	]*CONNECTFREQUENCY[ 	]*[0-9]*' ../$INCLUDE/config.h\
+	| sed -e 's/[^0-9]*\([0-9]*\).*/\1/'`
+echo "define(CFREQ,$CONT)" >> $M4
+
+MAXL=`egrep '^#define[ 	]*MAXIMUM_LINKS[ 	]*[0-9]* | head -1' ../$INCLUDE/config.h | sed -e 's/[^0-9]*\([0-9]*\).*/\1/'`
+echo "define(MAXLINKS,$MAXL)" >> $M4
+
 DOM=`egrep '^domain' /etc/resolv.conf | \
-sed -e 's/^domain[ 	]*\([a-zA-Z\-\.0-9]*\).*/\1/'`
+	sed -e 's/^domain[ 	]*\([^	 ]*\).*/\1/'`
 echo "define(DOMAIN,$DOM)" >> $M4
 
 cat >>$M4 <<_EOF_
