@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.83 2004/03/24 09:44:05 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.84 2004/04/13 16:31:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -985,7 +985,7 @@ void	initstats(void)
 {
 	bzero((char *)&istat, sizeof(istat));
 	istat.is_serv = 1;
-	istat.is_remc = 1;	/* don't ask me why, I forgot. */
+	istat.is_localc = 1;	/* me */
 	istat.is_m_users_t = timeofday;
 	istat.is_m_myclnt_t = timeofday;
 	istat.is_l_myclnt_t = timeofday;
