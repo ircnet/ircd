@@ -1,3 +1,17 @@
+Sat Oct 10 18:55:38 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* a_io.c: don't TST_* if cldata[i].?fd <= 0 in loop_io().
+
+	* ircd.s, s_auth.c, s_bsd.c, s_bsd_ext.h: always attempt to
+	restart iauth in start_iauth() after receiving a SIGUSR1.
+
+	* s_service.c: reverted part of last change.
+
+	* s_user.c: last change introduced a bug. (typo, reported by N. Aust)
+
+	* channel.c: fixed match_modeid() to handle remote clients
+	properly now that it's used from can_send().	
+
 Thu Oct  8 18:33:50 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* configure.in: always compile with -g flag, and never strip.
