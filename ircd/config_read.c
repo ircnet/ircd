@@ -7,12 +7,23 @@
 #define FILEMAX 255
 
 /* max nesting depth. ircd.conf itself is depth = 0 */
-#define MAXDEPTH 3
+#define MAXDEPTH 13
+
+typedef struct File aFile;
+struct File
+{
+	char *filename;
+	int includeline;
+	aFile *parent;
+	aFile *next;
+};
 
 typedef struct Config aConfig;
 struct Config
 {
 	char *line;
+	int linenum;
+	aFile *file;
 	aConfig *next;
 };
 
@@ -23,7 +34,8 @@ static void	config_free(aConfig *);
 #else
 #define STACKTYPE char
 #endif
-void           config_error(int, STACKTYPE *, int, char *, ...);
+void	config_error(int, STACKTYPE *, int, char *, ...);
+aFile	*new_config_file(char *, aFile *, int);
 
 
 #ifdef CONFIG_DIRECTIVE_INCLUDE
@@ -196,6 +208,32 @@ void config_free(aConfig *cnf)
 		MyFree(p->line);
 		MyFree(p);
 	}
+}
+
+aFile *new_config_file(char *filename, aFile *parent, int fnr)
+{
+	aFile *tmp = (aFile *) malloc(sizeof(aFile));
+
+	tmp->filename = strdup(filename);
+	tmp->includeline = fnr;
+	tmp->parent = parent;
+	tmp->next = NULL;
+
+	/* First get to the root of the file tree */
+	while (parent && parent->parent)
+	{
+		parent = parent->parent;
+	}
+	/* Then go to the end to add a new one */
+	while (parent && parent->next)
+	{
+		parent = parent->next;
+	}
+        if (parent)
+        {
+		parent->next = tmp;
+        }
+        return tmp;
 }
 #endif /* CONFIG_DIRECTIVE_INCLUDE */
 
