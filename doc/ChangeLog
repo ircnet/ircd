@@ -6,6 +6,8 @@
 	  before USER (with help from fiction).
 	* s_user.c/register_user(): add_to_client_hash_table() when registering
 	  after "NICK 0".
+	* struct_def.h, s_misc.c, s_user.c: is_save statistics.
+	* channel.c/send_channel_members(): SID as source if ST_UID server.
 
 2004-02-27  Piotr Kucharski
 
