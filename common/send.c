@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.5 1997/04/18 14:31:00 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.6 1997/04/24 21:16:44 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -651,24 +651,76 @@ char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 {
 	Reg	int	i;
 	Reg	aClient *cptr;
-	Reg	Link	*lp;
+	Reg	Link	*channels, *lp;
 	int	len = 0;
 
-	if (MyConnect(user))
+/*      This is kind of funky, but should work.  The first part below
+	is optimized for HUB servers or servers with few clients on
+	them.  The second part is optimized for bigger client servers
+	where looping through the whole client list is bad.  I'm not
+	really certain of the point at which each function equals
+	out...but I do know the 2nd part will help big client servers
+	fairly well... - Comstud 97/04/24
+*/
+     
+	if (highest_fd < 50) /* This part optimized for HUB servers... */
 	    {
-		len = sendpreprep(user, user, pattern,
+		if (MyConnect(user))
+		    {
+			len = sendpreprep(user, user, pattern,
 				  p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,p11);
-		(void)send_message(user, psendbuf, len);
+			(void)send_message(user, psendbuf, len);
+		    }
+		for (i = 0; i <= highest_fd; i++)
+		    {
+			if (!(cptr = local[i]) || IsServer(cptr) ||
+			    user == cptr || !user->user)
+				continue;
+			for (lp = user->user->channel; lp; lp = lp->next)
+				if (IsMember(cptr, lp->value.chptr) &&
+				    !IsQuiet(lp->value.chptr))
+				    {
+#ifndef DEBUGMODE
+					if (!len) /* This saves little cpu,
+						     but breaks the debug code.. */
+#endif
+						len = sendpreprep(cptr, user,
+								  pattern,
+							  p1, p2, p3, p4, p5,
+						  p6, p7, p8, p9, p10, p11);
+					(void)send_message(cptr, psendbuf,
+							   len);
+					break;
+				    }
+		    }
 	    }
-	for (i = 0; i <= highest_fd; i++)
+	else
 	    {
-		if (!(cptr = local[i]) || IsServer(cptr) ||
-		    user == cptr || !user->user)
-			continue;
-		for (lp = user->user->channel; lp; lp = lp->next)
-			if (IsMember(cptr, lp->value.chptr) &&
-			    !IsQuiet(lp->value.chptr))
+		/* This part optimized for client servers */
+		bzero((char *)&sentalong[0], sizeof(int) * MAXCONNECTIONS);
+		if (MyConnect(user))
+		    {
+			len = sendpreprep(user, user, pattern, p1, p2, p3, p4,
+					  p5, p6, p7, p8, p9, p10, p11);
+			(void)send_message(user, psendbuf, len);
+			sentalong[user->fd] = 1;
+		    }
+		if (!user->user)
+			return;
+		for (channels=user->user->channel; channels;
+		     channels=channels->next)
+		    {
+			if (IsQuiet(channels->value.chptr))
+				continue;
+			for (lp=channels->value.chptr->members;lp;
+			     user=user->next)
 			    {
+				cptr = lp->value.cptr;
+				if (user == cptr)
+					continue;
+				if (!MyConnect(cptr) || sentalong[cptr->fd])
+					continue;
+				sentalong[cptr->fd]++;
 #ifndef DEBUGMODE
 				if (!len) /* This saves little cpu,
 					     but breaks the debug code.. */
@@ -680,6 +732,7 @@ char	*pattern, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10, *p11;
 				(void)send_message(cptr, psendbuf, len);
 				break;
 			    }
+		    }
 	    }
 	return;
 }
