@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.34 2002/01/06 05:55:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.35 2002/03/24 19:56:33 jv Exp $";
 #endif
 
 #include "os.h"
@@ -195,7 +195,7 @@ int	wants;
 			   (wants & SERVICE_WANT_USER) ?
 			   ((wants & SERVICE_WANT_TOKEN) ?
 			    sptr->user->servp->tok : sptr->user->server) : ".",
-			   (wants & SERVICE_WANT_UMODE) ? umode : "+",
+			   (wants & SERVICE_WANT_UMODE | SERVICE_WANT_OPER) ? umode : "+",
 			   (wants & SERVICE_WANT_USER) ? sptr->info : "");
 	else
 		/* old style NICK + USER + UMODE */
