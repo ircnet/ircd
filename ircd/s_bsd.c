@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.125 2004/03/10 18:41:29 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.126 2004/03/10 19:37:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2349,11 +2349,12 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 		    }
 	    }
 	cptr = make_client(NULL);
-	if (!make_server(cptr))
+	if ((make_server(cptr))==NULL)
 	{
 		free_client(cptr);
 		return -1;
 	}
+	add_client_to_list(cptr);
 	cptr->hostp = hp;
 	/*
 	 * Copy these in so we have something for error detection.
@@ -2370,12 +2371,12 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 
 	if (!svp)
 	    {
-		if (cptr->fd != -1)
+free_server:
+		if (cptr->fd >= 0)
 			(void)close(cptr->fd);
 		cptr->fd = -2;
 		cptr->serv->bcptr = NULL;
-		free_server(cptr->serv, cptr);
-		free_client(cptr);
+		remove_client_from_list(cptr);
 		return -1;
 	    }
 
@@ -2392,15 +2393,10 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 		  sendto_one(by,
 			     ":%s NOTICE %s :Connect to host %s failed.",
 			     ME, by->name, cptr);
-		(void)close(cptr->fd);
-		cptr->fd = -2;
-		cptr->serv->bcptr = NULL;
-		free_server(cptr->serv, cptr);
-		free_client(cptr);
 		errno = i;
 		if (errno == EINTR)
 			errno = ETIMEDOUT;
-		return -1;
+		goto free_server;
 	    }
 	(void)alarm(0);
 
@@ -2424,12 +2420,7 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 			     ":%s NOTICE %s :Connect to host %s failed.",
 			     ME, by->name, cptr);
 		det_confs_butmask(cptr, 0);
-		(void)close(cptr->fd);
-		cptr->fd = -2;
-		cptr->serv->bcptr = NULL;
-		free_server(cptr->serv, cptr);
-		free_client(cptr);
-		return(-1);
+		goto free_server;
 	    }
 	/*
 	** The socket has been connected or connect is in progress.
@@ -2457,7 +2448,6 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 	SetConnecting(cptr);
 
 	get_sockhost(cptr, aconf->host);
-	add_client_to_list(cptr);
 	nextping = timeofday;
 	istat.is_unknown++;
 
