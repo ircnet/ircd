@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.108 2004/05/07 19:29:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.109 2004/06/18 23:46:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -62,17 +62,8 @@ static	int	check_time_interval (char *, char *);
 #endif
 static	int	lookup_confhost (aConfItem *);
 
-#if defined(CONFIG_DIRECTIVE_INCLUDE)
-
-typedef struct Config aConfig;
-struct Config
-{
-	char *line;
-	aConfig *next;
-};
-
-void config_file(char *, char *, char *);
-aConfig *config_read(int, int);
+#ifdef CONFIG_DIRECTIVE_INCLUDE
+#include "config_read.c"
 #endif
 
 aConfItem	*conf = NULL;
@@ -1642,14 +1633,7 @@ int 	initconf(int opt)
 		aconf = NULL;
 	}
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
-	/* config_read() alloc()s, free now (no longer needed) */
-	while (ConfigTop)
-	{
-		p = ConfigTop;
-		ConfigTop = ConfigTop->next;
-		MyFree(p->line);
-		MyFree(p);
-	}
+	config_free(ConfigTop);
 #endif
 	if (aconf)
 		free_conf(aconf);
@@ -2090,148 +2074,3 @@ aConfItem	*find_denied(char *name, int class)
     return NULL;
 }
 
-#ifdef CONFIG_DIRECTIVE_INCLUDE
-
-/* max file length */
-#define FILEMAX 255
-
-/* max nesting depth. ircd.conf itself is depth = 0 */
-#define MAXDEPTH 3
-
-/* 
-** syntax of include is simple:
-** #include "filename"
-** #include <filename>
-** # must be first char on the line and " or > the last
-** if filename in <>, it's loaded from dir where IRCDCONF_PATH is.
-*/
-
-/* read from supplied fd, putting line by line onto aConfig struct.
-** calls itself recursively for each #include directive */
-aConfig *config_read(int fd, int depth)
-{
-	int len;
-	struct stat fst;
-	char *i, *address;
-	aConfig *ConfigTop = NULL;
-	aConfig *ConfigCur = NULL;
-
-	fstat(fd, &fst);
-	len = fst.st_size;
-	if ((address = mmap(NULL, len, PROT_READ, MAP_SHARED, fd, 0))
-		== MAP_FAILED)
-	{
-		sendto_flag(SCH_ERROR, "mmap failed reading config");
-		return NULL;
-	}
-
-	i = address;
-	while (i < address + len)
-	{
-		char *p;
-		aConfig	*new;
-		int linelen;
-
-		/* eat empty lines first */
-		while (*i == '\n' || *i == '\r')
-		{
-			i++;
-		}
-		p = strchr(i, '\n');
-		if (p == NULL)
-		{
-			/* EOF without \n, I presume */
-			p = address + len;
-		}
-
-		if (*i == '#')
-		{
-			char	*start = i + 9, *end = p;
-			int	dont = 0;
-
-			end--;			/* eat last \n */
-			if (*end == '\r')
-				end--;		/* ... and \r, if is */
-
-			if (((*start == '<' && *end == '>') ||
-				(*start == '"' && *end == '"'))
-				&& strncasecmp(i, "#include ", 9) == 0)
-			{
-				char	file[FILEMAX + 1];
-				char	*filep = file;
-				aConfig	*ret;
-
-				*filep = '\0';
-				if (depth >= MAXDEPTH)
-				{
-					sendto_flag(SCH_ERROR,
-						"config: too nested (%d)",
-						depth);
-					dont = 1;
-				}
-				if (*start == '<')
-				{
-					strcat(file, IRCDCONF_PATH);
-					filep = strrchr(file, '/') + 1;
-					*filep = '\0';
-				}
-				if (end - start + filep - file >= FILEMAX)
-				{
-					sendto_flag(SCH_ERROR, "config: too "
-						"long filename to process");
-					dont = 1;
-				}
-				start++;
-				memcpy(filep, start, end - start);
-				filep += end - start;
-				*filep = '\0';
-				if ((fd = open(file, O_RDONLY)) < 0)
-				{
-					sendto_flag(SCH_ERROR,
-						"config: error opening %s "
-						"(depth=%d)", file, depth);
-					dont = 1;
-				}
-				if (dont == 0)
-				{
-					ret = config_read(fd, depth + 1);
-					close(fd);
-					if (ConfigCur)
-						ConfigCur->next = ret;
-					else
-						ConfigTop = ret;
-					while (ConfigCur->next)
-					{
-						ConfigCur = ConfigCur->next;
-					}
-					i = p + 1;
-					continue;
-				}
-			}
-			/* comments and bad #include directives are not
-			** discarded -- upper layer may want to do something
-			** with them (like new directives? --B. */
-		}
-		linelen = p - i;
-		if (*(p - 1) == '\r')
-			linelen--;
-		new = (aConfig *)malloc(sizeof(aConfig));
-		new->line = (char *) malloc((linelen+1) * sizeof(char));
-		memcpy(new->line, i, linelen);
-		new->line[linelen] = '\0';
-		new->next = NULL;
-		if (ConfigCur)
-		{
-			ConfigCur->next = new;
-		}
-		else
-		{
-			ConfigTop = new;
-		}
-		ConfigCur = new;
-		i = p + 1;
-	}
-	munmap(address, len);
-	return ConfigTop;
-}
-#endif
