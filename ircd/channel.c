@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.30 1998/03/22 19:17:35 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.31 1998/03/30 13:30:44 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -171,11 +171,19 @@ char	*banid;
 	for (ban = chptr->banlist; ban; ban = ban->next)
 	    {
 		len += strlen(ban->value.cp);
-		if (MyClient(cptr) &&
-		    ((len > MAXBANLENGTH) || (++cnt >= MAXBANS) ||
-		     !match(ban->value.cp, banid) ||
-		     !match(banid, ban->value.cp)))
-			return -1;
+		if (MyClient(cptr))
+		    {
+			if ((len > MAXBANLENGTH) || (++cnt >= MAXBANS))
+				return -1;
+			if (!match(ban->value.cp, banid) ||
+			    !match(banid, ban->value.cp))
+			    {
+				sendto_one(cptr, rpl_str(RPL_BANLIST,
+							 cptr->name),
+					   chptr->chname, ban->value.cp);
+				return -1;
+			    }
+		    }
 		else if (!mycmp(ban->value.cp, banid))
 			return -1;
 		
