@@ -1,3 +1,16 @@
+2001-12-24  Piotr Kucharski
+
+	* s_user.c/m_unick(): changes, including ip, removing token and
+	  hopcount
+
+2001-12-22  Piotr Kucharski
+
+	* s_bsd.c/check_server(): check for class being legal, so we
+	  do not core later.
+	* s_serv.c: introduced get_version() for easier reading; also
+	  few changes to it.
+	* parse.c: added find_sid().
+
 2001-12-13  Piotr Kucharski
 
 	* configure: a typo made FreeBSD 5.0 be taken for Solaris 2.0
@@ -19,7 +32,7 @@
 
 	* s_err.c, numeric_def.h: Change RPL_BOUNCE to numeric 010.
 
-2001-01-15	Piotr Kucharski
+2001-01-15  Piotr Kucharski
 
 	* s_user.c/m_unick(): fixed irritating typo (parv[7] vs. parv[8])
 
@@ -243,7 +256,7 @@
 	* channel.c/m_kick(): 'KICK #chan1,#chan2 nick1,nick2' was not
 	  working properly
 
-2001-02-28	Piotr Kucharski
+2001-02-28  Piotr Kucharski
 
 	* send.c/sendto_flog(),logfiles_open(),logfiles_close(),
 	  s_conf.c/rehash(), ircd.c: Stop open-close logfiles ping-pong,
