@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.44 1998/08/24 02:26:34 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.45 1998/08/24 15:54:23 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -254,22 +254,26 @@ aClient	*cptr;
 	Debug((DEBUG_INFO,"check_version: %s", cptr->info));
 
 	if (cptr->info == DefInfo)
-		return 1; /* no version checked */
+	    {
+		cptr->hopcount = SV_OLD;
+		return 1; /* no version checked (e.g. older than 2.9) */
+	    }
 	if (id = index(cptr->info, ' '))
 	    {
 		*id++ = '\0';
 		if (link = index(id, ' '))
 			*link++ = '\0';
-		if (misc = index(id, ':'))
+		if (misc = index(id, '|'))
 			*misc++ = '\0';
 		else
 		    {
 			misc = id;
-			id = "IRC";
+			id = "";
 		    }
 	    }
 	else
-		id = "IRC";
+		id = "";
+
 	/* hop = 1 really for local client, return it in m_server_estab() */
 	if (!strncmp(cptr->info, "0209", 4))
 	    {
@@ -290,7 +294,7 @@ aClient	*cptr;
 		 !strncmp(cptr->info, "020999", 6))
 		cptr->hopcount = SV_29|SV_NJOIN|SV_NMODE|SV_NCHAN; /* SV_2_10*/
 	else
-		cptr->hopcount = SV_OLD;
+		cptr->hopcount = SV_OLD; /* uhuh */
 
 	/* Check version number/mask from conf */
 	sprintf(buf, "%s/%s", id, cptr->info);
@@ -312,8 +316,6 @@ aClient	*cptr;
 			return exit_client(cptr, cptr, &me, "Bad flags");
 		    }
 	    }
-	else
-		return 2;	/* No flags checked */
 
 	/* right now, I can't code anything good for this */
 	/* Stop whining, and do it! ;) */
@@ -327,7 +329,7 @@ aClient	*cptr;
 	    (bootopt & BOOT_STRICTPROT) && !strchr(link, 'P'))
 		return exit_client(cptr, cptr, &me, "Unsafe mode");
 
-	return 3;
+	return 2;
 }
 
 /*
@@ -724,10 +726,10 @@ Reg	aClient	*cptr;
 	    {
 		if (bconf->passwd[0])
 #ifndef	ZIP_LINKS
-			sendto_one(cptr, "PASS %s %s IRC:%s %s", bconf->passwd,
+			sendto_one(cptr, "PASS %s %s IRC|%s %s", bconf->passwd,
 				   pass_version, serveropts,				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
 #else
-			sendto_one(cptr, "PASS %s %s IRC:%s %s%s",
+			sendto_one(cptr, "PASS %s %s IRC|%s %s%s",
 				   bconf->passwd, pass_version, serveropts,
 			   (bconf->status == CONF_ZCONNECT_SERVER) ? "Z" : "",
 				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
