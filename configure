@@ -39,6 +39,6 @@ else
   then
     echo "Have you read doc/README? (I hope so)"
     echo "Next cd ${rev}, edit \"config.h\","
-    echo "run \"make\" to build and \"make install\" to install."
+    echo "run \"make all\" to build and \"make install\" to install."
   fi
 fi
