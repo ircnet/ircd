@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.11 1997/09/08 00:23:19 kalt Exp $
+#*   $Id: Makefile.in,v 1.12 1997/09/12 17:59:29 kalt Exp $
 #*
 #*/
 
@@ -28,7 +28,7 @@ exec_prefix = @exec_prefix@
 
 CC = @CC@
 S_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common @IRC_ZLIB_INCLUDE@
-CC_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common
+CC_CFLAGS = @CFLAGS@ -I. -I../ircd -I../common @IRC_ZLIB_INCLUDE@
 C_CFLAGS = @CFLAGS@ -I. -I../irc -I../common
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
@@ -156,7 +156,7 @@ clmatch.o: ../common/match.c setup.h config.h
 clparse.o: ../common/parse.c setup.h config.h
 	$(CC) $(C_CFLAGS) -DCLIENT_COMPILE -c -o $@ ../common/parse.c
 
-clsupport.o: ../common/support.c setup.h config.h
+clsupport.o: ../common/support.c setup.h config.h ../common/patchlevel.h
 	$(CC) $(C_CFLAGS) -DCLIENT_COMPILE -c -o $@ ../common/support.c
 
 c_bsd.o: ../irc/c_bsd.c setup.h config.h

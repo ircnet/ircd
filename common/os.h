@@ -198,6 +198,10 @@
 # include <netinfo/ni.h>
 #endif
 
+#if USE_ZLIB
+# include <zlib.h>
+#endif
+
 /*  Some special include files for a special OS. :)
  */
 
