@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.44 2005/02/15 19:21:44 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.45 2005/02/22 18:27:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1020,9 +1020,11 @@ static	void	validate(aConfItem *top)
 			nr = aconf->clients;
 			filelist = findConfLineNumber(nr);
 			config_error(CF_WARN, CK_FILE, CK_LINE,
-				"unmatched %c:%s:%s:%s",
-				confchar(aconf->status), aconf->host,
-				SHOWSTR(aconf->passwd), aconf->name);
+				"unmatched %c%c%s%c%s%c%s",
+				confchar(aconf->status), IRCDCONF_DELIMITER,
+				aconf->host, IRCDCONF_DELIMITER,
+				SHOWSTR(aconf->passwd), IRCDCONF_DELIMITER,
+				aconf->name);
 		    }
 	return;
 }
