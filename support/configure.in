@@ -793,13 +793,13 @@ dnl main
 dnl ----
 
 AC_INIT([irc],[2.11],[ircd-bugs@irc.org])
-AC_REVISION([$Id: configure.in,v 1.59 2004/07/07 16:27:01 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.60 2004/09/08 19:23:18 chopin Exp $])
 AC_PREREQ(2.59)
 
-AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [PREFIX/var/log/ircd]], [
+AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [[localstatedir/log/ircd]]], [
 logdir=$with_logdir
 ],[
-logdir='${prefix}/var/log/ircd'
+logdir=$localstatedir'/log/ircd'
 ])
 AC_SUBST(logdir)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
