@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.128 2004/07/05 15:48:20 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.129 2004/07/13 22:57:47 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -281,7 +281,9 @@ long	oline_flags_parse(char *string)
 		switch(*s)
 		{
 		case 'L': tmp |= ACL_LOCOP; break;
-		case 'A': tmp |= (ACL_ALL & ~ACL_LOCOP); break;
+		case 'A': tmp |= (ACL_ALL & 
+			~(ACL_LOCOP|ACL_CLIENTS|ACL_NOPENALTY|ACL_CANFLOOD));
+			break;
 		case 'K': tmp |= ACL_KILL; break;
 		case 'k': tmp |= ACL_KILLLOCAL; break;
 		case 'S': tmp |= ACL_SQUIT; break;
@@ -304,6 +306,36 @@ long	oline_flags_parse(char *string)
 		case 't': tmp |= ACL_TRACE; break;
 		}
 	}
+	if (tmp & ACL_LOCOP)
+		tmp &= ~ACL_ALL_REMOTE;
+#ifdef OPER_KILL
+# ifdef LOCAL_KILL_ONLY
+	tmp &= ~ACL_KILLREMOTE;
+# endif
+#else
+	tmp &= ~ACL_KILL;
+#endif
+#ifndef OPER_REHASH
+	tmp &= ~ACL_REHASH;
+#endif
+#ifndef OPER_SQUIT
+	tmp &= ~ACL_SQUIT;
+#endif
+#ifndef OPER_CONNECT
+	tmp &= ~ACL_CONNECT;
+#endif
+#ifndef OPER_RESTART
+	tmp &= ~ACL_RESTART;
+#endif
+#ifndef OPER_DIE
+	tmp &= ~ACL_DIE;
+#endif
+#ifndef OPER_SET
+	tmp &= ~ACL_SET;
+#endif
+#ifndef OPER_TKLINE
+	tmp &= ~ACL_TKLINE;
+#endif
 	return tmp;
 }
 /*
@@ -1675,36 +1707,6 @@ int 	initconf(int opt)
 		if (tmp3 && (aconf->status & CONF_OPERATOR))
 		{
 			aconf->flags |= oline_flags_parse(tmp3);
-			if (aconf->flags & ACL_LOCOP)
-				aconf->flags &= ~ACL_ALL_REMOTE;
-#ifdef OPER_KILL
-# ifdef LOCAL_KILL_ONLY
-			aconf->flags &= ~ACL_KILLREMOTE;
-# endif
-#else
-			aconf->flags &= ~ACL_KILL;
-#endif
-#ifndef OPER_REHASH
-			aconf->flags &= ~ACL_REHASH;
-#endif
-#ifndef OPER_SQUIT
-			aconf->flags &= ~ACL_SQUIT;
-#endif
-#ifndef OPER_CONNECT
-			aconf->flags &= ~ACL_CONNECT;
-#endif
-#ifndef OPER_RESTART
-			aconf->flags &= ~ACL_RESTART;
-#endif
-#ifndef OPER_DIE
-			aconf->flags &= ~ACL_DIE;
-#endif
-#ifndef OPER_SET
-			aconf->flags &= ~ACL_SET;
-#endif
-#ifndef OPER_TKLINE
-			aconf->flags &= ~ACL_TKLINE;
-#endif
 		}
 		if (aconf->status & CONF_SERVER_MASK)
 		    {
