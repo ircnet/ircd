@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.115 2002/11/23 18:47:45 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.116 2002/11/24 21:02:39 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1774,6 +1774,42 @@ char	*to;
 	return;
 }
 
+static void report_fd(aClient *sptr, aClient *acptr, char *to)
+{
+	static char locip[100], *ret;
+	int s;
+
+	if (IsMe(acptr) || !acptr->acpt || !IsRegistered(acptr))
+		return;
+	ret = 
+#ifdef INET6
+		inetntop(AF_INET6,
+		(char *)&acptr->acpt->ip,
+		mydummy, MYDUMMY_SIZE);
+#else
+		inetntoa((char *)&acptr->acpt->ip);
+#endif
+	s = strlen(ret) + 1;
+	memcpy(locip, ret, s < sizeof(locip) ? s : sizeof(locip));
+	locip[sizeof(locip) - 1] = 0;
+	sendto_one(sptr,":%s %d %s %d %s %d %s %d %s %s %d",
+		ME,RPL_STATSLINKINFO,to,
+		acptr->fd,
+		locip,
+		acptr->acpt->port,
+#ifdef INET6
+		inetntop(AF_INET6,
+		(char *)&acptr->ip,
+		mydummy, MYDUMMY_SIZE),
+#else
+		inetntoa((char *)&acptr->ip),
+#endif
+		acptr->port,acptr->name,
+		acptr->user ? acptr->user->username : acptr->auth,
+		acptr->user ? timeofday - acptr->user->last : -1
+		);
+}
+
 int	m_stats(cptr, sptr, parc, parv)
 aClient *cptr, *sptr;
 int	parc;
@@ -1824,6 +1860,36 @@ char	*parv[];
 
 	switch (stat)
 	{
+	case 'f' : case 'F' :
+		/* send list of file descriptors 
+		 * Avaible only for local opers for security reasons.
+		 */
+		if (!IsAnOper(sptr) || !MyConnect(sptr))
+		{
+			stat = '*';
+			break;
+		}
+		if (doall || wilds)
+		    {
+			for (i = 0; i <= highest_fd; i++)
+			    {
+				if (!(acptr = local[i]))
+					continue;
+
+				if (wilds && match(cm, acptr->name))
+					continue;
+				report_fd(sptr, acptr, parv[0]);
+			    }
+		    }
+		else
+		    {
+			if ((acptr = find_client(cm, NULL)))
+				report_fd(sptr, acptr, parv[0]);
+		    }
+		break;
+
+		/* fallthru to stats l */
+		
 	case 'L' : case 'l' :
 		/*
 		 * send info about connections which match, or all if the
@@ -1843,7 +1909,7 @@ char	*parv[];
 			    {
 				if (!(acptr = local[i]))
 					continue;
-				if (IsPerson(acptr) && !(MyConnect(sptr) 
+				if (IsPerson(acptr) && !(MyConnect(sptr)
 				    && IsAnOper(sptr)) && acptr != sptr)
 					continue;
 				if (wilds && match(cm, acptr->name))
