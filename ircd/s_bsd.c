@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.19 1997/10/13 17:37:12 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.20 1997/10/17 17:45:15 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1800,12 +1800,8 @@ FdAry	*fdp;
 		wait.tv_sec = MIN(delay2, delay);
 		wait.tv_usec = usec;
 #if ! USE_POLL
-# ifdef	HPUX
-		nfds = select(highfd + 1, (int *)&read_set, (int *)&write_set,
-			      0, &wait);
-# else
-		nfds = select(highfd + 1, &read_set, &write_set, 0, &wait);
-# endif
+		nfds = select(highfd + 1, (SELECT_FDSET_TYPE *)&read_set,
+			      (SELECT_FDSET_TYPE *)&write_set, 0, &wait);
 #else
 		nfds = poll( poll_fdarray, nbr_pfds,
 			     wait.tv_sec * 1000 + wait.tv_usec/1000 );

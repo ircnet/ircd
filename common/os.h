@@ -533,7 +533,14 @@ extern struct hostent *_switch_gethostbyname_r __P((const char *name,
 # define HAVE_GETRUSAGE 1
 #endif
 
-/*  poll/select portability problems.
+/*  select portability problems - some systems do not define FD_... macros; on
+ *  some systems (for example HPUX), select uses an int * instead of an
+ *  fd_set * for its 2nd, 3rd and 4th arguments.
+ *
+ *  Note. This test should be more portable and put in configure ... but I've
+ *        no idea on how to build a test for configure that will guess if the
+ *        system uses int * or fd_set * inside select(). If you've some idea,
+ *        please tell it to me. :)                   -- Alain.Nissen@ulg.ac.be
  */
 
 #if ! USE_POLL
@@ -543,8 +550,10 @@ extern struct hostent *_switch_gethostbyname_r __P((const char *name,
 #  define FD_ISSET(s1, set) (((set)->fds_bits[0]) & (1 << (s1)))
 #  define FD_SETSIZE        30
 # endif /* FD_ZERO */
-# ifdef HPUX
-#  define select(a,b,c,d,e) (select((a), (int *)(b), (int *)(c), (int *)(d), (e)))
+# if defined(HPUX) && (! defined(_XPG4_EXTENDED) || (defined(_XPG4_EXTENDED) && defined(__INCLUDE_FROM_TIME_H) && !defined(_XOPEN_SOURCE_EXTENDED)))
+#  define SELECT_FDSET_TYPE int
+# else
+#  define SELECT_FDSET_TYPE fd_set
 # endif
 #endif /* USE_POLL */
 
@@ -552,6 +561,7 @@ extern struct hostent *_switch_gethostbyname_r __P((const char *name,
  *  only if <sys/wait.h> is compatible with POSIX.1 - if not included, a
  *  prototype must be supplied for wait (wait3 and waitpid are unused here).
  */
+
 #if ! HAVE_SYS_WAIT_H
 # if USE_UNION_WAIT
 extern pid_t wait __P((union wait *));
@@ -561,10 +571,11 @@ extern pid_t wait __P((int *));
 #endif
 
 /*  <sys/socket.h> portability problems - X/Open SPEC 1170 specifies that
- *  the length parameter of socket operations must be a size_t (resp. *size_t),
- *  instead of an int (resp. *int); the problem is that only a few systems
- *  (for example AIX 4.2) follow this specification; others systems still
- *  uses int (resp. *int), which is not always equal to size_t (resp. *size_t).
+ *  the length parameter of socket operations must be a size_t
+ *  (resp. size_t *), instead of an int (resp. int *); the problem is that
+ *  only a few systems (for example AIX 4.2) follow this specification; others
+ *  systems still use int (resp. int *), which is not always equal to size_t
+ *  (resp. size_t *).
  *
  *  Note. This test should be more portable and put in configure ... but I've
  *        no idea on how to build a test for configure that will guess if the

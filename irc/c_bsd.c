@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_bsd.c,v 1.3 1997/09/03 17:45:31 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: c_bsd.c,v 1.4 1997/10/17 17:45:16 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -98,11 +98,7 @@ int	sock;
 		if (termtype == TERMCAP_TERM)
 			tcap_move (-1, i);
 #endif
-#ifdef HPUX
-		if (select(32, (int *)&ready, 0, 0, NULL) < 0) {
-#else
-		if (select(32, &ready, 0, 0, NULL) < 0) {
-#endif
+		if (select(32, (SELECT_FDSET_TYPE *)&ready, 0, 0, NULL) < 0) {
 /*      perror("select"); */
 			continue;
 		}
