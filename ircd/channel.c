@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.86 1999/01/17 00:36:40 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.87 1999/01/17 01:13:54 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2008,7 +2008,7 @@ char	*parv[];
 					continue;
 				    }
 #endif
-				chptr = hash_find_channels(name+2);
+				chptr = hash_find_channels(name+2, NULL);
 				if (chptr)
 				    {
 					sendto_one(sptr,
@@ -2023,7 +2023,7 @@ char	*parv[];
 					/*
 					 * This is a bit wrong: if a channel
 					 * rightfully ceases to exist, it
-					 * can still be *locked* for up to
+v					 * can still be *locked* for up to
 					 * 2*CHIDNB^3 seconds (~24h)
 					 * Is it a reasonnable price to pay to
 					 * ensure shortname uniqueness? -kalt
@@ -2038,7 +2038,8 @@ char	*parv[];
 				name = buf;
 			    }
 			else if (!get_channel(sptr, name, 0) &&
-				 !(chptr = get_channel(sptr, name+1, 0)))
+				 !(*name == '!' && *name != 0 &&
+				   (chptr = hash_find_channels(name+1, NULL))))
 			    {
 				if (MyClient(sptr))
 					sendto_one(sptr,
@@ -2049,6 +2050,7 @@ char	*parv[];
 				/* from a server, it is legitimate */
 			    }
 			else if (chptr)
+				/* joining a !channel using the short name */
 				name = chptr->chname;
 		    }
 		if (!IsChannelName(name) ||
@@ -2798,6 +2800,23 @@ char	*parv[];
 						   chptr->users, chptr->topic);
 				if (!MyConnect(sptr) && rlen > CHREPLLEN)
 					break;
+			    }
+			if (*name == '!')
+			    {
+				chptr = NULL;
+				while (chptr=hash_find_channels(name+1, chptr))
+				    {
+					if (!ShowChannel(sptr, chptr))
+						continue;
+					rlen += sendto_one(sptr,
+							   rpl_str(RPL_LIST,
+								   parv[0]),
+							   name, chptr->users,
+							   chptr->topic);
+					if (!MyConnect(sptr) &&
+					    rlen > CHREPLLEN)
+						break;
+				    }		
 			    }
 		     }
 	}

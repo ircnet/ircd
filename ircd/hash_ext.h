@@ -46,7 +46,7 @@ EXTERN int del_from_server_hash_table __P((aServer *sptr, aClient *cptr));
 EXTERN aClient *hash_find_client __P((char *name, aClient *cptr));
 EXTERN aClient *hash_find_server __P((char *server, aClient *cptr));
 EXTERN aChannel *hash_find_channel __P((char *name, aChannel *chptr));
-EXTERN aChannel *hash_find_channels __P((char *name));
+EXTERN aChannel *hash_find_channels __P((char *name, aChannel *chptr));
 EXTERN aServer *hash_find_stoken __P((int tok, aClient *cptr, void *dummy));
 EXTERN int m_hash __P((aClient *cptr, aClient *sptr, int parc, char *parv[]));
 #undef EXTERN

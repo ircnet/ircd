@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.11 1999/01/17 00:36:40 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.12 1999/01/17 01:13:54 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -638,17 +638,29 @@ aChannel *chptr;
  *
  * look up matches for !?????name instead of a real match.
  */
-aChannel	*hash_find_channels(name)
+aChannel	*hash_find_channels(name, chptr)
 char	*name;
+aChannel *chptr;
 {
 	Reg	aChannel	*tmp, *prv = NULL;
 	Reg	aHashEntry	*tmp3;
 	u_int	hashv, hv;
 
-	hashv = hash_channel_name(name, &hv);
-	tmp3 = &channelTable[hashv];
+	if (chptr == NULL)
+	    {
+		hashv = hash_channel_name(name, &hv);
+		tmp3 = &channelTable[hashv];
+		chptr = (aChannel *) tmp3->list;
+	    }
+	else
+	    {
+		hv = chptr->hashv;
+		chptr = chptr->hnextch;
+	    }
 
-	for (tmp = (aChannel *)tmp3->list; tmp; prv = tmp, tmp = tmp->hnextch)
+	if (chptr == NULL)
+		return NULL;
+	for (tmp = chptr; tmp; prv = tmp, tmp = tmp->hnextch)
 		if (hv == tmp->hashv && *tmp->chname == '!' &&
 		    mycmp(name, tmp->chname + CHIDLEN + 1) == 0)
 		    {
