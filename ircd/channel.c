@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.221 2004/08/02 17:42:08 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.222 2004/08/03 15:10:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2389,8 +2389,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				sendto_channel_butserv(chptr, sptr,
 						PartFmt,
 						parv[0], chptr->chname,
-						IsAnonymous(chptr) ? "None" :
-						(key ? key : parv[0]));
+						key ? key : "");
 				remove_user_from_channel(sptr, chptr);
 			    }
 			sendto_match_servs(NULL, cptr, ":%s JOIN 0 :%s",
