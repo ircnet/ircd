@@ -1,3 +1,15 @@
+2002-12-28  Jakub Vlasek
+	
+	* msg_def.h, parse.c, s_serv.c, s_serv_ext.h: Added SET command.
+	* config.h.dist: Added OPER_SET and LOCOP_SET defines.
+	* s_misc.c: Added initruntimeconf() used for initialisation of
+	  struct iconf.
+	* ircd.c, ircd_ext.h: Added declaration of iconf. Structure used
+	  for keeping run-time configuration data.
+	* ircd.c/main(): Call initruntimeconf().
+	* ircd.c/try_connections(): Do not autoconnect if autoconnect
+	  disabled via SET.
+
 2002-11-29  Jakub Vlasek
 
 	* mkpasswd.c, contrib/mkpasswd/README: New version from W. Campbell.
