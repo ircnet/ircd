@@ -1,7 +1,7 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
-# $Id: ircd.conf.example,v 1.10 1998/12/13 00:02:34 kalt Exp $
+# $Id: ircd.conf.example,v 1.11 1999/07/14 16:17:23 kalt Exp $
 #
 # some changes for 295 and cleaning, delta, Sat Jun 13 01:09:25 MES 1998
 #
@@ -472,13 +472,19 @@ B:*.fi::irc.funet.fi:6667:
 ############################
 # S: [OPTIONAL]. These lines define services allowed to connect to your
 # server.  Each service needs a separate line which only allows him to
-# connect once.
+# connect once. Remember to compile the ircd with #define USE_SERVICES
+# in config.h, otherwise you can't use services.
 #
 # The fields are as follow:
 # S:<TARGET Host Mask>:<Password>:<Service Name>:<Service Type>:<Class>
 #
 # Example, you want to allow a local information service:
 S:eep.local.net:thisisapassword:EepInfo:0:1
+#
+# Another example, ircd versions since 04/10/1999 support also a hex
+# mask. This is a temporary kline service (tkserv) as you can find it in
+# contrib/tkserv :
+S:eep.local.net:thisisapassword:TkEep:0x2000000:1
 #
 #
 ############################
