@@ -1,3 +1,27 @@
+1999-07-02  Christophe Kalt
+
+	* res.c/proc_answer(): portability fix from hybrid6.
+	
+	* send.c/sendto_match_butone: finally looked closely at why this
+	was sending $*.mask to the wrong servers, fixed.
+
+	* struct_def.h, send.c/sendto_match_butone(), list_ext.h,
+	list.c/make_client(), ircd.c/setup_me(), s_misc.c/exit_client(),
+	s_serv.c, s_service.c/m_service(), s_user.c/m_user(): removed old
+	code conditional to NO_USRTOP being undefined.
+	
+	* s_user.c:
+		* m_nick(): new delay on nicks to prevent insidious
+		collisions (from Piotr Kucharski).
+		* m_private(): dropped restrictions on mass msg/notices.
+
+	* s_auth.c/read_authports(): can't call set_clean_username with
+	->auth pointing to ->username (from Piotr Kucharski).
+
+	* mod_socks.c: couple typos.
+
+	* a_conf.c/conf_read(): ->popt wasn't initialized.
+
 1999-06-27  Christophe Kalt
 
 	* s_misc.c/exit_one_client(): made BETTER_NDELAY a little more
