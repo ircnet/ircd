@@ -1,3 +1,30 @@
+2003-10-17  Kurt Roeckx
+
+	* hash.c, list.c, s_id.c, s_serv.c, s_service.c: Fix warnings
+	  (from Robbert Muller)
+	* s_service.c/sendnum_toone(): Correctly send modes to the services
+	  that requested it. (From Robbert Muller)
+	* ircd.c/main(): cygwin (1.5?) can now use iauth.
+	* s_bsd.c/daemonize(): Go in the background on cygwin too.
+	* dbuf_ext.h, send_ext.h, class_ext.h, hash_ext.h, ircd.c, ircd_ext.h,
+	  list_ext.h, res_ext.h, res_init_ext.h, s_auth_ext.h, s_bsd.c,
+	  s_bsd_ext.h, s_conf_ext.h, s_id_ext.h, s_misc_ext.h, whowas_ext.h:
+	  Fix compile warnings (From Robbert Muller)
+	* ircd.c, ircd_ext.h: Get rid of PROFIL.
+	* a_conf_ext.h, a_io_ext.h, a_log_ext.h, mkpasswd.c, support_ext.h,
+	  channel.c, chkconf.c: Fix compile warnings (From Robbert Muller)
+	* c_msg_ext.h, edit_ext.h, irc_ext.h, screen_ext.h: Fix compile
+	  warnings (From Robbert Muller)
+	* support.c, support_ext.h: Convert dumpcore() to use stdarg.
+	* *_ext.h, os.h: Get rid of __P().
+
+
+2003-10-15  Kurt Roeckx
+
+	* parse.c, send_ext.h, ircdwatch.c, iauth.c, mod_lhex.c, mod_pipe.c,
+	  mod_rfc931.c, mod_socks.c, channel.c, ircd.c, list.c, s_misc.c:
+	  Fix some warnings (from Robbert Muller)
+
 2003-10-14  Kurt Roeckx
 
 	* send.c, a_conf.c, c_conf_ext.h, s_serv.c: More warning fixes (from
