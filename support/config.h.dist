@@ -446,8 +446,6 @@
  */
 #define MIRC_KLUDGE
 
-#define USE_IAUTH
-
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
@@ -548,6 +546,12 @@
  * -avalon
  */
 #define	SENDQ_ALWAYS
+
+/*
+ * USE_IAUTH makes ircd use the iauth program for authentication.
+ * it can always be overriden by using the -s switch
+ */
+#define USE_IAUTH
 
 #ifdef ZIP_LINKS
 /*
