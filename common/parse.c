@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.75 2004/06/21 14:37:12 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.76 2004/06/21 15:54:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -568,7 +568,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	Reg	int	len, i, numeric = 0, paramcount;
 	Reg	struct	Message *mptr = NULL;
 	int	ret;
-	int	status = from->status < STAT_SERVER ? STAT_UNREG : from->status;
+	int	status;
 
 	Debug((DEBUG_DEBUG, "Parsing %s: %s",
 		get_client_name(cptr, FALSE), buffer));
@@ -740,6 +740,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 	mptr->count++;
 	if (!MyConnect(from))
 		mptr->rcount++;
+	status = from->status < STAT_SERVER ? STAT_UNREG : from->status;
 	if (IsRegisteredUser(cptr) &&
 #ifdef	IDLE_FROM_MSG
 	    mptr->handler[status] == m_private)
