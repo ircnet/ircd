@@ -351,6 +351,22 @@ AC_MSG_RESULT(no))
 ])
 
 
+AC_DEFUN(IRC_HPUX_CC,
+[AC_MSG_CHECKING([for HPUX's cc])
+AC_EGREP_CPP(yes,
+[#ifdef hpux
+yes
+#endif],
+if test x$CC = xcc; then
+  AC_MSG_RESULT(yes)
+  CC="$CC -Ae"
+else
+  AC_MSG_RESULT(no)
+fi,
+AC_MSG_RESULT(no))
+])
+
+
 AC_DEFUN(IRC_ALPHA_BETA,
 [AC_MSG_CHECKING(whether this is an alpha/beta release)
 AC_CACHE_VAL(irc_cv_alpha_beta,
@@ -1422,7 +1438,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.34 1999/03/11 17:12:37 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.35 1999/03/11 17:15:24 kalt Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1440,6 +1456,7 @@ IRC_AIX
 AC_ISC_POSIX
 AC_MINIX
 IRC_SGI_CC
+IRC_HPUX_CC
 IRC_SOLARIS_2
 IRC_LINUX
 
