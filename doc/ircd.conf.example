@@ -1,6 +1,8 @@
 # IRC - Internet Relay Chat, doc/example.conf
 # Copyright (C) 1994, Helen Rose
 #
+# $Id: ircd.conf.example,v 1.2 1997/04/21 13:42:29 kalt Exp $
+#
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation; either version 1, or (at your option)
@@ -56,9 +58,9 @@
 # M: [MANDATORY]. This line sets your server's name, description.
 # Fields, in order, are: 
 #
-# M:hostname:*:Description Of Your Server
+# M:hostname:*:Description Of Your Server:port
 #
-M:csa.bu.edu:*:Boston University Computer Science Department::
+M:csa.bu.edu:*:Boston University Computer Science Department:6667:
 #
 # A: [MANDATORY]. This line lists your administrative information
 # (contact address, etc). To view this information, /admin (server) will
@@ -78,8 +80,8 @@ A:Boston University CS Department:Main Client Server:Helen Rose <hrose@cs.bu.edu
 #
 # The fields are as follows::
 # P:UNIX socket file:*:*:port number
-# for example, an internet domain socket on port 6665: 
-P::::6665:
+# for example, an internet domain socket on port 6667:
+P::::6667:
 #
 # This line is an example of a UNIX domain socket in /tmp
 P:/tmp/.ircd:*:*:6666:
