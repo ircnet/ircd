@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.126 2004/07/03 16:00:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.127 2004/07/03 16:22:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -263,6 +263,8 @@ char	*oline_flags_to_string(long flags)
 		*s++ = 'P';
 	if (flags & ACL_CANFLOOD)
 		*s++ = 'p';
+	if (flags & ACL_TRACE)
+		*s++ = 't';
 	if (s == ofsbuf)
 		*s++ = '-';
 	*s++ = '\0';
@@ -299,6 +301,7 @@ long	oline_flags_parse(char *string)
 #endif
 		case 'P': tmp |= ACL_NOPENALTY; break;
 		case 'p': tmp |= ACL_CANFLOOD; break;
+		case 't': tmp |= ACL_TRACE; break;
 		}
 	}
 	return tmp;
