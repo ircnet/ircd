@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.108 2002/01/06 02:18:32 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.109 2002/01/06 03:46:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2147,7 +2147,7 @@ char	*parv[];
 	SetInvisible(sptr);
 #endif
 	if (sptr->flags & FLAGS_RILINE)
-		SetRestricted(sptr->user);
+		SetRestricted(sptr);
 	sptr->user->flags |= (UFLAGS & atoi(host));
 	strncpyzt(user->host, host, sizeof(user->host));
 	user->server = find_server_string(me.serv->snum);
@@ -3030,7 +3030,7 @@ char	*parv[];
 		if (!(setflags & FLAGS_LOCOP) && IsLocOp(sptr))
 			sptr->user->flags &= ~FLAGS_LOCOP;
 		if ((setflags & FLAGS_RESTRICT) &&
-		    !IsRestricted(sptr->user))
+		    !IsRestricted(sptr))
 		    {
 			sendto_one(sptr, replies[ERR_RESTRICTED], ME, BadTo(parv[0]));
 			SetRestricted(sptr);
