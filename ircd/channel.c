@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.135 2003/02/10 02:39:05 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.136 2003/02/10 15:48:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -306,6 +306,7 @@ aChannel *chptr;
 					if (match(tmp->value.cp, s) == 0)
 						break;
 #ifndef INET6
+/* match_ipmask() seems so expensive :( */
 					/* depending on popularity of CIDR bans,
 					   we could move the whole block before
 					   checking @IP ban */
@@ -316,9 +317,9 @@ aChannel *chptr;
 						buf, &mask) == 2)
 					{
 						mask=32-mask;
-						if (ntohl(cptr->ip.s_addr)
+						if (htonl(cptr->ip.s_addr)
 							>> mask ==
-							ntohl(inet_addr(buf))
+							htonl(inet_addr(buf))
 							>> mask)
 							/* CIDR match */
 							break;
