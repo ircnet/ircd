@@ -1,3 +1,12 @@
+1999-07-17  Christophe Kalt
+
+	* ircd.c/setup_me(), s_bsd.c: fixed that really old bug about the
+	I line format to match connections received on the loopback
+	interface (from Eugene L. Vorokov).
+
+	* configure.in: fixed previous changes about poll() (reported by
+	KIKUCHI Takahiro).
+
 1999-07-17  Kurt Roeckx
 
         * s_user.c/m_kill(): killer could end up < path
