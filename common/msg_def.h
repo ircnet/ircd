@@ -78,6 +78,7 @@
 #define MSG_EOB	     "EOB"
 #define MSG_SET      "SET"
 #define MSG_MAP	     "MAP"
+#define MSG_POST     "POST"
 
 #define MAXPARA		15
 
