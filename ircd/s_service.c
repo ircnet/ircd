@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_service.c,v 1.50 2004/03/18 22:48:01 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_service.c,v 1.51 2004/03/25 22:07:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -474,7 +474,7 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	svc->wants = 0;
 	svc->type = type;
 	reorder_client_in_list(acptr);
-	(void)add_to_client_hash_table(acptr->name, sptr);
+	(void)add_to_client_hash_table(acptr->name, acptr);
 
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_SERVICE, NULL, acptr,
