@@ -644,7 +644,6 @@ struct Channel	{
 # define	IsChannelName(n)	((n) && (*(n) == '#' || *(n) == '&' ||\
 					*(n) == '+' || *(n) == '!'))
 #else
-					(*(n) == '!' && cid_ok(n))))
 # define	IsChannelName(n)	((n) && (*(n) == '#' || *(n) == '&' ||\
 					*(n) == '+' || \
 					(*(n) == '!' && cid_ok(n))))
