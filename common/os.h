@@ -699,3 +699,36 @@ char mydummy2[MYDUMMY_SIZE];
 #if defined(HAVE_MMAP)
 #include <sys/mman.h>
 #endif
+
+/* Courtesy of AC_CHECK_TYPES autoconf macro in configure */
+#if !HAVE_INT16_T
+typedef int16_t short
+#endif
+#if !HAVE_INT32_T
+typedef int32_t int
+#endif
+#if !HAVE_INT8_T
+typedef int8_t char
+#endif
+#if !HAVE_U_CHAR
+typedef u_char unsigned char
+#endif
+#if !HAVE_U_INT
+typedef u_int unsigned int
+#endif
+#if !HAVE_U_INT32_T
+typedef u_int32_t unsigned int
+#endif
+#if !HAVE_U_INT16_T
+typedef u_int16_t unsigned short
+#endif
+#if !HAVE_U_INT8_T
+typedef u_int8_t unsigned char
+#endif
+#if !HAVE_U_LONG
+typedef u_long unsigned long
+#endif
+#if !HAVE_U_SHORT
+typedef u_short unsigned short
+#endif
+
