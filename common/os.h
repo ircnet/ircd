@@ -129,6 +129,10 @@
 
 #if HAVE_SYS_POLL_H
 # include <sys/poll.h>
+# if linux && !defined(POLLRDNORM)
+/* Linux 2.1.xx supports poll(), header files are not upto date yet */
+#  define POLLRDNORM 0x0040
+# endif
 #endif
 
 #if HAVE_STROPTS_H
