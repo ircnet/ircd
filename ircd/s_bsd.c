@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.41 1998/10/10 12:19:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.42 1998/10/27 10:01:28 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -510,7 +510,7 @@ void	init_sys()
 			(void)fprintf(stderr, "Hard Limit: %d IRC max: %d\n",
 				      (int) limit.rlim_max, MAXCONNECTIONS);
 			(void)fprintf(stderr,
-				      "Recompile and fix MAXCONNECTIONS\n");
+				      "Fix MAXCONNECTIONS and recompile.\n");
 			exit(-1);
 		    }
 		limit.rlim_cur = limit.rlim_max; /* make soft limit the max */
