@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: class.c,v 1.10 2003/10/18 15:31:24 q Exp $";
+static  char rcsid[] = "@(#)$Id: class.c,v 1.11 2004/03/06 20:52:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -230,7 +230,7 @@ int	get_sendq(aClient *cptr)
 	Reg	Link	*tmp;
 	Reg	aClass	*cl;
 
-	if (cptr->serv)
+	if (cptr->serv && cptr->serv->nline)
 		sendq = MaxSendq(cptr->serv->nline->class);
 	else if (cptr && !IsMe(cptr)  && (cptr->confs))
 		for (tmp = cptr->confs; tmp; tmp = tmp->next)
