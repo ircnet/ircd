@@ -6,6 +6,7 @@
 	* s_bsd.c/connect_inet(): Use aconf->source_ip to bind correct IP
 	  for outgoing connections.
 	* s_conf.c/initconf(): Fill aconf->source_ip.
+	* 2.11-New: Added.
 
 2002-11-22  Jakub Vlasek
 
