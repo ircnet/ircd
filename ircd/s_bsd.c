@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.162 2004/10/02 01:20:44 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.163 2004/10/05 00:11:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -177,7 +177,7 @@ void	report_error(char *text, aClient *cptr)
 		cptr->serv && cptr->serv->byuid[0])
 	{
 		bysptr = find_uid(cptr->serv->byuid, NULL);
-		if (!MyConnect(bysptr))
+		if (bysptr && !MyConnect(bysptr))
 		{
 			fmbuf[0] = '\0';
 			strcpy(fmbuf, ":%s NOTICE %s :");
