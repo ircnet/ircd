@@ -1,3 +1,12 @@
+2002-08-05  Piotr Kucharski
+
+	* s_user.c/m_nick(): check for correct number of params in NICK when
+	  it comes from server before checking for collisions.
+
+2002-08-04  Piotr Kucharski
+
+	* class.c/add_class(): typo in debug string.
+
 2002-08-01  Piotr Kucharski
 
 	* struct_def.h: added invLink struct, similar to Link, but keeps
