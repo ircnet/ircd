@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.78 2001/12/29 20:54:07 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.79 2001/12/30 00:15:22 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1081,8 +1081,8 @@ aClient	*cptr;
 			    "Lost N-Line for %s", get_client_name(cptr,FALSE));
 		return -1;
 	    }
-	sendto_one(cptr, "SERVER %s 1 :%s",
-		   my_name_for_link(ME, aconf->port), me.info);
+	sendto_one(cptr, "SERVER %s 1 %s :%s",
+		   my_name_for_link(ME, aconf->port), me.serv->sid, me.info);
 	if (!IsDead(cptr))
 	    {
 		start_auth(cptr);
