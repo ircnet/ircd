@@ -1433,7 +1433,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.50 2004/03/05 20:29:04 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.51 2004/03/05 23:56:11 chopin Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1445,7 +1445,7 @@ AC_PROG_CPP
 AC_PROG_AWK
 IRC_PROG_INSTALL
 AC_PATH_PROGS(SUM, md5sum md5 sum cksum, true)
-AC_PATH_PROGS(M4_PATH, m4, m4)
+AC_PATH_PROGS(M4_PATH, gm4 m4, m4)
 AC_PROG_GCC_TRADITIONAL
 
 IRC_AIX
