@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.146 2004/11/02 16:21:51 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.147 2004/11/02 22:37:03 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2574,7 +2574,7 @@ int	m_untkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 
 	if (deleted)
 	{
-		sendto_flag(SCH_NOTICE, "UNTKLINE %s@%s by %s",
+		sendto_flag(SCH_OPER, "UNTKLINE %s@%s by %s",
 			user, host, parv[0]);
 	}
 	return 1;
