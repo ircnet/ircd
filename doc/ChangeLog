@@ -1,6 +1,7 @@
 2004-02-29  Piotr Kucharski
 
 	* s_serv.c/m_squit(): squit without comment bug (noted by Marcin Krol).
+	* hash.c/bigger_hash_table(): uid hash table bug (endless loop).
 
 2004-02-27  Piotr Kucharski
 
