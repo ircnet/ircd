@@ -1,3 +1,8 @@
+1999-08-01  Piotr Kucharski
+
+	* ircd.c/bad_command(): -d command line option no longer exists,
+	while -s was added.
+
 1999-07-28  Christophe Kalt
 
 	* struct_def.h: IsChannelName() macro cannot use cid_ok() for the
