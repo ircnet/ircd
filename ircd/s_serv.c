@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.124 2003/08/10 16:36:17 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.125 2003/08/10 16:37:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3063,7 +3063,12 @@ char	*parv[];
 	{
 		return 0;
 	}
-	
+	if (ST_NOTUID(sptr))
+	{
+		sendto_flag(SCH_ERROR, "EOB protocol error from %s",
+			get_client_name(sptr, TRUE));
+		return exit_client(sptr, sptr, &me, "EOB protocol error");
+	}
 	if (IsBursting(sptr))
 	{
 		if (MyConnect(sptr))
