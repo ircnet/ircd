@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.46 2004/04/16 23:12:08 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.47 2004/05/12 16:46:01 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -25,7 +25,7 @@ Important changes in 2.11.0 (since 2.10.3p5):
 	  client IP PTR points to, not the CNAME that points to client IP.
 	* resolv.conf can have IPv6 nameservers (this makes ircd fully IPv6).
 	* P: can have flags ('D' and 'S'), check INSTALL file for details.
-	* class summary was moved from trace to (separate) stats C.
+	* class usage was moved from end of trace to stats Y.
 	* redundant bans are allowed to be set now.
 	* SERVICE command has been changed slightly, update your services.
 
