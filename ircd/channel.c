@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.237 2004/11/03 14:07:45 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.238 2004/11/13 20:56:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2618,6 +2618,25 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aClient *acptr;
 	int maxlen;
 
+	/* get channel pointer */
+	if (!IsChannelName(parv[1]))
+	{
+		sendto_one(sptr, replies[ERR_NOSUCHCHANNEL],
+			ME, BadTo(parv[0]), parv[1]);
+		return 0;
+	}
+	if (check_channelmask(sptr, cptr, parv[1]) == -1)
+	{
+		sendto_flag(SCH_DEBUG, "received NJOIN for %s from %s",
+			parv[1], get_client_name(cptr, TRUE));
+		return 0;
+	}
+	convert_scandinavian(parv[1], cptr);
+	/* Use '&me', because NJOIN is, unlike JOIN, always for
+	** remote clients, see get_channel() what's that for. --B. */
+	chptr = get_channel(&me, parv[1], CREATE);
+	/* assert(chptr != NULL); */
+
 	*nbuf = '\0'; q = nbuf;
 	*uidbuf = '\0'; u = uidbuf;
  	/* 17 comes from syntax ": NJOIN  :,@@+\r\n\0" */ 
@@ -2629,75 +2648,61 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		chop = 0;
 		mbuf[0] = '\0';
 		if (*target == '@')
-		    {
+		{
 			if (*(target+1) == '@')
-			    {
+			{
 				/* actually never sends in a JOIN ^G */
 				if (*(target+2) == '+')
-				    {
+				{
 					strcpy(mbuf, "\007ov");
-					chop = CHFL_UNIQOP|CHFL_CHANOP| \
-					  CHFL_VOICE;
+					chop = CHFL_UNIQOP| \
+						CHFL_CHANOP|CHFL_VOICE;
 					name = target + 3;
-				    }
+				}
 				else
-				    {
+				{
 					strcpy(mbuf, "\007o");
 					chop = CHFL_UNIQOP|CHFL_CHANOP;
 					name = target + 2;
-				    }
-			    }
+				}
+			}
 			else
-			    {
+			{
 				if (*(target+1) == '+')
-				    {
+				{
 					strcpy(mbuf, "\007ov");
 					chop = CHFL_CHANOP|CHFL_VOICE;
 					name = target+2;
-				    }
+				}
 				else
-				    {
+				{
 					strcpy(mbuf, "\007o");
 					chop = CHFL_CHANOP;
 					name = target+1;
-				    }
-			    }
-		    }
+				}
+			}
+		}
 		else if (*target == '+')
-		    {
+		{
 			strcpy(mbuf, "\007v");
 			chop = CHFL_VOICE;
 			name = target+1;
-		    }
+		}
 		else
+		{
 			name = target;
+		}
 		/* find user */
 		if (!(acptr = find_person(name, NULL)) &&
 			!(acptr = find_uid(name, NULL)))
+		{
 			continue;
+		}
 		/* is user who we think? */
 		if (acptr->from != cptr)
+		{
 			continue;
-		/* get channel pointer */
-		if (!chptr)
-		    {
-			if (check_channelmask(sptr, cptr, parv[1]) == -1)
-			    {
-				sendto_flag(SCH_DEBUG,
-					    "received NJOIN for %s from %s",
-					    parv[1],
-					    get_client_name(cptr, TRUE));
-				return 0;
-			    }
-			convert_scandinavian(parv[1], cptr);
-			chptr = get_channel(acptr, parv[1], CREATE);
-			if (!IsChannelName(parv[1]) || chptr == NULL)
-			    {
-				sendto_one(sptr, replies[ERR_NOSUCHCHANNEL],
-							 ME, BadTo(parv[0]), parv[1]);
-				return 0;
-			    }
-		    }
+		}
 		/* make sure user isn't already on channel */
 		if (IsMember(acptr, chptr))
 		{
