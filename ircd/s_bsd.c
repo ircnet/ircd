@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.163 2004/10/05 00:11:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.164 2004/10/26 19:13:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -734,6 +734,7 @@ void	init_sys(void)
 	bzero((char *)&fdall, sizeof(fdall));
 	fdas.highest = fdall.highest = -1;
 	/* we need stderr open, don't close() it, daemonize() will do it */
+	/* after ircdwatch restarts ircd, we no longer have stderr, FIXME */
 	local[0] = local[1] = local[2] = NULL;
 	for (fd = 3; fd < MAXCONNECTIONS; fd++)
 	{
@@ -751,11 +752,14 @@ void	daemonize(void)
 	if (bootopt & BOOT_TTY)	/* debugging is going to a tty */
 		goto init_dgram;
 
-	(void) fclose(stdout);
+	(void)fclose(stdout);
 	(void)close(1);
 
 	if (!(bootopt & BOOT_DEBUG))
+	{
+		(void)fclose(stderr);
 		(void)close(2);
+	}
 
 	if (((bootopt & BOOT_CONSOLE) || isatty(0)) &&
 	    !(bootopt & BOOT_INETD))
@@ -777,7 +781,7 @@ void	daemonize(void)
 #else
 		(void)setpgrp(0, (int)getpid());
 #endif
-		(void)close(0);	/* fd 0 opened by inetd */
+		(void)close(0);
 		local[0] = NULL;
 	    }
 init_dgram:
