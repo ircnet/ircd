@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.209 2004/06/12 22:07:54 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.210 2004/06/12 22:28:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2569,6 +2569,9 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char	*inpath = cptr->name;
 	char	*user, *path, *killer;
 	int	chasing = 0;
+
+	if (is_allowed(sptr, ACL_KILL))
+		return m_nopriv(cptr, sptr, parc, parv);
 
 	user = parv[1];
 	/* one day we'll require path, remember to change in msgtab[] --B. */

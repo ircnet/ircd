@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.194 2004/06/12 14:55:58 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.195 2004/06/12 22:28:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2632,13 +2632,15 @@ int	m_admin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	return 2;
 }
 
-#if defined(OPER_REHASH) || defined(LOCOP_REHASH)
 /*
 ** m_rehash
 **
 */
 int	m_rehash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
+	if (is_allowed(sptr, ACL_REHASH))
+		return m_nopriv(cptr, sptr, parc, parv);
+
 	sendto_one(sptr, replies[RPL_REHASHING], ME, BadTo(parv[0]),
 		   mybasename(configfile));
 	sendto_flag(SCH_NOTICE,
@@ -2648,9 +2650,7 @@ int	m_rehash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #endif
 	return rehash(cptr, sptr, (parc > 1) ? ((*parv[1] == 'q')?2:0) : 0);
 }
-#endif
 
-#if defined(OPER_RESTART) || defined(LOCOP_RESTART)
 /*
 ** m_restart
 **
@@ -2660,6 +2660,9 @@ int	m_restart(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	aClient	*acptr;
 	Reg	int	i;
 	char	killer[HOSTLEN * 2 + USERLEN + 5];
+
+	if (is_allowed(sptr, ACL_RESTART))
+		return m_nopriv(cptr, sptr, parc, parv);
 
 	strcpy(killer, get_client_name(sptr, TRUE));
 	sprintf(buf, "RESTART by %s", get_client_name(sptr, TRUE));
@@ -2688,7 +2691,6 @@ int	m_restart(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	/*NOT REACHED*/
 	return 0;
 }
-#endif
 
 static	void	trace_one(aClient *sptr, aClient *acptr)
 {
@@ -3169,12 +3171,14 @@ int	m_eoback(aClient *cptr, aClient *sptr, int parc, char *parv[])
 }
 
 
-#if defined(OPER_DIE) || defined(LOCOP_DIE)
 int	m_die(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg	aClient	*acptr;
 	Reg	int	i;
 	char	killer[HOSTLEN * 2 + USERLEN + 5];
+
+	if (is_allowed(sptr, ACL_DIE))
+		return m_nopriv(cptr, sptr, parc, parv);
 
 	strcpy(killer, get_client_name(sptr, TRUE));
 	for (i = 0; i <= highest_fd; i++)
@@ -3199,9 +3203,7 @@ int	m_die(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	(void)s_die(0);
 	return 0;
 }
-#endif
 
-#if defined(OPER_SET) || defined(LOCOP_SET)
 int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	typedef struct
@@ -3217,6 +3219,9 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{ 0, NULL }
 	};
 	int i, acmd = 0;
+
+	if (is_allowed(sptr, ACL_SET))
+		return m_nopriv(cptr, sptr, parc, parv);
 
 	if (parc > 1)
 	{
@@ -3310,7 +3315,7 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 	return 1;
 }
-#endif
+
 /*
 ** storing server names in User structures is a real waste,
 ** the following functions change it to only store a pointer.

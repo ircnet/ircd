@@ -62,20 +62,10 @@ EXTERN int m_sdie (aClient *, aClient *, int, char **);
 EXTERN int m_map (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN char *find_server_string (int snum);
 EXTERN int find_server_num (char *sname);
-#if defined(OPER_REHASH) || defined(LOCOP_REHASH)
-EXTERN int m_rehash (aClient *cptr, aClient *sptr, int parc,
-			 char *parv[]);
-#endif /* OPER_REHASH || LOCOP_REHASH */
-#if defined(OPER_RESTART) || defined(LOCOP_RESTART)
-EXTERN int m_restart (aClient *cptr, aClient *sptr, int parc,
-			  char *parv[]);
-#endif /* OPER_RESTART || LOCOP_RESTART */
-#if defined(OPER_DIE) || defined(LOCOP_DIE)
+EXTERN int m_rehash (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_restart (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_die (aClient *cptr, aClient *sptr, int parc, char *parv[]);
-#endif /* OPER_DIE || LOCOP_DIE */
-#if defined(OPER_SET) || defined(LOCOP_SET)
 EXTERN int m_set(aClient *cptr, aClient *sptr, int parc, char *parv[]);
-#endif /* OPER_SET || LOCOP_SET */
 
 void	add_server_to_tree(aClient *cptr);
 void	remove_server_from_tree(aClient *cptr);
