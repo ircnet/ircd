@@ -1,3 +1,26 @@
+Sat Aug 22 15:20:10 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* channel.c: fixed ^G bug (only triggered in channel creation)
+
+	* struct_def.h, channel.c, s_err.c, s_user.c: AWAY is back.
+
+Sun Aug 16 16:01:15 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* ircd.c:, s_bsd.c: added -s switch.
+
+Sat Aug  8 14:21:20 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* s_serv.c: Roger's diff broke compression. (reported by Andre Koopal)
+
+	* Makefile.in: iauth didn't know where to find zlib.h (reported
+	by delta)
+
+	* a_log.c: typos in parameter names (reported by delta).
+
+Fri Aug  7 23:54:10 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* mod_rfc931.c: added sanity check on replies.
+
 Fri Aug  7 00:03:45 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* mod_rfc931.c: read RFC 1413 and fixed the reply parser.
