@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.21 2002/03/17 20:45:11 jv Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.22 2002/04/07 20:00:40 jv Exp $";
 #endif
 
 #include "os.h"
@@ -180,6 +180,11 @@ size_t the_size;
 {
 	static char local_dummy[MYDUMMY_SIZE];
 
+	if (the_size > sizeof(local_dummy))
+	{
+		the_size = sizeof(local_dummy);
+	}
+	
 	if (!inet_ntop(af, in, local_dummy, the_size))
 	{
 		/* good that every function calling this one
@@ -243,7 +248,8 @@ size_t the_size;
 #endif
 	    }
 	else
-		bcopy(local_dummy, out, 64);
+		bcopy(local_dummy, out,	the_size);
+
 	return out;
 }
 
