@@ -23,7 +23,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.2 1997/04/14 15:04:06 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.3 1997/04/14 20:02:55 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -948,6 +948,7 @@ static	SChan	svchans[SCH_MAX] = {
 	{ SCH_SERVER,	"&SERVERS",	NULL },
 	{ SCH_HASH,	"&HASH",	NULL },
 	{ SCH_LOCAL,	"&LOCAL",	NULL },
+	{ SCH_DEBUG,	"&DEBUG",	NULL },
 };
 
 
