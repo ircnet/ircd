@@ -1,6 +1,6 @@
   IRC Services
   Christophe Kalt
-  $Id: SERVICE.txt,v 1.1 1997/08/07 19:56:14 kalt Exp $
+  $Id: SERVICE.txt,v 1.2 1997/08/08 12:46:09 kalt Exp $
 
   The IRC protocol described in RFC 1459 defines two types of connec-
   tions (client, and server).  A third type was introduced with version
@@ -279,19 +279,25 @@
      IInnffoorrmmaattiioonn
         The service ``information'' should be short and descriptive.
 
-     BBaassiicc qquueerriieess
-        The service should reply to at least 2 queries:
+     MMaannddaattoorryy qquueerriieess
+        The service must reply to at least 2 queries:
 
         AADDMMIINN
-           name and e-mail address of the administrator.
+           Name and e-mail address of the administrator.
 
         HHEELLPP
-           list of queries understood by the service.  Each query should
+           List of queries understood by the service.  Each query should
            also have an help.
+
+     BBaassiicc qquueerriieess
+        These queries should also be understood by the service:
 
         IINNFFOO
            This should be a short text explaining what the service and
            its purpose are.
+
+        VVEERRSSIIOONN
+           The version of the running code.
 
   44..33..  FFlloooodd ccoonnttrrooll
 
@@ -301,12 +307,6 @@
 
   Services should implement their own flood control (for outgoing
   traffic) to be safe.
-
-
-
-
-
-
 
 
 

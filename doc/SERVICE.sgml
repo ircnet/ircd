@@ -4,7 +4,7 @@
 
 <title>IRC Services
 <author>Christophe Kalt
-<date>$Id: SERVICE.sgml,v 1.1 1997/08/07 19:56:01 kalt Exp $
+<date>$Id: SERVICE.sgml,v 1.2 1997/08/08 12:45:00 kalt Exp $
 <abstract>
 The IRC protocol described in RFC 1459 defines two types of
 connections (client, and server).  A third type was
@@ -248,15 +248,19 @@ simple rules:
 unique on the network.
 <tag/Information/The service ``information'' should be short
 and descriptive.
-<tag/Basic queries/The service should reply to at least 2
+<tag/Mandatory queries/The service must reply to at least 2
 queries:
 <descrip>
-<tag/ADMIN/name and e-mail address of the administrator.
-<tag/HELP/list of queries understood by the service.  Each
+<tag/ADMIN/Name and e-mail address of the administrator.
+<tag/HELP/List of queries understood by the service.  Each
 query should also have an help.
+</descrip>
+<tag/Basic queries/These queries should also be understood
+by the service:
+<descrip>
 <tag/INFO/This should be a short text explaining what the
 service and its purpose are.
-</descrip>
+<tag/VERSION/The version of the running code.
 </descrip>
 <sect1>Flood control
 <p>
