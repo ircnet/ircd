@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.220 2004/08/02 16:26:55 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.221 2004/08/02 17:42:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1614,6 +1614,10 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				if ((host = rindex(user ? user : cp, '@')))
 					*host++ = '\0';
 				lp->value.alist = make_bei(cp, user, host);
+				if (user)
+					user[-1] = '!';
+				if (host)
+					host[-1] = '@';
 				break;
 			case MODE_KEY :
 				c = 'k';
