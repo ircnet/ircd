@@ -124,6 +124,7 @@
 #define	RPL_CREATED          003
 #define	RPL_MYINFO           004
 #define	RPL_BOUNCE           005
+#define	RPL_YOURID            42
 
 /*
  * Errors are in the range from 400-599 currently and are grouped by what
