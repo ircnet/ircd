@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.71 2003/02/17 01:55:42 jv Exp $
+ *   $Id: struct_def.h,v 1.72 2003/07/18 17:31:31 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -163,7 +163,6 @@ typedef struct        LineItem aExtData;
 #define	FLAGS_WXAUTH	0x0004000 /* same as above, but also prevent parsing */
 #define	FLAGS_NONL	0x0008000 /* No \n in buffer */
 #define	FLAGS_CBURST	0x0010000 /* set to mark connection burst being sent */
-#define	FLAGS_RILINE	0x0020000 /* Restricted i-line [unused?] */
 #define	FLAGS_QUIT	0x0040000 /* QUIT :comment shows it's not a split */
 #define	FLAGS_SPLIT	0x0080000 /* client QUITting because of a netsplit */
 #define	FLAGS_HIDDEN	0x0100000 /* netsplit is behind a hostmask,
@@ -178,20 +177,19 @@ typedef struct        LineItem aExtData;
 				  ** a SQUIT. */
 #define	FLAGS_EOB	0x4000000 /* EOB received */
 
-#define	FLAGS_OPER	0x0001 /* Operator */
-#define	FLAGS_LOCOP	0x0002 /* Local operator -- SRB */
+#define	FLAGS_OPER	0x0001 /* operator */
+#define	FLAGS_LOCOP	0x0002 /* local operator -- SRB */
 #define	FLAGS_WALLOP	0x0004 /* send wallops to them */
 #define	FLAGS_INVISIBLE	0x0008 /* makes user invisible */
-#define FLAGS_RESTRICT	0x0010 /* Restricted user */
+#define FLAGS_RESTRICT	0x0010 /* restricted user */
 #define FLAGS_AWAY	0x0020 /* user is away */
-
-#define FLAGS_EXEMPT    0x0040 /* User is exemped from k-lines */
+#define FLAGS_EXEMPT    0x0040 /* user is exempted from k-lines */
 	
 #define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP|FLAGS_AWAY)
 #define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP|FLAGS_RESTRICT)
 
 /*
- * flags macros.
+ * user flags macros.
  */
 #define	IsOper(x)		((x)->user && (x)->user->flags & FLAGS_OPER)
 #define	IsLocOp(x)		((x)->user && (x)->user->flags & FLAGS_LOCOP)
@@ -299,6 +297,7 @@ struct	ListItem	{
 	char	*host;
 };
 
+/* these define configuration lines (A:, M:, I:, K:, etc.) */
 #define	CONF_ILLEGAL		0x80000000
 #define	CONF_MATCH		0x40000000
 #define	CONF_QUARANTINED_SERVER	0x000001
@@ -312,9 +311,6 @@ struct	ListItem	{
 #define	CONF_ME			0x000100
 #define	CONF_KILL		0x000200
 #define	CONF_ADMIN		0x000400
-#ifdef 	R_LINES
-#define	CONF_RESTRICT		0x000800
-#endif
 #define	CONF_CLASS		0x001000
 #define	CONF_SERVICE		0x002000
 #define	CONF_LEAF		0x004000
@@ -411,6 +407,7 @@ struct	User	{
 	char	*server;
 	u_int	hhashv;		/* hostname hash value */
 	struct User *hhnext;	/* next entry in hostname hash */
+				/* sip MUST be the last in this struct!!! */
 	char	sip[1];		/* ip as a string, big enough for ipv6
 				 * allocated to real size in make_user */
 

@@ -2,6 +2,7 @@
 
 	* irc_sprintf.c, irc_sprintf_body.c, irc_sprintf_ext.h: various
 	  cleanups, typo fixes (from Zobo).
+	* struct_def.h: removed unused flags, some cleanups.
 
 2003-06-22  Kurt Roeckx
 
