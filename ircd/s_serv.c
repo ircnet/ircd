@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.252 2004/10/26 23:23:02 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.253 2004/10/27 14:08:39 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3700,7 +3700,7 @@ void	do_emulated_eob(aClient *sptr)
 	return;
 }
 
-static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf, int size)
+static	void	dump_map_sid(aClient *sptr, char *mask, aClient *root, char *pbuf, int size)
 {
         int i = 1;
         aClient *acptr;
@@ -3723,7 +3723,12 @@ static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf, int size)
 			root->serv->sid,
 			BadTo(root->serv->verstr));
 	}
-	sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
+	
+	if (!mask || 0==match(mask, 
+		(IsMasked(root) ? root->serv->maskedby->name : root->name)))
+	{
+		sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
+	}
 	
 	if (root->serv->down)
 	{
@@ -3756,14 +3761,13 @@ static	void	dump_sid_map(aClient *sptr, aClient *root, char *pbuf, int size)
 		*(pbuf + 3) = ' ';
 		/* "pbuf + 4" and "size - 4" because each nesting 
 		** we add 4 chars in front of output line --B. */
-		dump_sid_map(sptr, acptr, pbuf + 4, size - 4);
+		dump_map_sid(sptr, mask, acptr, pbuf + 4, size - 4);
 		i++;
 	}
 }
 
 
-static	void	dump_map(aClient *sptr, aClient *root, aClient **prevserver,
-			char *pbuf)
+static	void	dump_map(aClient *sptr, char *mask, aClient *root, aClient **prevserver, char *pbuf)
 {
 	aClient *prev = NULL;
         aClient *acptr;
@@ -3779,7 +3783,8 @@ static	void	dump_map(aClient *sptr, aClient *root, aClient **prevserver,
 	{
 		*pbuf= '\0';
 		strcat(pbuf, root->name);
-		sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
+		if (!mask || !match(mask, root->name))
+			sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
 	}
 	
 	/* Clean up the output line */
@@ -3814,7 +3819,7 @@ static	void	dump_map(aClient *sptr, aClient *root, aClient **prevserver,
 				*(pbuf + 3) = ' ';
 
 				/* prev - with new previous server ptr */
-				dump_map(sptr, *prevserver, &prev, pbuf + 4);
+				dump_map(sptr, mask, *prevserver, &prev, pbuf + 4);
 			}
 			/* store this server */
 			*prevserver = acptr;
@@ -3822,7 +3827,7 @@ static	void	dump_map(aClient *sptr, aClient *root, aClient **prevserver,
 		else
 		{
 			/* Masked server found - check it's leaves */
-			dump_map(sptr, acptr, prevserver, pbuf);
+			dump_map(sptr, mask, acptr, prevserver, pbuf);
 		}
 		/* Display the last found server if we are on the correct
 		 * level */
@@ -3833,7 +3838,7 @@ static	void	dump_map(aClient *sptr, aClient *root, aClient **prevserver,
 			*(pbuf + 1) = '`';
 			*(pbuf + 2) = '-';
 			*(pbuf + 3) = ' ';
-			dump_map(sptr, *prevserver, &prev, pbuf + 4);
+			dump_map(sptr, mask, *prevserver, &prev, pbuf + 4);
 			*prevserver = NULL;
 		}
 	}
@@ -3847,19 +3852,33 @@ static	void	dump_map(aClient *sptr, aClient *root, aClient **prevserver,
 int	m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr = NULL;
-	if ((parc > 1) && (*parv[1] == 's'))
+	int sids = 0;
+	char *mask = NULL;
+
+	if (parc > 1)
+	{
+		if (parv[parc-1][0] == 's' && parv[parc-1][1] == '\0')
+		{
+			sids = parc - 1;
+		}
+		if (sids != 1)
+		{
+			mask = parv[1];
+		}
+	}
+	if (sids)
 	{
 		/* print full dump of the network */
 		sendto_one(sptr, replies[RPL_MAPSTART], ME, BadTo(sptr->name),
 				"Server users SID version");
-		dump_sid_map(sptr, &me, buf, sizeof(buf) - 
+		dump_map_sid(sptr, mask, &me, buf, sizeof(buf) - 
 			strlen(BadTo(sptr->name)) - strlen(ME) - 8);
 		sendto_one(sptr, replies[RPL_MAPEND], ME, BadTo(sptr->name));
 		return 2;
 	}
 	sendto_one(sptr, replies[RPL_MAPSTART], ME, BadTo(sptr->name),
 			"Server");
-	dump_map(sptr, &me, &acptr, buf);
+	dump_map(sptr, mask, &me, &acptr, buf);
 	sendto_one(sptr, replies[RPL_MAPEND], ME, BadTo(sptr->name));
 	return 2;
 }
