@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.93 1999/02/19 01:05:04 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.94 1999/02/19 19:00:12 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1677,48 +1677,33 @@ aClient	*sptr;
 Reg	aChannel *chptr;
 char	*key;
 {
-	Link	*lp, *banned;
-	int	ckinvite = 0;
+	Link	*lp = NULL, *banned;
 
 	if (chptr->users == 0 && (bootopt & BOOT_PROT) && 
 	    chptr->history != 0 && *chptr->chname != '!')
 		return (timeofday > chptr->history) ? 0 : ERR_UNAVAILRESOURCE;
+
+	for (lp = sptr->user->invited; lp; lp = lp->next)
+		if (lp->value.chptr == chptr)
+			break;
+
 	if (banned = match_modeid(CHFL_BAN, sptr, chptr))
 		if (match_modeid(CHFL_EXCEPTION, sptr, chptr))
 			banned = NULL;
-		else
-		    {
-			for (lp = sptr->user->invited; lp; lp = lp->next)
-				if (lp->value.chptr == chptr)
-					break;
-			if (!lp)
-				return (ERR_BANNEDFROMCHAN);
-			ckinvite = 1;
-		    }
+		else if (lp == NULL)
+			return (ERR_BANNEDFROMCHAN);
 
-	if ((chptr->mode.mode & MODE_INVITEONLY) && !ckinvite &&
-	    !match_modeid(CHFL_INVITE, sptr, chptr))
-	    {
-		for (lp = sptr->user->invited; lp; lp = lp->next)
-			if (lp->value.chptr == chptr)
-				break;
-		if (!lp)
-			return (ERR_INVITEONLYCHAN);
-		ckinvite = 1;
-	    }
+	if ((chptr->mode.mode & MODE_INVITEONLY)
+	    && !match_modeid(CHFL_INVITE, sptr, chptr)
+	    && (lp == NULL))
+		return (ERR_INVITEONLYCHAN);
 
 	if (*chptr->mode.key && (BadPtr(key) || mycmp(chptr->mode.key, key)))
 		return (ERR_BADCHANNELKEY);
 
 	if (chptr->mode.limit && (chptr->users >= chptr->mode.limit) &&
-	    !ckinvite)
-	    {
-		for (lp = sptr->user->invited; lp; lp = lp->next)
-			if (lp->value.chptr == chptr)
-				break;
-		if (!lp)
-			return (ERR_CHANNELISFULL);
-	    }
+	    (lp == NULL))
+		return (ERR_CHANNELISFULL);
 
 	if (banned)
 		sendto_channel_butone(&me, &me, chptr,
