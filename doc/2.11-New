@@ -77,7 +77,6 @@ Admin:
 	* STATS f, avaible to local operators only, shows detailed
 	  information about client TCP connection.
 	* -t option (foreground mode) is now avaible even without DEBUGMODE
-	* o: and O: in config are now swapped to be consistent with usermode.
 	* Added SET command which makes possible to fine-tune certain
 	  ircd values during runtime (like dbuf poolsize and autoconnect).
 	* Stats Z no longer computes real memory statistics unless DEBUGMODE

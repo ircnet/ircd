@@ -42,5 +42,8 @@ EXTERN void init_io (void);
 EXTERN void loop_io (void);
 EXTERN int tcp_connect (char *, char *, u_short, char **);
 
+EXTERN char strConn[256];
+EXTERN int strConnLen;
+
 /* () */
 #undef EXTERN

@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.62 2004/09/09 17:18:25 chopin Exp $
+#*   $Id: Makefile.in,v 1.63 2004/09/21 15:32:49 chopin Exp $
 #*
 #*/
 
@@ -155,7 +155,7 @@ IRCD_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
 
 IAUTH_COMMON_OBJS = clsupport.o clmatch.o # This is a little evil
 IAUTH_OBJS = iauth.o a_conf.o a_io.o a_log.o \
-             mod_lhex.o mod_pipe.o mod_rfc931.o mod_socks.o
+             mod_lhex.o mod_pipe.o mod_rfc931.o mod_socks.o mod_webproxy.o
 
 CHKCONF_COMMON_OBJS = match.o
 CHKCONF_OBJS = chkconf.o
@@ -407,6 +407,9 @@ mod_rfc931.o: ../iauth/mod_rfc931.c config.h ../common/struct_def.h setup.h
 
 mod_socks.o: ../iauth/mod_socks.c config.h ../common/struct_def.h setup.h
 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_socks.c
+
+mod_webproxy.o: ../iauth/mod_webproxy.c config.h ../common/struct_def.h setup.h
+	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_webproxy.c
 
 chkconf.o: ../ircd/chkconf.c setup.h config.h ../common/struct_def.h ../ircd/config_read.c
 	$(CC) $(CC_CFLAGS) -DCHKCONF_COMPILE -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" \

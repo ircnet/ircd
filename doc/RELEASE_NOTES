@@ -1,48 +1,106 @@
-# @(#)$Id: RELEASE_NOTES,v 1.56 2004/09/21 14:13:05 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.57 2004/09/21 15:28:19 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
-Important changes in 2.11.0 (since 2.10.3p5):
 
-	* New server-server protocol based on Unique IDs. In pure 2.11 collided
-	  clients will stay on with changed nick.
-	* M: requires SID now. Please read INSTALL.txt and example.conf
-	* A: accepts "network name" parameter.
-	* H: can have SID masks to accept. Read docs.
-	* Nicknames of local clients cannot have [\]{|} chars. Sorry.
-	* Channelnames created on 2.11.0 will have chars {}~\ in their name
-	  automatically converted to []^|. Sorry.
-	* I: require now both name AND addr to match. Revise your config.
-	* I: have flags now (D, E, e, F, I, M, N, R), check INSTALL for details.
-	* OPER_REMOTE is removed (and server behaves like it was defined).
-	* stats l/L no longer returns listeners, use stats P.
-	* DNS command is oper only from now.
+New features in 2.11.0:
+	* New server-server protocol based on Unique IDs.
+	* When collision occurs, clients get their nicks forcefully changed
+	  to their UIDs. (Note: this requires no 2.10 server on the path
+	  between these two clients!)
+	* New channel list type: R (aka reop hints). With the same syntax and
+	  behaviour as beI, it serves as a hint list for reopping opless
+	  channels.
+	* CIDR support in +beIR channelmodes.
+	* New wildcard "#", matching any digit (note that if ban (in nick part)
+	  starts with digit, it will match on UID, if with '#', it will match
+	  on nickname).
+	* Clients can use "NICK 0" to get their UID as a nick. Works during
+	  registration, too.
+	* Channels now keep information of who and when set the topic.
+	* File resolv.conf can have IPv6 servers (this makes ircd fully IPv6).
+	* New "STATS P" to return listeners (removed from "STATS L").
 	* DELAY_CLOSE is default, this may use some extra fds.
-	* resolving slightly changed: when host has CNAMEs, use the name that
+	* OPER_REMOTE is removed (and server behaves like it was defined).
+	* Resolving slightly changed: when host has CNAMEs, use the name that
 	  client IP PTR points to, not the CNAME that points to client IP.
-	* resolv.conf can have IPv6 nameservers (this makes ircd fully IPv6).
-	* P: can have flags ('D' and 'S'), check INSTALL file for details.
-	* class usage was moved from end of trace to stats Y.
-	* redundant bans are allowed to be set now.
-	* SERVICE command has been changed slightly (removed 2nd (stok) and 5th
-	  (hopcount) parameters), please update your services.
-	* file names and layout changed a bit, read 2.11-New and be careful.
-	* user mode +w is doing nothing: class usage is in stats Y and wallops
+	* It is now possible to include files in config without need of m4.
+	* New "TKLINE seconds user@host :reason" and "UNTKLINE user@host"
+	  commands, available for services and (depending on O: flag) opers.
+	* New "REHASH t" removes all tklines.
+	* Oper-only (access granted via O: flag) &CLIENTS channel reporting
+	  (if defined) clients connects, quits, nickchanges.
+	* New config line X (for excluding users).
+	* "STATS k" (lower case k) returns list of tklines.
+	* New DelayedKill feature to make ircd more responsible on rehash
+	  on big servers with many clients and many klines.
+	* Reject reason sent to client can be specified in iauth.conf
+	* C:lines can have negative ports to disable autoconnects; these
+	  will be used when "CONNECT" with port "0" is used.
+	* Possibility of using port "0" in manual "CONNECT" (even remote); ircd
+	  will use port from ircd.conf.
+	* New "STATS ?" shows quick information about connected servers.
+	* New "STATS f" shows detailed information about client TCP connection
+	  (local opers only).
+	* New "SET" command, which makes possible to fine-tune certain ircd
+	  values during runtime (like dbuf poolsize and autoconnect).
+	* New iauth module: mod_webproxy.
+	* Modules socks and webproxy can work on different ports.
+	* New keyword "delayed" in iauth configuration (shortening time client
+	  waits for accepting).
+
+Important changes in 2.11.0 (since 2.10.3):
+	* Nicknames of local clients cannot have [\]{|} chars. (Will be removed
+	  in 2.11.1).
+	* Channelnames created on 2.11.0 will have chars {}~\ in their name
+	  automatically converted to []^|. (Will be removed in 2.11.1).
+	* An irc client is no longer included.
+	* Class usage was moved from end of "TRACE" to "STATS Y".
+	* "DNS" command is oper only from now.
+	* Redundant bans are allowed to be set.
+	* User mode +w is doing nothing: class usage is in stats Y and wallops
 	  are sent to a new server channel &WALLOPS.
-	* irc client is no longer included.
-	* rehash q was changed to rehash d (dns flush).
-	* ircd is capable of including files to config file without need of m4.
-	* new commands: TKLINE and UNTKLINE.
-	* stats K returns list of klines, stats k list of tklines.
-	* rehash t removes all tklines.
+	* "REHASH d" (dns flush) instead of "REHASH q".
+	* Only "STATS K" (upper case K) returns list of klines.
+	* "LIST" (if allowed) does not disconnect if client's sendQ fills.
+	* "WHOIS" now shows the time user signed on.
+	* "LUSERS" shows local and global usercount maximum.
+	* "INVITE" overriding ban shows inviter's n!u@h in channel notice.
+	* Support for text representation of user modes in USER command
+	  during registration.
+	* Operator broadcast message syntax has been changed: add one '$' in
+	  front (so NOTICE either $$*mask or $#*mask).
+	* Essential notices were moved from &LOCAL to &NOTICES
+	* Client's username and hostname are strictly checked for valid chars.
+	* "-t" runtime option (foreground mode) available without DEBUGMODE.
+	* "STATS Z" no longer computes real memory stats without DEBUGMODE.
+	* "STATS l" and "STATS L" show counts in Bytes, not KiBytes.
+	* "SERVICE" command has been changed slightly (removed 2nd (stok) and 5th
+	  (hopcount) parameters), please update your services.
+
+Important configuration changes between 2.10.x and 2.11.0:
+	* M: has a new mandatory field: SID. Please read INSTALL.
+	* A: has a new field: "network name". 
+	* H: can have SID masks to accept.
+	* I: requires now both name field and addr field to match.
+	* I: has a new field: flags (D, E, e, F, I, M, N, R); read INSTALL.
+	* P: has a new field: flags ('D' and 'S'); read INSTALL.
+	* C: has a new field: outgoing IP (useful for multihomed servers).
 	* O: have flags now, check INSTALL file for details; WARNING: no flags
 	  means no privileges at all!
-	* oper-only (access granted via O: flag) &CLIENTS channel reporting
-	  (if defined) clients connects, quits, nickchanges.
-	* new way of excluding users, X:line.
-	* new wildcard (#), matching any digit.
-	* mod_socks no longer works on default 1080, you have to explicitly set
-	  "port = " in module configuration in iauth.conf.
+	* o: is deprecated (but still works), please use O: with 'L' flag.
+	* File names and layout changed a bit, be careful:
+	  - localstatedir defaults to $(prefix)/var (autoconf did that!)
+	  - logdir defaults to $(localstatedir)/log, not $(prefix)/var/log
+	  - ircd_var_dir (where .pid and .tune are kept) defaults to
+	    $(localstatedir)/run
+	  - log files are no longer in $(prefix)/var/log/ircd/, instead
+	    they are in $(logdir)
+	  - log file names changed from $(logdir)/{users,rejects,auth}
+	    to $(logdir)/ircd.{users,rejects,auth}
+	  - config and log file names depend on $(IRCD) name.
+	* Module socks no longer has default port, you must explicitly
+	  set "port = " in module configuration in iauth.conf.
 
 This is version 2.10.3 of the IRC software.
 ===============================================================================

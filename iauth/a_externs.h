@@ -32,3 +32,4 @@
 #include "mod_socks_ext.h"
 #include "mod_pipe_ext.h"
 #include "mod_lhex_ext.h"
+#include "mod_webproxy_ext.h"
