@@ -1,3 +1,20 @@
+Fri Jun 12 19:00:03 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* ircd.c: fix for inetd support (from Jonathan Chapman
+	<jonathan@clover.net>).
+
+	* parse.c, s_debug.c: more LOCOP_* fixes (from Michael Neumayer).
+
+	* s_user.c: oper counter bugfix (from Magnus Tjernstrom).
+
+	* channel.c:
+		* fixed join #a,#b,.. desynch bug (reported by viha@vip.fi).
+		* fixed netjoin +p/+s desynch problem (same).
+	
+Sun May 31 14:18:41 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* send.c, channel.c: '-' leftovers (Michael Neumayer <eumel@42.org>).
+
 Mon May 25 15:13:51 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* struct_def.h, channel.c, hash.c, s_misc.c: changed new channels
