@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.123 2003/07/28 17:17:43 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.124 2003/08/10 16:36:17 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3096,7 +3096,7 @@ char	*parv[];
 		{
 			sendto_flag(SCH_ERROR,
 				"Received another EOB for server %s (%s)",
-				 sid, sptr->name);
+				 sptr->serv->sid, sptr->name);
 			return 1;
 		}
 	}
