@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.211 2004/06/06 11:00:41 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.212 2004/06/06 11:30:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -156,6 +156,7 @@ static	void	free_bei(aListItem *bei)
 static	aListItem	*make_bei(char *nick, char *user, char *host)
 {
 	aListItem	*tmp;
+	int	len;
 
 	tmp = (struct ListItem *)MyMalloc(sizeof(aListItem));
 
@@ -166,8 +167,9 @@ static	aListItem	*make_bei(char *nick, char *user, char *host)
 	}
 	else
 	{
-		tmp->nick=(char *) MyMalloc( strlen(nick)+1 );
-		strncpyzt(tmp->nick, nick, NICKLEN + 1);
+		len = MIN(strlen(nick), NICKLEN) + 1;
+		tmp->nick = (char *) MyMalloc(len);
+		strncpyzt(tmp->nick, nick, len);
 	}
 	user = check_string(user);
 	if (user == asterix)
@@ -176,8 +178,9 @@ static	aListItem	*make_bei(char *nick, char *user, char *host)
 	}
 	else
 	{
-		tmp->user=(char *) MyMalloc( strlen(user)+1 );
-		strncpyzt(tmp->user, user, USERLEN + 1);
+		len = MIN(strlen(user), USERLEN) + 1;
+		tmp->user=(char *) MyMalloc(len);
+		strncpyzt(tmp->user, user, len);
 	}
 	host = check_string(host);
 	if (host == asterix)
@@ -186,8 +189,9 @@ static	aListItem	*make_bei(char *nick, char *user, char *host)
 	}
 	else
 	{
-		tmp->host=(char *) MyMalloc( strlen(host)+1 );
-		strncpyzt(tmp->host, host, HOSTLEN + 1);
+		len = MIN(strlen(host), HOSTLEN) + 1;
+		tmp->host=(char *) MyMalloc(len);
+		strncpyzt(tmp->host, host, len);
 	}
 
 	return tmp;
