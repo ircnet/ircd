@@ -1,3 +1,7 @@
+2004-02-09  Piotr Kucharski
+
+	* s_conf.c/initconf(): swap o: and O: to match umode.
+
 2004-02-08  Piotr Kucharski
 
 	* iauth.c: new function write_pidfile().
