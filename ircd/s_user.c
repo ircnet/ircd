@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.234 2004/10/07 00:16:47 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.235 2004/10/09 01:28:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2877,15 +2877,21 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int	m_ping(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	char	*destination;
+	char	*origin, *destination;
 
+	origin = parv[1];
 	destination = parv[2]; /* Will get NULL or pointer (parc >= 2!!) */
 
+	acptr = find_client(origin, NULL);
+	if (!acptr)
+		acptr = find_server(origin, NULL);
+	if (!acptr || acptr != sptr)
+		origin = cptr->name;
 	if (!BadPtr(destination) && match(destination, ME) != 0)
 	{
 		if ((acptr = find_server(destination, NULL)))
 			sendto_one(acptr, ":%s PING %s :%s", parv[0],
-				cptr->name, destination);
+				origin, destination);
 	    	else
 		{
 			sendto_one(sptr, replies[ERR_NOSUCHSERVER],
