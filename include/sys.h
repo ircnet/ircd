@@ -37,8 +37,10 @@
 #include <sys/param.h>
 #ifdef HAVE_SYS_BITYPES_H
 # include <sys/bitypes.h>
-#elif (!defined(BSD)) || (BSD < 199306)
-# include "bitypes.h"
+#else
+# if (!defined(BSD)) || (BSD < 199306)
+#  include "bitypes.h"
+# endif
 #endif
 
 #ifdef	HAVE_UNISTD_H
@@ -105,10 +107,6 @@ typedef	unsigned char	u_char;
 typedef	unsigned short	u_short;
 typedef	unsigned long	u_long;
 typedef	unsigned int	u_int;
-#endif
-
-#ifdef	USE_VARARGS
-# include <varargs.h>
 #endif
 
 #define	SETSOCKOPT(fd, o1, o2, p1, o3)	setsockopt(fd, o1, o2, (char *)p1,\

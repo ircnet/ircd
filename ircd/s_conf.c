@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.8 1997/06/02 13:17:15 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.9 1997/06/09 14:43:01 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -1429,8 +1429,8 @@ int	class;
 			    {
 				char rpl[BUFSIZE];
 				
-				irc_sprintf(rpl, rpl_str(RPL_BOUNCE,"unknown"),
-					    aconf->name, aconf->port);
+				SPRINTF(rpl, rpl_str(RPL_BOUNCE,"unknown"),
+					aconf->name, aconf->port);
 				strcat(rpl, "\r\n");
 				send(class, rpl, strlen(rpl), 0);
 				return;

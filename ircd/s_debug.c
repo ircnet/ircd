@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.2 1997/04/14 15:04:25 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.3 1997/06/09 14:43:01 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -194,35 +194,34 @@ char	serveropts[] = {
 #ifdef DEBUGMODE
 static	char	debugbuf[1024];
 
-#ifndef	USE_VARARGS
-/*VARARGS2*/
+#ifndef	USE_STDARG
 void	debug(level, form, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)
 int	level;
 char	*form, *p1, *p2, *p3, *p4, *p5, *p6, *p7, *p8, *p9, *p10;
-{
 #else
-void	debug(level, form, va_alist)
+void	vdebug(level, form, va)
 int	level;
 char	*form;
-va_dcl
-{
-	va_list	vl;
-
-	va_start(vl);
+va_list	va;
 #endif
+{
 	int	err = errno;
 
 #ifdef	USE_SYSLOG
 	if (level == DEBUG_ERROR)
+#ifndef	USE_STDARG
 		syslog(LOG_ERR, form, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
+#else
+		vsyslog(LOG_ERR, form, va);
+#endif
 #endif
 	if ((debuglevel >= 0) && (level <= debuglevel))
 	    {
-#ifndef	USE_VARARGS
+#ifndef	USE_STDARG
 		(void)sprintf(debugbuf, form,
 				p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 #else
-		(void)vsprintf(debugbuf, form, vl);
+		(void)vsprintf(debugbuf, form, va);
 #endif
 		if (local[2])
 		    {
@@ -234,6 +233,18 @@ va_dcl
 	    }
 	errno = err;
 }
+
+#ifdef USE_STDARG
+void	debug(level, form, ...)
+int     level;
+char    *form;
+{
+	va_list va;
+        va_start(va, form);
+	vdebug(level, form, va);
+        va_end(va);
+}
+#endif
 
 /*
  * This is part of the STATS replies. There is no offical numeric for this
