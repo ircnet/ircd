@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.33 1998/08/05 21:43:33 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.34 1998/08/06 02:01:48 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -464,7 +464,6 @@ start_iauth()
 		first = 0;
 	else
 	    {
-		char buf[10];
 		int i;
 		aClient *cptr;
 
@@ -474,8 +473,7 @@ start_iauth()
 				continue;
 			if (IsServer(cptr) || IsService(cptr))
 				continue;
-			sprintf(buf, "%d O\n", i);
-			sendto_iauth(buf);
+			sendto_iauth("%d O", i);
 		    }
 	    }
 #endif
