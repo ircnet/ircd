@@ -1,0 +1,446 @@
+This is stats.info, produced by makeinfo version 4.6 from
+/tmp/linuxdoc-dir-4761/sgmltmp.stats.info.2.
+
+   \input texinfo
+
+
+File: stats.info,  Node: Top,  Next: Introduction,  Up: (dir)
+
+STATS unleashed
+***************
+
+     Piotr Kucharski
+     $Id: stats.info,v 1.1 2004/03/25 00:22:18 chopin Exp $
+
+   This document describes all STATS for ircd server 2.11.
+
+* Menu:
+
+* Introduction::
+* STATS unleashed::
+* Enhancements::
+
+
+File: stats.info,  Node: Introduction,  Next: STATS unleashed,  Prev: Top,  Up: Top
+
+Introduction
+************
+
+So far STATS has one-char parameter. The result always ends with 219
+numeric ,,End of STATS report". Whether it was empty output or invalid
+parameter can be determined by the char in 219 numeric (after the
+nickname): if it is the char we passed as parameter, the output was
+empty, if it was asterisk ,,*", there was no such STATS we requested.
+
+
+File: stats.info,  Node: STATS unleashed,  Next: Enhancements,  Prev: Introduction,  Up: Top
+
+STATS unleashed
+***************
+
+All examples are raw ircd output minus prefix (server name), numeric
+(varies from stats to stats) and nickname of a client requesting STATS.
+Also ending 219 numeric is omitted in whole.
+
+`a, A - iauth configuration'
+          * rfc931
+          * socks reject,megaparanoid,cache=0
+
+     Shows all succesfully loaded iauth modules and their options.
+
+`b, B - bounce lines'
+          B -1 <NULL> irc.example.org 4444 0
+          B <NULL> <NULL> irc.example.net 4444 0
+
+     2nd field is class number or the hostname/IP mask to match the
+     client; if NULL, it matches any class or hostname, if "-1", it is
+     used only for those clients that were rejected for connecting to
+     server-only port.  4th is server name and 5th the port, both
+     telling the client where it should connect to.
+
+`c - connect, zipped connect and noconnect lines'
+          C *@192.168.0.13 * *.example.net 6667 10
+
+     "C" or "c" (lowercase is a mark for zipped links) are connect
+     lines, that is the list of servers we will connect to. 2nd field
+     is remote server IP (or name), 3rd the password for connection
+     (disguised as "*"), 4th IRC name of a server, 5th - port that
+     autoconnection will be attempted to (non-positive disables A/C)
+     and finally the class this server will be using is in 6th field.
+
+          N *@192.168.0.13 * *.example.net 1 10
+
+     "N" stands for no-connect lines, and these are the servers that
+     will connect to us. It is required that each "C" has its
+     corresponding "N".  The format is the same as "C" with an
+     exception of last but one field: it is not a port, but a number of
+     labels (parts of hostname between dots) from start to replace with
+     "*" when introducing us to this server (allows masking).
+
+`C - class statistics'
+          Class 0 13
+
+     There are 13 clients (users, services, servers) using class 0.
+
+`d, D - defines'
+          HUB:yes MS:3
+          LQ:128 MXC:100 TS:60 HRD:30 HGL:900 WWD:15 ATO:90
+          KCTL:90 DCTL:1800 LDCTL:5400 CF:1000 MCPU:10
+          H:63 N:9 D:9 U:10 R:50 T:160 C:50 P:20 K:23
+          BS:512 MXR:20 MXB:30 MXBL:1024 PY:10
+          ZL:-1 CM:2 CP:10 DC:15
+          AC:ON SS:0 SU:2
+
+     These shows values of most variables set in config.h or
+     struct_def.h, compiled in the server:
+        * HUB (HUB): whether server can be a hub (more than one server
+          connected)
+
+        * MS (MAXSERVERS): initial buffers allocation for that many
+          servers (it can grow later anyway)
+
+        * LQ (LISTENQUEUE): maximum number of connections waiting to be
+          accepted on one port
+
+        * MXC (MAXCONNECTIONS): maximum number of all open file
+          descriptors allowed for ircd (this includes client
+          connections, dns, motd, opening conf fds, pipes, P-lines etc.)
+
+        * TS (TIMESEC): allowed idle seconds (doing nothing waiting for
+          messages to come)
+
+        * HRD (HANGONRETRYDELAY): wait that seconds before fast server
+          reconnection
+
+        * HGL (HANGONGOODLINK): allow fast server reconnection if link
+          has been open for that many seconds
+
+        * WWD (WRITEWAITDELAY): seconds to wait for write() call to
+          complete if stuck
+
+        * ATO (ACCEPTTIMEOUT): seconds to wait for all auth/dns to
+          complete (after that client quits with a "Ping timeout"
+          reason)
+
+        * KCTL (KILLCHASETIMELIMIT): seconds within which KILL, KICK or
+          MODE reaches target after it changed nick
+
+        * DCTL (DELAYCHASETIMELIMIT): seconds of channel delay
+          protection
+
+        * LDCTL (LDELAYCHASETIMELIMIT): seconds of !-channel delay
+          protection
+
+        * CF (CLIENT_FLOOD): number of bytes that can be sent to server
+          without quitting with an "Excess flood" reason
+
+        * MCPU (MAXCHANNELSPERUSER): maximum number of channels per
+          user (service channels not counted in)
+
+        * H (HOSTLEN): maximum length of a hostname for a client (if
+          longer, it's seen as IP)
+
+        * N (NICKLEN): maximum length of a nicks allowed for local
+          clients
+
+        * D (UIDLEN): length of an UID
+
+        * U (USERLEN): maximum length of a user (aka ident) field
+
+        * R (REALLEN): maximum length of an info field of a client
+
+        * T (TOPICLEN): maximum length of a topic on a channel
+
+        * C (CHANNELLEN): maximum length of a channel name
+
+        * P (PASSWDLEN): maximum length of a passwords (in I-, C-lines
+          etc.)
+
+        * K (KEYLEN): maximum length of a key on a channel
+
+        * BS (BUFSIZE): internal buffer size
+
+        * MXR (MAXRECIPIENTS): maximum number of targets (recipients)
+          allowed in one command
+
+        * MXB (MAXBANS): maximum number of all beIR modes per channel
+
+        * MXBL (MAXBANLENGTH): maximum length of one beIR mode
+
+        * PY (MAXPENALTY): penalty points (received in various number
+          for each command) after which client commands are not
+          processed anymore
+
+        * ZL (ZIP_LEVEL): level of compression for ziplinks ("-1" if
+          none)
+
+        * CM (CLONE_MAX): maximum number of clients ("-1" if none),
+          that...
+
+        * CP (CLONE_PERIOD): ... in that many seconds may connect to
+          server without being rejected for too fast connecting clients
+          ("-1" if none)
+
+        * DC (DELAY_CLOSE): seconds to keep too fast reconnecting
+          clones delayed before closing their sockets ("-1" if none)
+
+        * AC: auto connect status
+
+        * SS (SPLIT_SERVERS): state of split if number of servers on
+          the network is below that number
+
+        * SU (SPLIT_USERS): state of split if number of users on the
+          network is below that number
+
+`f, F - file descriptors report'
+          1 0.0.0.0 4444 192.168.1.13 51397 Beeth chopin 3774
+
+     For security reasons it is available to operators only. The
+     meaning of fields is: file descriptor number, local ip, local
+     port, client ip, client port, client nick, client auth (ident),
+     idle.
+
+`h, H - hub, leaf, deny lines'
+          H * 616* hub.example.org 0 :-1
+
+     Hub line define what servers (2nd field) and what SIDs (3rd field)
+     are allowed to be introduced by the server specified in 4th field.
+
+          L * * leaf.example.org 0 :-1
+
+     Leaf line ensures that servers we are connected to (matching 4th
+     field) do not become hubs introducing us servers matching the mask
+     (2nd field). 3th field is ignored, 5th field is max depth.
+
+          D *.org <NULL> <NULL> 99 :0
+
+     Deny autoconnect to servers that names match 4th field or that are
+     in a class specified by 5th field if any of the servers matching
+     2nd field or defined to be in class specified in 3rd field are
+     currently present on the network.
+
+`i, I - allowed user connections'
+          I 127.0.0.1 <NULL> <NULL> 0 10 -
+
+     2nd field is an IP address, IP mask or CIDR, 3rd is password
+     (disguised by "*" if present), 4th is a hostname required to
+     match, 5th is a port this line is valid for, 6th is the class
+     client will be put in and finally 7th field is I-line flags (all
+     explained in the INSTALL file). 2nd and 4th fields can be prefixed
+     by "user@", which means ident must match as well.
+
+`k, K - disallowed user connections (aka kill lines)'
+          K pc*.example.org sorry,no,entrance * 0 -1
+
+     The hostname or IP to match (CIDR allowed), kill line comment or
+     (very rarely used) time interval when kill line is effective,
+     username or auth to match, port on which kill line is effective.
+     Lowercase "k" matches on auth, read the INSTALL file for more info.
+
+`l, L - link info'
+          clientname[username@host.name] 0 181 11431 37 318 :6442
+
+     1st field is client info (client can be server, too). If uppercase
+     "L" is used, then the real IP is shown, not the hostname.  2nd
+     field is sendQ, 3rd received lines, 4th received bytes, 5th sent
+     lines, 6th sent bytes, 7th is client uptime.
+
+     This command accepts second parameter: if present, it shows the
+     above info only for the specified client.
+
+`m, M - commands usage stats'
+          COMMANDNAME 1 6 0
+
+     1st field is command name, 2nd number of times this command was
+     used, 3rd is number of bytes this command parameters had in total,
+     4th is number of times that command was used from remote clients.
+
+`o, O - operator lines'
+          o *@*.example.org * Beeth 0 10
+
+     1st field is operator type, lowercase is global operator,
+     uppercase is local.  2nd field is the user@hostname required to
+     match, 3rd is password (disguised as "*"), 4th is the nickname,
+     5th is port (though unused) and 6th is the class user will get
+     after becoming operator.
+
+`p - ping reports'
+          irc.example.org[*@192.168.1.13] 11 0 0 -1
+
+     1st is servername (and its socketname), 2nd is sequence number of
+     last udp ping sent, 3rd is number of received answers, 4th is
+     average response time in miliseconds, 5th is preference used in
+     autoconnecting. Only last 20 minutes are remembered.
+
+`P - ports listening'
+          4444 * - 0 246 14989 48 427 7169 1 active
+
+     1st field is port number, 2nd is IP we listen on (or unix socket
+     directory), 3rd is P-line flags, 4th field is sendQ, 5th received
+     lines, 6th received bytes, 7th sent lines, 8th sent bytes, 9th is
+     client uptime, 10th is number of clients using that P-line and
+     finally, 11th shows whether it is "active" or "inactive" (delayed
+     accept).
+
+`q, Q - quarantine lines'
+          Q <NULL> security_reasons irc.example.com 0 -1
+
+     3rd field is a reason for quarantining server matching 4th field.
+
+`r, R - system usage'
+          CPU Secs 1269:55 User 975:10 System 294:45
+          RSS 180656 ShMem 4294962080 Data 1446 Stack 4294963143
+          Swaps 0 Reclaims 882162 Faults 14516
+          Block in 13 out 0
+          Msg Rcv 21277744 Send 56443634
+          Signals 16 Context Vol. 14305344 Invol 6442565
+          DBUF alloc 60 blocks 40867
+
+     Just read man getrusage().
+
+`s, S - service lines'
+          S *@192.168.1.13 * ServiceName 0x3F00FFFF 0
+
+     2nd field is hostmask service is allowed to connect from, 3rd is
+     password (diguised as "*"), 4th is service name, 5th is service
+     type and 6th is class number.
+
+`t, T - statistics'
+          accepts 1269601 refused 1173948
+
+     Clients accepted and refused.
+          unknown: commands 534523 prefixes 88
+
+     Unknown commands and prefixes received.
+          nick collisions 47 saves 10, unknown closes 1210400
+
+     Unknown closes are all those closed that never got to client
+     (user, service or server) state.
+          wrong direction 0 empty 1937
+
+     Messages coming from wrong direction and empty messages.
+          users without servers 0 ghosts N/A
+          numerics seen 261332 mode fakes 2894
+          auth: successes 0 fails 0
+          local connections 12 udp packets 0
+          udp errors 0 udp dropped 0
+
+          link checks 38 passed 1 15s/35 30s dropped 0Sq/0Yg/2Fl
+
+     Calls to check_link(), accepted early (last one made more than 15s
+     ago, but little sendQ), accepted (more than 30s ago), dropped
+     because of too high sendQ (64kB), too young link (less than 60
+     sec), simply refused.
+          whowas turnover 490/13570/34247 [90]
+          ndelay turnover 8001/46556/195114 [1800]
+          abuse protections 1 strict 1
+          delay close 0 total 996
+
+     Current number of delayed fds and total.
+          Client - Server
+          connected 58205 1
+          bytes sent 4566999994 30687304
+          bytes recv 376478537 500907236
+          time connected 844868798 367786
+
+     Summary of (respectively) client and server: connected amounts,
+     bytes sent, bytes received and overall time connected.
+          iauth modules statistics (Wed Mar 24 22:44:05 2004)
+
+          spawned: 1, current options: 3 (2.11.0a5)
+
+          rfc931 connected 516946 unix 292818 other 7809 bad 205665 out of 1268450
+
+          rfc931 skipped 0 aborted 83143 / 77594
+
+          socks open 8/1/0 closed 0/20/0 noproxy 21655
+
+          socks cache open 15 closed 2 noproxy 1110772 miss 157676 (285 <= 1029)
+
+     Apart from iauth stats (start time, number of times respawned,
+     options), all iauth modules statistics (if available).
+
+     Most of these are self-explanatory. Should you want more words
+     about some, drop me a note.
+
+`u, U - uptime'
+          Server Up 0 days, 0:31:55
+
+     You guessed right, that's ircd uptime.
+
+`v, V - version restriction lines'
+          V IRC/0210* IRC/D * 0 0
+
+     2nd field is version to match, 3rd is server flags, 4th is server
+     name mask.  (If all match, server is rejected; this one rejects
+     all 2.10 servers compiled with 'D' (debugmode).)
+
+`y, Y - class lines'
+          Y 0 300 0 16000 3000000 12.2 24.2
+
+     2nd field is class number, 3rd is ping frequency, 4th is connect
+     frequency (used only by servers), 5th maximum number of clients
+     that can attach to this class, 6th is maximum sendQ for each
+     client, 7th defines local limits and 8th field global limits (read
+     the INSTALL file for details).
+
+`z, Z - memory usage'
+          Client Local 2749(2210196) Remote 111389(8911120) Auth 31(1030)
+          Users 114064 in/visible 103664/10393(17337728) Invites 17(204)
+          User channels 418848(5026176) Aways 890(29745)
+          Attached confs 2719(32628)
+          Conflines 4888(527572)
+          Classes 18(792)
+          Channels 55106(19083997) Modes 65117(1879252) History 0(0) Cache 0(0)
+          Channel members 418879(5026548) invite 17(204)
+          Whowas users 111214(16904528) away 109(3679) links 12502(150024)
+          Whowas array 133852(10172752) Delay array 133852(2677040)
+          Hash: client 135347(1624164) chan 67741(812892)
+
+     All these tell the number of items and (in the parens) the memory
+     all such items use.
+          Dbuf blocks 40867(83205212) (> 40867 [40867]) (45 < 3575) [0]
+
+     Number of dbuf blocks in use (and memory they use), number of
+     dbufs allocated during startup, the same number again (almost
+     always), dbufs in use, max dbufs in use, number of times dbufs
+     were increased.
+          RES table 8072
+          Structs 20440 IP storage 12344 Name storage 12685
+
+     Resolver tables current sizes in bytes.
+          Total: ww 27080959 ch 25990001 cl 33547797 co 527572 db 83205212
+
+     Total amount of memory for whowas (ww), all channel related items
+     (ch), all client related items (cl), all configuration lines (co)
+     and all dbufs allocated (db).
+          TOTAL: 172842930 sbrk(0)-etext: 249755424
+
+     Total amount of memory used from sbrk() call.
+
+`? - connected servers info'
+          irc.example.org (4, 06:31:29) 1S 2725C 491646kB sent 30180kB recv 0kB sq
+
+     Server name, (days, h:m:s link uptime), servers connected, clients
+     connected, kB sent, kB received and sendQ. There also can be
+     "BURST" word at the end, indicating netjoin in progress.
+
+
+
+File: stats.info,  Node: Enhancements,  Prev: STATS unleashed,  Up: Top
+
+Enhancements
+************
+
+If you notice some errors or wish to have some things explained better,
+drop a line to `ircd-dev@irc.org'
+
+
+
+Tag Table:
+Node: Top123
+Node: Introduction378
+Node: STATS unleashed837
+Node: Enhancements16015
+
+End Tag Table
