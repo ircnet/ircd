@@ -1,3 +1,8 @@
+2005-01-02  Kurt Roeckx
+
+	* configure.in/configure: Use AC_CHECK_LIB to check if pow needs -lm.
+	* config.guess/config.sub: Update to latest versions.
+
 2.11.0
 
 2004-12-21  Piotr Kucharski
