@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.156 2003/10/12 14:10:08 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.157 2003/10/13 21:48:51 q Exp $";
 #endif
 
 #include "os.h"
@@ -334,7 +334,6 @@ aClient *cptr;
 aChannel *chptr;
 {
 	Reg	Link	*tmp;
-	char	*s;
 
 	if (!IsPerson(cptr))
 		return NULL;
@@ -1035,7 +1034,7 @@ char	*parv[];
 				0x0, 0x0 };
 
 	Reg	Link	*lp = NULL;
-	Reg	char	*curr = parv[0], *cp = NULL, *ucp;
+	Reg	char	*curr = parv[0], *cp = NULL, *ucp = NULL;
 	Reg	int	*ip;
 	u_int	whatt = MODE_ADD;
 	int	limitset = 0, count = 0, chasing = 0;
@@ -1045,7 +1044,7 @@ char	*parv[];
 	Link	*plp = NULL;
 	int	compat = -1; /* to prevent mixing old/new modes */
 	char	*mbuf = modebuf, *pbuf = parabuf, *upbuf = uparabuf;
-	int tmp_chfl, tmp_rpl, tmp_rpl2, tmp_mode;
+	int	tmp_chfl = 0, tmp_rpl = 0, tmp_rpl2 = 0, tmp_mode = 0;
 
 	*mbuf = *pbuf = *upbuf = '\0';
 	if (parc < 1)
@@ -3269,9 +3268,9 @@ end_of_list:
 static void names_channel(aClient *cptr, aClient *sptr, char *to,
 			  aChannel *chptr, int sendeon)
 {
-	Reg 	Link	*lp;
+	Reg 	Link	*lp = NULL;
 	Reg	aClient	*acptr;
-	int 	pxlen, ismember, nlen, maxlen;
+	int 	pxlen, ismember = 0, nlen, maxlen;
 	char 	*pbuf = buf;
 	int	showusers = 1;
 	

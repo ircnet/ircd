@@ -36,6 +36,8 @@ extern char *networkname;
 #define EXTERN
 #endif /* S_CONF_C */
 EXTERN void det_confs_butmask __P((aClient *cptr, int mask));
+EXTERN int match_ipmask __P((char *mask, aClient *cptr,
+	int maskwithusername));
 EXTERN int attach_Iline __P((aClient *cptr, Reg struct hostent *hp,
 			     char *sockhost));
 EXTERN aConfItem *count_cnlines __P((Reg Link *lp));

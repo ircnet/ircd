@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.48 2003/10/12 14:29:55 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.49 2003/10/13 21:48:52 q Exp $";
 #endif
 
 #include "os.h"
@@ -194,7 +194,7 @@ read_iauth()
 	    olen += i;
 	    buf[olen] = '\0';
 	    start = buf;
-	    while (end = index(start, '\n'))
+	    while ((end = index(start, '\n')))
 		{
 		    *end++ = '\0';
 		    last = *start;
@@ -243,7 +243,7 @@ read_iauth()
 			{
 			    aExtCf *ectmp;
 
-			    while (ectmp = iauth_conf)
+			    while ((ectmp = iauth_conf))
 				{
 				    iauth_conf = iauth_conf->next;
 				    MyFree(ectmp->line);
@@ -270,7 +270,7 @@ read_iauth()
 			{
 			    aExtData *ectmp;
 
-			    while (ectmp = iauth_stats)
+			    while ((ectmp = iauth_stats))
 				{
 				    iauth_stats = iauth_stats->next;
 				    MyFree(ectmp->line);

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.91 2003/07/28 17:16:38 jv Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.92 2003/10/13 21:48:52 q Exp $";
 #endif
 
 #include "os.h"
@@ -787,13 +787,17 @@ char	*argv[];
 		int	flag = *p++;
 
 		if (flag == '\0' || *p == '\0')
+		{
 			if (argc > 1 && argv[1][0] != '-')
-			    {
+			{
 				p = *++argv;
 				argc -= 1;
-			    }
+			}
 			else
+			{
 				p = "";
+			}
+		}
 
 		switch (flag)
 		    {

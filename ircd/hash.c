@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.28 2002/08/01 00:50:00 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.29 2003/10/13 21:48:52 q Exp $";
 #endif
 
 #include "os.h"
@@ -79,9 +79,7 @@ int     _HOSTNAMEHASHSIZE = 0;
  * or division or modulus in the inner loop.  subtraction and other bit
  * operations allowed.
  */
-static	u_int	hash_nick_name(nname, store)
-char	*nname;
-int	*store;
+static	u_int	hash_nick_name(char *nname, u_int *store)
 {
 	Reg	u_char	*name = (u_char *)nname;
 	Reg	u_char	ch;
@@ -109,9 +107,7 @@ int	*store;
  * or division or modulus in the inner loop.  subtraction and other bit
  * operations allowed.
  */
-static	u_int	hash_uid(uid, store)
-char	*uid;
-int	*store;
+static	u_int	hash_uid(char *uid, u_int *store)
 {
 	Reg	u_char	ch;
 	Reg	u_int	hash = 1;
@@ -132,7 +128,7 @@ int	*store;
 /*
 ** hash_sid
 */
-static	u_int	hash_sid(char *sid, int *store)
+static	u_int	hash_sid(char *sid, u_int *store)
 {
 	Reg	u_char	ch;
 	Reg	u_int	hash = 1;
@@ -1215,7 +1211,7 @@ struct HashTable_s
 	int *miss;
 	int *nentries;
 	int *size;
-	u_int (*hashfunc)(char *name, int *store);
+	u_int (*hashfunc)(char *name, u_int *store);
 };
 
 #if defined(DEBUGMODE) || defined(HASHDEBUG)
@@ -1335,7 +1331,7 @@ char	*parv[];
 	int shash = -1, i, l;
 	int deepest = 0 , deeplink = 0, totlink = 0, mosthits = 0, mosthit = 0;
 	int tothits = 0, used = 0, used_now = 0, link_pop[11];
-	int unavaible = -1;
+	static int unavailable = -1;
 	
 	struct HashTable_s HashTables[] =
 	{
@@ -1345,8 +1341,8 @@ char	*parv[];
 			hash_uid},
 		{'C', "channel", &channelTable, &chhits, &chmiss, &sidsize,
 			&_CHANNELHASHSIZE, hash_channel_name},
-		{'s', "server", &serverTable, &unavaible, &unavaible, &svsize,
-			&_SERVERSIZE, NULL },
+		{'s', "server", &serverTable, &unavailable, &unavailable,
+			&svsize, &_SERVERSIZE, NULL },
 		{'S', "SID", &sidTable, &sidhits, &sidmiss, &sidsize, &_SIDSIZE,
 			hash_sid },
 		{'h', "hostname", &hostnameTable, &cnhits, &cnmiss, &cnsize,
@@ -1403,7 +1399,7 @@ char	*parv[];
 	
 	if (shash == -1)
 	{
-		return;
+		return 1;
 	}
 #if defined(DEBUGMODE) || defined(HASHDEBUG)
 	if (parc > 2)
@@ -1447,7 +1443,7 @@ char	*parv[];
 			if (!HashTables[shash].hashfunc)
 			{
 				sendto_one(sptr, ":%s NOTICE %s :Hash function"
-						"unavaible", ME, parv[0]);
+						" unavailable", ME, parv[0]);
 				return 2;
 			}
 			hval = HashTables[shash].hashfunc(parv[3], NULL);

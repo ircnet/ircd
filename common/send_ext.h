@@ -36,6 +36,8 @@ EXTERN void flush_connections __P((int fd));
 EXTERN void flush_fdary __P((FdAry *));
 EXTERN int send_message __P((aClient *, char *, int));
 EXTERN void setup_svchans();
+EXTERN void logfiles_open();
+EXTERN void logfiles_close();
 EXTERN void sendto_flog __P((aClient *cptr, char msg,
 			     char *username, char *hostname));
 EXTERN void sendto_channel_butone (aClient *one, aClient *from,
@@ -59,5 +61,7 @@ EXTERN void sendto_ops_butone (aClient *one, aClient *from, char *pattern,
 EXTERN void sendto_prefix_one (aClient *to, aClient *from, char *pattern,
 			       ...);
 EXTERN void sendto_flag (u_int chan, char *pattern, ...);
+EXTERN void sendto_match_butone_old(aClient *one, aClient *from,
+		char *mask, int what, char *pattern, ...);
 #endif /* CLIENT_COMPILE */
 #undef EXTERN

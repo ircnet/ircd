@@ -40,4 +40,5 @@ EXTERN int match __P((char *mask, char *name));
 EXTERN char *collapse __P((char *pattern));
 EXTERN int mycmp __P((char *s1, char *s2));
 EXTERN int myncmp __P((char *str1, char *str2, int n));
+EXTERN int isvalidusername __P((char *username));
 #undef EXTERN

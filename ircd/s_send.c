@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_send.c,v 1.4 2003/06/22 15:15:02 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_send.c,v 1.5 2003/10/13 21:48:53 q Exp $";
 #endif
 
 #include "os.h"
@@ -46,32 +46,40 @@ static void
 esend_message(to)
 aClient	*to;
 {
-    if (maxplen != lastmax)
+	if (maxplen != lastmax)
 	{
-	    if (maxplen + slen > 512)
+		if (maxplen + slen > 512)
 		{
-		    slen = 510 - maxplen;
-		    suffixbuf[slen++] = '\r';
-		    suffixbuf[slen++] = '\n';
-		    suffixbuf[slen] = '0';
+			slen = 510 - maxplen;
+			suffixbuf[slen++] = '\r';
+			suffixbuf[slen++] = '\n';
+			suffixbuf[slen] = '0';
 		}
-	    lastmax = maxplen;
+		lastmax = maxplen;
 	}
 
-    if (ST_UID(to) && newplen > 0)
+	if (ST_UID(to) && newplen > 0)
 	{
-	    send_message(to, newprefixbuf, newplen);
-	    if (slen)
-		    send_message(to, suffixbuf, slen);
+		send_message(to, newprefixbuf, newplen);
+		if (slen)
+		{
+			send_message(to, suffixbuf, slen);
+		}
 	}
-    else
+	else
 	{
-	    if (IsServer(to))
+		if (IsServer(to))
+		{
 		    send_message(to, oldprefixbuf, oldplen);
-	    else
-		    send_message(to, prefixbuf, plen);
-	    if (slen)
-		    send_message(to, suffixbuf, slen);
+		}
+		else
+		{
+			send_message(to, prefixbuf, plen);
+		}
+		if (slen)
+		{
+			send_message(to, suffixbuf, slen);
+		}
 	}
 }
 
@@ -79,18 +87,22 @@ aClient	*to;
 ** build_old_prefix
 **	function responsible for filling oldprefixbuf using pre-UID conventions
 */
-static void
-build_old_prefix(orig, imsg, dest, dname)
-aClient *orig, *dest;
-char *imsg, *dname;
+static void	build_old_prefix(aClient *orig, char *imsg, aClient *dest,
+	char *dname)
 {
-    if (oldplen != 0)
-	    return;
-    if (dname == NULL)
-	    dname = dest->name;
-    oldplen = sprintf(oldprefixbuf, ":%s %s %s", orig->name, imsg, dname);
-    if (oldplen > maxplen)
-	    maxplen = oldplen;
+	if (oldplen != 0)
+	{
+		return;
+	}
+	if (dname == NULL)
+	{
+		dname = dest->name;
+	}
+	oldplen = sprintf(oldprefixbuf, ":%s %s %s", orig->name, imsg, dname);
+	if (oldplen > maxplen)
+	{
+		maxplen = oldplen;
+	}
 }
 
 /*
@@ -98,92 +110,110 @@ char *imsg, *dname;
 **	function responsible for filling oldprefixbuf with the origin and/or
 **	destination's UID if they exist.
 */
-static void
-build_new_prefix(orig, imsg, dest, dname)
-aClient *orig, *dest;
-char *imsg, *dname;
+static void	build_new_prefix(aClient *orig, char *imsg, aClient *dest,
+	char *dname)
 {
-    char *oname = NULL;
+	char *oname = NULL;
 
-    if (newplen != 0)
-	    return;
-    if (IsRegisteredUser(orig) && orig->user->uid[0])
-	    oname = orig->user->uid;
-    if (dname == NULL)
-	    if (IsRegisteredUser(dest) && dest->user->uid[0])
-		    dname = dest->user->uid;
-	    else
-		    if (oname)
-			    dname = dest->name;
-		    else
-			{
-			    newplen = -1;
-			    return; /* no uid anywhere, bail out */
-			}
-    newplen = sprintf(newprefixbuf, ":%s %s %s", oname, imsg, dname);
-    if (newplen > maxplen)
+	if (newplen != 0)
+	{
+		return;
+	}
+	if (IsRegisteredUser(orig) && orig->user->uid[0])
+	{
+		oname = orig->user->uid;
+	}
+	if (dname == NULL)
+	{
+		if (IsRegisteredUser(dest) && dest->user->uid[0])
+		{
+			dname = dest->user->uid;
+		}
+		else if (oname)
+		{
+			dname = dest->name;
+		}
+		else
+		{
+			newplen = -1;
+			return; /* no uid anywhere, bail out */
+		}
+	}
+	newplen = sprintf(newprefixbuf, ":%s %s %s", oname, imsg, dname);
+	if (newplen > maxplen)
+	{
 	    maxplen = newplen;
+	}
 }
 
 /*
 ** build_prefix
 **	function responsible for filling prefixbuf
 */
-static void
-build_prefix(orig, imsg, dest, dname)
-aClient *orig, *dest;
-char *imsg, *dname;
+static void	build_prefix(aClient *orig, char *imsg, aClient *dest,
+	char *dname)
 {
-    char *cp = prefixbuf, *ch;
+	char *cp = prefixbuf, *ch;
 
-    if (plen != 0)
-	    return;
-    if (dname == NULL)
-	    dname = dest->name;
-
-    if (IsPerson(orig))
+	if (plen != 0)
 	{
-	    *cp++ = ':';
-
-	    ch = orig->name; while (*ch) *cp++ = *ch++;
-	    *cp++ = '!';
-	    ch = orig->user->username; while (*ch) *cp++ = *ch++;
-	    *cp++ = '@';
-	    ch = orig->user->host; while (*ch) *cp++ = *ch++;
-
-	    *cp++ = ' ';
-	    while (*imsg) *cp++ = *imsg++;
-
-	    *cp++ = ' ';
-	    ch = (dname) ? dname : dest->name; while (*ch) *cp++ = *ch++;
-	    
-	    *cp++ = ' ';
-	    *cp = '0';
-	    plen = cp - prefixbuf;
+		return;
 	}
-    else
+	if (dname == NULL)
 	{
-	    if (dname == NULL)
-		    dname = dest->name;
-	    plen = sprintf(prefixbuf, ":%s %s %s", orig->name, imsg, dname);
+		dname = dest->name;
 	}
-    if (plen > maxplen)
-	    maxplen = plen;
+
+	if (IsPerson(orig))
+	{
+		*cp++ = ':';
+
+		ch = orig->name; while (*ch) *cp++ = *ch++;
+		*cp++ = '!';
+		ch = orig->user->username; while (*ch) *cp++ = *ch++;
+		*cp++ = '@';
+		ch = orig->user->host; while (*ch) *cp++ = *ch++;
+
+		*cp++ = ' ';
+		while (*imsg) *cp++ = *imsg++;
+
+		*cp++ = ' ';
+		ch = (dname) ? dname : dest->name; while (*ch) *cp++ = *ch++;
+
+		*cp++ = ' ';
+		*cp = '0';
+		plen = cp - prefixbuf;
+	}
+	else
+	{
+		if (dname == NULL)
+		{
+			dname = dest->name;
+		}
+		plen = sprintf(prefixbuf, ":%s %s %s", orig->name, imsg, dname);
+	}
+
+	if (plen > maxplen)
+	{
+		maxplen = plen;
+	}
 }
 
 /*
 ** build_suffix
 **	function responsible for filling suffixbuf.
 */
-static void
-build_suffix(char *format, va_list va)
+static void	build_suffix(char *format, va_list va)
 {
-    if (slen)
-	    return;
-    slen = vsprintf(suffixbuf, format, va);
-    suffixbuf[slen++] = '\r';
-    suffixbuf[slen++] = '\n';
-    suffixbuf[slen] = '0';
+	if (slen)
+	{
+		return;
+	}
+	
+	slen = vsprintf(suffixbuf, format, va);
+	suffixbuf[slen++] = '\r';
+	suffixbuf[slen++] = '\n';
+	suffixbuf[slen] = '0';
 }
 
 /*
@@ -207,17 +237,21 @@ build_suffix(char *format, va_list va)
 void
 esendto_one(aClient *orig, aClient *dest, char *imsg, char *fmt, ...)
 {
-    va_list va;
+	va_list va;
 
-    CLEAR_LENGTHS;
-    if (ST_UID(dest->from))
-	    build_new_prefix(orig, imsg, dest, NULL);
-    if (newplen <= 0)
-	    build_old_prefix(orig, imsg, dest, NULL);
-    va_start(va, fmt);
-    build_suffix(fmt, va);
-    va_end(va);
-    esend_message(dest->from);
+	CLEAR_LENGTHS;
+	if (ST_UID(dest->from))
+	{
+		build_new_prefix(orig, imsg, dest, NULL);
+	}
+	if (newplen <= 0)
+	{
+		build_old_prefix(orig, imsg, dest, NULL);
+	}
+	va_start(va, fmt);
+	build_suffix(fmt, va);
+	va_end(va);
+	esend_message(dest->from);
 }
 
 /*
@@ -228,27 +262,29 @@ void
 esendto_serv_butone(aClient *orig, aClient *dest, char *dname, char *imsg,
 		    aClient *one, char *fmt, ...)
 {
-    int	i;
-    aClient *acptr;
+	int	i;
+	aClient *acptr;
 
-    CLEAR_LENGTHS;
-    for (i = fdas.highest; i >= 0; i--)
-	    if ((acptr = local[fdas.fd[i]]) &&
-		(!one || acptr != one->from) && !IsMe(acptr))
+	CLEAR_LENGTHS;
+	for (i = fdas.highest; i >= 0; i--)
+	{
+		if ((acptr = local[fdas.fd[i]]) &&
+			(!one || acptr != one->from) && !IsMe(acptr))
 		{
-		    if (newplen == 0 && ST_UID(acptr))
-			    build_new_prefix(orig, imsg, dest, dname);
-		    if (oldplen == 0 && (ST_NOTUID(acptr) || newplen <= 0))
-			    build_old_prefix(orig, imsg, dest, dname);
-		    if (slen == 0)
+			if (newplen == 0 && ST_UID(acptr))
+				build_new_prefix(orig, imsg, dest, dname);
+			if (oldplen == 0 && (ST_NOTUID(acptr) || newplen <= 0))
+				build_old_prefix(orig, imsg, dest, dname);
+			if (slen == 0)
 			{
-			    va_list va;
-			    va_start(va, fmt);
-			    build_suffix(fmt, va);
-			    va_end(va);
+				va_list va;
+				va_start(va, fmt);
+				build_suffix(fmt, va);
+				va_end(va);
 			}
-		    esend_message(acptr);
+			esend_message(acptr);
 		}
+	}
 }
 
 /*
@@ -259,43 +295,57 @@ void
 esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 		       aChannel *chptr, char *fmt, ...)
 {
-    Link *lp;
-    aClient *acptr;
+	Link	*lp;
+	aClient	*acptr;
 
-    CLEAR_LENGTHS;
+	CLEAR_LENGTHS;
 
-    for (lp = chptr->clist; lp; lp = lp->next)
+	for (lp = chptr->clist; lp; lp = lp->next)
 	{
-	    acptr = lp->value.cptr;
-	    if (acptr->from == one || IsMe(acptr))
-		    continue;	/* ...was the one I should skip */
-	    if (acptr == orig)
-		    continue;
-
-	    if (MyConnect(acptr) && IsRegisteredUser(acptr))
+		acptr = lp->value.cptr;
+		if (acptr->from == one || IsMe(acptr))
 		{
-		    /* to local users */
-		    if (plen == 0)
-			    plen = sprintf(":anonymous!anonymous@anonymous. %s %s", imsg, chptr->chname);
+			continue;	/* ...was the one I should skip */
 		}
-	    else
+		if (acptr == orig)
 		{
-		    /* to servers */
-		    if (newplen == 0 && ST_UID(acptr))
-			    build_new_prefix(orig, imsg, NULL, chptr->chname);
-		    if (oldplen == 0 && (ST_NOTUID(acptr) || newplen <= 0))
-			    build_old_prefix(orig, imsg, NULL, chptr->chname);
+			continue;
 		}
 
-	    if (slen == 0)
+		if (MyConnect(acptr) && IsRegisteredUser(acptr))
 		{
-		    va_list va;
-		    va_start(va, fmt);
-		    build_suffix(fmt, va);
-		    va_end(va);
+			/* to local users */
+			if (plen == 0)
+			{
+				plen = sprintf(":anonymous!anonymous@"
+					"anonymous. %s %s", imsg,
+					chptr->chname);
+			}
+		}
+		else
+		{
+			/* to servers */
+			if (newplen == 0 && ST_UID(acptr))
+			{
+				build_new_prefix(orig, imsg, NULL,
+					chptr->chname);
+			}
+			if (oldplen == 0 && (ST_NOTUID(acptr) || newplen <= 0))
+			{
+				build_old_prefix(orig, imsg, NULL,
+					chptr->chname);
+			}
 		}
 
-	    esend_message(acptr);
+		if (slen == 0)
+		{
+			va_list va;
+			va_start(va, fmt);
+			build_suffix(fmt, va);
+			va_end(va);
+		}
+
+		esend_message(acptr);
 	}
 }
 
@@ -307,40 +357,54 @@ esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 void
 esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr, char *fmt, ...)
 {
-    int i;
-    aClient *cptr;
-    char *mask;
+	int	i;
+	aClient	*cptr;
+	char	*mask;
 
-    CLEAR_LENGTHS;
+	CLEAR_LENGTHS;
 
-    if (chptr)
+	if (chptr)
 	{
-	    if (*chptr->chname == '&')
-		    return;
-	    if ((mask = rindex(chptr->chname, ':')))
-		    mask++;
-	}
-    else
-	    mask = NULL;
-
-    for (i = fdas.highest; i >= 0; i--)
-	{
-	    if (!(cptr = local[fdas.fd[i]]) || (cptr == orig) || IsMe(cptr))
-		    continue;
-	    if (!BadPtr(mask) && match(mask, cptr->name))
-		    continue;
-	    if (newplen == 0 && ST_UID(cptr))
-		    build_new_prefix(orig, imsg, NULL, chptr->chname);
-	    if (oldplen == 0 && (ST_NOTUID(cptr) || newplen <= 0))
-		    build_old_prefix(orig, imsg, NULL, chptr->chname);
-	    if (slen == 0)
+		if (*chptr->chname == '&')
 		{
-		    va_list va;
-		    va_start(va, fmt);
-		    build_suffix(fmt, va);
-		    va_end(va);
+		    return;
+		}
+		if ((mask = rindex(chptr->chname, ':')))
+		{
+		    mask++;
+		}
+	}
+	else
+	{
+		mask = NULL;
+	}
+
+	for (i = fdas.highest; i >= 0; i--)
+	{
+		if (!(cptr = local[fdas.fd[i]]) || (cptr == orig) || IsMe(cptr))
+		{
+			continue;
+		}
+		if (!BadPtr(mask) && match(mask, cptr->name))
+		{
+		    continue;
+		}
+		if (newplen == 0 && ST_UID(cptr))
+		{
+		    build_new_prefix(orig, imsg, NULL, chptr->chname);
+		}
+		if (oldplen == 0 && (ST_NOTUID(cptr) || newplen <= 0))
+		{
+		    build_old_prefix(orig, imsg, NULL, chptr->chname);
+		}
+		if (slen == 0)
+		{
+			va_list va;
+			va_start(va, fmt);
+			build_suffix(fmt, va);
+			va_end(va);
 		}
 
-	    esend_message(cptr);
+		esend_message(cptr);
 	}
 }

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.159 2003/10/02 22:42:58 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.160 2003/10/13 21:48:54 q Exp $";
 #endif
 
 #include "os.h"
@@ -1213,9 +1213,7 @@ int	parc;
 char	*parv[];
 {
 	aClient *acptr;
-	int	delayed = 0;
-	char	*uid, nick[NICKLEN+2], *s, *user, *host, *realname;
-	Link	*lp = NULL;
+	char	*uid, nick[NICKLEN+2], *user, *host, *realname;
 
 	if (parc < 8)
 	    {
@@ -1739,29 +1737,34 @@ Link *lp;
 ** who_channel
 **	lists all users on a given channel
 */
-static	void	who_channel(sptr, chptr, oper)
-aClient *sptr;
-aChannel *chptr;
-int oper;
+static	void	who_channel(aClient *sptr, aChannel *chptr, int oper)
 {
 	Reg	Link	*lp;
 	int	member;
 
 	if (!IsAnonymous(chptr))
-	    {
+	{
 		member = IsMember(sptr, chptr);
 		if (member || !SecretChannel(chptr))
+		{
 			for (lp = chptr->members; lp; lp = lp->next)
-			    {
+			{
 				if (oper && !IsAnOper(lp->value.cptr))
+				{
 					continue;
+				}
 				if (IsInvisible(lp->value.cptr) && !member)
+				{
 					continue;
+				}
 				who_one(sptr, lp->value.cptr, chptr, lp);
-			    }
-	    }
-	else if (lp = find_user_link(chptr->members, sptr))
+			}
+		}
+	}
+	else if ((lp = find_user_link(chptr->members, sptr)))
+	{
 		who_one(sptr, lp->value.cptr, chptr, lp);
+	}
 }
 
 /*
@@ -1775,8 +1778,6 @@ static	void	who_find(aClient *sptr, char *mask, int oper)
 {
 	aChannel *chptr = NULL;
 	Link	*lp,*lp2;
-	int	member;
-	int	showperson;
 	aClient	*acptr;
 	
 	/* first, show INvisible matching users on common channels */
@@ -3510,24 +3511,24 @@ char *path;
 **	parv[1] = saved user
 **	parv[2] = save path
 */
-int
-m_save(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_save(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	char *path = (parc > 2) ? parv[2] : "*no-path*";
 	
 	if (parc < 2)
 	{
-		sendto_flag(SCH_ERROR, "Save with not enough parameters from %s",
-				cptr->name);
-		return;
+		sendto_flag(SCH_ERROR, "Save with not enough parameters "
+			"from %s", cptr->name);
+		return 1;
 	}
+
 	/* need sanity checks here -syrk */
 	acptr = find_uid(parv[1], NULL);
 	if (acptr && strcasecmp(acptr->name, acptr->user->uid))
+	{
 		save_user(cptr, acptr, path);
+	}
+
 	return 0;
 }

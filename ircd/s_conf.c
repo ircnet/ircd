@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.63 2003/10/02 23:00:57 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.64 2003/10/13 21:48:53 q Exp $";
 #endif
 
 #include "os.h"
@@ -57,7 +57,9 @@ static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.63 2003/10/02 23:00:57 chopin Exp 
 #include "s_externs.h"
 #undef S_CONF_C
 
+#ifdef TIMEDKLINES
 static	int	check_time_interval __P((char *, char *));
+#endif
 static	int	lookup_confhost __P((aConfItem *));
 
 aConfItem	*conf = NULL;
@@ -1608,9 +1610,9 @@ int	doall;
 char	**comment;
 {
 	static char	reply[256];
-	char *host, *ip, *name, *ident, *check;
-	aConfItem *tmp;
-	int	now;
+	char		*host, *ip, *name, *ident, *check;
+	aConfItem	*tmp;
+	int		now = 0;
 
 	if (!cptr->user)
 		return 0;
@@ -1843,21 +1845,24 @@ char	*interval, *reply;
 void	find_bounce(cptr, class, fd)
 aClient *cptr;
 int	class, fd;
-    {
+{
 	Reg	aConfItem	*aconf;
 
 	for (aconf = conf; aconf; aconf = aconf->next)
-	    {
+	{
 		if (aconf->status != CONF_BOUNCE)
+		{
 			continue;
+		}
 
 		if (fd >= 0)
+		{
 			/*
 			** early rejection,
 			** connection class and hostname are unknown
 			*/
 			if (*aconf->host == '\0')
-			    {
+			{
 				char rpl[BUFSIZE];
 				
 				sprintf(rpl, replies[RPL_BOUNCE], ME, "unknown",
@@ -1869,9 +1874,12 @@ int	class, fd;
 				send(fd, rpl, strlen(rpl), 0);
 #endif
 				return;
-			    }
+			}
 			else
+			{
 				continue;
+			}
+		}
 
 		/* fd < 0 */
 		/*
@@ -1881,25 +1889,31 @@ int	class, fd;
 		*/
 		if (fd != -2 &&
 		    !strchr(aconf->host, '.') && isdigit(*aconf->host))
-		    {
+		{
 			if (class != atoi(aconf->host))
+			{
 				continue;
-		    }
+			}
+		}
 		else
+		{
 			if (strchr(aconf->host, '/'))
-			    {
+			{
 				if (match_ipmask(aconf->host, cptr, 1))
 					continue;
-			    }
+			}
 			else if (match(aconf->host, cptr->sockhost))
+			{
 				continue;
+			}
+		}
 
-		sendto_one(cptr, replies[RPL_BOUNCE], ME, BadTo(cptr->name), aconf->name,
-			   aconf->port);
+		sendto_one(cptr, replies[RPL_BOUNCE], ME, BadTo(cptr->name),
+			aconf->name, aconf->port);
 		return;
-	    }
+	}
 	
-    }
+}
 
 /*
 ** find_denied

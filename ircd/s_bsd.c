@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.98 2003/08/12 16:56:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.99 2003/10/13 21:48:53 q Exp $";
 #endif
 
 #include "os.h"
@@ -95,9 +95,7 @@ static	char	readbuf[READBUF_SIZE];
 ** (as suggested by eps@TOASTER.SFSU.EDU)
 */
 
-void	add_local_domain(hname, size)
-char	*hname;
-int	size;
+void	add_local_domain(char *hname, size_t size)
 {
 #ifdef RES_INIT
 	/* try to fix up unqualified names */
@@ -670,8 +668,10 @@ void	write_pidfile()
 		bzero(buff, sizeof(buff));
 		(void)sprintf(buff,"%5d\n", (int)getpid());
 		if (write(fd, buff, strlen(buff)) == -1)
+		{
 			Debug((DEBUG_NOTICE,"Error writing to pid file %s",
 			      IRCDPID_PATH));
+		}
 		(void)close(fd);
 		return;
 	    }
@@ -730,7 +730,7 @@ Reg	char	*sockn;
 		cptr->hostp = me.hostp;
 	    }
 	bcopy((char *)&sk.SIN_ADDR, (char *)&cptr->ip, sizeof(struct IN_ADDR));
-	cptr->port = (int)(ntohs(sk.SIN_PORT));
+	cptr->port = ntohs(sk.SIN_PORT);
 
 	return 0;
 }

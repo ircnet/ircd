@@ -24,10 +24,11 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.27 2003/08/12 16:56:49 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.28 2003/10/13 21:48:52 q Exp $";
 #endif
 
-/* #undef	DEBUG	/* because there is a lot of debug code in here :-) */
+/* because there is a lot of debug code in here :-) */
+/* #undef	DEBUG */
 
 static	char	hostbuf[HOSTLEN+1+100]; /* +100 for INET6 */
 static	char	dot[] = ".";
@@ -230,12 +231,13 @@ time_t	now;
 
 	Debug((DEBUG_DNS,"timeout_query_list at %s",myctime(now)));
 	for (rptr = first; rptr; rptr = r2ptr)
-	    {
+	{
 		r2ptr = rptr->next;
 		tout = rptr->sentat + rptr->timeout;
 		if (now >= tout)
+		{
 			if (--rptr->retries <= 0)
-			    {
+			{
 #ifdef DEBUG
 				Debug((DEBUG_ERROR,"timeout %x now %d cptr %x",
 				       rptr, now, rptr->cinfo.value.cptr));
@@ -243,7 +245,7 @@ time_t	now;
 				reinfo.re_timeouts++;
 				cptr = rptr->cinfo.value.cptr;
 				switch (rptr->cinfo.flags)
-				    {
+				{
 				case ASYNC_CLIENT :
 #if defined(USE_IAUTH)
 					sendto_iauth("%d d", cptr->fd);
@@ -255,12 +257,12 @@ time_t	now;
 						    "Host %s unknown",
 						    rptr->name);
 					break;
-				    }
+				}
 				rem_request(rptr);
 				continue;
-			    }
+			}
 			else
-			    {
+			{
 				rptr->sentat = now;
 				rptr->timeout += rptr->timeout;
 				resend_query(rptr);
@@ -270,10 +272,13 @@ time_t	now;
 				       rptr, now, rptr->retries,
 				       rptr->cinfo.value.cptr));
 #endif
-			    }
+			}
+		}
 		if (!next || tout < next)
+		{
 			next = tout;
-	    }
+		}
+	}
 	return (next > now) ? next : (now + AR_TTL);
 }
 
@@ -479,7 +484,7 @@ Reg	ResRQ	*rptr;
 	    }
 	else
 	    {
-		(void)sprintf(ipbuf, "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.ip6.int.",
+		(void)sprintf(ipbuf, "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.ip6.arpa.",
 		(u_int)(cp[15]&0xf), (u_int)(cp[15]>>4),
 		(u_int)(cp[14]&0xf), (u_int)(cp[14]>>4),
 		(u_int)(cp[13]&0xf), (u_int)(cp[13]>>4),

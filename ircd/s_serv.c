@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.125 2003/08/10 16:37:32 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.126 2003/10/13 21:48:53 q Exp $";
 #endif
 
 #include "os.h"
@@ -36,6 +36,7 @@ static	char	buf[BUFSIZE];
 static	int	check_link __P((aClient *));
 static	int	get_version __P((char *version, char *id));
 static	void	trace_one __P((aClient *sptr, aClient *acptr));
+static	int	check_servername __P((char *hostname));
 const	char	*check_servername_errors[3][2] = {
 	{ "too long", "Bogus servername - too long" },
 	{ "invalid", "Bogus servername - invalid hostname" },
@@ -381,60 +382,70 @@ aClient	*cptr;
 	Debug((DEBUG_INFO,"check_version: %s", cptr->info));
 
 	if (cptr->info == DefInfo)
-	    {
+	{
 		cptr->hopcount = SV_OLD;
 		return 1; /* no version checked (e.g. older than 2.9) */
-	    }
-	if (id = index(cptr->info, ' '))
-	    {
+	}
+	if ((id = index(cptr->info, ' ')))
+	{
 		*id++ = '\0';
-		if (link = index(id, ' '))
+		if ((link = index(id, ' ')))
+		{
 			*link++ = '\0';
-		if (misc = index(id, '|'))
+		}
+		if ((misc = index(id, '|')))
+		{
 			*misc++ = '\0';
+		}
 		else
-		    {
+		{
 			misc = id;
 			id = "";
-		    }
-	    }
+		}
+	}
 	else
+	{
 		id = "";
+	}
 
 	cptr->hopcount = get_version(cptr->info, id);
 
 	/* Check version number/mask from conf */
 	sprintf(buf, "%s/%s", id, cptr->info);
 	if (find_two_masks(cptr->name, buf, CONF_VER))
-	    {
+	{
 		sendto_flag(SCH_ERROR, "Bad version %s %s from %s", id,
 			    cptr->info, get_client_name(cptr, TRUE));
 		return exit_client(cptr, cptr, &me, "Bad version");
-	    }
+	}
 
 	if (misc)
-	    {
+	{
 		sprintf(buf, "%s/%s", id, misc);
 		/* Check version flags from conf */
 		if (find_conf_flags(cptr->name, buf, CONF_VER))
-		    {
+		{
 			sendto_flag(SCH_ERROR, "Bad flags %s (%s) from %s",
 				    misc, id, get_client_name(cptr, TRUE));
 			return exit_client(cptr, cptr, &me, "Bad flags");
-		    }
-	    }
+		}
+	}
 
 	/* right now, I can't code anything good for this */
 	/* Stop whining, and do it! ;) */
 	if (link && strchr(link, 'Z'))	/* Compression requested */
+	{
                 cptr->flags |= FLAGS_ZIPRQ;
+	}
 	/*
 	 * If server was started with -p strict, be careful about the
 	 * other server mode.
 	 */
 	if (link && strncmp(cptr->info, "020", 3) &&
-	    (bootopt & BOOT_STRICTPROT) && !strchr(link, 'P'))
+		(bootopt & BOOT_STRICTPROT) && !strchr(link, 'P'))
+	{
 		return exit_client(cptr, cptr, &me, "Unsafe mode");
+	}
 
 	return 2;
 }
@@ -499,7 +510,7 @@ static void send_server(aClient *cptr, aClient *server)
 ** introduce_server()
 ** Introduces a server I got from cptr to all my other servers.
 */
-static int introduce_server(aClient *cptr, aClient *server)
+static void	introduce_server(aClient *cptr, aClient *server)
 {
 	int i;
 	aClient *acptr;
@@ -547,8 +558,7 @@ static void send_server_burst(aClient *cptr, aClient *acptr)
 */
 int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-       aClient *acptr;
-       int i;
+	aClient *acptr;
 
 	if (parc < 3)
 	{
@@ -590,7 +600,9 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	SetServer(acptr);
 	istat.is_masked++;
 	if (istat.is_serv > istat.is_m_serv)
+	{
 		istat.is_m_serv = istat.is_serv;
+	}
 
 	/* We add this server to client list, but *only* to SID hash. */
 	add_client_to_list(acptr);
@@ -613,6 +625,8 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	/* And introduce the server to others. */
 	introduce_server(cptr, acptr);
+
+	return 1;
 }
 
 
@@ -625,19 +639,14 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[4] = server version (remote 2.11)/serverinfo(remote 2.10+local2.11)
 **	parv[5] = serverinfo (remote 2.11)
 */
-int	m_server(cptr, sptr, parc, parv)
-aClient *cptr, *sptr;
-int	parc;
-char	*parv[];
+int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Reg	char	*ch;
-	Reg	int	i;
-	char	info[REALLEN+1], *inpath, *host, *stok;
-	char	versionbuf[11];		/* At least PATCHLEVEL size! */
-	aClient *acptr, *bcptr;
-	aConfItem *aconf;
-	int	hop = 0, token = 0;
-	int	tmperr;
+	char		info[REALLEN+1], *inpath, *host;
+	char		versionbuf[11];	/* At least PATCHLEVEL size! */
+	aClient		*acptr, *bcptr;
+	aConfItem	*aconf;
+	int		hop = 0;
+	int		tmperr;
 
 	if (sptr->user) /* in case NICK hasn't been received yet */
             {
@@ -954,7 +963,6 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	
 	Reg	aConfItem	*aconf, *bconf;
 	char	mlname[HOSTLEN+1], *inpath, *host, *s, *encr, *stok;
-	int	i;
 
 	host = cptr->name;
 	inpath = get_client_name(cptr,TRUE); /* "refresh" inpath with host */
@@ -1433,7 +1441,6 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			char eobbuf[BUFSIZE];
 			char *e;
 			int eobmaxlen;
-			int flag;
 
 			e = eobbuf;
 			eobmaxlen = BUFSIZE
@@ -1642,20 +1649,25 @@ char	*parv[];
 	parv[4] = NULL;
 	if (hunt_server(cptr, sptr, ":%s SUMMON %s %s %s", 2, parc, parv) ==
 	    HUNTED_ISME)
-	    {
+	{
 #ifdef ENABLE_SUMMON
 		if ((fd = utmp_open()) == -1)
-		    {
+		{
 			sendto_one(sptr, replies[ERR_FILEERROR], ME, BadTo(parv[0]),
 				   "open", UTMP);
 			return 1;
-		    }
+		}
+
 #  ifndef LEAST_IDLE
 		while ((flag = utmp_read(fd, namebuf, linebuf, hostbuf,
 					 sizeof(hostbuf))) == 0) 
+		{
 			if (StrEq(namebuf,user))
+			{
 				break;
-#  else
+			}
+		}
+#  else	/* LEAST_IDLE */
 		/* use least-idle tty, not the first
 		 * one we find in utmp. 10/9/90 Spike@world.std.com
 		 * (loosely based on Jim Frost jimf@saber.com code)
@@ -1663,53 +1675,57 @@ char	*parv[];
 		
 		while ((flag = utmp_read(fd, namebuf, linetmp, hostbuf,
 					 sizeof(hostbuf))) == 0)
-		    {
+		{
 			if (StrEq(namebuf,user))
-			    {
+			{
 				sprintf(ttyname,"/dev/%s",linetmp);
 				if (stat(ttyname,&stb) == -1)
-				    {
+				{
 					sendto_one(sptr,
 						   replies[ERR_FILEERROR],
 						   ME, BadTo(sptr->name),
 						   "stat", ttyname);
 					return 1;
-				    }
+				}
 				if (!ltime)
-				    {
+				{
 					ltime= stb.st_mtime;
 					(void)strcpy(linebuf,linetmp);
-				    }
+				}
 				else if (stb.st_mtime > ltime) /* less idle */
-				    {
+				{
 					ltime= stb.st_mtime;
 					(void)strcpy(linebuf,linetmp);
-				    }
-			    }
-		    }
-#  endif
+				}
+			}
+		}
+#  endif /* LEAST_IDLE */
 		(void)utmp_close(fd);
 #  ifdef LEAST_IDLE
 		if (ltime == 0)
 #  else
 		if (flag == -1)
 #  endif
+		{
 			sendto_one(sptr, replies[ERR_NOLOGIN], ME, BadTo(parv[0]), user);
+		}
 		else
+		{
 			summon(sptr, user, linebuf, chname);
-#else
+		}
+#else	/* ENABLE_SUMMON */
 		sendto_one(sptr, replies[ERR_SUMMONDISABLED], ME, BadTo(parv[0]));
 #endif /* ENABLE_SUMMON */
-	    }
+	}
 	else
+	{
 		return 3;
+	}
 	return 2;
 }
 /* stats ? - quick info about connected servers
  */
-static void report_myservers(sptr,to)
-aClient *sptr;
-char *to;
+static void report_myservers(aClient *sptr, char *to)
 {
 	int i;
 	int timeconnected;
@@ -1730,23 +1746,23 @@ char *to;
 		}
 		timeconnected = timeofday - acptr->firsttime;
 #ifdef HUB
-                        for (asptr = svrtop;asptr;asptr = asptr->nexts)
-                        {
-				if (IsMasked(asptr->bcptr))
-				{
-					continue;
-				}
-                                if (asptr->bcptr->from == acptr)
-                                {
-                                        servers++;
-                                        users += asptr->usercnt[0];
-					users += asptr->usercnt[1];
-				}
+		for (asptr = svrtop; asptr; asptr = asptr->nexts)
+		{
+			if (IsMasked(asptr->bcptr))
+			{
+				continue;
 			}
+			if (asptr->bcptr->from == acptr)
+			{
+				servers++;
+				users += asptr->usercnt[0];
+				users += asptr->usercnt[1];
+			}
+		}
 #else /* !HUB */
-			servers = istat.is_serv - 1;
-			users = istat.is_user[0] + istat.is_user[1];
-			users -= istat.is_myclnt;
+		servers = istat.is_serv - 1;
+		users = istat.is_user[0] + istat.is_user[1];
+		users -= istat.is_myclnt;
 #endif
 		sendto_one(sptr,
 			   ":%s %d %s :%s (%d, %02d:%02d:%02d) %dS %dC"
@@ -2730,9 +2746,9 @@ void trace_one(aClient *sptr, aClient *acptr)
 		{
 			/* we need to count servers/users behind this link */
 			int servers = 0, users = 0;
-			aServer *asptr;
 #ifdef HUB
-                        for (asptr = svrtop; asptr; asptr = asptr->nexts)
+			aServer *asptr;
+			for (asptr = svrtop; asptr; asptr = asptr->nexts)
 			{
 				if (asptr->bcptr->from == acptr)
 				{
