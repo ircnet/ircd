@@ -328,9 +328,10 @@ char	*parv[];
 			parv[3], parv[2]);
 		break;
 	    case RPL_TRACELINK:
-		sprintf(mybuf,"%s<%s> Link => %s (%s)", parv[0], parv[3],
-			parv[4], parv[5]);
-		break;
+                sprintf(mybuf,"%s<%s> Link %s> %s (%s up %s) bQ:%s fQ:%s",
+                        parv[0], parv[3], parv[6], parv[4], parv[5], parv[7],
+                        parv[8], parv[9]);
+  		break;
 	    case RPL_TRACESERVER:
 		if (parc <= 5)
 			sprintf(mybuf,"*** %s Class: %s %s: %s",

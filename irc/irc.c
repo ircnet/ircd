@@ -283,7 +283,7 @@ char	*argv[];
 			strncpy(meUser.username,userdata->pw_name,USERLEN);
 #endif
 		}
-		strcpy(meUser.server,me.sockhost);
+		meUser.server = strdup(me.sockhost);
 		meUser.username[USERLEN] = '\0';
 		me.info[REALLEN] = '\0';
 		me.fd = sock;
