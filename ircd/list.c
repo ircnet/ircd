@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.35 2004/07/26 16:06:17 jv Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.36 2004/08/02 15:49:08 jv Exp $";
 #endif
 
 #include "os.h"
@@ -260,12 +260,6 @@ aServer	*make_server(aClient *cptr)
 		serv->refcnt = 1;
 		serv->nexts = NULL;
 		serv->prevs = NULL;
-		if (svrtop)
-		{
-			svrtop->prevs = serv;
-			serv->nexts = svrtop;
-		}
-		svrtop = serv;
 		SetBit(tok);
 		serv->ltok = tok;
 		sprintf(serv->tok, "%d", serv->ltok);
@@ -280,30 +274,34 @@ aServer	*make_server(aClient *cptr)
 **	Decrease user reference count by one and release block,
 **	if count reaches 0
 */
-void	free_user(anUser *user, aClient *cptr)
+void	free_user(anUser *user)
 {
 	aServer *serv;
+	aClient *cptr = user->bcptr;
 
 	if (--user->refcnt <= 0)
-	    {
-		if ((serv = user->servp))
-		    {
-			user->servp = NULL; /* to avoid some impossible loop */
-			free_server(serv, serv->bcptr);
-		    }
-		if (user->away)
-		    {
-			istat.is_away--;
-			istat.is_awaymem -= (strlen(user->away) + 1);
-			MyFree(user->away);
-		    }
+	{
+		/* Loop: This would be second deallocation of this structure.
+		 * XXX: Remove loop detection before 2.11.0 - jv
+		 */
+
+		if (user->refcnt == -211001)
+		{
+			sendto_flag(SCH_ERROR,
+				"* %p free_user loop (%s!%s@%s) %p *",
+				(void *)cptr, cptr ? cptr->name : "<noname>",
+				user->username, user->host, user);
+
+			return;
+		}
+		
 		/*
 		 * sanity check
 		 */
 		if (user->joined || user->refcnt < 0 ||
 		    user->invited || user->channel || user->uwas ||
 		    user->bcptr)
-		    {
+		{
 			char buf[512];
 			/*too many arguments for dumpcore() and sendto_flag()*/
 			sprintf(buf, "%p %p %p %p %d %d %p (%s)",
@@ -322,7 +320,21 @@ void	free_user(anUser *user, aClient *cptr)
 				(void *)cptr, cptr ? cptr->name : "<noname>",
 				user->username, user->host, buf);
 #endif
-		    }
+		}
+
+		if ((serv = user->servp))
+		{
+			user->servp = NULL; /* to avoid some impossible loop */
+			user->refcnt = -211000; /* For loop detection */
+			free_server(serv);
+		}
+
+		if (user->away)
+		{
+			istat.is_away--;
+			istat.is_awaymem -= (strlen(user->away) + 1);
+			MyFree(user->away);
+		}
 		MyFree(user);
 #ifdef	DEBUGMODE
 		users.inuse--;
@@ -330,31 +342,33 @@ void	free_user(anUser *user, aClient *cptr)
 	    }
 }
 
-void	free_server(aServer *serv, aClient *cptr)
+void	free_server(aServer *serv)
 {
-	if (cptr && cptr->serv)
-	{
-		/* has to be removed from the list of aServer structures */
-		if (cptr->serv->nexts)
-			cptr->serv->nexts->prevs = cptr->serv->prevs;
-		if (cptr->serv->prevs)
-			cptr->serv->prevs->nexts = cptr->serv->nexts;
-		if (svrtop == cptr->serv)
-			svrtop = cptr->serv->nexts;
-		cptr->serv->prevs = NULL;
-		cptr->serv->nexts = NULL;
-		if (cptr->serv->user)
-		{
-			free_user(cptr->serv->user, cptr);
-			cptr->serv->user = NULL;
-		}
-		ClearBit(cptr->serv->ltok);
-		cptr->serv->bcptr = NULL;
-	}
-
+	aClient *cptr = serv->bcptr;
 	/* decrement reference counter, and eventually free it */
 	if (--serv->refcnt <= 0)
 	{
+		if (serv->refcnt == -211001)
+		{
+			/* Loop detected, break it.
+			 * XXX: Remove loop detection before 2.11.0 - jv */
+			sendto_flag(SCH_DEBUG, "* %#x free_server loop %s *",
+				    serv, serv->namebuf);
+			return;
+
+		}
+		/* Decrease (and possibly free) refcnt of the user struct
+		 * of who connected this server.
+		 */
+		if (serv->user)
+		{
+			int cnt = serv->refcnt;
+			serv->refcnt = -211000;	/* Loop detection */
+			free_user(serv->user);
+			serv->user = NULL;
+			serv->refcnt = cnt;
+		}
+
 		if (serv->refcnt < 0 ||	serv->prevs || serv->nexts ||
 		    serv->bcptr || serv->user)
 		{
@@ -374,6 +388,9 @@ void	free_server(aServer *serv, aClient *cptr)
 				    cptr, cptr ? cptr->name : "<noname>", buf);
 #endif
 		}
+		/* Free token */
+		ClearBit(serv->ltok);
+
 		MyFree(serv);
 	}
 }
@@ -410,13 +427,14 @@ void	remove_client_from_list(aClient *cptr)
 		istat.is_users--;
 		/* decrement reference counter, and eventually free it */
 		cptr->user->bcptr = NULL;
-		(void)free_user(cptr->user, cptr);
+		(void)free_user(cptr->user);
 	    }
 
 	if (cptr->serv)
-	    {
-		free_server(cptr->serv, cptr);
-	    }
+	{
+		cptr->serv->bcptr = NULL;
+		free_server(cptr->serv);
+	}
 
 	if (cptr->service)
 		/*
