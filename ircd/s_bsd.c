@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.170 2004/11/19 15:22:08 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.171 2004/11/19 15:42:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1644,6 +1644,21 @@ static  int     check_clones(aClient *cptr)
 }
 #endif
 
+/* moved from inner blocks of add_connection to get rid of gotos */
+void	add_connection_refuse(int fd, aClient *acptr, int delay)
+{
+#if !defined(DELAY_CLOSE)
+	delay = 0;
+#endif
+	if (!delay)
+	{
+		(void)close(fd);
+	}
+	ircstp->is_ref++;
+	acptr->fd = -2;
+	free_client(acptr);
+}
+
 /*
  * Creates a client which has just connected to us on the given fd.
  * The sockhost field is initialized with the ip# of the host.
@@ -1676,19 +1691,15 @@ aClient	*add_connection(aClient *cptr, int fd)
 #endif
 				report_error("Failed in connecting to %s :%s",
 					     cptr);
-add_con_refuse:
-			(void)close(fd);
-#if defined(CLONE_CHECK) && defined(DELAY_CLOSE)
-add_con_refuse_delay:
-#endif
-			ircstp->is_ref++;
-			acptr->fd = -2;
-			free_client(acptr);
+			add_connection_refuse(fd, acptr, 0);
 			return NULL;
 		    }
 		/* don't want to add "Failed in connecting to" here.. */
 		if (aconf && IsIllegal(aconf))
-			goto add_con_refuse;
+		{
+			add_connection_refuse(fd, acptr, 0);
+			return NULL;
+		}
 		/* Copy ascii address to 'sockhost' just in case. Then we
 		 * have something valid to put into error messages...
 		 */
@@ -1711,12 +1722,14 @@ add_con_refuse_delay:
 			sendto_flog(acptr, EXITC_CLONE, "", acptr->sockhost);
 #ifdef DELAY_CLOSE
 			nextdelayclose = delay_close(fd);
-			goto add_con_refuse_delay;
 #else
 			(void)send(fd, "ERROR :Too rapid connections from your "
 				"host\r\n", 46, 0);
-			goto add_con_refuse;
 #endif
+			/* If DELAY_CLOSE is not defined, delay will
+			** be changed to 0 inside. --B. */
+			add_connection_refuse(fd, acptr, 1);
+			return NULL;
 		}
 #endif
 		lin.flags = ASYNC_CLIENT;
@@ -1739,7 +1752,10 @@ add_con_refuse_delay:
 	acptr->fd = fd;
 	set_non_blocking(acptr->fd, acptr);
 	if (set_sock_opts(acptr->fd, acptr) == -1)
-		goto add_con_refuse;
+	{
+		add_connection_refuse(fd, acptr, 0);
+		return NULL;
+	}
 	if (aconf)
 		aconf->clients++;
 	if (fd > highest_fd)
