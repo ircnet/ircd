@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.117 2002/03/24 19:58:37 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.118 2002/03/28 22:55:24 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1638,75 +1638,102 @@ int oper;
 ** who_find
 **	lists all (matching) users.
 **	CPU intensive, but what can be done?
+**	
+**	Reduced CPU load - 05/2001
 */
-static	void	who_find(sptr, mask, oper)
-aClient *sptr;
-char *mask;
-int oper;
+static	void	who_find(aClient *sptr, char *mask, int oper)
 {
-	aChannel *chptr, *ch2ptr;
-	Link	*lp;
+	aChannel *chptr = NULL;
+	Link	*lp,*lp2;
 	int	member;
-	int	showperson, isinvis;
+	int	showperson;
 	aClient	*acptr;
+	int	myoper = 1;
+
+	if (MyConnect(sptr) && IsAnOper(sptr))
+	{
+		myoper = 1;
+	}
+
+	/* first, show INvisible matching users on common channels */
+	for (lp = sptr->user->channel; lp ;lp = lp->next)
+	{
+		chptr = lp->value.chptr;
+		if (IsAnonymous(chptr))
+			continue;
+		for (lp2 = chptr->members; lp2 ;lp2 = lp2->next)
+		{
+			acptr = lp2->value.cptr;
+			
+			if (!IsInvisible(acptr)
+			    || (acptr->flags & FLAGS_HIDDEN))
+			{
+				continue;
+			}
+			
+			if (oper && !IsAnOper(acptr))
+			{
+				continue;
+			}
+			
+			/* Mark user with FLAGS_HIDDEN to prevent multiple
+			 * checking.
+			 */
+			
+			acptr->flags |= FLAGS_HIDDEN;
+			if (!mask ||
+			     match(mask, acptr->name) == 0 ||
+			     match(mask, acptr->user->username) == 0 ||
+			     match(mask, acptr->user->host) == 0 ||
+			     match(mask, acptr->user->server) == 0 ||
+			     match(mask, acptr->info) == 0)
+				who_one(sptr, acptr, chptr, NULL);
+		
+		}
+	}
 
 	for (acptr = client; acptr; acptr = acptr->next)
-	    {
-		ch2ptr = NULL;
+	{
 			
 		if (!IsPerson(acptr))
 			continue;
-		if (oper && !IsAnOper(acptr))
+		
+		/* clear the flag */
+		if (acptr->flags & FLAGS_HIDDEN)
+		{
+			acptr->flags &= ~FLAGS_HIDDEN;
 			continue;
-		showperson = 0;
+		}
+		
+		/* allow local opers to see matching clients
+		 * on _LOCAL_ server */
+		if (IsInvisible(acptr) && !(MyConnect(acptr) && myoper))
+		{
+			continue;
+		}
+		
+		/* we wanted only opers */
+		if (oper && !IsAnOper(acptr))
+		{
+			continue;
+		}
+
 		/*
-		 * Show user if they are on the same channel, or not
-		 * invisible and on a non secret channel (if any).
-		 * Do this before brute force match on all relevant
-		 * fields since these are less cpu intensive (I
-		 * hope :-) and should provide better/more shortcuts
-		 * -avalon
-		 */
-		isinvis = IsInvisible(acptr);
-		for (lp = acptr->user->channel; lp; lp = lp->next)
-		    {
-			chptr = lp->value.chptr;
-			if (IsAnonymous(chptr))
-				continue;
-			member = IsMember(sptr, chptr);
-			if (isinvis && !member)
-				continue;
-			if (member || (!isinvis && PubChannel(chptr)))
-			    {
-				showperson = 1;
-				if (!IsAnonymous(chptr) ||
-				    acptr != sptr)
-				    {
-					ch2ptr = chptr;
-					break;
-				    }
-			    }
-			if (HiddenChannel(chptr) &&
-			    !SecretChannel(chptr) && !isinvis)
-				showperson = 1;
-		    }
-		if (!acptr->user->channel && !isinvis)
-			showperson = 1;
-		/*
-		** This is brute force solution, not efficient...? ;( 
+		** This is brute force solution, not efficient...? ;(
 		** Show entry, if no mask or any of the fields match
 		** the mask. --msa
 		*/
-		if (showperson &&
-		    (!mask ||
+		if (!mask ||
 		     match(mask, acptr->name) == 0 ||
 		     match(mask, acptr->user->username) == 0 ||
 		     match(mask, acptr->user->host) == 0 ||
 		     match(mask, acptr->user->server) == 0 ||
-		     match(mask, acptr->info) == 0))
-			who_one(sptr, acptr, ch2ptr, NULL);
-	    }
+		     match(mask, acptr->info) == 0)
+			who_one(sptr, acptr, NULL, NULL);
+	}
+	
 }
+
 
 /*
 ** m_who
@@ -1750,9 +1777,6 @@ char	*parv[];
 		/* I think it's useless --Beeth */
 		clean_channelname(mask);
 #endif
-
-		/* simplify mask */
-		(void)collapse(mask);
 
 		/*
 		** We can never have here !mask 
@@ -1827,9 +1851,13 @@ char	*parv[];
 			else
 			{
 				/*
-				** All nice chances lost above. 
+				** All nice chances lost above.
 				** We must hog our server with that.
 				*/
+				
+				/* simplify mask */
+				(void)collapse(mask);
+
 				who_find(sptr, mask, oper);
 				penalty += MAXPENALTY;
 			}
