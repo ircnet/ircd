@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.129 2004/03/14 11:55:02 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.130 2004/03/14 12:04:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -809,24 +809,26 @@ int	check_client(aClient *cptr)
 	Debug((DEBUG_DNS, "ch_cl: access ok: %s[%s]",
 		cptr->name, sockname));
 
-#ifdef INET6
-	if (IN6_IS_ADDR_LOOPBACK(&cptr->ip) || IsUnixSocket(cptr) ||
-	    /* If s6_addr32 was standard, we could just compare them,
-	     * not memcmp. --B. */
-	    !memcmp(cptr->ip.s6_addr, mysk.sin6_addr.s6_addr, 16) 
-/* ||
-	    IN6_ARE_ADDR_SAMEPREFIX(&cptr->ip, &mysk.SIN_ADDR))
- about the same, I think              NOT */
-                                                              )
-#else
-        if (inetnetof(cptr->ip) == IN_LOOPBACKNET || IsUnixSocket(cptr) ||
-            cptr->ip.S_ADDR == mysk.SIN_ADDR.S_ADDR)
+#ifdef NO_OPER_REMOTE
+	if (
+#ifdef UNIXPORT
+		IsUnixSocket(cptr) ||
 #endif
-	    {
-
+#ifdef INET6
+		IN6_IS_ADDR_LOOPBACK(&cptr->ip) ||
+		/* If s6_addr32 was standard, we could just compare them,
+		 * not memcmp. --B. */
+		!memcmp(cptr->ip.s6_addr, mysk.sin6_addr.s6_addr, 16)
+#else
+		inetnetof(cptr->ip) == IN_LOOPBACKNET ||
+		cptr->ip.S_ADDR == mysk.SIN_ADDR.S_ADDR
+#endif
+		)
+	{
 		ircstp->is_loc++;
 		cptr->flags |= FLAGS_LOCAL;
-	    }
+	}
+#endif /* NO_OPER_REMOTE */
 	return 0;
 }
 
