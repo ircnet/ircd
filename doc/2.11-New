@@ -25,3 +25,14 @@
 	* STATS f, avaible to local operators only, shows detailed
 	  information about client TCP connection.
 	* INVITE overriding ban shows inviter's n!u@h in channel notice.
+	* -t option (foreground mode) is now avaible even without DEBUGMODE
+	* CIDR support in +beI channelmodes.
+	* Added new wildcard character '#' matching any digit.
+	* Support for text representation of user modes in USER command
+	  during registration.
+	* Added SET command which makes possible to fine-tune certain
+	  ircd values during runtime (like dbuf poolsize and autoconnect).
+	* Stats Z no longer computes real memory statistics unless DEBUGMODE
+	  set.
+	* Added DelayKill feature to make ircd more responsible on rehash
+	  on big servers with many clients and many klines.
