@@ -1,4 +1,4 @@
-dnl configure.in for irc-2.9.3
+dnl configure.in for irc-2.9.4
 dnl Matthew Green (mrg@mame.mu.oz.au), Alain Nissen (Alain.Nissen@ulg.ac.be)
 dnl using portions of Avalon's Config and GNU Autoconf 1.12.
 
@@ -21,6 +21,7 @@ AC_TRY_CPP([#include <zlib.h>],
 [no_zlib_include=
 irc_zlib_include=],
 [for irc_dir in "$irc_zlib_include" \
+                     `test -z "$irc_zlib_prefix" || echo "$irc_zlib_prefix/include"` \
                      `echo "$irc_zlib_library" | sed s/lib/include/` \
                      /usr/include /usr/local/include /usr/unsupported/include \
                      /usr/share/include /usr/local/share/include /include \
@@ -46,6 +47,7 @@ irc_zlib_library=
 LIBS="$irc_save_LIBS"],
 [LIBS="$irc_save_LIBS"
 for irc_dir in "$irc_zlib_library" \
+                    `test -z "$irc_zlib_prefix" || echo "$irc_zlib_prefix/lib"` \
                     `echo "$irc_zlib_include" | sed s/include/lib/` \
                     /usr/lib /usr/local/lib /usr/unsupported/lib \
                     /usr/share/lib /usr/local/share/lib /lib /usr/zlib/lib \
@@ -108,46 +110,55 @@ AC_SUBST(IRC_ZLIB_LIBRARY)
 
 
 AC_DEFUN(IRC_CURSES_TERMCAP,
-[AC_MSG_CHECKING([whether (n)curses or termcap library will be used])
-AC_CACHE_VAL(irc_cv_curses_termcap,
+[AC_MSG_CHECKING([whether ncurses, curses or termcap library will be used])
+AC_ARG_WITH(ncurses, [  --without-ncurses       does not look for ncurses library, will not use it])
+AC_ARG_WITH(curses, [  --without-curses        does not look for curses library, will not use it])
+AC_ARG_WITH(termcap, [  --without-termcap       does not look for termcap library, will not use it])
+AC_CACHE_VAL(irc_cv_ncurses_curses_termcap,
 [irc_save_LIBS="$LIBS"
-LIBS="-lncurses $LIBS"
+LIBS="-lncurses $irc_save_LIBS"
 AC_TRY_LINK(,
 [initscr()],
-[irc_cv_curses_termcap=ncurses
-LIBS="$irc_save_LIBS"],
-[LIBS="$irc_save_LIBS"
-LIBS="-lcurses $LIBS"
+irc_ncurses=yes,
+irc_ncurses=no)
+LIBS="-lcurses $irc_save_LIBS"
 AC_TRY_LINK(,
 [initscr()],
-[irc_cv_curses_termcap=curses
-LIBS="$irc_save_LIBS"],
-[LIBS="$irc_save_LIBS"
-LIBS="-ltermcap $LIBS"
+irc_curses=yes,
+irc_curses=no)
+LIBS="-ltermcap $irc_save_LIBS"
 AC_TRY_LINK(,
 [tgetent()],
-[irc_cv_curses_termcap=termcap
-LIBS="$irc_save_LIBS"],
-[irc_cv_curses_termcap=none
-LIBS="$irc_save_LIBS"])
+irc_termcap=yes,
+irc_termcap=no)
+LIBS="$irc_save_LIBS"
+irc_cv_ncurses_curses_termcap="irc_ncurses=$irc_ncurses irc_curses=$irc_curses irc_termcap=$irc_termcap"
 ])
-])
-])
-if test $irc_cv_curses_termcap = ncurses; then
+eval $irc_cv_ncurses_curses_termcap
+if test "x$with_ncurses" = xno; then
+  irc_ncurses=no
+fi
+if test "x$with_curses" = xno; then
+  irc_curses=no
+fi
+if test "x$with_termcap" = xno; then
+  irc_termcap=no
+fi
+if test $irc_ncurses = yes; then
   AC_MSG_RESULT(ncurses)
   AC_DEFINE(USE_NCURSES)
   IRC_CURSES_TERMCAP_LIBRARY="-lncurses"
-elif test $irc_cv_curses_termcap = curses; then
+elif test $irc_curses = yes; then
   AC_MSG_RESULT(curses)
   AC_DEFINE(USE_CURSES)
   IRC_CURSES_TERMCAP_LIBRARY="-lcurses"
-elif test $irc_cv_curses_termcap = termcap; then
+elif test $irc_termcap = yes; then
   AC_MSG_RESULT(termcap)
   AC_DEFINE(USE_TERMCAP)
   IRC_CURSES_TERMCAP_LIBRARY="-ltermcap"
 else
   AC_MSG_RESULT(none)
-  AC_MSG_WARN([I can't find either (n)curses or termcap library.])
+  AC_MSG_WARN([I can't find either ncurses, curses or termcap library.])
   IRC_CURSES_TERMCAP_LIBRARY=
 fi
 AC_SUBST(IRC_CURSES_TERMCAP_LIBRARY)
@@ -282,6 +293,40 @@ else
   AC_MSG_RESULT(no)
 fi,
 AC_MSG_RESULT(no))
+])
+
+
+AC_DEFUN(IRC_ALPHA_BETA,
+[AC_MSG_CHECKING(whether this is an alpha/beta release)
+AC_CACHE_VAL(irc_cv_alpha_beta,
+[AC_EGREP_CPP(^\"......00,
+[#include "../include/patchlevel.h"
+#ifdef PATCHLEVEL
+PATCHLEVEL
+#else
+"0000000000"
+#endif
+],irc_cv_alpha_beta=,
+irc_cv_alpha_beta=yes)
+])
+if test x$irc_cv_alpha_beta = xyes; then
+  AC_MSG_RESULT(yes)
+  AC_MSG_WARN([
+
+This is a development version of the package,
+it is not intended to be used in a production environment.
+])
+  if test ! "$ac_test_CFLAGS" = set; then
+    if test x$ac_cv_prog_cc_g = xyes -o x$GCC = x; then
+      CFLAGS="$CFLAGS -g"
+    fi
+  fi
+else
+  AC_MSG_RESULT(no)
+  if test ! "${LDFLAGS+set}" = set; then
+    LDFLAGS="-s"
+  fi
+fi
 ])
 
 
@@ -675,8 +720,9 @@ Features and packages:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --zlib-include=DIR      zlib include files are in DIR
-  --zlib-library=DIR      zlib library files are in DIR
+  --zlib-prefix=ZDIR      zlib installation prefix is ZDIR
+  --zlib-include=ZIDIR    zlib include files are in ZIDIR [ZDIR/include]
+  --zlib-library=ZLDIR    zlib library files are in ZLDIR [ZDIR/lib]
 changequote([, ])dnl
 EOF
     if test -n "$ac_help"; then
@@ -860,6 +906,13 @@ changequote([, ])dnl
     ac_package=`echo $ac_package| sed 's/-/_/g'`
     eval "with_${ac_package}=no" ;;
 
+  -zlib-prefix | --zlib-prefix | --zlib-prefi | --zlib-pref \
+  | --zlib-pre | --zlib-pr | --zlib-p)
+    ac_prev=irc_zlib_prefix ;;
+  -zlib-prefix=* | --zlib-prefix=* | --zlib-prefi=* | --zlib-pref=* \
+  | --zlib-pre=* | --zlib-pr=* | --zlib-p=*)
+    irc_zlib_prefix="$ac_optarg" ;;
+
   -zlib-include | --zlib-include | --zlib-includ | --zlib-inclu \
   | --zlib-incl | --zlib-inc | --zlib-in | --zlib-i)
     ac_prev=irc_zlib_include ;;
@@ -912,7 +965,8 @@ AC_DIVERT_POP()dnl to NORMAL
 
 
 AC_DEFUN(IRC_PROG_INSTALL,
-[AC_REQUIRE([AC_CONFIG_AUX_DIR_DEFAULT])dnl
+[define(AC_PROVIDE_AC_PROG_INSTALL)
+AC_REQUIRE([AC_CONFIG_AUX_DIR_DEFAULT])dnl
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
 # incompatible versions:
@@ -979,22 +1033,52 @@ AC_SUBST(INSTALL_DATA)dnl
 ])
 
 
+AC_DEFUN(IRC_PROG_CC,
+[define(AC_PROVIDE_AC_PROG_CC)
+AC_BEFORE([$0], [AC_PROG_CPP])dnl
+AC_CHECK_PROG(CC, gcc, gcc)
+if test -z "$CC"; then
+  AC_CHECK_PROG(CC, cc, cc, , , /usr/ucb/cc)
+  test -z "$CC" && AC_MSG_ERROR([no acceptable cc found in \$PATH])
+fi
+
+AC_PROG_CC_WORKS
+AC_PROG_CC_GNU
+
+ac_test_CFLAGS="${CFLAGS+set}"
+
+if test $ac_cv_prog_gcc = yes; then
+  GCC=yes
+  ac_save_CFLAGS="$CFLAGS"
+  CFLAGS=
+  AC_PROG_CC_G
+  if test "$ac_test_CFLAGS" = set; then
+    CFLAGS="$ac_save_CFLAGS"
+  else
+    CFLAGS="-O2"
+  fi
+else
+  GCC=
+fi
+])
+
+
 dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.9 1997/07/22 12:41:54 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.10 1997/08/08 16:17:11 kalt Exp $])
 AC_PREREQ(1.12)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../include/setup.h.in)
 AC_CONFIG_AUX_DIR(../support)
 
-AC_PROG_CC
+IRC_PROG_CC
 AC_PROG_CPP
-define([AC_PROVIDE_AC_PROG_INSTALL])
 IRC_PROG_INSTALL
 AC_PATH_PROGS(SUM, sum cksum, true)
 AC_PROG_GCC_TRADITIONAL
+IRC_ALPHA_BETA
 
 AC_AIX
 AC_ISC_POSIX
