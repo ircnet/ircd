@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.7 1997/04/18 21:32:31 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.8 1997/05/21 20:18:47 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -1948,17 +1948,7 @@ FdAry	*fdp;
 			    && cptr->authfd >= 0
 #endif
 			    )
-/*
-#ifdef	_DO_POLL_
-			    && (authclnts[fd]->authfd == fd)
-#endif
-*/
 			    {
-/*
-#ifdef	_DO_POLL_
-				cptr = authclnts[fd];
-#endif
-*/
 				auth--;
 				if (TST_WRITE_EVENT(cptr->authfd))
 				    {
@@ -1979,11 +1969,6 @@ FdAry	*fdp;
 			continue;
 #else
 		fd = cptr->fd;
-/*
-		above, already
-		if (!(cptr = local[fd = fdp->fd[i]]))
-			continue;
-*/
 #endif
 		/*
 		 * accept connections
@@ -2063,14 +2048,10 @@ deadsocket:
 		    }
 		length = 1;	/* for fall through case */
 		if (!NoNewLine(cptr) || TST_READ_EVENT(fd)) {
-		    if (!(DoingAuth(cptr) &&
-			  timeofday - cptr->firsttime < 5))
+		    if (!DoingAuth(cptr))
 			    length = read_packet(cptr,
 						 TST_READ_EVENT(fd));
 		}
-/*		else if (IsClient(cptr) && DBufLength(&cptr->recvQ))
-			length = client_packet(cptr);
-*/
 		readcalls++;
 		if (length == FLUSH_BUFFER)
 			continue;
