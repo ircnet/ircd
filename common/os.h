@@ -27,7 +27,7 @@
 
 #include "setup.h"
 
-#if defined(linux)
+#if defined(linux) || defined(__CYGWIN32__)
 # define _GNU_SOURCE 1
 #endif
 
