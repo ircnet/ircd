@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.33 1999/04/10 16:51:43 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.34 1999/06/15 01:25:06 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -452,7 +452,13 @@ Reg	aClient	*cptr;
 
 	/* get remote host peer - so that we get right interface -- jrg */
 	tlen = ulen = sizeof(us);
-	(void)getpeername(cptr->fd, (struct sockaddr *)&them, &tlen);
+	if (getpeername(cptr->fd, (struct sockaddr *)&them, &tlen) < 0)
+	    {
+		/* we probably don't need this error message -kalt */
+		report_error("getpeername for auth request %s:%s", cptr);
+		close(cptr->authfd);
+		return;
+	    }
 	them.SIN_FAMILY = AFINET;
 
 	/* We must bind the local end to the interface that they connected
