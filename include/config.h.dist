@@ -56,20 +56,6 @@
 				     behaviour (apollo sr10.1/bsd4.3 needs
 				     this) */
 
-/*
- * If you have curses, and wish to use it, then define HAVECURSES. This is the
- * default mode. If you do not have termcap, then undefine HAVETERMCAP. This is
- * the default mode. You can use both HAVECURSES and HAVETERMCAP, but you must
- * define one of the two at least. Remember to check LIBFLAGS in the Makefiles.
- *
- * NOTICE: HAVECURSES and HAVETERMCAP are still under testing. Currently, use
- *  only HAVECURSES and not HAVETERMCAP. This is a temporary condition only.
- *
- * NOTE: These *ONLY* apply to the irc client in this package
- */
-#define	HAVECURSES		/* If you have curses, and want to use it.  */
-#undef	HAVETERMCAP		/* If you have termcap, and want to use it. */
-
 /* 
  * NPATH is path to backup file for NOTE. If both this and EPATH is defined, 
  * a real channel structure (news-similar) may be created by operators 
@@ -86,17 +72,18 @@
 #undef	NPATH /* "/local/gnu/icn/.ircdnote" */
 
 /*
- * Full pathnames and defaults of irc system's support files. Please note that
+ * Pathnames and defaults of irc system's support files. Please note that
  * these are only the recommened names and paths. Change as needed.
  * You must define these to something, even if you don't really want them.
- * Note: The directory path IRCDDIR is defined by Makefile.
  */
-#define	SPATH	"ircd"
-#define	CPATH	"ircd.conf"
-#define	MPATH	"ircd.motd"
-#define	LPATH	"ircd.log"
-#define	PPATH	"ircd.pid"
-#define	TPATH	"ircd.tune"
+/* This is either full path or file within "server_bin_dir" (see Makefile) */
+#define	SPATH	"ircd"		/* daemon path */
+/* These are either full paths or files within "irc_dir" (see Makefile) */
+#define	CPATH	"ircd.conf"	/* configuration file */
+#define	MPATH	"ircd.motd"	/* motd file */
+#define	LPATH	"ircd.log"	/* debugging log */
+#define	PPATH	"ircd.pid"	/* PID file */
+#define	TPATH	"ircd.tune"	/* tuning file */
 
 /*
  * If you don't want the server to keep reading the MOTD file from the disk,
@@ -112,7 +99,7 @@
  *	FNAME_USERLOG just logs user connections,
  *	FNAME_OPERLOG logs every successful use of /oper.
  *	FNAME_CONNLOG logs every user rejected or uncomplete connection
- * These are either full paths or files within IRCDDIR (see Makefile).
+ * These are either full paths or files within "irc_dir" (see Makefile).
  */
 #define FNAME_USERLOG "users" /* */
 #define FNAME_OPERLOG "opers" /* */
@@ -655,13 +642,17 @@
  */
 #define	MAXCLIENTS	(MAXCONNECTIONS-4)
 
-#ifdef HAVECURSES
+#ifdef USE_NCURSES
 # define DOCURSES
 #else
-# undef DOCURSES
+# ifdef USE_CURSES
+#   define DOCURSES
+# else
+#   undef DOCURSES
+# endif
 #endif
 
-#ifdef HAVETERMCAP
+#ifdef USE_TERMCAP
 # define DOTERMCAP
 #else
 # undef DOTERMCAP

@@ -31,7 +31,7 @@
 #include "res.h"
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.6 1997/06/19 15:06:44 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.7 1997/07/15 04:35:46 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -109,7 +109,7 @@ int	op;
 		    {
 			ircd_res.nscount = 1;
 			ircd_res.nsaddr_list[0].sin_addr.s_addr =
-				inet_addr("127.0.0.1");
+				inetaddr("127.0.0.1");
 		    }
 	    }
 
@@ -748,10 +748,10 @@ char	*lp;
 	a = proc_answer(rptr, hptr, buf, buf+rc);
 	if (a == -1) {
 		sendto_flag(SCH_ERROR, "Bad hostname returned from %s for %s",
-			    inet_ntoa(sin.sin_addr),
+			    inetntoa((char *)&sin.sin_addr),
 			    inetntoa((char *)&rptr->he.h_addr));
 		Debug((DEBUG_DNS, "Bad hostname returned from %s for %s",
-		       inet_ntoa(sin.sin_addr),
+		       inetntoa((char *)&sin.sin_addr),
 		       inetntoa((char *)&rptr->he.h_addr)));
 	}
 #ifdef DEBUG

@@ -1,7 +1,6 @@
-spitshell=cat
-package=IRC
+#!/bin/sh
 
-echo "Extracting $package/ircd/version.c..."
+echo "Building version.c..."
 
 if test -r version.c
 then
@@ -13,13 +12,13 @@ fi
 
 generation=`expr $generation + 1`
 
-sumsserv=`@SUM@ ../ircd/s_serv.c`;
-sumsuser=`@SUM@ ../ircd/s_user.c`;
-sumchan=`@SUM@ ../ircd/channel.c`;
-sumsbsd=`@SUM@ ../ircd/s_bsd.c`;
-sumhash=`@SUM@ ../ircd/hash.c`;
-sumsmisc=`@SUM@ ../ircd/s_misc.c`;
-sumircd=`@SUM@ ../ircd/ircd.c`;
+sumsserv="`(cd ../ircd; @SUM@ s_serv.c)`"
+sumsuser="`(cd ../ircd; @SUM@ s_user.c)`"
+sumchan="`(cd ../ircd; @SUM@ channel.c)`"
+sumsbsd="`(cd ../ircd; @SUM@ s_bsd.c)`"
+sumhash="`(cd ../ircd; @SUM@ hash.c)`"
+sumsmisc="`(cd ../ircd; @SUM@ s_misc.c)`"
+sumircd="`(cd ../ircd; @SUM@ ircd.c)`"
 
 creation=`date | \
 awk '{if (NF == 6) \
@@ -27,7 +26,7 @@ awk '{if (NF == 6) \
 else \
          { print $1 " "  $2 " " $3 " " $7 " at " $4 " " $5 " " $6 }}'`
 
-$spitshell >version.c <<!SUB!THIS!
+cat >version.c <<!SUB!THIS!
 /*
  *   IRC - Internet Relay Chat, ircd/version.c
  *   Copyright (C) 1990 Chelsea Ashley Dyerman
@@ -52,7 +51,7 @@ $spitshell >version.c <<!SUB!THIS!
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.3 1997/04/21 00:25:35 kalt Exp $";
+static  char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.4 1997/07/15 04:35:48 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -65,7 +64,7 @@ char *pass_version = PATCHLEVEL;
 
 char *infotext[] =
     {
-	"$package --",
+	"IRC --",
 	"Based on the original code written by Jarkko Oikarinen",
 	"Copyright 1988, 1989, 1990, 1991 University of Oulu, Computing Center",
 	"",

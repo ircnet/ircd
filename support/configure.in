@@ -1,81 +1,291 @@
-dnl @(#)$Id configure.in,v 1.2 1995/01/07 01:50:18 mrg Exp$
-dnl
-dnl configure.in for ircd 2.9.
-dnl written by matthew green (mrg@mame.mu.oz.au), with portions
-dnl from avalon's Config.
-dnl copyright (c) 1995.
+dnl configure.in for irc-2.9.3
+dnl Matthew Green (mrg@mame.mu.oz.au), Alain Nissen (Alain.Nissen@ulg.ac.be)
+dnl using portions of Avalon's Config and GNU Autoconf 1.12.
 
-AC_REVISION(1.2)dnl
-AC_INIT(ircd/ircd.c)
-AC_CONFIG_HEADER(setup.h:include/setup.h.in)
+dnl ---------
+dnl new tests
+dnl ---------
 
-AC_PROG_CC
-AC_PROG_CPP
-AC_AIX
-AC_ISC_POSIX
-AC_PROG_GCC_TRADITIONAL
+AC_DEFUN(IRC_PATH_ZLIB,
+[AC_MSG_CHECKING(for zlib package)
+AC_ARG_WITH(zlib, [  --with-zlib             checks for zlib; if found, enables compressed links])
+AC_ARG_WITH(zlib, [  --without-zlib          does not check for zlib; disables compressed links])
+if test "x$with_zlib" = xno; then
+  no_zlib=yes
+else
+AC_CACHE_VAL(irc_cv_path_zlib,
+[no_zlib=yes
+no_zlib_include=yes
+no_zlib_library=yes
+AC_TRY_CPP([#include <zlib.h>],
+[no_zlib_include=
+irc_zlib_include=],
+[for irc_dir in "$irc_zlib_include" \
+                     `echo "$irc_zlib_library" | sed s/lib/include/` \
+                     /usr/include /usr/local/include /usr/unsupported/include \
+                     /usr/share/include /usr/local/share/include /include \
+                     /usr/zlib/include /usr/local/zlib/include \
+                     /usr/include/zlib /usr/local/include/zlib \
+                     /usr/unsupported/include/zlib /usr/share/include/zlib \
+                     /usr/local/share/include/zlib /include/zlib \
+                     /usr/zlib/include/zlib /usr/local/zlib/include/zlib; \
+  do
+    if test -r "$irc_dir/zlib.h"; then
+      no_zlib_include=
+      irc_zlib_include=$irc_dir
+      break
+    fi
+  done
+])
+irc_save_LIBS="$LIBS"
+LIBS="-lz $LIBS"
+AC_TRY_LINK(,
+[inflate()],
+[no_zlib_library=
+irc_zlib_library=
+LIBS="$irc_save_LIBS"],
+[LIBS="$irc_save_LIBS"
+for irc_dir in "$irc_zlib_library" \
+                    `echo "$irc_zlib_include" | sed s/include/lib/` \
+                    /usr/lib /usr/local/lib /usr/unsupported/lib \
+                    /usr/share/lib /usr/local/share/lib /lib /usr/zlib/lib \
+                    /usr/local/zlib/lib /usr/lib/zlib /usr/local/lib/zlib \
+                    /usr/unsupported/lib/zlib /usr/share/lib/zlib \
+                    /usr/local/share/lib/zlib /lib/zlib \
+                    /usr/zlib/lib/zlib /usr/local/zlib/lib/zlib; \
+do
+  for irc_extension in a so sl; do
+    if test -r $irc_dir/libz.$irc_extension; then
+      no_zlib_library=
+      irc_zlib_library=$irc_dir
+      break 2
+    fi
+  done
+done
+])
+if test "x$no_zlib_include" = x && test "x$no_zlib_library" = x; then
+  no_zlib=
+fi
+if test "$no_zlib" = yes; then
+  irc_cv_path_zlib="no_zlib=yes"
+else
+  irc_cv_path_zlib="no_zlib= irc_zlib_include=$irc_zlib_include irc_zlib_library=$irc_zlib_library"
+fi])
+  eval "$irc_cv_path_zlib"
+fi
+if test "$no_zlib" = yes; then
+  IRC_ZLIB_LIBRARY=
+  IRC_ZLIB_INCLUDE=
+  AC_MSG_RESULT(no)
+else
+  AC_DEFINE(USE_ZLIB)
+  if test "x$irc_zlib_library" = x; then
+    irc_zlib_library_message="found by the linker"
+    IRC_ZLIB_LIBRARY=-lz
+  else
+    irc_zlib_library_message="in $irc_zlib_library"
+    IRC_ZLIB_LIBRARY=-L$irc_zlib_library
+    if test "`(uname) 2>/dev/null`" = SunOS &&
+      uname -r | grep '^5' >/dev/null; then
+      IRC_ZLIB_LIBRARY="$IRC_ZLIB_LIBRARY -R$irc_zlib_library$"
+    fi
+    IRC_ZLIB_LIBRARY="$IRC_ZLIB_LIBRARY -lz"
+  fi
+  if test "x$irc_zlib_include" = x; then
+    irc_zlib_include_message="found by the compiler"
+    IRC_ZLIB_INCLUDE=
+  else
+    irc_zlib_include_message="in $irc_zlib_include"
+    IRC_ZLIB_INCLUDE=-I$irc_zlib_include
+  fi
+  AC_MSG_RESULT([])
+  AC_MSG_RESULT([  library $irc_zlib_library_message])
+  AC_MSG_RESULT([  header $irc_zlib_include_message])
+fi
+AC_SUBST(IRC_ZLIB_INCLUDE)
+AC_SUBST(IRC_ZLIB_LIBRARY)
+])
 
-dnl SGI's compiler needs -cckr
-AC_MSG_CHECKING(for SGI's cc(1))
-AC_EGREP_CPP(yes, [#ifdef sgi
-yes
-#endif
+
+AC_DEFUN(IRC_CURSES_TERMCAP,
+[AC_MSG_CHECKING([whether (n)curses or termcap library will be used])
+AC_CACHE_VAL(irc_cv_curses_termcap,
+[irc_save_LIBS="$LIBS"
+LIBS="-lncurses $LIBS"
+AC_TRY_LINK(,
+[initscr()],
+[irc_cv_curses_termcap=ncurses
+LIBS="$irc_save_LIBS"],
+[LIBS="$irc_save_LIBS"
+LIBS="-lcurses $LIBS"
+AC_TRY_LINK(,
+[initscr()],
+[irc_cv_curses_termcap=curses
+LIBS="$irc_save_LIBS"],
+[LIBS="$irc_save_LIBS"
+LIBS="-ltermcap $LIBS"
+AC_TRY_LINK(,
+[tgetent()],
+[irc_cv_curses_termcap=termcap
+LIBS="$irc_save_LIBS"],
+[irc_cv_curses_termcap=none
+LIBS="$irc_save_LIBS"])
+])
+])
+])
+if test $irc_cv_curses_termcap = ncurses; then
+  AC_MSG_RESULT(ncurses)
+  AC_DEFINE(USE_NCURSES)
+  IRC_CURSES_TERMCAP_LIBRARY="-lncurses"
+elif test $irc_cv_curses_termcap = curses; then
+  AC_MSG_RESULT(curses)
+  AC_DEFINE(USE_CURSES)
+  IRC_CURSES_TERMCAP_LIBRARY="-lcurses"
+elif test $irc_cv_curses_termcap = termcap; then
+  AC_MSG_RESULT(termcap)
+  AC_DEFINE(USE_TERMCAP)
+  IRC_CURSES_TERMCAP_LIBRARY="-ltermcap"
+else
+  AC_MSG_RESULT(none)
+  AC_MSG_WARN([I can't find either (n)curses or termcap library.])
+  IRC_CURSES_TERMCAP_LIBRARY=
+fi
+AC_SUBST(IRC_CURSES_TERMCAP_LIBRARY)
+])
+
+
+AC_DEFUN(IRC_UNION_WAIT,
+[AC_MSG_CHECKING(whether an union wait * is mandatory in waitpid)
+AC_CACHE_VAL(irc_cv_type_union_wait,
+AC_TRY_COMPILE([#include <sys/wait.h>],
+[
+int status;
+waitpid(-1, &status, 0);
 ],
-if test x$CC = xcc; then
-  CFLAGS="-cckr $CFLAGS"
+irc_cv_type_union_wait=no,
+AC_TRY_COMPILE([#include <sys/wait.h>],
+[
+union wait status;
+waitpid(-1, &status, 0);
+],
+irc_cv_type_union_wait=yes,
+irc_cv_type_union_wait=no)))
+if test $irc_cv_type_union_wait = yes; then
   AC_MSG_RESULT(yes)
+  AC_DEFINE(USE_UNION_WAIT)
+else
+  AC_MSG_RESULT(no)
+fi
+])
+
+
+AC_DEFUN(IRC_SOLARIS_2_2,
+[AC_MSG_CHECKING([for Solaris 2.2 (SunOS 5.2)])
+AC_CACHE_VAL(irc_cv_solaris_2_2,
+[if test "`(uname) 2>/dev/null`" = SunOS &&
+  uname -r | grep '5\.2' >/dev/null; then
+  irc_cv_solaris_2_2=yes
+else
+  irc_cv_solaris_2_2=no
+fi
+])
+if test $irc_cv_solaris_2_2 = yes; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(SOLARIS_2_2)
+else
+  AC_MSG_RESULT(no)
+fi
+])
+
+
+AC_DEFUN(IRC_SOLARIS_2_3,
+[AC_MSG_CHECKING([for Solaris 2.3 (SunOS 5.3)])
+AC_CACHE_VAL(irc_cv_solaris_2_3,
+[if test "`(uname) 2>/dev/null`" = SunOS &&
+  uname -r | grep '5\.3' >/dev/null; then
+  irc_cv_solaris_2_3=yes
+else
+  irc_cv_solaris_2_3=no
+fi
+])
+if test $irc_cv_solaris_2_3 = yes; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(SOLARIS_2_3)
+else
+  AC_MSG_RESULT(no)
+fi
+])
+
+
+AC_DEFUN(IRC_SOLARIS_2,
+[AC_MSG_CHECKING([for Solaris 2.x (SunOS 5.x)])
+AC_CACHE_VAL(irc_cv_solaris_2,
+[if test "`(uname) 2>/dev/null`" = SunOS && 
+  uname -r | grep '^5' >/dev/null; then
+  irc_cv_solaris_2=yes
+else
+  irc_cv_solaris_2=no
+fi
+])
+if test $irc_cv_solaris_2 = yes; then
+  AC_MSG_RESULT(yes)
+  IRC_SOLARIS_2_3
+  if test $irc_cv_solaris_2_3 != yes; then
+    IRC_SOLARIS_2_2
+  fi
+else
+  AC_MSG_RESULT(no)
+fi
+])
+
+
+AC_DEFUN(IRC_DECL_SYS_ERRLIST,
+[AC_CACHE_CHECK([for sys_errlist declaration in errno.h],
+  irc_cv_decl_sys_errlist,
+[AC_TRY_COMPILE([#include <sys/types.h>
+#include <errno.h>],
+[char *msg = sys_errlist[0];],
+  irc_cv_decl_sys_errlist=yes, irc_cv_decl_sys_errlist=no)])
+if test $irc_cv_decl_sys_errlist = yes; then
+  AC_DEFINE(SYS_ERRLIST_DECLARED)
+fi
+])
+
+
+AC_DEFUN(IRC_SGI_CC,
+[AC_MSG_CHECKING([for SGI's cc])
+AC_EGREP_CPP(yes,
+[#ifdef sgi
+yes
+#endif],
+if test x$CC = xcc; then
+  AC_MSG_RESULT(yes)
+  CC="$CC -cckr"
 else
   AC_MSG_RESULT(no)
 fi,
 AC_MSG_RESULT(no))
+])
 
-AC_PATH_PROGS(SUM, sum cksum, true)
 
-AC_CHECK_LIB(crypt, crypt)
-AC_CHECK_LIB(socket, socket)
-AC_CHECK_LIB(nsl, socket)
-dnl AC_CHECK_LIB(resolv, res_init)
-
-AC_CHECK_HEADERS(sys/syslog.h stdlib.h stddef.h sys/malloc.h sys/param.h unistd.h string.h strings.h sys/cdefs.h arpa/inet.h arpa/nameser.h resolv.h sys/bitypes.h netdb.h)
-
-AC_CHECK_FUNC(index, , AC_DEFINE(NOINDEX))
-AC_CHECK_FUNC(strerror, , AC_DEFINE(NEED_STRERROR))
-AC_CHECK_FUNC(strtoken, , AC_DEFINE(NEED_STRTOKEN))
-AC_CHECK_FUNC(strtok, , AC_DEFINE(NEED_STRTOK))
-AC_CHECK_FUNC(inet_addr, , AC_DEFINE(NEED_INET_ADDR))
-AC_CHECK_FUNC(inet_aton, , AC_DEFINE(NEED_INET_ATON))
-AC_CHECK_FUNC(inet_ntoa, , AC_DEFINE(NEED_INET_NTOA))
-AC_CHECK_FUNC(inet_netof, , AC_DEFINE(NEED_INET_NETOF))
-AC_CHECK_FUNC(bcopy, , 
-  AC_FUNC_CHECK(memmove, AC_DEFINE(HAVE_MEMMOVE), AC_DEFINE(NEED_BCOPY)))
-AC_CHECK_FUNC(bzero, , AC_DEFINE(NEED_BZERO))
-AC_CHECK_FUNC(bcmp, , AC_DEFINE(NEED_BCMP))
-AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY),
-  AC_CHECK_FUNC(lrand48, AC_DEFINE(HAVE_LRAND48), ))
-AC_CHECK_FUNC(getrusage, AC_DEFINE(GETRURSASGE_2),
-  AC_CHECK_FUNC(times, AC_DEFINE(TIMES_2), ))
-
-echo checking signal implementation
-AC_CHECK_FUNC(sigaction, AC_DEFINE(POSIX_SIGNALS),
-  AC_CHECK_FUNC(sigset,
-    AC_DEFINE(BSD_RELIABLE_SIGNALS)
-    AC_DEFINE(signal, sigset),
-
-AC_CHECKING(for reliable signals)
-AC_TRY_RUN([
+AC_DEFUN(IRC_SIGNAL_IMPLEMENTATION,
+[AC_MSG_CHECKING([for signal implementation])
+AC_CACHE_VAL(irc_cv_signal_implementation,
+[if test x$ac_cv_func_sigaction = xyes; then
+  irc_cv_signal_implementation=posix_sigaction
+elif test x$ac_cv_func_sigset = xyes; then
+  irc_cv_signal_implementation=bsd_sigset
+else
+  AC_TRY_RUN([
 #include <sys/types.h>
 #include <signal.h>
-
 #ifndef SIGCHLD
-# define SIGCHLD SIGCLD
+#define SIGCHLD SIGCLD
 #endif
 
 int got;
 
-#ifdef SIGVOID
-void
-#endif
-hand()
+RETSIGTYPE hand()
 {
   got++;
 }
@@ -89,14 +299,97 @@ main()
     exit(1);
   exit(0);
 }
-],AC_DEFINE(BSD_RELIABLE_SIGNALS) AC_MSG_RESULT(yes), AC_DEFINE(SYSV_UNRELIABLE_SIGNALS) AC_MSG_RESULT(no), :)
-))
+],
+    irc_cv_signal_implementation=bsd_signal,
+    irc_cv_signal_implementation=sysv_signal)
+fi
+])
+if test $irc_cv_signal_implementation = posix_sigaction; then
+  AC_MSG_RESULT([using POSIX sigaction])
+  AC_DEFINE(POSIX_SIGNALS)
+elif test $irc_cv_signal_implementation = bsd_sigset; then
+  AC_MSG_RESULT([using BSD sigset])
+  AC_DEFINE(BSD_RELIABLE_SIGNALS)
+  AC_DEFINE(signal, sigset)
+elif test $irc_cv_signal_implementation = bsd_signal; then
+  AC_MSG_RESULT([using reliable BSD signal])
+  AC_DEFINE(BSD_RELIABLE_SIGNALS)
+else
+  AC_MSG_RESULT([using unreliable SystemV signal])
+  AC_DEFINE(SYSV_UNRELIABLE_SIGNALS)
+fi
+])
 
-dnl
-dnl check for working stdarg/vsprintf
-dnl
-AC_MSG_CHECKING(for working stdarg/vsprintf)
-AC_TRY_RUN([
+
+AC_DEFUN(IRC_NON_BLOCKING_SYSTEM,
+[AC_MSG_CHECKING([for a working non-blocking system])
+AC_CACHE_VAL(irc_cv_non_blocking_system,
+[
+changequote(<<, >>)dnl
+<<
+irc_precode='#include <sys/types.h>
+#include <sys/socket.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/file.h>
+#include <signal.h>
+
+RETSIGTYPE alarmed()
+{
+  exit(1);
+}
+
+main()
+{
+  char b[12], x[32];
+  int f, l = sizeof(x);
+  f = socket(AF_INET, SOCK_DGRAM, 0);
+  if (f >= 0 && !(fcntl(f, F_SETFL, '
+irc_postcode=')))
+    {
+      signal(SIGALRM, alarmed);
+      alarm(3);
+      recvfrom(f, b, 12, 0, x, &l);
+      alarm(0);
+      exit(0);
+    }
+   exit(1);
+}'
+>>
+changequote([, ])dnl
+irc_code_posix="${irc_precode}O_NONBLOCK${irc_postcode}"
+irc_code_bsd="${irc_precode}O_NDELAY${irc_postcode}"
+irc_code_sysv="${irc_precode}FIONBIO${irc_postcode}"
+AC_TRY_RUN($irc_code_posix,
+  irc_cv_non_blocking_system=posix,
+  AC_TRY_RUN($irc_code_bsd,
+    irc_cv_non_blocking_system=bsd,
+    AC_TRY_RUN($irc_code_sysv,
+      irc_cv_non_blocking_system=sysv,
+      irc_cv_non_blocking_system=none)))
+])
+if test $irc_cv_non_blocking_system = posix; then
+  AC_MSG_RESULT([using POSIX O_NONBLOCK])
+  AC_DEFINE(NBLOCK_POSIX)
+elif test $irc_cv_non_blocking_system = bsd; then
+  AC_MSG_RESULT([using BSD O_NDELAY])
+  AC_DEFINE(NBLOCK_BSD)
+elif test $irc_cv_non_blocking_system = sysv; then
+  AC_MSG_RESULT([using SystemV FIONBIO])
+  AC_DEFINE(NBLOCK_SYSV)
+else
+  AC_MSG_RESULT([using none])
+  AC_MSG_WARN([I can't find a working non-blocking system.])
+fi
+])
+
+
+AC_DEFUN(IRC_STDARG,
+[AC_MSG_CHECKING([for working stdarg])
+AC_CACHE_VAL(irc_cv_stdarg,
+AC_TRY_RUN(
+changequote(<<, >>)dnl
+<<
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
@@ -166,95 +459,510 @@ int main(void)
 {
   int res = base("toto was here ! 42", "toto %s here ! %d", "was", 42);
 
-  return res ? 0 : 1;
+  exit(res ? 0 : 1);
 }
-],AC_DEFINE(USE_STDARG) AC_MSG_RESULT(yes), AC_MSG_RESULT(no), :)
-
-
-dnl
-dnl check for non-blocking fd style available..
-dnl
-AC_MSG_CHECKING(for non-blocking)
-changequote(<<, >>)dnl
-<<
-precode='#include <sys/types.h>
-#include <sys/socket.h>
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <sys/file.h>
-#include <signal.h>
-
-alarmed()
-{
-	exit(1);
-}
-
-main()
-{
-	char b[12], x[32];
-	int f, l = sizeof(x);
-	f = socket(AF_INET, SOCK_DGRAM, 0);
-	if (f >= 0 && !(fcntl(f, F_SETFL,'
-postcode='))) {
-		signal(SIGALRM, alarmed);
-		alarm(3);
-		recvfrom(f, b, 12, 0, x, &l);
-		alarm(0);
-		exit(0);
-	}
-	exit(1);
-}'
->>
+>>,
 changequote([, ])dnl
-
-code="$precode O_NONBLOCK $postcode"
-
-AC_TRY_RUN($code,
-  AC_DEFINE(NBLOCK_POSIX)
-  AC_MSG_RESULT(posix),
-  code="$precode O_NDELAY $postcode"
-  AC_TRY_RUN($code,
-    AC_DEFINE(NBLOCK_BSD)
-    AC_MSG_RESULT(bsd),
-    code="$precode FIONBIO $postcode"
-    AC_TRY_RUN($code,
-      AC_DEFINE(NBLOCK_SYSV)
-      AC_MSG_RESULT(system v),
-      AC_MSG_WARN(i can't find a working non blocking system),
-      :),
-    :),
-  :)
-
-dnl Uh, what is this? Other than broken..
-dnl if test x$ac_cv_headers_sys_malloc_h != xno
-dnl then
-dnl 	AC_DEFINE_UNQUOTED(MALLOCH, <sys/malloc.h>)
-dnl fi
-
-dnl
-dnl check for sys_errlist declaration
-dnl
-
-AC_MSG_CHECKING(for sys_errlist declaration)
-AC_TRY_RUN([
-#include <sys/types.h>
-#include <stdio.h>
-#include <errno.h>
-main()
-{
-  char *s = sys_errlist[0];
-  exit(0);
-}
-],AC_DEFINE(SYS_ERRLIST_DECLARED) AC_MSG_RESULT(yes), AC_MSG_RESULT(no), :)
-
-dnl Shared linking of zlib can mess things, check it last.
-if test x$ZLIB_HOME != x; then
-	LDFLAGS="${LDFLAGS} -L${ZLIB_HOME}/lib"
-	AC_CHECK_LIB(z, inflate, LIBS="-lz $LIBS"
-			CPPFLAGS="${CPPFLAGS} -I${ZLIB_HOME}/include",
-			echo Failed to use ZLIB_HOME=${ZLIB_HOME})
+irc_cv_stdarg=yes,
+irc_cv_stdarg=no)
+)
+if test $irc_cv_stdarg = yes; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE(USE_STDARG)
 else
-       AC_CHECK_LIB(z, inflate)
+  AC_MSG_RESULT(no)
 fi
+])
 
-AC_OUTPUT(Makefile:support/Makefile.in version.c.SH:ircd/version.c.SH.in sums:ircd/crypt/sums.in)
+
+dnl -------------------------------------------------------------------
+dnl modified Autoconf tests; their names begin with IRC_ instead of AC_
+dnl -------------------------------------------------------------------
+
+AC_DEFUN(IRC_INIT_PARSE_ARGS,
+[
+# Initialize some variables set by options.
+# The variables have the same names as the options, with
+# dashes changed to underlines.
+build=NONE
+cache_file=./config.cache
+exec_prefix=NONE
+host=NONE
+no_create=
+nonopt=NONE
+no_recursion=
+prefix=NONE
+program_prefix=NONE
+program_suffix=NONE
+program_transform_name=s,x,x,
+silent=
+site=
+srcdir=
+target=NONE
+verbose=
+zlib_include=NONE
+zlib_library=NONE
+dnl Installation directory options.
+dnl These are left unexpanded so users can "make install exec_prefix=/foo"
+dnl and all the variables that are supposed to be based on exec_prefix
+dnl by default will actually change.
+dnl Use braces instead of parens because sh, perl, etc. also accept them.
+bindir='${exec_prefix}/bin'
+sbindir='${exec_prefix}/sbin'
+libexecdir='${exec_prefix}/libexec'
+datadir='${prefix}/share'
+sysconfdir='${prefix}/etc'
+sharedstatedir='${prefix}/com'
+localstatedir='${prefix}/var'
+libdir='${exec_prefix}/lib'
+includedir='${prefix}/include'
+oldincludedir='/usr/include'
+infodir='${prefix}/info'
+mandir='${prefix}/man'
+
+# Initialize some other variables.
+subdirs=
+MFLAGS= MAKEFLAGS=
+# Maximum number of lines to put in a shell here document.
+ac_max_here_lines=12
+
+ac_prev=
+for ac_option
+do
+
+  # If the previous option needs an argument, assign it.
+  if test -n "$ac_prev"; then
+    eval "$ac_prev=\$ac_option"
+    ac_prev=
+    continue
+  fi
+
+  case "$ac_option" in
+changequote(, )dnl
+  -*=*) ac_optarg=`echo "$ac_option" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+changequote([, ])dnl
+  *) ac_optarg= ;;
+  esac
+
+  # Accept the important Cygnus configure options, so we can diagnose typos.
+
+  case "$ac_option" in
+
+  -bindir | --bindir | --bindi | --bind | --bin | --bi)
+    ac_prev=bindir ;;
+  -bindir=* | --bindir=* | --bindi=* | --bind=* | --bin=* | --bi=*)
+    bindir="$ac_optarg" ;;
+
+  -build | --build | --buil | --bui | --bu)
+    ac_prev=build ;;
+  -build=* | --build=* | --buil=* | --bui=* | --bu=*)
+    build="$ac_optarg" ;;
+
+  -cache-file | --cache-file | --cache-fil | --cache-fi \
+  | --cache-f | --cache- | --cache | --cach | --cac | --ca | --c)
+    ac_prev=cache_file ;;
+  -cache-file=* | --cache-file=* | --cache-fil=* | --cache-fi=* \
+  | --cache-f=* | --cache-=* | --cache=* | --cach=* | --cac=* | --ca=* | --c=*)
+    cache_file="$ac_optarg" ;;
+
+  -datadir | --datadir | --datadi | --datad | --data | --dat | --da)
+    ac_prev=datadir ;;
+  -datadir=* | --datadir=* | --datadi=* | --datad=* | --data=* | --dat=* \
+  | --da=*)
+    datadir="$ac_optarg" ;;
+
+  -disable-* | --disable-*)
+    ac_feature=`echo $ac_option|sed -e 's/-*disable-//'`
+    # Reject names that are not valid shell variable names.
+changequote(, )dnl
+    if test -n "`echo $ac_feature| sed 's/[-a-zA-Z0-9_]//g'`"; then
+changequote([, ])dnl
+      AC_MSG_ERROR($ac_feature: invalid feature name)
+    fi
+    ac_feature=`echo $ac_feature| sed 's/-/_/g'`
+    eval "enable_${ac_feature}=no" ;;
+
+  -enable-* | --enable-*)
+    ac_feature=`echo $ac_option|sed -e 's/-*enable-//' -e 's/=.*//'`
+    # Reject names that are not valid shell variable names.
+changequote(, )dnl
+    if test -n "`echo $ac_feature| sed 's/[-_a-zA-Z0-9]//g'`"; then
+changequote([, ])dnl
+      AC_MSG_ERROR($ac_feature: invalid feature name)
+    fi
+    ac_feature=`echo $ac_feature| sed 's/-/_/g'`
+    case "$ac_option" in
+      *=*) ;;
+      *) ac_optarg=yes ;;
+    esac
+    eval "enable_${ac_feature}='$ac_optarg'" ;;
+
+  -exec-prefix | --exec_prefix | --exec-prefix | --exec-prefi \
+  | --exec-pref | --exec-pre | --exec-pr | --exec-p | --exec- \
+  | --exec | --exe | --ex)
+    ac_prev=exec_prefix ;;
+  -exec-prefix=* | --exec_prefix=* | --exec-prefix=* | --exec-prefi=* \
+  | --exec-pref=* | --exec-pre=* | --exec-pr=* | --exec-p=* | --exec-=* \
+  | --exec=* | --exe=* | --ex=*)
+    exec_prefix="$ac_optarg" ;;
+
+  -gas | --gas | --ga | --g)
+    # Obsolete; use --with-gas.
+    with_gas=yes ;;
+
+  -help | --help | --hel | --he)
+    # Omit some internal or obsolete options to make the list less imposing.
+    # This message is too long to be a string in the A/UX 3.1 sh.
+    cat << EOF
+changequote(, )dnl
+Usage: configure [options] [host]
+Options: [defaults in brackets after descriptions]
+Configuration:
+  --cache-file=FILE       cache test results in FILE
+  --help                  print this message
+  --no-create             do not create output files
+  --quiet, --silent       do not print \`checking...' messages
+  --version               print the version of autoconf that created configure
+Directory and file names:
+  --prefix=PREFIX         install architecture-independent files in PREFIX
+                          [$ac_default_prefix]
+  --exec-prefix=EPREFIX   install architecture-dependent files in EPREFIX
+                          [same as prefix]
+  --bindir=DIR            user executables in DIR [EPREFIX/bin]
+  --sbindir=DIR           system admin executables in DIR [EPREFIX/sbin]
+  --libexecdir=DIR        program executables in DIR [EPREFIX/libexec]
+  --datadir=DIR           read-only architecture-independent data in DIR
+                          [PREFIX/share]
+  --sysconfdir=DIR        read-only single-machine data in DIR [PREFIX/etc]
+  --sharedstatedir=DIR    modifiable architecture-independent data in DIR
+                          [PREFIX/com]
+  --localstatedir=DIR     modifiable single-machine data in DIR [PREFIX/var]
+  --libdir=DIR            object code libraries in DIR [EPREFIX/lib]
+  --includedir=DIR        C header files in DIR [PREFIX/include]
+  --oldincludedir=DIR     C header files for non-gcc in DIR [/usr/include]
+  --infodir=DIR           info documentation in DIR [PREFIX/info]
+  --mandir=DIR            man documentation in DIR [PREFIX/man]
+  --srcdir=DIR            find the sources in DIR [configure dir or ..]
+  --program-prefix=PREFIX prepend PREFIX to installed program names
+  --program-suffix=SUFFIX append SUFFIX to installed program names
+  --program-transform-name=PROGRAM
+                          run sed PROGRAM on installed program names
+EOF
+    cat << EOF
+Host type:
+  --build=BUILD           configure for building on BUILD [BUILD=HOST]
+  --host=HOST             configure for HOST [guessed]
+  --target=TARGET         configure for TARGET [TARGET=HOST]
+Features and packages:
+  --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
+  --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --zlib-include=DIR      zlib include files are in DIR
+  --zlib-library=DIR      zlib library files are in DIR
+changequote([, ])dnl
+EOF
+    if test -n "$ac_help"; then
+      echo "--enable and --with options recognized:$ac_help"
+    fi
+    exit 0 ;;
+
+  -host | --host | --hos | --ho)
+    ac_prev=host ;;
+  -host=* | --host=* | --hos=* | --ho=*)
+    host="$ac_optarg" ;;
+
+  -includedir | --includedir | --includedi | --included | --include \
+  | --includ | --inclu | --incl | --inc)
+    ac_prev=includedir ;;
+  -includedir=* | --includedir=* | --includedi=* | --included=* | --include=* \
+  | --includ=* | --inclu=* | --incl=* | --inc=*)
+    includedir="$ac_optarg" ;;
+
+  -infodir | --infodir | --infodi | --infod | --info | --inf)
+    ac_prev=infodir ;;
+  -infodir=* | --infodir=* | --infodi=* | --infod=* | --info=* | --inf=*)
+    infodir="$ac_optarg" ;;
+
+  -libdir | --libdir | --libdi | --libd)
+    ac_prev=libdir ;;
+  -libdir=* | --libdir=* | --libdi=* | --libd=*)
+    libdir="$ac_optarg" ;;
+
+  -libexecdir | --libexecdir | --libexecdi | --libexecd | --libexec \
+  | --libexe | --libex | --libe)
+    ac_prev=libexecdir ;;
+  -libexecdir=* | --libexecdir=* | --libexecdi=* | --libexecd=* | --libexec=* \
+  | --libexe=* | --libex=* | --libe=*)
+    libexecdir="$ac_optarg" ;;
+
+  -localstatedir | --localstatedir | --localstatedi | --localstated \
+  | --localstate | --localstat | --localsta | --localst \
+  | --locals | --local | --loca | --loc | --lo)
+    ac_prev=localstatedir ;;
+  -localstatedir=* | --localstatedir=* | --localstatedi=* | --localstated=* \
+  | --localstate=* | --localstat=* | --localsta=* | --localst=* \
+  | --locals=* | --local=* | --loca=* | --loc=* | --lo=*)
+    localstatedir="$ac_optarg" ;;
+
+  -mandir | --mandir | --mandi | --mand | --man | --ma | --m)
+    ac_prev=mandir ;;
+  -mandir=* | --mandir=* | --mandi=* | --mand=* | --man=* | --ma=* | --m=*)
+    mandir="$ac_optarg" ;;
+
+  -nfp | --nfp | --nf)
+    # Obsolete; use --without-fp.
+    with_fp=no ;;
+
+  -no-create | --no-create | --no-creat | --no-crea | --no-cre \
+  | --no-cr | --no-c)
+    no_create=yes ;;
+
+  -no-recursion | --no-recursion | --no-recursio | --no-recursi \
+  | --no-recurs | --no-recur | --no-recu | --no-rec | --no-re | --no-r)
+    no_recursion=yes ;;
+
+  -oldincludedir | --oldincludedir | --oldincludedi | --oldincluded \
+  | --oldinclude | --oldinclud | --oldinclu | --oldincl | --oldinc \
+  | --oldin | --oldi | --old | --ol | --o)
+    ac_prev=oldincludedir ;;
+  -oldincludedir=* | --oldincludedir=* | --oldincludedi=* | --oldincluded=* \
+  | --oldinclude=* | --oldinclud=* | --oldinclu=* | --oldincl=* | --oldinc=* \
+  | --oldin=* | --oldi=* | --old=* | --ol=* | --o=*)
+    oldincludedir="$ac_optarg" ;;
+
+  -prefix | --prefix | --prefi | --pref | --pre | --pr | --p)
+    ac_prev=prefix ;;
+  -prefix=* | --prefix=* | --prefi=* | --pref=* | --pre=* | --pr=* | --p=*)
+    prefix="$ac_optarg" ;;
+
+  -program-prefix | --program-prefix | --program-prefi | --program-pref \
+  | --program-pre | --program-pr | --program-p)
+    ac_prev=program_prefix ;;
+  -program-prefix=* | --program-prefix=* | --program-prefi=* \
+  | --program-pref=* | --program-pre=* | --program-pr=* | --program-p=*)
+    program_prefix="$ac_optarg" ;;
+
+  -program-suffix | --program-suffix | --program-suffi | --program-suff \
+  | --program-suf | --program-su | --program-s)
+    ac_prev=program_suffix ;;
+  -program-suffix=* | --program-suffix=* | --program-suffi=* \
+  | --program-suff=* | --program-suf=* | --program-su=* | --program-s=*)
+    program_suffix="$ac_optarg" ;;
+
+  -program-transform-name | --program-transform-name \
+  | --program-transform-nam | --program-transform-na \
+  | --program-transform-n | --program-transform- \
+  | --program-transform | --program-transfor \
+  | --program-transfo | --program-transf \
+  | --program-trans | --program-tran \
+  | --progr-tra | --program-tr | --program-t)
+    ac_prev=program_transform_name ;;
+  -program-transform-name=* | --program-transform-name=* \
+  | --program-transform-nam=* | --program-transform-na=* \
+  | --program-transform-n=* | --program-transform-=* \
+  | --program-transform=* | --program-transfor=* \
+  | --program-transfo=* | --program-transf=* \
+  | --program-trans=* | --program-tran=* \
+  | --progr-tra=* | --program-tr=* | --program-t=*)
+    program_transform_name="$ac_optarg" ;;
+
+  -q | -quiet | --quiet | --quie | --qui | --qu | --q \
+  | -silent | --silent | --silen | --sile | --sil)
+    silent=yes ;;
+
+  -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+    ac_prev=sbindir ;;
+  -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
+  | --sbi=* | --sb=*)
+    sbindir="$ac_optarg" ;;
+
+  -sharedstatedir | --sharedstatedir | --sharedstatedi \
+  | --sharedstated | --sharedstate | --sharedstat | --sharedsta \
+  | --sharedst | --shareds | --shared | --share | --shar \
+  | --sha | --sh)
+    ac_prev=sharedstatedir ;;
+  -sharedstatedir=* | --sharedstatedir=* | --sharedstatedi=* \
+  | --sharedstated=* | --sharedstate=* | --sharedstat=* | --sharedsta=* \
+  | --sharedst=* | --shareds=* | --shared=* | --share=* | --shar=* \
+  | --sha=* | --sh=*)
+    sharedstatedir="$ac_optarg" ;;
+
+  -site | --site | --sit)
+    ac_prev=site ;;
+  -site=* | --site=* | --sit=*)
+    site="$ac_optarg" ;;
+
+  -srcdir | --srcdir | --srcdi | --srcd | --src | --sr)
+    ac_prev=srcdir ;;
+  -srcdir=* | --srcdir=* | --srcdi=* | --srcd=* | --src=* | --sr=*)
+    srcdir="$ac_optarg" ;;
+
+  -sysconfdir | --sysconfdir | --sysconfdi | --sysconfd | --sysconf \
+  | --syscon | --sysco | --sysc | --sys | --sy)
+    ac_prev=sysconfdir ;;
+  -sysconfdir=* | --sysconfdir=* | --sysconfdi=* | --sysconfd=* | --sysconf=* \
+  | --syscon=* | --sysco=* | --sysc=* | --sys=* | --sy=*)
+    sysconfdir="$ac_optarg" ;;
+
+  -target | --target | --targe | --targ | --tar | --ta | --t)
+    ac_prev=target ;;
+  -target=* | --target=* | --targe=* | --targ=* | --tar=* | --ta=* | --t=*)
+    target="$ac_optarg" ;;
+
+  -v | -verbose | --verbose | --verbos | --verbo | --verb)
+    verbose=yes ;;
+
+  -version | --version | --versio | --versi | --vers)
+    echo "configure generated by autoconf version AC_ACVERSION"
+    exit 0 ;;
+
+  -with-* | --with-*)
+    ac_package=`echo $ac_option|sed -e 's/-*with-//' -e 's/=.*//'`
+    # Reject names that are not valid shell variable names.
+changequote(, )dnl
+    if test -n "`echo $ac_package| sed 's/[-_a-zA-Z0-9]//g'`"; then
+changequote([, ])dnl
+      AC_MSG_ERROR($ac_package: invalid package name)
+    fi
+    ac_package=`echo $ac_package| sed 's/-/_/g'`
+    case "$ac_option" in
+      *=*) ;;
+      *) ac_optarg=yes ;;
+    esac
+    eval "with_${ac_package}='$ac_optarg'" ;;
+
+  -without-* | --without-*)
+    ac_package=`echo $ac_option|sed -e 's/-*without-//'`
+    # Reject names that are not valid shell variable names.
+changequote(, )dnl
+    if test -n "`echo $ac_package| sed 's/[-a-zA-Z0-9_]//g'`"; then
+changequote([, ])dnl
+      AC_MSG_ERROR($ac_package: invalid package name)
+    fi
+    ac_package=`echo $ac_package| sed 's/-/_/g'`
+    eval "with_${ac_package}=no" ;;
+
+  -zlib-include | --zlib-include | --zlib-includ | --zlib-inclu \
+  | --zlib-incl | --zlib-inc | --zlib-in | --zlib-i)
+    ac_prev=irc_zlib_include ;;
+  -zlib-include=* | --zlib-include=* | --zlib-includ=* | --zlib-inclu=* \
+  | --zlib-incl=* | --zlib-inc=* | --zlib-in=* | --zlib-i=*)
+    irc_zlib_include="$ac_optarg" ;;
+
+  -zlib-library | --zlib-library | --zlib-librar | --zlib-libra | --zlib-libr \
+  | --zlib-lib | --zlib-li | --zlib-l)
+    ac_prev=irc_zlib_library ;;
+  -zlib-library=* | --zlib-library=* | --zlib-librar=* | --zlib-libra=* \
+  | --zlib-libr=* | --zlib-lib=* | --zlib-li=* | --zlib-l=*)
+    irc_zlib_library="$ac_optarg" ;;
+
+  -*) AC_MSG_ERROR([$ac_option: invalid option; use --help to show usage])
+    ;;
+
+  *)
+changequote(, )dnl
+    if test -n "`echo $ac_option| sed 's/[-a-z0-9.]//g'`"; then
+changequote([, ])dnl
+      AC_MSG_WARN($ac_option: invalid host type)
+    fi
+    if test "x$nonopt" != xNONE; then
+      AC_MSG_ERROR(can only configure for one host and one target at a time)
+    fi
+    nonopt="$ac_option"
+    ;;
+
+  esac
+done
+
+if test -n "$ac_prev"; then
+  AC_MSG_ERROR(missing argument to --`echo $ac_prev | sed 's/_/-/g'`)
+fi
+])
+
+
+AC_DEFUN(IRC_INIT,
+[sinclude(acsite.m4)dnl
+sinclude(./aclocal.m4)dnl
+AC_REQUIRE([AC_INIT_BINSH])dnl
+AC_INIT_NOTICE
+AC_DIVERT_POP()dnl to NORMAL
+AC_DIVERT_PUSH(AC_DIVERSION_INIT)dnl
+IRC_INIT_PARSE_ARGS
+AC_INIT_PREPARE($1)dnl
+AC_DIVERT_POP()dnl to NORMAL
+])
+
+
+dnl ----
+dnl main
+dnl ----
+
+AC_REVISION([$Id configure.in,v 1.2 1995/01/07 01:50:18 mrg Exp$])
+AC_PREREQ(1.12)
+IRC_INIT(../ircd/ircd.c)
+AC_CONFIG_HEADER(setup.h:../include/setup.h.in)
+AC_CONFIG_AUX_DIR(../support)
+
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PATH_PROGS(SUM, sum cksum, true)
+AC_PROG_GCC_TRADITIONAL
+
+AC_AIX
+AC_ISC_POSIX
+AC_MINIX
+IRC_SGI_CC
+IRC_SOLARIS_2
+
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_CHECK_HEADERS(syslog.h sys/syslog.h stdlib.h stddef.h sys/malloc.h sys/param.h unistd.h string.h strings.h sys/cdefs.h arpa/inet.h arpa/nameser.h resolv.h sys/bitypes.h netdb.h memory.h fcntl.h limits.h sys/file.h sys/ioctl.h sys/time.h)
+IRC_DECL_SYS_ERRLIST
+AC_HEADER_STAT
+AC_HEADER_TIME
+AC_STRUCT_TM
+AC_TYPE_SIGNAL
+AC_TYPE_SIZE_T
+AC_TYPE_UID_T
+IRC_UNION_WAIT
+
+AC_C_BIGENDIAN
+AC_C_CONST
+
+AC_CHECK_LIB(crypt, crypt)
+AC_CHECK_LIB(socket, socket)
+AC_CHECK_LIB(nsl, socket)
+
+IRC_PATH_ZLIB
+IRC_CURSES_TERMCAP
+
+AC_FUNC_MEMCMP
+AC_FUNC_SETPGRP
+AC_FUNC_SETVBUF_REVERSED
+AC_FUNC_VFORK
+AC_FUNC_WAIT3
+AC_CHECK_FUNCS(strchr memcpy gethostname gettimeofday lrand48 mkdir select socket strdup strerror sigaction sigset getrusage times)
+AC_CHECK_FUNC(index, , AC_DEFINE(NOINDEX))
+AC_CHECK_FUNC(strerror, , AC_DEFINE(NEED_STRERROR))
+AC_CHECK_FUNC(strtoken, , AC_DEFINE(NEED_STRTOKEN))
+AC_CHECK_FUNC(strtok, , AC_DEFINE(NEED_STRTOK))
+dnl we now always use our own
+dnl AC_CHECK_FUNC(inet_addr, , AC_DEFINE(NEED_INET_ADDR))
+dnl AC_CHECK_FUNC(inet_aton, , AC_DEFINE(NEED_INET_ATON))
+dnl AC_CHECK_FUNC(inet_ntoa, , AC_DEFINE(NEED_INET_NTOA))
+dnl AC_CHECK_FUNC(inet_netof, , AC_DEFINE(NEED_INET_NETOF))
+AC_CHECK_FUNC(bcopy, , 
+  AC_FUNC_CHECK(memmove, AC_DEFINE(HAVE_MEMMOVE), AC_DEFINE(NEED_BCOPY)))
+AC_CHECK_FUNC(bzero, , AC_DEFINE(NEED_BZERO))
+AC_CHECK_FUNC(bcmp, , AC_DEFINE(NEED_BCMP))
+AC_CHECK_FUNC(getrusage, AC_DEFINE(GETRUSAGE_2),
+  AC_CHECK_FUNC(times, AC_DEFINE(TIMES_2), ))
+
+IRC_SIGNAL_IMPLEMENTATION
+IRC_NON_BLOCKING_SYSTEM
+IRC_STDARG
+
+AC_OUTPUT(Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../ircd/crypt/sums.in)
+AC_OUTPUT_COMMANDS(chmod a+x version.c.SH)

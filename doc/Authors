@@ -79,7 +79,7 @@ Chelsea Ashley Dyerman
 The version 2.5.2 release was coordinated by Christopher Davis, Helen Rose,
 and Tom Hopkins.
 
-The versions 2.6.2, 2.7 and 2.8 releases were coordinated by Darren Reed.
+The versions 2.6.2, 2.7, 2.8 and 2.9 releases were coordinated by Darren Reed.
 
 Contributions for the 2.8 release from the following people:
 Matthew Green <phone@cairo.anu.edu.au>
@@ -137,3 +137,15 @@ Basalat Ali Raja <gwydion@gnu.ai.mit.edu>
 Eric P. Scott <eps@toaster.sfsu.edu>
 Dan Goodwin <fornax@wpi.wpi.edu>
 Noah Friedman <friedman@ai.mit.edu>
+
+Contributions for the 2.9 release from the following people:
+Christophe Kalt <kalt@stealth.net>
+Vesa Ruokonen <ruokonen@lut.fi>
+
+Various modifications, bugreports, cleanups and testing by:
+
+Chris Behrens <cbehrens@concentric.net>
+Olivier Galibert <Olivier.Galibert@mines.u-nancy.fr>
+Alain Nissen <Alain.Nissen@ulg.ac.be>
+Helmut Springer <delta@RUS.Uni-Stuttgart.DE>
+Magnus Tjernstrom <d92-mtm@oook.campus.luth.se>

@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info1278tmp2.
+input file /tmp/sgml2info29291tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.7 1997/06/09 15:24:53 kalt Exp $
+     $Id: INSTALL.info,v 1.8 1997/07/15 04:35:42 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.3.
 
@@ -28,13 +28,38 @@ File: INSTALL.info,  Node: Installing IRC-,  Next: The config-h file,  Prev: Top
 Installing IRC-
 ***************
 
-   So that ircd/irc will compile and work correctly with your version
-of Unix, it is necessary that you run "make" first. This will run
-configure which will probe your system for any peculiarities it has and
-setup the Makefile and a file of default #define's ($arch/setup.h). To
-change the default directory into which ircd will install using "make
-install", invoke "make" using the "CONFIGARGS=-prefix=/dir" command
-line option.
+   This package uses a GNU configure script for its configuration.  You
+simply need to untar the distribution and run the "configure" script.
+This will run configure which will probe your system for any
+peculiarities it has and setup the Makefile and a file of default
+#define's ($arch/setup.h).
+
+   There are a few options to "configure" to help it out, or change the
+default behaviour:
+`--prefix=DIR'
+     changes the default directory into which ircd will install using
+     "make install".  This defaults to /usr/local
+
+`--libdir=DIR'
+     changes the default directory where most irc files will go.
+     (default is prefix/lib/ircd)
+
+`--zlib-include=DIR'
+     specifies in which directory the include file from the zlib is
+     located.
+
+`--zlib-library=DIR'
+     specifies in which directory the zlib library is locate.
+
+`--with-zlib'
+     is the default.  "configure" looks on your system to find the
+     zlib.  If found, ircd will be linked using it.  This does NOT mean
+     you can use server link compression, for this you also need to
+     define ZIP_LINKS (see section below).
+
+`--without-zlib'
+     tells "configure" not to look for the zlib.  Defining this will
+     keep you from using server link compression.
 
 
 File: INSTALL.info,  Node: The config-h file,  Next: Editing the Makefile and compiling,  Prev: Installing IRC-,  Up: Top
@@ -94,12 +119,12 @@ SPATH CPATH MPATH LPATH PPATH TPATH
 ===================================
 
    Define SPATH to be the directory path to ircd.  This is usually
-/usr/local/bin/ircd, unless you don't have installation permission
+/usr/local/sbin/ircd, unless you don't have installation permission
 there.
 
    Define CPATH to be the directory path to the "ircd.conf" file. This
-path is usually /usr/local/lib/ircd.conf. The format of this file will
-be discussed later.
+path is usually /usr/local/lib/ircd/ircd.conf. The format of this file
+will be discussed later.
 
    The LPATH #define should be set to "/dev/null" unless you plan to
 debug the program.  Note that the logfile grows very quickly.
@@ -114,8 +139,8 @@ file.  It is used for storing the server's PID so a ps(1) isn't
 necessary.
 
    Define TPATH to be the directory path to the "ircd.tune" file. This
-path is usually /usr/local/lib/ircd.tune.  This file is used by the
-server to optimize memory use.
+path is usually /usr/local/lib/ircd/ircd.tune.  This file is used by
+the server to optimize memory use.
 
 
 File: INSTALL.info,  Node: CACHED_MOTD,  Next: CHROOTDIR,  Prev: SPATH CPATH MPATH LPATH PPATH TPATH,  Up: The config-h file
@@ -241,13 +266,10 @@ Editing the Makefile and compiling
 
    This package now uses GNU autoconf to probe your system and generate
 the correct Makefile.  However you need to edit it to specify specific
-information, such as "prefix", "IRCDMODE" and "IRCDDIR".
+information, such as "prefix", "irc_mode", "ircd_mode" and "irc_dir".
 
-   If GNU autoconf didn't generate a correct Makefile for your machine,
-you might need to uncomment the correct "IRCDLIBS", "IRCLIBS" and
-"IRCDDIR" lines.
-
-   To now build and install the server, type "make && make install".
+   Now to build the package, type "make".  If everything goes will, you
+can then install it by typing "make install".
 
    If you have trouble compiling ircd, copy Makefile.in to Makefile and
 edit Makefile as appropriate.
@@ -283,7 +305,7 @@ configuration options.  The record types are as follows:
 
   7. Restrict lines          (R)
 
-  8. Excluded accounts       (K)
+  8. Excluded accounts       (K,k)
 
   9. Server connections      (C,c,N)
 
@@ -1396,39 +1418,39 @@ Related resources
 
 
 Tag Table:
-Node: Top122
-Node: Installing IRC-608
-Node: The config-h file1166
-Node: Define what type of UNIX your machine uses-1832
-Node: DEBUGMODE2232
-Node: SPATH CPATH MPATH LPATH PPATH TPATH2890
-Node: CACHED_MOTD4088
-Node: CHROOTDIR4558
-Node: ENABLE_SUMMON ENABLE_USERS4882
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE5418
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY6101
-Node: ZIP_LINKS ZIP_LEVEL6733
-Node: SLOW_ACCEPT7744
-Node: CLONE_CHECK8362
-Node: Other #define's8702
-Node: Editing the Makefile and compiling9027
-Node: The ircd-conf file9756
-Node: Machine information11438
-Node: Administrative info13534
-Node: Port connections15569
-Node: Connection Classes17779
-Node: Client connections21702
-Node: Operator priviliges24987
-Node: Restrict connections27107
-Node: Excluded accounts28422
-Node: Server connections31722
-Node: Hub connections40155
-Node: Leaf connections41368
-Node: Version limitations43451
-Node: Excluded machines44684
-Node: Service connections45991
-Node: Bounce server48364
-Node: Default local server (for local clients) `*OBSOLETED*'49988
-Node: Related resources50871
+Node: Top123
+Node: Installing IRC-609
+Node: The config-h file1965
+Node: Define what type of UNIX your machine uses-2631
+Node: DEBUGMODE3031
+Node: SPATH CPATH MPATH LPATH PPATH TPATH3689
+Node: CACHED_MOTD4898
+Node: CHROOTDIR5368
+Node: ENABLE_SUMMON ENABLE_USERS5692
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6228
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY6911
+Node: ZIP_LINKS ZIP_LEVEL7543
+Node: SLOW_ACCEPT8554
+Node: CLONE_CHECK9172
+Node: Other #define's9512
+Node: Editing the Makefile and compiling9837
+Node: The ircd-conf file10472
+Node: Machine information12156
+Node: Administrative info14252
+Node: Port connections16287
+Node: Connection Classes18497
+Node: Client connections22420
+Node: Operator priviliges25705
+Node: Restrict connections27825
+Node: Excluded accounts29140
+Node: Server connections32440
+Node: Hub connections40873
+Node: Leaf connections42086
+Node: Version limitations44169
+Node: Excluded machines45402
+Node: Service connections46709
+Node: Bounce server49082
+Node: Default local server (for local clients) `*OBSOLETED*'50706
+Node: Related resources51589
 
 End Tag Table

@@ -1,18 +1,44 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.7 1997/06/09 15:24:54 kalt Exp $
+  $Id: INSTALL.txt,v 1.8 1997/07/15 04:35:43 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.3.
 
   11..  IInnssttaalllliinngg IIRRCC..
 
-  So that ircd/irc will compile and work correctly with your version of
-  Unix, it is necessary that you run ``make'' first. This will run
-  configure which will probe your system for any peculiarities it has
-  and setup the Makefile and a file of default #define's
-  ($arch/setup.h). To change the default directory into which ircd will
-  install using ``make install'', invoke ``make'' using the
-  ``CONFIGARGS=--prefix=/dir'' command line option.
+  This package uses a GNU configure script for its configuration.  You
+  simply need to untar the distribution and run the ``configure''
+  script.  This will run configure which will probe your system for any
+  peculiarities it has and setup the Makefile and a file of default
+  #define's ($arch/setup.h).
+
+  There are a few options to ``configure'' to help it out, or change the
+  default behaviour:
+
+     ----pprreeffiixx==DDIIRR
+        changes the default directory into which ircd will install using
+        ``make install''.  This defaults to /usr/local
+
+     ----lliibbddiirr==DDIIRR
+        changes the default directory where most irc files will go.
+        (default is prefix/lib/ircd)
+
+     ----zzlliibb--iinncclluuddee==DDIIRR
+        specifies in which directory the include file from the zlib is
+        located.
+
+     ----zzlliibb--lliibbrraarryy==DDIIRR
+        specifies in which directory the zlib library is locate.
+
+     ----wwiitthh--zzlliibb
+        is the default.  ``configure'' looks on your system to find the
+        zlib.  If found, ircd will be linked using it.  This does NOT
+        mean you can use server link compression, for this you also need
+        to define ZIP_LINKS (see section below).
+
+     ----wwiitthhoouutt--zzlliibb
+        tells ``configure'' not to look for the zlib.  Defining this
+        will keep you from using server link compression.
 
 
   22..  TThhee ccoonnffiigg..hh ffiillee
@@ -45,12 +71,12 @@
   22..33..  SSPPAATTHH,, CCPPAATTHH,, MMPPAATTHH,, LLPPAATTHH,, PPPPAATTHH,, TTPPAATTHH
 
   Define SPATH to be the directory path to ircd.  This is usually
-  /usr/local/bin/ircd, unless you don't have installation permission
+  /usr/local/sbin/ircd, unless you don't have installation permission
   there.
 
   Define CPATH to be the directory path to the ``ircd.conf'' file. This
-  path is usually /usr/local/lib/ircd.conf. The format of this file will
-  be discussed later.
+  path is usually /usr/local/lib/ircd/ircd.conf. The format of this file
+  will be discussed later.
 
   The LPATH #define should be set to ``/dev/null'' unless you plan to
   debug the program.  Note that the logfile grows very quickly.
@@ -65,8 +91,8 @@
   necessary.
 
   Define TPATH to be the directory path to the ``ircd.tune'' file. This
-  path is usually /usr/local/lib/ircd.tune.  This file is used by the
-  server to optimize memory use.
+  path is usually /usr/local/lib/ircd/ircd.tune.  This file is used by
+  the server to optimize memory use.
 
 
   22..44..  CCAACCHHEEDD__MMOOTTDD
@@ -104,8 +130,6 @@
   report the number of invisible users to all people and not just
   operators.  The NO_DEFAULT_INVISIBLE define is used to toggle whether
   clients are automatically made invisible when they register.
-
-
   22..88..  OOPPEERR__KKIILLLL,, OOPPEERR__RREEHHAASSHH,, OOPPEERR__RREESSTTAARRTT,, LLOOCCAALL__KKIILLLL__OONNLLYY
 
   The three operator only commands, KILL, REHASH and RESTART, may all be
@@ -165,13 +189,12 @@
 
   This package now uses GNU autoconf to probe your system and generate
   the correct Makefile.  However you need to edit it to specify specific
-  information, such as ``prefix'', ``IRCDMODE'' and ``IRCDDIR''.
+  information, such as ``prefix'', ``irc_mode'', ``ircd_mode'' and
+  ``irc_dir''.
 
-  If GNU autoconf didn't generate a correct Makefile for your machine,
-  you might need to uncomment the correct ``IRCDLIBS'', ``IRCLIBS'' and
-  ``IRCDDIR'' lines.
+  Now to build the package, type ``make''.  If everything goes will, you
+  can then install it by typing ``make install''.
 
-  To now build and install the server, type ``make && make install''.
 
   If you have trouble compiling ircd, copy Makefile.in to Makefile and
   edit Makefile as appropriate.
@@ -195,7 +218,6 @@
 
   2. Administrative info     (A)
 
-
   3. Port connections        (P)
 
   4. Connection Classes      (Y)
@@ -206,7 +228,7 @@
 
   7. Restrict lines          (R)
 
-  8. Excluded accounts       (K)
+  8. Excluded accounts       (K,k)
 
   9. Server connections      (C,c,N)
 
@@ -305,6 +327,7 @@
 
 
 
+
      AA  This specifies an Admin record.
 
      YYoouurr NNaammee && LLooccaattiioonn
@@ -371,7 +394,6 @@
         accepted. If no is defined here, server will bind to all
         interfaces (INADDR_ANY).  See also MACHINE CONFIGURATION section
         to properly configure outgoing connections.
-
         P:192.168.1.194:::6664:
 
      IInntteerrnneett IIPP## MMaasskk
@@ -458,7 +480,6 @@
         remain ``silent'' before sending a PING message to make sure it
         is still alive.  Unless you are sure of what you are doing, use
         the default value which is in your config.h file.
-
 
      CCoonnnneecctt FFrreeqquueennccyy||MMaaxx IIPP
         This field has a different meaning depending on the use of the Y
@@ -571,7 +592,6 @@
 
         Allow clients from machines matching *.tut.fi to connect with
         the password ``secret''.
-
         I:*::*::1
 
         Allow anyone from anywhere to connect your server.
@@ -656,7 +676,6 @@
         having a lower number than that for the relevant I-line) and
         determines the maximum number of simultaneous uses of the O-line
         allowable through the max. links field in the Y-line.
-
 
      EExxaammppllee
         O:orion.cair.du.edu:pyunxc:Jeff::1
@@ -771,7 +790,6 @@
      EExxaammpplleess
         K:orion.cair.du.edu::jtrim:0:
 
-
         If user ``jtrim'' connects to IRC from host
         ``orion.cair.du.edu'' then IMMEDIATELY REMOVE HIM from my IRCD.
 
@@ -837,6 +855,7 @@
      increased).
 
 
+
      FFoorrmmaatt
 
         C:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<TARGET PORT>:<Class>
@@ -856,6 +875,7 @@
      C:root@nic.funet.fi:passwd:nic.funet.fi:6667:1
 
      Each field is separated with a ":" charcter:
+
      CC  This field tells the IRC program which option is being
         configured. "C" corresponds to a server Connect option.
 
@@ -1034,7 +1054,6 @@
         may ``hub for''.  If a server is only going to supply its own
         name (ie act as a solitary leaf) then no H-line is required for,
         else a H-line must be added.
-
      FFoorrmmaatt
 
         H:<Server Mask>:*:<Server Name>::
@@ -1054,6 +1073,7 @@
 
         Allows a server named ``*.bu.edu'' to introduce only servers
         that match the ``*.edu'' name mask.
+
         H:*::eff.org::
 
         Allows ``eff.org'' to introduce (and act as a hub for) any
@@ -1099,8 +1119,6 @@
      FFoorrmmaatt
 
         L:<Server Mask>:*:<Server Name>:<Max Depth>:
-
-
 
      SSeerrvveerr MMaasskk
         Mask of which servers the leaf-like attributes are used on when
@@ -1234,7 +1252,6 @@
         The type of service. It defines the priviledges given to the
         service. Be very careful in the types you allow.  The types can
         be found in include/service.h
-
      CCllaassss
         The class field should refer to an existing class.
 
@@ -1363,23 +1380,6 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -16,139 +16,287 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.2 1997/04/14 15:04:42 kalt Exp $
+#*   $Id: Makefile.in,v 1.3 1997/07/15 04:35:49 kalt Exp $
 #*
 #*/
 
+# -------------------------------------------------------------------------
+# Start of system configuration section.
+#
 prefix = @prefix@
 exec_prefix = @exec_prefix@
 
 CC = @CC@
-DEFS = @DEFS@
-LIBS = @LIBS@
-
-INCLUDEDIR = -I. -I../include
-CFLAGS = @CFLAGS@ $(DEFS) $(INCLUDEDIR) @CPPFLAGS@
+CFLAGS = @CFLAGS@ -I. -I../include @IRC_ZLIB_INCLUDE@
 LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+MATHLIBS = -lm
+ZLIBS = @IRC_ZLIB_LIBRARY@
+CURSESLIBS = @IRC_CURSES_TERMCAP_LIBRARY@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+MKDIRHIER = ../support/mkdirhier
 
-IRCDLIBS = $(LIBS)
+# Directory in which to install irc.
+client_bin_dir = @bindir@
 
-RM=/bin/rm
+# Directory in which to install ircd and chkconf.
+server_bin_dir = @sbindir@
 
-# IRCDMODE is the mode you want the binary to be.
-# The 4 at the front is important (allows for setuidness)
-#
-# WARNING: if you are making ircd SUID or SGID, check config.h to make sure
-#          you are not defining CMDLINE_CONFIG 
-IRCDMODE = 711
+# Directory in which to install the client manual page file.
+client_man_dir = @mandir@/man1
 
-# IRCDDIR is used as default path for file names in <systype>/config.h
-#
-IRCDDIR = $(prefix)/lib/irc
+# Directory in which to install the server manual page file.
+server_man_dir = @mandir@/man8
 
-IRCLIBS=-lcurses -ltermcap $(LIBS)
+# Directory where most files will be
+irc_dir = @libdir@/ircd
 
-# The following are from the time when autoconf wasn't used.
-# They are pretty useless but can be a good source of inspiration if you
-# have trouble compiling.
-#
-# use the following on MIPS:
-#CFLAGS= -systype bsd43 -DSYSTYPE_BSD43 $(INCLUDEDIR)
-# For IRIX (SGI) cc(1), use the following:
-#CFLAGS= -O -cckr $(INCLUDEDIR)
-#
-# on NEXT use:
-#CFLAGS=-bsd $(INCLUDEDIR)
-#on NeXT other than 2.0:
-#IRCDLIBS=-lsys_s
-#
-# AIX flags
-#CFLAGS=-D_BSD $(DEFS) $(INCLUDEDIR)
-#IRCDLIBS=-lm -lbsd
-#IRCLIBS=-lcurses -lcur
-#
-# Dynix/ptx V2.0.x
-#CFLAGS= $(INCLUDEDIR) -O -Xo
-#IRCDLIBS= -lsocket -linet -lnsl -lseq
-#IRCLIBS=-ltermcap -lcurses -lsocket -linet -lnsl -lseq
-# 
-# Dynix/ptx V1.x.x
-#IRCDLIBS= -lsocket -linet -lnsl -lseq
-#
-#use the following on SUN OS without nameserver libraries inside libc
-#IRCDLIBS= -lresolv
-#
-# Solaris 2/SVR4
-#IRCDLIBS= -lresolv -lsocket -lnsl
-#IRCLIBS=-lcurses -ltermcap -lsocket -lnsl
-#
-# ESIX
-#CFLAGS=-O $(INCLUDEDIR) -I/usr/ucbinclude
-#IRCDLIBS=-L/usr/ucblib -L/usr/lib -lsocket -lucb -lresolv -lns -lnsl
-#
-#CFLAGS= $(INCLUDEDIR) -traditional -Wall -Dlint -g -pedantic
-#
-# LDFLAGS - flags to send the loader (ld). SunOS users may want to add
-# -Bstatic here.
-#LDFLAGS=-Bstatic
-# HP-UX
-#LDFLAGS=-Wl,-a,archive -y
+# Access mode for irc.
+irc_mode = 711
 
-SHELL=/bin/sh
-TARGETS=ircd irc
-BINDIR=$(IRCDDIR)
-MANDIR= $(prefix)/man
-INSTALL=../support/bsdinstall
+# Access mode for ircd.
+ircd_mode = 711
 
-MAKE=make 'CFLAGS=${CFLAGS}' 'CC=${CC}' 'IRCDLIBS=${IRCDLIBS}' \
-	'LDFLAGS=${LDFLAGS}' 'IRCDMODE=${IRCDMODE}' 'BINDIR=${BINDIR}' \
-	'INSTALL=${INSTALL}' 'IRCLIBS=${IRCLIBS}' 'INCLUDEDIR=${INCLUDEDIR}' \
-	'IRCDDIR=${IRCDDIR}' 'SHELL=${SHELL}' 'RM=${RM}'
+# End of system configuration section.
+# ------------------------------------------------------------------------
+# Please don't change anything below this point - no need really - I hope.
 
-all:	build
+RM = rm -f
 
-server:
-	@echo 'Making server'; ${MAKE} build -f Makefile.ircd
+CLIENT_COMMON_OBJS = clbsd.o cldbuf.o clpacket.o clsend.o clmatch.o \
+                     clparse.o clsupport.o
+CLIENT_OBJS = c_bsd.o c_msg.o c_numeric.o c_version.o edit.o help.o \
+              ignore.o irc.o screen.o str.o c_debug.o ctcp.o
+CLIENT = irc
 
-client:
-	@echo 'Making client'; ${MAKE} build -f Makefile.irc
+SERVER_COMMON_OBJS = bsd.o dbuf.o packet.o send.o match.o parse.o \
+                     support.o
+SERVER_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
+              s_bsd.o s_conf.o s_debug.o s_err.o s_misc.o s_numeric.o \
+              s_serv.o s_service.o s_user.o s_zip.o whowas.o note.o \
+              res_init.o res_comp.o res_mkquery.o version.o
+SERVER = ircd
 
-build:
-	@for i in $(TARGETS); do \
-		echo "Building $$i";\
-		${MAKE} build -f Makefile.$$i; \
-	done
+CHKCONF_COMMON_OBJS = match.o
+CHKCONF_OBJS = chkconf.o
+CHKCONF = chkconf
 
-config configure:
-	${SHELL} ../support/configure ${CONFIGARGS}
+all: client server
+
+client: $(CLIENT)
+
+server: $(SERVER) $(CHKCONF)
+
+$(CLIENT): $(CLIENT_COMMON_OBJS) $(CLIENT_OBJS)
+	$(RM) $@
+	$(CC) $(LDFLAGS) -o $@ $(CLIENT_COMMON_OBJS) $(CLIENT_OBJS) $(CURSESLIBS) $(LIBS)
+
+$(SERVER): $(SERVER_COMMON_OBJS) $(SERVER_OBJS)
+	$(RM) $@
+	$(CC) $(LDFLAGS) -o $@ $(SERVER_COMMON_OBJS) $(SERVER_OBJS) $(ZLIBS) $(MATHLIBS) $(LIBS)
+
+$(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
+	$(RM) $@
+	$(CC) $(LDFLAGS) -o $@ $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS) $(LIBS)
+
+install: install-client install-server
+
+install-client: client
+	-@if [ ! -d $(client_bin_dir) ]; then \
+	$(MKDIRHIER) $(client_bin_dir); \
+	fi
+	-@if [ ! -d $(client_man_dir) ]; then \
+	$(MKDIRHIER) $(client_man_dir); \
+	fi
+	$(INSTALL_PROGRAM) -m $(irc_mode) $(CLIENT) $(client_bin_dir)
+	(cd ../doc; $(INSTALL_DATA) irc.1 $(client_man_dir))
+	@echo "installation of client done."
+
+install-server: server
+	-@if [ ! -d $(server_bin_dir) ]; then \
+	$(MKDIRHIER) $(server_bin_dir); \
+	fi
+	-@if [ ! -d $(server_man_dir) ]; then \
+	$(MKDIRHIER) $(server_man_dir); \
+	fi
+	-@if [ ! -d $(config_dir) ]; then \
+	$(MKDIRHIER) $(config_dir); \
+	fi
+	-@if [ ! -d $(log_dir) ]; then \
+	$(MKDIRHIER) $(log_dir); \
+	fi
+	-@if [ ! -d $(run_dir) ]; then \
+	$(MKDIRHIER) $(run_dir); \
+	fi
+	$(INSTALL_PROGRAM) -m $(ircd_mode) $(SERVER) $(server_bin_dir)
+	$(INSTALL_PROGRAM) -m $(ircd_mode) $(CHKCONF) $(server_bin_dir)
+	(cd ../doc; $(INSTALL_DATA) ircd.8 $(server_man_dir))
+	(cd ../doc; $(INSTALL_DATA) example.conf $(config_dir))
+	@echo "installation of server done."
+
+clbsd.o: ../common/bsd.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../common/bsd.c
+
+cldbuf.o: ../common/dbuf.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../common/dbuf.c
+
+clpacket.o: ../common/packet.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../common/packet.c
+
+clsend.o: ../common/send.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../common/send.c
+
+clmatch.o: ../common/match.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../common/match.c
+
+clparse.o: ../common/parse.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../common/parse.c
+
+clsupport.o: ../common/support.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../common/support.c
+
+c_bsd.o: ../irc/c_bsd.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/c_bsd.c
+
+c_msg.o: ../irc/c_msg.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/c_msg.c
+
+c_numeric.o: ../irc/c_numeric.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/c_numeric.c
+
+c_version.o: ../irc/c_version.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/c_version.c
+
+edit.o: ../irc/edit.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/edit.c
+
+help.o: ../irc/help.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/help.c
+
+ignore.o: ../irc/ignore.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/ignore.c
+
+irc.o: ../irc/irc.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/irc.c
+
+screen.o: ../irc/screen.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/screen.c
+
+str.o: ../irc/str.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/str.c
+
+c_debug.o: ../irc/c_debug.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/c_debug.c
+
+ctcp.o: ../irc/ctcp.c setup.h config.h
+	$(CC) $(CFLAGS) -DCLIENT_COMPILE -c -o $@ ../irc/ctcp.c
+
+bsd.o: ../common/bsd.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../common/bsd.c
+
+dbuf.o: ../common/dbuf.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../common/dbuf.c
+
+packet.o: ../common/packet.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../common/packet.c
+
+send.o: ../common/send.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../common/send.c
+
+match.o: ../common/match.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../common/match.c
+
+parse.o: ../common/parse.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../common/parse.c
+
+support.o: ../common/support.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../common/support.c
+
+#inet_addr.o: ../common/inet_addr.c setup.h config.h
+#	$(CC) $(CFLAGS) -c -o $@ ../common/inet_addr.c
+
+channel.o: ../ircd/channel.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/channel.c
+
+class.o: ../ircd/class.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/class.c
+
+hash.o: ../ircd/hash.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/hash.c
+
+ircd.o: ../ircd/ircd.c setup.h config.h Makefile
+	$(CC) $(CFLAGS) -DDPATH="\"$(irc_dir)\"" -c -o $@ ../ircd/ircd.c
+
+list.o: ../ircd/list.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/list.c
+
+res.o: ../ircd/res.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/res.c
+
+s_auth.o: ../ircd/s_auth.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_auth.c
+
+s_bsd.o: ../ircd/s_bsd.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_bsd.c
+
+s_conf.o: ../ircd/s_conf.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_conf.c
+
+s_debug.o: ../ircd/s_debug.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_debug.c
+
+s_err.o: ../ircd/s_err.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_err.c
+
+s_misc.o: ../ircd/s_misc.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_misc.c
+
+s_numeric.o: ../ircd/s_numeric.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_numeric.c
+
+s_serv.o: ../ircd/s_serv.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_serv.c
+
+s_service.o: ../ircd/s_service.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_service.c
+
+s_user.o: ../ircd/s_user.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_user.c
+
+s_zip.o: ../ircd/s_zip.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/s_zip.c
+
+whowas.o: ../ircd/whowas.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/whowas.c
+
+note.o: ../ircd/note.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/note.c
+
+res_init.o: ../ircd/res_init.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/res_init.c
+
+res_comp.o: ../ircd/res_comp.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/res_comp.c
+
+res_mkquery.o: ../ircd/res_mkquery.c setup.h config.h
+	$(CC) $(CFLAGS) -c -o $@ ../ircd/res_mkquery.c
+
+chkconf.o: ../ircd/chkconf.c setup.h config.h Makefile
+	$(CC) $(CFLAGS) -DDPATH="\"$(irc_dir)\"" -c -o $@ ../ircd/chkconf.c
+
+version.o: version.c
+	$(CC) $(CFLAGS) -c -o $@ version.c
+
+version.c:
+	./version.c.SH
 
 clean:
-	${RM} -f *.o *~ #* core *.bak
-	@for i in $(TARGETS); do \
-		echo "Cleaning $$i";\
-		${MAKE} clean -f Makefile.$$i; \
-	done
+	$(RM) $(CLIENT) $(SERVER) $(CHKCONF) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"*
 
-distclean realclean: clean
-	${RM} -f config.log config.cache config.status setup.h Makefile version.c.SH mkpasswd sums
-	@echo "Run sh ../support/configure to reconfigure"
-
-depend:
-	@for i in $(TARGETS); do \
-		echo "Making dependencies in $$i";\
-		${MAKE} depend -f Makefile.$$i; \
-	done
-
-install: all
-	-@chmod +x ${INSTALL}
-	@for i in $(TARGETS); do \
-		echo "Installing $$i";\
-		${MAKE} 'INSTALL=${INSTALL}' install -f Makefile.$$i; \
-	done
-	-${INSTALL} -c -m 644 ../doc/ircd.8 ${MANDIR}/man8
-	-${INSTALL} -c -m 644 ../doc/irc.1 ${MANDIR}/man1
-
+distclean:
+	@echo "To make distclean, just delete the current directory."
 
 rcs:
-	cii -H -R common include ircd
-
+	(cd ..; cii -H -R configure common doc include irc ircd support)

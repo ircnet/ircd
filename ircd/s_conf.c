@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.9 1997/06/09 14:43:01 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.10 1997/07/15 04:35:47 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -61,8 +61,6 @@ static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.9 1997/06/09 14:43:01 kalt Exp $";
 #ifdef __hpux
 # ifdef HAVE_ARPA_INET_H
 #  include <arpa/inet.h>
-# else
-#  include "inet.h"
 # endif
 #endif
 #if defined(PCS) || defined(AIX) || defined(DYNIXPTX) || defined(SVR3)
@@ -1114,7 +1112,7 @@ Reg	aConfItem	*aconf;
 	ln.flags = ASYNC_CONF;
 
 	if (isdigit(*s))
-		aconf->ipnum.s_addr = inet_addr(s);
+		aconf->ipnum.s_addr = inetaddr(s);
 	else if ((hp = gethost_byname(s, &ln)))
 		bcopy(hp->h_addr, (char *)&(aconf->ipnum),
 			sizeof(struct in_addr));

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.7 1997/06/20 15:08:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_debug.c,v 1.8 1997/07/15 04:35:47 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -164,7 +164,6 @@ char	serveropts[] = {
 #ifdef GETRUSAGE_2
 # ifdef SVR4
 #  include <sys/time.h>
-#  include <sys/rusage.h>
 # endif
 # include <sys/resource.h>
 #else

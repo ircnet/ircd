@@ -1,3 +1,19 @@
+Tue Jul 15 00:18:01 1997  Christophe Kalt
+
+	* inet_addr.c moved to support.c, renamed functions (inet_addr,
+	inet_aton, inet_ntoa, inet_netof) to avoid clashes; always used
+	even if the system has it. (easy way to sort the total mess
+	related to bind 4.x, 8.x ...)
+
+	* New configure and Makefile from Alain Nissen. (many many files
+	changed, removed, created, rewrote)
+
+	* buildm4: update (Mario Holbe).
+
+	* struct.h, s_bsd.c: fixed the P line rehash bug(?).
+
+	* h.h, ircd.c: let's be nice to SunOS' cc.
+
 Mon Jun 30 21:41:11 1997  Christophe Kalt
 
 	* dbuf.c, send.c: earlier changes broke the client.

@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.10 1997/07/08 12:24:00 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.11 1997/07/15 04:35:47 kalt Exp $";
 #endif
 
 #include <sys/types.h>
@@ -58,8 +58,6 @@ static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.10 1997/07/08 12:24:00 kalt Exp $";
 #endif
 #ifdef HAVE_ARPA_INET_H
 # include <arpa/inet.h>
-#else
-# include "inet.h"
 #endif
 #include <stdio.h>
 #include <signal.h>
@@ -277,7 +275,7 @@ int	port;
 		if (!ip || !isdigit(*ip))
 			server.sin_addr.s_addr = INADDR_ANY;
 		else
-			server.sin_addr.s_addr = inet_addr(ip);
+			server.sin_addr.s_addr = inetaddr(ip);
 		server.sin_port = htons(port);
 		/*
 		 * Try 10 times to bind the socket with an interval of 20
@@ -633,7 +631,7 @@ Reg	char	*sockn;
 		return -1;
 	    }
 	(void)strcpy(sockn, (char *)inetntoa((char *)&sk.sin_addr));
-	if (inet_netof(sk.sin_addr) == IN_LOOPBACKNET)
+	if (inetnetof(sk.sin_addr) == IN_LOOPBACKNET)
 	    {
 		cptr->hostp = NULL;
 		strncpyzt(sockn, me.sockhost, HOSTLEN);
@@ -697,8 +695,8 @@ Reg	aClient	*cptr;
 	Debug((DEBUG_DNS, "ch_cl: access ok: %s[%s]",
 		cptr->name, sockname));
 
-	if (inet_netof(cptr->ip) == IN_LOOPBACKNET || IsUnixSocket(cptr) ||
-	    inet_netof(cptr->ip) == inet_netof(mysk.sin_addr))
+	if (inetnetof(cptr->ip) == IN_LOOPBACKNET || IsUnixSocket(cptr) ||
+	    inetnetof(cptr->ip) == inetnetof(mysk.sin_addr))
 	    {
 		ircstp->is_loc++;
 		cptr->flags |= FLAGS_LOCAL;
@@ -2161,7 +2159,7 @@ struct	hostent	*hp;
 		nextdnscheck = 1;
 		s = (char *)index(aconf->host, '@');
 		s++; /* should NEVER be NULL */
-		if ((aconf->ipnum.s_addr = inet_addr(s)) == -1)
+		if ((aconf->ipnum.s_addr = inetaddr(s)) == -1)
 		    {
 			aconf->ipnum.s_addr = 0;
 			hp = gethost_byname(s, &lin);
@@ -2324,7 +2322,7 @@ int	*lenp;
 	 * being present instead. If we dont know it, then the connect fails.
 	 */
 	if (isdigit(*aconf->host) && (aconf->ipnum.s_addr == -1))
-		aconf->ipnum.s_addr = inet_addr(aconf->host);
+		aconf->ipnum.s_addr = inetaddr(aconf->host);
 	if (aconf->ipnum.s_addr == -1)
 	    {
 		hp = cptr->hostp;
@@ -2569,7 +2567,7 @@ int	len;
 	mysk.sin_family = AF_INET;
 	
 	if ((aconf = find_me())->passwd && isdigit(*aconf->passwd))
-		mysk.sin_addr.s_addr = inet_addr(aconf->passwd);
+		mysk.sin_addr.s_addr = inetaddr(aconf->passwd);
 
 	if (gethostname(name, len) == -1)
 		return;
@@ -2631,7 +2629,7 @@ aConfItem	*aconf;
 		return udpfd;
 	bzero((char *)&from, sizeof(from));
 	if (aconf->passwd && isdigit(*aconf->passwd))
-	  from.sin_addr.s_addr = inet_addr(aconf->passwd);
+	  from.sin_addr.s_addr = inetaddr(aconf->passwd);
 	else
 	  from.sin_addr.s_addr = htonl(INADDR_ANY); /* hmmpf */
 	from.sin_port = htons((u_short) aconf->port);

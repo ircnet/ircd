@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static char rcsid[] = "$Id: res_init.c,v 1.3 1997/05/15 20:31:40 kalt Exp $";
+static char rcsid[] = "$Id: res_init.c,v 1.4 1997/07/15 04:35:46 kalt Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include <sys/types.h>
@@ -63,7 +63,7 @@ static char rcsid[] = "$Id: res_init.c,v 1.3 1997/05/15 20:31:40 kalt Exp $";
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <netinet/in.h>
-#include "inet.h"
+/*#include "inet.h"*/
 #include "nameser.h"
 
 #include <stdio.h>
@@ -321,7 +321,7 @@ ircd_res_init()
 		    cp = buf + sizeof("nameserver") - 1;
 		    while (*cp == ' ' || *cp == '\t')
 			cp++;
-		    if ((*cp != '\0') && (*cp != '\n') && inet_aton(cp, &a)) {
+		    if ((*cp != '\0') && (*cp != '\n') && inetaton(cp, &a)) {
 			ircd_res.nsaddr_list[nserv].sin_addr = a;
 			ircd_res.nsaddr_list[nserv].sin_family = AF_INET;
 			ircd_res.nsaddr_list[nserv].sin_port =
@@ -346,7 +346,7 @@ ircd_res_init()
 				cp++;
 			n = *cp;
 			*cp = 0;
-			if (inet_aton(net, &a)) {
+			if (inetaton(net, &a)) {
 			    ircd_res.sort_list[nsort].addr = a;
 			    if (ISSORTMASK(n)) {
 				*cp++ = n;
@@ -356,7 +356,7 @@ ircd_res_init()
 				    cp++;
 				n = *cp;
 				*cp = 0;
-				if (inet_aton(net, &a)) {
+				if (inetaton(net, &a)) {
 				    ircd_res.sort_list[nsort].mask = a.s_addr;
 				} else {
 				    ircd_res.sort_list[nsort].mask = 
@@ -559,7 +559,7 @@ ircd_netinfo_res_init(haveenv, havesearch)
 			 n++) {
 			struct in_addr a;
 
-			if (inet_aton(nl.ni_namelist_val[n], &a)) {
+			if (inetaton(nl.ni_namelist_val[n], &a)) {
 			    ircd_res.nsaddr_list[nserv].sin_addr = a;
 			    ircd_res.nsaddr_list[nserv].sin_family = AF_INET;
 			    ircd_res.nsaddr_list[nserv].sin_port =
@@ -601,11 +601,11 @@ ircd_netinfo_res_init(haveenv, havesearch)
 				*cp = '\0';
 				break;
 			}
-			if (inet_aton(nl.ni_namelist_val[n], &a)) {
+			if (inetaton(nl.ni_namelist_val[n], &a)) {
 			    ircd_res.sort_list[nsort].addr = a;
 			    if (*cp && ISSORTMASK(ch)) {
 			    	*cp++ = ch;
-			        if (inet_aton(cp, &a)) {
+			        if (inetaton(cp, &a)) {
 				    ircd_res.sort_list[nsort].mask = a.s_addr;
 				} else {
 				    ircd_res.sort_list[nsort].mask =

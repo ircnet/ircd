@@ -74,7 +74,7 @@ aClient	*cptr;
 	server.sin_family = AF_INET;
  
 	if (isdigit(*host))
-		server.sin_addr.s_addr = inet_addr(host);
+		server.sin_addr.s_addr = inetaddr(host);
 	else { 
 		hp = gethostbyname(host);
 		if (hp == 0) {
