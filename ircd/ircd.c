@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.135 2004/05/16 16:37:25 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.136 2004/06/17 14:14:22 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -431,7 +431,7 @@ static	int	delayed_kills(time_t currenttime)
 		}
 		return 0;
 	}
-	return 1;
+	return rehashed;
 }
 
 static	time_t	check_pings(time_t currenttime)
