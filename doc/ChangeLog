@@ -1,3 +1,13 @@
+2003-12-09  Piotr Kucharski
+
+	* s_conf.c/find_denied(): try find_client with server name (from C:),
+	  not server address.
+	* s_bsd.c/close_connection(): when nextconnect was 0, it was not
+	  reset when server closed connection. This bug made autoconnect
+	  stop forever.
+	* s_bsd.c/close_connection(): added another sanity check for the
+	  benefit of nextconnect.
+	  
 2003-11-13  Piotr Kucharski
 
 	* s_user.c/m_pass(): don't copy PASS params to info when issued 
