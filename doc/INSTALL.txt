@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.69 2004/08/31 13:31:12 chopin Exp $
+  $Id: INSTALL.txt,v 1.70 2004/09/09 17:20:18 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -26,10 +26,6 @@
         files will go. It is important to set this properly. (default is
         prefix/sbin)
 
-     ----wwiitthh--llooggddiirr==DDIIRR
-        changes the default directory where the irc log files will go.
-        (default is prefix/var/log/ircd)
-
      ----ssyyssccoonnffddiirr==DDIIRR
         changes the default directory where the irc server configuration
         files will go. (default is prefix/etc)
@@ -37,6 +33,10 @@
      ----llooccaallssttaatteeddiirr==DDIIRR
         changes the default directory where the irc server state files
         will go. (default is prefix/var)
+
+     ----wwiitthh--llooggddiirr==DDIIRR
+        changes the default directory where the irc log files will go.
+        (default is localstatedir/log)
 
      ----wwiitthh--rreessccoonnff==FFIILLEE
         defines the file to be used by ircd to initialize its resolver.
@@ -92,7 +92,8 @@
   Digital Unix, FreeBSD+KAME, Linux, NetBSD+INRIA.
 
   Because IPv6 numeric addresses contain ``:'' characters, tthhee ddeeffaauulltt
-  sseeppaarraattoorr ffoorr tthhee sseerrvveerr ccoonnffiigguurraattiioonn ffiillee wwaass cchhaannggeedd ttoo ````%%''''.
+  sseeppaarraattoorr ffoorr tthhee sseerrvveerr ccoonnffiigguurraattiioonn ffiillee wwaass cchhaannggeedd ttoo ````%%''''. You
+  can adjust it to your needs in config.h file.
 
 
   22..  TThhee ccoonnffiigg..hh ffiillee
@@ -130,6 +131,8 @@
   to glean information the same as finger can.  ENABLE_SUMMON toggles
   whether the server will attempt to summon local users to irc by
   writing a message similar to that from talk(1) to a user's tty.
+
+
   22..44..  NNOO__DDEEFFAAUULLTT__IINNVVIISSIIBBLLEE
 
   The NO_DEFAULT_INVISIBLE define is used to toggle whether clients are
@@ -192,6 +195,7 @@
   the file under the line with "STOP STOP" in it be changed.
 
 
+
   33..  EEddiittiinngg tthhee MMaakkeeffiillee,, aanndd ccoommppiilliinngg
 
   This package now uses GNU autoconf to probe your system and generate
@@ -210,13 +214,40 @@
   If you have trouble compiling ircd, copy Makefile.in to Makefile and
   edit Makefile as appropriate.
 
+  If everything went fine, the default layout of installed files is as
+  follows (note that existing iauth.conf and ircd.motd will not be
+  overwritten):
+
+  PREFIX/sbin/ircd
+  PREFIX/sbin/iauth
+  PREFIX/sbin/chkconf
+  PREFIX/sbin/ircd-mkpasswd
+  PREFIX/sbin/ircdwatch
+  PREFIX/man/man8/ircd.8
+  PREFIX/man/man8/iauth.8
+  PREFIX/man/man8/ircdwatch.8
+  PREFIX/man/man5/iauth.conf.5
+  PREFIX/etc/ircd.m4
+  PREFIX/etc/ircd.conf.example
+  PREFIX/etc/iauth.conf.example
+  PREFIX/etc/iauth.conf
+  PREFIX/etc/ircd.motd
+  PREFIX/var/run/
+  PREFIX/var/log/
+
+
+  Files created by ircd package during normal execution would be
+  ircd.pid, ircd.tune, iauth.pid, ircdwatch.pid in PREFIX/var/run/ and
+  ircd.users, ircd.rejects, ircd.auth, ircd.opers, ircd.debug,
+  iauth.debug in PREFIX/var/log/.
+
 
   44..  TThhee iirrccdd..ccoonnff ffiillee
 
   After installing the ircd and irc programs, edit the ircd.conf file as
   per the instructions in this section and install it in the location
   you specified in the config.h file.  There is a sample conf file
-  called example.conf in the doc/ directory.
+  called ircd.conf.example in the doc/ directory.
 
   Appendix A (See INSTALL.appendix) describes the differences between IP
   addresses and host names.  If you are unfamiliar with this, you should
@@ -261,7 +292,6 @@
   15.
      Service connections   (S)
 
-
   16.
      Bounce server         (B)
 
@@ -276,15 +306,16 @@
         As of the 2.11.0 version of the server, if the server has been
         compiled with #define CONFIG_DIRECTIVE_INCLUDE, you will be able
         to use #include directive in ircd.conf to include files without
-        the need of M4.
+        the need of M4, also recursively.
 
         #include "filename"
 
 
-     Note that syntax is very strict, it must be followed to the letter.
-     If filename does not start with slash, ircd config directory is
-     prepended.  Also note that chkconf will follow such includes, giv-
-     ing however wrong line numbers in output.
+     For the command to be recognized, `#' MUST be first character in
+     the line and there must be space after "include" word. Quotes
+     around filename are optional.  If filename does not start with
+     slash, ircd config directory is prepended.  Also note that chkconf
+     will follow such includes.
 
 
   44..11..  MMaacchhiinnee iinnffoorrmmaattiioonn
@@ -393,7 +424,6 @@
      OOtthheerr
         This is really an OTHER field - you can add what you want here.
 
-
      NNeettwwoorrkk nnaammee
         Use this field to announce your network name in 005 numerics.
         Use only one word!
@@ -428,6 +458,7 @@
         connections on as well as extra internet ports.
 
      FFoorrmmaatt
+
 
         P:<Internet IP#>:::<Port>::<Flags>
         P:<Directory>:::<Port>::<Flags>
@@ -559,6 +590,7 @@
         the connection counts are done for all clients present on the
         net instead of only counting local clients.
 
+
      NNoottee
         leaving any of the fields (except SendQ and limits) out means
         their value is 0 (ZERO)!!  The SendQ field default value is
@@ -591,6 +623,7 @@
         checked every 300 seconds.  The connection is allowed to remain
         silent for 120 seconds before a PING is sent.  NOTE: fields 3 &
         4 are in seconds.  The SendQ is set to 800000 bytes.
+
         Y:1:60:0:50:20000:2:5: (client class)
 
         In case of a client class, the fields are interpreted a bit
@@ -624,7 +657,6 @@
         There are clients written in C, GNU Emacs Lisp and many other
         languages.  The ``irc'' program is the C client.  Each person
         that talks via IRC is running their own client.
-
         The ircd.conf files contains entries that specify which clients
         are allowed to connect to your irc daemon.  Obviously you want
         to allow your own machine's clients to connect.  You may want to
@@ -822,6 +854,7 @@
         password and always keep the ``ircd.conf'' file protected from
         all of the other users.
 
+
      NNiicckknnaammee
         The Nickname you usually go by - but you can make this what you
         want.
@@ -853,7 +886,6 @@
         +o  C - allows local and remote CONNECT
 
         +o  c - allows local CONNECT
-
 
         +o  D - allows DIE
 
@@ -955,7 +987,6 @@
         opposed to the UNIX type), the reply is not used to set the
         user's username.  (lowercase) k lines can be used in these case
         to reject users based on their ident reply.
-
         This field will be matched against the ident server reply.  It
         is important to note that OTHER replies are prefixed with a
         ``-'' by the ircd, while UNIX replies are not.
@@ -1021,6 +1052,7 @@
         IRC-Network then you would have to talk to the administrator on
         that site to disable his access from that IRCD Server as well.
 
+
      FFoorrmmaatt
 
         X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:
@@ -1047,7 +1079,6 @@
      NNoottee
         You need to compile server with #define XLINE to get this
         functionality.
-
 
 
   44..99..  SSeerrvveerr ccoonnnneeccttiioonnss
@@ -1087,6 +1118,7 @@
      increased).
 
 
+
      FFoorrmmaatt
 
         C:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<TARGET PORT>:<Class>:<Source IP>
@@ -1114,7 +1146,6 @@
         to.  If ``user@'' prefixes the actual hostname or IP address the
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
-
 
      PPaasssswwoorrdd
         The password of the other host.  A password must always be
@@ -1154,7 +1185,6 @@
      NNEEWW!!!!!!
         As of the 2.11.0 version of the server, SSoouurrccee IIPP field has been
         added.
-
   Some examples:
 
   +o  C:nic.funet.fi::nic.funet.fi:6667:1
@@ -1221,7 +1251,6 @@
      This line says: expect a Connection from host ``18.72.0.252'', and
      don't expect login password.  The connecting host should identify
      itself as ``garfield.mit.edu''.
-
      NN  ``N'' corresponds to a server Noconnect option.
 
      TTAARRGGEETT HHoosstt AAddddrr
@@ -1314,6 +1343,7 @@
      SSeerrvveerr NNaammee
         This field is matched against the server name that the server
         wants to auto connect to.
+
      SSeerrvveerr CCllaassss
         This field is used to match against the class to which belong
         the servers for which an autoconnect is set.
@@ -1350,8 +1380,6 @@
 
         H:<Server Mask>:<SID Mask>:<Server Name>::
 
-
-
      SSeerrvveerr MMaasskk
         All servers that are allowed via this H-line must match the mask
         given in this field.
@@ -1380,6 +1408,8 @@
      NNoottee
         It is possible to have and use multiple H-lines (or L-lines) for
         the one server.  eg:
+
+
         H:*.edu:*:*.bu.edu::
         H:*.au:*:*.bu.edu::
 
@@ -1414,8 +1444,6 @@
      FFoorrmmaatt
 
         L:<Server Mask>:*:<Server Name>:<Max Depth>:
-
-
 
      SSeerrvveerr MMaasskk
         Mask of which servers the leaf-like attributes are used on when
@@ -1483,7 +1511,6 @@
         V:*/0209*::::
 
         Disallows any server using the 2.9 protocol to connect.
-
      NNoottee
         It is possible to have and use multiple V-lines for the one
         server mask.
@@ -1577,6 +1604,8 @@
         unallowed command. Services however, are not affected by flood
         control and can be granted special privileges. It is therefore
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
+
+
   44..1166..  BBoouunnccee sseerrvveerr
 
 
@@ -1641,7 +1670,6 @@
         port 6667.
 
 
-
   55..  RReellaatteedd rreessoouurrcceess
 
 
@@ -1677,6 +1705,7 @@
   report it.
 
 
+
   66..11..  HHooww ttoo rreeppoorrtt aa bbuugg
 
   To save everyone time, make sure that your e-mail contains all the
@@ -1703,7 +1732,6 @@
 
      FFiixx
         If you have a fix, don't forget to include it.
-
 
 
   66..22..  WWhheerree ttoo sseenndd aa bbuugg rreeppoorrtt

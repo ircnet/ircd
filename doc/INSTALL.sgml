@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.69 2004/08/31 13:31:11 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.70 2004/09/09 17:20:18 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -27,12 +27,12 @@ to /usr/local
 <tag/--sbindir=DIR/ changes the default directory where the
 system admin executable files will go. It is important to
 set this properly. (default is prefix/sbin)
-<tag/--with-logdir=DIR/ changes the default directory where the
-irc log files will go. (default is prefix/var/log/ircd)
 <tag/--sysconfdir=DIR/ changes the default directory where
 the irc server configuration files will go. (default is prefix/etc)
 <tag/--localstatedir=DIR/ changes the default directory
 where the irc server state files will go. (default is prefix/var)
+<tag/--with-logdir=DIR/ changes the default directory where the
+irc log files will go. (default is localstatedir/log)
 <tag/--with-resconf=FILE/ defines the file to be used by ircd to
 initialize its resolver.  (default is /etc/resolv.conf)
 <tag/--zlib-include=DIR/ specifies in which directory the
@@ -77,7 +77,7 @@ BSD/OS+KAME, Digital Unix, FreeBSD+KAME, Linux, NetBSD+INRIA.
 <p>
 Because IPv6 numeric addresses contain ``:'' characters,
 <bf>the default separator for the server configuration file was
-changed to ``%''</bf>.
+changed to ``%''</bf>. You can adjust it to your needs in config.h file.
 
 <sect>The config.h file
 <p>
@@ -192,13 +192,38 @@ goes will, you can then install it by typing ``make install''.
 <p>
 If you have trouble compiling ircd, copy Makefile.in to
 Makefile and edit Makefile as appropriate.
+<p>
+If everything went fine, the default layout of installed files is
+as follows (note that existing iauth.conf and ircd.motd will not be
+overwritten):
+<verb>
+PREFIX/sbin/ircd
+PREFIX/sbin/iauth
+PREFIX/sbin/chkconf
+PREFIX/sbin/ircd-mkpasswd
+PREFIX/sbin/ircdwatch
+PREFIX/man/man8/ircd.8
+PREFIX/man/man8/iauth.8
+PREFIX/man/man8/ircdwatch.8
+PREFIX/man/man5/iauth.conf.5
+PREFIX/etc/ircd.m4
+PREFIX/etc/ircd.conf.example
+PREFIX/etc/iauth.conf.example
+PREFIX/etc/iauth.conf
+PREFIX/etc/ircd.motd
+PREFIX/var/run/
+PREFIX/var/log/
+</verb>
+Files created by ircd package during normal execution would be ircd.pid, ircd.tune,
+iauth.pid, ircdwatch.pid in PREFIX/var/run/ and ircd.users, ircd.rejects, ircd.auth,
+ircd.opers, ircd.debug, iauth.debug in PREFIX/var/log/.
 
 <sect>The ircd.conf file
 <p>
 After installing the ircd and irc programs, edit the
 ircd.conf file as per the instructions in this section and
 install it in the location you specified in the config.h
-file.  There is a sample conf file called example.conf in
+file.  There is a sample conf file called ircd.conf.example in
 the doc/ directory.
 <p>
 Appendix A (See INSTALL.appendix) describes the differences
@@ -238,12 +263,13 @@ connections).
 <tag/NEW!!!/ As of the 2.11.0 version of the server, if the 
 server has been compiled with #define CONFIG_DIRECTIVE_INCLUDE, you will be
 able to use #include directive in ircd.conf to include files without
-the need of M4.
+the need of M4, also recursively.
 <verb>#include "filename"</verb>
-Note that syntax is very strict, it must be followed to the letter.
+For the command to be recognized, `#' MUST be first character in the line
+and there must be space after "include" word. Quotes around filename are
+optional.
 If filename does not start with slash, ircd config directory is prepended.
-Also note that chkconf will follow such includes, giving however wrong line
-numbers in output.
+Also note that chkconf will follow such includes.
 </descrip>
 
 <sect1>Machine information

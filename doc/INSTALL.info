@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.7 from
-/tmp/linuxdoc-dir-886/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-16586/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.69 2004/08/31 13:31:11 chopin Exp $
+     $Id: INSTALL.info,v 1.70 2004/09/09 17:20:18 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -58,10 +58,6 @@ default behaviour:
      files will go. It is important to set this properly. (default is
      prefix/sbin)
 
-`--with-logdir=DIR'
-     changes the default directory where the irc log files will go.
-     (default is prefix/var/log/ircd)
-
 `--sysconfdir=DIR'
      changes the default directory where the irc server configuration
      files will go. (default is prefix/etc)
@@ -69,6 +65,10 @@ default behaviour:
 `--localstatedir=DIR'
      changes the default directory where the irc server state files
      will go. (default is prefix/var)
+
+`--with-logdir=DIR'
+     changes the default directory where the irc log files will go.
+     (default is localstatedir/log)
 
 `--with-resconf=FILE'
      defines the file to be used by ircd to initialize its resolver.
@@ -131,7 +131,8 @@ This version was tested on the following IPv6 systems: BSD/OS+KAME,
 Digital Unix, FreeBSD+KAME, Linux, NetBSD+INRIA.
 
    Because IPv6 numeric addresses contain ":" characters, `the default
-separator for the server configuration file was changed to "%"'.
+separator for the server configuration file was changed to "%"'. You
+can adjust it to your needs in config.h file.
 
 
 File: INSTALL.info,  Node: The config-h file,  Next: Editing the Makefile and compiling,  Prev: Installing IRC-,  Up: Top
@@ -294,6 +295,19 @@ you can then install it by typing "make install".
    If you have trouble compiling ircd, copy Makefile.in to Makefile and
 edit Makefile as appropriate.
 
+   If everything went fine, the default layout of installed files is as
+follows (note that existing iauth.conf and ircd.motd will not be
+overwritten): PREFIX/sbin/ircd PREFIX/sbin/iauth PREFIX/sbin/chkconf
+PREFIX/sbin/ircd-mkpasswd PREFIX/sbin/ircdwatch PREFIX/man/man8/ircd.8
+PREFIX/man/man8/iauth.8 PREFIX/man/man8/ircdwatch.8
+PREFIX/man/man5/iauth.conf.5 PREFIX/etc/ircd.m4
+PREFIX/etc/ircd.conf.example PREFIX/etc/iauth.conf.example
+PREFIX/etc/iauth.conf PREFIX/etc/ircd.motd PREFIX/var/run/
+PREFIX/var/log/ Files created by ircd package during normal execution
+would be ircd.pid, ircd.tune, iauth.pid, ircdwatch.pid in
+PREFIX/var/run/ and ircd.users, ircd.rejects, ircd.auth, ircd.opers,
+ircd.debug, iauth.debug in PREFIX/var/log/.
+
 
 File: INSTALL.info,  Node: The ircd-conf file,  Next: Related resources,  Prev: Editing the Makefile and compiling,  Up: Top
 
@@ -303,7 +317,7 @@ File: INSTALL.info,  Node: The ircd-conf file,  Next: Related resources,  Prev: 
 After installing the ircd and irc programs, edit the ircd.conf file as
 per the instructions in this section and install it in the location you
 specified in the config.h file.  There is a sample conf file called
-example.conf in the doc/ directory.
+ircd.conf.example in the doc/ directory.
 
    Appendix A (See INSTALL.appendix) describes the differences between
 IP addresses and host names.  If you are unfamiliar with this, you
@@ -353,11 +367,12 @@ connections).
      As of the 2.11.0 version of the server, if the server has been
      compiled with #define CONFIG_DIRECTIVE_INCLUDE, you will be able
      to use #include directive in ircd.conf to include files without
-     the need of M4.  #include "filename" Note that syntax is very
-     strict, it must be followed to the letter.  If filename does not
-     start with slash, ircd config directory is prepended.  Also note
-     that chkconf will follow such includes, giving however wrong line
-     numbers in output.
+     the need of M4, also recursively.  #include "filename" For the
+     command to be recognized, `#' MUST be first character in the line
+     and there must be space after "include" word. Quotes around
+     filename are optional.  If filename does not start with slash,
+     ircd config directory is prepended.  Also note that chkconf will
+     follow such includes.
 
 
 * Menu:
@@ -1778,42 +1793,42 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top126
-Node: Installing IRC-649
-Node: The configure script878
+Node: Top128
+Node: Installing IRC-651
+Node: The configure script880
 Node: Notes for Cygwin32 users3178
 Node: Notes concerning IPv6 support3919
-Node: The config-h file4358
-Node: DEBUGMODE4908
-Node: CHROOTDIR5493
-Node: ENABLE_SUMMON ENABLE_USERS5870
-Node: NO_DEFAULT_INVISIBLE6389
-Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY6738
-Node: ZIP_LINKS ZIP_LEVEL7385
-Node: SLOW_ACCEPT8421
-Node: CLONE_CHECK9059
-Node: Other #define's9430
-Node: Editing the Makefile and compiling9760
-Node: The ircd-conf file10749
-Node: Machine information13178
-Node: Administrative info15801
-Node: Port connections17960
-Node: Connection Classes20117
-Node: Client connections25252
-Node: Operator priviliges31042
-Node: Excluded accounts34352
-Node: X Excluded accounts38273
-Node: Server connections39571
-Node: Deny auto-connections48209
-Node: Hub connections49788
-Node: Leaf connections51286
-Node: Version limitations53380
-Node: Excluded machines55148
-Node: Service connections56463
-Node: Bounce server58067
-Node: Related resources59938
-Node: Reporting a bug60981
-Node: How to report a bug61242
-Node: Where to send a bug report62261
+Node: The config-h file4408
+Node: DEBUGMODE4958
+Node: CHROOTDIR5543
+Node: ENABLE_SUMMON ENABLE_USERS5920
+Node: NO_DEFAULT_INVISIBLE6439
+Node: OPER_KILL OPER_REHASH OPER_RESTART OPER_SET LOCAL_KILL_ONLY6788
+Node: ZIP_LINKS ZIP_LEVEL7435
+Node: SLOW_ACCEPT8471
+Node: CLONE_CHECK9109
+Node: Other #define's9480
+Node: Editing the Makefile and compiling9810
+Node: The ircd-conf file11536
+Node: Machine information14037
+Node: Administrative info16660
+Node: Port connections18819
+Node: Connection Classes20976
+Node: Client connections26111
+Node: Operator priviliges31901
+Node: Excluded accounts35211
+Node: X Excluded accounts39132
+Node: Server connections40430
+Node: Deny auto-connections49068
+Node: Hub connections50647
+Node: Leaf connections52145
+Node: Version limitations54239
+Node: Excluded machines56007
+Node: Service connections57322
+Node: Bounce server58926
+Node: Related resources60797
+Node: Reporting a bug61840
+Node: How to report a bug62101
+Node: Where to send a bug report63120
 
 End Tag Table
