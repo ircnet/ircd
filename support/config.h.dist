@@ -431,6 +431,14 @@
 */
 /* #undef TXT_NOSTATSK "Please use http://example.org/klines instead" */
 
+/*
+** If you have problems with two servers autoconnecting to each other
+** all the time and thus squitting, define this. It will eat a little
+** CPU during AC and it will not allow to try to connect to server that
+** is trying to connect to you.
+*/
+/* #undef DISABLE_DOUBLE_CONNECTS */
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */

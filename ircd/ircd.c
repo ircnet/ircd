@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.140 2004/08/10 23:19:16 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.141 2004/08/12 21:43:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -214,6 +214,7 @@ static	time_t	try_connections(time_t currenttime)
 	aClass	*cltmp;
 	aConfItem *con_conf = NULL;
 	int	allheld = 1;
+	int	i;
 
 	Debug((DEBUG_NOTICE,"Connection check at   : %s",
 		myctime(currenttime)));
@@ -260,6 +261,40 @@ static	time_t	try_connections(time_t currenttime)
 		if (find_denied(aconf->name, Class(cltmp)))
 			continue;
 
+#ifdef DISABLE_DOUBLE_CONNECTS
+		/* Much better would be traversing only unknown
+		** connections, but this requires another global
+		** variable, adding and removing from there in
+		** proper places etc. Some day. --B. */
+		for (i = highest_fd; i >= 0; i--)
+		{
+			if (!(cptr = local[i]) ||
+				cptr->status > STAT_UNKNOWN)
+			{
+				continue;
+			}
+			/* an unknown traveller we have */
+			if (
+#ifndef INET6
+				cptr->ip.s_addr == aconf->ipnum.s_addr
+#else
+				!memcmp(cptr->ip.s6_addr,
+					aconf->ipnum.s6_addr, 16)
+#endif
+			)
+			{
+				/* IP the same. Coincidence? Maybe.
+				** Do not cause havoc with double connect. */
+				break;
+			}
+			cptr = NULL;
+		}
+		if (cptr)
+		{
+			sendto_flag(SCH_SERVER, "AC to %s postponed", aconf->name);
+			continue;
+		}
+#endif
 		/* we have a candidate! */
 
 		/* choose the best. */
