@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.71 2004/02/22 18:21:53 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.72 2004/02/23 19:56:11 jv Exp $";
 #endif
 
 #include "os.h"
@@ -32,8 +32,8 @@ static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.71 2004/02/22 18:21:53 chopin Exp 
 #undef S_MISC_C
 
 static	void	exit_one_client (aClient *, aClient *, aClient *, const char *);
-static	void	exit_server(aClient *cptr, aClient *acptr, const char *comment,
-			const char *comment2);
+static	void	exit_server(aClient *, aClient *, aClient *, const char *,
+			const char *);
 
 
 static	char	*months[] = {
@@ -343,11 +343,12 @@ int	mark_blind_servers (aClient *cptr, aClient *server)
 ** Argument:
 **	cptr: The real server to SQUIT.
 **	acptr: One of the depended servers to SQUIT.
+**	from: Originator of SQUIT.
 **	comment: The original comment for the SQUIT. (Only for cptr itself.)
 **	comment2: The comment for (S)QUIT reasons for the rest.
 */
-static	void	exit_server(aClient *cptr, aClient *acptr, const char *comment,
-			const char *comment2)
+static	void	exit_server(aClient *cptr, aClient *acptr, aClient *from,
+			const char *comment, const char *comment2)
 {
 	aClient	*acptr2;
 	int	flags;
@@ -355,7 +356,7 @@ static	void	exit_server(aClient *cptr, aClient *acptr, const char *comment,
 	/* Remove all the servers recursively. */
 	while (acptr->serv->down)
 	{
-		exit_server(cptr, acptr->serv->down, comment, comment2);
+		exit_server(cptr, acptr->serv->down, from, comment, comment2);
 	}
 	/* Here we should send "Received SQUIT" for last server,
 	** but exit_client() is doing (well, almost) this --Beeth */
@@ -395,7 +396,7 @@ static	void	exit_server(aClient *cptr, aClient *acptr, const char *comment,
 	{
 		sendto_flag(SCH_SERVER,
 			"Received SQUIT %s from %s (%s)", acptr->name,
-			acptr->serv->up->name,
+			acptr == cptr ? from->name : acptr->serv->up->name,
 			acptr == cptr ? comment : comment2);
 	}
 	exit_one_client(cptr->from, acptr, &me,
@@ -522,16 +523,16 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 				buf2[0] = '\0';
 				if (cptr != NULL)
 				{
-					if (IsServer(cptr))
+					if (IsServer(from))
 					{
 						sprintf(buf2, "(by %s(%s))",
-							cptr->name,
-							cptr->serv->sid);
+							from->name,
+							from->serv->sid);
 					}
 					else
 					{
 						sprintf(buf2, "(by %s)",
-							cptr->name);
+							from->name);
 					}
 				}
 				else
@@ -539,8 +540,10 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 					strcpy(buf2, ME);
 				}
 				sendto_one(sptr, ":%s SQUIT %s :Remote: %s %s",
-					   me.serv->sid, sptr->serv->sid,
-					   comment, buf2);
+					me.serv->sid, 
+					ST_UID(sptr) ? sptr->serv->sid
+					: sptr->name,
+					comment, buf2);
 			}
 
 			if (cptr != NULL && sptr != cptr)
@@ -596,7 +599,7 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 			** give the right quit reason for clients. */
 			strncpyzt(comment1, comment, sizeof(comment1));
 		}
-		exit_server(sptr, sptr, comment, comment1);
+		exit_server(sptr, sptr, from, comment, comment1);
 		check_split();
 		if ((cptr == sptr))
 		{
