@@ -218,7 +218,7 @@
 #endif
 
 #if defined(INET6) && defined(CLIENT_COMPILE)
-# if (defined(linux) || defined(__NetBSD__) || defined(__osf__)) && \
+# if (defined(linux) || defined(__NetBSD__) || defined(__FreeBSD__) || defined(__osf__)) && \
 	HAVE_RESOLV_H
 #  include <resolv.h>
 # endif
@@ -729,7 +729,7 @@ static unsigned char minus_one[]={ 255, 255, 255, 255, 255, 255, 255, 255, 255,
 char mydummy[MYDUMMY_SIZE];
 char mydummy2[MYDUMMY_SIZE];
 
-# if defined(linux) || defined(__NetBSD__)
+# if defined(linux) || defined(__NetBSD__) || defined(__FreeBSD__)
 #  ifndef s6_laddr
 #   define s6_laddr        s6_addr32
 #  endif
