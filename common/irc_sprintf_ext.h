@@ -1,53 +1,31 @@
-/************************************************************************
+/*
  *   IRC - Internet Relay Chat, common/irc_sprintf_ext.h
  *   Copyright (C) 2002 Piotr Kucharski
- *
- *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 1, or (at your option)
- *   any later version.
- *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
- *
- *   You should have received a copy of the GNU General Public License
- *   along with this program; if not, write to the Free Software
- *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
 /*  This file contains external definitions for global variables and functions
     defined in common/irc_sprintf.c.
-    $Id: irc_sprintf_ext.h,v 1.3 2002/08/23 16:31:32 chopin Exp $
+    $Id: irc_sprintf_ext.h,v 1.4 2002/08/23 18:46:36 chopin Exp $
  */
 
 /*  External definitions for global functions.
  */
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <strings.h>
+#ifndef IRC_SPRINTF_C
+#define EXTERN extern
+#else /* IRC_SPRINTF_C */
+#define EXTERN
+#endif /* IRC_SPRINTF_C */
 
-/* extern void *memmove(void *s1, const void *s2, size_t n); */
-
-
-#define BUFSIZE 512
+EXTERN int irc_sprintf(aClient *target, char *buf, char *format, ...)
+EXTERN int irc_vsprintf(aClient *target, char *buf, char *format, va_list ap)
 
 #ifdef IRC_SPRINTF_C
-
 #undef IRC_SPRINTF_SNPRINTF
 #undef IRC_SPRINTF_DEBUG
-
 #ifdef IRC_SPRINTF_DEBUG
 # include <assert.h>
 #endif
-
-typedef struct Client aClient;
-struct Client {
-        char name[9];
-        char uid[9];
-};
 
 static const char atoo_tab[128] = {
 '0','0', '0','1', '0','2', '0','3', '0','4', '0','5', '0','6', '0','7',
@@ -337,3 +315,4 @@ static const char atod_tab[4000] = {
 '9','9','5',0, '9','9','6',0, '9','9','7',0, '9','9','8',0, '9','9','9',0
 };
 #endif /* IRC_SPRINTF_C */
+
