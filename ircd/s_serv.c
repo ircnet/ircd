@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.96 2002/04/08 01:58:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.97 2002/04/16 20:53:47 jv Exp $";
 #endif
 
 #include "os.h"
@@ -35,6 +35,7 @@ static	char	buf[BUFSIZE];
 
 static	int	check_link __P((aClient *));
 static	int	get_version __P((char *version, char *id));
+static	void	trace_one __P((aClient *sptr, aClient *acptr));
 const	char	*check_servername_errors[3][2] = {
 	{ "too long", "Bogus servername - too long" },
 	{ "invalid", "Bogus servername - invalid hostname" },
@@ -1980,118 +1981,125 @@ aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
     {
-	int	s_count = 0,	/* server */
-		c_count = 0,	/* client (visible) */
-		u_count = 0,	/* unknown */
-		i_count = 0,	/* invisible client */
-		o_count = 0,	/* oparator */
-		v_count = 0;	/* service */
-	int	m_client = 0,	/* my clients */
-		m_server = 0,	/* my server links */
-		m_service = 0;	/* my services */
-	aClient *acptr;
-
+	int		s_count = 0,	/* server */
+			c_count = 0,	/* client (visible) */
+			u_count = 0,	/* unknown */
+			i_count = 0,	/* invisible client */
+			o_count = 0,	/* operator */
+			v_count = 0;	/* service */
+	int		m_clients = 0,	/* my clients */
+			m_servers = 0,	/* my server links */
+			m_services = 0;	/* my services */
+	
 	if (parc > 2)
+	{
 		if (hunt_server(cptr, sptr, ":%s LUSERS %s :%s", 2, parc, parv)
 		    != HUNTED_ISME)
 			return 3;
+	}
 
-	if (parc == 1 || !MyConnect(sptr))
-	    {
-		sendto_one(sptr, replies[RPL_LUSERCLIENT], ME, BadTo(parv[0]),
-			   istat.is_user[0] + istat.is_user[1],
-			   istat.is_service, istat.is_serv);
-		if (istat.is_oper)
-			sendto_one(sptr, replies[RPL_LUSEROP], ME, BadTo(parv[0]),
-				   istat.is_oper);
-		if (istat.is_unknown > 0)
-			sendto_one(sptr, replies[RPL_LUSERUNKNOWN], ME, BadTo(parv[0]),
-				   istat.is_unknown);
-		if (istat.is_chan)
-			sendto_one(sptr, replies[RPL_LUSERCHANNELS], ME, BadTo(parv[0]),
-				   istat.is_chan);
-		sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]),
-			   istat.is_myclnt, istat.is_myservice,
-			   istat.is_myserv);
-		return 2;
-	    }
-	(void)collapse(parv[1]);
-	for (acptr = client; acptr; acptr = acptr->next)
-	    {
-		if (!IsServer(acptr) && acptr->user)
-		    {
-			if (match(parv[1], acptr->user->server))
-				continue;
-		    }
-		else
-      			if (match(parv[1], acptr->name))
-				continue;
+	if (parc > 1)
+	{
+		(void)collapse(parv[1]);
+	}
 
-		switch (acptr->status)
+	if (parc == 1 || (parv[1][0] == '*' && parv[1][1] == '\0'))
+	{
+		s_count = istat.is_serv;
+		c_count = istat.is_user[0];
+		i_count = istat.is_user[1];
+		u_count = istat.is_unknown;
+		o_count = istat.is_oper;
+		v_count = istat.is_service;
+		m_clients = istat.is_myclnt;
+		m_servers = istat.is_myserv;
+		m_services = istat.is_myservice;
+	}
+	else
+	{	
+		aClient 	*acptr;
+        	aServer 	*asptr;
+		aService 	*svcp;
+		
+		if ((acptr = find_client(parv[1], NULL)) && IsServer(acptr))
 		{
-		case STAT_SERVER:
-			if (MyConnect(acptr))
-				m_server++;
-			/* flow thru */
-		case STAT_ME:
-			s_count++;
-			break;
-		case STAT_SERVICE:
-			if (MyConnect(acptr))
-				m_service++;
-			v_count++;
-			break;
-		case STAT_CLIENT:
-			if (IsOper(acptr))
-				o_count++;
-#ifdef	SHOW_INVISIBLE_LUSERS
-			if (MyConnect(acptr))
-		  		m_client++;
-			if (!IsInvisible(acptr))
-				c_count++;
-			else
-				i_count++;
-#else
-			if (MyConnect(acptr))
-			    {
-				if (IsInvisible(acptr))
-				    {
-					if (IsAnOper(sptr))
-						m_client++;
-				    }
-				else
-					m_client++;
-			    }
-	 		if (!IsInvisible(acptr))
-				c_count++;
-			else
-				i_count++;
-#endif
-			break;
-		default:
-			u_count++;
-			break;
-	 	}
-	     }
-#ifndef	SHOW_INVISIBLE_LUSERS
-	if (IsAnOper(sptr) && i_count)
+			/* LUSERS <server> */
+			s_count = 1;
+			c_count = acptr->serv->usercnt[0];
+			i_count = acptr->serv->usercnt[1];
+			o_count = acptr->serv->usercnt[2];
+			
+			if (IsMe(acptr))
+			{
+				m_clients = istat.is_myclnt;
+				m_servers = istat.is_myserv;
+				m_services = istat.is_myservice;
+				u_count = istat.is_unknown;
+
+			}
+		}
+		else
+		{
+			/* LUSERS <mask> */
+			for (asptr = svrtop; asptr; asptr = asptr->nexts)
+			{
+				if (!match(parv[1], asptr->bcptr->name))
+				{
+					s_count++;
+					
+					c_count += asptr->usercnt[0];
+					i_count += asptr->usercnt[1];
+					o_count += asptr->usercnt[2];
+					
+					if (IsMe(asptr->bcptr))
+					{
+						m_clients = istat.is_myclnt;
+						m_servers = istat.is_myserv;
+						m_services = istat.is_myservice;
+						u_count = istat.is_unknown;
+
+					}
+				}
+			}
+		}
+		/* Count services, but only if we found some matching server
+		 * before (to prevent wrong matches on masks like *irc*).
+		 */
+		if (s_count)
+		{
+			for (svcp = svctop; svcp; svcp = svcp->nexts)
+			{
+				if (!match(parv[1], svcp->servp->bcptr->name))
+				{
+					v_count++;
+				}
+			}
+		}
+	}
+	
+#ifndef SHOW_INVISIBLE_LUSERS
+	if (!IsOper(sptr))
+	{
+		i_count = 0;
+	}
 #endif
 	sendto_one(sptr, replies[RPL_LUSERCLIENT], ME, BadTo(parv[0]),
 		   c_count + i_count, v_count, s_count);
-#ifndef	SHOW_INVISIBLE_LUSERS
-	else
-		sendto_one(sptr, replies[RPL_LUSERCLIENT], ME, BadTo(parv[0]),
-			   c_count, v_count, s_count);
-#endif
 	if (o_count)
-		sendto_one(sptr, replies[RPL_LUSEROP], ME, BadTo(parv[0]), o_count);
-	if (u_count > 0)
-		sendto_one(sptr, replies[RPL_LUSERUNKNOWN], ME, BadTo(parv[0]), u_count);
-	if ((c_count = count_channels(sptr))>0)
-		sendto_one(sptr, replies[RPL_LUSERCHANNELS], ME, BadTo(parv[0]),
-			   count_channels(sptr));
-	sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]), m_client, m_service,
-		   m_server);
+	{
+		sendto_one(sptr, replies[RPL_LUSEROP], ME, BadTo(parv[0]),
+			   o_count);
+	}
+	if (u_count)
+	{
+		sendto_one(sptr, replies[RPL_LUSERUNKNOWN], ME, parv[0],
+			   u_count);
+	}
+	sendto_one(sptr, replies[RPL_LUSERCHANNELS], ME, BadTo(parv[0]),
+		   istat.is_chan);
+	
+	sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]), m_clients,
+		   m_services, m_servers);
 	return 2;
     }
 
@@ -2395,167 +2403,251 @@ char	*parv[];
 }
 #endif
 
+void trace_one(aClient *sptr, aClient *acptr)
+{
+	char *name;
+	int class;
+	char *to;
+
+	to = HasUID(sptr) ? sptr->user->uid : sptr->name;
+	
+	name = get_client_name(acptr, FALSE);
+	class = get_client_class(acptr);
+	
+	switch (acptr->status)
+	{
+                case STAT_CONNECTING:
+                        sendto_one(sptr, replies[RPL_TRACECONNECTING],ME, to,
+				   class, name);
+                        break;
+			
+                case STAT_HANDSHAKE:
+                        sendto_one(sptr, replies[RPL_TRACEHANDSHAKE], ME, to,
+				   class, name);
+                        break;
+			
+                case STAT_ME:
+                        break;
+			
+		case STAT_UNKNOWN:
+			sendto_one(sptr, replies[RPL_TRACEUNKNOWN], ME, to,
+				   to, class, name);
+			break;
+			
+		case STAT_CLIENT:
+			if (IsAnOper(acptr))
+			{
+				sendto_one(sptr, replies[RPL_TRACEOPERATOR], ME,
+					to, class, name);
+			}
+			else
+			{
+				sendto_one(sptr, replies[RPL_TRACEUSER], ME,
+					to, class, name);
+			}
+			break;
+			
+                case STAT_SERVER:
+		{
+			/* we need to count servers/users behind this link */
+			int servers = 0, users = 0;
+			aServer *asptr;
+#ifdef HUB
+                        for (asptr = svrtop; asptr; asptr = asptr->nexts)
+			{
+				if (asptr->bcptr->from == acptr)
+				{
+					servers++;
+					users += asptr->usercnt[0];
+#ifdef SHOW_INVISIBLE_LUSERS
+					users += asptr->usercnt[1];						
+#endif
+				}
+			}
+#else /* !HUB */
+				/* we can have only one server linked */
+				servers = istat.is_serv - 1;
+				users = istat.is_user[0];
+#ifdef SHOW_INVISIBLE_LUSERS
+				users += istat.is_user[1];
+				/* We are counting all remote users,
+				 * therefore we need to substract our own
+				 * users.
+				 */
+				users -= istat.is_myclnt;
+
+#else
+				users -= me.usercnt[0];
+#endif
+#endif /* HUB */
+                        if (acptr->serv->user)
+			{
+                                sendto_one(sptr, replies[RPL_TRACESERVER], ME,
+                                           to, class, servers,
+                                           users, name, acptr->serv->by,
+                                           acptr->serv->user->username,
+                                           acptr->serv->user->host,
+                                           acptr->serv->version,
+                                           (acptr->flags & FLAGS_ZIP) ?
+					   	"z" : "");
+			}
+                        else
+			{
+                                sendto_one(sptr, replies[RPL_TRACESERVER], ME,
+                                           to, class, servers,
+                                           users, name,
+                                           *(acptr->serv->by) ?
+                                           acptr->serv->by : "*", "*", ME,
+                                           acptr->serv->version,
+                                           (acptr->flags & FLAGS_ZIP) ?
+					   	"z" : "");
+			}
+			break;
+		}
+		
+		case STAT_SERVICE:
+                        sendto_one(sptr, replies[RPL_TRACESERVICE], ME, to,
+				   class, name,
+				   acptr->service->type, acptr->service->wants);
+                        break;
+
+                case STAT_LOG:
+                        sendto_one(sptr, replies[RPL_TRACELOG], ME, to, ME,
+                                   acptr->port);
+                        break;
+
+                default: /* ...we actually shouldn't come here... --msa */
+                        sendto_one(sptr, replies[RPL_TRACENEWTYPE], ME, to,
+				   name);
+                        break;
+	}
+}
+
 /*
-** m_trace
-**	parv[0] = sender prefix
-**	parv[1] = servername
-*/
+ * m_trace
+ * 	parv[0] = sender prefix
+ * 	parv[1] = traced nick/server/service
+ */
 int	m_trace(cptr, sptr, parc, parv)
 aClient *cptr, *sptr;
 int	parc;
 char	*parv[];
 {
-	Reg	int	i;
-	Reg	aClient	*acptr;
-	aClass	*cltmp;
-	char	*tname;
-	int	doall, link_s[MAXCONNECTIONS], link_u[MAXCONNECTIONS];
-	int	wilds, dow;
-
-	if (parc > 1)
-		tname = parv[1];
-	else
-		tname = ME;
-
-	switch (hunt_server(cptr, sptr, ":%s TRACE :%s", 1, parc, parv))
-	{
-	case HUNTED_PASS: /* note: gets here only if parv[1] exists */
-	    {
-		aClient	*ac2ptr;
-
-		ac2ptr = next_client(client, parv[1]);
-		sendto_one(sptr, replies[RPL_TRACELINK], ME, BadTo(parv[0]),
-			   version, debugmode, tname, ac2ptr->from->name,
-			   ac2ptr->from->serv->version,
-			   (ac2ptr->from->flags & FLAGS_ZIP) ? "z" : "",
-			   timeofday - ac2ptr->from->firsttime,
-			   (int)DBufLength(&ac2ptr->from->sendQ),
-			   (int)DBufLength(&sptr->from->sendQ));
-		return 5;
-	    }
-	case HUNTED_ISME:
-		break;
-	default:
-		return 1;
-	}
-
-	doall = (parv[1] && (parc > 1)) ? !match(tname, ME): TRUE;
-	wilds = !parv[1] || index(tname, '*') || index(tname, '?');
-	dow = wilds || doall;
-
-	if (doall) {
-		for (i = 0; i < MAXCONNECTIONS; i++)
-			link_s[i] = 0, link_u[i] = 0;
-		for (acptr = client; acptr; acptr = acptr->next)
-#ifdef	SHOW_INVISIBLE_LUSERS
-			if (IsPerson(acptr))
-				link_u[acptr->from->fd]++;
-#else
-			if (IsPerson(acptr) &&
-			    (!IsInvisible(acptr) || IsOper(sptr)))
-				link_u[acptr->from->fd]++;
-#endif
-			else if (IsServer(acptr))
-				link_s[acptr->from->fd]++;
-	}
-
-	/* report all direct connections */
+	aClient *acptr;
+	int maskedserv = 0;
+	int i = 0;
 	
-	for (i = 0; i <= highest_fd; i++)
-	    {
-		char	*name;
-		int	class;
-
-		if (!(acptr = local[i])) /* Local Connection? */
-			continue;
-		if (IsPerson(acptr) && IsInvisible(acptr) && dow &&
-		    !(MyConnect(sptr) && IsAnOper(sptr)) &&
-		    !IsAnOper(acptr) && (acptr != sptr))
-			continue;
-		if (!doall && wilds && match(tname, acptr->name))
-			continue;
-		if (!dow && mycmp(tname, acptr->name))
-			continue;
-		name = get_client_name(acptr,FALSE);
-		class = get_client_class(acptr);
-
-		switch(acptr->status)
+	if (parc > 1)
+	{
+		/* wildcards now allowed only in server/service names */
+		acptr = find_matching_client(parv[1]);
+		if (!acptr)
 		{
-		case STAT_CONNECTING:
-			sendto_one(sptr, replies[RPL_TRACECONNECTING],
-				   ME, BadTo(parv[0]), class, name);
-			break;
-		case STAT_HANDSHAKE:
-			sendto_one(sptr, replies[RPL_TRACEHANDSHAKE], ME, BadTo(parv[0]),
-				   class, name);
-			break;
-		case STAT_ME:
-			break;
-		case STAT_UNKNOWN:
-			if (IsAnOper(sptr) || (MyPerson(sptr) && SendWallops(sptr)))
-				sendto_one(sptr,
-					   replies[RPL_TRACEUNKNOWN], ME, BadTo(parv[0]),
-					   class, name);
-			break;
-		case STAT_CLIENT:
-			/* Only opers see users if there is a wildcard
-			 * but anyone can see all the opers.
-			 */
-			if (IsAnOper(acptr))
-				sendto_one(sptr,
-					   replies[RPL_TRACEOPERATOR], ME, BadTo(parv[0]),
-					   class, name);
-			else if (!dow || (MyConnect(sptr) && IsAnOper(sptr)))
-				sendto_one(sptr,
-					   replies[RPL_TRACEUSER], ME, BadTo(parv[0]),
-					   class, name);
-			break;
-		case STAT_SERVER:
-			if (acptr->serv->user)
-				sendto_one(sptr, replies[RPL_TRACESERVER],
-					   ME, BadTo(parv[0]), class, link_s[i],
-					   link_u[i], name, acptr->serv->by,
-					   acptr->serv->user->username,
-					   acptr->serv->user->host,
-					   acptr->serv->version,
-					   (acptr->flags & FLAGS_ZIP) ?"z":"");
-			else
-				sendto_one(sptr, replies[RPL_TRACESERVER],
-					   ME, BadTo(parv[0]), class, link_s[i],
-					   link_u[i], name,
-					   *(acptr->serv->by) ?
-					   acptr->serv->by : "*", "*", ME,
-					   acptr->serv->version,
-					   (acptr->flags & FLAGS_ZIP) ?"z":"");			break;
-		case STAT_SERVICE:
-			sendto_one(sptr, replies[RPL_TRACESERVICE], ME, BadTo(parv[0]),
-				   class, name, acptr->service->type,
-				   acptr->service->wants);
-			break;
-		case STAT_LOG:
-			sendto_one(sptr, replies[RPL_TRACELOG], ME, BadTo(parv[0]),
-				   ME, acptr->port);
-			break;
-		default: /* ...we actually shouldn't come here... --msa */
-			sendto_one(sptr, replies[RPL_TRACENEWTYPE], ME, BadTo(parv[0]),
-				   name);
-			break;
+			sendto_one(sptr, replies[ERR_NOSUCHSERVER],
+					ME, BadTo(parv[0]), parv[1]);
+			return 1;
 		}
-	    }
+		if (IsServer(acptr))
+		{
+			if (!match(acptr->name, parv[1]))
+			{
+				/* if we are tracing masked server,
+				 * we have to send parv[1], not acptr->name
+				 */
+				maskedserv = 1;
+			}
+		}
+	}
+	else
+	{
+		acptr = &me;
+	}
+	
+	if (!IsMe(acptr))
+	{
+		if (!MyConnect(acptr) || IsServer(acptr))
+		{
+			if (acptr->from == cptr)
+			{	/* eek ?! */
+				return 1;
+			}
+			/* passthru */
+              		sendto_one(sptr, replies[RPL_TRACELINK], ME,
+				   BadTo(parv[0]), version, debugmode,
+				   (maskedserv) ? parv[1] : acptr->name,
+				   acptr->from->name,
+				   acptr->from->serv->version,
+				   (acptr->from->flags & FLAGS_ZIP) ? "z" : "",
+        	               	   timeofday - acptr->from->firsttime,
+                	           (int)DBufLength(&acptr->from->sendQ),
+                        	   (int)DBufLength(&sptr->from->sendQ));
 
-	/*
-	 * Add these lines to summarize the above which can get rather long
-	 * and messy when done remotely - Avalon
-	 */
-	if (IsPerson(sptr) && SendWallops(sptr))
-	    for (cltmp = FirstClass(); doall && cltmp; cltmp = NextClass(cltmp))
-		if (Links(cltmp) > 0)
-			sendto_one(sptr, replies[RPL_TRACECLASS], ME, BadTo(parv[0]),
-				   Class(cltmp), Links(cltmp));
-	sendto_one(sptr, replies[RPL_TRACEEND], ME, BadTo(parv[0]), tname, version,
-		   debugmode);
+			sendto_one(acptr, ":%s TRACE :%s", sptr->name,
+				(maskedserv) ? parv[1] : acptr->name);
+			return 5;
+		}
+		else
+		{
+			/* tracing something local */
+			trace_one(sptr, acptr);	
+		}
+	}
+	else
+	{
+		/* report everything */
+		aClient *a2cptr;
+		
+		for (i = 0; i <= highest_fd; i++)
+		{
+			if (!(a2cptr = local[i]))
+			{
+				continue;
+			}
+			if (IsMe(a2cptr))
+			{
+				continue;
+			}
+			if (IsPerson(a2cptr)
+				&& !(a2cptr == sptr)
+				&& !(IsAnOper(a2cptr)
+				     && !(IsAnOper(sptr) && MyConnect(sptr))
+				    )
+			   )
+			{
+				continue;
+			}
+			if (IsUnknown(a2cptr)
+			    && !((IsAnOper(sptr) || MyClient(sptr))
+				 && SendWallops(sptr)
+				)
+			    )
+			{
+				continue;
+			}
+			trace_one(sptr, a2cptr);	
+		}
+		
+		/* Report Class usage */
+		if (IsPerson(sptr) && SendWallops(sptr))
+		{
+			aClass  *tmp;
+		    	for (tmp = FirstClass(); tmp; tmp = NextClass(tmp))
+		    	{
+				if (Links(tmp) > 0)
+				{
+					sendto_one(sptr,
+						   replies[RPL_TRACECLASS],
+						   ME, BadTo(parv[0]),
+					   	   Class(tmp), Links(tmp));
+				}
+	   		}
+		}
+	}
+	sendto_one(sptr, replies[RPL_TRACEEND], ME, BadTo(parv[0]),
+		   acptr->name, version, debugmode);
+	
 	return 2;
-    }
+}
 
 /*
 ** m_motd
