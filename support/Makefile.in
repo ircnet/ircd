@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.39 1999/03/11 17:31:36 kalt Exp $
+#*   $Id: Makefile.in,v 1.40 1999/04/12 19:45:04 kalt Exp $
 #*
 #*/
 
@@ -157,7 +157,8 @@ SERVER_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
 
 IAUTH_COMMON_OBJS = clsupport.o clmatch.o # This is a little evil
 IAUTH_OBJS = iauth.o a_conf.o a_io.o a_log.o \
-             mod_pipe.o mod_rfc931.o mod_socks.o
+             mod_lhex.o mod_pipe.o mod_rfc931.o mod_socks.o
+IAUTH = iauth
 
 CHKCONF_COMMON_OBJS = match.o
 CHKCONF_OBJS = chkconf.o
@@ -446,6 +447,9 @@ a_io.o: ../iauth/a_io.c config.h setup.h
 a_log.o: ../iauth/a_log.c config.h setup.h
 	$(CC) $(A_CFLAGS) -DIAUTHDBG_PATH="\"$(IAUTHDBG_PATH)\"" -DFNAME_AUTHLOG="\"$(FNAME_AUTHLOG)\"" -c -o $@ ../iauth/a_log.c
 
+mod_lhex.o: ../iauth/mod_lhex.c config.h setup.h
+	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_lhex.c
+
 mod_pipe.o: ../iauth/mod_pipe.c config.h setup.h
 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_pipe.c
 
@@ -467,7 +471,7 @@ mkpasswd.o: ../contrib/mkpasswd/mkpasswd.c
 	$(CC) $(O_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c
 
 tkserv.o: ../contrib/tkserv/tkserv.c tkconf.h
-	$(CC) $(O_CFLAGS)  $(IRCD_FILES) -DTKSERV_LOGFILE="\"$(TKSERV_LOGFILE)\"" -DTKSERV_ACCESSFILE="\"$(TKSERV_ACCESSFILE)\"" -DTKSERV_IRCD_CONF="\"$(TKSERV_IRCD_CONF)\"" -c -o $@ $<
+	$(CC) $(O_CFLAGS)  $(IRCD_FILES) -DTKSERV_LOGFILE="\"$(TKSERV_LOGFILE)\"" -DTKSERV_ACCESSFILE="\"$(TKSERV_ACCESSFILE)\"" -DTKSERV_IRCD_CONF="\"$(TKSERV_IRCD_CONF)\"" -c -o $@ ../contrib/tkserv/tkserv.c
 
 clean:
 	$(RM) $(CLIENT) $(SERVER) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH) $(TKSERV) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c

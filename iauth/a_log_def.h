@@ -26,15 +26,16 @@
 #define	ALOG_FLOG	0x01	/* file log */
 #define	ALOG_IRCD	0x02	/* notice sent to ircd (then sent to &AUTH) */
 
-#define	ALOG_DCONF	0x00100	/* debug: configuration file */
-#define	ALOG_DMISC	0x00200	/* debug: misc stuff */
-#define	ALOG_DIO	0x00400	/* debug: IO stuff */
-#define	ALOG_DSPY	0x01000	/* debug: show ircd stream */
-#define	ALOG_DIRCD	0x02000	/* debug: errors reported by ircd */
+#define	ALOG_DCONF	0x000100	/* debug: configuration file */
+#define	ALOG_DMISC	0x000200	/* debug: misc stuff */
+#define	ALOG_DIO	0x000400	/* debug: IO stuff */
+#define	ALOG_DSPY	0x001000	/* debug: show ircd stream */
+#define	ALOG_DIRCD	0x002000	/* debug: errors reported by ircd */
 
-#define	ALOG_D931	0x10000	/* debug: module rfc931 */
-#define	ALOG_DSOCKS	0x20000	/* debug: module socks */
-#define	ALOG_DSOCKSC	0x40000	/* debug: module socks cache */
-#define	ALOG_DPIPE	0x80000	/* debug: module pipe */
+#define	ALOG_D931	0x010000	/* debug: module rfc931 */
+#define	ALOG_DSOCKS	0x020000	/* debug: module socks */
+#define	ALOG_DSOCKSC	0x040000	/* debug: module socks cache */
+#define	ALOG_DPIPE	0x080000	/* debug: module pipe */
+#define	ALOG_DLHEX	0x100000	/* debug: module pipe */
 
-#define	ALOG_DALL	0xF3700	/* any debug flag */
+#define	ALOG_DALL	0x1F3700	/* any debug flag */

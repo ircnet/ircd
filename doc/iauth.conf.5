@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.11 1999/03/13 23:14:06 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1999/03/13 23:14:06 $"
+.\" @(#)$Id: iauth.conf.5,v 1.12 1999/04/12 19:45:04 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1999/04/12 19:45:04 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -95,12 +95,18 @@ to set the cache lifetime in minutes.  By default, caching is enabled for
 This module is for authentication TCP connections using the protocol
 defined in RFC 1413 (which obsoletes RFC 931).  It is always loaded, and
 does not recognize the "host" nor "ip" fields.
+.TP
+.B lhex
+This module acts as a proxy, communicating with a LHEx server to perform
+authentication of client connections.  It takes a single (mandatory)
+option, which is the IP-address of the LHEx server to use.
 .SH EXAMPLE
 The following file will cause the IRC daemon to reject all connections
 originating from a system where an open proxy is running for hosts within
 *.fr and *.enserb.u-bordeaux.fr but not for other hosts matching
 *.u-bordeaux.fr.  For all connections, an ident lookup (RFC 1413) will be
-performed.
+performed. In addition, every connection is authenticated with the LHEx
+server at IP-address 127.0.0.1.
 
 .RS
 .nf
@@ -111,6 +117,9 @@ module socks
         host = *.fr            
 
 module rfc931
+
+module lhex
+        option = 127.0.0.1
 .fi
 .RE
 .SH CAVEATS

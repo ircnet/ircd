@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.17 1999/03/13 23:14:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.18 1999/04/12 19:45:04 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -84,6 +84,7 @@ char *cfile;
 	Mlist[Mcnt++] = &Module_rfc931;
 	Mlist[Mcnt++] = &Module_socks;
 	Mlist[Mcnt++] = &Module_pipe;
+	Mlist[Mcnt++] = &Module_lhex;
 	Mlist[Mcnt] = NULL;
 
 	cfh = fopen((cfile) ? cfile : IAUTHCONF_PATH, "r");
@@ -404,7 +405,10 @@ char *cfile;
 	return o_all;
 }
 
-/* conf_match: check if an instance is to be applied to a connection */
+/* conf_match: check if an instance is to be applied to a connection
+   Returns -1: no match, and never will
+            0: got a match, doIt[tm]
+	    1: no match, but might be later so ask again */
 int
 conf_match(cl, inst)
 u_int cl;
