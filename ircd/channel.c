@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.132 2002/10/09 21:23:19 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.133 2002/11/11 18:41:45 jv Exp $";
 #endif
 
 #include "os.h"
@@ -3028,6 +3028,7 @@ char	*parv[];
 	{
 		Link *lp;
 		int listedchannels = 0;
+		int maxsendq = 0;
 		
 		if (!sptr->user)
 		{
@@ -3043,6 +3044,14 @@ char	*parv[];
 				LIST_ALIS_NOTE);
 		}
 #endif
+		/* Keep 10% of sendQ free
+		 * Note: Definition of LIST command prevents obtaining
+		 * of complete LIST from remote server, if this
+		 * behaviour is changed, MyConnect() check needs to be added
+		 * here and within following loops as well. - jv
+		 */
+		maxsendq = (int) ((float) get_sendq(sptr) * (float) 0.9);
+		
 		/* First, show all +s/+p channels user is on */
 		for (lp = sptr->user->channel; lp; lp = lp->next)
 		{
@@ -3053,6 +3062,14 @@ char	*parv[];
 					   BadTo(parv[0]), chptr->chname,
 					   chptr->users, chptr->topic);
 				listedchannels++;
+
+				if (DBufLength(&sptr->sendQ) > maxsendq)
+				{
+					sendto_one(sptr,
+						replies[ERR_TOOMANYMATCHES],
+						ME, BadTo(parv[0]), "LIST");
+					goto end_of_list;
+				}
 			}
 		}
 
@@ -3069,10 +3086,20 @@ char	*parv[];
 			sendto_one(sptr, replies[RPL_LIST], ME, BadTo(parv[0]),
 				chptr->chname, chptr->users,
 				chptr->topic);
+
 			listedchannels++;
-			
+
+			if (DBufLength(&sptr->sendQ) > maxsendq)
+			{
+				sendto_one(sptr, replies[ERR_TOOMANYMATCHES],
+					ME, BadTo(parv[0]), "LIST");
+
+				break;
+			}
+		
 		}
 		
+end_of_list:
 #ifdef LIST_ALIS_NOTE
 		/* Send second notice if we listed more than 24 channels
 		 * - usual height of irc client in text mode.
@@ -3123,8 +3150,8 @@ char	*parv[];
 		     }
 	}
 	if (!MyConnect(sptr) && rlen > CHREPLLEN)
-		sendto_one(sptr, replies[ERR_TOOMANYMATCHES], ME, BadTo(parv[0]),
-			   !BadPtr(parv[1]) ? parv[1] : "*");
+		sendto_one(sptr, replies[ERR_TOOMANYMATCHES], ME,
+			   BadTo(parv[0]), "LIST");
 	sendto_one(sptr, replies[RPL_LISTEND], ME, BadTo(parv[0]));
 	return 2;
     }
