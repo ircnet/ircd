@@ -1,3 +1,8 @@
+2004-06-13  Piotr Kucharski
+
+	* channel.c/set_mode(): reset reop time when +r comes from server (or
+	  channel will never get reopped).
+
 2004-06-12  Piotr Kucharski
 
 	* struct_def.h: new enum type ACL.
