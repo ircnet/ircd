@@ -3,6 +3,9 @@
 	* res.c/proc_answer(), get_res(): fix CNAMEs resolving; now we use the
 	  the name that client IP has "IN PTR" to, not the name that "IN A" 
 	  points to client IP (patch from BitKoenig).
+	* list.c/make_conf(): initialize flags to 0L.
+	* struct_def.h, chkconf.c, s_conf.c, s_serv.c: got rid of CONF_RCLIENT
+	  internally -- it's CONF_CLIENT with 'R' flag set.
 
 2004-03-04  Piotr Kucharski
 
