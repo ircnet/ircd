@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.2 1997/04/14 15:04:07 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.3 1997/06/08 23:06:13 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -52,7 +52,7 @@ char	*s;
 **			of separators
 **			argv 9/90
 **
-**	$Id: support.c,v 1.2 1997/04/14 15:04:07 kalt Exp $
+**	$Id: support.c,v 1.3 1997/06/08 23:06:13 kalt Exp $
 */
 
 char *strtoken(save, str, fs)
@@ -106,7 +106,7 @@ char *str, *fs;
 **	strerror - return an appropriate system error string to a given errno
 **
 **		   argv 11/90
-**	$Id: support.c,v 1.2 1997/04/14 15:04:07 kalt Exp $
+**	$Id: support.c,v 1.3 1997/06/08 23:06:13 kalt Exp $
 */
 
 char *strerror(err_no)
@@ -140,7 +140,7 @@ int err_no;
 **			internet number (some ULTRIX don't have this)
 **			argv 11/90).
 **	inet_ntoa --	its broken on some Ultrix/Dynix too. -avalon
-**	$Id: support.c,v 1.2 1997/04/14 15:04:07 kalt Exp $
+**	$Id: support.c,v 1.3 1997/06/08 23:06:13 kalt Exp $
 */
 
 char	*inetntoa(in)
@@ -163,7 +163,7 @@ char	*in;
 /*
 **	inet_netof --	return the net portion of an internet number
 **			argv 11/90
-**	$Id: support.c,v 1.2 1997/04/14 15:04:07 kalt Exp $
+**	$Id: support.c,v 1.3 1997/06/08 23:06:13 kalt Exp $
 **
 */
 
@@ -498,6 +498,7 @@ dgetsreturnbuf:
 	goto dgetsagain;
 }
 
+#ifndef USE_STDARG
 /*
  * By Mika
  */
@@ -582,6 +583,7 @@ char	*i0, *i1, *i2, *i3, *i4, *i5, *i6, *i7, *i8, *i9, *i10, *i11;
 	*wp = '\0';
 	return wp - outp;
 }
+#endif
 
 /*
  * Make 'readable' version string.

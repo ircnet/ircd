@@ -57,17 +57,6 @@
 				     this) */
 
 /*
- * If your host supports varargs and has vsprintf(), vprintf() and vscanf()
- * C calls in its library, then you can define USE_VARARGS to use varargs
- * instead of imitation variable arg passing.
-#undef	USE_VARARGS
- * NOTE: with current server code, varargs doesn't survive because it can't
- *       be used in a chain of 3 or more funtions which all have a variable
- *       number of params.  If anyone has a solution to this, please notify
- *       the maintainer.
- */
-
-/*
  * If you have curses, and wish to use it, then define HAVECURSES. This is the
  * default mode. If you do not have termcap, then undefine HAVETERMCAP. This is
  * the default mode. You can use both HAVECURSES and HAVETERMCAP, but you must

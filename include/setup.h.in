@@ -89,3 +89,6 @@
 
 /* Define if you have bit types defined in system include files */
 #undef HAVE_BIT_TYPES   
+
+/* Define if stdarg.h/vsprintf does what we want them to do */
+#undef USE_STDARG

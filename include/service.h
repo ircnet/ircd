@@ -4,7 +4,11 @@
 
 #ifdef USE_SERVICES
 extern	aService *make_service __P((aClient *));
+#ifndef USE_STDARG
 extern	void	check_services_butone();
+#else
+extern	void	check_services_butone(long, char *, aClient *, char *, ...);
+#endif
 extern	void	check_services_num __P((aClient *, char *));
 #endif
 

@@ -55,7 +55,7 @@ AC_CHECK_FUNC(gettimeofday, AC_DEFINE(HAVE_GETTIMEOFDAY),
 AC_CHECK_FUNC(getrusage, AC_DEFINE(GETRURSASGE_2),
   AC_CHECK_FUNC(times, AC_DEFINE(TIMES_2), ))
 
-echo checking signal implimentation
+echo checking signal implementation
 AC_CHECK_FUNC(sigaction, AC_DEFINE(POSIX_SIGNALS),
   AC_CHECK_FUNC(sigset,
     AC_DEFINE(BSD_RELIABLE_SIGNALS)
@@ -91,6 +91,85 @@ main()
 }
 ],AC_DEFINE(BSD_RELIABLE_SIGNALS) AC_MSG_RESULT(yes), AC_DEFINE(SYSV_UNRELIABLE_SIGNALS) AC_MSG_RESULT(no), :)
 ))
+
+dnl
+dnl check for working stdarg/vsprintf
+dnl
+AC_MSG_CHECKING(for working stdarg/vsprintf)
+AC_TRY_RUN([
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+
+char buf1[256];
+
+int level1(char *data, char *format, va_list ap)
+{
+  return vsprintf(data, format, ap);
+}
+
+int level2(char *data, int rounds, char *format, va_list ap)
+{
+  if(!--rounds)
+    return level1(data, format, ap);
+  else {
+    if(rounds == 2) {
+      va_list ap2 = ap;
+      char *arg = va_arg(ap2, char *);
+      strcpy(buf1, arg);
+    }
+    return level2(data, rounds, format, ap);
+  }
+}
+
+int level3(char *data, char *format, va_list ap)
+{
+  return level2(data, 5, format, ap);
+}
+
+int dotest(int size, char *val, char *data)
+{
+  if(size != strlen(val))
+    return 0;
+  if(strcmp(data, val))
+    return 0;
+  if(strcmp(buf1, "was"))
+    return 0;
+  return 1;
+}
+
+int base(char *val, char *format, ...)
+{
+  int res = 1;
+  char data[256];
+
+  {
+    va_list ap;
+    data[0]=0;
+    va_start(ap, format);
+    res = dotest(level3(data, format, ap), val, data);
+    va_end(ap);
+  }
+
+  {
+    va_list ap;
+    data[0]=0;
+    va_start(ap, format);
+    res = res && dotest(level3(data, format, ap), val, data);
+    va_end(ap);
+  }
+
+  return res;
+}
+
+int main(void)
+{
+  int res = base("toto was here ! 42", "toto %s here ! %d", "was", 42);
+
+  return res ? 0 : 1;
+}
+],AC_DEFINE(USE_STDARG) AC_MSG_RESULT(yes), AC_MSG_RESULT(no), :)
+
 
 dnl
 dnl check for non-blocking fd style available..

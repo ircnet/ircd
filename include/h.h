@@ -24,6 +24,10 @@
  * -avalon
  */
 
+#ifdef USE_STDARG
+#include <stdarg.h>
+#endif
+
 #ifdef CACHED_MOTD
 extern aMotd *motd;
 extern struct tm motd_tm;
@@ -96,7 +100,6 @@ extern	void	get_sockhost __P((aClient *, char *));
 extern	char	*rpl_str __P((int, char *)), *err_str __P((int, char *));
 extern	char	*strerror __P((int));
 extern	int	dgets __P((int, char *, int));
-extern	void	ircsprintf __P(());
 extern	char	*inetntoa __P((char *)), *mystrdup __P((char *));
 
 extern	u_int	dbufalloc, dbufblocks, poolsize;
@@ -141,14 +144,18 @@ extern	void	server_reboot __P(());
 extern	void	terminate __P(()), write_pidfile __P(());
 
 extern	int	send_queued __P((aClient *));
+
+#ifndef USE_STDARG
 /*VARARGS2*/
 extern	int	sendto_one();
 /*VARARGS4*/
 extern	void	sendto_channel_butone();
 /*VARARGS2*/
 extern	void	sendto_serv_butone();
+#ifndef NoV28Links
 /*VARARGS2*/
 extern	void	sendto_serv_v();
+#endif
 /*VARARGS2*/
 extern	void	sendto_common_channels();
 /*VARARGS3*/
@@ -157,14 +164,28 @@ extern	void	sendto_channel_butserv();
 extern	void	sendto_match_servs();
 /*VARARGS5*/
 extern	void	sendto_match_butone();
-/*VARARGS1*/
-extern	void	sendto_ops();
 /*VARARGS3*/
 extern	void	sendto_ops_butone();
 /*VARARGS3*/
 extern	void	sendto_prefix_one();
 /*VARARGS2*/
 extern	void	sendto_flag();
+#else
+extern	int	sendto_one(aClient *, char *, ...);
+extern	int	vsendto_one(aClient *, char *, va_list);
+extern	void	sendto_channel_butone(aClient *, aClient *, aChannel *, char *, ...);
+extern	void	sendto_serv_butone(aClient *, char *, ...);
+#ifndef NoV28Links
+extern	void	sendto_serv_v(aClient *, int, char *, ...);
+#endif
+extern	void	sendto_common_channels(aClient *, char *, ...);
+extern	void	sendto_channel_butserv(aChannel *, aClient *, char *, ...);
+extern	void	sendto_match_servs(aChannel *, aClient	*, char *, ...);
+extern	void	sendto_match_butone(aClient *, aClient *, char *, int, char *, ...);
+extern	void	sendto_ops_butone(aClient *, aClient *, char *, ...);
+extern	void	sendto_prefix_one(aClient *, aClient *, char *, ...);
+extern	void	sendto_flag(u_int, char *, ...);
+#endif
 
 extern	void	setup_svchans __P(());
 
