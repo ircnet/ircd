@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: packet.c,v 1.9 2001/10/20 17:57:21 q Exp $";
+static  char rcsid[] = "@(#)$Id: packet.c,v 1.10 2002/06/01 22:11:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -68,25 +68,10 @@ Reg	int	length;
 #endif
  
 	me.receiveB += length; /* Update bytes received */
-	if (me.receiveB > 1023)
-	    {
-		me.receiveK += (me.receiveB >> 10);
-		me.receiveB &= 0x03ff;
-	    }
 	cptr->receiveB += length;
-	if (cptr->receiveB > 1023)
-	    {
-		cptr->receiveK += (cptr->receiveB >> 10);
-		cptr->receiveB &= 0x03ff;	/* 2^10 = 1024, 3ff = 1023 */
-	    }
 	if (acpt != &me)
 	    {
 		acpt->receiveB += length;
-		if (acpt->receiveB > 1023)
-		    {
-			acpt->receiveK += (acpt->receiveB >> 10);
-			acpt->receiveB &= 0x03ff;
-		    }
 	    }
 
 	bufptr = cptr->buffer;

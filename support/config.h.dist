@@ -242,7 +242,7 @@
  * If you wish to have the server send 'vital' messages about server
  * through syslog, define USE_SYSLOG. Only system errors and events critical
  * to the server are logged although if this is defined with FNAME_USERLOG,
- * syslog() is used instead of the above file. It is not recommended that
+ * syslog() is used additionally to the above file. It is not recommended that
  * this option is used unless you tell the system administrator beforehand
  * and obtain their permission to send messages to the system log files.
  */
@@ -266,6 +266,14 @@
  */
 #define LOG_FACILITY LOG_DAEMON
 #endif /* USE_SYSLOG */
+
+/*
+ * LOG_OLDFORMAT
+ *
+ * Define this if you want old format of logs. (Mind, you will lose
+ * additional information, like remote ip, port, etc.)
+ */
+#undef	LOG_OLDFORMAT
 
 /*
  * define this if you want to use crypted passwords for operators in your

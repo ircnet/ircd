@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.127 2002/05/23 12:39:36 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.128 2002/06/01 22:11:03 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -311,25 +311,6 @@ char	*buffer;
 }
 
 /*
-** ereject_user
-**	extracted from register_user for clarity
-**	early rejection of a user connection, with logging.
-*/
-int
-ereject_user(cptr, shortm, longm)
-aClient *cptr;
-char *shortm, *longm;
-{
-#if defined(FNAME_CONNLOG) || defined(USE_SERVICES) || \
-	(defined(USE_SYSLOG) && defined(SYSLOG_CONN))
-	sendto_flog(cptr, shortm, "<none>",
-		    (IsUnixSocket(cptr)) ? me.sockhost :
-		    ((cptr->hostp) ? cptr->hostp->h_name : cptr->sockhost));
-#endif
-	return exit_client(cptr, cptr, &me, longm);
-}
-
-/*
 ** register_user
 **	This function is called when both NICK and USER messages
 **	have been accepted for the client, in whatever order. Only
@@ -394,8 +375,6 @@ char	*nick, *username;
 		    }
 		if (!DoneXAuth(sptr) && (iauth_options & XOPT_REQUIRED))
 		    {
-			char *reason;
-
 			if (iauth_options & XOPT_NOTIMEOUT)
 			    {
 				count += 1;
@@ -405,13 +384,12 @@ char	*nick, *username;
 	    "iauth may not be running! (refusing new user connections)");
 					last = timeofday;
 				    }
-				reason = "No iauth!";
+				sptr->exitc = EXITC_AUTHFAIL;
 			    }
 			else
-				reason = "iauth t/o";
-			sptr->exitc = EXITC_AUTHFAIL;
-			return ereject_user(cptr, reason,
-					    "Authentication failure!");
+				sptr->exitc = EXITC_AUTHTOUT;
+			return exit_client(cptr, cptr, &me,
+				"Authentication failure! - no iauth?");
 		    }
 		if (timeofday - last > 300 && count)
 		    {
@@ -456,6 +434,7 @@ char	*nick, *username;
 			ircstp->is_ref++;
 			sendto_flag(SCH_LOCAL, "Invalid username:  %s@%s.",
 				lbuf, sptr->sockhost);
+			sptr->exitc = EXITC_REF;
 			return exit_client(cptr, sptr, &me, "Invalid username");
 		}
 #endif
@@ -517,31 +496,30 @@ char	*nick, *username;
 				sendto_flag(SCH_LOCAL,
 					    "Denied connection from %s.",
 					    get_client_host(sptr));
-			return ereject_user(cptr, " Denied  ","Denied access");
+			return exit_client(cptr, cptr, &me, "Denied access");
 		    }
 		if ((i = check_client(sptr)))
 		    {
-			struct msg_set { char *shortm; char *longm; };
+			struct msg_set { char shortm; char *longm; };
 			    
 			static struct msg_set exit_msg[7] = {
-			{ "G u@h max", "Too many user connections (global)" },
-			{ "G IP  max", "Too many host connections (global)" },
-			{ "L u@h max", "Too many user connections (local)" },
-			{ "L IP  max", "Too many host connections (local)" },
-			{ "   max   ", "Too many connections" },
-			{ " No Auth ", "Unauthorized connection" },
-			{ " Failure ", "Connect failure" } };
+			{ EXITC_GUHMAX, "To many user connections (global)" },
+			{ EXITC_GHMAX, "Too many host connections (global)" },
+			{ EXITC_LUHMAX, "Too many user connections (local)" },
+			{ EXITC_LHMAX, "Too many host connections (local)" },
+			{ EXITC_YLINEMAX, "Too many connections" },
+			{ EXITC_NOILINE, "Unauthorized connection" },
+			{ EXITC_UNDEF, "Connect failure" } };
 
 			i += 7;
 			if (i < 0 || i > 6) /* in case.. */
 				i = 6;
 
 			ircstp->is_ref++;
-			sptr->exitc = EXITC_REF;
+			sptr->exitc = exit_msg[i].shortm;
 			sendto_flag(SCH_LOCAL, "%s from %s.",
 				    exit_msg[i].longm, get_client_host(sptr));
-			return ereject_user(cptr, exit_msg[i].shortm,
-					    exit_msg[i].longm);
+			return exit_client(cptr, cptr, &me, exit_msg[i].longm);
 		    }
 #ifndef	NO_PREFIX
 		if (IsRestricted(sptr))
@@ -584,12 +562,7 @@ char	*nick, *username;
 			sendto_flag(SCH_LOCAL, "K-lined %s@%s.",
 				    user->username, sptr->sockhost);
 			ircstp->is_ref++;
-			sptr->exitc = EXITC_REF;
-#if defined(FNAME_CONNLOG) || defined(USE_SERVICES) || \
-	(defined(USE_SYSLOG) && defined(SYSLOG_CONN))
-			sendto_flog(sptr, " K lined ", user->username,
-				    user->host);
-#endif
+			sptr->exitc = EXITC_KLINE;
 			if (reason)
 				sprintf(buf, "K-lined: %.80s", reason);
 			return exit_client(cptr, sptr, &me, (reason) ? buf :
@@ -601,19 +574,12 @@ char	*nick, *username;
 			sendto_flag(SCH_LOCAL, "R-lined %s@%s.",
 				    user->username, sptr->sockhost);
 			ircstp->is_ref++;
-			sptr->exitc = EXITC_REF;
-# if defined(FNAME_CONNLOG) || defined(USE_SERVICES) || \
-	(defined(USE_SYSLOG) && defined(SYSLOG_CONN))
-			sendto_flog(sptr, " R lined ", user->username,
-				    user->host);
-# endif
+			sptr->exitc = EXITC_RLINE;
 			return exit_client(cptr, sptr, &me , "R-lined");
 		    }
 #endif
 		if (oldstatus == STAT_MASTER && MyConnect(sptr))
 			(void)m_oper(&me, sptr, 1, parv);
-/*		*user->tok = '1';
-		user->tok[1] = '\0';*/
 		sp = user->servp;
 	    }
 	else

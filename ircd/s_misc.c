@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.44 2002/04/16 20:51:39 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.45 2002/06/01 22:11:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -472,11 +472,13 @@ char	*comment;	/* Reason for the exit */
 				    sptr->user->host);
 # endif
 		    }
-		else if (sptr->exitc != EXITC_REF && sptr->exitc != EXITC_AREF)
+		else
 		    {
 # if defined(FNAME_CONNLOG) || defined(USE_SERVICES) || \
 	(defined(USE_SYSLOG) && defined(SYSLOG_CONN))
-			sendto_flog(sptr, " Unknown ", "<none>", 
+			sendto_flog(sptr, sptr->exitc ? sptr->exitc :
+				    EXITC_UNDEF, sptr->user && sptr->user->username ?
+				    sptr->user->username : "",
 				    (IsUnixSocket(sptr)) ? me.sockhost :
 				    ((sptr->hostp) ? sptr->hostp->h_name :
 				     sptr->sockhost));
@@ -920,39 +922,15 @@ char	*name;
 		    {
 			sp->is_sbs += acptr->sendB;
 			sp->is_sbr += acptr->receiveB;
-			sp->is_sks += acptr->sendK;
-			sp->is_skr += acptr->receiveK;
 			sp->is_sti += timeofday - acptr->firsttime;
 			sp->is_sv++;
-			if (sp->is_sbs > 1023)
-			    {
-				sp->is_sks += (sp->is_sbs >> 10);
-				sp->is_sbs &= 0x3ff;
-			    }
-			if (sp->is_sbr > 1023)
-			    {
-				sp->is_skr += (sp->is_sbr >> 10);
-				sp->is_sbr &= 0x3ff;
-			    }
 		    }
 		else if (IsClient(acptr))
 		    {
 			sp->is_cbs += acptr->sendB;
 			sp->is_cbr += acptr->receiveB;
-			sp->is_cks += acptr->sendK;
-			sp->is_ckr += acptr->receiveK;
 			sp->is_cti += timeofday - acptr->firsttime;
 			sp->is_cl++;
-			if (sp->is_cbs > 1023)
-			    {
-				sp->is_cks += (sp->is_cbs >> 10);
-				sp->is_cbs &= 0x3ff;
-			    }
-			if (sp->is_cbr > 1023)
-			    {
-				sp->is_ckr += (sp->is_cbr >> 10);
-				sp->is_cbr &= 0x3ff;
-			    }
 		    }
 		else if (IsUnknown(acptr))
 			sp->is_ni++;
@@ -997,12 +975,12 @@ char	*name;
 		   ME, RPL_STATSDEBUG, name);
 	sendto_one(cptr, ":%s %d %s :connected %lu %lu",
 		   ME, RPL_STATSDEBUG, name, sp->is_cl, sp->is_sv);
-	sendto_one(cptr, ":%s %d %s :bytes sent %lu.%luK %lu.%luK",
+	sendto_one(cptr, ":%s %d %s :bytes sent %llu %llu",
 		   ME, RPL_STATSDEBUG, name,
-		   sp->is_cks, sp->is_cbs, sp->is_sks, sp->is_sbs);
-	sendto_one(cptr, ":%s %d %s :bytes recv %lu.%luK %lu.%luK",
+		   sp->is_cbs, sp->is_sbs);
+	sendto_one(cptr, ":%s %d %s :bytes recv %llu %llu",
 		   ME, RPL_STATSDEBUG, name,
-		   sp->is_ckr, sp->is_cbr, sp->is_skr, sp->is_sbr);
+		   sp->is_cbr, sp->is_sbr);
 	sendto_one(cptr, ":%s %d %s :time connected %lu %lu",
 		   ME, RPL_STATSDEBUG, name, sp->is_cti, sp->is_sti);
 #if defined(USE_IAUTH)

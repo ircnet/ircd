@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.55 2002/04/16 20:46:45 jv Exp $
+ *   $Id: struct_def.h,v 1.56 2002/06/01 22:11:01 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -454,11 +454,9 @@ struct Client	{
 	dbuf	sendQ;		/* Outgoing message queue--if socket full */
 	dbuf	recvQ;		/* Hold for data incoming yet to be parsed */
 	long	sendM;		/* Statistics: protocol messages send */
-	long	sendK;		/* Statistics: total k-bytes send */
 	long	receiveM;	/* Statistics: protocol messages received */
-	long	receiveK;	/* Statistics: total k-bytes received */
-	u_short	sendB;		/* counters to count upto 1-k lots of bytes */
-	u_short	receiveB;	/* sent and received. */
+	unsigned long long	sendB;		/* Statistics: total bytes send */
+	unsigned long long	receiveB;	/* Statistics: total bytes received */
 	time_t	lasttime;	/* last time we received data */
 	time_t	firsttime;	/* time client was created */
 	time_t	since;		/* last time we parsed something */
@@ -488,14 +486,10 @@ struct	stats {
 	u_int	is_sv;	/* number of server connections */
 	u_int	is_ni;	/* connection but no idea who it was
 			 * (can be a P: line that has been removed -krys) */
-	u_short	is_cbs;	/* bytes sent to clients */
-	u_short	is_cbr;	/* bytes received to clients */
-	u_short	is_sbs;	/* bytes sent to servers */
-	u_short	is_sbr;	/* bytes received to servers */
-	u_long	is_cks;	/* k-bytes sent to clients */
-	u_long	is_ckr;	/* k-bytes received to clients */
-	u_long	is_sks;	/* k-bytes sent to servers */
-	u_long	is_skr;	/* k-bytes received to servers */
+	unsigned long long	is_cbs;	/* bytes sent to clients */
+	unsigned long long	is_cbr;	/* bytes received to clients */
+	unsigned long long	is_sbs;	/* bytes sent to servers */
+	unsigned long long	is_sbr;	/* bytes received to servers */
 	time_t	is_cti;	/* time spent connected by clients */
 	time_t	is_sti;	/* time spent connected by servers */
 	u_int	is_ac;	/* connections accepted */
@@ -813,12 +807,20 @@ typedef	struct	{
 /* Client exit codes for log file */
 #define EXITC_UNDEF	'-'	/* unregistered client */
 #define EXITC_REG	'0'	/* normal exit */
+#define EXITC_AUTHFAIL	'A'	/* Authentication failure (iauth problem) */
+#define EXITC_AUTHTOUT	'a'	/* Authentication time out */
+#define EXITC_CLONE	'C'	/* CLONE_CHECK */
 #define EXITC_DIE	'd'	/* server died */
 #define EXITC_DEAD	'D'	/* socket died */
 #define EXITC_ERROR	'E'	/* socket error */
 #define EXITC_FLOOD	'F'	/* client flooding */
+#define EXITC_GHMAX	'G'	/* global clients per host max limit */
+#define EXITC_GUHMAX	'g'	/* global clients per user@host max limit */
+#define EXITC_NOILINE	'I'	/* No matching I:line */
 #define EXITC_KLINE	'k'	/* K-lined */
 #define EXITC_KILL	'K'	/* KILLed */
+#define EXITC_LHMAX	'L'	/* local clients per host max limit */
+#define EXITC_LUHMAX	'l'	/* local clients per user@host max limit */
 #define EXITC_MBUF	'M'	/* mem alloc error */
 #define EXITC_PING	'P'	/* ping timeout */
 #define EXITC_SENDQ	'Q'	/* send queue exceeded */
@@ -826,9 +828,8 @@ typedef	struct	{
 #define EXITC_REF	'R'	/* Refused */
 #define EXITC_AREF	'U'	/* Unauthorized by iauth */
 #define EXITC_AREFQ	'u'	/* Unauthorized by iauth, be quiet */
-#define EXITC_AUTHFAIL	'A'	/* Authentication failure (iauth problem) */
-#define EXITC_AUTHTOUT	'a'	/* Authentication time out */
 #define EXITC_VIRUS	'v'	/* joined a channel used by PrettyPark virus */
+#define EXITC_YLINEMAX	'Y'	/* Y:line max clients limit */
 
 /* eXternal authentication slave OPTions */
 #define	XOPT_REQUIRED	0x01	/* require authentication be done by iauth */

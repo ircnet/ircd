@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.46 2002/05/26 20:02:11 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.47 2002/06/01 22:11:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -379,7 +379,8 @@ aClient *to;
 #ifndef CLIENT_COMPILE
 static	anUser	ausr = { NULL, NULL, NULL, NULL, 0, 0, 0, 0, NULL,
 			 0, NULL, NULL,
-			 "anonymous", "0", "anonymous.", "anonymous."};
+			 "anonymous", "0", "anonymous.", "anonymous.",
+			 "127.0.0.0"};
 
 static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 			 &anon, -2, 0, STAT_CLIENT, "anonymous", "anonymous",
@@ -388,9 +389,9 @@ static	aClient	anon = { NULL, NULL, NULL, &ausr, NULL, NULL, 0, 0,/*flags*/
 			 NULL,
 # endif
 			 0, {0, 0, NULL }, {0, 0, NULL },
-			 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, 0, NULL, 0
+			 0, 0, 0L, 0L, 0, 0, 0, NULL, NULL, 0, NULL, 0
 # if defined(__STDC__)	/* hack around union{} initialization	-Vesa */
-			 ,{0}, NULL, "", ""
+			 , {0}, NULL, "", "", EXITC_UNDEF
 # endif
 			};
 #endif
@@ -1514,7 +1515,9 @@ char	*msg, *username, *hostname;
 	** I mean, when you manage to keep ircd
 	** running for almost 12 years ;-) --B.
 	*/
+#ifdef LOG_OLDFORMAT
 	char	buf[12];
+#endif
 	int	logfile;
 
 	logfile = msg ? connlog : userlog;
@@ -1526,6 +1529,7 @@ char	*msg, *username, *hostname;
 		return;
 	}
 #endif
+#ifdef LOG_OLDFORMAT
 	if (!msg)
 	{
 		time_t	duration;
@@ -1545,10 +1549,28 @@ char	*msg, *username, *hostname;
 	(void)sprintf(linebuf,
 		"%s (%s): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
 		myctime(cptr->firsttime), msg ? msg : buf,
-		username, hostname, cptr->auth,
-		cptr->exitc, cptr->sendM, cptr->sendK,
-		cptr->receiveM, cptr->receiveK);
-
+		username[0]?username:"<none>", hostname,
+		cptr->auth ? cptr->auth : "<none>",
+		cptr->exitc, cptr->sendM, cptr->sendB>>10,
+		cptr->receiveM, cptr->receiveB>>10);
+#else
+	/*
+	** This is the content of loglines.
+	** (See? Waving a flag helped! ;-) --Beeth)
+	*/
+	(void)sprintf(linebuf,
+		"%c\t%d\t%d\t%s\t%s\t%s\t%s\t%d\t%s\t%lu\t%llu\t%lu\t%llu\n",
+		cptr->exitc, (u_int) cptr->firsttime, (u_int) timeofday,
+		username, hostname, cptr->auth ? cptr->auth : "",
+		cptr->user ? cptr->user->sip :
+#ifdef INET6
+		inetntop(AF_INET6, (char *)&cptr->ip, mydummy, MYDUMMY_SIZE),
+#else
+		inetntoa((char *)&cptr->ip),
+#endif
+		cptr->port, cptr->acpt ? cptr->acpt->sockhost : "?",
+		cptr->sendM, cptr->sendB, cptr->receiveM, cptr->receiveB);
+#endif /* LOG_OLDFORMAT */
 #if defined(USE_SYSLOG) && (defined(SYSLOG_USERS) || defined(SYSLOG_CONN))
 	if (!msg)
 	{

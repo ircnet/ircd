@@ -1,3 +1,21 @@
+2002-06-01  Piotr Kucharski
+
+	* a_conf.c/conf_err(): exit iauth on config error.
+	* bsd.c, packet.c, struct_def.h, s_bsd.c, s_misc.c, s_serv.c, send.c:
+	  got rid of receiveK and sendK from struct Client, got rid of is_cks,
+	  is_ckr, is_sks, is_skr from struct stats, changed receiveB, sendB
+	  is_cbs, is_cbr, is_sbs, is_sbr to unsigned long long.
+	* list.c/make_client(): add initialization of stats variables.
+	* send.c/sendto_flog(): new log format.
+	* struct_def.h: more EXITC_ codes.
+	* s_user.c, s_user_ext.h: got rid of ereject_user(), use exit_client()
+	  instead.
+	* ircd.c/check_pings(), s_bsd.c/add_connection(),
+	  s_user.c/register_user(): set proper cptr->exitc, use exit_client()
+	  instead of ereject_user(), get rid of duplicating sendto_flog()s.
+	* s_misc.c/exit_client(): log everything from here, use sptr->exitc.
+	* config.h.dist: add LOG_OLDFORMAT define.
+
 2002-05-26  Piotr Kucharski
 
 	* send.c/sendto_flog(): ircd was not honouring SYSLOG_CONN and

@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.86 2002/03/14 02:08:15 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.87 2002/06/01 22:11:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1129,38 +1129,14 @@ aClient *cptr;
 		ircstp->is_sv++;
 		ircstp->is_sbs += cptr->sendB;
 		ircstp->is_sbr += cptr->receiveB;
-		ircstp->is_sks += cptr->sendK;
-		ircstp->is_skr += cptr->receiveK;
 		ircstp->is_sti += timeofday - cptr->firsttime;
-		if (ircstp->is_sbs > 1023)
-		    {
-			ircstp->is_sks += (ircstp->is_sbs >> 10);
-			ircstp->is_sbs &= 0x3ff;
-		    }
-		if (ircstp->is_sbr > 1023)
-		    {
-			ircstp->is_skr += (ircstp->is_sbr >> 10);
-			ircstp->is_sbr &= 0x3ff;
-		    }
 	    }
 	else if (IsClient(cptr))
 	    {
 		ircstp->is_cl++;
 		ircstp->is_cbs += cptr->sendB;
 		ircstp->is_cbr += cptr->receiveB;
-		ircstp->is_cks += cptr->sendK;
-		ircstp->is_ckr += cptr->receiveK;
 		ircstp->is_cti += timeofday - cptr->firsttime;
-		if (ircstp->is_cbs > 1023)
-		    {
-			ircstp->is_cks += (ircstp->is_cbs >> 10);
-			ircstp->is_cbs &= 0x3ff;
-		    }
-		if (ircstp->is_cbr > 1023)
-		    {
-			ircstp->is_ckr += (ircstp->is_cbr >> 10);
-			ircstp->is_cbr &= 0x3ff;
-		    }
 	    }
 	else
 		ircstp->is_ni++;
@@ -1536,7 +1512,7 @@ add_con_refuse:
 		sendto_flag(SCH_LOCAL, "Rejecting connection from %s[%s].",
 			    (acptr->hostp) ? acptr->hostp->h_name : "",
 			    acptr->sockhost);
-		sendto_flog(acptr, " ?Clone? ", "<none>",
+		sendto_flog(acptr, EXITC_CLONE, "",
 			    (acptr->hostp) ? acptr->hostp->h_name :
 			    acptr->sockhost);
 		del_queries((char *)acptr);

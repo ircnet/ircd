@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: bsd.c,v 1.5 2002/04/06 23:37:31 jv Exp $";
+static  char rcsid[] = "@(#)$Id: bsd.c,v 1.6 2002/06/01 22:11:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -161,24 +161,9 @@ char	*str;
 #endif
 		cptr->sendB += retval;
 		me.sendB += retval;
-		if (cptr->sendB > 1023)
-		    {
-			cptr->sendK += (cptr->sendB >> 10);
-			cptr->sendB &= 0x03ff;	/* 2^10 = 1024, 3ff = 1023 */
-		    }
 		if (acpt != &me)
 		    {
 			acpt->sendB += retval;
-			if (acpt->sendB > 1023)
-			    {
-				acpt->sendK += (acpt->sendB >> 10);
-				acpt->sendB &= 0x03ff;
-			    }
-		    }
-		else if (me.sendB > 1023)
-		    {
-			me.sendK += (me.sendB >> 10);
-			me.sendB &= 0x03ff;
 		    }
 	    }
 	return(retval);
