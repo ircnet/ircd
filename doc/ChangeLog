@@ -1,3 +1,7 @@
+2002-11-29  Jakub Vlasek
+
+	* mkpasswd.c, contrib/mkpasswd/README: New version from W. Campbell.
+
 2002-11-25  Jakub Vlasek
 	
 	* s_user.c/m_nick(): Allow user to set his nick to UID by specifying
