@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.33 2003/10/18 17:30:22 q Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.34 2003/10/22 19:10:14 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1288,7 +1288,7 @@ int	m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{'u', "UID", &uidTable, &uidhits, &uidmiss, &uidsize, &_UIDSIZE,
 			hash_uid},
 		{'C', "channel", &channelTable, &chhits, &chmiss, &sidsize,
-			&_CHANNELHASHSIZE, hash_channel_name},
+			&_CHANNELHASHSIZE, NULL},
 		{'s', "server", &serverTable, &unavailable, &unavailable,
 			&svsize, &_SERVERSIZE, NULL },
 		{'S', "SID", &sidTable, &sidhits, &sidmiss, &sidsize, &_SIDSIZE,
@@ -1319,8 +1319,8 @@ int	m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 		sendto_one(sptr, ":%s NOTICE %s: Commands: ",
 				ME, sptr->name);
-		sendto_one(sptr, ":%s NOTICE %s: hash <string> - hashes"
-				"iven string with apropriate hashing function",
+		sendto_one(sptr, ":%s NOTICE %s: hash <string> - hashes given "
+				"string with appropriate hashing function",
 				ME, sptr->name);
 #if defined(DEBUGMODE) || defined(HASHDEBUG)
 		sendto_one(sptr, ":%s NOTICE %s: show <number> - dumps bucket"
@@ -1383,18 +1383,31 @@ int	m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			return 1;
 		}
 #endif
-		/* Hash given string with apropriate hashing function */
+		/* Hash given string with appropriate hashing function */
 		if (!strcasecmp(parv[2], "hash"))
 		{
 			int hval;
-			/* Server hash doesn't have hashfunc */
-			if (!HashTables[shash].hashfunc)
+			
+			/* Server hash doesn't have hashfunc
+			 * Also make an exception for channel hashfunc
+			 * which takes 3 params
+			 */
+			if (!HashTables[shash].hashfunc &&
+				(HashTables[shash].hash != 'C'))
 			{
 				sendto_one(sptr, ":%s NOTICE %s :Hash function"
 						" unavailable", ME, parv[0]);
 				return 2;
 			}
-			hval = HashTables[shash].hashfunc(parv[3], NULL);
+			if (HashTables[shash].hash != 'C')
+			{
+				hval = HashTables[shash].hashfunc(parv[3],
+								  NULL);
+			}
+			else
+			{
+				hval = hash_channel_name(parv[3], NULL, 0);
+			}
 			sendto_one(sptr, ":%s NOTICE %s :Hash value of %s"
 				" using %s hash function is %d ", ME, parv[0],
 				parv[3], HashTables[shash].hashname, hval);
