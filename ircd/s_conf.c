@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.117 2004/06/24 17:26:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.118 2004/06/25 01:42:05 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -259,7 +259,7 @@ long	oline_flags_parse(char *string)
 		switch(*s)
 		{
 		case 'L': tmp |= ACL_LOCOP; break;
-		case 'A': tmp |= ACL_ALL_MASK; break;
+		case 'A': tmp |= (ACL_ALL & ~ACL_LOCOP); break;
 		case 'K': tmp |= ACL_KILL; break;
 		case 'k': tmp |= ACL_KILLLOCAL; break;
 		case 'S': tmp |= ACL_SQUIT; break;
@@ -1630,7 +1630,7 @@ int 	initconf(int opt)
 		{
 			aconf->flags |= oline_flags_parse(tmp3);
 			if (aconf->flags & ACL_LOCOP)
-				aconf->flags &= ACL_LOCOP_MASK;
+				aconf->flags &= ~ACL_ALL_REMOTE;
 #ifdef OPER_KILL
 # ifdef LOCAL_KILL_ONLY
 			aconf->flags &= ~ACL_KILLREMOTE;
