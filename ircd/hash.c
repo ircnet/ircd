@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.40 2004/08/21 21:36:49 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.41 2004/10/01 20:22:14 chopin Exp $";
 #endif
 
 #include "os.h"

@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.29 2004/09/21 22:29:49 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: a_io.c,v 1.30 2004/10/01 20:22:13 chopin Exp $";
 #endif
 
 #include "os.h"

@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.39 2004/08/21 21:36:49 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.40 2004/10/01 20:22:14 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
