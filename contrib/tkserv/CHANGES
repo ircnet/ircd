@@ -29,4 +29,5 @@
           not when accessing TkServ
 1.0.7	: TkServ won't crash anymore if a bad lifetime is given (Tero)
 1.0.8	: A few changes to make TkServ fit better into ircd/contrib.
-1.0.8	: Warning about global distribution removed
+1.0.8	: TkServ now sends out a hint when it receives an unknown cmd
+          (Fusion & viha)

@@ -30,6 +30,9 @@ to the development of TkServ:
   + possibility to explicitly disallow specific hosts from getting tklined
   + leading colons for the /squery commands in the README
 
+- Kristian 'Fusion' Bergmann & 'viha'
+  + Sending out of a hint when an unknown command is received
+
 - 'jbn'
   + expiration of tklines / default expiration
 

@@ -3,7 +3,7 @@
 **
 ** Copyright (c) 1998 Kaspar 'Kasi' Landsberg, <kl@berlin.Snafu.DE> 
 **
-** File     : tkserv.c v1.0.6
+** File     : tkserv.c v1.0.8
 ** Author   : Kaspar 'Kasi' Landsberg, <kl@berlin.Snafu.DE>
 ** Desc.    : Temporary K-line Service.
 **            For further info see the README file.
@@ -606,23 +606,26 @@ void service_squery(char **args)
         sendto_user(TKSERV_ADMIN_OTHER);
     }
 
-     if (!strcasecmp(cmd, "help"))
+    else if (!strcasecmp(cmd, "help"))
         squery_help(args);
 
-    if (!strcasecmp(cmd, "info"))
+    else if (!strcasecmp(cmd, "info"))
     {
         sendto_user("This service is featuring temporary k-lines.");
         sendto_user("It's available at http://www.snafu.de/~kl/tkserv.");
     }
 
-    if (!strcasecmp(cmd, "quit"))
+    else if (!strcasecmp(cmd, "quit"))
         squery_quit(args);
 
-    if (!strcasecmp(cmd, "tkline"))
+    else if (!strcasecmp(cmd, "tkline"))
         squery_tkline(args);
 
-    if (!strcasecmp(cmd, "version"))
+    else if (!strcasecmp(cmd, "version"))
         sendto_user(TKS_VERSION);
+        
+    else
+    	sendto_user("Unknown command. Try HELP.");
 }
 
 /* SQUERY HELP */
@@ -904,6 +907,12 @@ int main(int argc, char *argv[])
         exit(1);
     }
     
+    if (!strcmp(TKSERV_DIST, "*"))
+    {
+        printf("Your service has a global distribution. Please make sure that\n");
+        printf("you read the part about the service distribution in the README.\n");
+    }
+
     sendlog("Welcome to TkServ. Lean back and enjoy the show...");
 
     if ((fd = socket(sock_type, proto_type, 0)) < 0)

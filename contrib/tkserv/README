@@ -72,18 +72,17 @@ B) Editing the configuration file (config.h)
    TKSERV_DESC (a neato description :)
    TKSERV_DIST (the distribution of the service)
 
-|  A few words to the distribution of the service: Don't make it a global
-|  service unless you think you really have to. If all TkServs had a global
-|  distribution, the /servlist would unnecessarily grow. And TkServ is
-|  really not a service which needs to be global. If you want remote
-|  opers/users to be able to access your local TkServ, just give them a
-|  special I: line for that so they can put a 'TkServ client' on your
-|  your server. This has also the advantage that it reduces the
-|  service<->client lag, which might be helpful if your server is lagged
-|  now and then.
-|  On the other side, if your service is global, then other opers may see
-|  that you are running one, ask for access to it and thus making it more
-|  useful.
+|  A few words to the distribution of the service. Here are the pros &
+|  contras of a global TkServ from my point of view:
+|
+|  [contra] It makes the /servlist become unnecessarily big and less handy
+|  [contra] You can detect also local services by /trace'ing a server
+|  [contra] You can access a local TkServ by setting up a special client
+|           on the concerned server (maybe with a special I: line)
+|
+|  [pro]    A global TkServ is more comfortable to use for remote users.
+|  [pro]    If you want to see which server is running one (for e.g. to
+|           request access to it), you do only have to do a /servlist.
 
    TKSERV_PATH (the abs. path to your ircd.conf, no trailing slash please!)
    TKSERV_LOGFILE (the abs. path to your tkserv logfile, no trailing slash)
@@ -93,9 +92,7 @@ B) Editing the configuration file (config.h)
    
 C) Compiling the source
 
-   "gcc -O3 -o tkserv tkserv.c" works fine for me under Linux. =)
-   "gcc -O3 -o tkserv tkserv.c" should also do it under Irix.
-   "gcc -O3 -o tkserv tkserv.c -lsocket -lnsl" should do it under Slowlaris.
+TkServ will be compiled along with the irc server.
 
 D) Setting up the access file: tkserv.access
 
