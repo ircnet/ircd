@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.217 2004/06/27 21:10:26 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.218 2004/06/27 21:14:32 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2003,28 +2003,15 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	/* If request from remote client, let's tame it a little. */
 	if (IsServer(cptr))
 	{
+		/* These stats usually output large quantity of lines. */
 		switch(stat)
 		{
-		/* These stats are available with no penalty for all. */
-		case 'd': case 'D':	/* defines */
-		case 'p': 		/* ping stats */
-		case 'P': 		/* ports listening */
-		case 'q': case 'Q':	/* Q:lines */
-		case 's': case 'S':	/* services */
-		case 'u': case 'U':	/* uptime */
-		case 'v': case 'V':	/* V:lines */
-		case 'l': case 'L':	/* links (wildcard is dropped later) */
-			break;
-		/* These are available with no penalty for opers. */
-		/* Although I have no idea, why only for opers. --B. */
-		case 'o': case 'O':	/* O:lines */
-		case 'c': 		/* C:/N: lines */
-		case 'y': case 'Y': 	/* Y:lines */
-		case 'h': case 'H':	/* H:/D: lines */
-		case 'a': case 'A':	/* iauth conf */
-		case 'b': case 'B':	/* B:lines */
-		case '?': 		/* connected servers */
-		default:
+		case 'i': case 'I':
+		case 'c': case 'C':
+		case 'k': case 'K':
+		case 'm': case 'M':
+		case 't': case 'T':
+		case 'z': case 'Z':
 			if (check_link(sptr))
 			{
 				sendto_one(sptr, replies[RPL_TRYAGAIN], ME,
