@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.3 1997/04/14 20:03:49 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.4 1997/04/21 00:33:11 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -1395,7 +1395,7 @@ int	class;
 
 	for (aconf = conf; aconf; aconf = aconf->next)
 	    {
-		if (aconf->status & CONF_BOUNCE)
+		if (aconf->status != CONF_BOUNCE)
 			continue;
 		/* early rejection, connection class is unknown */
 		if (cptr == NULL && atoi(aconf->host) == -1)
