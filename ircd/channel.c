@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.145 2003/02/16 00:52:40 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.146 2003/04/13 11:34:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1293,8 +1293,8 @@ char	*parv[];
 				tmp_rpl = RPL_EXCEPTLIST;
 				tmp_rpl2 = RPL_ENDOFEXCEPTLIST;
 				tmp_mode = MODE_EXCEPTION;
-			case 'I':
 				break;
+			case 'I':
 				tmp_chfl = CHFL_INVITE;
 				tmp_rpl = RPL_INVITELIST;
 				tmp_rpl2 = RPL_ENDOFINVITELIST;
