@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.106 2001/12/31 03:48:50 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.107 2001/12/31 05:46:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1264,7 +1264,7 @@ char	*parv[];
 	*/
 	acptr = make_client(cptr);
 	add_client_to_list(acptr);
-	acptr->user = make_user(sptr);
+	(void)make_user(acptr);
 	/* more corrrect is this, but we don't yet have ->mask, so...
 	acptr->user->servp = find_server_name(sptr->serv->mask->serv->snum);
 	... just remember to change it one day --Beeth */
