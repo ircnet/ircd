@@ -48,7 +48,7 @@ EXTERN int del_from_client_hash_table __P((char *name, aClient *cptr));
 EXTERN int del_from_uid_hash_table __P((char *uid, aClient *cptr));
 EXTERN int del_from_channel_hash_table __P((char *name, aChannel *chptr));
 EXTERN int del_from_server_hash_table __P((aServer *sptr, aClient *cptr));
-EXTERN int del_from_sid_hash_table __P((char *sid, aClient *cptr));
+EXTERN int del_from_sid_hash_table __P((aServer *sptr, aClient *cptr));
 EXTERN aClient *hash_find_client __P((char *name, aClient *cptr));
 EXTERN aClient *hash_find_uid __P((char *uid, aClient *cptr));
 EXTERN aClient *hash_find_server __P((char *server, aClient *cptr));
