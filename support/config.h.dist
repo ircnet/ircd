@@ -664,7 +664,8 @@
 
 /*
 ** LISTENER_DELAY, if defined, adds an artificial delay between checking
-** listeners for new connections.
+** listeners for new connections. If undefined, it accepts clients faster
+** but the CPU load increases.
 ** LISTENER_MAXACCEPT defines how many clients will be accepted during one
 ** listener check.
 */
@@ -672,6 +673,7 @@
 #define LISTENER_DELAY 2
 #define LISTENER_MAXACCEPT 1
 #else
+#define LISTENER_DELAY 1
 #define LISTENER_MAXACCEPT 10
 #endif
 
