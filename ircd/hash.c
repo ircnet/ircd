@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: hash.c,v 1.22 2002/01/06 02:22:19 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: hash.c,v 1.23 2002/01/06 15:48:06 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -425,7 +425,11 @@ int	new;
 		sidTable = table;
 		for (sptr = svrtop; sptr; sptr = sptr->nexts)
 		{
-			(void)add_to_sid_hash_table(sptr->sid, sptr->bcptr);
+			if (ST_UID(sptr))
+			{
+				(void) add_to_sid_hash_table(sptr->sid,
+					sptr->bcptr);
+			}
 		}
 		MyFree(otab);
 	}
