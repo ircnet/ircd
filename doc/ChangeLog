@@ -1,3 +1,13 @@
+Thu Apr 24 18:51:25 1997  Christophe Kalt
+
+	* send.c: better (faster) sendto_common_channel() (from Chris Behrens).
+
+	* s_serv.c: fixed connected burst for services with hostmasks.
+
+	* s_user.c: fixed origin check in m_pong().
+
+	* res.c: added a check on hostnames. (From Darren Reed)
+
 Sun Apr 20 20:30:21 1997  Christophe Kalt
 
 	* s_conf.c: find_bounce() had an inversed test. (how could it work
