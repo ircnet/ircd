@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.16 1998/08/07 17:22:00 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.17 1998/09/18 22:49:39 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -506,7 +506,7 @@ Reg	aClient	*cptr;
 				break;
 		strncpyzt(system, t, sizeof(system));
 		for (t = ruser; *s && (t < ruser + sizeof(ruser)); s++)
-			if (!isspace(*s) && *s != ':' && *s != '@')
+			if (!isspace(*s) && *s != ':' && *s != '@' && *s !='[')
 				*t++ = *s;
 		*t = '\0';
 		Debug((DEBUG_INFO,"auth reply ok [%s] [%s]", system, ruser));

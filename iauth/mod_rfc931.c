@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.5 1998/08/08 04:30:53 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.6 1998/09/18 22:49:40 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -156,6 +156,7 @@ u_int cl;
 					while (*++chk)
 						if (*chk == ':' ||
 						    *chk == '@' ||
+						    *chk == '[' ||
 						    isspace(*chk))
 							break;
 					if (*chk)
