@@ -3,6 +3,9 @@
 	* s_user.c/m_nick(): fix performance bug introduced in code
 	preventing insidious collisions
 
+	* mod_socks.c/socks_open_proxy(): now reports in logs versions
+	of open proxies found
+
 1999-07-02  Kurt Roeckx
 
 	* configure.in, Makefile.in: Added -I for inet6.
