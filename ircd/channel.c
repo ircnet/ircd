@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.174 2004/02/12 21:22:39 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.175 2004/02/13 02:41:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2329,6 +2329,10 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			clean_channelname(name), s = NULL;
 
 		chptr = get_channel(sptr, name, !CREATE);
+
+		if (chptr && IsMember(sptr, chptr))
+			continue;
+
 		if (MyConnect(sptr) && !(chptr && IsQuiet(chptr)) &&
 			sptr->user->joined >= MAXCHANNELSPERUSER)
 		{
@@ -2349,8 +2353,6 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (!chptr)
 			chptr = get_channel(sptr, name, CREATE);
 
-		if (IsMember(sptr, chptr))
-			continue;
 		if (!chptr ||
 		    (MyConnect(sptr) && (i = can_join(sptr, chptr, key))))
 		    {
