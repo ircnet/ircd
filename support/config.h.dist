@@ -592,4 +592,10 @@
 */
 #define	NOWRITEALARM	1
 
-#define RESTRICT_USERNAMES
+/*
+** Accept only hostnames conforming to RFC1034/1035/1123.
+** Conformance of the internal resolver to RFC1123.
+*/
+#define	RESTRICT_HOSTNAMES
+
+#define	RESTRICT_USERNAMES
