@@ -12,6 +12,10 @@
 	* send.c/initconf(): parse sendq.bsendq in conf.
 	* send.c/send_message(): remove ignoring sendq exceeding during burst
 	  as we now have burst sendq.
+	* s_serv.c, s_serv_ext.h: remove do_emulated_eob().
+	* s_user.c/m_pong(), s_numeric.c/do_numeric(): remove do_emulated_eob()
+	  calls.
+	* s_serv.c/m_server_estab(): don't PING anymore (EOB emulation).
 
 2005-01-30  Piotr Kucharski, Kurt Roeckx
 

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.72 2005/01/30 15:31:34 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.73 2005/01/31 13:14:06 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -459,9 +459,12 @@ links this class will allow from automatic connections (C
 lines).  Using /CONNECT overrides this feature.  Also
 defines the maximum number of users in this class for I/O
 lines per I/O line.
-<tag/SendQ/ This field defines the ``SendQ'' value for this
-class.  If this field is not present, the default (from
-config.h) is assigned.
+<tag/SendQ/ This field defines the ``SendQ'' (data awaiting to be sent
+to the client) value for this class. The format is &lt;x&gt;.&lt;y&gt;
+<itemize>
+<item> x: defines maximum size of sendq, defaults to QUEUELEN if unset.
+<item> y: defines maximum size of sendq during burst, defaults to x if unset.
+</itemize>
 <tag/Local limit/  This field is used to limit the number
 of local concurrent connections.  The format is
 &lt;x&gt;.&lt;y&gt;

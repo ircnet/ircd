@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.7 from
-/tmp/linuxdoc-dir-4751/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-4096/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.72 2005/01/30 15:31:34 chopin Exp $
+     $Id: INSTALL.info,v 1.73 2005/01/31 13:14:06 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -641,8 +641,13 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
      in this class for I/O lines per I/O line.
 
 `SendQ'
-     This field defines the "SendQ" value for this class.  If this
-     field is not present, the default (from config.h) is assigned.
+     This field defines the "SendQ" (data awaiting to be sent to the
+     client) value for this class. The format is <x>.<y>
+        *  x: defines maximum size of sendq, defaults to QUEUELEN if
+          unset.
+
+        *  y: defines maximum size of sendq during burst, defaults to x
+          if unset.
 
 `Local limit'
      This field is used to limit the number of local concurrent
@@ -1813,21 +1818,21 @@ Node: Machine information13951
 Node: Administrative info16574
 Node: Port connections18733
 Node: Connection Classes20890
-Node: Client connections26025
-Node: Operator priviliges31812
-Node: Excluded accounts35122
-Node: X Excluded accounts39043
-Node: Server connections40341
-Node: Deny auto-connections48979
-Node: Hub connections50558
-Node: Leaf connections52056
-Node: Version limitations54150
-Node: Excluded machines55918
-Node: Service connections57233
-Node: Bounce server58837
-Node: Related resources60708
-Node: Reporting a bug61751
-Node: How to report a bug62012
-Node: Where to send a bug report63031
+Node: Client connections26195
+Node: Operator priviliges31982
+Node: Excluded accounts35292
+Node: X Excluded accounts39213
+Node: Server connections40511
+Node: Deny auto-connections49149
+Node: Hub connections50728
+Node: Leaf connections52226
+Node: Version limitations54320
+Node: Excluded machines56088
+Node: Service connections57403
+Node: Bounce server59007
+Node: Related resources60878
+Node: Reporting a bug61921
+Node: How to report a bug62182
+Node: Where to send a bug report63201
 
 End Tag Table

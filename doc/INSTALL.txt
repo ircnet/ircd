@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.72 2005/01/30 15:31:35 chopin Exp $
+  $Id: INSTALL.txt,v 1.73 2005/01/31 13:14:07 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -568,8 +568,14 @@
         users in this class for I/O lines per I/O line.
 
      SSeennddQQ
-        This field defines the ``SendQ'' value for this class.  If this
-        field is not present, the default (from config.h) is assigned.
+        This field defines the ``SendQ'' (data awaiting to be sent to
+        the client) value for this class. The format is <x>.<y>
+
+        +o  x: defines maximum size of sendq, defaults to QUEUELEN if
+           unset.
+
+        +o  y: defines maximum size of sendq during burst, defaults to x
+           if unset.
 
      LLooccaall lliimmiitt
         This field is used to limit the number of local concurrent
@@ -587,7 +593,6 @@
         This field has the same use as the ``Local limit'' field.  But,
         the connection counts are done for all clients present on the
         net instead of only counting local clients.
-
 
      NNoottee
         leaving any of the fields (except SendQ and limits) out means
@@ -655,6 +660,7 @@
         There are clients written in C, GNU Emacs Lisp and many other
         languages.  The ``irc'' program is the C client.  Each person
         that talks via IRC is running their own client.
+
         The ircd.conf files contains entries that specify which clients
         are allowed to connect to your irc daemon.  Obviously you want
         to allow your own machine's clients to connect.  You may want to
@@ -781,7 +787,6 @@
         Allow anyone from anywhere to connect to your server.
 
         I:::*.fi:6667:1
-
         Allow clients from machines matching ``*.fi'' to connect on the
         port 6667.
 
@@ -853,6 +858,7 @@
         IRC know you are who you say you are!  Never tell anyone your
         password and always keep the ``ircd.conf'' file protected from
         all of the other users.
+
      NNiicckknnaammee
         The Nickname you usually go by - but you can make this what you
         want.
@@ -913,7 +919,6 @@
 
         ``L'' flag cannot be overridden by other flags.  If <Flags>
         field is left empty, no privileges will be granted.
-
      EExxaammppllee
         O:orion.cair.du.edu:pyunxc:Jeff::1:A
 
@@ -985,6 +990,7 @@
         opposed to the UNIX type), the reply is not used to set the
         user's username.  (lowercase) k lines can be used in these case
         to reject users based on their ident reply.
+
         This field will be matched against the ident server reply.  It
         is important to note that OTHER replies are prefixed with a
         ``-'' by the ircd, while UNIX replies are not.
@@ -1050,7 +1056,6 @@
         IRC-Network then you would have to talk to the administrator on
         that site to disable his access from that IRCD Server as well.
 
-
      FFoorrmmaatt
 
         X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:
@@ -1111,10 +1116,10 @@
 
   1. to save your server from causing extra load and delays to users
 
+
   2. to save internet from extra network traffic (remember the old rwho
      program with traffic problems when the number of machines
      increased).
-
 
 
      FFoorrmmaatt
@@ -1183,6 +1188,7 @@
      NNEEWW!!!!!!
         As of the 2.11.0 version of the server, SSoouurrccee IIPP field has been
         added.
+
   Some examples:
 
   +o  C:nic.funet.fi::nic.funet.fi:6667:1
@@ -1243,12 +1249,12 @@
      This line says: expect a connection from host ``garfield.mit.edu'',
      and expect a login password of ``golden'', and expect the host to
      identify itself as ``garfield.mit.edu''.
-
      N:18.72.0.252::garfield.mit.edu::
 
      This line says: expect a Connection from host ``18.72.0.252'', and
      don't expect login password.  The connecting host should identify
      itself as ``garfield.mit.edu''.
+
      NN  ``N'' corresponds to a server Noconnect option.
 
      TTAARRGGEETT HHoosstt AAddddrr
@@ -1309,9 +1315,6 @@
         I advise you to not to use wildcard servers before you know for
         sure how they are used, they are mostly beneficial for backbones
         of countries and other large areas with common domain.
-
-
-
   44..1100..  DDeennyy aauuttoo--ccoonnnneeccttiioonnss
 
 
