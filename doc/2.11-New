@@ -3,7 +3,7 @@ Most important changes in 2.11 server grouped by who most benefits from the
 feature or who should look at it more carefully.
 
 All:
-	* Nicknames cannot contain [|]^{\} chars. (This restriction will be
+	* Nicknames cannot contain [|]{\} chars. (This restriction will be
 	  removed in 2.11.1)
 	* Channel names cannot contain {\}~ chars. If used (or from remote),
 	  they will be changed to [|]^ accordingly. (This restriction will be
@@ -39,6 +39,8 @@ Server:
 	* Added new wildcard character '#' matching any digit.
 
 Admin:
+	* Newest autoconf changed localstatedir (where ircd.pid is kept)
+	  from var/run/ to var/ -- make sure you update all scripts.
 	* Ability to specify outgoing IP in C: line.
 	* I:line now requires both addr and name fields to match.
 	* I:line flags
@@ -47,6 +49,7 @@ Admin:
 		I - restricted, when client has no ident.
 		E - client is exempted from K: lines.
 		N - disable resolved hostname to be used.
+		M - disable resolved hostname to be shown.
 		D - restricted, when client has no reverse DNS.
 	* Reject reason sent to client can be specified in iauth.conf.
 	* Client's username and hostname are checked for valid chars.
@@ -62,4 +65,5 @@ Admin:
 	* Stats Z no longer computes real memory statistics unless DEBUGMODE
 	  set.
 	* Stats l/L shows count in Bytes, not kBytes.
+	* SERVICE command changed, it uses SID now.
 
