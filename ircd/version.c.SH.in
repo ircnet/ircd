@@ -51,7 +51,7 @@ cat >version.c <<!SUB!THIS!
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.12 2004/10/01 20:22:16 chopin Exp $";
+static const volatile char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.13 2004/12/28 20:55:12 q Exp $";
 #endif
 
 #include "os.h"
@@ -85,7 +85,7 @@ char *infotext[] =
 	"Thanks to the following people for their work on 2.11:",
 	"",
 	"jv           Jakub Vlasek             jv@pilsedu.cz",
-	"Q            Kurt Roeckx              Q@ping.be",
+	"Q            Kurt Roeckx              kurt@roeckx.be",
 	"",
 	"Thanks to the following people for their work on 2.10:",
 	"",

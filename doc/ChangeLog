@@ -3506,7 +3506,7 @@
 	* s_serv.c: changed m_trace() to only show unknowns to opers and
 	local clients.
 
-	* a_io.c: fd remap processing bugfix (from Q@ping.be).
+	* a_io.c: fd remap processing bugfix (from kurt@roeckx.be).
 
 	* s_bsd.c: fixed ircd/iauth problem with servers ircd connects to.
 

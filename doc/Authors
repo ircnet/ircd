@@ -171,7 +171,7 @@ Various modifications, bugreports, cleanups and testing by:
 
 Helmut Springer <delta@RUS.Uni-Stuttgart.DE>
 Michael 'Eumel' Neumayer <eumel@42.org>
-Kurt Roeckx <Q@ping.be> cleaned up the compression code, among many things
+Kurt Roeckx <kurt@roeckx.be> cleaned up the compression code, among many things
 Roar Thronæs <roart@nvg.ntnu.no> for more IPv6 work
 Piotr Kucharski <chopin@sgh.waw.pl> for his work on the anti socks module
 Michal Svoboda <svobodam@eva.vsp.cz> removed useless anUser linked list
@@ -182,5 +182,5 @@ opinions, and code to IRC.
 The versions 2.11 releases were coordinated by Piotr Kucharski.
 
 Great input came from Jakub Vlasek <jv@pilsedu.cz> and
-Kurt Roeckx <Q@ping.be>.
+Kurt Roeckx <kurt@roeckx.be>.
 For the rest of contributors check ChangeLog.
