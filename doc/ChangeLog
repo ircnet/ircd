@@ -1,3 +1,12 @@
+2004-05-07  Piotr Kucharski
+
+	* configure, configure.in: update to work with autoconf 2.57.
+	* configure, configure.in, setup.h.in, os.h: check for mmap().
+	* s_conf.c, Makefile.in: new function config_read() parsing #include
+	  directive in ircd.conf file without calling m4.
+	* config.h.dist: new define CONFIG_DIRECTIVE_INCLUDE.
+	* s_conf.c/initconf(): use config_read() if defined.
+
 2004-04-18  Jakub Vlasek
 
 	* s_bsd.c/read_message(): Do not check cptrs of delayed listeners.
@@ -5,6 +14,8 @@
 	* s_misc.c/exit_cone_client(): incorrect SQUITs were sent to 2.10 which
 	  resulted in strange remote client quits (looking as if whole net was
 	  breaking apart).
+	* s_misc.c/exit_server(): use from, not &me or else -- otherwise squits
+	  get messed up for 2.10 (after all, that's what from is for, eh?)
 
 2004-04-17  Piotr Kucharski
 
