@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.81 1998/12/14 18:10:26 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.82 1998/12/14 18:12:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -727,9 +727,14 @@ uncommented may just lead to desynchs..
 	if (cptr->serv->version & SV_NMODE)
 	    {
 		if (modebuf[1] || *parabuf)
+		    {
 			/* only needed to help compatibility */
 			sendto_one(cptr, ":%s MODE %s %s %s",
 				   ME, chptr->chname, modebuf, parabuf);
+			*parabuf = '\0';
+			*modebuf = '+';
+			modebuf[1] = '\0';
+		    }
 		send_mode_list(cptr, chptr->chname, chptr->mlist,
 			       CHFL_EXCEPTION, 'e');
 		send_mode_list(cptr, chptr->chname, chptr->mlist,
