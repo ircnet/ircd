@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.67 2003/10/18 15:31:25 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.68 2003/10/18 21:33:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -941,7 +941,15 @@ int	rehash(aClient *cptr, aClient *sptr, int sig)
 #ifdef CACHED_MOTD
 	read_motd(IRCDMOTD_PATH);
 #endif
-	rehashed = 1;
+	if (rehashed == 1)
+	{
+		/* queue another rehash for later */
+		rehashed = 2;
+	}
+	else if (rehashed == 0)
+	{
+		rehashed = 1;
+	}
 	return ret;
 }
 
@@ -1562,9 +1570,11 @@ badlookup:
 	return -1;
 }
 
-int	find_kill(aClient *cptr, int doall, char **comment)
+int	find_kill(aClient *cptr, int timedklines, char **comment)
 {
+#ifdef TIMEDKLINES
 	static char	reply[256];
+#endif
 	char		*host, *ip, *name, *ident, *check;
 	aConfItem	*tmp;
 	int		now = 0;
@@ -1602,12 +1612,16 @@ int	find_kill(aClient *cptr, int doall, char **comment)
             (name ? strlen(name) : 0) > (size_t) HOSTLEN)
 		return (0);
 
+#ifdef TIMEDKLINES
 	*reply = '\0';
+#endif
 
 	for (tmp = kconf; tmp; tmp = tmp->next)
-	    {
-		if (!doall && (BadPtr(tmp->passwd) || !isdigit(*tmp->passwd)))
+	{
+#ifdef TIMEDKLINES
+		if (timedklines && (BadPtr(tmp->passwd) || !isdigit(*tmp->passwd)))
 			continue;
+#endif
 		if (!(tmp->status & (CONF_KILL | CONF_OTHERKILL)))
 			continue; /* should never happen with kconf */
 		if (!tmp->host || !tmp->name)
@@ -1657,7 +1671,7 @@ int	find_kill(aClient *cptr, int doall, char **comment)
 #endif
 			break;
 		    }
-	    }
+	}
 
 	if (tmp && !BadPtr(tmp->passwd))
 	{
@@ -1667,12 +1681,14 @@ int	find_kill(aClient *cptr, int doall, char **comment)
 	{
 		*comment = NULL;
 	}
+#ifdef TIMEDKLINES
 	if (*reply)
 	{
-		/* TIMEDKLINES */
 		sendto_one(cptr, reply, ME, now, cptr->name);
 	}
-	else if (tmp)
+	else
+#endif
+	if (tmp)
 	{
 		sendto_one(cptr, replies[ERR_YOUREBANNEDCREEP], 
 			ME, cptr->name,

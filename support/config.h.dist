@@ -386,6 +386,16 @@
  */
 #define SIXBONE_HACK
 
+/*
+** Servers with many clients and lots of K:lines are having noticable
+** lag after rehash. Define this to the number of clients you want to
+** be checked each time (all clients will eventually be checked, of course).
+** This will lessen the load and eliminate the lag during rehash.
+** Undefine (or define to bigger than MAXCONNECTIONS) to check all clients
+** in one sweep.
+*/
+#define MAXDELAYEDKILLS 200
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
@@ -533,14 +543,6 @@
 #define WHOIS_SIGNON_TIME 1
 
 /*
-** Define this to make server (more) responsive during rehash by not checking
-** all clients at once, only in small amounts. *Extremely* useful for servers
-** having clients times number of klines more than, say, 200000. Without this
-** clients on such servers will get few seconds (sometimes even minutes) lag.
-*/
-#undef DELAYED_KILLS
-
-/*
 ** Split detection
 */
 #define SPLIT_USERS	15000
@@ -617,6 +619,10 @@
 #undef	ZIP_LINKS
 #endif
 
+#ifdef TIMEDKLINES && !defined(TIMEDKLINES)
+#error Define TIMEDKLINES to number of seconds...
+#endif
+
 #if defined(TIMEDKLINES)
 # if (TIMEDKLINES < 60)
 # error TIMEDKLINES must be bigger than 60 seconds
@@ -655,14 +661,6 @@
 ** "New highest local/global clients count" messages
 */
 #define CLCHSEC 300
-
-/* 
-** This controls how many clients will be checked by DelayedKills
-** in one sweep.
-*/
-#ifdef DELAYED_KILLS
-# define MAXDELAYEDKILLS 200
-#endif
 
 #ifndef SPLIT_USERS
 #error SPLIT_USERS must be defined

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.63 2003/10/18 18:40:38 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.64 2003/10/18 21:33:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -30,11 +30,6 @@ static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.63 2003/10/18 18:40:38 q Exp $";
 #define S_MISC_C
 #include "s_externs.h"
 #undef S_MISC_C
-
-#ifdef DELAYED_KILLS
-extern int dk_tocheck;
-extern int dk_lastfd;
-#endif
 
 static	void	exit_one_client (aClient *, aClient *, aClient *, const char *);
 static	void	exit_server(aClient *cptr, aClient *acptr, const char *comment,
@@ -493,10 +488,6 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 			if (IsPerson(sptr))
 			{
 				istat.is_myclnt--;
-#ifdef DELAYED_KILLS
-				if (sptr->fd > dk_lastfd)
-					dk_tocheck--;
-#endif
 			}
 			else if (IsServer(sptr))
 			{

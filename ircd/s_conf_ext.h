@@ -61,7 +61,7 @@ EXTERN aConfItem *find_conf_entry (aConfItem *aconf, u_int mask);
 EXTERN int rehash (aClient *cptr, aClient *sptr, int sig);
 EXTERN int openconf(void);
 EXTERN int initconf (int opt);
-EXTERN int find_kill (aClient *cptr, int doall, char **comment);
+EXTERN int find_kill (aClient *cptr, int timedklines, char **comment);
 EXTERN int find_two_masks (char *name, char *host, int stat);
 EXTERN int find_conf_flags (char *name, char *key, int stat);
 EXTERN int find_restrict (aClient *cptr);
