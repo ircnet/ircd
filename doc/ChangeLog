@@ -1,3 +1,20 @@
+2004-02-19  Piotr Kucharski
+
+	* Makefile.in: when jv rewrote m_hash on 2002/07/04, sums were removed.
+	  no need to munch hash.c anymore.
+	* s_user.c/m_nick(): we were calling add_to_client_hash_table() twice
+	  with UID-nick! Hash tables get corrupted. It was caused by allowing
+	  "NICK 0" during registration and was causing endless loop in hash.
+	* s_user.c/m_unick(): fixed core in checking for collisions (local
+	  unregistered clients have no ->user struct).
+
+2004-02-18  Piotr Kucharski
+
+	* channel.c/m_part(): canonize list of channels first; move comment
+	  out of strtoken loop; allow empty comment, don't force it to be
+	  user nick.
+	* channel.c/m_part(): buffer overflow resulting in network desync.
+
 2004-02-17  Piotr Kucharski
 
 	* s_user.c/m_nick(): do not add to hash table nick of "0".
