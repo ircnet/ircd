@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.182 2004/03/30 13:25:03 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.183 2004/03/30 13:27:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -37,7 +37,7 @@ static	int	check_link (aClient *);
 static	int	get_version (char *, char *);
 static	void	trace_one (aClient *, aClient *);
 static	void	report_listeners(aClient *, char *);
-static	void	report_class(aClient *, char *);
+static	void	report_class_usage(aClient *, char *);
 const	char	*check_servername_errors[3][2] = {
 	{ "too long", "Bogus servername - too long" },
 	{ "invalid", "Bogus servername - invalid hostname" },
@@ -2124,7 +2124,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		report_configured_links(cptr, parv[0], CONF_BOUNCE);
 		break;
 	case 'C': /* class usage stats */
-		report_class(cptr, BadTo(parv[0]));
+		report_class_usage(cptr, BadTo(parv[0]));
 		break;
 	case 'c': /* C and N conf lines */
 		report_configured_links(cptr, parv[0], CONF_CONNECT_SERVER|
@@ -3776,7 +3776,7 @@ static void report_listeners(aClient *sptr, char *to)
 }
 
 /* Reports class usage */
-static void report_class(aClient *sptr, char *to)
+static void report_class_usage(aClient *sptr, char *to)
 {
 	aClass  *tmp;
 
