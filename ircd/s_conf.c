@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.52 2002/05/20 00:10:28 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.53 2002/06/02 00:45:55 jv Exp $";
 #endif
 
 #include "os.h"
@@ -357,10 +357,12 @@ aClient *cptr;
 		    ConfMaxLinks(aconf) > 0)
 			return -3;    /* Use this for printing error message */
 	    }
-	if ((aconf->status & (CONF_CLIENT | CONF_RCLIENT)))
-	    {
-		int	hcnt = 0, ucnt = 0;
 
+	if ((aconf->status & (CONF_CLIENT | CONF_RCLIENT)))
+	{
+		int hcnt = 0, ucnt = 0;
+		int ghcnt = 0, gucnt = 0;
+		anUser *user = NULL;
 		/* check on local/global limits per host and per user@host */
 
 		/*
@@ -368,60 +370,60 @@ aClient *cptr;
 		**	host check is done on the IP address.
 		**	user check is done on the IDENT reply.
 		*/
-		if (ConfMaxHLocal(aconf) > 0 || ConfMaxUHLocal(aconf) > 0) {
-			Reg     aClient *acptr;
-			Reg     int     i;
-
-			for (i = highest_fd; i >= 0; i--)
-				if ((acptr = local[i]) && (cptr != acptr) &&
-				    !IsListening(acptr) &&
-				    !bcmp((char *)&cptr->ip,(char *)&acptr->ip,
-					  sizeof(cptr->ip)))
-				    {
-					hcnt++;
-					if (!strncasecmp(acptr->auth,
-							 cptr->auth, USERLEN))
-						ucnt++;
-				    }
-			if (ConfMaxHLocal(aconf) > 0 &&
-			    hcnt >= ConfMaxHLocal(aconf))
-				return -4;	/* for error message */
-			if (ConfMaxUHLocal(aconf) > 0 &&
-			    ucnt >= ConfMaxUHLocal(aconf))
-				return -5;      /* for error message */
-		}
-		/*
-		** Global limits
-		**	host check is done on the hostname (IP if unresolved)
-		**	user check is done on username
-		*/
-		if (ConfMaxHGlobal(aconf) > 0 || ConfMaxUHGlobal(aconf) > 0)
-		    {
-			Reg     aClient *acptr;
-			Reg     int     ghcnt = hcnt, gucnt = ucnt;
-
-			for (acptr = client; acptr; acptr = acptr->next)
-			    {
-				if (!IsPerson(acptr))
-					continue;
-				if (MyConnect(acptr) &&
-				    (ConfMaxHLocal(aconf) > 0 ||
-				     ConfMaxUHLocal(aconf) > 0))
-					continue;
-				if (!strcmp(cptr->sockhost, acptr->user->host))
-				    {
-					if (ConfMaxHGlobal(aconf) > 0 &&
-					    ++ghcnt >= ConfMaxHGlobal(aconf))
-						return -6;
+		if (ConfMaxHLocal(aconf) > 0 || ConfMaxUHLocal(aconf) > 0 ||
+		    ConfMaxHGlobal(aconf) > 0 || ConfMaxUHGlobal(aconf) > 0 )
+		{
+			for ((user = hash_find_hostname(cptr->sockhost, NULL));
+			     user; user = user->hhnext)
+			{
+				if (!mycmp(cptr->sockhost, user->host))
+				{
+					ghcnt++;
+					if (MyConnect(user->bcptr))
+					{
+						hcnt++;
+						if (!mycmp(user->bcptr->auth,
+							   cptr->auth))
+						{
+							ucnt++;
+							gucnt++;
+						}
+					}
+					else
+					{
+						if (!mycmp(user->username,
+							   cptr->user->username
+							   ))
+						{
+							gucnt++;
+						}
+					}
+					if (ConfMaxUHLocal(aconf) > 0 &&
+					    ucnt >= ConfMaxUHLocal(aconf))
+					{
+						return -5;
+					}
+	
+					if (ConfMaxHLocal(aconf) > 0 &&
+					    hcnt >= ConfMaxHLocal(aconf))
+					{
+						return -4;
+					}
 					if (ConfMaxUHGlobal(aconf) > 0 &&
-					    !strcmp(cptr->user->username,
-						    acptr->user->username) &&
-					    (++gucnt >=ConfMaxUHGlobal(aconf)))
+					    gucnt >= ConfMaxUHGlobal(aconf))
+					{
 						return -7;
-				    }
-			    }
-		    }
-	    }
+					}
+					if (ConfMaxHGlobal(aconf) > 0 &&
+					     ghcnt >= ConfMaxHGlobal(aconf))
+					{
+						return -6;
+					}
+				}
+			}
+		}
+	}
+
 
 	lp = make_link();
 	istat.is_conflink++;
