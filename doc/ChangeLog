@@ -1,3 +1,7 @@
+1999-08-31  Kurt Roeckx
+
+	* s_user.c/m_kill: acptr wasn't initialised
+
 1999-06-??  Christophe Kalt
 
 	* hash_ext.h, msg_def.h, numeric_def.h, parse_ext.h, struct_def.h,
