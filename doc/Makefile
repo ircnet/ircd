@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile,v 1.2 1997/04/14 15:40:22 kalt Exp $
+#*   $Id: Makefile,v 1.3 1997/08/08 14:44:13 kalt Exp $
 #*
 #*/
 
@@ -24,9 +24,14 @@ MANDIR=/usr/local/man
 
 all:
 
-sgml: INSTALL.sgml
+sgml: service doc
+
+doc: INSTALL.sgml
 	sgml2txt INSTALL.sgml
 	sgml2info INSTALL.sgml
+
+service: SERVICE.sgml
+	sgml2txt SERVICE.sgml
 
 install: all
 	-${INSTALL} -c -m 644 ircd.8 ${MANDIR}/man8
