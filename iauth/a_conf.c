@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.27 2004/09/13 01:17:18 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.28 2004/09/20 16:14:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -358,6 +358,17 @@ char	*conf_read(char *cfile)
 					(*last)->timeout = local_timeout;
 					continue;
 				    }
+				else if (!strncmp(buffer+1, "port = ", 7))
+				    {
+					u_int local_port;
+					if (sscanf(buffer+1, "port = %u",
+						   &local_port) != 1)
+						conf_err(lnnb,
+							 "Invalid setting.",
+							 cfile);
+					(*last)->port = local_port;
+					continue;
+				    }
 				else
 				    {
 					conf_err(lnnb, "Invalid keyword.",
@@ -384,6 +395,11 @@ char	*conf_read(char *cfile)
 				    }
 				(*ttmp)->nextt = NULL;
 			    }
+			if ((*last)->port == 0 &&
+				Mlist[i] == &Module_socks)
+			{
+				conf_err(lnnb, "port here is mandatory.", cfile);
+			}
 
 			last = &((*last)->nexti);
 		    }
