@@ -1,3 +1,15 @@
+2004-03-07  Piotr Kucharski
+
+	* class.c/get_sendq(): check also for NULL ->nline.
+	* s_conf.c/attach_Iline(): make a case for UNIXPORT or else we need
+	  "match any" I:line.
+	* list.c/make_server(): check and eventually quit earlier, without
+	  MyMalloc()ing.
+	* struct_def.h, send.c, ircd.c, list.c, s_bsd.c, s_conf.c, s_serv.c,
+	  s_service.c: changed cptr->name to pointer, added namebuf[]s of
+	  proper sizes to cptr, cptr->serv and cptr->service; this saves us
+	  in memory (HOSTLEN-NICKLEN) bytes per each client (5MB on IRCnet).
+
 2004-03-05  Piotr Kucharski
 
 	* res.c/proc_answer(), get_res(): fix CNAMEs resolving; now we use the
