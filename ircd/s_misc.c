@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.21 1998/05/25 20:44:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.22 1998/08/02 17:29:30 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -812,16 +812,6 @@ char	*comment;
 #endif
 						 is_chan_op(sptr, lp->value.chptr))
 						lp->value.chptr->history = timeofday + DELAYCHASETIMELIMIT;
-				/*
-				 * if a chanop leaves (no matter how), record
-				 * the time to be able to later massreop if
-				 * necessary.
-				 */
-/*
-				if (*lp->value.chptr->chname == '-' &&
-				    is_chan_op(sptr, lp->value.chptr))
-					lp->value.chptr->massop = timeofday + LDELAYCHASETIMELIMIT;
-*/
 				remove_user_from_channel(sptr,lp->value.chptr);
 			    }
 

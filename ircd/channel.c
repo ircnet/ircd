@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.48 1998/07/19 21:52:27 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.49 1998/08/02 17:29:29 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -365,6 +365,15 @@ aChannel *chptr;
 	for (curr = &chptr->members; (tmp = *curr); curr = &tmp->next)
 		if (tmp->value.cptr == sptr)
 		    {
+			/*
+			 * if a chanop leaves (no matter how), record
+			 * the time to be able to later massreop if
+			 * necessary.
+			 */
+			if (*chptr->chname == '!' &&
+			    (tmp->flags & (CHFL_CHANOP | CHFL_UNIQOP)))
+				chptr->reop = timeofday + LDELAYCHASETIMELIMIT;
+
 			*curr = tmp->next;
 			free_link(tmp);
 			break;
@@ -439,15 +448,17 @@ aClient *cptr;
 aChannel *chptr;
 {
 	Reg	Link	*lp;
+	int	chanop = 0;
 
 	if (MyConnect(cptr) && IsPerson(cptr) && IsRestricted(cptr) &&
 	    *chptr->chname != '&')
 		return 0;
 	if (chptr)
 		if ((lp = find_user_link(chptr->members, cptr)))
-			return (lp->flags & (CHFL_CHANOP | CHFL_UNIQOP));
-
-	return 0;
+			chanop = (lp->flags & (CHFL_CHANOP | CHFL_UNIQOP));
+	if (chanop)
+		chptr->reop = 0;
+	return chanop;
 }
 
 int	has_voice(cptr, chptr)
@@ -585,6 +596,8 @@ aChannel *chptr;
 		*mbuf++ = 'a';
 	if (chptr->mode.mode & MODE_QUIET)
 		*mbuf++ = 'q';
+	if (chptr->mode.mode & MODE_REOP)
+		*mbuf++ = 'r';
 	if (chptr->mode.limit)
 	    {
 		*mbuf++ = 'l';
@@ -884,7 +897,8 @@ char	*parv[], *mbuf, *pbuf;
 				MODE_PRIVATE,    'p', MODE_SECRET,     's',
 				MODE_MODERATED,  'm', MODE_NOPRIVMSGS, 'n',
 				MODE_TOPICLIMIT, 't', MODE_INVITEONLY, 'i',
-				MODE_ANONYMOUS,  'a', 0x0, 0x0 };
+				MODE_ANONYMOUS,  'a', MODE_REOP,       'r',
+				0x0, 0x0 };
 
 	Reg	Link	*lp = NULL;
 	Reg	char	*curr = parv[0], *cp = NULL;
@@ -1270,6 +1284,12 @@ char	*parv[], *mbuf, *pbuf;
 					sendto_one(sptr,
 					   err_str(ERR_CHANOPRIVSNEEDED,
 						   parv[0]), chptr->chname);
+				else if (*ip == MODE_REOP && !IsServer(sptr) &&
+					 !(is_chan_op(sptr,chptr)&CHFL_UNIQOP))
+					/* MODE_REOP is restricted to UNIQOP */
+					sendto_one(sptr,
+					   err_str(ERR_CHANOPRIVSNEEDED,
+						   parv[0]), chptr->chname);
 				else if (!(*ip == MODE_ANONYMOUS &&
 					   whatt == MODE_ADD &&
 					   !IsServer(sptr) &&
@@ -1507,8 +1527,11 @@ char	*parv[], *mbuf, *pbuf;
 					break;
 				mode->limit = nusers;
 				break;
+			case MODE_CHANOP : /* fall through case */
+				if (ischop && lp->value.cptr == sptr &&
+				    lp->flags == MODE_CHANOP|MODE_DEL)
+					chptr->reop = timeofday + LDELAYCHASETIMELIMIT;
 			case MODE_UNIQOP :
-			case MODE_CHANOP :
 			case MODE_VOICE :
 				*mbuf++ = c;
 				(void)strcat(pbuf, cp);
@@ -2941,6 +2964,110 @@ aClient	*cptr, *user;
 	return;
 }
 
+#define CHECKFREQ	300
+/* consider reoping an opless !channel */
+static int
+reop_channel(now, chptr)
+time_t now;
+aChannel *chptr;
+{
+    Link *lp, op;
+
+    op.value.chptr = NULL;
+    if (chptr->users <= 5 && (now - chptr->history > DELAYCHASETIMELIMIT))
+	{
+	    /* few users, no recent split: this is really a small channel */
+	    char mbuf[4], nbuf[3*(NICKLEN+1)+1];
+	    int cnt;
+	    
+	    lp = chptr->members;
+	    while (lp)
+		{
+		    if (lp->flags & (CHFL_CHANOP | CHFL_UNIQOP))
+			{
+			    chptr->reop = 0;
+			    return 0;
+			}
+		    if (!MyConnect(lp->value.cptr))
+			    continue;
+		    op.value.cptr = lp->value.cptr;
+		    lp = lp->next;
+		}
+	    if (op.value.cptr == NULL &&
+		((now - chptr->reop) < LDELAYCHASETIMELIMIT))
+		    /*
+		    ** do nothing if no local users, 
+		    ** unless the reop is really overdue.
+		    */
+		    return 0;
+	    sendto_channel_butserv(chptr, &me,
+			   ":%s NOTICE %s :Enforcing channel mode +r (%d)",
+				   ME, chptr->chname, now - chptr->reop);
+	    op.flags = MODE_ADD|MODE_CHANOP;
+	    lp = chptr->members;
+	    cnt = 3;
+	    while (lp)
+		{
+		    if (cnt == 3)
+			{
+			    mbuf[cnt] = '\0';
+			    if (lp != chptr->members)
+				    sendto_channel_butserv(chptr, &me,
+						   ":%s MODE %s +%s %s",
+							   ME, chptr->chname,
+							   mbuf, nbuf);
+			    cnt = 0;
+			    mbuf[0] = nbuf[0] = '\0';
+			}
+		    op.value.cptr = lp->value.cptr;
+		    change_chan_flag(&op, chptr);
+		    mbuf[cnt++] = 'o';
+		    strcat(nbuf, lp->value.cptr->name);
+		    strcat(nbuf, " ");
+		    lp = lp->next;
+		}
+	    if (cnt)
+		{
+		    mbuf[cnt] = '\0';
+		    sendto_channel_butserv(chptr, &me, ":%s MODE %s +%s %s",
+					   ME, chptr->chname, mbuf, nbuf);
+		}
+	}
+    else
+	{
+	    time_t idlelimit = now - 
+		    MIN((LDELAYCHASETIMELIMIT/2), (2*CHECKFREQ));
+
+	    lp = chptr->members;
+	    while (lp)
+		{
+		    if (lp->flags & (CHFL_CHANOP | CHFL_UNIQOP))
+			{
+			    chptr->reop = 0;
+			    return 0;
+			}
+		    if (!MyConnect(lp->value.cptr))
+			    continue;
+		    if (lp->value.cptr->user->last > idlelimit &&
+			(op.value.cptr == NULL ||
+			 lp->value.cptr->user->last>op.value.cptr->user->last))
+			    op.value.cptr = lp->value.cptr;
+		    lp = lp->next;
+		}
+	    if (op.value.cptr == NULL)
+		    return 0;
+	    sendto_channel_butserv(chptr, &me,
+			   ":%s NOTICE %s :Enforcing channel mode +r (%d)", ME,
+					   chptr->chname, now - chptr->reop);
+	    op.flags = MODE_ADD|MODE_CHANOP;
+	    change_chan_flag(&op, chptr);
+	    sendto_channel_butserv(chptr, &me, ":%s MODE %s +o %s",
+				   ME, chptr->chname, op.value.cptr->name);
+	}
+    chptr->reop = 0;
+    return 1;
+}
+
 /*
  * Cleanup locked channels, run frequently.
  *
@@ -2958,12 +3085,11 @@ time_t	now;
 	static	u_int	max_nb = 0; /* maximum of live channels */
 	static	u_char	split = 0;
 	Reg	aChannel *chptr = channel;
-	Reg	u_int	cur_nb = 1, curh_nb = 0;
+	Reg	u_int	cur_nb = 1, curh_nb = 0, r_cnt = 0;
 	aChannel *del_ch;
 #ifdef DEBUGMODE
 	u_int	del = istat.is_hchan;
 #endif
-#define CHECKFREQ	300
 #define SPLITBONUS	(CHECKFREQ - 50)
 
 	collect_chid();
@@ -2973,11 +3099,18 @@ time_t	now;
 		if (chptr->users == 0)
 			curh_nb++;
 		else
+		    {
 			cur_nb++;
+			if (chptr->reop <= now)
+				r_cnt += reop_channel(now, chptr);
+		    }
 		chptr = chptr->nextch;
 	    }
 	if (cur_nb > max_nb)
 		max_nb = cur_nb;
+
+	if (r_cnt)
+		sendto_flag(SCH_CHAN, "Re-opped %u channel(s).", r_cnt);
 
 	/*
 	** check for huge netsplits, if so, garbage collection is not really

@@ -575,7 +575,7 @@ struct Channel	{
 	Link	*mlist;		/* list of extended modes: +b/+e/+I */
 	Link	*clist;		/* list of connections which are members */
 	time_t	history;	/* channel history (aka channel delay) */
-/*	time_t	massop;		/* massreop stamp for -channels */
+	time_t	reop;		/* server reop stamp for !channels */
 	char	chname[1];
 };
 
@@ -610,7 +610,8 @@ struct Channel	{
 #define	MODE_QUIET	0x2000
 #define	MODE_EXCEPTION	0x4000
 #define	MODE_INVITE	0x8000
-#define MODE_FLAGS	0xffff
+#define	MODE_REOP	0x10000
+#define	MODE_FLAGS	0x1ffff
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */
