@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.108 2002/07/30 16:44:47 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.109 2002/08/24 01:09:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1720,7 +1720,7 @@ char	*parv[];
 
 	if (IsServer(cptr) &&
 	    (stat != 'd' && stat != 'p' && stat != 'q' && stat != 's' &&
-	     stat != 'u' && stat != 'v') &&
+	     stat != 'u' && stat != 'v' && stat != 'l' && stat != 'L') &&
 	    !((stat == 'o' || stat == 'c') && IsOper(sptr)))
 	    {
 		if (check_link(cptr))
@@ -1759,6 +1759,12 @@ char	*parv[];
 		 */
 		if (doall || wilds)
 		    {
+			if (IsServer(cptr) && check_link(cptr))
+		    	{
+				sendto_one(sptr, replies[RPL_TRYAGAIN], ME,
+					BadTo(parv[0]), "STATS");
+				return 5;
+		    	}
 			for (i = 0; i <= highest_fd; i++)
 			    {
 				if (!(acptr = local[i]))
