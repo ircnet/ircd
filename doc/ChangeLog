@@ -1,3 +1,22 @@
+2.11.0b18
+
+2004-11-19  Piotr Kucharski
+
+	* send.c/send_queued(): use strerror, not errno.
+	* send.c, channel.c, config_read.c, hash.c, s_user.c, whowas.c: remove
+	  some unused variables to get rid of warnings.
+	* s_bsd.c/read_message(): move write_err declaration out to get rid of
+	  some errors.
+	* s_bsd.c: new function add_connection_refuse().
+	* s_bsd.c/add_connection(): change gotos to inside block to function
+	  call (to avoid compiler warnings).
+	* struct_def.h: ConfItem->pref can be -1, so int, not u_int.
+	* list.c/make_conf(): bzero IN_ADDR size for INET6 sake.
+	* s_conf.c/match_ipmask(): badmask for ipv4 masks between 32 and 96
+	  when INET6.
+	* s_conf.c/do_tkline(), m_untkline(): send notices to config.h-defined
+	  channel.
+
 2004-11-16  Piotr Kucharski
 
 	* send.c/dead_link(): make it va-aware, don't hardcode get_client_name,

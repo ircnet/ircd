@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.67 2004/11/02 22:38:34 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.68 2004/11/19 18:15:57 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -57,7 +57,10 @@ New features in 2.11.0:
 	  and global usercounts and maximums (new 265/266 numerics).
 	* New command "MAP [*.mask] [s]" showing ascii tree version of LINKS
 	  and including (with "s" param) user counts and server versions.
-	* Oper-only &OPER channel reporting tklines now, more to come.
+	* Oper-only &OPER channel (if defined, reporting tklines).
+	* Run time parameter -T (tune file) can be empty, no tune file will be
+	  used at all then.
+	* Burst includes empty channels (to be locked).
 
 Important changes in 2.11.0 (since 2.10.3):
 	* Nicknames of local clients cannot have [\]{|} chars. (Will be removed
@@ -89,6 +92,10 @@ Important changes in 2.11.0 (since 2.10.3):
 	  (hopcount) parameters), please update your services.
 	* Format of log files has changed.
 	* Format of KILL logs (including syslog) has changed.
+	* Iauth prints errors to stderr and exits with code 1 if error.
+	* New config.h option to speed up accepting clients (costs CPU).
+	* Increasing poolsize is unlimited by default and it does not increase
+	  client sendq while at it.
 
 Important configuration changes between 2.10.x and 2.11.0:
 	* ircd.tune must be removed when upgrading from 2.10.x to 2.11.x
