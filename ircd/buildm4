@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /bin/sh
 # IRC - Internet Relay Chat, ircd/buildm4
 # Copyright (C) 1993, 1994 Darren Reed
 #
@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
-# $Id: buildm4,v 1.7 1997/09/26 17:56:48 kalt Exp $
+# $Id: buildm4,v 1.8 1997/10/06 14:59:37 kalt Exp $
 #
 
 #
@@ -44,7 +44,7 @@ PORT=`egrep '^#define[ 	]*PORT[ 	]*[0-9]*' ../$INCLUDE/config.h | \
 echo "define(PORT,$PORT)" >> $M4
 
 PING=`egrep '^#define[ 	]*PINGFREQUENCY[ 	]*[0-9]*' ../$INCLUDE/config.h\
-	| sed -e 's/[^0-9]*\([0-9]*\).*/\1/`
+	| sed -e 's/[^0-9]*\([0-9]*\).*/\1/'`
 echo "define(PFREQ,$PING)" >> $M4
 
 CONT=`egrep '^#define[ 	]*CONNECTFREQUENCY[ 	]*[0-9]*' ../$INCLUDE/config.h\
