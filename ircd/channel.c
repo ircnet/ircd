@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.104 1999/07/20 17:13:43 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.105 1999/07/21 16:24:23 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1001,7 +1001,10 @@ char	*parv[], *mbuf, *pbuf;
 			whatt = MODE_DEL;
 			break;
 		case 'O':
-			if (*chptr->chname == '!' && parc > 0)
+			if (parc > 0)
+			    {
+			if (*chptr->chname == '!')
+			    {
 			    if (IsMember(sptr, chptr))
 			        {
 					*penalty += 1;
@@ -1025,7 +1028,8 @@ char	*parv[], *mbuf, *pbuf;
 							   chptr->chname);
 					break;
 				    }
-				else
+				else /* not IsMember() */
+				    {
 					if (!IsServer(sptr))
 					    {
 						sendto_one(sptr, err_str(ERR_NOTONCHANNEL, sptr->name),
@@ -1033,6 +1037,14 @@ char	*parv[], *mbuf, *pbuf;
 						*(curr+1) = '\0';
 						break;
 					    }
+				    }
+			    }
+			else /* *chptr->chname != '!' */
+				sendto_one(cptr, err_str(ERR_UNKNOWNMODE,
+					sptr->name), *curr, chptr->chname);
+					*(curr+1) = '\0';
+					break;
+			    }
 			/*
 			 * is this really ever used ?
 			 * or do ^G & NJOIN do the trick?
