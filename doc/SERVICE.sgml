@@ -4,7 +4,7 @@
 
 <title>IRC Services
 <author>Christophe Kalt
-<date>$Id: SERVICE.sgml,v 1.2 1997/08/08 12:45:00 kalt Exp $
+<date>$Id: SERVICE.sgml,v 1.3 1997/08/08 12:46:01 kalt Exp $
 <abstract>
 The IRC protocol described in RFC 1459 defines two types of
 connections (client, and server).  A third type was
@@ -261,6 +261,7 @@ by the service:
 <tag/INFO/This should be a short text explaining what the
 service and its purpose are.
 <tag/VERSION/The version of the running code.
+</descrip>
 </descrip>
 <sect1>Flood control
 <p>
