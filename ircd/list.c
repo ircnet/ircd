@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.15 2002/01/08 03:40:20 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.16 2002/03/14 02:06:17 jv Exp $";
 #endif
 
 #include "os.h"
@@ -75,6 +75,12 @@ void	initlists()
 
 void	outofmemory()
 {
+	if (serverbooting)
+	{
+
+		fprintf(stderr,"Fatal Error: Out of memory.\n");
+		exit(-1);
+	}
 	Debug((DEBUG_FATAL, "Out of memory: restarting server..."));
 	sendto_flag(SCH_NOTICE, "Ouch!!! Out of memory...");
 	restart("Out of Memory");
