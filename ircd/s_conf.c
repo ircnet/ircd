@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.38 1999/02/21 00:33:45 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.39 1999/03/30 19:35:43 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -994,7 +994,10 @@ int	opt;
 			DupString(aconf->name, tmp);
 			if ((tmp = getfield(NULL)) == NULL)
 				break;
-			aconf->port = atoi(tmp);
+			aconf->port = 0;
+			if (sscanf(tmp, "%x", &aconf->port) != 1 ||
+			    aconf->port == 0)
+				aconf->port = atoi(tmp);
 			if (aconf->status == CONF_CONNECT_SERVER)
 				DupString(tmp2, tmp);
 			if (aconf->status == CONF_ZCONNECT_SERVER)
