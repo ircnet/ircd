@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.28 1998/09/11 20:12:56 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.29 1998/09/14 11:44:51 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.5.
 </abstract>
@@ -94,18 +94,14 @@ diagnostics whilst running.
 <bf>This should only be defined for test purposes, and never
 used on a production server.</bf>
 
-<sect1>SPATH, CPATH, MPATH, LPATH, PPATH, TPATH
-<p>
-Define SPATH to be the directory path to ircd.  This is
-usually /usr/local/sbin/ircd, unless you don't have
-installation permission there.
+<sect1>CPATH, MPATH, LPATH, PPATH, TPATH, QPATH, OPATH
 <p>
 Define CPATH to be the directory path to the ``ircd.conf''
 file. This path is usually /usr/local/lib/ircd/ircd.conf. The
 format of this file will be discussed later.
 <p>
 The LPATH &num;define should be set to ``/dev/null'' unless
-you plan to debug the program.  Note that the logfile grows
+you plan to debug the ircd program.  Note that the logfile grows
 very quickly.
 <p>
 Define MPATH to be the path to the ``motd'' (message of the
@@ -118,9 +114,13 @@ file which either doesn't exist (but is creatable) or a
 previously used PPATH file.  It is used for storing the
 server's PID so a ps(1) isn't necessary.
 <p>
-Define TPATH to be the directory path to the ``ircd.tune''
-file. This path is usually /usr/local/lib/ircd/ircd.tune.  This
-file is used by the server to optimize memory use.
+Define QPATH to be the directory path to the ``iauth.conf''
+file. This path is usually /usr/local/lib/ircd/iauth.conf.
+The format of this file is described by a manual page.
+<p>
+The OPATH &num;define should be set to ``/dev/null'' unless
+you plan to debug the iauth program.  Note that the logfile grows
+very quickly.
 
 <sect1>CACHED_MOTD
 <p>

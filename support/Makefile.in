@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.32 1998/09/10 13:14:40 kalt Exp $
+#*   $Id: Makefile.in,v 1.33 1998/09/14 11:44:53 kalt Exp $
 #*
 #*/
 
@@ -152,7 +152,7 @@ $(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 
 ircdwatch: ircdwatch.o
 	$(RM) ircdwatch
-	$(CC) -o $@ $<
+	$(CC) -o $@ ircdwatch.o
 
 ircd-mkpasswd: mkpasswd.o
 	$(RM) ircd-mkpasswd
@@ -310,7 +310,7 @@ hash.o: ../common/struct_def.h ../common/os.h ../ircd/hash_def.h \
 	@touch hash.o
 
 ircd.o: ../ircd/ircd.c setup.h config.h
-	$(CC) $(S_CFLAGS) -DDPATH="\"$(ircd_dir)\"" -c -o $@ ../ircd/ircd.c
+	$(CC) $(S_CFLAGS) -DDPATH="\"$(ircd_dir)\"" -DSPATH="\"$(server_bin_dir)/ircd\"" -DAPATH="\"$(server_bin_dir)/iauth\"" -c -o $@ ../ircd/ircd.c
 
 list.o: ../ircd/list.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/list.c
@@ -322,7 +322,7 @@ s_auth.o: ../ircd/s_auth.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_auth.c
 
 s_bsd.o: ../ircd/s_bsd.c setup.h config.h
-	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_bsd.c
+	$(CC) $(S_CFLAGS) -DAPATH="\"$(server_bin_dir)/iauth\"" -c -o $@ ../ircd/s_bsd.c
 
 s_conf.o: ../ircd/s_conf.c setup.h config.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_conf.c
@@ -393,7 +393,7 @@ chkconf.o: ../ircd/chkconf.c setup.h config.h
 # stuff in contrib/
 
 ircdwatch.o: ../contrib/ircdwatch/ircdwatch.c
-	$(CC) $(O_CFLAGS) -DSERVER_BIN_DIR="\"$(server_bin_dir)\"" -DDPATH="\"$(ircd_dir)\"" -c -o $@ $<
+	$(CC) $(O_CFLAGS) -DSERVER_BIN_DIR="\"$(server_bin_dir)\"" -DDPATH="\"$(ircd_dir)\"" -DMYNAME="\"ircd\"" -c -o $@ ../contrib/ircdwatch/ircdwatch.c
 
 mkpasswd.o: ../contrib/mkpasswd/mkpasswd.c
 	$(CC) $(O_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c

@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info13222tmp2.
+input file /tmp/sgml2info28572tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.28 1998/09/11 20:12:55 kalt Exp $
+     $Id: INSTALL.info,v 1.29 1998/09/14 11:44:50 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.5.
 
@@ -120,7 +120,7 @@ This is done by editing the "config.h" file and changing the various
 
 * Define what type of UNIX your machine uses-::
 * DEBUGMODE::
-* SPATH CPATH MPATH LPATH PPATH TPATH::
+* CPATH MPATH LPATH PPATH TPATH QPATH OPATH::
 * CACHED_MOTD::
 * CHROOTDIR::
 * ENABLE_SUMMON ENABLE_USERS::
@@ -142,7 +142,7 @@ the #undef to #define (if needed).Some flavours of Unix require no
 #define and in such cases all others should be #undef'd.
 
 
-File: INSTALL.info,  Node: DEBUGMODE,  Next: SPATH CPATH MPATH LPATH PPATH TPATH,  Prev: Define what type of UNIX your machine uses-,  Up: The config-h file
+File: INSTALL.info,  Node: DEBUGMODE,  Next: CPATH MPATH LPATH PPATH TPATH QPATH OPATH,  Prev: Define what type of UNIX your machine uses-,  Up: The config-h file
 
 DEBUGMODE
 =========
@@ -158,21 +158,17 @@ of self diagnostics whilst running.
 production server.'
 
 
-File: INSTALL.info,  Node: SPATH CPATH MPATH LPATH PPATH TPATH,  Next: CACHED_MOTD,  Prev: DEBUGMODE,  Up: The config-h file
+File: INSTALL.info,  Node: CPATH MPATH LPATH PPATH TPATH QPATH OPATH,  Next: CACHED_MOTD,  Prev: DEBUGMODE,  Up: The config-h file
 
-SPATH CPATH MPATH LPATH PPATH TPATH
-===================================
-
-   Define SPATH to be the directory path to ircd.  This is usually
-/usr/local/sbin/ircd, unless you don't have installation permission
-there.
+CPATH MPATH LPATH PPATH TPATH QPATH OPATH
+=========================================
 
    Define CPATH to be the directory path to the "ircd.conf" file. This
 path is usually /usr/local/lib/ircd/ircd.conf. The format of this file
 will be discussed later.
 
    The LPATH #define should be set to "/dev/null" unless you plan to
-debug the program.  Note that the logfile grows very quickly.
+debug the ircd program.  Note that the logfile grows very quickly.
 
    Define MPATH to be the path to the "motd" (message of the day) file
 for the server.  Keep in mind this is automatically displayed whenever
@@ -183,12 +179,15 @@ either doesn't exist (but is creatable) or a previously used PPATH
 file.  It is used for storing the server's PID so a ps(1) isn't
 necessary.
 
-   Define TPATH to be the directory path to the "ircd.tune" file. This
-path is usually /usr/local/lib/ircd/ircd.tune.  This file is used by
-the server to optimize memory use.
+   Define QPATH to be the directory path to the "iauth.conf" file. This
+path is usually /usr/local/lib/ircd/iauth.conf.  The format of this
+file is described by a manual page.
+
+   The OPATH #define should be set to "/dev/null" unless you plan to
+debug the iauth program.  Note that the logfile grows very quickly.
 
 
-File: INSTALL.info,  Node: CACHED_MOTD,  Next: CHROOTDIR,  Prev: SPATH CPATH MPATH LPATH PPATH TPATH,  Up: The config-h file
+File: INSTALL.info,  Node: CACHED_MOTD,  Next: CHROOTDIR,  Prev: CPATH MPATH LPATH PPATH TPATH QPATH OPATH,  Up: The config-h file
 
 CACHED_MOTD
 ===========
@@ -1624,37 +1623,37 @@ Node: Installing IRC-610
 Node: The configure script801
 Node: Notes for Cygwin32 users2627
 Node: The config-h file3519
-Node: Define what type of UNIX your machine uses-4185
-Node: DEBUGMODE4585
-Node: SPATH CPATH MPATH LPATH PPATH TPATH5243
-Node: CACHED_MOTD6452
-Node: CHROOTDIR6922
-Node: ENABLE_SUMMON ENABLE_USERS7246
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7782
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY8465
-Node: ZIP_LINKS ZIP_LEVEL9097
-Node: SLOW_ACCEPT10108
-Node: CLONE_CHECK10726
-Node: Other #define's11066
-Node: Editing the Makefile and compiling11391
-Node: The ircd-conf file12031
-Node: Machine information14063
-Node: Administrative info16159
-Node: Port connections18194
-Node: Connection Classes20404
-Node: Client connections25855
-Node: Operator priviliges31368
-Node: Restrict connections33488
-Node: Excluded accounts34803
-Node: Server connections38769
-Node: Deny auto-connections47208
-Node: Hub connections48581
-Node: Leaf connections49797
-Node: Version limitations51880
-Node: Excluded machines53596
-Node: Service connections54903
-Node: Bounce server56496
-Node: Default local server (for local clients) `*OBSOLETED*'58198
-Node: Related resources59081
+Node: Define what type of UNIX your machine uses-4191
+Node: DEBUGMODE4591
+Node: CPATH MPATH LPATH PPATH TPATH QPATH OPATH5255
+Node: CACHED_MOTD6483
+Node: CHROOTDIR6959
+Node: ENABLE_SUMMON ENABLE_USERS7283
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7819
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY8502
+Node: ZIP_LINKS ZIP_LEVEL9134
+Node: SLOW_ACCEPT10145
+Node: CLONE_CHECK10763
+Node: Other #define's11103
+Node: Editing the Makefile and compiling11428
+Node: The ircd-conf file12068
+Node: Machine information14100
+Node: Administrative info16196
+Node: Port connections18231
+Node: Connection Classes20441
+Node: Client connections25892
+Node: Operator priviliges31405
+Node: Restrict connections33525
+Node: Excluded accounts34840
+Node: Server connections38806
+Node: Deny auto-connections47245
+Node: Hub connections48618
+Node: Leaf connections49834
+Node: Version limitations51917
+Node: Excluded machines53633
+Node: Service connections54940
+Node: Bounce server56533
+Node: Default local server (for local clients) `*OBSOLETED*'58235
+Node: Related resources59118
 
 End Tag Table

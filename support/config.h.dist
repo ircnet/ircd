@@ -82,10 +82,6 @@
  * these are only the recommened names and paths. Change as needed.
  * You must define these to something, even if you don't really want them.
  */
-/* These are either full paths or files within "ircd_dir" (see Makefile) */
-#define	SPATH	"@server_bin_dir@ircd"		/* daemon path */
-#define	APATH	"@server_bin_dir@iauth"		/* authentication process path */
-
 #define	CPATH	"ircd.conf"	/* configuration file */
 #define	MPATH	"ircd.motd"	/* motd file */
 #define	LPATH	"ircd.log"	/* debugging log */
@@ -581,7 +577,6 @@
 /* #undef	NO_PREFIX */
 
 /* ------------------------- END CONFIGURATION SECTION -------------------- */
-#define	MYNAME SPATH
 #define	CONFIGFILE CPATH
 #define	IRCD_PIDFILE PPATH
 

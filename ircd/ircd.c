@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.31 1998/09/13 16:44:46 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.32 1998/09/14 11:44:52 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -193,12 +193,12 @@ void	server_reboot()
 	ircd_writetune(tunefile);
 	if (!(bootopt & (BOOT_INETD|BOOT_OPER)))
 	    {
-		(void)execv(MYNAME, myargv);
+		(void)execv(SPATH, myargv);
 #ifdef USE_SYSLOG
 		/* Have to reopen since it has been closed above */
 		
 		openlog(myargv[0], LOG_PID|LOG_NDELAY, LOG_FACILITY);
-		syslog(LOG_CRIT, "execv(%s,%s) failed: %m\n", MYNAME,
+		syslog(LOG_CRIT, "execv(%s,%s) failed: %m\n", SPATH,
 		       myargv[0]);
 		closelog();
 #endif
