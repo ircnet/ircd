@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.5 1997/06/09 14:50:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.6 1997/06/18 17:14:29 kalt Exp $";
 #endif
 
 #include "struct.h"
@@ -144,7 +144,6 @@ VOIDSIG s_restart()
 void	server_reboot()
 {
 	Reg	int	i;
-	char	*myname;
 
 	sendto_flag(SCH_NOTICE, "Aieeeee!!!  Restarting server...");
 	Debug((DEBUG_NOTICE,"Restarting server..."));
@@ -164,18 +163,20 @@ void	server_reboot()
 	if ((bootopt & BOOT_CONSOLE) || isatty(0))
 		(void)close(0);
 	ircd_writetune(tunefile);
-	myname = (char *)malloc(strlen(MYNAME) + 6);
-	(void)strcpy(myname, MYNAME);
 	if (!(bootopt & (BOOT_INETD|BOOT_OPER)))
-		(void)execv(myname, myargv);
+	    {
+		(void)execv(MYNAME, myargv);
 #ifdef USE_SYSLOG
-	/* Have to reopen since it has been closed above */
-
-	openlog(myargv[0], LOG_PID|LOG_NDELAY, LOG_FACILITY);
-	syslog(LOG_CRIT, "execv(%s,%s) failed: %m\n", myname, myargv[0]);
-	closelog();
+		/* Have to reopen since it has been closed above */
+		
+		openlog(myargv[0], LOG_PID|LOG_NDELAY, LOG_FACILITY);
+		syslog(LOG_CRIT, "execv(%s,%s) failed: %m\n", MYNAME,
+		       myargv[0]);
+		closelog();
 #endif
-	Debug((DEBUG_FATAL,"Couldn't restart server: %s", strerror(errno)));
+		Debug((DEBUG_FATAL,"Couldn't restart server: %s",
+		       strerror(errno)));
+	    }
 	exit(-1);
 }
 
