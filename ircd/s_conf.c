@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.81 2004/03/04 11:58:21 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.82 2004/03/04 12:59:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -296,7 +296,25 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 				}
 			}
 		}
-
+		/* Non empty aconf->name, but no dns to match. */
+		if (*aconf->name && !hp)
+		{
+			/* Give it the last chance. */
+			if (strcmp(aconf->name, "*") == 0 ||
+				strcmp(aconf->name, "*@*") == 0)
+			{
+				namematched = 1;
+			}
+			else
+			{
+				continue;	/* Try another I:line. */
+			}
+		}
+		/* Empty aconf->name, treat like '*', don't care about DNS. */
+		if (!*aconf->name)
+		{
+			namematched = 1;
+		}
 		/* Require name to match before checking addr fields. */
 		if (!namematched)
 			continue;	/* Try another I:line. */
