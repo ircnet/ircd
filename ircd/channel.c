@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.46 1998/07/19 20:21:52 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.47 1998/07/19 20:31:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1110,6 +1110,9 @@ char	*parv[], *mbuf, *pbuf;
 				break;
 			if (whatt == MODE_ADD)
 			    {
+				if (**parv == ':')
+					/* this won't propagate right */
+					break;
 				lp = &chops[opcnt++];
 				lp->value.cp = *parv;
 				lp->flags = MODE_ADD|MODE_BAN;
@@ -1150,6 +1153,9 @@ char	*parv[], *mbuf, *pbuf;
 				break;
 			if (whatt == MODE_ADD)
 			    {
+				if (**parv == ':')
+					/* this won't propagate right */
+					break;
 				lp = &chops[opcnt++];
 				lp->value.cp = *parv;
 				lp->flags = MODE_ADD|MODE_EXCEPTION;
@@ -1190,6 +1196,9 @@ char	*parv[], *mbuf, *pbuf;
 				break;
 			if (whatt == MODE_ADD)
 			    {
+				if (**parv == ':')
+					/* this won't propagate right */
+					break;
 				lp = &chops[opcnt++];
 				lp->value.cp = *parv;
 				lp->flags = MODE_ADD|MODE_INVITE;
