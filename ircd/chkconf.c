@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.16 2002/11/07 21:52:59 jv Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.17 2002/11/25 00:23:05 jv Exp $";
 #endif
 
 #include "os.h"
@@ -83,9 +83,11 @@ int	main(int argc, char *argv[])
 		configfile = argv[1];
 	/* Initialize counters to be able to print line number even with m4 */
 	mywc();
+#ifdef DEBUGMODE
 	for(filelist = files; filelist->next; filelist = filelist->next)
 	  fprintf(stderr, "%s: Min %d - Max %d\n",
 		  filelist->filename, filelist->min, filelist->max);
+#endif
 	/* If I do not use result as temporary return value
 	 * I get loops when M4_PREPROC is defined - Babar */
 	result = initconf();
