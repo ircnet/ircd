@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: iauth.c,v 1.3 1998/08/06 02:22:14 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: iauth.c,v 1.4 1998/08/07 02:04:23 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -178,13 +178,14 @@ char	*argv[];
 		   );
 	init_io();
 	conf_read(NULL);
+	conf_ircd();
 
 #if defined(IAUTH_DEBUG)
 	if (debuglevel & ALOG_DIRCD)
-		sendto_ircd("1 G");
+		sendto_ircd("G 1");
 	else
 #endif
-		sendto_ircd("0 G");
+		sendto_ircd("G 0");
 
 	while (1)
 	    {

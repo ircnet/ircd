@@ -38,6 +38,7 @@ struct Instance
     AnInstance	*nexti;
     aModule	*mod;
     void	*opt;
+    char	*popt;
     aTarget	*address;
     aTarget	*hostname;
 };
