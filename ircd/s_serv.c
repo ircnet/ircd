@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.196 2004/06/15 11:07:52 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.197 2004/06/15 16:19:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -38,6 +38,7 @@ static	int	get_version (char *, char *);
 static	void	trace_one (aClient *, aClient *);
 static	void	report_listeners(aClient *, char *);
 static	void	report_class_usage(aClient *, char *);
+static	void	count_servers_users(aClient *, int *, int *);
 const	char	*check_servername_errors[3][2] = {
 	{ "too long", "Bogus servername - too long" },
 	{ "invalid", "Bogus servername - invalid hostname" },
@@ -1774,27 +1775,7 @@ static	void	report_myservers(aClient *sptr, char *to)
 			continue;
 		}
 		timeconnected = timeofday - acptr->firsttime;
-#ifdef HUB
-		servers = 0;
-		users = 0;
-		for (asptr = svrtop; asptr; asptr = asptr->nexts)
-		{
-			if (IsMasked(asptr->bcptr))
-			{
-				continue;
-			}
-			if (asptr->bcptr->from == acptr)
-			{
-				servers++;
-				users += asptr->usercnt[0];
-				users += asptr->usercnt[1];
-			}
-		}
-#else /* !HUB */
-		servers = istat.is_serv - 1;
-		users = istat.is_user[0] + istat.is_user[1];
-		users -= istat.is_myclnt;
-#endif
+		count_servers_users(acptr, &servers, &users);
 		sendto_one(sptr,
 			   ":%s %d %s :%s (%d, %02d:%02d:%02d) %dS %dC"
 			   " %lldkB sent %lldkB recv %ldkB sq%s",
@@ -1809,6 +1790,38 @@ static	void	report_myservers(aClient *sptr, char *to)
 			   (int) ((int)DBufLength(&acptr->sendQ) / 1024),
 			   IsBursting(acptr) ? " BURST" : "");
 	}
+}
+
+/* Count number of servers and users behind client cptr.
+** Values are put on provided servers and users. */
+void	count_servers_users(aClient *cptr, int *servers, int *users)
+{
+#ifdef HUB
+	aServer *asptr;
+
+	*servers = 0;
+	*users = 0;
+	for (asptr = svrtop; asptr; asptr = asptr->nexts)
+	{
+		if (asptr->bcptr->from == cptr)
+		{
+			if (!IsMasked(asptr->bcptr))
+			{
+				*servers += 1;
+			}
+			*users += asptr->usercnt[0];
+			*users += asptr->usercnt[1];
+		}
+	}
+#else /* !HUB */
+	/* we can have only one server linked */
+	*servers = istat.is_serv - 1;
+	*users = istat.is_user[0];
+	*users += istat.is_user[1];
+	/* is_user includes myclnt, so we have to subtract it */
+	*users -= istat.is_myclnt;
+#endif
+	return;
 }
 
 /*
@@ -2731,35 +2744,7 @@ static	void	trace_one(aClient *sptr, aClient *acptr)
 		{
 			/* we need to count servers/users behind this link */
 			int servers = 0, users = 0;
-#ifdef HUB
-			aServer *asptr;
-			for (asptr = svrtop; asptr; asptr = asptr->nexts)
-			{
-				if (asptr->bcptr->from == acptr)
-				{
-					servers++;
-					users += asptr->usercnt[0];
-#ifdef SHOW_INVISIBLE_LUSERS
-					users += asptr->usercnt[1];						
-#endif
-				}
-			}
-#else /* !HUB */
-				/* we can have only one server linked */
-				servers = istat.is_serv - 1;
-				users = istat.is_user[0];
-#ifdef SHOW_INVISIBLE_LUSERS
-				users += istat.is_user[1];
-				/* We are counting all remote users,
-				 * therefore we need to substract our own
-				 * users.
-				 */
-				users -= istat.is_myclnt;
-
-#else
-				users -= me.usercnt[0];
-#endif
-#endif /* HUB */
+			count_servers_users(acptr, &servers, &users);
                         if (acptr->serv->user)
 			{
                                 sendto_one(sptr, replies[RPL_TRACESERVER], ME,
