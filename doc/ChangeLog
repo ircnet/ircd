@@ -14,6 +14,11 @@
 	* s_conf.c/attach_Iline(): ClearXlined() if 'e' flag.
 	* register_user(): get rid of IsKlineExempt around IsXlined, new flag
 	  takes care of it now.
+	* s_err.c, config.h.dist: customizable 381 reply.
+	* numeric_def.h: new numeric 499.
+	* config.h.dist, s_err.c: customizable 499 reply.
+	* s_serv.c/m_stats(): if customizable 499 defined, send it to users instead
+	  of reporting K-lines (useful for servers with huge list of K).
 
 2004-06-30  Jakub Vlasek
 
