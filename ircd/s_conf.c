@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.109 2004/06/18 23:46:42 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.110 2004/06/19 00:16:25 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1040,7 +1040,7 @@ int	rehash(aClient *cptr, aClient *sptr, int sig)
 	for (cltmp = NextClass(FirstClass()); cltmp; cltmp = NextClass(cltmp))
 		MaxLinks(cltmp) = -1;
 
-	if (sig == 2)
+	if (sig == 'd')
 		flush_cache();
 	(void) initconf(0);
 	close_listeners();

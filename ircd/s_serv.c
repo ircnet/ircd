@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.201 2004/06/17 11:56:06 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.202 2004/06/19 00:16:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2645,7 +2645,7 @@ int	m_rehash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #ifdef USE_SYSLOG
 	syslog(LOG_INFO, "REHASH From %s\n", get_client_name(sptr, FALSE));
 #endif
-	return rehash(cptr, sptr, (parc > 1) ? ((*parv[1] == 'q')?2:0) : 0);
+	return rehash(cptr, sptr, (parc > 1) ? parv[1][0] : 0);
 }
 
 /*
