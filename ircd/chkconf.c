@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.8 1998/09/07 21:54:19 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.9 1998/09/23 13:09:22 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -467,6 +467,16 @@ int	opt;
 					toupper(confchar(aconf->status)));
 			else
 				flags |= aconf->status;
+		    }
+
+		if (aconf->status & CONF_VER)
+		    {
+			if (*aconf->host && !index(aconf->host, '/'))
+				(void)fprintf(stderr,
+					      "\tWARNING: No / in V line.");
+			else if (*aconf->passwd && !index(aconf->passwd, '/'))
+				(void)fprintf(stderr,
+					      "\tWARNING: No / in V line.");
 		    }
 print_confline:
 		if (debugflag > 8)
