@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.56 2004/06/11 23:22:35 chopin Exp $
+#*   $Id: Makefile.in,v 1.57 2004/06/18 23:58:13 chopin Exp $
 #*
 #*/
 
@@ -331,7 +331,7 @@ s_auth.o: ../ircd/s_auth.c setup.h config.h
 s_bsd.o: ../ircd/s_bsd.c setup.h config.h
 	$(CC) $(S_CFLAGS) -DIRCDPID_PATH="\"$(IRCDPID_PATH)\"" -DIAUTH_PATH="\"$(IAUTH_PATH)\"" -DIAUTH="\"$(IAUTH)\"" -c -o $@ ../ircd/s_bsd.c
 
-s_conf.o: ../ircd/s_conf.c setup.h config.h
+s_conf.o: ../ircd/s_conf.c setup.h config.h ../ircd/config_read.c
 	$(CC) $(S_CFLAGS) -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" \
 	-DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" \
 	-DM4_PATH="\"$(M4_PATH)\"" -c -o $@ ../ircd/s_conf.c
@@ -405,7 +405,7 @@ mod_rfc931.o: ../iauth/mod_rfc931.c config.h setup.h
 mod_socks.o: ../iauth/mod_socks.c config.h setup.h
 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_socks.c
 
-chkconf.o: ../ircd/chkconf.c setup.h config.h
+chkconf.o: ../ircd/chkconf.c setup.h config.h ../ircd/config_read.c
 	$(CC) $(CC_CFLAGS) -DCHKCONF_COMPILE -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" \
 	-DM4_PATH="\"$(M4_PATH)\"" -DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" -c -o $@ ../ircd/chkconf.c
 
