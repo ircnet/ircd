@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.16 1997/12/17 14:58:20 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.17 1998/02/18 21:47:55 kalt Exp $
 
 This is version 2.9.5 of the IRC software.
 
@@ -6,6 +6,23 @@ This is version 2.9.5 of the IRC software.
 
 New feature in 2.9.5:
 	* D lines created.
+
+------
+
+2.9.5 is taking steps to suppress the usage of the 2.9 JOIN
+format (:nickname JOIN #channel^Gov).  Future versions will
+not generate such joins anymore.  In order to make the
+transition smooth, it is imperative that all servers on the
+IRC network be upgraded to 2.9.5 when the JOIN syntax is
+abandonned.  Not doing so will result in a considerable
+increase of the amount of bandwidth used during netjoins.
+
+As a result, MIRC_KLUDGE is now defined by default in config.h
+
+------
+
+2.9.5 can be compiled on a W32 system using the Cygwin32
+library (http://www.cygnus.com/misc/gnu-win32/).
 
 ===============================================================================
 

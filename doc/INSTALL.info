@@ -1,5 +1,5 @@
 This is Info file INSTALL.info, produced by Makeinfo-1.55 from the
-input file /tmp/sgml2info15483tmp2.
+input file /tmp/sgml2info13260tmp2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt
-     $Id: INSTALL.info,v 1.22 1998/01/23 14:48:37 kalt Exp $
+     $Id: INSTALL.info,v 1.23 1998/02/18 21:47:53 kalt Exp $
 
    This document describes how to install, and configure IRC 2.9.5.
 
@@ -27,6 +27,17 @@ File: INSTALL.info,  Node: Installing IRC-,  Next: The config-h file,  Prev: Top
 
 Installing IRC-
 ***************
+
+* Menu:
+
+* The configure script::
+* Notes for Cygwin32 users::
+
+
+File: INSTALL.info,  Node: The configure script,  Next: Notes for Cygwin32 users,  Up: Installing IRC-
+
+The configure script
+====================
 
    This package uses a GNU configure script for its configuration.  You
 simply need to untar the distribution and run the "configure" script.
@@ -69,6 +80,27 @@ default behaviour:
 `--without-zlib'
      tells "configure" not to look for the zlib.  Defining this will
      keep you from using server link compression.
+
+
+File: INSTALL.info,  Node: Notes for Cygwin32 users,  Prev: The configure script,  Up: Installing IRC-
+
+Notes for Cygwin32 users
+========================
+
+   The 2.9.5 release compiles properly on W32 systems which have the
+GNU-Win32 environment () setup.  At the time of the release, tests were
+made using the version b18 of the Cygwin32 library with the "coolview"
+patch from Sergey Okhapkin.  (This patch should be rolled in the next
+beta)
+
+   When compiling on such system, you want to make sure that you have
+carefully followed the Cygwin32 installation notes.  In particular, you
+will need to make sure that the following files exist: `/bin/cp.exe',
+`/bin/mv.exe', `/bin/rm.exe' and `/bin/sh.exe'.
+
+   Also, the IRC server needs a `resolv.conf' file in order to
+initialize the resolver.  This file can be anywhere (see configure
+options), and is typically in `/etc' on UNIX systems.
 
 
 File: INSTALL.info,  Node: The config-h file,  Next: Editing the Makefile and compiling,  Prev: Installing IRC-,  Up: Top
@@ -1572,38 +1604,40 @@ Related resources
 Tag Table:
 Node: Top123
 Node: Installing IRC-610
-Node: The config-h file2296
-Node: Define what type of UNIX your machine uses-2962
-Node: DEBUGMODE3362
-Node: SPATH CPATH MPATH LPATH PPATH TPATH4020
-Node: CACHED_MOTD5229
-Node: CHROOTDIR5699
-Node: ENABLE_SUMMON ENABLE_USERS6023
-Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE6559
-Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY7242
-Node: ZIP_LINKS ZIP_LEVEL7874
-Node: SLOW_ACCEPT8885
-Node: CLONE_CHECK9503
-Node: Other #define's9843
-Node: Editing the Makefile and compiling10168
-Node: The ircd-conf file10804
-Node: Machine information12836
-Node: Administrative info14932
-Node: Port connections16967
-Node: Connection Classes19177
-Node: Client connections24628
-Node: Operator priviliges30141
-Node: Restrict connections32261
-Node: Excluded accounts33576
-Node: Server connections37539
-Node: Deny auto-connections45978
-Node: Hub connections47351
-Node: Leaf connections48567
-Node: Version limitations50650
-Node: Excluded machines51889
-Node: Service connections53196
-Node: Bounce server54789
-Node: Default local server (for local clients) `*OBSOLETED*'56491
-Node: Related resources57374
+Node: The configure script801
+Node: Notes for Cygwin32 users2509
+Node: The config-h file3401
+Node: Define what type of UNIX your machine uses-4067
+Node: DEBUGMODE4467
+Node: SPATH CPATH MPATH LPATH PPATH TPATH5125
+Node: CACHED_MOTD6334
+Node: CHROOTDIR6804
+Node: ENABLE_SUMMON ENABLE_USERS7128
+Node: SHOW_INVISIBLE_LUSERS NO_DEFAULT_INVISIBLE7664
+Node: OPER_KILL OPER_REHASH OPER_RESTART LOCAL_KILL_ONLY8347
+Node: ZIP_LINKS ZIP_LEVEL8979
+Node: SLOW_ACCEPT9990
+Node: CLONE_CHECK10608
+Node: Other #define's10948
+Node: Editing the Makefile and compiling11273
+Node: The ircd-conf file11909
+Node: Machine information13941
+Node: Administrative info16037
+Node: Port connections18072
+Node: Connection Classes20282
+Node: Client connections25733
+Node: Operator priviliges31246
+Node: Restrict connections33366
+Node: Excluded accounts34681
+Node: Server connections38644
+Node: Deny auto-connections47083
+Node: Hub connections48456
+Node: Leaf connections49672
+Node: Version limitations51755
+Node: Excluded machines52994
+Node: Service connections54301
+Node: Bounce server55894
+Node: Default local server (for local clients) `*OBSOLETED*'57596
+Node: Related resources58479
 
 End Tag Table

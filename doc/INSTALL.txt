@@ -1,10 +1,12 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.22 1998/01/23 14:48:39 kalt Exp $
+  $Id: INSTALL.txt,v 1.23 1998/02/18 21:47:54 kalt Exp $
 
   This document describes how to install, and configure IRC 2.9.5.
 
   11..  IInnssttaalllliinngg IIRRCC..
+
+  11..11..  TThhee ccoonnffiigguurree ssccrriipptt
 
   This package uses a GNU configure script for its configuration.  You
   simply need to untar the distribution and run the ``configure''
@@ -48,6 +50,23 @@
      ----wwiitthhoouutt--zzlliibb
         tells ``configure'' not to look for the zlib.  Defining this
         will keep you from using server link compression.
+
+
+  11..22..  NNootteess ffoorr CCyyggwwiinn3322 uusseerrss
+
+  The 2.9.5 release compiles properly on W32 systems which have the GNU-
+  Win32 environment ( <http://www.cygnus.com/misc/gnu-win32/>) setup.
+  At the time of the release, tests were made using the version b18 of
+  the Cygwin32 library with the ``coolview'' patch from Sergey Okhapkin.
+  (This patch should be rolled in the next beta)
+
+  When compiling on such system, you want to make sure that you have
+  carefully followed the Cygwin32 installation notes.  In particular,
+  you will need to make sure that the following files exist:
+  //bbiinn//ccpp..eexxee, //bbiinn//mmvv..eexxee, //bbiinn//rrmm..eexxee and //bbiinn//sshh..eexxee.
+  Also, the IRC server needs a rreessoollvv..ccoonnff file in order to initialize
+  the resolver.  This file can be anywhere (see configure options), and
+  is typically in //eettcc on UNIX systems.
 
 
   22..  TThhee ccoonnffiigg..hh ffiillee
@@ -110,6 +129,7 @@
   it reads it from the disk.  This is quite intensive and can be
   undesirable for busy servers.
 
+
   Defining CACHED_MOTD will make the server store the ``motd'' in
   memory, and only read it again from the disk when rehashing if the
   file has changed.
@@ -129,6 +149,7 @@
   to glean information the same as finger can.  ENABLE_SUMMON toggles
   whether the server will attempt to summon local users to irc by
   writing a message similar to that from talk(1) to a user's tty.
+
 
   22..77..  SSHHOOWW__IINNVVIISSIIBBLLEE__LLUUSSEERRSS,, NNOO__DDEEFFAAUULLTT__IINNVVIISSIIBBLLEE
 
@@ -193,7 +214,6 @@
   The rest of the user changable #define's should be pretty much self
   explanatory in the config.h file.  It is *NOT* recommended that any of
   the file undef the line with "STOP STOP" in it be changed.
-
 
 
   33..  EEddiittiinngg tthhee MMaakkeeffiillee,, aanndd ccoommppiilliinngg
@@ -262,6 +282,7 @@
 
   16.
      Bounce server           (B)
+
   17.
      Default local server    (U)
 
@@ -328,6 +349,9 @@
 
         This line reads: My Hosts name is ``orion.cair.du.edu'' and my
         site is located in ``Denver Colorado, USA''.
+
+
+
   44..22..  AAddmmiinniissttrraattiivvee iinnffoo
 
 
@@ -370,7 +394,6 @@
         A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu
         UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello
         in Finnish today?;)::
-
         Would look like this when printed out with the /admin command:
 
         Jeff Trim -  Denver Colorado, USA INET jtrim@orion.cair.du.edu
@@ -455,9 +478,6 @@
 
      NNoottee
         You need at least one P line.
-
-
-
 
 
   44..44..  CCoonnnneeccttiioonn CCllaasssseess
@@ -572,7 +592,6 @@
         the servers that is ``behind'' it, the server will disconnect
         the lower class one and schedule a ``new'' connection for the
         higher class server.
-
         Y:1:60:0:50:20000:2:5: (client class)
 
         In case of a client class, the fields are interpreted a bit
@@ -639,7 +658,6 @@
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
         Wildcards are permitted.
-
         This field can be empty, it then has a special meaning.  See
         Below.
 
@@ -706,7 +724,6 @@
         port 6667.
 
         I:135.11.35.*::*.net::1
-
         Allows clients from machines which host name matches ``*.net''
         or which IP address matches ``135.11.35.*'' to connect to the
         server.  If the host name does not match ``*.net'' then the IP
@@ -790,6 +807,7 @@
 
      EExxaammppllee
         O:orion.cair.du.edu:pyunxc:Jeff::1
+
         There is an OPERATOR at ``orion.cair.du.edu'' that can get
         Operator priviliges if he specifies a password of ``pyunxc'' and
         uses a NICKNAME of ``Jeff''.
@@ -855,7 +873,6 @@
 
      FFoorrmmaatt
 
-
         k:<Host Name>:<time interval(s)|comment>:<Auth>:<port>:
 
 
@@ -905,7 +922,6 @@
      PPoorrtt
         The port on which the Kill line will be effective. 0 means all
         ports.
-
      EExxaammpplleess
         K:orion.cair.du.edu::jtrim:0:
 
@@ -987,7 +1003,6 @@
 
      FFoorrmmaatt
 
-
         C:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<TARGET PORT>:<Class>
 
 
@@ -1054,6 +1069,7 @@
      This reads: Connect to host ``nic.funet.fi'', with no password and
      expect this server to identify itself to you as ``nic.funet.fi''.
      Your machine will connect to this host to port 6667.
+
   +o  C:18.72.0.252:Jeff:garfield.mit.edu:6667:1
 
      This reads: Connect to a host at address ``18.72.0.252'', using a
@@ -1104,7 +1120,6 @@
      This line says: expect a connection from host ``garfield.mit.edu'',
      and expect a login password of ``golden'', and expect the host to
      identify itself as ``garfield.mit.edu''.
-
      N:18.72.0.252::garfield.mit.edu::
 
      This line says: expect a Connection from host ``18.72.0.252'', and
@@ -1118,7 +1133,6 @@
         to.  If ``user@'' prefixes the actual hostname or IP address the
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
-
 
      PPaasssswwoorrdd
         The password of the other host.  A password must always be
@@ -1172,9 +1186,6 @@
         I advice you to not to use wildcard servers before you know for
         sure how they are used, they are mostly beneficial for backbones
         of countries and other large areas with common domain.
-
-
-
   44..1100..  DDeennyy aauuttoo--ccoonnnneeccttiioonnss
 
 
@@ -1252,6 +1263,7 @@
         that match the ``*.edu'' name mask.
 
         H:*::eff.org::
+
         Allows ``eff.org'' to introduce (and act as a hub for) any
         server.
 
@@ -1304,6 +1316,7 @@
         be used within this field for matching purposes.  If this field
         is empty, it acts the same as if it were a single * (ie matches
         everything).
+
 
      SSeerrvveerr NNaammee
         The name of the server connected to you that for which you want
@@ -1436,6 +1449,7 @@
      CCllaassss
         The class field should refer to an existing class.
 
+
      NNootteess
         A service is not a very useful sort of client, it cannot join
         channels or issue certain commands although most are available
@@ -1500,6 +1514,8 @@
         secondary server.
 
 
+
+
   44..1177..  DDeeffaauulltt llooccaall sseerrvveerr ((ffoorr llooccaall cclliieennttss)) **OOBBSSOOLLEETTEEDD**
 
 
@@ -1545,22 +1561,6 @@
      WWWWWW 22..99
         Vesa Ruokonen has also put serveral pages related to the 2.9
         servers on the WWW:  <http://www.irc.org/~irc/server/>.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

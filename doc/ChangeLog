@@ -1,3 +1,19 @@
+Tue Feb 17 21:25:02 1998  Christophe Kalt
+
+	* s_bsd.c: w32 doesn't have a working fork().
+	
+	* ircd.c: deal with "getpwuid(getuid())" returning NULL.
+	
+	* configure.in, os.h, support.c: use our own truncate() when
+	needed (CYGWIN32), and CYGWIN32 portability.  (Thanks to Dave
+	Miller <yahoo@molalla.net>).
+
+	* config.guess: update.
+
+	* s_user.c: broadcast restriction wasn't right (Yegg).
+
+	* send.c, ircd.c: removed noisy debugging notices.
+
 Sat Feb  7 09:21:52 1998  Christophe Kalt
 
 	* s_user.c:

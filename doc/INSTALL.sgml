@@ -4,12 +4,13 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.22 1998/01/23 14:48:39 kalt Exp $
+<date>$Id: INSTALL.sgml,v 1.23 1998/02/18 21:47:54 kalt Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.9.5.
 </abstract>
 
 <sect>Installing IRC.
+<sect1>The configure script
 <p>
 This package uses a GNU configure script for its configuration.
 You simply need to untar the distribution and run the
@@ -42,6 +43,28 @@ for this you also need to define ZIP_LINKS (see section below).
 <tag/--without-zlib/ tells ``configure'' not to look for the zlib.
 Defining this will keep you from using server link compression.
 </descrip>
+
+<sect1>Notes for Cygwin32 users
+<p>
+The 2.9.5 release compiles properly on W32 systems which
+have the GNU-Win32 environment (<url
+url="http://www.cygnus.com/misc/gnu-win32/">) setup.  At the
+time of the release, tests were made using the version b18
+of the Cygwin32 library with the ``coolview'' patch from
+Sergey Okhapkin.  (This patch should be rolled in the next
+beta)
+<p>
+When compiling on such system, you want to make sure that
+you have carefully followed the Cygwin32 installation
+notes.  In particular, you will need to make sure that the
+following files exist: <bf>/bin/cp.exe</bf>,
+<bf>/bin/mv.exe</bf>, <bf>/bin/rm.exe</bf> and
+<bf>/bin/sh.exe</bf>.
+<p>
+Also, the IRC server needs a <bf>resolv.conf</bf> file in
+order to initialize the resolver.  This file can be anywhere
+(see configure options), and is typically in <bf>/etc</bf>
+on UNIX systems.
 
 <sect>The config.h file
 <p>
