@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.166 2004/01/01 14:13:50 q Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.167 2004/01/02 15:33:40 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -444,7 +444,7 @@ static	void	add_user_to_channel(aChannel *chptr, aClient *who, int flags)
 		ptr->value.chptr = chptr;
 		ptr->next = who->user->channel;
 		who->user->channel = ptr;
-		if (chptr->chname[0] != '&')
+		if (!IsQuiet(chptr))
 		{
 			who->user->joined++;
 			istat.is_userc++;
@@ -501,7 +501,7 @@ void	remove_user_from_channel(aClient *sptr, aChannel *chptr)
 				free_link(tmp);
 				break;
 			    }
-	if (chptr->chname[0] != '&')
+	if (!IsQuiet(chptr))
 	{
 		sptr->user->joined--;
 		istat.is_userc--;
@@ -2319,8 +2319,8 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		else
 			clean_channelname(name), s = NULL;
 
-		if (MyConnect(sptr) && name[0] != '&' &&
-		    sptr->user->joined >= MAXCHANNELSPERUSER)
+		if (MyConnect(sptr) &&
+			sptr->user->joined >= MAXCHANNELSPERUSER)
 		{
 			sendto_one(sptr, replies[ERR_TOOMANYCHANNELS],
 				   ME, BadTo(parv[0]), name);
