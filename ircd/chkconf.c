@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.25 2004/03/05 22:06:10 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.26 2004/06/18 23:54:41 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -29,6 +29,10 @@ static  char rcsid[] = "@(#)$Id: chkconf.c,v 1.25 2004/03/05 22:06:10 chopin Exp
 
 #define MyMalloc(x)     malloc(x)
 /*#define MyFree(x)       free(x)*/
+
+#ifdef CONFIG_DIRECTIVE_INCLUDE
+#include "config_read.c"
+#endif
 
 static	void	new_class(int);
 static	char	*getfield(char *), confchar(u_int);
@@ -159,11 +163,17 @@ static	int	openconf()
 static	aConfItem 	*initconf()
 {
 	int	fd;
-	char	line[512], *tmp, *tmp3 = NULL, c[80], *s;
+	char	*tmp, *tmp3 = NULL, *s;
 	int	ccount = 0, ncount = 0, dh, flags = 0, nr = 0;
 	aConfItem *aconf = NULL, *ctop = NULL;
 	int	mandatory_found = 0, valid = 1;
 	struct wordcount *filelist = files;
+#if defined(CONFIG_DIRECTIVE_INCLUDE)
+	char    *line;
+	aConfig *ConfigTop, *p, *p2;
+#else
+	char	line[512], c[80];
+#endif
 
 	(void)fprintf(stderr, "initconf(): ircd.conf = %s\n", configfile);
 	if ((fd = openconf()) == -1)
@@ -174,8 +184,13 @@ static	aConfItem 	*initconf()
 		return NULL;
 	    }
 
+#if defined(CONFIG_DIRECTIVE_INCLUDE)
+	ConfigTop = config_read(fd, 0);
+	for(p = ConfigTop; p; p = p->next)
+#else
 	(void)dgets(-1, NULL, 0); /* make sure buffer is at empty pos */
 	while ((dh = dgets(fd, line, sizeof(line) - 1)) > 0)
+#endif
 	    {
 		if (aconf)
 		    {
@@ -196,6 +211,9 @@ static	aConfItem 	*initconf()
 	    	while (filelist->next && (filelist->max < nr))
 	    		filelist = filelist->next;
 
+#if defined(CONFIG_DIRECTIVE_INCLUDE)
+		line = p->line;
+#else
 		if ((tmp = (char *)index(line, '\n')))
 			*tmp = 0;
 		else while(dgets(fd, c, sizeof(c) - 1))
@@ -204,6 +222,7 @@ static	aConfItem 	*initconf()
 				*tmp = 0;
 				break;
 			    }
+#endif
 		/*
 		 * Do quoting of characters and # detection.
 		 */
@@ -595,6 +614,9 @@ print_confline:
 			aconf = NULL;
 		    }
 	    }
+#if defined(CONFIG_DIRECTIVE_INCLUDE)
+	config_free(ConfigTop);
+#endif
 	(void)close(fd);
 #ifdef	M4_PREPROC
 	(void)wait(0);
