@@ -1,14 +1,8 @@
-# @(#)$Id: RELEASE_NOTES,v 1.2 1997/04/14 15:04:09 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.3 1997/04/28 02:20:48 kalt Exp $
 
 This is a development version of the package,
 
 			USE AT YOUR OWN RISK
-
----
-
-2.9.3b7 introduces a change in the PASS syntax which makes
-the `link compression negociation' *incompatible* with
-previous betas.
 
 ---
 
@@ -25,9 +19,15 @@ and 2.7 servers on the same network.
 
 ---
 
+The format of M and P lines has changed since 2.9.2, your old config
+might need to be updated.
+
+---
+
 2.9.3b8 changes + to ! in whois replies
 
 ---
 
-The format of M and P lines has changed since 2.9.2, your old config
-might need to be updated.
+2.9.3b7 introduces a change in the PASS syntax which makes
+the `link compression negociation' *incompatible* with
+previous betas.

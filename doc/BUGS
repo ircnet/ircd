@@ -1,4 +1,4 @@
-# @(#)$Id: BUGS,v 1.1 1997/04/18 21:25:41 kalt Exp $
+# @(#)$Id: BUGS,v 1.2 1997/04/28 02:20:48 kalt Exp $
 
 The list is probably not as scary as it once was.
 Anyone with some free time is welcome to fix those =)
@@ -11,3 +11,5 @@ Anyone with some free time is welcome to fix those =)
 
 * RECONNECT is still in some unknown state. (and deactivated
   for various reasons)
+
+* NOTE is part of the server code.

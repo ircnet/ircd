@@ -1,3 +1,16 @@
+Sun Apr 27 16:40:08 1997  Christophe Kalt
+
+	* send.c: fixed couple buglets (added by Chris Behrens :^).
+
+	* s_user.c: removed dummy m_note() which was unused and buggy, and
+	would let any oper _broadcast_ NOTE queries to the net.
+
+	* m_note.c: Modified m_note() in note.c not to send any NOTE
+	commands to other servers.
+
+	This is lame, someone help me and port note to be a service. 
+	Then, I'll finally take it out of the server !! :-)
+
 Thu Apr 24 18:51:25 1997  Christophe Kalt
 
 	* send.c: better (faster) sendto_common_channel() (from Chris Behrens).
