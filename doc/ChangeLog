@@ -6,6 +6,9 @@
 	* list.c/make_conf(): initialize flags to 0L.
 	* struct_def.h, chkconf.c, s_conf.c, s_serv.c: got rid of CONF_RCLIENT
 	  internally -- it's CONF_CLIENT with 'R' flag set.
+	* s_conf.c/iline_flags_to_string(): return '-' when no flags.
+	* s_serv.c/report_configured_links(): iline_flags_to_string() now
+	  returns '-' for no flags, no need to check it here.
 
 2004-03-04  Piotr Kucharski
 
