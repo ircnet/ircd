@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: parse.c,v 1.78 2004/07/03 16:04:39 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: parse.c,v 1.79 2004/08/13 01:23:03 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -103,7 +103,7 @@ struct Message msgtab[] = {
 { "TKLINE",   3, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_tkline, m_tkline, m_unreg } },
 { "UNTKLINE", 1, MPAR, 0, 0, 0L, { m_nop, m_nopriv, m_untkline, m_untkline, m_unreg } },
 #endif
-{ NULL,       0,    0, 0, 0, 0L,   NULL, NULL, NULL, NULL, NULL }
+{ NULL,       0,    0, 0, 0, 0L, { NULL, NULL, NULL, NULL, NULL } }
 };
 
 /*

@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.133 2004/08/10 18:52:40 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.134 2004/08/13 01:23:04 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1374,7 +1374,7 @@ int 	initconf(int opt)
 	aConfItem *aconf = NULL;
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
 	char	*line;
-	aConfig	*ConfigTop, *p, *p2;
+	aConfig	*ConfigTop, *p;
 #else
 	char	line[512], c[80];
 #endif
@@ -1878,10 +1878,10 @@ int	find_kill(aClient *cptr, int timedklines, char **comment)
 {
 #ifdef TIMEDKLINES
 	static char	reply[256];
+	int		now = 0;
 #endif
 	char		*host, *ip, *name, *ident, *check;
 	aConfItem	*tmp;
-	int		now = 0;
 #ifdef TKLINE
 	int		tklines = 1;
 #endif
@@ -2281,7 +2281,6 @@ int	m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 {
 	int	time, status = CONF_TKILL;
 	char	*user, *host, *reason, *s;
-	aConfItem	*tmp;
 
 	if (is_allowed(sptr, ACL_TKLINE))
 		return m_nopriv(cptr, sptr, parc, parv);
@@ -2315,7 +2314,7 @@ int	m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 	if (*user == '=')
 	{
 		status = CONF_TOTHERKILL;
-		*user++;
+		user++;
 	}
 	*host++ = '\0';
 	reason = parv[3];
@@ -2492,7 +2491,7 @@ int	m_untkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 	}
 	if (*user == '=')
 	{
-		*user++;
+		user++;
 	}
 	*host++ = '\0';
 

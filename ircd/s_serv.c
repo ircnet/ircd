@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.228 2004/08/13 00:00:47 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.229 2004/08/13 01:23:04 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1756,9 +1756,6 @@ static	void	report_myservers(aClient *sptr, char *to)
 	int i;
 	int timeconnected;
 	aClient *acptr;
-#ifdef	HUB
-	aServer *asptr;
-#endif
 	int users, servers;
 
 	for (i = fdas.highest; i >= 0; i--)
@@ -3770,7 +3767,6 @@ static void report_listeners(aClient *sptr, char *to)
 {
 	aConfItem *tmp;
 	aClient	*acptr;
-	int	i;
 
 	for (acptr = ListenerLL; acptr; acptr = acptr->next)
 	{
