@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.22 1998/04/05 21:49:55 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.23 1998/04/05 21:58:10 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1219,7 +1219,7 @@ void	sendto_ops_butone(aClient *one, aClient *from, char *pattern, ...)
 	bzero((char *)&sentalong[0], sizeof(int) * MAXCONNECTIONS);
 	for (cptr = client; cptr; cptr = cptr->next)
 	    {
-		if (IsService(cptr))
+		if (IsService(cptr) || !IsRegistered(cptr))
 			continue;
 		if ((IsPerson(cptr) && !SendWallops(cptr)) || IsMe(cptr))
 			continue;
