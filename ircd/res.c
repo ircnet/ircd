@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.10 1997/09/03 17:45:52 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.11 1997/09/03 18:20:18 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -1446,7 +1446,8 @@ int len;
 	char	*s, c;
 
 	for (s = name; (c = *s) && len; s++, len--)
-		if (isspace(c) || (c == 0x7) || (c == ':'))
+		if (isspace(c) || (c == 0x7) || (c == ':') ||
+		    (c == '*') || (c == '?'))
 			return -1;
 	return 0;
 }
