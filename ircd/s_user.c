@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.99 2001/12/29 04:17:08 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.100 2001/12/30 00:13:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -595,8 +595,6 @@ char	*nick, *username;
 
 	SetClient(sptr);
 	if (!MyConnect(sptr))
-/* && IsServer(cptr)) -- obsolete, old 2.8 protocol;
-   someone needs to clean all this 2.8 stuff --Beeth */
 	    {
 		acptr = find_server(user->server, NULL);
 		if (acptr && acptr->from != cptr)
@@ -608,9 +606,33 @@ char	*nick, *username;
 			return exit_client(cptr, sptr, &me,
 					   "USER server wrong direction");
 		    }
+		send_umode(NULL, sptr, 0, SEND_UMODES, buf);
+	    }
+	else
+	    {
+		istat.is_unknown--;
+		istat.is_myclnt++;
+		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
+		strcpy(sptr->user->uid, next_uid());
+		add_to_uid_hash_table(sptr->user->uid, sptr);
+		sptr->exitc = EXITC_REG;
+		sendto_one(sptr, replies[RPL_WELCOME], ME, BadTo(nick), buf);
+		/* This is a duplicate of the NOTICE but see below...*/
+		sendto_one(sptr, replies[RPL_YOURHOST], ME, BadTo(nick),
+			   get_client_name(&me, FALSE), version);
+		sendto_one(sptr, replies[RPL_CREATED], ME, BadTo(nick), creation);
+		sendto_one(sptr, replies[RPL_MYINFO], ME, BadTo(parv[0]),
+			   ME, version);
+		sendto_one(sptr, replies[RPL_YOURID], ME, BadTo(parv[0]),
+			sptr->user->uid);
+		(void)m_lusers(sptr, sptr, 1, parv);
+		(void)m_motd(sptr, sptr, 1, parv);
+		if (IsRestricted(sptr))
+			sendto_one(sptr, replies[ERR_RESTRICTED], ME, BadTo(nick));
+		send_umode(sptr, sptr, 0, ALL_UMODES, buf);
+		nextping = timeofday;
 	    }
 
-	send_umode(NULL, sptr, 0, SEND_UMODES, buf);
 	for (i = fdas.highest; i >= 0; i--)
 	    {	/* Find my leaf servers and feed the new client to them */
 		if ((acptr = local[fdas.fd[i]]) == cptr || IsMe(acptr))
@@ -643,30 +665,6 @@ char	*nick, *username;
 		istat.is_user[1]++;	/* Local and server defaults +i */
 	else
 		istat.is_user[0]++;
-	if (MyConnect(sptr))
-	    {
-		istat.is_unknown--;
-		istat.is_myclnt++;
-		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
-		strcpy(sptr->user->uid, next_uid());
-		add_to_uid_hash_table(sptr->user->uid, sptr);
-		sptr->exitc = EXITC_REG;
-		sendto_one(sptr, replies[RPL_WELCOME], ME, BadTo(nick), buf);
-		/* This is a duplicate of the NOTICE but see below...*/
-		sendto_one(sptr, replies[RPL_YOURHOST], ME, BadTo(nick),
-			   get_client_name(&me, FALSE), version);
-		sendto_one(sptr, replies[RPL_CREATED], ME, BadTo(nick), creation);
-		sendto_one(sptr, replies[RPL_MYINFO], ME, BadTo(parv[0]),
-			   ME, version);
-		sendto_one(sptr, replies[RPL_YOURID], ME, BadTo(parv[0]),
-			sptr->user->uid);
-		(void)m_lusers(sptr, sptr, 1, parv);
-		(void)m_motd(sptr, sptr, 1, parv);
-		if (IsRestricted(sptr))
-			sendto_one(sptr, replies[ERR_RESTRICTED], ME, BadTo(nick));
-		send_umode(sptr, sptr, 0, ALL_UMODES, buf);
-		nextping = timeofday;
-	    }
 #ifdef	USE_SERVICES
 #if 0
 	check_services_butone(SERVICE_WANT_NICK, user->server, NULL,
