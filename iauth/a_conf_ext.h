@@ -25,6 +25,7 @@
  */
 #ifndef A_CONF_C
 extern u_int	debuglevel;
+extern u_char	iauth_required;
 extern AnInstance *instances;
 #endif /* A_CONF_C */
 

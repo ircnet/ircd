@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.28 1999/03/07 23:01:13 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.29 1999/03/07 23:46:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -29,8 +29,10 @@ static  char rcsid[] = "@(#)$Id: s_auth.c,v 1.28 1999/03/07 23:01:13 kalt Exp $"
 
 #if defined(USE_IAUTH)
 
-aExtCf		*iauth_conf = NULL;
-aExtData	*iauth_stats = NULL;
+u_char		iauth_required = 0;
+
+static aExtCf	*iauth_conf = NULL;
+static aExtData	*iauth_stats = NULL;
 
 /*
  * sendto_iauth
@@ -133,7 +135,18 @@ read_iauth()
 		    if (*start == 'G')
 			{
 			    ia_dbg = atoi(start+2);
-			    sendto_flag(SCH_AUTH, "ia_dbg == %d", ia_dbg);
+			    sendto_flag(SCH_AUTH, "ia_dbg = %d", ia_dbg);
+			    start = end;
+			    continue;
+			}
+		    if (*start == 'O') /* options */
+			{
+			    if (strchr(start+2, 'R'))
+				    iauth_required = 1;
+			    else
+				    iauth_required = 0;
+			    if (ia_dbg)
+				    sendto_flag(SCH_AUTH,"ia_dbg = %d",ia_dbg);
 			    start = end;
 			    continue;
 			}
@@ -384,14 +397,18 @@ Reg	aClient	*cptr;
 
 	SOCK_LEN_TYPE ulen, tlen;
 
+# if defined(USE_IAUTH)
+	if (iauth_required && adfd < 0)
+		return;
+# endif
 	Debug((DEBUG_NOTICE,"start_auth(%x) fd %d status %d",
 		cptr, cptr->fd, cptr->status));
 	if ((cptr->authfd = socket(AFINET, SOCK_STREAM, 0)) == -1)
 	    {
-#ifdef	USE_SYSLOG
+# ifdef	USE_SYSLOG
 		syslog(LOG_ERR, "Unable to create auth socket for %s:%m",
 			get_client_name(cptr,TRUE));
-#endif
+# endif
 		Debug((DEBUG_ERROR, "Unable to create auth socket for %s:%s",
 			get_client_name(cptr, TRUE),
 			strerror(get_sockerr(cptr))));
@@ -419,23 +436,23 @@ Reg	aClient	*cptr;
 	   from query socket -- jrg */
 	(void)getsockname(cptr->fd, (struct sockaddr *)&us, &ulen);
 	us.SIN_FAMILY = AFINET;
-#if defined(USE_IAUTH)
+# if defined(USE_IAUTH)
 	if (adfd >= 0)
 	    {
 		char abuf[BUFSIZ];
-#ifdef INET6
+#  ifdef INET6
 		sprintf(abuf, "%d C %s %u ", cptr->fd,
 			inetntop(AF_INET6, (char *)&them.sin6_addr, mydummy,
 				 MYDUMMY_SIZE), ntohs(them.SIN_PORT));
 		sprintf(abuf+strlen(abuf), "%s %u",
 			inetntop(AF_INET6, (char *)&us.sin6_addr, mydummy,
 				 MYDUMMY_SIZE), ntohs(us.SIN_PORT));
-#else
+#  else
 		sprintf(abuf, "%d C %s %u ", cptr->fd,
 			inetntoa((char *)&them.sin_addr),ntohs(them.SIN_PORT));
 		sprintf(abuf+strlen(abuf), "%s %u",
 			inetntoa((char *)&us.sin_addr), ntohs(us.SIN_PORT));
-#endif
+#  endif
 		if (sendto_iauth(abuf) == 0)
 		    {
 			close(cptr->authfd);
@@ -444,43 +461,43 @@ Reg	aClient	*cptr;
 			return;
 		    }
 	    }
-#endif
-#ifdef INET6
+# endif
+# ifdef INET6
 	Debug((DEBUG_NOTICE,"auth(%x) from %s %x %x",
 	       cptr, inet_ntop(AF_INET6, (char *)&us.sin6_addr, mydummy,
 			       MYDUMMY_SIZE), us.sin6_addr.s6_addr[14],
 	       us.sin6_addr.s6_addr[15]));
-#else
+# else
 	Debug((DEBUG_NOTICE,"auth(%x) from %s",
 	       cptr, inetntoa((char *)&us.sin_addr)));
-#endif
+# endif
 	them.SIN_PORT = htons(113);
 	us.SIN_PORT = htons(0);  /* bind assigns us a port */
 	if (bind(cptr->authfd, (struct SOCKADDR *)&us, ulen) >= 0)
 	    {
 		(void)getsockname(cptr->fd, (struct SOCKADDR *)&us, &ulen);
-#ifdef INET6
+# ifdef INET6
 		Debug((DEBUG_NOTICE,"auth(%x) to %s",
 			cptr, inet_ntop(AF_INET6, (char *)&them.sin6_addr,
 					mydummy, MYDUMMY_SIZE)));
-#else
+# else
 		Debug((DEBUG_NOTICE,"auth(%x) to %s",
 			cptr, inetntoa((char *)&them.sin_addr)));
-#endif
+# endif
 		(void)alarm((unsigned)4);
 		if (connect(cptr->authfd, (struct SOCKADDR *)&them,
 			    tlen) == -1 && errno != EINPROGRESS)
 		    {
-#ifdef INET6
+# ifdef INET6
 			Debug((DEBUG_ERROR,
 				"auth(%x) connect failed to %s - %d", cptr,
 				inet_ntop(AF_INET6, (char *)&them.sin6_addr,
 					  mydummy, MYDUMMY_SIZE), errno));
-#else
+# else
 			Debug((DEBUG_ERROR,
 				"auth(%x) connect failed to %s - %d", cptr,
 				inetntoa((char *)&them.sin_addr), errno));
-#endif
+# endif
 			ircstp->is_abad++;
 			/*
 			 * No error report from this...
@@ -496,16 +513,16 @@ Reg	aClient	*cptr;
 	    {
 		report_error("binding stream socket for auth request %s:%s",
 			     cptr);
-#ifdef INET6
+# ifdef INET6
 		Debug((DEBUG_ERROR,"auth(%x) bind failed on %s port %d - %d",
 		      cptr, inet_ntop(AF_INET6, (char *)&us.sin6_addr,
 		      mydummy, MYDUMMY_SIZE),
 		      ntohs(us.SIN_PORT), errno));
-#else
+# else
 		Debug((DEBUG_ERROR,"auth(%x) bind failed on %s port %d - %d",
 		      cptr, inetntoa((char *)&us.sin_addr),
 		      ntohs(us.SIN_PORT), errno));
-#endif
+# endif
 	    }
 
 	cptr->flags |= (FLAGS_WRAUTH|FLAGS_AUTH);

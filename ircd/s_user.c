@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.68 1999/03/05 01:53:20 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.69 1999/03/07 23:46:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -356,6 +356,30 @@ char	*nick, *username;
 		char *reason = NULL;
 
 #if defined(USE_IAUTH)
+		if (adfd < 0 && iauth_required)
+		    {
+			time_t last = 0;
+
+			if (timeofday - last > 300)
+				sendto_flag(SCH_AUTH, 
+			    "iauth not running! (refusing new connections)");
+			return exit_client(cptr, sptr, &me,
+					   "Authentication Failure!");
+#if defined(USE_SYSLOG) && defined(SYSLOG_CONN)
+			syslog(LOG_NOTICE, "%s ( %s ): <none>@%s [%s] %c\n",
+			       myctime(sptr->firsttime), "No iauth!",
+			       (IsUnixSocket(sptr)) ? me.sockhost :
+			       ((sptr->hostp) ? sptr->hostp->h_name :
+				sptr->sockhost), sptr->auth, EXITC_AUTHFAIL);
+#endif		    
+#if defined(FNAME_CONNLOG) || defined(USE_SERVICES)
+			sendto_flog(sptr, "No iauth!", 0, "<none>",
+				    (IsUnixSocket(sptr)) ? me.sockhost :
+				    ((sptr->hostp) ? sptr->hostp->h_name :
+				    sptr->sockhost));
+#endif
+		    }
+
 		/* this should not be needed, but there's a bug.. -kalt */
 		/* haven't seen any notice like this, ever.. no bug no more? */
 		if (*cptr->username == '\0')

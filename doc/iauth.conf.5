@@ -1,5 +1,5 @@
-.\" @(#)$Id: iauth.conf.5,v 1.5 1999/01/13 02:32:40 kalt Exp $
-.TH IAUTH.CONF 5 "$Date: 1999/01/13 02:32:40 $"
+.\" @(#)$Id: iauth.conf.5,v 1.6 1999/03/07 23:46:55 kalt Exp $
+.TH IAUTH.CONF 5 "$Date: 1999/03/07 23:46:55 $"
 .SH NAME
 iauth.conf \- The Internet Relay Chat Authentication Configuration File
 .SH DESCRIPTION
@@ -10,8 +10,9 @@ particular connection.  The list is ordered, which means that the first
 module to successfully authenticate a connection will be the last to be
 tried.
 
-The file is divided in sections, each section specifies a module with
-eventual options using the following format:
+The file is divided in sections, the first section is used for iauth
+options, each subsequent section specifies a module with eventual options
+using the following format:
 
 .RS
 .nf
@@ -35,6 +36,11 @@ be used.
 
 When writing a configuration file, one should \fBalways\fP verify the
 syntax using the \fIiauth\fP program to avoid later problems.
+.SH IAUTH OPTIONS
+.TP
+.B required
+By specifying this keyword, the IRC server is told not to accept new user
+connections if iauth is not running.
 .SH MODULES
 .TP
 .B pipe

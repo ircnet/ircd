@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.8 1999/02/21 00:33:45 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.9 1999/03/07 23:46:55 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -31,6 +31,7 @@ static aModule *Mlist[] =
 	{ &Module_rfc931, &Module_socks, &Module_pipe, (aModule *)NULL };
 
 u_int	debuglevel = 0;
+u_char	iauth_required = 0;
 
 AnInstance *instances = NULL;
 
@@ -79,6 +80,8 @@ char *cfile;
 			*ch = '\0';
 			if (ch = index(buffer, '#'))
 				*ch = '\0';
+			if (!strncmp("required", buffer, 8))
+				iauth_required = 1;
 			/* debugmode setting */
 			if (!strncmp("debuglvl = 0x", buffer, 13))
 			    {

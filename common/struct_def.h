@@ -192,7 +192,6 @@ typedef struct        LineItem aExtData;
 #define	SendWallops(x)		((x)->user->flags & FLAGS_WALLOP)
 #define	IsUnixSocket(x)		((x)->flags & FLAGS_UNIX)
 #define	IsListening(x)		((x)->flags & FLAGS_LISTEN)
-#define	DoAccess(x)		((x)->flags & FLAGS_CHKACCESS)
 #define	IsLocal(x)		(MyConnect(x) && (x)->flags & FLAGS_LOCAL)
 #define	IsDead(x)		((x)->flags & FLAGS_DEADSOCKET)
 #define	IsHeld(x)		((x)->flags & FLAGS_HELD)
@@ -206,7 +205,6 @@ typedef struct        LineItem aExtData;
 #define	SetUnixSock(x)		((x)->flags |= FLAGS_UNIX)
 #define	SetDNS(x)		((x)->flags |= FLAGS_DOINGDNS)
 #define	DoingDNS(x)		((x)->flags & FLAGS_DOINGDNS)
-#define	SetAccess(x)		((x)->flags |= FLAGS_CHKACCESS)
 #define	DoingAuth(x)		((x)->flags & FLAGS_AUTH)
 #define	DoingXAuth(x)		((x)->flags & FLAGS_XAUTH)
 #define	NoNewLine(x)		((x)->flags & FLAGS_NONL)
@@ -218,7 +216,6 @@ typedef struct        LineItem aExtData;
 #define	ClearDNS(x)		((x)->flags &= ~FLAGS_DOINGDNS)
 #define	ClearAuth(x)		((x)->flags &= ~FLAGS_AUTH)
 #define	ClearXAuth(x)		((x)->flags &= ~FLAGS_XAUTH)
-#define	ClearAccess(x)		((x)->flags &= ~FLAGS_CHKACCESS)
 
 /*
  * defined debugging levels
@@ -782,6 +779,7 @@ typedef	struct	{
 #define EXITC_REF	'R'	/* Refused */
 #define EXITC_AREF	'U'	/* Unauthorized by iauth */
 #define EXITC_AREFQ	'u'	/* Unauthorized by iauth, be quiet */
+#define	EXITC_AUTHFAIL	'A'	/* Authentication failure (iauth problem) */
 
 /* misc defines */
 
