@@ -1,6 +1,11 @@
 2004-02-23  Piotr Kucharski
 
 	* s_serv.c/m_squit(): do not send compatibility sids in SQUIT.
+	* s_misc.c/exit_client(): moved adding "by whom" to comment of squit
+	  to m_squit().
+	* s_serv.c/m_squit(): add "by whom" to comment of squit.
+	* parse.c/find_matching_client(): traverse server list from bottom
+	  (ME) to up, so we find ourselves first (fixes trace bug).
 
 2004-02-22  Jakub Vlasek
 
