@@ -1436,7 +1436,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.36 1999/03/11 19:57:09 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.37 1999/06/21 01:59:59 kalt Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
@@ -1492,6 +1492,7 @@ AC_C_CONST
 AC_CHECK_LIB(crypt, crypt)
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(nsl, socket)
+AC_CHECK_LIB(gen, basename)
 
 IRC_PATH_ZLIB
 IRC_CURSES_TERMCAP
