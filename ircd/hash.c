@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.41 2004/10/01 20:22:14 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.42 2004/10/03 17:13:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1072,7 +1072,7 @@ aChannel	*hash_find_channels(char *name, aChannel *chptr)
 /*
  * hash_find_stoken
  */
-aServer	*hash_find_stoken(int tok, aClient *cptr, void *dummy)
+aServer	*hash_find_stoken(int tok, aClient *cptr, void *mydummy)
 {
 	Reg	aServer	*tmp, *prv = NULL;
 	Reg	aHashEntry	*tmp3;
@@ -1096,7 +1096,7 @@ aServer	*hash_find_stoken(int tok, aClient *cptr, void *dummy)
 			    }
 			return (tmp);
 		    }
-	return (aServer *)dummy;
+	return (aServer *)mydummy;
 }
 
 /*

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: mod_webproxy.c,v 1.2 2004/10/01 20:22:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: mod_webproxy.c,v 1.3 2004/10/03 17:13:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -199,7 +199,7 @@ static	int	proxy_check_cache(u_int cl)
 
 static	int	proxy_write(u_int cl)
 {
-	u_char query[128];	/* big enough to hold all queries */
+	char query[128];	/* big enough to hold all queries */
 	int query_len;		/* length of query */
 #ifndef	INET6
 	u_int a, b, c, d;

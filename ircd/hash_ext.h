@@ -57,7 +57,7 @@ EXTERN aClient *hash_find_uid (char *uid, aClient *cptr);
 EXTERN aClient *hash_find_server (char *server, aClient *cptr);
 EXTERN aChannel *hash_find_channel (char *name, aChannel *chptr);
 EXTERN aChannel *hash_find_channels (char *name, aChannel *chptr);
-EXTERN aServer *hash_find_stoken (int tok, aClient *cptr, void *dummy);
+EXTERN aServer *hash_find_stoken (int tok, aClient *cptr, void *mydummy);
 EXTERN aClient *hash_find_sid (char *sid, aClient *cptr);
 EXTERN anUser *hash_find_hostname (char *hostname, anUser *user);
 EXTERN int m_hash (aClient *cptr, aClient *sptr, int parc, char *parv[]);

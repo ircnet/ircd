@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.237 2004/10/02 01:20:44 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.238 2004/10/03 17:13:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -138,15 +138,11 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	** name is expanded if the incoming mask is the same as
 	** the server name for that link to the name of link.
 	*/
-	while ((*server == '*') && IsServer(cptr))
+	if ((*server == '*') && IsServer(cptr)
+		&& (aconf = cptr->serv->nline) != NULL
+		&& !mycmp(server, my_name_for_link(ME, aconf->port)))
 	{
-		aconf = cptr->serv->nline;
-		if (!aconf)
-			break;
-		if (!mycmp(server,
-			   my_name_for_link(ME, aconf->port)))
-			server = cptr->name;
-		break; /* WARNING is normal here */
+		server = cptr->name;
 	}
 	/*
 	** Find server matching (compatibility) SID

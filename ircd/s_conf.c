@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.139 2004/10/02 01:20:44 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.140 2004/10/03 17:13:43 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1549,8 +1549,8 @@ int 	initconf(int opt)
 		if (IsIllegal(aconf))
 			continue;
 
-		for (;;) /* Fake loop, that I can use break here --msa */
-		    {
+		do
+		{
 			if ((tmp = getfield(NULL)) == NULL)
 				break;
 #ifdef	INET6
@@ -1598,8 +1598,7 @@ int 	initconf(int opt)
 				break;
 			/* used in Y: global limits */
 			tmp4 = getfield(NULL);
-			break;
-		    }
+		} while (0); /* to use break without compiler warnings */
 		istat.is_confmem += aconf->host ? strlen(aconf->host)+1 : 0;
 		istat.is_confmem += aconf->passwd ? strlen(aconf->passwd)+1 :0;
 		istat.is_confmem += aconf->name ? strlen(aconf->name)+1 : 0;
