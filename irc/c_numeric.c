@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: c_numeric.c,v 1.5 2003/10/18 15:31:27 q Exp $";
+static  char rcsid[] = "@(#)$Id: c_numeric.c,v 1.6 2004/03/14 13:25:07 chopin Exp $";
 #endif
  
 #include "os.h"
@@ -333,10 +333,6 @@ int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
 	    case RPL_TRACENEWTYPE:
 		sprintf(mybuf,"*** %s %s Class: %s %s",
 			parv[0], parv[2], parv[3], parv[4]);
-		break;
-	    case RPL_TRACELOG:
-		sprintf(mybuf,"*** %s File: %s level:%s ",
-			parv[0], parv[3], parv[4]);
 		break;
 	    case RPL_TRACECLASS:
 		sprintf(mybuf,"*** %s Class: %s Links: %s",
