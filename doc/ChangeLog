@@ -1,3 +1,8 @@
+1999-07-04  Piotr Kucharski
+
+	* s_user.c/m_nick(): fix performance bug introduced in code
+	preventing insidious collisions
+
 1999-07-02  Kurt Roeckx
 
 	* configure.in, Makefile.in: Added -I for inet6.
@@ -6,7 +11,7 @@
 
 	* res.c/proc_answer(): portability fix from hybrid6.
 	
-	* send.c/sendto_match_butone: finally looked closely at why this
+	* send.c/sendto_match_butone(): finally looked closely at why this
 	was sending $*.mask to the wrong servers, fixed.
 
 	* struct_def.h, send.c/sendto_match_butone(), list_ext.h,
@@ -51,7 +56,7 @@
 
 1999-06-20  Christophe Kalt
 
-	* mod_socks: added code to allow checks for v5 as well as v4,
+	* mod_socks.c: added code to allow checks for v5 as well as v4,
 	depending on configuration (from Piotr Kucharski).
 
 	* configure.in, ircd.c/ircd_writetune(), s_serv.c/m_rehash(): use
