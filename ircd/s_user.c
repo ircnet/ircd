@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.112 2002/01/24 23:52:51 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.113 2002/02/02 13:29:30 jv Exp $";
 #endif
 
 #include "os.h"
@@ -2641,7 +2641,7 @@ char	*parv[];
 		if (encr == NULL)
 		    {
 			sendto_flag(SCH_ERROR, "crypt() returned NULL");
-			sendto_one(sptr,err_str(ERR_PASSWDMISMATCH, parv[0]));
+			sendto_one(sptr,replies[ERR_PASSWDMISMATCH], ME,BadTo(parv[0]));
 			return 3;
 		    }
 	    }
