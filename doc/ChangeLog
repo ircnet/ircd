@@ -1,3 +1,12 @@
+2002-11-24  Jakub Vlasek
+
+	* struct_def.h: Added source_ip to struct ConfItem.
+	* list.c/make_conf(): set source_ip to NULL. 
+	* list.c/free_conf(): Free source_ip.
+	* s_bsd.c/connect_inet(): Use aconf->source_ip to bind correct IP
+	  for outgoing connections.
+	* s_conf.c/initconf(): Fill aconf->source_ip.
+
 2002-11-22  Jakub Vlasek
 
 	* s_serv.c/m_stats(): Do not reply to stats requests with more than 
