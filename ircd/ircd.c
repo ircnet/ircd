@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.78 2002/04/08 02:45:56 jv Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.79 2002/05/20 15:59:43 jv Exp $";
 #endif
 
 #include "os.h"
@@ -952,6 +952,7 @@ char	*argv[];
 		else
 		    exit(5);
 	    }
+	
 	if (bootopt & BOOT_OPER)
 	    {
 		aClient *tmp = add_connection(&me, 0);
@@ -961,8 +962,6 @@ char	*argv[];
 		SetMaster(tmp);
 		local[0] = tmp;
 	    }
-	else
-		write_pidfile();
 
 
 	Debug((DEBUG_NOTICE,"Server ready..."));
@@ -976,6 +975,10 @@ char	*argv[];
 	timeofday = time(NULL);
 	
 	daemonize();	
+	if (!(bootopt & BOOT_OPER))
+	{
+		write_pidfile();
+	}
 	dbuf_init();
 	
 	serverbooting = 0;
@@ -1224,9 +1227,9 @@ static	void	setup_signals()
 	(void)signal(SIGPIPE, SIG_IGN);
 	
 # endif /* HAVE_RELIABLE_SIGNALS */
-	(void)signal(SIGALRM, dummy);   
+	(void)signal(SIGALRM, dummy);
 	(void)signal(SIGHUP, s_rehash);
-	(void)signal(SIGTERM, s_die); 
+	(void)signal(SIGTERM, s_die);
 	(void)signal(SIGINT, s_restart);
 # if defined(USE_IAUTH)
 	(void)signal(SIGUSR1, s_slave);
