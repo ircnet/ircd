@@ -1,3 +1,12 @@
+1999-07-14  Christophe Kalt
+
+	* configure.in, os.h: use ncurses.h (from KIKUCHI Takahiro).
+
+	* configure.in: SunOS has poll(), but we don't want to use it
+	(reported by KIKUCHI Takahiro).
+
+	* mod_lhex.c: replaced strtoul() with sscanf().
+
 1999-07-11  Christophe Kalt
 
 	* a_defines.h was missing support_def.h (from KIKUCHI Takahiro).
