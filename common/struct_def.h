@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.96 2004/03/22 14:03:51 jv Exp $
+ *   $Id: struct_def.h,v 1.97 2004/04/07 17:02:37 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -200,7 +200,7 @@ typedef struct        LineItem aExtData;
 #ifdef UNIXPORT
 #define	IsUnixSocket(x)		((x)->flags & FLAGS_UNIX)
 #endif
-#define	IsListening(x)		((x)->flags & FLAGS_LISTEN)
+#define	IsListener(x)		((x)->flags & FLAGS_LISTEN)
 #define IsListenerInactive(x)	((x)->flags & FLAGS_LISTENINACTIVE)
 #define	IsLocal(x)		(MyConnect(x) && (x)->flags & FLAGS_LOCAL)
 #define	IsDead(x)		((x)->flags & FLAGS_DEADSOCK)

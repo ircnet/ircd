@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.126 2004/04/07 16:56:59 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.127 2004/04/07 17:02:38 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -916,7 +916,7 @@ int	main(int argc, char *argv[])
                     {   
 			if (!(acptr = local[i]))
 				continue;
-			if (IsListening(acptr))
+			if (IsListener(acptr))
 				break;
 			acptr = NULL;
 		    }

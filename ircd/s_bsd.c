@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.138 2004/04/07 16:57:00 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.139 2004/04/07 17:02:38 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -453,7 +453,7 @@ void	close_listeners(void)
 	    {
 		if (!(cptr = local[i]))
 			continue;
-		if (cptr == &me || !IsListening(cptr))
+		if (cptr == &me || !IsListener(cptr))
 			continue;
 		aconf = cptr->confs->value.aconf;
 
@@ -481,7 +481,7 @@ void	activate_delayed_listeners(void)
 	{
 		if (!(cptr = local[i]))
 			continue;
-		if (cptr == &me || !IsListening(cptr))
+		if (cptr == &me || !IsListener(cptr))
 			continue;
 
 		if (IsListenerInactive(cptr))
@@ -1265,7 +1265,7 @@ void	close_connection(aClient *cptr)
 		sendto_iauth("%d D", cptr->fd);
 #endif
 		flush_connections(i);
-		if (IsServer(cptr) || IsListening(cptr))
+		if (IsServer(cptr) || IsListener(cptr))
 		    {
 			del_fd(i, &fdas);
 #ifdef	ZIP_LINKS
@@ -1371,7 +1371,7 @@ static	int	set_sock_opts(int fd, aClient *cptr)
 	 * Method borrowed from Wietse Venema's TCP wrapper.
 	 */
 	{
-	    if (!IsListening(cptr)
+	    if (!IsListener(cptr)
 #ifdef UNIXPORT
 		&& !IsUnixSocket(cptr)
 #endif
@@ -2020,7 +2020,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 			** Checking for new connections is only done up to
 			** once per second.
 			*/
-			if (IsListening(cptr))
+			if (IsListener(cptr))
 			    {
 				if (timeofday > cptr->lasttime + 1 && ro == 0)
 				    {
@@ -2217,7 +2217,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 		/*
 		 * accept connections
 		 */
-		if (TST_READ_EVENT(fd) && IsListening(cptr))
+		if (TST_READ_EVENT(fd) && IsListener(cptr))
 		    {
 			CLR_READ_EVENT(fd);
 			cptr->lasttime = timeofday;
