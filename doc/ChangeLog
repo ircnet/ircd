@@ -1,3 +1,18 @@
+2005-02-08  Piotr Kucharski
+
+	* struct_def.h: removed ST_UID and ST_NOTUID.
+	* parse.c, send.c, channel.c, s_misc.c, s_send.c, s_serv.c, s_user.c,
+	  s_service.c: changed ST_UID to IsServer, changed ST_NOTUID to false.
+	* send.c, send_ext.h: removed unneeded sendto_match_butone_old().
+	* s_user.c/m_message(): removed sendto_match_butone_old().
+	* channel.c/send_channel_modes(): no need for special case for +R.
+	* s_misc.c/mark_blind_servers(), exit_client(), exit_one_client(),
+	  s_serv.c/m_squit(), send_server(), m_server(), m_server_estab(),
+	  m_eob(), s_service/m_service(), s_user.c/register_user(): removed
+	  always matching conditions and never matching conditions and code.
+	* parse.c/find_sender(), s_id.c/sid_valid(), s_serv.c/m_server(),
+	  m_server_estab(), m_trace(): sid cannot have '$' anymore.
+
 2005-02-07  Piotr Kucharski
 
 	* struct_def.h: removed HasUID macro.
