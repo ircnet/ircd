@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.244 2005/02/04 18:08:50 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.245 2005/02/04 18:31:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -256,12 +256,6 @@ int	do_nick_name(char *nick, int server)
 
 	for (ch = nick; *ch && (ch-nick) < (server?NICKLEN:LOCALNICKLEN); ch++)
 	{
-		/* Transition period. Until all 2.10 are gone, disable
-		** these chars in nicks for users. --B. */
-		if (!server && isscandinavian(*ch))
-		{
-			break;
-		}
 		/* 2.11.1 should remove this if() and fix
 		** match.c to make '~' NVALID --B. */
 		if (server && *ch == '~')
@@ -807,7 +801,7 @@ int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	int	delayed = 0;
 	char	nick[NICKLEN+2], *user, *host;
 	Link	*lp = NULL;
-	int	donickname, allowednicklen;
+	int	allowednicklen;
 
 	if (MyConnect(cptr) && IsUnknown(cptr) &&
 		IsConfServeronly(cptr->acpt->confs->value.aconf))
@@ -897,9 +891,6 @@ badparamcountkills:
 #endif
 	}
 
-	/* do_nick_name() can change "nick" (like: drop scandinavian
-	** origin, so it is needed before ":old NICK old" type. --B. */
-	donickname = do_nick_name(nick, IsServer(cptr));
 	if (MyPerson(sptr))
 	{
 		if (!strcmp(sptr->name, nick))
@@ -936,7 +927,8 @@ badparamcountkills:
 	 * creation) then reject it. If from a server and we reject it,
 	 * we have to KILL it. -avalon 4/4/92
 	 */
-	if (donickname == 0 || strncmp(nick, parv[1], allowednicklen))
+	if (do_nick_name(nick, IsServer(cptr)) == 0 ||
+		strncmp(nick, parv[1], allowednicklen))
 	{
 		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, BadTo(parv[0]),
 			   parv[1]);
