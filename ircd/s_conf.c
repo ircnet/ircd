@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.71 2004/02/09 00:04:09 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.72 2004/02/09 15:45:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -643,8 +643,6 @@ aConfItem	*find_conf_exact(char *name, char *user, char *host,
 
 	for (tmp = conf; tmp; tmp = tmp->next)
 	    {
-		if (IsIllegal(tmp))
-			continue;
 		if (!(tmp->status & statmask) || !tmp->name || !tmp->host ||
 		    mycmp(tmp->name, name))
 			continue;
@@ -714,8 +712,6 @@ aConfItem	*find_conf_name(char *name, int statmask)
  
 	for (tmp = conf; tmp; tmp = tmp->next)
 	    {
-		if (IsIllegal(tmp))
-			continue;
 		/*
 		** Accept if the *real* hostname (usually sockecthost)
 		** matches *either* host or name field of the configuration.
@@ -738,8 +734,6 @@ aConfItem	*find_conf(Link *lp, char *name, int statmask)
 	for (; lp; lp = lp->next)
 	    {
 		tmp = lp->value.aconf;
-		if (IsIllegal(tmp))
-			continue;
 		if ((tmp->status & statmask) &&
 		    (((tmp->status & (CONF_SERVER_MASK|CONF_HUB)) &&
 	 	     tmp->name && !mycmp(tmp->name, name)) ||
@@ -763,8 +757,6 @@ aConfItem	*find_conf_host(Link *lp, char *host, int statmask)
 	for (; lp; lp = lp->next)
 	    {
 		tmp = lp->value.aconf;
-		if (IsIllegal(tmp))
-			continue;
 		if (tmp->status & statmask &&
 		    (!(tmp->status & CONF_SERVER_MASK || tmp->host) ||
 	 	     (tmp->host && !match(tmp->host, host))))
@@ -787,8 +779,6 @@ aConfItem	*find_conf_ip(Link *lp, char *ip, char *user, int statmask)
 	for (; lp; lp = lp->next)
 	    {
 		tmp = lp->value.aconf;
-		if (IsIllegal(tmp))
-			continue;
 		if (!(tmp->status & statmask))
 			continue;
 		s = index(tmp->host, '@');
