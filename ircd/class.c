@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.20 2005/01/30 16:24:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.21 2005/02/22 17:09:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -234,7 +234,6 @@ void	report_classes(aClient *sptr, char *to)
 int	get_sendq(aClient *cptr, int bursting)
 {
 	Reg	int	sendq = QUEUELEN;
-	Reg	int	bsendq = 2 * QUEUELEN;
 	Reg	Link	*tmp;
 	Reg	aClass	*cl;
 

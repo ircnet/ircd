@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.64 2005/02/08 02:27:35 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.65 2005/02/22 17:09:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -326,7 +326,6 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aServer	*sp = NULL;
 	char	*dist, *server = NULL, *info;
 	int	type, i;
-	char	*mlname;
 
 	if (sptr->user)
 	    {
