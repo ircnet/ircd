@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.223 2004/08/08 18:19:18 chopin Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.224 2004/08/12 23:15:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3233,6 +3233,11 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (*parv[2] == '&' && !MyClient(acptr))
 		return 1;
 	chptr = find_channel(parv[2], NullChn);
+	if (!chptr && parv[2][0] == '!')
+	{
+		/* Try to find !channel using shortname */
+		chptr = hash_find_channels(parv[2] + 1, NULL);
+	}
 
 	if (!chptr)
 	    {
