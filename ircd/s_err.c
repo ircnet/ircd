@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_err.c,v 1.27 2001/02/10 19:16:52 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_err.c,v 1.28 2001/06/29 18:37:37 q Exp $";
 #endif
 
 #include "os.h"
@@ -38,7 +38,7 @@ char *	replies[] = {
 /* 007 */ (char *)NULL,
 /* 008 */ (char *)NULL,
 /* 009 */ (char *)NULL,
-/* 010 RPL_BOUNCE */	":%s 010 %s %s %s :Please use this Server/Port instead",
+/* 010 RPL_BOUNCE */	":%s 010 %s %s %d :Please use this Server/Port instead",
 /* 011 */ (char *)NULL,
 /* 012 */ (char *)NULL,
 /* 013 */ (char *)NULL,
