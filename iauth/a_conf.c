@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.23 2002/06/01 18:26:21 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.24 2002/09/28 21:00:55 jv Exp $";
 #endif
 
 #include "os.h"
@@ -248,6 +248,7 @@ char *cfile;
 			(*last)->hostname = NULL;
 			(*last)->address = NULL;
 			(*last)->timeout = timeout;
+			(*last)->reason	= NULL;
 			if (Mlist[i] == &Module_rfc931)
 				ident = *last;
 
@@ -291,6 +292,17 @@ char *cfile;
 							mystrdup(buffer + 10);
 					continue;
 				    }
+				if (!strncasecmp(buffer+1, "reason = ", 9))
+				{
+					if ((*last)->reason)
+						conf_err(lnnb,
+					"Duplicate reason keyword: ignored.",
+						cfile);
+					else
+						(*last)->reason =
+							mystrdup(buffer + 10);
+					continue;
+				}
 				if (!strncasecmp(buffer+1, "host = ", 7))
 				    {
 					needh = 1;
