@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt
-  $Id: INSTALL.txt,v 1.39 2002/06/01 18:11:57 chopin Exp $
+  $Id: INSTALL.txt,v 1.40 2002/06/01 18:14:58 chopin Exp $
 
   This document describes how to install, and configure IRC 2.10.3.
 
@@ -354,7 +354,7 @@
      SSIIDD
         Defines Server ID, network-wide unique identifier of your
         server. It must begin with a digit. This must be set with
-        cooperation of other servers' admins. On IRCNet you must consult
+        cooperation of other servers' admins. On IRCnet you must consult
         your coord and/or admins of your peers.
 
      EExxaammppllee::
@@ -415,7 +415,7 @@
 
         A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu
         UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello
-        in Finnish today?;)::IRCNet
+        in Finnish today?;)::IRCnet
 
         Would look like this when printed out with the /admin command:
 
@@ -1157,7 +1157,7 @@
         The class field should refer to an existing class.
 
      WWiillddccaarrddss ddoommaaiinnss
-        To reduce the great amount of servers in IRCNet wildcard DOMAINS
+        To reduce the great amount of servers in IRCnet wildcard DOMAINS
         were introduced in 2.6. To explain the usage of wildcard domains
         we take an example of such:
 

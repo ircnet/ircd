@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.41 2002/06/01 18:03:43 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.42 2002/06/01 18:14:58 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.10.3.
 </abstract>
@@ -308,7 +308,7 @@ field description in connect lines).
 <tag/SID/
 Defines Server ID, network-wide unique identifier of
 your server. It must begin with a digit. This must be set with
-cooperation of other servers' admins. On IRCNet you must
+cooperation of other servers' admins. On IRCnet you must
 consult your coord and/or admins of your peers.
 <tag/Example:/ 
 M:tolsun.oulu.fi::Oulu, Finland:6667:00A
@@ -353,7 +353,7 @@ in 005 numerics. Use only one word!
 (the line is just one line in the confuration file, here it
 is cut into two lines to make it clearer to read):
 <p>
-A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello in Finnish today?;)::IRCNet
+A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello in Finnish today?;)::IRCnet
 <p>
 Would look like this when printed out with the /admin command:
 <p>
@@ -973,7 +973,7 @@ field.
 <tag/Domain Mask/ Domain masking, see below.
 <tag/Class/ The class field should refer to an existing class.
 <tag/Wildcards domains/ To reduce the great amount of
-servers in IRCNet wildcard DOMAINS were introduced in
+servers in IRCnet wildcard DOMAINS were introduced in
 2.6. To explain the usage of wildcard domains we take an
 example of such:
 <p>
