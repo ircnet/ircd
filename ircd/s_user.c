@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.104 2001/12/30 16:09:06 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.105 2001/12/31 01:21:25 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -256,7 +256,7 @@ int	server;
 		return 0;
 
 	for (ch = nick; *ch && (ch - nick) < NICKLEN; ch++)
-		if (!isvalid(*ch) || isspace(*ch))
+		if (!isvalidnick(*ch))
 			break;
 
 	*ch = '\0';
@@ -548,6 +548,18 @@ char	*nick, *username;
 			return exit_client(cptr, sptr, &me, "Bad Password");
 		    }
 		bzero(sptr->passwd, sizeof(sptr->passwd));
+#ifdef RESTRICT_USERNAMES
+		/*
+		** Do not allow special chars in the username.
+		*/
+		if (!isvalidusername(user->username))
+		{
+			ircstp->is_ref++;
+			sendto_flag(SCH_LOCAL, "Invalid username:  %s@%s.",
+				sptr->user->username, sptr->sockhost);
+			return exit_client(cptr, sptr, &me, "Invalid username");
+		}
+#endif
 		/*
 		 * following block for the benefit of time-dependent K:-lines
 		 */

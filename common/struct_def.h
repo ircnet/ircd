@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.49 2001/12/30 07:24:08 chopin Exp $
+ *   $Id: struct_def.h,v 1.50 2001/12/31 01:21:24 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -671,8 +671,6 @@ struct Channel	{
 #define	BadPtr(x) (!(x) || (*(x) == '\0'))
 #define	BadTo(x) (BadPtr((x)) ? "*" : (x))
 
-#define	isvalid(c) (((c) >= 'A' && (c) <= '~') || isdigit(c) || (c) == '-')
-
 #define	MyConnect(x)			((x)->fd >= 0)
 #define	MyClient(x)			(MyConnect(x) && IsClient(x))
 #define	MyPerson(x)			(MyConnect(x) && IsPerson(x))
@@ -850,3 +848,12 @@ typedef	struct	Ignore {
 #define	HEADERLEN	200
 
 #endif /* CLIENT_COMPILE */
+
+/* safety checks */
+#if ! (UIDLEN <= NICKLEN)
+#   error UIDLEN must not be bigger than NICKLEN
+#endif
+#if ! (UIDLEN > SIDLEN)
+#   error UIDLEN must be bigger than SIDLEN
+#endif
+

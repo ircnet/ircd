@@ -609,11 +609,4 @@
 */
 #define	NOWRITEALARM	1
 
-/* safety checks */
-# if	(UIDLEN > NICKLEN)
-#error UIDLEN must not be bigger than NICKLEN
-# endif
-
-# if	(UIDLEN <= SIDLEN)
-#error UIDLEN must be bigger than SIDLEN
-# endif
+#define RESTRICT_USERNAMES
