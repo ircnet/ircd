@@ -1,3 +1,15 @@
+Mon Sep  7 18:03:34 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* s_bsd.c: inversed test for -s in start_iauth().
+
+	* channel.c:
+		* keys starting with ':' don't propagate correctly.
+		* m_njoin() didn't send modes properly to clients.
+
+	* s_serv.c:
+		* slightly changed the PASS syntax again.
+		* 2.10 alphas didn't recognize peers as such (reported by Q).
+
 Sun Aug 23 22:16:40 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* struct_def.h, ircd.c, list.c, list_ext.h, s_conf.c, s_serv.c,
