@@ -1,3 +1,91 @@
+1999-03-04  Christophe Kalt
+
+	* ircd.c/io_loop(), s_bsd.c/start_iauth(): keep trying to restart
+	iauth (up to once every 90 seconds) to avoid being iauth-less.
+
+	* struct_def.h, mod_socks.c, s_auth.c, s_user.c: added new message
+	type from iauth to ircd to allow denying connections without any
+	message sent to &AUTH; used by the socks module.
+
+1999-02-22  Christophe Kalt
+
+	* s_err.c: RPL_TRACESERVICE changed to show values in hexadecimal
+	(from Thomas Kuiper).
+
+	* s_service.c/m_service(): fixed error message.
+
+1999-02-20  Christophe Kalt
+
+	* configure, configure.in, Makefile.in, config.h.dist, buildm4,
+	send.c, ircd.c, s_bsd.c, s_conf.c, s_misc.c, s_serv.c, s_user.c,
+	chkconf.c, a_conf.c, a_log.c: paths overhaul.
+
+	* c_msg_ext.h, c_msg.c: fixed m_server() prototype.
+
+1999-02-19  Kurt Roeckx
+
+	* packet.c/dopacket(), s_bsd.c/read_packet(): bugfix.
+
+1999-02-18  Christophe Kalt  <kalt@azurite>
+
+	* res.c/proc_answer(): fixed T_PTR processing (problem reported by
+	Michal Svoboda).
+	
+	* channel.c:
+		* del_modeid(): bugfix when called with NULL.
+		* can_join(): readability (from Q).
+
+	* s_serv.c/check_version():
+		* removed code about 2.10.0[ab]*.
+		* never used NJOIN with 0209* servers (bugfix).
+
+	* s_err.c: removed extraneous %s in RPL_UNIQOPIS.
+
+1999-02-09  Kurt Roeckx
+
+	* hash.c/hash_find_channels(): cleanup.
+
+	* ircd.c/main(), ircd_ext.h: various cleanups.
+
+	* res_comp_ext.h: added prototype for ircd_getshort().
+
+	* s_bsd.c/read_message(): typo fix (=! -> !=).
+
+	* s_conf.c/attach_conf(): stops detecting listen sockets as
+	clients from same IP address.
+
+	* s_err.c: removed / from replies.
+
+	* s_serv.c/m_links(): removed unused variable.
+
+	* s_user.c/who_channel(): removed unused variables.
+
+1999-02-05  Christophe Kalt
+
+	* match.c/match(): removed predictable if's (from Tero Jänkä).
+
+	* s_serv.c/m_server_estab(): flush_connections() called once
+	during burst.
+
+	* s_debug.c: updated.
+
+	* ircd.c/io_loop(), s_bsd.c/read_message(), s_bsd_ext.h, config.h:
+	new logic inspired from irce, removed PREFER_SERVER.
+
+	* s_bsd.c: 
+		* added read_listeners().
+		* set_sock_opts() now sets SO_SNDLOWAT.
+		* add_connection() now sends a message to client being
+		reject by the anti-clone crap.
+
+	* send.c: added flush_fdary() function.
+
+	* common_def.h, config.h, send.c: removed SENDQ_ALWAYS define,
+	simplified code for when it was undefined as it is only used by
+	the client now.
+
+2.10.2
+
 1999-02-03  Christophe Kalt
 
 	* mod_rfc931.c/rfc931_work(): get rid of any \n in replies.
@@ -90,6 +178,14 @@
 
 	* s_bsd.c: don't call dopacket() again for compressed links just
 	because the output buffer was filled up.
+
+1998-12-31  Christophe Kalt
+
+	* ircd.c: removed extraneous flush_connections() call in io_loop().
+	
+	* ircd.c, s_bsd.c, list.c, list_ext.h: removed unused 'active' code.
+
+	* struct_def.h, parse.c: removed various unused aClient fields.
 
 1998-12-24  Christophe Kalt
 

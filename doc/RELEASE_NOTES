@@ -1,6 +1,11 @@
-# @(#)$Id: RELEASE_NOTES,v 1.30 1999/01/29 00:08:52 kalt Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.31 1999/03/05 02:19:07 kalt Exp $
 
-This is version 2.10.2 of the IRC software.
+This is a development version of the IRC software.
+
+===============================================================================
+
+Important changes in 2.10.3 (since 2.10.2):
+	* default PATHs have changed, see INSTALL file and Makefile.
 
 ===============================================================================
 
