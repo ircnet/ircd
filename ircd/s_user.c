@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.51 1998/08/24 02:26:36 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.52 1998/09/09 14:31:06 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -2050,7 +2050,8 @@ char	*parv[];
 			sptr->user->away = NULL;
 		    }
 		if (sptr->user->flags & FLAGS_AWAY)
-			sendto_serv_butone(cptr, ":%s MODE :-a", parv[0]);
+			sendto_serv_butone(cptr, ":%s MODE %s :-a", parv[0],
+					   parv[0]);
 		/* sendto_serv_butone(cptr, ":%s AWAY", parv[0]); */
 		if (MyConnect(sptr))
 			sendto_one(sptr, rpl_str(RPL_UNAWAY, parv[0]));
@@ -2087,7 +2088,7 @@ char	*parv[];
 		istat.is_away++;
 		istat.is_awaymem += len;
 		away = (char *)MyMalloc(len);
-		sendto_serv_butone(cptr, ":%s MODE :+a", parv[0]);
+		sendto_serv_butone(cptr, ":%s MODE %s :+a", parv[0], parv[0]);
 	    }
 
 	sptr->user->flags |= FLAGS_AWAY;
@@ -2601,7 +2602,18 @@ char	*parv[];
 					istat.is_awaymem -= (strlen(sptr->user->away) + 1);
 					MyFree(sptr->user->away);
 					sptr->user->away = NULL;
+#ifdef  USE_SERVICES
+				check_services_butone(SERVICE_WANT_AWAY,
+						      sptr->user->server, sptr,
+						      ":%s AWAY", parv[0]);
+#endif
 				    }
+#ifdef  USE_SERVICES
+				if (what == MODE_ADD)
+				check_services_butone(SERVICE_WANT_AWAY,
+						      sptr->user->server, sptr,
+						      ":%s AWAY :", parv[0]);
+#endif
 			default :
 				for (s = user_modes; (flag = *s); s += 2)
 					if (*m == (char)(*(s+1)))
