@@ -1,3 +1,11 @@
+2003-10-18  Jakub Vlasek
+
+	* msg_def.h: Added MSG_MAP.
+	* numeric_def.h, s_err.c: Added MSG_MAPSTART, MSG_MAP and MSG_MAPEND.
+	* parse.c, s_serv_ext.h: Added m_map.
+	* s_serv.c: Added m_map(), dump_map() and dump_sid_map().
+	* s_serv.c/m_trace(): Allow tracing of a SID.
+	
 2003-10-17  Kurt Roeckx
 
 	* hash.c, list.c, s_id.c, s_serv.c, s_service.c: Fix warnings
