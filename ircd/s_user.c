@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.253 2005/02/15 19:20:23 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.254 2005/02/20 21:56:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -772,13 +772,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 ** m_nick
 **	parv[0] = sender prefix
 **	parv[1] = nickname
-** the following are only used between servers since version 2.9
-**	parv[2] = hopcount
-**	parv[3] = username (login name, account)
-**	parv[4] = client host name
-**	parv[5] = server token
-**	parv[6] = users mode
-**	parv[7] = users real name info
 */
 int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
@@ -802,18 +795,13 @@ int	m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return 1;
 	    }
 
-	if (parc < 2)
-	    {
-		sendto_one(sptr, replies[ERR_NONICKNAMEGIVEN], ME, BadTo(parv[0]));
-		return 1;
-	    }
 	/* local clients' nick size can be LOCALNICKLEN max */
 	allowednicklen = MyConnect(sptr) ? LOCALNICKLEN : NICKLEN;
 	strncpyzt(nick, parv[1], allowednicklen + 1);
 
 	if (IsServer(cptr))
 	{
-		if (parc != 8 && parc != 2)
+		if (parc != 2)
 		{
 			char buf[BUFSIZE];
 			int k;
@@ -837,12 +825,6 @@ badparamcountkills:
 				get_client_name(cptr, FALSE),
 				parv[0], buf[0] ? buf : "");
 			return 0;
-		}
-		else if (parc == 8)
-		{
-			/* :server NICK new hop user name srv flags :info */
-			user = parv[3];
-			host = parv[4];
 		}
 		else /* parc == 2 */
 		{
@@ -978,7 +960,7 @@ badparamcountkills:
 	}
 	/*
 	** Note: From this point forward it can be assumed that
-	** acptr != sptr (point to different client structures).
+	** acptr != sptr (points to different client structures).
 	*/
 	/*
 	** If the older one is "non-person", the new entry is just
@@ -1013,20 +995,7 @@ badparamcountkills:
 	** joined and having same nicks in use. We cannot have TWO users with
 	** same nick--purge this NICK from the system with a KILL... >;)
 	**
-	** Since 2.11, we will first try to SAVE both users, if possible.
-	*/
-
-	/*
-	** When dealing with collisions, we can see the following cases:
-	** - Both users have an UID: No problem at all, just SAVE them.
-	** - Neither of them has an UID: Just KILL them both.
-	** - One of them doesn't have an UID.  You have to KILL both clients.
-	**   You atleast have to KILL the one without.  If you send it to the
-	**   other server, the one with UID gets killed too because of the nick
-	**   chase.
-	**   You can't depend on the other to do the KILL for you, since it
-	**   might not even see the collision.  (The user changed nick
-	**   before it.)
+	** Since 2.11, we SAVE both users, not KILL.
 	*/
 
 	/*
@@ -1035,53 +1004,15 @@ badparamcountkills:
 	*/
 	if (sptr == cptr)
 	{
-		/*
-		** A new NICK being introduced by a neighbouring
-		** server (e.g. message type "NICK new" received)
-		*/
-		if (parc != 8)
-		{
-			/* New NICK *must* have proper param count */
-			goto badparamcountkills;
-		}
-		/*
-		** A new client never has an UID in this function, so
-		** we have to kill both clients.
-		*/
-		sendto_one(acptr, replies[ERR_NICKCOLLISION], ME, acptr->name,
-			acptr->name, user, host);
-		sendto_one(cptr, replies[ERR_NICKCOLLISION], ME, acptr->name,
-			acptr->name, 
-			(acptr->user) ? acptr->user->username : "???",
-			(acptr->user) ? acptr->user->host : "???");
-		sendto_flag(SCH_KILL,
-			    "Nick collision on %s (%s@%s)%s <- (%s@%s)%s",
-			    acptr->name,
-			    (acptr->user) ? acptr->user->username : "???",
-			    (acptr->user) ? acptr->user->host : "???",
-			    acptr->from->name,
-			    user, host, get_client_name(cptr, FALSE));
-		ircstp->is_kill++;
-		sendto_serv_butone(NULL, 
-				   ":%s KILL %s :%s ((%s@%s)%s <- (%s@%s)%s)",
-				   ME, acptr->name, ME,
-				   (acptr->user) ? acptr->user->username:"???",
-				   (acptr->user) ? acptr->user->host : "???",
-				   acptr->from->name, user, host,
-				   /* NOTE: Cannot use get_client_name twice
-				   ** here, it returns static string pointer:
-				   ** the other info would be lost
-				   */
-				   get_client_name(cptr, FALSE));
-		acptr->flags |= FLAGS_KILLED;
-		return exit_client(NULL, acptr, &me, "Nick collision");
+		/* 2.11+ do not introduce clients with NICK. --B. */
+		goto badparamcountkills;
 	}
 
 	/*
-	** Since it's not a new client, it might have an UID here, so check
-	** both to have one.  If they both have one, SAVE them.
+	** Since it's not a new client, it must have an UID here,
+	** so SAVE them both.
 	*/
-	if (sptr->user && acptr->user)	/* XXX check if needed at all */
+	/* assert(sptr->user!=NULL); assert(acptr->user!=NULL); */
 	{
 		char	path[BUFSIZE];
 
@@ -1102,74 +1033,14 @@ badparamcountkills:
 		return 2;
 	}
 
-	/*
-	** A NICK change has collided (e.g. message type
-	** ":old NICK new". This requires more complex cleanout.
-	** Both clients must be purged from this server, the "new"
-	** must be killed from the incoming connection, and "old" must
-	** be purged from all outgoing connections.
-	*/
-	if (parc != 2)
-	{
-		/* NICK change *must* have proper param count */
-		goto badparamcountkills;
-	}
-	sendto_one(acptr, replies[ERR_NICKCOLLISION], ME, acptr->name,
-		acptr->name, user, host);
-	sendto_one(cptr, replies[ERR_NICKCOLLISION], ME, acptr->name,
-		acptr->name, 
-		(acptr->user) ? acptr->user->username : "???",
-		(acptr->user) ? acptr->user->host : "???");
-	sendto_flag(SCH_KILL, "Nick change collision %s!%s@%s to %s %s <- %s",
-		    sptr->name, user, host, acptr->name, acptr->from->name,
-		    get_client_name(cptr, FALSE));
-	ircstp->is_kill++;
-	sendto_serv_butone(NULL, /* KILL old from outgoing servers */
-			   ":%s KILL %s :%s (%s@%s[%s](%s) <- %s@%s[%s])",
-			   ME, sptr->name, ME, acptr->user->username, 
-			   acptr->user->host, acptr->from->name, acptr->name,
-			   user, host, cptr->name);
-	ircstp->is_kill++;
-	sendto_serv_butone(NULL, /* Kill new from incoming link */
-		   ":%s KILL %s :%s (%s@%s[%s] <- %s@%s[%s](%s))",
-		   ME, acptr->name, ME, acptr->user->username,
-		   acptr->user->host, acptr->from->name,
-		   user, host, cptr->name, sptr->name);
-	acptr->flags |= FLAGS_KILLED;
-	(void)exit_client(NULL, acptr, &me, "Nick collision(new)");
-	sptr->flags |= FLAGS_KILLED;
-	return exit_client(cptr, sptr, &me, "Nick collision(old)");
-
 nickkilldone:
 	if (IsServer(sptr))
-	    {
-		char	*pv[7];
-
-		if (parc != 8)
-		{
-			/* New NICK *must* have proper param count */
-			goto badparamcountkills;
-		}
-
-		/* A server introducing a new client, change source */
-		sptr = make_client(cptr);
-		add_client_to_list(sptr);
-		if (parc > 2)
-			sptr->hopcount = atoi(parv[2]);
-		(void)strcpy(sptr->name, nick);
-
-		pv[0] = sptr->name;
-		pv[1] = parv[3];
-		pv[2] = parv[4];
-		pv[3] = parv[5];
-		pv[4] = parv[7];
-		pv[5] = parv[6];
-		pv[6] = NULL;
-		(void)add_to_client_hash_table(nick, sptr);
-		return m_user(cptr, sptr, 6, pv);
-	    }
+	{
+		/* 2.11+ do not introduce clients with NICK. --B. */
+		goto badparamcountkills;
+	}
 	else if (sptr->name[0])		/* NICK received before, changing */
-	    {
+	{
 		if (MyConnect(sptr))
 		{
 			if (!IsPerson(sptr))    /* Unregistered client */
@@ -1215,14 +1086,14 @@ nickkilldone:
 				sptr->user->username, sptr->user->host, nick);
 #endif
 		if (sptr->user) /* should always be true.. */
-		    {
+		{
 			add_history(sptr, sptr);
 #ifdef	USE_SERVICES
 			check_services_butone(SERVICE_WANT_NICK,
 					      sptr->user->server, sptr,
 					      ":%s NICK :%s", parv[0], nick);
 #endif
-		    }
+		}
 		else
 			sendto_flag(SCH_NOTICE,
 				    "Illegal NICK change: %s -> %s from %s",
@@ -1231,9 +1102,9 @@ nickkilldone:
 		if (sptr->name[0])
 			(void)del_from_client_hash_table(sptr->name, sptr);
 		(void)strcpy(sptr->name, nick);
-	    }
+	}
 	else
-	    {
+	{
 		/* Client setting NICK the first time */
 
 		/* This had to be copied here to avoid problems.. */
@@ -1266,7 +1137,7 @@ nickkilldone:
 		{
 			return 3;
 		}
-	    }
+	}
 	/* Registered client doing "NICK 0" already has UID in sptr->name.
 	** If sptr->name is "0" here, it means there was no "USER" (thanks
 	** to that fiction's "isdigit" check above after register_user), so
