@@ -1,3 +1,31 @@
+Sun Sep 20 15:22:25 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* os.h, configure.in: configure now checks for poll() existence to
+	decide if it should be used.
+
+	* res_init.c, s_conf.c: strncpy() bugfixes (from Q).
+
+	* s_auth.c, mod_rfc931.c: '[' is no longer allowed in ident replies.
+
+	* channel.c: don't let chanops set +a on !channels.
+
+	* a_io.c: (weirdbug)fix.
+
+	* s_err.c: numeric 004 update.
+
+	* s_user.c: connections rejected by iauth are now shown as K-lined
+	in &LOCAL.
+
+	* s_bsd.c: new PASS syntax (Q).
+
+Sun Sep 13 20:32:08 1998  Christophe Kalt  <kalt@millennium.stealth.net>
+
+	* config.h.dist, ircd.c: removed MYNAME.
+	
+	* Makefile.in, config.h.dist: SPATH/APATH cleanup.
+
+	* parse.c: ABW fix (Leon Brouwers <leonb@sci.kun.nl> and purify).
+
 Sat Sep 12 18:53:39 1998  Christophe Kalt  <kalt@millennium.stealth.net>
 
 	* ircd.c, s_bsd.c: SIGCHLD handling code to avoid zombies.

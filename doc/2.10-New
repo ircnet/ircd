@@ -5,6 +5,7 @@
 	* added channel mode +e (exceptions to bans).
 	* added channel mode +I (invitations).
 	* invites can now be used to override channel bans and limit.
+	* banned users cannot speak on channel without +o/+v.
 	* ! channels introduced (can't be collided);
 	  A quite detailed technical description can be found on the web:
 		http://www.stealth.net/~kalt/irc/channel.html
