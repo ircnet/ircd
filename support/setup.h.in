@@ -351,9 +351,6 @@
    (e.g. linux 2.0.x) have a non-working poll() */
 #undef USE_POLL
 
-/* Define is the system can use variable arguments. */
-#undef USE_STDARG
-
 /* Define if the second argument of waitpid must be an "union wait *" instead
    of an "int *". */
 #undef USE_UNION_WAIT
