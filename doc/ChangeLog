@@ -1,3 +1,10 @@
+2.11.0b19
+
+2004-11-29  Piotr Kucharski
+
+	* send.c/send_message(): use to->name, not get_client_name in &notices.
+	* s_user.c/m_nick(), config.h.dist: DISABLE_NICK0_REGISTRATION define.
+
 2.11.0b18
 
 2004-11-20  Piotr Kucharski
@@ -10,7 +17,8 @@
 
 	* send.c/send_queued(): use strerror, not errno.
 	* send.c, channel.c, config_read.c, hash.c, s_user.c, whowas.c: remove
-	  some unused variables to get rid of warnings.
+	  some unused variables to get rid of warnings (compilation warnings of
+	  today noted by Andreas Ley).
 	* s_bsd.c/read_message(): move write_err declaration out to get rid of
 	  some errors.
 	* s_bsd.c: new function add_connection_refuse().
