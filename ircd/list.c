@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: list.c,v 1.31 2004/03/07 02:47:50 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: list.c,v 1.32 2004/03/11 02:06:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -277,7 +277,7 @@ aServer	*make_server(aClient *cptr)
 
 /*
 ** free_user
-**	Decrease user reference count by one and realease block,
+**	Decrease user reference count by one and release block,
 **	if count reaches 0
 */
 void	free_user(anUser *user, aClient *cptr)
@@ -332,12 +332,34 @@ void	free_user(anUser *user, aClient *cptr)
 
 void	free_server(aServer *serv, aClient *cptr)
 {
+	if (cptr && cptr->serv)
+	{
+		/* has to be removed from the list of aServer structures */
+		if (cptr->serv->nexts)
+			cptr->serv->nexts->prevs = cptr->serv->prevs;
+		if (cptr->serv->prevs)
+			cptr->serv->prevs->nexts = cptr->serv->nexts;
+		if (svrtop == cptr->serv)
+			svrtop = cptr->serv->nexts;
+		cptr->serv->prevs = NULL;
+		cptr->serv->nexts = NULL;
+		if (cptr->serv->user)
+		{
+			free_user(cptr->serv->user, cptr);
+			cptr->serv->user = NULL;
+		}
+		ClearBit(cptr->serv->ltok);
+		cptr->serv->bcptr = NULL;
+	}
+
+	/* decrement reference counter, and eventually free it */
 	if (--serv->refcnt <= 0)
-	    {
+	{
 		if (serv->refcnt < 0 ||	serv->prevs || serv->nexts ||
 		    serv->bcptr || serv->user)
-		    {
+		{
 			char buf[512];
+
 			sprintf(buf, "%d %p %p %p %p (%s)",
 				serv->refcnt, (void *)serv->prevs,
 				(void *)serv->nexts, (void *)serv->user,
@@ -351,9 +373,9 @@ void	free_server(aServer *serv, aClient *cptr)
 			sendto_flag(SCH_ERROR, "* %#x server %s %s *",
 				    cptr, cptr ? cptr->name : "<noname>", buf);
 #endif
-		    }
+		}
 		MyFree(serv);
-	    }
+	}
 }
 
 /*
@@ -389,25 +411,6 @@ void	remove_client_from_list(aClient *cptr)
 
 	if (cptr->serv)
 	    {
-		/* has to be removed from the list of aServer structures */
-		if (cptr->serv->nexts)
-			cptr->serv->nexts->prevs = cptr->serv->prevs;
-		if (cptr->serv->prevs)
-			cptr->serv->prevs->nexts = cptr->serv->nexts;
-		if (svrtop == cptr->serv)
-			svrtop = cptr->serv->nexts;
-		cptr->serv->prevs = NULL;
-		cptr->serv->nexts = NULL;
-		
-		if (cptr->serv->user)
-		    {
-			free_user(cptr->serv->user, cptr);
-			cptr->serv->user = NULL;
-		    }
-
-		ClearBit(cptr->serv->ltok);
-		/* decrement reference counter, and eventually free it */
-		cptr->serv->bcptr = NULL;
 		free_server(cptr->serv, cptr);
 	    }
 
