@@ -2,6 +2,8 @@
 
 	* iauth.c: new function write_pidfile().
 	* Makefile.in: added IAUTHPID_PATH.
+	* s_user.c/m_quit(): enclose local users' supplied quit reasons with
+	  double quotes; get rid of default "I Quit" message.
 
 2004-01-20  Piotr Kucharski
 

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.165 2003/11/13 21:55:54 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.166 2004/02/08 01:57:00 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2417,15 +2417,19 @@ user_finish:
 */
 int	m_quit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	static	char	quitc[] = "I Quit";
-	register char *comment = (parc > 1 && parv[1]) ? parv[1] : quitc;
+	static	char comment[TOPICLEN+1];
 
 	if (MyClient(sptr) || MyService(sptr))
-		if (!strncmp("Local Kill", comment, 10) ||
-		    !strncmp(comment, "Killed", 6))
-			comment = quitc;
-	if (strlen(comment) > (size_t) TOPICLEN)
-		comment[TOPICLEN] = '\0';
+	{
+		(void) snprintf(comment, TOPICLEN, "\"%s",
+			(parc > 1 && parv[1]) ? parv[1] : "");
+		(void) strcat(comment, "\"");
+	}
+	else
+	{
+		(void) snprintf(comment, TOPICLEN + 1, "%s",
+			(parc > 1 && parv[1]) ? parv[1] : "");
+	}
 	return IsServer(sptr) ? 0 : exit_client(cptr, sptr, sptr, comment);
 }
 
