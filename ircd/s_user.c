@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_user.c,v 1.97 2001/12/25 20:44:37 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_user.c,v 1.98 2001/12/27 19:17:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1301,20 +1301,33 @@ char	*parv[];
 		    }
 	    }
 
+	/*
+	** the following is copied from m_user() as we need only
+	** few things from it here, as we assume (should we?) it
+	** is all ok since UNICK can come only from other server
+	*/
 	acptr = make_client(cptr);
 	add_client_to_list(acptr);
+	acptr->user = make_user(sptr);
+	/* more corrrect is this, but we don't yet have ->mask, so...
+	acptr->user->servp = find_server_name(sptr->serv->mask->serv->snum);
+	... just remember to change it one day --Beeth */
+	acptr->user->servp = find_server_name(sptr->serv->snum);
+	sptr->serv->refcnt++;
+	/*
+	** shouldn't it be here strdup? let's hope refcnt will
+	** prevent freeing it
+	*/
+	acptr->user->server = sptr->name;
+	if (strlen(realname) > REALLEN)
 	{
-	    char	*pv[7];
-	    
-	    pv[0] = nick;  /* sender prefix in m_user? */
-	    pv[1] = user;
-	    pv[2] = host;
-	    pv[3] = parv[2]; /* uid (used to be server token) */
-	    pv[4] = parv[7]; /* users real name info */
-	    pv[5] = parv[6]; /* users mode */
-	    pv[6] = NULL;
-	    m_user(cptr, acptr, 6, pv);
+		realname[REALLEN] = '\0';
 	}
+	acptr->info = mystrdup(realname);
+	strncpyzt(acptr->user->username, parv[3], USERLEN+1);
+	strncpyzt(acptr->user->host, host, sizeof(acptr->user->host));
+	reorder_client_in_list(acptr);
+
 	/*
 	** NOTE: acptr->name has to be set *after* calling m_user();
 	** else it will already introduce the client which
