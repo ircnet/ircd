@@ -8696,7 +8696,7 @@ PATCHLEVEL
 
 _ACEOF
 if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  $EGREP "^\"......00" >/dev/null 2>&1; then
+  $EGREP "^ *\"......00" >/dev/null 2>&1; then
   irc_cv_alpha_beta=
 else
   irc_cv_alpha_beta=yes
