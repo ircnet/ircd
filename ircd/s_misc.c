@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.46 2002/06/02 00:47:07 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_misc.c,v 1.47 2002/06/06 04:59:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -468,7 +468,7 @@ char	*comment;	/* Reason for the exit */
 		    {
 # if defined(FNAME_USERLOG) || defined(USE_SERVICES) || \
 	(defined(USE_SYSLOG) && defined(SYSLOG_USERS))
-			sendto_flog(sptr, NULL, sptr->user->username,
+			sendto_flog(sptr, EXITC_REG, sptr->user->username,
 				    sptr->user->host);
 # endif
 		    }
@@ -476,8 +476,12 @@ char	*comment;	/* Reason for the exit */
 		    {
 # if defined(FNAME_CONNLOG) || defined(USE_SERVICES) || \
 	(defined(USE_SYSLOG) && defined(SYSLOG_CONN))
-			sendto_flog(sptr, sptr->exitc ? sptr->exitc :
-				    EXITC_UNDEF, sptr->user && sptr->user->username ?
+			if (sptr->exitc == NULL || sptr->exitc == EXITC_REG)
+			{
+				sptr->exitc = EXITC_UNDEF;
+			}
+			sendto_flog(sptr, sptr->exitc,
+				    sptr->user && sptr->user->username ?
 				    sptr->user->username : "",
 				    (IsUnixSocket(sptr)) ? me.sockhost :
 				    ((sptr->hostp) ? sptr->hostp->h_name :

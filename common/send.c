@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: send.c,v 1.49 2002/06/04 21:39:01 jv Exp $";
+static  char rcsid[] = "@(#)$Id: send.c,v 1.50 2002/06/06 04:59:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1519,16 +1519,14 @@ logfiles_close()
 
 /*
  * sendto_flog
- *	cptr		used for firsttime, auth, exitc, send/received M/K
- *	msg		if this contains a message, it means rejected client,
- *			hence we will log it in connlog; otherwise it's client
- *			quitting, so it ends up in userlog --Beeth
- *	username	can't get it from cptr
+ *	cptr		used for firsttime, auth, exitc, send/receive M/B
+ *	msg		exit code
+ *	username	sometimes can't get it from cptr
  *	hostname	i.e.
  */
 void	sendto_flog(cptr, msg, username, hostname)
 aClient	*cptr;
-char	*msg, *username, *hostname;
+char	msg, *username, *hostname;
 {
 	/* 
 	** One day we will rewrite linebuf to malloc()s, but for now
@@ -1548,7 +1546,11 @@ char	*msg, *username, *hostname;
 #endif
 	int	logfile;
 
-	logfile = msg ? connlog : userlog;
+	/*
+	** EXITC_REG == 0 means registered client quitting, so it goes to
+	** userlog; otherwise it's rejection and goes to connlog --Beeth.
+	*/
+	logfile = msg == EXITC_REG ? userlog : connlog;
 
 #if !defined(USE_SERVICES) && !( defined(USE_SYSLOG) && \
 	(defined(SYSLOG_USERS) || defined(SYSLOG_CONN)) )
@@ -1558,7 +1560,7 @@ char	*msg, *username, *hostname;
 	}
 #endif
 #ifdef LOG_OLDFORMAT
-	if (!msg)
+	if (msg == EXITC_REG)
 	{
 		time_t	duration;
 
@@ -1568,23 +1570,33 @@ char	*msg, *username, *hostname;
 			(int) ((duration % 3600) / 60),
 			(int) (duration % 60));
 	}
+	else
+	{
+		char *anyptr;
 
-	/*
-	** Aha, cptr->firsttime is time when user connected,
-	** so we syslog() it anyway. I'm waving big
-	** "rewrite log format" flag --Beeth.
-	*/
+		switch(msg)
+		{
+			case EXITC_GHMAX:	anyptr="G IP  max"; break;
+			case EXITC_GUHMAX:	anyptr="G u@h max"; break;
+			case EXITC_LHMAX:	anyptr="L IP  max"; break;
+			case EXITC_LUHMAX:	anyptr="L u@h max"; break;
+			case EXITC_AREF:
+			case EXITC_AREFQ:	anyptr=" Denied  "; break;
+			case EXITC_KLINE:	anyptr=" K lined "; break;
+			default:		anyptr=" Unknown ";
+		}
+		(void)sprintf(buf, "%s", anyptr);
+	}
 	(void)sprintf(linebuf,
 		"%s (%s): %s@%s [%s] %c %lu %luKb %lu %luKb\n",
-		myctime(cptr->firsttime), msg ? msg : buf,
-		username[0]?username:"<none>", hostname,
+		myctime(cptr->firsttime), buf,
+		username[0] ? username : "<none>", hostname,
 		cptr->auth ? cptr->auth : "<none>",
-		cptr->exitc, cptr->sendM, cptr->sendB>>10,
-		cptr->receiveM, cptr->receiveB>>10);
+		cptr->exitc, cptr->sendM, (long)(cptr->sendB>>10),
+		cptr->receiveM, (long)(cptr->receiveB>>10));
 #else
 	/*
 	** This is the content of loglines.
-	** (See? Waving a flag helped! ;-) --Beeth)
 	*/
 	(void)sprintf(linebuf,
 		"%c\t%d\t%d\t%s\t%s\t%s\t%s\t%d\t%s\t%lu\t%llu\t%lu\t%llu\n",
@@ -1600,7 +1612,7 @@ char	*msg, *username, *hostname;
 		cptr->sendM, cptr->sendB, cptr->receiveM, cptr->receiveB);
 #endif /* LOG_OLDFORMAT */
 #if defined(USE_SYSLOG) && (defined(SYSLOG_USERS) || defined(SYSLOG_CONN))
-	if (!msg)
+	if (msg == EXITC_REG)
 	{
 #  ifdef SYSLOG_USERS
 		syslog(LOG_NOTICE, "%s", linebuf);
@@ -1615,7 +1627,7 @@ char	*msg, *username, *hostname;
 #endif	/* USE_SYSLOG */
 
 #ifdef	USE_SERVICES
-	if (!msg)
+	if (msg == EXITC_REG)
 	{
 		check_services_butone(SERVICE_WANT_USERLOG, NULL, &me,
 				      "USERLOG :%s", linebuf);
