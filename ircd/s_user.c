@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.241 2005/01/30 13:45:08 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.242 2005/01/30 14:34:44 q Exp $";
 #endif
 
 #include "os.h"
@@ -763,12 +763,12 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		 * we are fully 2.11 */
 		if (ST_UID(acptr))
 		{
-				sendto_one(acptr,
-					":%s UNICK %s %s %s %s %s %s :%s",
-					user->servp->sid, nick, user->uid,
-					user->username, user->host, user->sip,
-					(*buf) ? buf : "+", sptr->info);
-			}
+			sendto_one(acptr,
+				":%s UNICK %s %s %s %s %s %s :%s",
+				user->servp->sid, nick, user->uid,
+				user->username, user->host, user->sip,
+				(*buf) ? buf : "+", sptr->info);
+		}
 	}	/* for(my-leaf-servers) */
 #ifdef	USE_SERVICES
 #if 0
@@ -2390,17 +2390,17 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		aClient	*acptr = NULL;
 		aServer	*sp = NULL;
 
-			/*
-			** Why? Why do we keep doing this?
-			** s_service.c had the same kind of kludge.
-			** Can't we get rid of this? - krys
-			*/
-			acptr = find_server(server, NULL);
-			if (acptr)
-				sendto_flag(SCH_ERROR,
-			    "ERROR: SERVER:%s uses wrong syntax for NICK (%s)",
-					    get_client_name(cptr, FALSE),
-					    parv[0]);
+		/*
+		** Why? Why do we keep doing this?
+		** s_service.c had the same kind of kludge.
+		** Can't we get rid of this? - krys
+		*/
+		acptr = find_server(server, NULL);
+		if (acptr)
+			sendto_flag(SCH_ERROR,
+		    "ERROR: SERVER:%s uses wrong syntax for NICK (%s)",
+				    get_client_name(cptr, FALSE),
+				    parv[0]);
 		if (acptr)
 			sp = acptr->serv;
 		else if (!sp)

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.259 2005/01/30 13:43:40 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.260 2005/01/30 14:34:43 q Exp $";
 #endif
 
 #include "os.h"
@@ -146,7 +146,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		server = cptr->name;
 	}
 	/* Try finding by sid. */
-		acptr = find_sid(server, NULL);
+	acptr = find_sid(server, NULL);
 	/*
 	** The following allows wild cards in SQUIT. Only useful
 	** when the command is issued by an oper.
@@ -584,8 +584,8 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	add_client_to_list(acptr);
 	register_server(acptr);
 
-		strncpyzt(acptr->serv->sid, parv[1], SIDLEN + 1);
-		add_to_sid_hash_table(parv[1], acptr);
+	strncpyzt(acptr->serv->sid, parv[1], SIDLEN + 1);
+	add_to_sid_hash_table(parv[1], acptr);
 
 	add_server_to_tree(acptr);
 
@@ -827,9 +827,9 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 		if (ST_UID(cptr))
 		{
-				strncpyzt(acptr->serv->sid, parv[3], SIDLEN+1);
-				acptr->serv->version |= SV_UID;
-				add_to_sid_hash_table(parv[3], acptr);
+			strncpyzt(acptr->serv->sid, parv[3], SIDLEN+1);
+			acptr->serv->version |= SV_UID;
+			add_to_sid_hash_table(parv[3], acptr);
 
 			strncpyzt(acptr->serv->verstr,
 				parv[4], sizeof(acptr->serv->verstr));
@@ -3036,7 +3036,7 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		acptr = NULL;
 		
-			acptr = find_sid(sid, NULL);
+		acptr = find_sid(sid, NULL);
 		if (!acptr)
 		{
 			sendto_flag(SCH_SERVER,

@@ -33,7 +33,7 @@
 	  used uninitialised when TIMEDKLINES is not defined.
 	* configure, setup.h.in, os.h: Make configure detect the arguments of
 	  accept() and use the 3rd argument for SOCK_LEN_TYPE, which should be
-          socklen_t in most cases.
+	  socklen_t in most cases.
 	* mode_pipe.c/pipe_start(): Properly terminate the call to execlp()
 	  with a (char *)NULL.
 	* os.h, support.c, support_ext.h, a_io.c, nameser_def.h, res.c,
