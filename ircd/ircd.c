@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.77 2002/03/17 20:06:47 jv Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.78 2002/04/08 02:45:56 jv Exp $";
 #endif
 
 #include "os.h"
@@ -567,7 +567,8 @@ aClient	*mp;
 	(void) strcpy(mp->user->host, mp->name);
 
 	(void)add_to_client_hash_table(mp->name, mp);
-
+	(void)add_to_sid_hash_table(mp->serv->sid, mp);
+	strncpyzt(mp->serv->verstr, PATCHLEVEL, sizeof(mp->serv->verstr));
 	setup_server_channels(mp);
 }
 
@@ -912,7 +913,6 @@ char	*argv[];
 	    }
 
 	setup_me(&me);
-	add_to_sid_hash_table(me.serv->sid,&me);
 	check_class();
 	ircd_writetune(tunefile);
 	if (bootopt & BOOT_INETD)
