@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.60 1999/07/23 17:04:56 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.61 1999/08/01 02:54:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -601,7 +601,7 @@ aClient	*mp;
 static	int	bad_command()
 {
   (void)printf(
-	 "Usage: ircd [-a] [-b] [-c] [-d path]%s [-h servername] [-q] [-o] [-i] [-T tunefile] [-p (strict|on|off)] [-v] %s\n",
+	 "Usage: ircd [-a] [-b] [-c]%s [-h servername] [-q] [-o] [-i] [-T tunefile] [-p (strict|on|off)] [-s] [-v] %s\n",
 #ifdef CMDLINE_CONFIG
 	 " [-f config]",
 #else
