@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.184 2004/03/30 13:59:06 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.185 2004/04/07 17:01:03 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3759,7 +3759,9 @@ static void report_listeners(aClient *sptr, char *to)
 
 	for (i = 0; i <= highest_fd; i++)
 	{
-		if (!(acptr = listeners[i]))
+		if (!(acptr = local[i]))
+			continue;
+		if (!IsListening(acptr))
 			continue;
 		tmp = acptr->confs->value.aconf;
 		sendto_one(sptr, ":%s %d %s %d %s %s %u %lu %llu %lu %llu %u"
