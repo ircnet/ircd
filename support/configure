@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# From configure.in Id: configure.in,v 1.43 1999/07/14 17:47:19 kalt Exp 
+# From configure.in Id: configure.in,v 1.44 1999/07/14 19:04:06 kalt Exp 
 
 # Guess values for system-dependent variables and create Makefiles.
 # Generated automatically using autoconf version 2.13 
@@ -3564,7 +3564,7 @@ echo "configure:3564: checking whether select or poll system call will be used" 
 if eval "test \"`echo '$''{'irc_cv_select_poll'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  if test "$irc_cv_sun" != "no" && test "x$irc_cv_solaris_2" = "x"; then
+  if test "$irc_cv_sun" != "no" && test "x$irc_cv_solaris_2" = "xno"; then
   # we don't like SunOS' poll() function
   irc_cv_select_poll=select
 else  

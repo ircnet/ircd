@@ -415,7 +415,7 @@ fi
 AC_DEFUN(IRC_SELECT_POLL,
 [AC_MSG_CHECKING([whether select or poll system call will be used])
 AC_CACHE_VAL(irc_cv_select_poll,
-[if test "$irc_cv_sun" != "no" && test "x$irc_cv_solaris_2" = "x"; then
+[if test "$irc_cv_sun" != "no" && test "x$irc_cv_solaris_2" = "xno"; then
   # we don't like SunOS' poll() function
   irc_cv_select_poll=select
 else  
@@ -1425,7 +1425,7 @@ dnl ----
 dnl main
 dnl ----
 
-AC_REVISION([$Id: configure.in,v 1.44 1999/07/14 19:04:06 kalt Exp $])
+AC_REVISION([$Id: configure.in,v 1.45 1999/07/17 21:12:43 kalt Exp $])
 AC_PREREQ(2.13)
 IRC_INIT(../ircd/ircd.c)
 AC_CONFIG_HEADER(setup.h:../support/setup.h.in)
