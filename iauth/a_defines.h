@@ -29,6 +29,9 @@
 #include "dbuf_def.h"	/* needed for struct_def.h, sigh */
 #include "class_def.h"	/* needed for struct_def.h, sigh */
 #include "struct_def.h"
+#if INET6
+# include "../ircd/nameser_def.h"
+#endif
 
 #include "a_conf_def.h"
 #include "a_struct_def.h"
