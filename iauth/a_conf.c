@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.1 1998/07/19 19:37:22 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_conf.c,v 1.2 1998/07/19 20:06:09 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -254,11 +254,11 @@ AnInstance *inst;
 	if ((ttmp = inst->hostname) && (cldata[cl].state & A_GOTH))
 		while (ttmp)
 		    {
-			if (match(ttmp->value, cldata[cl].hostname) == 0)
+			if (match(ttmp->value, cldata[cl].host) == 0)
 				return 0;
 			ttmp = ttmp->nextt;
 		    }
-	if (noipchk == 0 && ttmp = inst->address)
+	if (noipchk == 0 && (ttmp = inst->address))
 		while (ttmp)
 		    {
 			if (match(ttmp->value, cldata[cl].itsip) == 0)
