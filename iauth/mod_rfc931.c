@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.1 1998/07/19 19:37:26 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.2 1998/08/05 02:45:51 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -114,7 +114,11 @@ u_int cl;
 			if (cldata[cl].buflen > 512)
 			    cldata[cl].inbuffer[512] = '\0';
 			ch = index(cldata[cl].inbuffer, ':');
-			if (!strncmp(": USERID : UNIX : ", ch, 18))
+			if (ch == NULL)
+			    {
+				/* broken ident server */
+			    }
+			else if (!strncmp(": USERID : UNIX : ", ch, 18))
 			    {
 				/* bingo! */
 				if (cldata[cl].authuser)
