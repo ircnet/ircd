@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt
-<date>$Id: INSTALL.sgml,v 1.39 2001/10/20 17:57:24 q Exp $
+<date>$Id: INSTALL.sgml,v 1.40 2002/06/01 17:46:58 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.10.3.
 </abstract>
@@ -276,7 +276,7 @@ IRC needs to know a few things about your UNIX site, and the
 ``M'' command specifies this information for IRC.  The fomat
 of this command is:
 <tag/Format/ 
-<verb>M:&lt;Server NAME&gt;:&lt;YOUR Internet IP&num;&gt;:&lt;Geographic Location&gt;:&lt;Port&gt;</verb>
+<verb>M:&lt;Server NAME&gt;:&lt;YOUR Internet IP&num;&gt;:&lt;Geographic Location&gt;:&lt;Port&gt;:&lt;SID&gt;</verb>
 <tag/M/ 
 ``M'' specifies a Machine description line
 <tag/Server NAME/ 
@@ -305,16 +305,21 @@ Defines the port on which your server will listen for UDP
 pings from other servers.  This should be the port were
 other servers are set to autoconnect.  (Also see the port
 field description in connect lines).
+<tag/SID/
+Defines Server ID, network-wide unique identifier of
+your server. It must begin with a digit. This must be set with
+cooperation of other servers' admins. On IRCNet you must
+consult your coord and/or admins of your peers.
 <tag/Example:/ 
-M:tolsun.oulu.fi::Oulu, Finland:6667:
+M:tolsun.oulu.fi::Oulu, Finland:6667:00A
 <p>
-This line reads: My Host's name is ``tolsun.oulu.fi'' and my
-site is located in ``Oulu, Finland''.
+This line reads: My Host's name is ``tolsun.oulu.fi'', my
+site is located in ``Oulu, Finland'' and my SID is ``00A''.
 <p>
-M:orion.cair.du.edu::Denver Colorado, USA:6667:
+M:orion.cair.du.edu::Denver Colorado, USA:6667:00B
 <p>
-This line reads: My Hosts name is ``orion.cair.du.edu'' and
-my site is located in ``Denver Colorado, USA''.
+This line reads: My Hosts name is ``orion.cair.du.edu'',
+my site is located in ``Denver Colorado, USA'' and my SID is ``00B''.
 </descrip>
 <p>
 
@@ -325,7 +330,7 @@ my site is located in ``Denver Colorado, USA''.
 information about a site. The e-mail address of the person
 running the server should be included here in case problems
 arise.
-<tag/Format/<verb>A:&lt;Your Name/Location&gt;:&lt;Your Electronic Mailing Addr&gt;:&lt;other&gt;::</verb>
+<tag/Format/<verb>A:&lt;Your Name/Location&gt;:&lt;Your E-Mail Addr&gt;:&lt;other&gt;::&lt;network name&gt;</verb>
 <tag/A/This specifies an Admin record.
 <tag/Your Name &amp; Location/ Use this field to say tell
 your FULL NAME and where in the world your machine is.  Be
@@ -342,11 +347,13 @@ work because you know that ``orion'' is part of the DOMAIN
 mailing addresses.
 <tag/Other/ This is really an OTHER field - you can add what
 you want here.
+<tag/Network name/ Use this field to announce your network name
+in 005 numerics. Use only one word!
 <tag/Example/
 (the line is just one line in the confuration file, here it
 is cut into two lines to make it clearer to read):
 <p>
-A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello in Finnish today?;)::
+A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello in Finnish today?;)::IRCNet
 <p>
 Would look like this when printed out with the /admin command:
 <p>
@@ -367,7 +374,7 @@ server's ability to accept connections. By use of this line
 in the ircd.conf file, it is easy to setup both Unix Domain
 ports for the server to accept connections on as well as
 extra internet ports.
-<tag/Format/<verb>P:&lt;Internet IP&num;&gt;:&lt;*&gt;:&lt;Internet IP Mask&gt;:&lt;Port&gt;:
+<tag/Format/<verb>P:&lt;Internet IP&num;&gt;:&lt;*&gt;::&lt;Port&gt;:
 P:&lt;Directory&gt;:&lt;*&gt;:&lt;*&gt;:&lt;Port&gt;:</verb>
 </descrip>
 <itemize>
@@ -381,20 +388,6 @@ CONFIGURATION section to properly configure outgoing
 connections.
 <p>
 P:192.168.1.194:::6664:
-<tag/Internet IP&num; Mask/ This defines where connections may
-come from and be accepted. The IP mask uses either *'s or
-0's as wildcards. The following two lines are the same:
-<p>
-<verb>P:::128.2.*:6664:
-P:::128.2.0.0:6664:
-</verb>
-<p>
-The incoming isn't matched against the mask, rather the ip&num;
-string is decoded and compared segment by segment. Thus
-<p>
-P:::128.2*.1.2:6664:
-<p>
-will not match 128.20.1.2.
 <tag/Port/ The port number field tells the server which port
 number it should listen on for incoming connections.
 </descrip>
@@ -414,7 +407,8 @@ Creates a unix socket in the /tmp/.ircd directory called
 </descrip>
 </itemize>
 <descrip>
-<tag/Note/ You need at least one P line.
+<tag/Note/ You need at least one P line or server won't start.
+(Unless you run it from inetd.)
 </descrip>
 
 <sect1>Connection Classes
@@ -470,9 +464,9 @@ Only x or y may be set, any unset value defaults to zero.
 ``Local limit'' field.  But, the connection counts are done
 for all clients present on the net instead of only counting
 local clients.
-<tag/Note/ leaving any of the fields (except SendQ) out
+<tag/Note/ leaving any of the fields (except SendQ and limits) out
 means their value is 0 (ZERO)!!  The SendQ field default
-value is dynamically determined.
+value is dynamically determined. Limits default to 1.1 (one connection).
 <tag/Note/ If you plan to use the local user@host limit,
 please read the following very carefully.  The ``user''
 value is the ident reply for the connection.  If no reply
@@ -486,20 +480,13 @@ define a local limit (same or lower) as it won't take more
 CPU and will make the global limit more accurate.
 <tag/Note/ The local and global limits only affect users (I
 lines), not servers nor services.
-<tag/Example/ Y:23:120:300:5:100000:0:0: (server class)
+<tag/Example/ Y:23:120:300:5:800000:0:0: (server class)
 <p>
 This defines class 23 to allow 5 auto-connections, which are
 checked every 300 seconds.  The connection is allowed to
 remain silent for 120 seconds before a PING is sent.  NOTE:
-fields 3 & 4 are in seconds.  The SendQ is set to 100000
+fields 3 & 4 are in seconds.  The SendQ is set to 800000
 bytes.
-<p>
-Another feature of connection class is the ability to do
-automatic routing by using the class as a ``priority''.  If
-you are connected to a server which has a class lower than
-one of the servers that is ``behind'' it, the server will
-disconnect the lower class one and schedule a ``new''
-connection for the higher class server.
 <p>
 Y:1:60:0:50:20000:2:5: (client class)
 <p>
@@ -520,7 +507,7 @@ users.  The connections are allowed to remain silent for 60
 seconds before a PING is set.  The SendQ is set to 20000
 bytes.  A new connection in this class will only be allowed
 if there aren't more than 2 other local connections from the
-same IP address, 1 other local connection from the same user
+same IP address, 1 local connection from the same user
 from the same IP address, or more than 5 other connections
 on the net from the same hostname.
 </descrip>
@@ -550,7 +537,8 @@ machine(s) that are allowed to connect.  If ``user@''
 prefixes the actual IP address the server will require that
 the remote username returned by the ident server be the same
 as the one given before the ``@''.  Wildcards are permitted
-unless using a bitmask (e.g. 1.2.3.0/24).
+unless using a bitmask (e.g. 1.2.3.0/24). Note that bitmask
+are encouraged over wildcards, as they are more accurate.
 <tag/Password/The password that must be given by the client
 to be allowed on the server.
 <tag/TARGET Host NAME/Specifies the host name(s) of the
@@ -584,12 +572,12 @@ making this file for tolsun and you wanted to let your own
 clients to connect to your server, you would add this entry
 to the file:
 <p>
-I:x::tolsun.oulu.fi::1
+I:::tolsun.oulu.fi::1
 <p>
 If you wanted to let remote clients connect, you could add
 the following lines:
 <p>
-I:x::*.du.edu::1
+I:::*.du.edu::1
 <p>
 Allow any clients from machines whose names end in
 ``.du.edu'' to connect with no password.
@@ -600,12 +588,12 @@ Allow clients from a machine with that IP number to
 connect. Numeric match is enough, name is not required
 anymore.
 <p>
-I:x:secret:*.tut.fi::1
+I::secret:*.tut.fi::1
 <p>
 Allow clients from machines matching ``*.tut.fi'' to connect
 with the password ``secret''.
 <p>
-I:*::*::1
+I:::*::1
 <p>
 Allow anyone from anywhere to connect your server.
 <p>
@@ -616,23 +604,23 @@ your machine and take your network ports. Of course the same
 things can be done by simply telnetting to your machine's
 SMTP port (for example).
 <p>
-I:x::*.fi:6667:1
+I:::*.fi:6667:1
 <p>
 Allow clients from machines matching ``*.fi'' to connect on
 the port 6667.
 <p>
-I:135.11.35.*::*.net::1
+I:135.11.35.0/24::*.net::1
 <p>
 Allows clients from machines which host name matches
-``*.net'' or which IP address matches ``135.11.35.*'' to
+``*.net'' or which IP address is within block ``135.11.35.0/24'' to
 connect to the server.  If the host name does not match
 ``*.net'' then the IP address is used for these clients,
 even if the host name is known.
 <p>
-I:135.11.35.*::::1
+I:135.11.35.0/24::::1
 <p>
-Allows clients from machines which IP address matches
-``135.11.35.*'' to connect to the server.  If the host name
+Allows clients from machines which IP address is within block
+``135.11.35.0/24'' to connect to the server.  If the host name
 is known, is it used as address for these clients.
 <tag/NEW!!!/ As of the 2.7.2d version of the server, the
 server is able to accept connections on multiple
@@ -692,6 +680,7 @@ max. links field in the Y-line.
 There is an OPERATOR at ``orion.cair.du.edu'' that can get
 Operator priviliges if he specifies a password of ``pyunxc''
 and uses a NICKNAME of ``Jeff''.
+<tag/Note/ Host NAME accepts IP bitmasks.
 </descrip>
 
 <sect1>Restrict connections
@@ -984,7 +973,7 @@ field.
 <tag/Domain Mask/ Domain masking, see below.
 <tag/Class/ The class field should refer to an existing class.
 <tag/Wildcards domains/ To reduce the great amount of
-servers in IRCnet wildcard DOMAINS were introduced in
+servers in IRCNet wildcard DOMAINS were introduced in
 2.6. To explain the usage of wildcard domains we take an
 example of such:
 <p>
