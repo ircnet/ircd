@@ -9,6 +9,9 @@
 2004-02-13  Piotr Kucharski
 
 	* INSTALL.sgml: update.
+	* channel.c/m_join(): do not return "Too many channels" when client
+	  tries to join channel he is already on.
+	* s_bsd.c/add_local_domain(): fix localhost bug introduced in 2.10.3p5.
 
 2004-02-12  Piotr Kucharski
 

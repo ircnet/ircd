@@ -1,41 +1,63 @@
-XXX: group them into 3: servers, admins, clients changes.
 
-	* New server to server protocol, based on Unique IDs
-	* Ability to specify outgoing IP in C: line.
-	* I-line flags
-		D - restricted, when client has no reverse DNS
-		I - restricted, when client has no ident.
-		R - restricted.
-		E - client is exempted from K: lines
-		N - do not show resolved hostname (but bans still match)
-		
+Most important changes in 2.11 server grouped by who most benefits from the
+feature or who should look at it more carefully.
+
+All:
+	* Nicknames cannot contain [|]^{\} chars. (This restriction will be
+	  removed in 2.11.1)
+	* Channel names cannot contain {\}~ chars. If used (or from remote),
+	  they will be changed to [|]^ accordingly. (This restriction will be
+	  removed in 2.11.1)
+	* New channel list type: R (aka reop list). With the same syntax and
+	  behaviour as beI, it serves as a hint list for reopping opless
+	  channels. Note that clients cannot set it yet, not until 2.10 exist.
+	* CIDR support in +beIR channelmodes.
+
+Client:
+	* When collision occurs, clients get their nicks forcefully changed
+	  to their UIDs. (Note: this requires no 2.10 server on the path
+	  between these two clients!)
+	* Clients can use "NICK 0" to get their UID as a nick. Works during
+	  registration, too.
 	* Channels now keep information who and when set the topic.
-	* LIST does not disconnect if client's sendQ fills.
-	* Reject reason sent to client can be specified in iauth.conf.
-	* Client's username and hostname are checked for valid chars.
-
+	* LIST (if allowed) does not disconnect if client's sendQ fills.
+	* WHOIS now shows the time user signed on.
+	* LUSERS shows local and global usercount maximum.
+	* INVITE overriding ban shows inviter's n!u@h in channel notice.
+	* Support for text representation of user modes in USER command
+	  during registration.
+Server:
+	* New server to server protocol, based on Unique IDs
 	* Operator broadcast message syntax has been changed to:
 		$$*.mask - message all users matching given server mask
 		$#*.mask - message all users matching given hostname mask
-	
 	* Essential notices were moved from &LOCAL to &NOTICES
-	* WHOIS now shows the time user signed on.
-	* Possibility of using port 0 in server connects (even remote)
-	  ircd will use port from ircd.conf (which can be negative to turn off
-	  autoconnects)
-	* LUSERS shows local and global usercount maximum.
+	* Possibility of using port "0" in manual CONNECTs (even remote);
+	  ircd will use port from ircd.conf
+	* Added DelayedKill feature to make ircd more responsible on rehash
+	  on big servers with many clients and many klines.
+	* Added new wildcard character '#' matching any digit.
+
+Admin:
+	* Ability to specify outgoing IP in C: line.
+	* I-line flags
+		R - restricted.
+		D - restricted, when client has no reverse DNS
+		I - restricted, when client has no ident.
+		E - client is exempted from K: lines
+		N - do not show resolved hostname (but bans still match)
+		F - fall-through if password not matched.
+	* Reject reason sent to client can be specified in iauth.conf.
+	* Client's username and hostname are checked for valid chars.
+	* C:lines can have negative ports to disable autoconnects; these
+	  will be used when CONNECT with port "0" is used.
 	* STATS ? shows quick information about connected servers.
 	* STATS f, avaible to local operators only, shows detailed
 	  information about client TCP connection.
-	* INVITE overriding ban shows inviter's n!u@h in channel notice.
 	* -t option (foreground mode) is now avaible even without DEBUGMODE
-	* CIDR support in +beI channelmodes.
-	* Added new wildcard character '#' matching any digit.
-	* Support for text representation of user modes in USER command
-	  during registration.
+	* o: and O: in config are now swapped to be consistent with usermode.
 	* Added SET command which makes possible to fine-tune certain
 	  ircd values during runtime (like dbuf poolsize and autoconnect).
 	* Stats Z no longer computes real memory statistics unless DEBUGMODE
 	  set.
-	* Added DelayKill feature to make ircd more responsible on rehash
-	  on big servers with many clients and many klines.
+
