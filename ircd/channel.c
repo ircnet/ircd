@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.80 1998/12/13 00:02:35 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.81 1998/12/14 18:10:26 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1329,21 +1329,24 @@ char	*parv[], *mbuf, *pbuf;
 					sendto_one(sptr,
 					   err_str(ERR_CHANOPRIVSNEEDED,
 						   parv[0]), chptr->chname);
+				else if (((*ip == MODE_ANONYMOUS &&
+					   whatt == MODE_ADD &&
+					   *chptr->chname == '#') ||
+					  (*ip == MODE_REOP &&
+					   *chptr->chname != '!')) &&
+					 !IsServer(sptr))
+					sendto_one(cptr,
+						   err_str(ERR_UNKNOWNMODE,
+						   parv[0]), *curr);
 				else if ((*ip == MODE_REOP ||
 					  *ip == MODE_ANONYMOUS) &&
 					 !IsServer(sptr) &&
-					 !(ischop & CHFL_UNIQOP))
+					 !(is_chan_op(sptr,chptr) &CHFL_UNIQOP)
+					 && *chptr->chname == '!')
 					/* 2 modes restricted to UNIQOP */
 					sendto_one(sptr,
 					   err_str(ERR_CHANOPRIVSNEEDED,
 						   parv[0]), chptr->chname);
-				else if (*ip == MODE_ANONYMOUS &&
-					 whatt == MODE_ADD &&
-					 !IsServer(sptr) &&
-					 *chptr->chname == '#')
-					sendto_one(cptr,
-						   err_str(ERR_UNKNOWNMODE,
-						   parv[0]), *curr);
 				else
 				    {
 					/*
