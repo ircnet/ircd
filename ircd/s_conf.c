@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.51 2002/04/23 20:37:02 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.52 2002/05/20 00:10:28 jv Exp $";
 #endif
 
 #include "os.h"
@@ -271,6 +271,7 @@ aClient *cptr;
 aConfItem *aconf;
 {
 	Reg	Link	**lp, *tmp;
+	aConfItem **aconf2,*aconf3;
 
 	lp = &(cptr->confs);
 
@@ -291,7 +292,22 @@ aConfItem *aconf;
 				    }
 			     }
 			if (aconf && !--aconf->clients && IsIllegal(aconf))
-				free_conf(aconf);
+			{
+				/* Remove the conf entry from the Conf linked list */
+				for (aconf2 = &conf; (aconf3 = *aconf2); )
+				{
+					if (aconf3 == aconf)
+					{
+						*aconf2 = aconf3->next;
+						aconf3->next = NULL;
+						free_conf(aconf);
+					}
+					else
+					{
+						aconf2 = &aconf3->next;
+					}
+				}
+			}
 			tmp = *lp;
 			*lp = tmp->next;
 			free_link(tmp);
