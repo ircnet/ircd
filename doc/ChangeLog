@@ -8,6 +8,12 @@
 	* s_serv.c/report_x_lines(): show all 4 fields of X-lines.
 	* s_conf.c: remove xline_flags_to_string() and xline_flags_parse().
 	* struct_def.h: removed no longer needed defines.
+	* struct_def.h: xline exempt related defines added.
+	* s_conf.c/iline_flags_parse(), iline_flags_to_string(): added 'e' flag
+	  for X-line exempt.
+	* s_conf.c/attach_Iline(): ClearXlined() if 'e' flag.
+	* register_user(): get rid of IsKlineExempt around IsXlined, new flag
+	  takes care of it now.
 
 2004-06-30  Jakub Vlasek
 
