@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.30 1998/07/19 19:37:32 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: s_conf.c,v 1.31 1998/07/19 21:10:08 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -1297,6 +1297,8 @@ char	**comment;
 
 	if (tmp && !BadPtr(tmp->passwd))
 		*comment = tmp->passwd;
+	else
+		*comment = NULL;
 
  	return (tmp ? -1 : 0);
 }

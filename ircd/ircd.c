@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.22 1998/07/19 19:37:29 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.23 1998/07/19 21:10:09 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -427,7 +427,7 @@ time_t	currenttime;
 					    "Kill line active for %s",
 					    get_client_name(cptr, FALSE));
 				cptr->exitc = EXITC_KLINE;
-				if (reason)
+				if (!BadPtr(reason))
 					sprintf(buf, "Kill line active: %.80s",
 						reason);
 				(void)exit_client(cptr, cptr, &me, (reason) ?
