@@ -1,3 +1,12 @@
+2001-02-26  Kurt Roeckx
+
+	* struct_def.h, ircd.c, s_id.c, s_id_ext.h, s_misc.c, s_user.c, 
+	  config.h.dist: Properly generate UID's, and SAVE user where we can.
+
+2001-02-10  Kurt Roeckx
+
+	* s_err.c, numeric_def.h: Change RPL_BOUNCE to numeric 010.
+
 1999-09-21  Piotr Kucharski
 
 	* channel.c, class.c, parse.c, s_bsd.c, s_conf.c, s_err.c,
