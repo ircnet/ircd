@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.133 2003/10/18 18:40:39 q Exp $";
+static  char rcsid[] = "@(#)$Id: s_serv.c,v 1.134 2004/01/01 15:19:45 jv Exp $";
 #endif
 
 #include "os.h"
@@ -3537,12 +3537,12 @@ void	do_emulated_eob(aClient *sptr)
 {
 	aClient *acptr = sptr;
 
-	SetEOB(sptr);
-
 	if (IsBursting(sptr))
 	{
 		istat.is_eobservers++;
 	}
+	
+	SetEOB(sptr);
 	
 	if (MyConnect(sptr))
 	{
