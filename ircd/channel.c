@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.67 1998/09/23 23:20:28 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.68 1998/09/26 02:23:31 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -3119,7 +3119,8 @@ time_t	now;
 		else
 		    {
 			cur_nb++;
-			if (*chptr->chname == '!' && 
+			if (*chptr->chname == '!' &&
+			    (chptr->mode.mode & MODE_REOP) &&
 			    chptr->reop && chptr->reop <= now)
 				r_cnt += reop_channel(now, chptr);
 		    }
