@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.83 2002/01/24 01:06:48 jv Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.84 2002/01/24 01:17:26 jv Exp $";
 #endif
 
 #include "os.h"
@@ -616,6 +616,8 @@ void	init_sys()
 #if defined(HPUX) || defined(SVR4) || defined(DYNIXPTX) || \
     defined(_POSIX_SOURCE) || defined(SGI)
 		(void)setsid();
+#elif defined (__CYGWIN32__)
+    		(void)setpgrp();
 #else
 		(void)setpgrp(0, (int)getpid());
 #endif
@@ -1264,7 +1266,7 @@ aClient	*cptr;
 		report_error("setsockopt(SO_DEBUG) %s:%s", cptr);
 #endif /* SOLARIS_2 */
 #endif
-#ifdef	SO_USELOOPBACK
+#if defined(SO_USELOOPBACK) && !defined(__CYGWIN32__)
 	opt = 1;
 	if (SETSOCKOPT(fd, SOL_SOCKET, SO_USELOOPBACK, &opt, opt) < 0)
 		report_error("setsockopt(SO_USELOOPBACK) %s:%s", cptr);
