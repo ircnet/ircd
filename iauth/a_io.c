@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.12 1998/10/10 22:48:32 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.13 1998/11/03 18:00:06 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -392,9 +392,9 @@ parse_ircd()
 			** I can't think of any better way to handle this at
 			** the moment -kalt
 			*/
-			if (cldata[cl].state & A_IGNORE)
+			if (cldata[ncl].state & A_IGNORE)
 				break;
-			if (cldata[cl].state & A_LATE)
+			if (cldata[ncl].state & A_LATE)
 				/* pointless 99.9% of the time */
 				break;
 			if (cldata[ncl].authuser)
