@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.5 1998/08/05 22:15:50 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.6 1998/08/06 02:06:11 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -131,6 +131,7 @@ AnInstance *last;
 	    /* we got an authentication from the last module, stop here */
 	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): Stopping", cl, last));
 	    if (cldata[cl].state & (A_GOTH|A_NOH))
+		{
 		    /*
 		    ** we have the hostname info, so this is already the
 		    ** 2nd pass we made
@@ -138,6 +139,10 @@ AnInstance *last;
 		    */
 		    sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip,
 				cldata[cl].itsport);
+		    cldata[cl].state |= A_DONE;
+		    free(cldata[cl].inbuffer);
+		    cldata[cl].inbuffer = NULL;
+		}
 	    return;
 	}
 
@@ -180,6 +185,7 @@ AnInstance *last;
 		      "next_io(#%d, %x): no more instances to try (%X)",
 		      cl, last, cldata[cl].state & (A_GOTH|A_NOH)));
 	    if (cldata[cl].state & (A_GOTH|A_NOH))
+		{
 		    /*
 		    ** this is either the 2nd pass,
 		    ** or the 1st but we already know that have no hostname
@@ -187,6 +193,10 @@ AnInstance *last;
 		    */
 		    sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip,
 				cldata[cl].itsport);
+                    cldata[cl].state |= A_DONE;
+		    free(cldata[cl].inbuffer);
+		    cldata[cl].inbuffer = NULL;
+		}
 	    else
 		    cldata[cl].state |= A_COMPLETE;
 	    return;
@@ -241,7 +251,7 @@ parse_ircd()
 				/* this is not supposed to happen!!! */
                                 sendto_log(ALOG_IRCD, LOG_CRIT,
 			   "Entry %d [%c] is already active (fatal)!",
-					   chp[0], cl);
+					   cl, chp[0]);
 				exit(1);
 			    }
 			if (cldata[cl].instance || cldata[cl].rfd > 0 ||
@@ -249,7 +259,7 @@ parse_ircd()
 			    {
 				sendto_log(ALOG_IRCD, LOG_CRIT,
 				   "Entry %d [%c] is already active! (fatal)",
-					   chp[0], cl);
+					   cl, chp[0]);
 				exit(1);
 			    }
 			if (cldata[cl].authuser)
@@ -261,6 +271,15 @@ parse_ircd()
 				free(cldata[cl].authuser);
 				cldata[cl].authuser = NULL;
 			    }
+			if (cldata[cl].inbuffer)
+			    {
+				/* shouldn't be here - hmmpf */
+				sendto_log(ALOG_IRCD|ALOG_DIO, LOG_WARNING,
+					   "Unreleased buffer [%c %d]!",
+					   chp[0], cl);
+				free(cldata[cl].inbuffer);
+				cldata[cl].inbuffer = NULL;
+			    }
 			cldata[cl].user[0] = '\0';
 			cldata[cl].host[0] = '\0';
 			cldata[cl].best = cldata[cl].tried = NULL;
@@ -269,7 +288,7 @@ parse_ircd()
 				cldata[cl].state = A_ACTIVE|A_START;
 			else
 			    {
-				cldata[cl].state = A_ACTIVE;
+				cldata[cl].state = A_ACTIVE|A_IGNORE;
 				break;
 			    }
 			if (sscanf(chp+2, "%[^ ] %hu %[^ ] %hu",
@@ -281,6 +300,8 @@ parse_ircd()
 					   chp);
 				exit(1);
 			    }
+			/* we should really be using a pool of buffer here */
+			cldata[cl].inbuffer = malloc(INBUFSIZE);
 			if (cl > cl_highest)
 				cl_highest = cl;
 			next_io(cl, NULL); /* get started */
@@ -299,10 +320,13 @@ parse_ircd()
 			if (cldata[cl].rfd > 0 || cldata[cl].wfd > 0)
 				cldata[cl].instance->mod->clean(cl);
 			cldata[cl].instance = NULL;
-			/* log here? hmmpf */
+			/* log something here? hmmpf */
 			if (cldata[cl].authuser)
 				free(cldata[cl].authuser);
 			cldata[cl].authuser = NULL;
+			if (cldata[cl].inbuffer)
+				free(cldata[cl].inbuffer);
+			cldata[cl].inbuffer = NULL;
 			break;
 		case 'R': /* fd remap */
 			if (!(cldata[cl].state & A_ACTIVE))
@@ -342,6 +366,35 @@ parse_ircd()
 			cldata[cl].rfd = cldata[cl].wfd = 0;
 			cldata[cl].instance = NULL;
 			cldata[cl].authuser = NULL;
+			cldata[cl].inbuffer = NULL;
+			/*
+			** this is the ugly part of having a slave (considering
+			** that ircd remaps fd's: there is lag between the
+			** server and the slave.
+			** I can't think of any better way to handle this at
+			** the moment -kalt
+			*/
+			if (cldata[cl].state & A_IGNORE)
+				break;
+			if (cldata[cl].state & A_LATE)
+				/* pointless 99.9% of the time */
+				break;
+			if (cldata[ncl].authuser)
+				sendto_ircd("%c %d %s %u %s", 
+					    (cldata[ncl].state&A_UNIX)?'U':'u',
+					    ncl, cldata[ncl].itsip,
+                                            cldata[ncl].itsport,
+					    cldata[ncl].authuser);
+			if (cldata[ncl].state & A_DENY)
+				sendto_ircd("K %d %s %u ", ncl,
+					    cldata[ncl].itsip,
+					    cldata[ncl].itsport,
+                                            cldata[ncl].authuser);
+			if (cldata[ncl].state & A_DONE)
+				sendto_ircd("D %d %s %u ", ncl,
+					    cldata[ncl].itsip,
+					    cldata[ncl].itsport,
+                                            cldata[ncl].authuser);
 			break;
 		case 'N': /* hostname */
 			if (!(cldata[cl].state & A_ACTIVE))
@@ -351,6 +404,8 @@ parse_ircd()
 				   "Warning: Entry %d [N] is not active.", cl);
 				break;
 			    }
+			if (cldata[cl].state & A_IGNORE)
+				break;
 			strcpy(cldata[cl].host, chp+2);
 			cldata[cl].state |= A_GOTH|A_START;
 			if (cldata[cl].instance == NULL)
@@ -364,6 +419,8 @@ parse_ircd()
 				   "Warning: Entry %d [A] is not active.", cl);
 				break;
 			    }
+			if (cldata[cl].state & A_IGNORE)
+				break;
 			/* hmmpf */
 			break;
 		case 'U': /* user provided username */
@@ -374,11 +431,14 @@ parse_ircd()
 				   "Warning: Entry %d [U] is not active.", cl);
 				break;
 			    }
+			if (cldata[cl].state & A_IGNORE)
+				break;
 			cldata[cl].state |= A_GOTU;
 			/* hmmpf */
 			break;
 		case 'T': /* ircd is registering the client */
 			/* what to do with this? abort/continue? */
+			cldata[cl].state |= A_LATE;
 			break;
 		case 'd': /* DNS timeout */
 			if (!(cldata[cl].state & A_ACTIVE))

@@ -41,7 +41,7 @@ struct AuthData
 	AnInstance	*tried;		/* last instance tried in 1st pass */
 
 	/* the following are shared by a_io.c & modules */
-	char	inbuffer[INBUFSIZE];	/* input buffer */
+	char	*inbuffer;		/* input buffer */
 	u_int	buflen;			/* length of data in buffer */
 	int	rfd, wfd;		/* fd's */
 	AnInstance	*instance;	/* the module instanciation working */
@@ -52,10 +52,15 @@ struct AuthData
 #define	A_ACTIVE	0x0001	/* entry is active */
 #define	A_START		0x0002	/* go through modules from beginning */
 #define	A_COMPLETE	0x0004	/* did at least one complete pass */
-#define	A_CHKALL	0x0008	/* CPU saver */
+#define	A_DONE		0x0008	/* nothing left to be done */
+#define	A_CHKALL	0x0010	/* CPU saver */
+#define	A_IGNORE	0x0020	/* ignore subsequent messages from ircd */
 
 #define	A_GOTU		0x0100	/* got username (from ircd) */
 #define	A_GOTH		0x0200	/* got hostname (from ircd) */
 #define	A_NOH		0x0400	/* no hostname available */
+#define	A_LATE		0x0800	/* ircd is no longer waiting for a reply */
 
 #define A_UNIX		0x1000	/* authuser is suitable for use by ircd */
+#define A_DENY		0x8000	/* connection should be denied access */
+

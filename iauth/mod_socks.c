@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.2 1998/08/05 03:20:21 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: mod_socks.c,v 1.3 1998/08/06 02:06:12 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -134,9 +134,12 @@ u_int cl;
 				/* ack, open SOCKS proxy! */
 				if (cldata[cl].instance->opt &&
 				    strstr(cldata[cl].instance->opt, "reject"))
+				    {
 					sendto_ircd("K %d %s %u ", cl,
 						    cldata[cl].itsip,
 						    cldata[cl].itsport);
+					cldata[cl].state |= A_DENY;
+				    }
 				if (cldata[cl].instance->opt &&
 				    strstr(cldata[cl].instance->opt, "log"))
 					sendto_log(ALOG_FLOG, LOG_INFO,
