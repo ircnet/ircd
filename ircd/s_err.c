@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_err.c,v 1.60 2005/01/30 16:09:10 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_err.c,v 1.61 2005/02/10 16:54:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -424,7 +424,7 @@ char *	replies[] = {
 /* 389 */ (char *)NULL,
 /* 390 */ (char *)NULL,
 /* 391 RPL_TIME */	":%s 391 %s %s :%s",
-#if defined(USERS_RFC1459) && defined(ENABLE_USERS)
+#if defined(USERS_RFC1459) && defined(USERS_SHOWS_UTMP)
 /* 392 RPL_USERSSTART */	":%s 392 %s :UserID   Terminal  Host",
 /* 393 RPL_USERS */	":%s 393 %s :%-8s %-9s %-8s",
 /* 394 RPL_ENDOFUSERS */	":%s 394 %s :End of Users",
@@ -489,7 +489,7 @@ char *	replies[] = {
 #else
 /* 445 */ (char *)NULL,
 #endif
-#if defined(USERS_RFC1459) && !defined(ENABLE_USERS)
+#if defined(USERS_RFC1459) && !defined(USERS_SHOWS_UTMP)
 /* 446 ERR_USERSDISABLED */	":%s 446 %s :USERS has been disabled",
 #else
 /* 446 */ (char *)NULL,

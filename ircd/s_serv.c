@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.270 2005/02/09 18:35:32 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.271 2005/02/10 16:54:42 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2133,7 +2133,7 @@ int	m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 #ifdef USERS_RFC1459
 	{
-#ifdef ENABLE_USERS
+#ifdef USERS_SHOWS_UTMP
 		char	namebuf[10],linebuf[10],hostbuf[17];
 		int	fd, flag = 0;
 

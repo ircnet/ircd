@@ -86,21 +86,21 @@
 
 #ifdef USERS_RFC1459
 /*
- * Enables local USERS, which gives who/finger alike output from ircd box.
+ * If defined, outputs who/finger alike output from ircd box.
  * Note that some boxes no longer have /etc/utmp. When undefined, it will
  * return ERR_USERSDISABLED numeric. 
  * Consider its security implications before defining.
  */
-#undef	ENABLE_USERS
+#undef	USERS_SHOWS_UTMP
 #endif
 
-/* NO_DEFAULT_INVISIBLE
+/* DEFAULT_INVISIBLE
  *
- * When defined, your users will not automatically be attributed with user
+ * When defined, your users will automatically be attributed with user
  * mode "i" (i == invisible). Invisibility means people dont showup in
  * WHO or NAMES unless they are on the same channel as you.
  */
-#define	NO_DEFAULT_INVISIBLE
+#undef	DEFAULT_INVISIBLE
 
 /*
  * Define this if you want to have TKLINE and UNTKLINE commands
