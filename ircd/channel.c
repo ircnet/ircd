@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static	char rcsid[] = "@(#)$Id: channel.c,v 1.74 1998/10/24 19:52:37 kalt Exp $";
+static	char rcsid[] = "@(#)$Id: channel.c,v 1.75 1998/10/28 16:23:01 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -378,7 +378,7 @@ aChannel *chptr;
 			 * necessary.
 			 */
 			if (*chptr->chname == '!' &&
-			    (tmp->flags & (CHFL_CHANOP | CHFL_UNIQOP)))
+			    (tmp->flags & CHFL_CHANOP))
 				chptr->reop = timeofday + LDELAYCHASETIMELIMIT;
 
 			*curr = tmp->next;
@@ -447,7 +447,11 @@ aChannel *chptr;
 	if (lp->flags & MODE_ADD)
 		tmp->flags |= lp->flags & MODE_FLAGS;
 	else
+	    {
 		tmp->flags &= ~lp->flags & MODE_FLAGS;
+		if (lp->flags & CHFL_CHANOP)
+			tmp->flags &= ~CHFL_UNIQOP;
+	    }
 	/*
 	 * and make sure client membership mirrors channel
 	 */
@@ -455,7 +459,11 @@ aChannel *chptr;
 	if (lp->flags & MODE_ADD)
 		tmp->flags |= lp->flags & MODE_FLAGS;
 	else
+	    {
 		tmp->flags &= ~lp->flags & MODE_FLAGS;
+		if (lp->flags & CHFL_CHANOP)
+			tmp->flags &= ~CHFL_UNIQOP;
+	    }
 }
 
 int	is_chan_op(cptr, chptr)
@@ -470,7 +478,7 @@ aChannel *chptr;
 		return 0;
 	if (chptr)
 		if ((lp = find_user_link(chptr->members, cptr)))
-			chanop = (lp->flags & (CHFL_CHANOP | CHFL_UNIQOP));
+			chanop = (lp->flags & CHFL_CHANOP);
 	if (chanop)
 		chptr->reop = 0;
 	return chanop;
@@ -484,7 +492,7 @@ aChannel *chptr;
 
 	if (chptr)
 		if ((lp = find_user_link(chptr->members, cptr)))
-			return (lp->flags & (CHFL_UNIQOP | CHFL_VOICE));
+			return (lp->flags & CHFL_VOICE);
 
 	return 0;
 }
@@ -499,13 +507,13 @@ aChannel *chptr;
 	member = IsMember(cptr, chptr);
 	lp = find_user_link(chptr->members, cptr);
 
-	if ((!lp || !(lp->flags & (CHFL_UNIQOP | CHFL_CHANOP | CHFL_VOICE))) &&
+	if ((!lp || !(lp->flags & (CHFL_CHANOP | CHFL_VOICE))) &&
 	    !match_modeid(CHFL_EXCEPTION, cptr, chptr) &&
 	    match_modeid(CHFL_BAN, cptr, chptr))
 		return (MODE_BAN);
 
 	if (chptr->mode.mode & MODE_MODERATED &&
-	    (!lp || !(lp->flags & (CHFL_CHANOP|CHFL_VOICE|CHFL_UNIQOP))))
+	    (!lp || !(lp->flags & (CHFL_CHANOP|CHFL_VOICE))))
 			return (MODE_MODERATED);
 
 	if (chptr->mode.mode & MODE_NOPRIVMSGS && !member)
@@ -1564,7 +1572,8 @@ char	*parv[], *mbuf, *pbuf;
 			case MODE_CHANOP : /* fall through case */
 				if (ischop && lp->value.cptr == sptr &&
 				    lp->flags == MODE_CHANOP|MODE_DEL)
-					chptr->reop = timeofday + LDELAYCHASETIMELIMIT;
+					chptr->reop = timeofday + 
+						LDELAYCHASETIMELIMIT;
 			case MODE_UNIQOP :
 			case MODE_VOICE :
 				*mbuf++ = c;
@@ -2101,7 +2110,7 @@ char	*parv[];
 				 * because we use NJOIN for netjoins.
 				 * here, it *must* be a channel creation. -kalt
 				 */
-				flags |= CHFL_UNIQOP;
+				flags |= CHFL_UNIQOP|CHFL_CHANOP;
 			else if (*s == 'o')
 			    {
 				flags |= CHFL_CHANOP;
@@ -2200,13 +2209,14 @@ char	*parv[];
 				if (*(target+2) == '+')
 				    {
 					strcpy(mbuf, "\007O");
-					chop = CHFL_UNIQOP|CHFL_VOICE;
+					chop = CHFL_UNIQOP|CHFL_CHANOP| \
+					  CHFL_VOICE;
 					name = target + 3;
 				    }
 				else
 				    {
 					strcpy(mbuf, "\007Ov");
-					chop = CHFL_UNIQOP;
+					chop = CHFL_UNIQOP|CHFL_CHANOP;
 					name = target + 2;
 				    }
 			    }
@@ -2820,7 +2830,7 @@ char	*parv[];
 		    {
 			if ((lp = find_user_link(chptr->members, sptr)))
 			    {
-				if (lp->flags & (CHFL_UNIQOP|CHFL_CHANOP))
+				if (lp->flags & CHFL_CHANOP)
 					(void)strcat(buf, "@");
 				else if (lp->flags & CHFL_VOICE)
 					(void)strcat(buf, "+");
@@ -2837,7 +2847,7 @@ char	*parv[];
 			c2ptr = lp->value.cptr;
 			if (IsInvisible(c2ptr) && !IsMember(sptr,chptr))
 				continue;
-			if (lp->flags & (CHFL_UNIQOP|CHFL_CHANOP))
+			if (lp->flags & CHFL_CHANOP)
 			    {
 				(void)strcat(buf, "@");
 				idx++;
@@ -3021,7 +3031,7 @@ aChannel *chptr;
 	    lp = chptr->members;
 	    while (lp)
 		{
-		    if (lp->flags & (CHFL_CHANOP | CHFL_UNIQOP))
+		    if (lp->flags & CHFL_CHANOP)
 			{
 			    chptr->reop = 0;
 			    return 0;
@@ -3078,7 +3088,7 @@ aChannel *chptr;
 	    lp = chptr->members;
 	    while (lp)
 		{
-		    if (lp->flags & (CHFL_CHANOP | CHFL_UNIQOP))
+		    if (lp->flags & CHFL_CHANOP)
 			{
 			    chptr->reop = 0;
 			    return 0;
