@@ -1,3 +1,8 @@
+2002-04-23  Jakub Vlasek
+	
+	* s_conf.c/rehash(): Do not delist config entries which are still
+	  used.
+
 2002-04-19  Jakub Vlasek
 
 	* res.c/bad_hostname(): added defineable more restrictive hostname
