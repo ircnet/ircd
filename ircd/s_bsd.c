@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.79 2001/12/30 00:15:22 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: s_bsd.c,v 1.80 2002/01/05 02:49:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2409,7 +2409,7 @@ struct	hostent	*hp;
 	/*
 	** The socket has been connected or connect is in progress.
 	*/
-	(void)make_server(cptr);
+	(void)make_server(cptr, TRUE);
 	if (by && IsPerson(by))
 	    {
 		(void)strcpy(cptr->serv->by, by->name);

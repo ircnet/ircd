@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.69 2001/12/29 20:54:07 q Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.70 2002/01/05 02:49:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -554,7 +554,7 @@ aClient	*mp;
 	mp->user = NULL;
 	mp->fd = -1;
 	SetMe(mp);
-	(void) make_server(mp);
+	(void) make_server(mp, TRUE);
 	mp->serv->snum = find_server_num (ME);
 	(void) make_user(mp);
 	istat.is_users++;	/* here, cptr->next is NULL, see make_user() */
