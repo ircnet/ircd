@@ -54,7 +54,7 @@
 #define MSG_TRACE    "TRACE"	/* TRAC */
 #define MSG_NOTICE   "NOTICE"	/* NOTI */
 #define MSG_JOIN     "JOIN"	/* JOIN */
-#define MSG_NJOIN     "NJOIN"	/* NJOIN */
+#define MSG_NJOIN    "NJOIN"	/* NJOIN */
 #define MSG_PART     "PART"	/* PART */
 #define MSG_LUSERS   "LUSERS"	/* LUSE */
 #define MSG_MOTD     "MOTD"	/* MOTD */
@@ -74,5 +74,6 @@
 #define	MSG_DIE	     "DIE"
 #define	MSG_HASH     "HAZH"	/* HASH */
 #define	MSG_DNS      "DNS"	/* DNS  -> DNSS */
+#define	MSG_SMASK    "SMASK"	/* SMSK */
 
 #define MAXPARA    15 
