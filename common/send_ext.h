@@ -50,6 +50,7 @@ EXTERN void sendto_common_channels();
 EXTERN void sendto_channel_butserv();
 EXTERN void sendto_match_servs();
 EXTERN void sendto_match_servs_v();
+EXTERN void sendto_match_servs_notv();
 EXTERN void sendto_match_butone();
 EXTERN void sendto_ops_butone();
 EXTERN void sendto_prefix_one();
