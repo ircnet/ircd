@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: ircd.c,v 1.127 2004/04/07 17:02:38 chopin Exp $";
+static  char rcsid[] = "@(#)$Id: ircd.c,v 1.128 2004/04/14 19:52:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -410,7 +410,7 @@ static	time_t	check_pings(time_t currenttime)
 
 	for (i = highest_fd; i >= 0; i--)
 	    {
-		if (!(cptr = local[i]))
+		if (!(cptr = local[i]) || IsListener(cptr))
 			continue;
 
 #ifdef TIMEDKLINES
