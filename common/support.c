@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: support.c,v 1.19 2002/03/03 21:57:39 jv Exp $";
+static  char rcsid[] = "@(#)$Id: support.c,v 1.20 2002/03/14 23:15:17 jv Exp $";
 #endif
 
 #include "os.h"
@@ -876,11 +876,15 @@ char **make_isupport()
 	SPRINTF(tis[0],
 	"RFC2812 PREFIX=(ov)@+ CHANTYPES=#&!+ MODES=%d MAXCHANNELS=%d "
 	"NICKLEN=%d TOPICLEN=%d KICKLEN=%d MAXBANS=%d CHANNELLEN=%d CHIDLEN=%d "
-	"NETWORK=%s CHANMODES=beI,k,l,imnpstaqr",
+	"CHANMODES=beI,k,l,imnpstaqr",
 	MAXMODEPARAMS,MAXCHANNELSPERUSER,
-	NICKLEN,TOPICLEN,TOPICLEN,MAXBANS,CHANNELLEN,CHIDLEN,
-	NETWORK_NAME);
+	NICKLEN,TOPICLEN,TOPICLEN,MAXBANS,CHANNELLEN,CHIDLEN);
 
+	if (networkname)
+	{
+		strcat(tis[0], " NETWORK=");
+		strcat(tis[0], networkname);
+	}
 	tis[1] = (char *) MyMalloc(BUFSIZE);
 	SPRINTF(tis[1],	"PENALTY FNC EXCEPTS INVEX");
 
