@@ -31,7 +31,7 @@
 #include "res.h"
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: res.c,v 1.3 1997/04/24 21:16:51 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: res.c,v 1.4 1997/04/28 02:19:20 kalt Exp $";
 #endif
 
 #undef	DEBUG	/* because there is a lot of debug code in here :-) */
@@ -737,10 +737,12 @@ char	*lp;
 	    }
 	a = proc_answer(rptr, hptr, buf, buf+rc);
 	if (a == -1) {
-		sendto_flag(SCH_ERROR, "Bad hostname returned from %s",
-			inet_ntoa(sin.sin_addr));
-		Debug((DEBUG_DNS, "Bad hostname returned from %s",
-			inet_ntoa(sin.sin_addr)));
+		sendto_flag(SCH_ERROR, "Bad hostname returned from %s for %s",
+			    inet_ntoa(sin.sin_addr),
+			    inetntoa((char *)&rptr->he.h_addr));
+		Debug((DEBUG_DNS, "Bad hostname returned from %s for %s",
+		       inet_ntoa(sin.sin_addr),
+		       inetntoa((char *)&rptr->he.h_addr)));
 	}
 #ifdef DEBUG
 	Debug((DEBUG_INFO,"get_res:Proc answer = %d",a));
