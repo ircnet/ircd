@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static  char rcsid[] = "@(#)$Id: a_io.c,v 1.10 1998/09/12 22:54:28 kalt Exp $";
+static  char rcsid[] = "@(#)$Id: a_io.c,v 1.11 1998/09/18 22:30:59 kalt Exp $";
 #endif
 
 #include "os.h"
@@ -793,9 +793,14 @@ u_short port;
 		*error = errbuf;
 		return -1;
 	    }
+	/*
+	 * this bzero() shouldn't be needed.. should it?
+	 * AIX 4.1.5 doesn't like not having it tho.. I have no clue why -kalt
+	 */
+	bzero((char *)&sk, sizeof(sk));
 	sk.sin_family = AF_INET;
 	sk.sin_addr.s_addr = inetaddr(ourIP);
-	sk.sin_port = 0;
+	sk.sin_port = htons(0);
 	if (bind(fd, (SAP)&sk, sizeof(sk)) < 0)
 	    {
 		sprintf(errbuf, "bind() failed: %s", strerror(errno));
