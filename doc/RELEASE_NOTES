@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.64 2004/10/06 15:03:30 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.65 2004/10/27 13:35:05 chopin Exp $
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
@@ -84,6 +84,7 @@ Important changes in 2.11.0 (since 2.10.3):
 	* "SERVICE" command has been changed slightly (removed 2nd (stok) and 5th
 	  (hopcount) parameters), please update your services.
 	* Format of log files has changed.
+	* Format of KILL logs (including syslog) has changed.
 
 Important configuration changes between 2.10.x and 2.11.0:
 	* ircd.tune must be removed when upgrading from 2.10.x to 2.11.x
