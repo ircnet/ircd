@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.121 2004/10/01 16:08:29 chopin Exp $
+ *   $Id: struct_def.h,v 1.122 2004/10/04 20:23:37 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -407,7 +407,7 @@ typedef	struct	{
 struct Zdata {
 	z_stream	*in;		/* input zip stream data */
 	z_stream	*out;		/* output zip stream data */
-	char		outbuf[ZIP_MAXIMUM]; /* outgoing (unzipped) buffer */
+	Bytef		outbuf[ZIP_MAXIMUM]; /* outgoing (unzipped) buffer */
 	int		outcount;	/* size of outbuf content */
 };
 #endif

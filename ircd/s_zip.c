@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_zip.c,v 1.10 2004/10/01 20:22:16 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_zip.c,v 1.11 2004/10/04 20:23:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -146,10 +146,10 @@ char	*unzip_packet(aClient *cptr, char *buffer, int *length)
 	    }
 	if (*length)
 	    {
-		zin->next_in = buffer;
+		zin->next_in = (Bytef *) buffer;
 		zin->avail_in = *length;
 	    }
-	zin->next_out = unzipbuf;
+	zin->next_out = (Bytef *) unzipbuf;
 	zin->avail_out = UNZIP_BUFFER_SIZE;
 	switch (r = inflate(zin, Z_PARTIAL_FLUSH))
 	  {
@@ -225,7 +225,7 @@ char	*zip_buffer(aClient *cptr, char *buffer, int *length, int flush)
 
 	zout->next_in = cptr->zip->outbuf;
 	zout->avail_in = cptr->zip->outcount;
-	zout->next_out = zipbuf;
+	zout->next_out = (Bytef *) zipbuf;
 	zout->avail_out = ZIP_BUFFER_SIZE;
 
 	switch (r = deflate(zout, Z_PARTIAL_FLUSH))
