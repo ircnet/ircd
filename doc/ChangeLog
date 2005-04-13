@@ -1,3 +1,16 @@
+2.11.1a2
+
+2005-04-13  Piotr Kucharski
+
+	* s_user.c/hunt_server(): aware of sid now.
+	* s_conf.c/initconf(), config.h.dist: define to speed up rehash at 
+	  the expense of memory (from anfl).
+	* config.h.dist: increase some defaults to suit IRCnet better.
+	* configure, configure.in, Makefile.in: add --with-rundir (ircd pid
+	  and tune files) option.
+	* s_debug.c/send_defines(): show current istat.is_eobservers in
+	  addition to SPLIT_SERVERS value (and similar for users).
+
 2.11.1a1
 
 2005-03-30  Piotr Kucharski
