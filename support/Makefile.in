@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.67 2005/02/22 16:34:03 chopin Exp $
+#*   $Id: Makefile.in,v 1.68 2005/04/13 23:18:57 chopin Exp $
 #*
 #*/
 
@@ -77,7 +77,7 @@ server_man_dir = @mandir@/man8
 # Directory where config files (ircd.conf, ircd.motd and iauth.conf) live.
 ircd_conf_dir = @sysconfdir@
 # Directory where state files (ircd.pid, ircd.tune) live.
-ircd_var_dir = @localstatedir@/run
+ircd_var_dir = @rundir@
 # Directory where log files (users, opers, rejects and auth) live.
 ircd_log_dir = @logdir@
 
