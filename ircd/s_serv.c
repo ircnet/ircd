@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.272 2005/03/29 22:57:36 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.273 2005/04/13 23:17:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -527,10 +527,6 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	acptr->serv->maskedby = sptr->serv->maskedby;
 	SetServer(acptr);
 	istat.is_masked++;
-	if (istat.is_serv > istat.is_m_serv)
-	{
-		istat.is_m_serv = istat.is_serv;
-	}
 
 	/* We add this server to client list, but *only* to SID hash. */
 	add_client_to_list(acptr);
@@ -772,6 +768,8 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		acptr->serv->maskedby = acptr;
 		SetServer(acptr);
 		istat.is_serv++;
+		if (istat.is_serv > istat.is_m_serv)
+			istat.is_m_serv = istat.is_serv;
 		add_client_to_list(acptr);
 		register_server(acptr);
 
@@ -2918,7 +2916,6 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 		SetEOB(sptr);
 		istat.is_eobservers++;
-		if (atoi(sptr->serv->verstr) >= 210990800) /* XXX remove soon */
 		if (sptr->hopcount == 1)
 		{
 			sendto_one(sptr, ":%s EOBACK", me.serv->sid);
