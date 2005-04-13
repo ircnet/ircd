@@ -581,6 +581,12 @@
 */
 #undef DISABLE_NICK0_REGISTRATION
 
+/*
+** Define this to significantly speed up rehash with large amounts of I-lines.
+** Wastes some memory each rehash (luckily not indefinitely).
+*/
+#define FASTER_ILINE_REHASH
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 
