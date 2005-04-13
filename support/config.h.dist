@@ -528,13 +528,14 @@
  * This should always be bigger than the max counts of
  * users/servers in your TLD (or some other close group), so you
  * get in split when you split. It is also a good practice to set
- * it above half of what your whole network counts minimally, so
- * that split in the half would be noticed on each side.
+ * around 90% of what your whole network counts minimally (servers
+ * inside masks are also counted), so that splits of smaller parts
+ * would be noticed on each side.
  *
  * Defining to 0 disables entering split-mode.
  */
-#define SPLIT_USERS	70000
-#define SPLIT_SERVERS	30
+#define SPLIT_USERS	85000
+#define SPLIT_SERVERS	85
 
 /*
 ** Notice sent to connecting users if the server is in the split-mode.
@@ -713,7 +714,7 @@
 ** If you don't feel your users should use too long nicknames, you can
 ** restrict length of their dnicks here.
 */
-#define LOCALNICKLEN 12
+#define LOCALNICKLEN 15
 
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
