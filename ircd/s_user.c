@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.258 2005/03/29 22:30:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.259 2005/04/13 23:10:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -168,6 +168,10 @@ int	hunt_server(aClient *cptr, aClient *sptr, char *command, int server,
 	** non-matching lookups.
 	*/
 	if ((acptr = find_client(parv[server], NULL)))
+		if (acptr->from == sptr->from && !MyConnect(acptr))
+			acptr = NULL;
+	/* Match SID */
+	if (!acptr && (acptr = find_sid(parv[server], NULL)))
 		if (acptr->from == sptr->from && !MyConnect(acptr))
 			acptr = NULL;
 	/* Match *.masked.servers */
