@@ -1,4 +1,26 @@
-# @(#)$Id: RELEASE_NOTES,v 1.69 2004/12/21 01:14:09 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.70 2005/05/13 15:54:02 chopin Exp $
+
+This is version 2.11.1 of the IRC software.
+===============================================================================
+
+New features in 2.11.1:
+
+	* It is possible to log server channels to a file.
+	* New configure option --with-rundir.
+	* It is possible to remove +r mode from a channel.
+	* Clients can use '~' char in nicknames.
+
+Important changes in 2.11.1 (since 2.11.0):
+
+	* All restrictions were unlocked, that means clients can now:
+	  - use +R freely (when opped),
+	  - use longer nicks,
+	  - use [\]{|} chars in nicknames,
+	  - use {}~\ in channel names.
+
+Important configuration changes in 2.11.1 (since 2.11.0):
+
+	* None.
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================
