@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.74 2005/02/15 21:01:38 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.75 2005/05/13 15:10:29 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -76,7 +76,7 @@ This version was tested on the following IPv6 systems:
 BSD/OS+KAME, Digital Unix, FreeBSD+KAME, Linux, NetBSD+INRIA.
 <p>
 Because IPv6 numeric addresses contain ``:'' characters,
-<bf>the default separator for the server configuration file was
+<bf>the default separator for the server configuration file is
 changed to ``%''</bf>. You can adjust it to your needs in config.h file.
 
 <sect>The config.h file
@@ -168,6 +168,10 @@ This option is defined by default and acts as a wrapper, by
 checking incoming connections early before starting ident query.
 By default, the server will not accept more than 10 connections from the
 same host within 2 seconds.
+
+<sect1>LOG_SERVER_CHANNELS
+<p>This option allows you to log to files server channels (like &amp;NOTICES)
+chosen via LOG_SCH_* defines. Very handy.
 
 <sect1>Other &num;define's
 <p>
@@ -282,7 +286,7 @@ IRC needs to know a few things about your UNIX site, and the
 ``M'' command specifies this information for IRC.  The fomat
 of this command is:
 <tag/Format/ 
-<verb>M:&lt;Server NAME&gt;:&lt;YOUR Internet IP&num;&gt;:&lt;Geographic Location&gt;:&lt;Port&gt;:&lt;SID&gt;</verb>
+<verb>M:&lt;Server NAME&gt;:&lt;YOUR Internet IP&num;&gt;:&lt;Geographic Location&gt;:&lt;Port&gt;:&lt;SID&gt;:</verb>
 <tag/M/ 
 ``M'' specifies a Machine description line
 <tag/Server NAME/ 
@@ -318,12 +322,12 @@ your server. It must begin with a digit. This must be set with
 cooperation of other servers' admins. On IRCnet you must
 consult your coord and/or admins of your peers.
 <tag/Example:/ 
-M:tolsun.oulu.fi::Oulu, Finland:6667:00PA
+M:tolsun.oulu.fi::Oulu, Finland:6667:00PA:
 <p>
 This line reads: My Host's name is ``tolsun.oulu.fi'', my
 site is located in ``Oulu, Finland'' and my SID is ``00PA''.
 <p>
-M:orion.cair.du.edu::Denver Colorado, USA:6667:00PS
+M:orion.cair.du.edu::Denver Colorado, USA:6667:00PS:
 <p>
 This line reads: My Hosts name is ``orion.cair.du.edu'',
 my site is located in ``Denver Colorado, USA'' and my SID is ``00PS''.
@@ -340,7 +344,7 @@ section for configuring source IP of outgoing connections.
 information about a site. The e-mail address of the person
 running the server should be included here in case problems
 arise.
-<tag/Format/<verb>A:&lt;Your Name/Location&gt;:&lt;Your E-Mail Addr&gt;:&lt;other&gt;::&lt;network name&gt;</verb>
+<tag/Format/<verb>A:&lt;Your Name/Location&gt;:&lt;Your E-Mail Addr&gt;:&lt;other&gt;::&lt;network name&gt;:</verb>
 <tag/A/This specifies an Admin record.
 <tag/Your Name &amp; Location/ Use this field to say tell
 your FULL NAME and where in the world your machine is.  Be
@@ -363,7 +367,7 @@ in 005 numerics. Use only one word!
 (the line is just one line in the confuration file, here it
 is cut into two lines to make it clearer to read):
 <p>
-A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello in Finnish today?;)::IRCnet
+A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello in Finnish today?;)::IRCnet:
 <p>
 Would look like this when printed out with the /admin command:
 <p>
@@ -384,8 +388,8 @@ server's ability to accept connections. By use of this line
 in the ircd.conf file, it is easy to setup both Unix Domain
 ports for the server to accept connections on as well as
 extra internet ports.
-<tag/Format/<verb>P:&lt;Internet IP&num;&gt;:::&lt;Port&gt;::&lt;Flags&gt;
-P:&lt;Directory&gt;:::&lt;Port&gt;::&lt;Flags&gt;</verb>
+<tag/Format/<verb>P:&lt;Internet IP&num;&gt;:::&lt;Port&gt;::&lt;Flags&gt;:
+P:&lt;Directory&gt;:::&lt;Port&gt;::&lt;Flags&gt;:</verb>
 </descrip>
 <itemize>
 <item>Internet Ports
@@ -583,9 +587,9 @@ allowed on the server.
 one character in size, can be combined and their order does not matter.
 <itemize>
 <item>D - restricted, when client has no reverse DNS
-<item>E - client is exempted from K: lines
-<item>e - client is exempted from X: lines
-<item>F - fall-through to next I:line if password did not match
+<item>E - client is exempted from K-lines
+<item>e - client is exempted from X-lines
+<item>F - fall-through to next I-line if password did not match
 <item>I - restricted, when client has no ident.
 <item>M - disable resolved host name to be shown
 <item>N - disable resolved host name to be used
@@ -849,7 +853,8 @@ X:&lt;USER 1st arg&gt;:&lt;USER 2nd arg&gt;:&lt;USER 3rd arg&gt;:&lt;USER 4th ar
 command entry.
 <tag/USER n-th arg/ Given field will be matched against corresponding parameter
 of client USER command. If left empty it matches any. It may contain wildcards.
-<tag/Examples/ X:guest:::guest
+<tag/Examples/ 
+<verb>X:guest:::guest:</verb>
 If user registers with the following USER command
 <verb>USER guest anything anything :guest</verb>
 then IMMEDIATELY REMOVE HIM from my IRCD.
@@ -919,8 +924,7 @@ the remote username returned by the ident server be the same
 as the one given before the ``@''.
 <tag/Password/ The password of the other host.  A password
 must always be present for the line to be recognized.
-<tag/TARGET Host NAME/ The full hostname of the target
-machine. This is the name that the TARGET server will
+<tag/TARGET Host NAME/ This is the name that the TARGET server will
 identify itself with when you connect to it.  If you were
 connecting to nic.funet.fi you would receive
 ``nic.funet.fi'' and that is what you should place in this

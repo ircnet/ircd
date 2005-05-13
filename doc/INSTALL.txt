@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.74 2005/02/15 21:01:38 chopin Exp $
+  $Id: INSTALL.txt,v 1.75 2005/05/13 15:10:29 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -92,7 +92,7 @@
   Digital Unix, FreeBSD+KAME, Linux, NetBSD+INRIA.
 
   Because IPv6 numeric addresses contain ``:'' characters, tthhee ddeeffaauulltt
-  sseeppaarraattoorr ffoorr tthhee sseerrvveerr ccoonnffiigguurraattiioonn ffiillee wwaass cchhaannggeedd ttoo ````%%''''. You
+  sseeppaarraattoorr ffoorr tthhee sseerrvveerr ccoonnffiigguurraattiioonn ffiillee iiss cchhaannggeedd ttoo ````%%''''. You
   can adjust it to your needs in config.h file.
 
 
@@ -195,7 +195,13 @@
 
 
 
-  22..1100..  OOtthheerr ##ddeeffiinnee''ss
+  22..1100..  LLOOGG__SSEERRVVEERR__CCHHAANNNNEELLSS
+
+  This option allows you to log to files server channels (like &NOTICES)
+  chosen via LOG_SCH_* defines. Very handy.
+
+
+  22..1111..  OOtthheerr ##ddeeffiinnee''ss
 
   The rest of the user changable #define's should be pretty much self
   explanatory in the config.h file.  It is *NOT* recommended that any of
@@ -261,6 +267,7 @@
 
   The ircd.conf file contains various records that specify configuration
   options.  The record types are as follows:
+
   1. Machine information   (M)
 
   2. Administrative info   (A)
@@ -326,7 +333,6 @@
   44..11..  MMaacchhiinnee iinnffoorrmmaattiioonn
 
 
-
      IInnttrroodduuccttiioonn
         IRC needs to know a few things about your UNIX site, and the
         ``M'' command specifies this information for IRC.  The fomat of
@@ -334,7 +340,7 @@
 
      FFoorrmmaatt
 
-        M:<Server NAME>:<YOUR Internet IP#>:<Geographic Location>:<Port>:<SID>
+        M:<Server NAME>:<YOUR Internet IP#>:<Geographic Location>:<Port>:<SID>:
 
 
 
@@ -378,20 +384,21 @@
         your coord and/or admins of your peers.
 
      EExxaammppllee::
-        M:tolsun.oulu.fi::Oulu, Finland:6667:00PA
+        M:tolsun.oulu.fi::Oulu, Finland:6667:00PA:
 
         This line reads: My Host's name is ``tolsun.oulu.fi'', my site
         is located in ``Oulu, Finland'' and my SID is ``00PA''.
 
-        M:orion.cair.du.edu::Denver Colorado, USA:6667:00PS
+        M:orion.cair.du.edu::Denver Colorado, USA:6667:00PS:
 
         This line reads: My Hosts name is ``orion.cair.du.edu'', my site
         is located in ``Denver Colorado, USA'' and my SID is ``00PS''.
-
      NNoottee
         Using ``*'' as <Your Internet IP> allows OS to choose best
         outgoing source IP. See also SSeerrvveerr CCoonnnneeccttiioonnss section for
         configuring source IP of outgoing connections.
+
+
 
   44..22..  AAddmmiinniissttrraattiivvee iinnffoo
 
@@ -403,7 +410,7 @@
 
      FFoorrmmaatt
 
-        A:<Your Name/Location>:<Your E-Mail Addr>:<other>::<network name>
+        A:<Your Name/Location>:<Your E-Mail Addr>:<other>::<network name>:
 
 
 
@@ -438,7 +445,7 @@
 
         A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu
         UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello
-        in Finnish today?;)::IRCnet
+        in Finnish today?;)::IRCnet:
 
         Would look like this when printed out with the /admin command:
 
@@ -463,8 +470,8 @@
 
      FFoorrmmaatt
 
-        P:<Internet IP#>:::<Port>::<Flags>
-        P:<Directory>:::<Port>::<Flags>
+        P:<Internet IP#>:::<Port>::<Flags>:
+        P:<Directory>:::<Port>::<Flags>:
 
 
 
@@ -521,7 +528,6 @@
 
 
   44..44..  CCoonnnneeccttiioonn CCllaasssseess
-
 
 
      IInnttrroodduuccttiioonn
@@ -582,6 +588,7 @@
 
         +o  y: defines maximum size of sendq during burst, defaults to x
            if unset.
+
 
      LLooccaall lliimmiitt
         This field is used to limit the number of local concurrent
@@ -656,6 +663,7 @@
         address, or more than 5 other connections on the net from the
         same hostname.
 
+
   44..55..  CClliieenntt ccoonnnneeccttiioonnss
 
   How to let clients connect to your IRCD.
@@ -713,6 +721,7 @@
         is not working (they will rather be denied connection). Use
         ``N'' ffllaagg.
 
+
      PPoorrtt
         Specifies the port number for which this configuration line is
         valid.  An empty field, or ``0'' matches all ports.
@@ -728,11 +737,11 @@
 
         +o  D - restricted, when client has no reverse DNS
 
-        +o  E - client is exempted from K: lines
+        +o  E - client is exempted from K-lines
 
-        +o  e - client is exempted from X: lines
+        +o  e - client is exempted from X-lines
 
-        +o  F - fall-through to next I:line if password did not match
+        +o  F - fall-through to next I-line if password did not match
 
         +o  I - restricted, when client has no ident.
 
@@ -788,6 +797,7 @@
         with the password ``secret''.
 
         I:::*::1
+
         Allow anyone from anywhere to connect to your server.
 
         I:::*.fi:6667:1
@@ -986,6 +996,7 @@
         active continuously for the specified user/host machine.  You
         may also specify intervals during the line should be active, see
         examples below.
+
      UUsseerr
         The USERNAME of the user you want removed from IRC.  For example
         ``root''.
@@ -1076,10 +1087,13 @@
         contain wildcards.
 
      EExxaammpplleess
-        X:guest:::guest If user registers with the following USER
-        command
 
-        USER guest anything anything :guest
+        X:guest:::guest:
+
+
+     If user registers with the following USER command
+
+     USER guest anything anything :guest
 
 
      then IMMEDIATELY REMOVE HIM from my IRCD.
@@ -1118,6 +1132,7 @@
 
   PLEASE limit the number of hosts you will attempt to connect to down
   to 3. This is because of two main reasons:
+
   1. to save your server from causing extra load and delays to users
 
   2. to save internet from extra network traffic (remember the old rwho
@@ -1158,11 +1173,10 @@
         present for the line to be recognized.
 
      TTAARRGGEETT HHoosstt NNAAMMEE
-        The full hostname of the target machine. This is the name that
-        the TARGET server will identify itself with when you connect to
-        it.  If you were connecting to nic.funet.fi you would receive
-        ``nic.funet.fi'' and that is what you should place in this
-        field.
+        This is the name that the TARGET server will identify itself
+        with when you connect to it.  If you were connecting to
+        nic.funet.fi you would receive ``nic.funet.fi'' and that is what
+        you should place in this field.
 
      TTAARRGGEETT PPOORRTT
         The INTERNET Port that you want to connect to on the TARGET
@@ -1182,7 +1196,6 @@
      SSoouurrccee IIPP
         This field specifies source IP to use for connects to this
         server.
-
 
      CCoommpprreesssseedd lliinnkkss
         Server connections can be compressed with the zlib library.  To
@@ -1316,6 +1329,7 @@
         be ``*.fi''. Note that with wildcard name ``*.fi'' you could NOT
         connect to ``nic.funet.fi'' because that would result in a
         server name ccoolllliissiioonn (*.fi matches nic.funet.fi).
+
         I advise you to not to use wildcard servers before you know for
         sure how they are used, they are mostly beneficial for backbones
         of countries and other large areas with common domain.
@@ -1368,7 +1382,6 @@
         present on the network matches ``*.edu''.
 
         D::2:eff.org:3:
-
         Do not auto-connect to ``eff.org'', or any server in class ``3''
         if a server defined to be in class ``2'' is currently present on
         the network.
@@ -1499,7 +1512,6 @@
      FFllaaggss
         If any flag specified in this field is found in the peer's flags
         string, it will be rejected.
-
      SSeerrvveerr MMaasskk
         This field is used to match server names.  The V line will be
         used for servers matching the mask given in this field.
@@ -1566,7 +1578,6 @@
 
      EExxaammppllee
         Q::of the security holes:foo.bar.baz::
-
         This command excludes a server named ``foo.bar.baz'', the reason
         is given to be security holes (you should give a reason, it is
         polite). The first field is unused, so leave it empty.
@@ -1579,6 +1590,7 @@
         The Service is a special kind of IRC client. It does not have
         the full abilities of a normal user but can behave in a more
         active manner than a normal client.
+
         Services are not intended for interactive usage, and are better
         suited for automated clients.
 
@@ -1630,7 +1642,6 @@
      FFoorrmmaatt
 
         B:<Class|Host Mask>::<Server Name>:<Port>:
-
 
 
      BB  This specifies a Bounce record.

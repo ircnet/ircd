@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.7 from
-/tmp/linuxdoc-dir-7027/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-11656/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.74 2005/02/15 21:01:37 chopin Exp $
+     $Id: INSTALL.info,v 1.75 2005/05/13 15:10:28 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -131,8 +131,8 @@ This version was tested on the following IPv6 systems: BSD/OS+KAME,
 Digital Unix, FreeBSD+KAME, Linux, NetBSD+INRIA.
 
    Because IPv6 numeric addresses contain ":" characters, `the default
-separator for the server configuration file was changed to "%"'. You
-can adjust it to your needs in config.h file.
+separator for the server configuration file is changed to "%"'. You can
+adjust it to your needs in config.h file.
 
 
 File: INSTALL.info,  Node: The config-h file,  Next: Editing the Makefile and compiling,  Prev: Installing IRC-,  Up: Top
@@ -155,6 +155,7 @@ This is done by editing the "config.h" file and changing the various
 * ZIP_LINKS ZIP_LEVEL::
 * SLOW_ACCEPT::
 * CLONE_CHECK::
+* LOG_SERVER_CHANNELS::
 * Other #define's::
 
 
@@ -263,7 +264,7 @@ abused (fast massive join of clonebots..), for these reasons, if you
 decide to keep SLOW_ACCEPT undefined you MUST define CLONE_CHECK.
 
 
-File: INSTALL.info,  Node: CLONE_CHECK,  Next: Other #define's,  Prev: SLOW_ACCEPT,  Up: The config-h file
+File: INSTALL.info,  Node: CLONE_CHECK,  Next: LOG_SERVER_CHANNELS,  Prev: SLOW_ACCEPT,  Up: The config-h file
 
 2.9 CLONE_CHECK
 ===============
@@ -274,9 +275,18 @@ the server will not accept more than 10 connections from the same host
 within 2 seconds.
 
 
-File: INSTALL.info,  Node: Other #define's,  Prev: CLONE_CHECK,  Up: The config-h file
+File: INSTALL.info,  Node: LOG_SERVER_CHANNELS,  Next: Other #define's,  Prev: CLONE_CHECK,  Up: The config-h file
 
-2.10 Other #define's
+2.10 LOG_SERVER_CHANNELS
+========================
+
+This option allows you to log to files server channels (like &NOTICES)
+chosen via LOG_SCH_* defines. Very handy.
+
+
+File: INSTALL.info,  Node: Other #define's,  Prev: LOG_SERVER_CHANNELS,  Up: The config-h file
+
+2.11 Other #define's
 ====================
 
 The rest of the user changable #define's should be pretty much self
@@ -417,7 +427,7 @@ File: INSTALL.info,  Node: Machine information,  Next: Administrative info,  Up:
 
 `Format'
      M:<Server NAME>:<YOUR Internet IP#>:<Geographic
-     Location>:<Port>:<SID>
+     Location>:<Port>:<SID>:
 
 `M'
      "M" specifies a Machine description line
@@ -458,12 +468,12 @@ File: INSTALL.info,  Node: Machine information,  Next: Administrative info,  Up:
      and/or admins of your peers.
 
 `Example:'
-     M:tolsun.oulu.fi::Oulu, Finland:6667:00PA
+     M:tolsun.oulu.fi::Oulu, Finland:6667:00PA:
 
      This line reads: My Host's name is "tolsun.oulu.fi", my site is
      located in "Oulu, Finland" and my SID is "00PA".
 
-     M:orion.cair.du.edu::Denver Colorado, USA:6667:00PS
+     M:orion.cair.du.edu::Denver Colorado, USA:6667:00PS:
 
      This line reads: My Hosts name is "orion.cair.du.edu", my site is
      located in "Denver Colorado, USA" and my SID is "00PS".
@@ -486,7 +496,7 @@ File: INSTALL.info,  Node: Administrative info,  Next: Port connections,  Prev: 
      included here in case problems arise.
 
 `Format'
-     A:<Your Name/Location>:<Your E-Mail Addr>:<other>::<network name>
+     A:<Your Name/Location>:<Your E-Mail Addr>:<other>::<network name>:
 
 `A'
      This specifies an Admin record.
@@ -520,7 +530,7 @@ File: INSTALL.info,  Node: Administrative info,  Next: Port connections,  Prev: 
 
      A:Jeff Trim -  Denver Colorado, USA:INET jtrim@orion.cair.du.edu
      UUCP {hao,isis}!udenva!jtrim:Terve! Heippa!  Have you said hello
-     in Finnish today?;)::IRCnet
+     in Finnish today?;)::IRCnet:
 
      Would look like this when printed out with the /admin command:
 
@@ -546,7 +556,8 @@ File: INSTALL.info,  Node: Port connections,  Next: Connection Classes,  Prev: A
      connections on as well as extra internet ports.
 
 `Format'
-     P:<Internet IP#>:::<Port>::<Flags> P:<Directory>:::<Port>::<Flags>
+     P:<Internet IP#>:::<Port>::<Flags>:
+     P:<Directory>:::<Port>::<Flags>:
 
 
    * Internet Ports
@@ -802,11 +813,11 @@ How to let clients connect to your IRCD.
      size, can be combined and their order does not matter.
         * D - restricted, when client has no reverse DNS
 
-        * E - client is exempted from K: lines
+        * E - client is exempted from K-lines
 
-        * e - client is exempted from X: lines
+        * e - client is exempted from X-lines
 
-        * F - fall-through to next I:line if password did not match
+        * F - fall-through to next I-line if password did not match
 
         * I - restricted, when client has no ident.
 
@@ -1144,7 +1155,7 @@ Remove an errant user from IRC on your site.
      wildcards.
 
 `Examples'
-     X:guest:::guest If user registers with the following USER command
+     X:guest:::guest: If user registers with the following USER command
      USER guest anything anything :guest then IMMEDIATELY REMOVE HIM
      from my IRCD.
 
@@ -1219,10 +1230,10 @@ to 3. This is because of two main reasons:
      for the line to be recognized.
 
 `TARGET Host NAME'
-     The full hostname of the target machine. This is the name that the
-     TARGET server will identify itself with when you connect to it.
-     If you were connecting to nic.funet.fi you would receive
-     "nic.funet.fi" and that is what you should place in this field.
+     This is the name that the TARGET server will identify itself with
+     when you connect to it.  If you were connecting to nic.funet.fi
+     you would receive "nic.funet.fi" and that is what you should place
+     in this field.
 
 `TARGET PORT'
      The INTERNET Port that you want to connect to on the TARGET
@@ -1809,43 +1820,44 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top127
-Node: Installing IRC-650
-Node: The configure script879
-Node: Notes for Cygwin32 users3177
-Node: Notes concerning IPv6 support3918
+Node: Top128
+Node: Installing IRC-651
+Node: The configure script880
+Node: Notes for Cygwin32 users3178
+Node: Notes concerning IPv6 support3919
 Node: The config-h file4407
-Node: DEBUGMODE4985
-Node: CHROOTDIR5570
-Node: USERS_RFC1459 USERS_SHOWS_UTMP5951
-Node: ENABLE_SUMMON6539
-Node: DEFAULT_INVISIBLE6860
-Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7193
-Node: ZIP_LINKS ZIP_LEVEL7725
-Node: SLOW_ACCEPT8770
-Node: CLONE_CHECK9408
-Node: Other #define's9779
-Node: Editing the Makefile and compiling10111
-Node: The ircd-conf file11837
-Node: Machine information14338
-Node: Administrative info16961
-Node: Port connections19120
-Node: Connection Classes21277
-Node: Client connections26582
-Node: Operator priviliges32369
-Node: Excluded accounts35679
-Node: X Excluded accounts39600
-Node: Server connections40898
-Node: Deny auto-connections49536
-Node: Hub connections51115
-Node: Leaf connections52613
-Node: Version limitations54707
-Node: Excluded machines56475
-Node: Service connections57790
-Node: Bounce server59394
-Node: Related resources61265
-Node: Reporting a bug62308
-Node: How to report a bug62569
-Node: Where to send a bug report63588
+Node: DEBUGMODE5009
+Node: CHROOTDIR5594
+Node: USERS_RFC1459 USERS_SHOWS_UTMP5975
+Node: ENABLE_SUMMON6563
+Node: DEFAULT_INVISIBLE6884
+Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7217
+Node: ZIP_LINKS ZIP_LEVEL7749
+Node: SLOW_ACCEPT8794
+Node: CLONE_CHECK9432
+Node: LOG_SERVER_CHANNELS9807
+Node: Other #define's10090
+Node: Editing the Makefile and compiling10430
+Node: The ircd-conf file12156
+Node: Machine information14657
+Node: Administrative info17283
+Node: Port connections19444
+Node: Connection Classes21608
+Node: Client connections26913
+Node: Operator priviliges32698
+Node: Excluded accounts36008
+Node: X Excluded accounts39929
+Node: Server connections41228
+Node: Deny auto-connections49826
+Node: Hub connections51405
+Node: Leaf connections52903
+Node: Version limitations54997
+Node: Excluded machines56765
+Node: Service connections58080
+Node: Bounce server59684
+Node: Related resources61555
+Node: Reporting a bug62598
+Node: How to report a bug62859
+Node: Where to send a bug report63878
 
 End Tag Table
