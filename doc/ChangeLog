@@ -6,6 +6,9 @@
 	  channelname, not only one.
 	* INSTALL, ircd.8, 2.11-New, ircd.conf.example, RELEASE_LOG, 
 	  RELEASE_NOTES: doc updates.
+	* configure, configure.in, setup.h.in: try to find strlcpy().
+	* config_read.c: as fileio.c uses strlcpy, define it to strncpyzt if
+	  system does not have it.
 
 2005-04-26  Piotr Kucharski
 
