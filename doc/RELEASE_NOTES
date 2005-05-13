@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.70 2005/05/13 15:54:02 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.71 2005/05/13 16:09:33 chopin Exp $
 
 This is version 2.11.1 of the IRC software.
 ===============================================================================
@@ -12,6 +12,7 @@ New features in 2.11.1:
 
 Important changes in 2.11.1 (since 2.11.0):
 
+	* TKLINE command defaults to minutes, not seconds.
 	* All restrictions were unlocked, that means clients can now:
 	  - use +R freely (when opped),
 	  - use longer nicks,
@@ -20,7 +21,8 @@ Important changes in 2.11.1 (since 2.11.0):
 
 Important configuration changes in 2.11.1 (since 2.11.0):
 
-	* None.
+	* It is possible to define two sendq values, one for burst and
+	  one for normal work.
 
 This is version 2.11.0 of the IRC software.
 ===============================================================================

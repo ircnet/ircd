@@ -1,3 +1,16 @@
+2.11.1
+
+2005-05-13  Piotr Kucharski
+
+	* channel.c/check_channelmask(): remove all ':' from end of supplied
+	  channelname, not only one.
+	* INSTALL, ircd.8, 2.11-New, ircd.conf.example, RELEASE_LOG, 
+	  RELEASE_NOTES: doc updates.
+
+2005-04-26  Piotr Kucharski
+
+	* config_read.c/config_read(): use MyMalloc, not malloc (from kinlo).
+
 2.11.1a2
 
 2005-04-13  Piotr Kucharski
@@ -6,6 +19,7 @@
 	* s_conf.c/initconf(), config.h.dist: define to speed up rehash at 
 	  the expense of memory (from anfl).
 	* config.h.dist: increase some defaults to suit IRCnet better.
+	* config.h.dist: increase default LOCALNICKLEN to 15.
 	* configure, configure.in, Makefile.in: add --with-rundir (ircd pid
 	  and tune files) option.
 	* s_debug.c/send_defines(): show current istat.is_eobservers in

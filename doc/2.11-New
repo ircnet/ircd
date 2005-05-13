@@ -3,15 +3,15 @@ Most important changes in 2.11 server grouped by who most benefits from the
 feature or who should look at it more carefully.
 
 All:
-	* Nicknames cannot contain [|]{\} chars. (This restriction will be
-	  removed in 2.11.1)
+	* Nicknames cannot contain [|]{\} chars. (This restriction is
+	  removed since 2.11.1)
 	* Channel names cannot contain {\}~ chars. If used (or from remote),
-	  they will be changed to [|]^ accordingly. (This restriction will be
-	  removed in 2.11.1)
+	  they will be changed to [|]^ accordingly. (This restriction is
+	  removed since 2.11.1)
 	* New channel list type: R (aka reop hints). With the same syntax and
 	  behaviour as beI, it serves as a hint list for reopping opless
 	  channels.
-	* Clients cannot set +R. (This restriction will be removed in 2.11.1)
+	* Clients cannot set +R. (This restriction is removed since 2.11.1)
 	* CIDR support in +beIR channelmodes.
 	* +beIR channelmodes have new wildcard `#' matching any digit; note
 	  that if ban starts with digit, it will match on UID, if with '#',
@@ -23,7 +23,7 @@ Client:
 	  to their UIDs. (Note: this requires no 2.10 server on the path
 	  between these two clients!)
 	* Clients can use "NICK 0" to get their UID as a nick. Works during
-	  registration, too.
+	  registration, too, unless forbidden by admin.
 	* Channels now keep information who and when set the topic.
 	* LIST (if allowed) does not disconnect if client's sendQ fills.
 	* WHOIS now shows the time user signed on.
@@ -45,7 +45,7 @@ Operator:
 	  on big servers with many clients and many klines.
 	* New server channel &CLIENTS with clients connects, quits and nick
 	  changes (may be undefined during compilation).
-	* New command: TKLINE (syntax: TKLINE seconds user@host :reason),
+	* New command: TKLINE (syntax: TKLINE minutes user@host :reason),
 	  available for services and (depending on O-line flag) opers.
 
 Admin:
