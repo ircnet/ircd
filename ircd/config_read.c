@@ -1,4 +1,4 @@
-/* "@(#)$Id: config_read.c,v 1.32 2005/04/26 14:51:14 chopin Exp $"; */
+/* "@(#)$Id: config_read.c,v 1.33 2005/05/13 17:39:12 chopin Exp $"; */
 
 /* used in config_error() */
 #define CF_NONE 0
@@ -20,6 +20,9 @@
 #define fdopen fdbopen
 #define fgets fbgets
 #define fopen fbopen
+#if !defined(HAVE_STRLCPY)
+#define strlcpy(x, y, N) strncpyzt((x), (y), (N))
+#endif
 #include "fileio.c"
 #endif
 
