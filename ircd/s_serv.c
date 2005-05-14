@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.273 2005/04/13 23:17:28 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.274 2005/05/14 20:51:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1188,10 +1188,10 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 
 	strncpyzt(cptr->serv->verstr, versionbuf, sizeof(cptr->serv->verstr));
 	strcpy(cptr->serv->sid, sid);
-	add_to_sid_hash_table(sid, cptr);
 
 	cptr->flags |= FLAGS_CBURST;
 	register_server(cptr);
+	add_to_sid_hash_table(sid, cptr);
 	add_server_to_tree(cptr);
 	/* why no add_client_to_list() here? --B. */
 	Debug((DEBUG_NOTICE, "Server link established with %s V%X %s",
