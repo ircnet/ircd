@@ -1,5 +1,9 @@
 2.11.1
 
+2005-05-14  Piotr Kucharski
+
+	* s_serv.c/m_server(): add_to_sid_hash must be after register_server.
+
 2005-05-13  Piotr Kucharski
 
 	* channel.c/check_channelmask(): remove all ':' from end of supplied
