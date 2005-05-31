@@ -1,3 +1,10 @@
+2005-05-27  Piotr Kucharski
+
+	* channel.c/check_channelmask(): don't bother removing, simply
+	  return error, when last char is colon.
+	* channel.c/check_channelmask(): we no longer use \007, remove
+	  and simplify.
+
 2.11.1
 
 2005-05-14  Piotr Kucharski
