@@ -4,7 +4,7 @@
 
 <title>STATS unleashed
 <author>Piotr Kucharski
-<date>$Id: stats.sgml,v 1.7 2005/01/30 15:31:35 chopin Exp $
+<date>$Id: stats.sgml,v 1.8 2005/07/09 21:16:42 chopin Exp $
 <abstract>
 This document describes all STATS for ircd server 2.11.
 </abstract>
@@ -66,7 +66,7 @@ KCTL:90 DCTL:1800 LDCTL:5400 CF:1000 MCPU:10
 H:63 N:9 D:9 U:10 R:50 T:160 C:50 P:20 K:23
 BS:512 MXR:20 MXB:30 MXBL:1024 PY:10
 ZL:-1 CM:2 CP:10 DC:15
-AC: 1 CA:1 S:0 SS:20 SU:40000
+AC: 1 CA:1 S:0 SS:85(109) SU:85000(121765)
 CCL: 0x1</verb></tscreen>
 
 These shows values of most variables set in config.h or struct_def.h,
@@ -107,8 +107,8 @@ compiled in the server:
 <item>AC: auto connect status (0 disabled, 1 enabled)
 <item>CA: client accept status (0 disabled, 1 enabled, 2 enabled if not split)
 <item>S: split status (0 no split, 1 in split)
-<item>SS (SPLIT_SERVERS): state of split if number of servers on the network is below that number
-<item>SU (SPLIT_USERS): state of split if number of users on the network is below that number
+<item>SS (SPLIT_SERVERS): state of split if number of servers on the network is below that number (current number in parens)
+<item>SU (SPLIT_USERS): state of split if number of users on the network is below that number (current number in parens)
 <item>CCL: bitmask telling what is sent to &amp;CLIENTS channel.
 </itemize>
 
