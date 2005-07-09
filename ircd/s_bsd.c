@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.177 2005/06/01 18:14:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.178 2005/07/09 23:14:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2721,7 +2721,7 @@ static	struct	SOCKADDR *connect_inet(aConfItem *aconf, aClient *cptr,
 	server.SIN_FAMILY = AFINET;
 	get_sockhost(cptr, aconf->host);
 	
-	if (aconf->source_ip)
+	if (!BadPtr(aconf->source_ip))
 	{
 		memset(&outip, 0, sizeof(outip));
 		outip.SIN_PORT = 0;
