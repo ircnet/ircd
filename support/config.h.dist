@@ -263,7 +263,7 @@
 #undef LOG_SCH_ERROR	/* &ERRORS */
 #undef LOG_SCH_NOTICE	/* &NOTICES */
 #undef LOG_SCH_KILL	/* &KILLS */
-#undef LOG_SCH_CHAN	/* &CHANNELS */
+#undef LOG_SCH_CHAN	/* &CHANNEL */
 #undef LOG_SCH_NUM	/* &NUMERICS */
 #undef LOG_SCH_SERVER	/* &SERVERS */
 #undef LOG_SCH_HASH	/* &HASH */
