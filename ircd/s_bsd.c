@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.178 2005/07/09 23:14:59 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.179 2005/07/09 23:37:49 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -212,6 +212,13 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 	SOCK_LEN_TYPE len = sizeof(server);
 	char	ipname[20];
 
+	/* broken config? why allow such broken line to live?
+	** XXX: fix initconf()? --B. */
+	if (!ipmask)
+	{
+		sendto_flag(SCH_ERROR, "Invalid P-line");
+		return -1;
+	}
 	ad[0] = ad[1] = ad[2] = ad[3] = 0;
 
 	/*
@@ -2064,6 +2071,7 @@ static	int	read_packet(aClient *cptr, int msg_ready)
 		** it on the end of the receive queue and do it when its
 		** turn comes around.
 		*/
+		/* why no poolsize increase here like in send? --B. */
 		if (length && dbuf_put(&cptr->recvQ, readbuf, length) < 0)
 			return exit_client(cptr, cptr, &me, "dbuf_put fail");
 
