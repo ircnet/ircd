@@ -1,3 +1,11 @@
+2005-06-01  Piotr Kucharski
+
+	* s_serv.c/m_set(): manual SET CACCEPT ON activates delayed listeners.
+	* s_bsd.c/init_sys(): set soft limit on core size to its hard value;
+	  warn if not unlimited.
+
+2.11.1p1
+
 2005-05-27  Piotr Kucharski
 
 	* channel.c/check_channelmask(): don't bother removing, simply
