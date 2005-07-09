@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.261 2005/05/27 16:56:42 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.262 2005/07/09 22:15:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2464,7 +2464,8 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	char *name, *target, mbuf[MAXMODEPARAMS + 1];
+	char *name, *target;
+	char mbuf[3] /* "ov" */;
 	char uidbuf[BUFSIZE], *u;
 	char *p = NULL;
 	int chop, cnt = 0;
@@ -2522,17 +2523,16 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{
 			if (*(target+1) == '@')
 			{
-				/* actually never sends in a JOIN ^G */
 				if (*(target+2) == '+')
 				{
-					strcpy(mbuf, "\007ov");
+					strcpy(mbuf, "ov");
 					chop = CHFL_UNIQOP| \
 						CHFL_CHANOP|CHFL_VOICE;
 					name = target + 3;
 				}
 				else
 				{
-					strcpy(mbuf, "\007o");
+					strcpy(mbuf, "o");
 					chop = CHFL_UNIQOP|CHFL_CHANOP;
 					name = target + 2;
 				}
@@ -2541,13 +2541,13 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			{
 				if (*(target+1) == '+')
 				{
-					strcpy(mbuf, "\007ov");
+					strcpy(mbuf, "ov");
 					chop = CHFL_CHANOP|CHFL_VOICE;
 					name = target+2;
 				}
 				else
 				{
-					strcpy(mbuf, "\007o");
+					strcpy(mbuf, "o");
 					chop = CHFL_CHANOP;
 					name = target+1;
 				}
@@ -2555,7 +2555,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 		else if (*target == '+')
 		{
-			strcpy(mbuf, "\007v");
+			strcpy(mbuf, "v");
 			chop = CHFL_VOICE;
 			name = target+1;
 		}
@@ -2567,11 +2567,13 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (!(acptr = find_person(name, NULL)) &&
 			!(acptr = find_uid(name, NULL)))
 		{
+			/* shouldn't this be an error? --B. */
 			continue;
 		}
 		/* is user who we think? */
 		if (acptr->from != cptr)
 		{
+			/* shouldn't this be a squit-level error? --B. */
 			continue;
 		}
 		/* make sure user isn't already on channel */
@@ -2650,14 +2652,14 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				*parabuf = '\0'; *modebuf = '\0';
 				/* fall through */
 			case 1:
-				strcat(modebuf, mbuf+1);
-				cnt += strlen(mbuf+1);
+				strcat(modebuf, mbuf);
+				cnt += strlen(mbuf);
 				if (*parabuf)
 				    {
 					strcat(parabuf, " ");
 				    }
 				strcat(parabuf, acptr->name);
-				if (mbuf[2])
+				if (mbuf[1])
 				    {
 					strcat(parabuf, " ");
 					strcat(parabuf, acptr->name);
@@ -2667,11 +2669,11 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				sendto_channel_butserv(chptr, &me,
 					       ":%s MODE %s +%s%c %s %s",
 						       sptr->name, parv[1],
-						       modebuf, mbuf[1],
+						       modebuf, mbuf[0],
 						       parabuf, acptr->name);
-				if (mbuf[2])
+				if (mbuf[1])
 				    {
-					strcpy(modebuf, mbuf+2);
+					strcpy(modebuf, mbuf+1);
 					strcpy(parabuf, acptr->name);
 					cnt = 1;
 				    }
