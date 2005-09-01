@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.262 2005/07/09 22:15:14 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.263 2005/09/01 16:17:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3222,7 +3222,7 @@ int	m_list(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		
 		}
 		
-end_of_list:
+end_of_list:;
 #ifdef LIST_ALIS_NOTE
 		/* Send second notice if we listed more than 24 channels
 		 * - usual height of irc client in text mode.
