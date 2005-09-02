@@ -1,3 +1,15 @@
+2005-09-02  Piotr Kucharski
+
+	* s_serv.c/m_squit(): find_server() before searching among clients.
+
+2005-07-10  Piotr Kucharski
+
+	* channel.c/m_njoin(): get rid of ^V in mbuf, we never use it.
+	* hash.c/bigger_hash_table(): don't add ME to uid hash.
+	* s_bsd.c/connect_inet(): don't parse empty source ip (reported by
+	  fantomas).
+	* s_bsd.c/inetport(): do not sscanf null ipmask (reported by MJRider).
+
 2005-06-01  Piotr Kucharski
 
 	* s_serv.c/m_set(): manual SET CACCEPT ON activates delayed listeners.
