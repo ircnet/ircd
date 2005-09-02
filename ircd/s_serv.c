@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.275 2005/06/01 16:27:24 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.276 2005/09/02 13:59:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -151,6 +151,10 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	** The following allows wild cards in SQUIT. Only useful
 	** when the command is issued by an oper.
 	*/
+	if (!acptr)
+	{
+		acptr = find_server(server, NULL);
+	}
 	if (!acptr)
 	{
 		for (acptr = client;
