@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.65 2005/02/22 17:09:37 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.66 2005/11/15 18:52:04 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -55,7 +55,7 @@ aService	*make_service(aClient *cptr)
 
 void	free_service(aClient *cptr)
 {
-	Reg	aService	*serv;
+	aService	*serv;
 
 	if ((serv = cptr->service))
 	{
@@ -698,6 +698,10 @@ int	m_squery(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    (acptr->service->wants & SERVICE_WANT_PREFIX))
 			sendto_one(acptr, ":%s!%s@%s SQUERY %s :%s", parv[0],
 				   sptr->user->username, sptr->user->host,
+				   acptr->name, parv[2]);
+		else if (MyConnect(acptr) && 
+			(acptr->service->wants & SERVICE_WANT_UID))
+			sendto_one(acptr, ":%s SQUERY %s :%s", sptr->user->uid,
 				   acptr->name, parv[2]);
 		else
 			sendto_one(acptr, ":%s SQUERY %s :%s",
