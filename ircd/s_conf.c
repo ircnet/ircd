@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.159 2005/04/13 23:14:38 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.160 2005/11/15 20:07:58 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2363,69 +2363,13 @@ int	wdhms2sec(char *input, time_t *output)
 	return 0;
 }
 
-int	m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
-{
-	int	status = CONF_TKILL;
-	time_t	time;
-	char	*user, *host, *reason;
-	int	i;
-
-	if (!is_allowed(sptr, ACL_TKLINE))
-		return m_nopriv(cptr, sptr, parc, parv);
-
-	/* sanity checks */
-	i = wdhms2sec(parv[1], &time);
-	user = parv[2];
-	host = strchr(user, '@');
-	if (i || !host)
-	{
-		/* error */
-		if (!IsPerson(sptr))
-		{
-			sendto_one(sptr, ":%s NOTICE %s "
-				":TKLINE: Incorrect format",
-				ME, parv[0]);
-			return exit_client(cptr, cptr, &me,
-				"TKLINE: Incorrect format");
-		}
-		sendto_one(sptr, ":%s NOTICE %s :TKLINE: Incorrect format",
-			ME, parv[0]);
-		return 2;
-	}
-
-	/* All seems fine. */
-#ifdef TKLINE_MAXTIME
-	if (time > TKLINE_MAXTIME)
-		time = TKLINE_MAXTIME;
-#endif
-	if (*user == '=')
-	{
-		status = CONF_TOTHERKILL;
-		user++;
-	}
-	*host++ = '\0';
-#ifdef INET6
-	host = ipv6_convert(host);
-#endif
-	reason = parv[3];
-	if (strlen(reason) > TOPICLEN)
-	{
-		reason[TOPICLEN] = '\0';
-	}
-
-	/* All parameters are now sane. Do the stuff. */
-	do_tkline(parv[0], time, user, host, reason, status);
-
-	return 1;
-}
-
 /* 
  * Adds tkline to tkconf.
  * If tkline already existed, its expire time is updated.
  *
  * Returns created tkline expire time.
  */
-void do_tkline(char *who, time_t time, char *user, char *host, char *reason, int status)
+void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *reason, int status)
 {
 	char buff[BUFSIZE];
 	aClient	*acptr;
@@ -2556,6 +2500,66 @@ void do_tkline(char *who, time_t time, char *user, char *host, char *reason, int
 		nexttkexpire = MAX(timeofday + 60, aconf->hold);
 	}
 	return;
+}
+
+int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
+{
+	int	status = CONF_TKILL;
+	time_t	time;
+	char	*user, *host, *reason;
+	int	i;
+
+	/* sanity checks */
+	i = wdhms2sec(parv[1], &time);
+	user = parv[2];
+	host = strchr(user, '@');
+	if (i || !host)
+	{
+		/* error */
+		if (!IsPerson(sptr))
+		{
+			sendto_one(sptr, ":%s NOTICE %s "
+				":TKLINE: Incorrect format",
+				ME, parv[0]);
+			return exit_client(cptr, cptr, &me,
+				"TKLINE: Incorrect format");
+		}
+		sendto_one(sptr, ":%s NOTICE %s :TKLINE: Incorrect format",
+			ME, parv[0]);
+		return 2;
+	}
+
+	/* All seems fine. */
+#ifdef TKLINE_MAXTIME
+	if (time > TKLINE_MAXTIME)
+		time = TKLINE_MAXTIME;
+#endif
+	if (*user == '=')
+	{
+		status = CONF_TOTHERKILL;
+		user++;
+	}
+	*host++ = '\0';
+#ifdef INET6
+	host = ipv6_convert(host);
+#endif
+	reason = parv[3];
+	if (strlen(reason) > TOPICLEN)
+	{
+		reason[TOPICLEN] = '\0';
+	}
+
+	/* All parameters are now sane. Do the stuff. */
+	do_kline(1, parv[0], time, user, host, reason, status);
+
+	return 1;
+}
+
+int	m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
+{
+	if (!is_allowed(sptr, ACL_TKLINE))
+		return m_nopriv(cptr, sptr, parc, parv);
+	return prep_kline(1, cptr, sptr, parc, parv);
 }
 
 int	m_untkline(aClient *cptr, aClient *sptr, int parc, char **parv)
