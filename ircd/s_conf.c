@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.160 2005/11/15 20:07:58 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.161 2005/11/15 20:18:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2510,8 +2510,16 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 	int	i;
 
 	/* sanity checks */
-	i = wdhms2sec(parv[1], &time);
-	user = parv[2];
+	if (tkline)
+	{
+		i = wdhms2sec(parv[1], &time);
+#ifdef TKLINE_MAXTIME
+		if (time > TKLINE_MAXTIME)
+			time = TKLINE_MAXTIME;
+#endif
+		user = parv[2];
+		reason = parv[3];
+	}
 	host = strchr(user, '@');
 	if (i || !host)
 	{
@@ -2530,10 +2538,6 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 	}
 
 	/* All seems fine. */
-#ifdef TKLINE_MAXTIME
-	if (time > TKLINE_MAXTIME)
-		time = TKLINE_MAXTIME;
-#endif
 	if (*user == '=')
 	{
 		status = CONF_TOTHERKILL;
@@ -2543,14 +2547,13 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 #ifdef INET6
 	host = ipv6_convert(host);
 #endif
-	reason = parv[3];
 	if (strlen(reason) > TOPICLEN)
 	{
 		reason[TOPICLEN] = '\0';
 	}
 
 	/* All parameters are now sane. Do the stuff. */
-	do_kline(1, parv[0], time, user, host, reason, status);
+	do_kline(tkline, parv[0], time, user, host, reason, status);
 
 	return 1;
 }
