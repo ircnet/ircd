@@ -102,6 +102,11 @@
  */
 #undef	DEFAULT_INVISIBLE
 
+/* 
+ * Define this if you want to have KLINE command for opers and services.
+ */
+#undef KLINE
+
 /*
  * Define this if you want to have TKLINE and UNTKLINE commands
  * for opers and services.
@@ -126,6 +131,7 @@
 #define	OPER_RESTART
 #define	OPER_SET
 #define	OPER_SQUIT
+#define	OPER_KLINE
 #define	OPER_TKLINE
 /* In a perfect world these two (or at least second) would be undefined. */
 #define	OPER_KILL
