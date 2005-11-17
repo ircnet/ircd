@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.165 2005/11/17 15:39:30 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.166 2005/11/17 15:46:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2368,7 +2368,7 @@ int	wdhms2sec(char *input, time_t *output)
 	}
 	return 0;
 }
-#endif TKLINE
+#endif
 
 #if defined(TKLINE) || defined(KLINE)
 /* 
@@ -2550,6 +2550,12 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		reason = parv[2];
 	}
 	host = strchr(user, '@');
+	
+	if (strlen(user) > USERLEN+HOSTLEN+1)
+	{
+		/* induce error */
+		i = 1;
+	}
 	if (i || !host)
 	{
 		/* error */
