@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.161 2005/11/15 20:18:11 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.162 2005/11/17 15:14:02 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2364,7 +2364,7 @@ int	wdhms2sec(char *input, time_t *output)
 }
 
 /* 
- * Adds tkline to tkconf.
+ * Adds t/kline to t/kconf.
  * If tkline already existed, its expire time is updated.
  *
  * Returns created tkline expire time.
@@ -2379,7 +2379,7 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 	buff[0] = '\0';
 
 	/* Check if such u@h already exists in tkconf. */
-	for (aconf = tkconf; aconf; aconf = aconf->next)
+	for (aconf = tkline?tkconf:kconf; aconf; aconf = aconf->next)
 	{
 		if (0==strcasecmp(aconf->host, host) && 
 			0==strcasecmp(aconf->name, user))
@@ -2403,17 +2403,30 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 		istat.is_confmem += strlen(aconf->host) + 1;
 		istat.is_confmem += strlen(aconf->passwd) + 1;
 
-		/* put on top of tkconf */
-		if (tkconf)
+		/* put on top of t/kconf */
+		if (tkline)
 		{
-			aconf->next = tkconf;
+			if (tkconf)
+			{
+				aconf->next = tkconf;
+			}
+			tkconf = aconf;
+			sendto_flag(SCH_TKILL, "TKLINE %s@%s (%u) by %s :%s",
+				aconf->name, aconf->host, time, who, reason);
 		}
-		tkconf = aconf;
+		else
+		{
+			if (kconf)
+			{
+				aconf->next = kconf;
+			}
+			kconf = aconf;
+			sendto_flag(SCH_TKILL, "KLINE %s@%s by %s :%s",
+				aconf->name, aconf->host, who, reason);
+		}
 	}
-	sendto_flag(SCH_TKILL, "TKLINE %s@%s (%u) by %s :%s",
-		aconf->name, aconf->host, time, who, reason);
 
-	/* get rid of tklined clients */
+	/* get rid of klined clients */
 	for (i = highest_fd; i >= 0; i--)
 	{
 		if (!(acptr = local[i]) || !IsPerson(acptr)
@@ -2479,7 +2492,7 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 				ME, acptr->name, aconf->name, aconf->host,
 				": ", aconf->passwd);
 			sendto_flag(SCH_TKILL,
-				"TKill line active for %s",
+				"%sKill line active for %s", tkline?"T":"",
 				get_client_name(acptr, FALSE));
 			if (buff[0] == '\0')
 			{
@@ -2491,7 +2504,8 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 	}
 	if (count > 4)
 	{
-		sendto_flag(SCH_TKILL, "TKill reaped %d souls", count);
+		sendto_flag(SCH_TKILL, "%sKline reaped %d souls",
+			tkline?"T":"", count);
 	}
 
 	/* do next tkexpire, but not more often than once a minute */
@@ -2507,7 +2521,7 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 	int	status = CONF_TKILL;
 	time_t	time;
 	char	*user, *host, *reason;
-	int	i;
+	int	i = 0;
 
 	/* sanity checks */
 	if (tkline)
@@ -2519,6 +2533,11 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 #endif
 		user = parv[2];
 		reason = parv[3];
+	}
+	else
+	{
+		user = parv[1];
+		reason = parv[2];
 	}
 	host = strchr(user, '@');
 	if (i || !host)
@@ -2552,10 +2571,22 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		reason[TOPICLEN] = '\0';
 	}
 
+	if (!tkline)
+	{
+		/* add k-line to file */
+	}
+
 	/* All parameters are now sane. Do the stuff. */
 	do_kline(tkline, parv[0], time, user, host, reason, status);
 
 	return 1;
+}
+
+int	m_kline(aClient *cptr, aClient *sptr, int parc, char **parv)
+{
+	if (!is_allowed(sptr, ACL_KLINE))
+		return m_nopriv(cptr, sptr, parc, parv);
+	return prep_kline(0, cptr, sptr, parc, parv);
 }
 
 int	m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
