@@ -1,3 +1,22 @@
+2005-11-17  Piotr Kucharski
+
+	* s_conf.c, s_conf_ext.h: added m_kline().
+	* s_conf.c/prep_kline(), do_kline(): updated for kline cmd.
+	* parse.c: add KLINE cmd.
+	* struct_def.h: add ACL_KLINE.
+	* s_conf.c/oline_flags_to_string(), oline_flags_parse(): add ACL_KLINE.
+	* Makefile.in: add KLINE_PATH define.
+	* config.h.dist: add KLINE (default off) and OPER_KLINE defines.
+	* s_conf.c/prep_kline(): u@h length checks.
+	* s_conf.c/prep_kline(): writing klines to kline file.
+
+2005-11-15  Piotr Kucharski
+
+	* chkconf.c: compile warnings about redefining MyMalloc.
+	* service.c/m_squery(): use UID as source if service wants UIDs.
+	* s_conf.c: renamed do_tkline to do_kline, renamed m_tkline to
+	  prep_kline, added small m_tkline calling prep_kline.
+
 2005-09-02  Piotr Kucharski
 
 	* s_serv.c/m_squit(): find_server() before searching among clients.

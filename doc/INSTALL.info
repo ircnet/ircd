@@ -1,5 +1,5 @@
-This is INSTALL.info, produced by makeinfo version 4.7 from
-/tmp/linuxdoc-dir-11656/sgmltmp.INSTALL.info.2.
+This is INSTALL.info, produced by makeinfo version 4.8 from
+/tmp/linuxdoc-dir-25743/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.75 2005/05/13 15:10:28 chopin Exp $
+     $Id: INSTALL.info,v 1.76 2005/11/17 17:24:51 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -1002,6 +1002,8 @@ How to become the IRC administrator on your site
 
         * T - allows TKLINE
 
+        * q - allows KLINE
+
         * t - enables full TRACE and STATS L
 
      "L" flag cannot be overridden by other flags.  If <Flags> field is
@@ -1845,19 +1847,19 @@ Node: Port connections19444
 Node: Connection Classes21608
 Node: Client connections26913
 Node: Operator priviliges32698
-Node: Excluded accounts36008
-Node: X Excluded accounts39929
-Node: Server connections41228
-Node: Deny auto-connections49826
-Node: Hub connections51405
-Node: Leaf connections52903
-Node: Version limitations54997
-Node: Excluded machines56765
-Node: Service connections58080
-Node: Bounce server59684
-Node: Related resources61555
-Node: Reporting a bug62598
-Node: How to report a bug62859
-Node: Where to send a bug report63878
+Node: Excluded accounts36036
+Node: X Excluded accounts39957
+Node: Server connections41256
+Node: Deny auto-connections49854
+Node: Hub connections51433
+Node: Leaf connections52931
+Node: Version limitations55025
+Node: Excluded machines56793
+Node: Service connections58108
+Node: Bounce server59712
+Node: Related resources61583
+Node: Reporting a bug62626
+Node: How to report a bug62887
+Node: Where to send a bug report63906
 
 End Tag Table

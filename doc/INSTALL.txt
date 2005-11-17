@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.75 2005/05/13 15:10:29 chopin Exp $
+  $Id: INSTALL.txt,v 1.76 2005/11/17 17:24:52 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -930,6 +930,8 @@
 
         +o  T - allows TKLINE
 
+        +o  q - allows KLINE
+
         +o  t - enables full TRACE and STATS L
 
         ``L'' flag cannot be overridden by other flags.  If <Flags>
@@ -1247,8 +1249,6 @@
   entry contains the password, if any, that you require other hosts to
   have before they can connect to you.  These entries are of the same
   format as the ``C'' entries.
-
-
 
      FFoorrmmaatt
         The format for the NOCONNECT entry in the ``ircd.conf'' is:
