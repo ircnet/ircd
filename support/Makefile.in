@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.68 2005/04/13 23:18:57 chopin Exp $
+#*   $Id: Makefile.in,v 1.69 2005/11/17 15:26:39 chopin Exp $
 #*
 #*/
 
@@ -97,6 +97,8 @@ M4_PATH = @M4_PATH@
 
 # server configuration file
 IRCDCONF_PATH = $(ircd_conf_dir)/$(IRCD).conf
+# server configuration file (only for writing klines to)
+KLINE_PATH = $(ircd_conf_dir)/$(IRCD).kline
 # server Message Of The Day
 IRCDMOTD_PATH = $(ircd_conf_dir)/$(IRCD).motd
 # authentication slave configuration file
@@ -346,6 +348,7 @@ s_bsd.o: ../ircd/s_bsd.c setup.h config.h ../common/struct_def.h
 s_conf.o: ../ircd/s_conf.c setup.h config.h ../common/struct_def.h ../ircd/config_read.c
 	$(CC) $(S_CFLAGS) -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" \
 	-DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" \
+	-DKLINE_PATH="\"$(KLINE_PATH)\"" \
 	-DIRCDCONF_DIR="\"$(ircd_conf_dir)/\"" \
 	-DM4_PATH="\"$(M4_PATH)\"" -c -o $@ ../ircd/s_conf.c
 
