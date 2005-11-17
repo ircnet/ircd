@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.166 2005/11/17 15:46:45 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.167 2005/11/17 17:21:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2556,6 +2556,7 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		/* induce error */
 		i = 1;
 	}
+badkline:
 	if (i || !host)
 	{
 		/* error */
@@ -2587,10 +2588,59 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		reason[TOPICLEN] = '\0';
 	}
 
+#ifdef KLINE
 	if (!tkline)
 	{
-		/* add k-line to file */
+		int	kfd, ksize, kret;
+		char	kbuf[2*BUFSIZE];
+		char	*utmp, *htmp, *rtmp;
+
+		if (!strcmp(KLINE_PATH, IRCDCONF_PATH))
+		{
+			sendto_flag(SCH_ERROR,
+				"Invalid kline configuration file.");
+			return MAXPENALTY;
+		}
+		utmp = strchr(user, IRCDCONF_DELIMITER);
+		htmp = strchr(host, IRCDCONF_DELIMITER);
+		rtmp = strchr(reason, IRCDCONF_DELIMITER);
+		if (utmp || htmp || rtmp)
+		{
+			/* Too lazy to copy it here. --B. */
+			i = 1;
+			goto badkline;
+		}
+
+		kfd = open(KLINE_PATH, O_WRONLY|O_APPEND|O_NDELAY);
+		if (kfd < 0)
+		{
+			sendto_flag(SCH_ERROR,
+				"Cannot open kline configuration file.");
+			return MAXPENALTY;
+		}
+		ksize = snprintf(kbuf, sizeof(kbuf),
+			"%c%c%s%c%s%c%s%c0%c #%s%s%s%s%s#%d\n",
+			(status == CONF_OTHERKILL ? 'k' : 'K'),
+			IRCDCONF_DELIMITER, host, IRCDCONF_DELIMITER, reason,
+			IRCDCONF_DELIMITER, user, IRCDCONF_DELIMITER,
+			IRCDCONF_DELIMITER, sptr->name,
+			sptr->user ? "!" : "",
+			sptr->user ? sptr->user->username : "",
+			sptr->user ? "@" : "",
+			sptr->user ? sptr->user->host : "", (int)timeofday);
+		kret = write(kfd, kbuf, ksize);
+		close(kfd);
+		if (kret != ksize)
+		{
+			sendto_flag(SCH_ERROR, "Error writing (%d!=%d) "
+				"to kline configuration file.", kret, ksize);
+			sendto_one(sptr, ":%s NOTICE %s :KLINE: error writing "
+				"(%d!=%d) to kline configuration file",
+				ME, parv[0], kret, ksize);
+			return MAXPENALTY;
+		}
 	}
+#endif /* KLINE */
 
 	/* All parameters are now sane. Do the stuff. */
 	do_kline(tkline, parv[0], time, user, host, reason, status);
