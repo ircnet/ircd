@@ -83,6 +83,8 @@ EXTERN char *ipv6_convert (char *orig);
 EXTERN int m_tkline(aClient *, aClient *, int, char **);
 EXTERN int m_untkline(aClient *, aClient *, int, char **);
 EXTERN time_t tkline_expire(int);
-EXTERN void do_tkline(char *, time_t, char *, char *, char *, int);
+#endif
+#ifdef KLINE
+EXTERN int m_kline(aClient *, aClient *, int, char **);
 #endif
 #undef EXTERN
