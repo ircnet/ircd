@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.162 2005/11/17 15:14:02 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.163 2005/11/17 15:18:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2546,13 +2546,13 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		if (!IsPerson(sptr))
 		{
 			sendto_one(sptr, ":%s NOTICE %s "
-				":TKLINE: Incorrect format",
+				":T/KLINE: Incorrect format",
 				ME, parv[0]);
 			return exit_client(cptr, cptr, &me,
-				"TKLINE: Incorrect format");
+				"T/KLINE: Incorrect format");
 		}
-		sendto_one(sptr, ":%s NOTICE %s :TKLINE: Incorrect format",
-			ME, parv[0]);
+		sendto_one(sptr, ":%s NOTICE %s :%sKLINE: Incorrect format",
+			tkline?"T":"", ME, parv[0]);
 		return 2;
 	}
 
