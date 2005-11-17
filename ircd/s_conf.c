@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.164 2005/11/17 15:24:20 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.165 2005/11/17 15:39:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2368,7 +2368,9 @@ int	wdhms2sec(char *input, time_t *output)
 	}
 	return 0;
 }
+#endif TKLINE
 
+#if defined(TKLINE) || defined(KLINE)
 /* 
  * Adds t/kline to t/kconf.
  * If tkline already existed, its expire time is updated.
@@ -2514,17 +2516,19 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 			tkline?"T":"", count);
 	}
 
+#ifdef TKLINE
 	/* do next tkexpire, but not more often than once a minute */
 	if (!nexttkexpire || nexttkexpire > aconf->hold)
 	{
 		nexttkexpire = MAX(timeofday + 60, aconf->hold);
 	}
+#endif
 	return;
 }
 
 int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 {
-	int	status = CONF_TKILL;
+	int	status = tkline ? CONF_TKILL : CONF_KILL;
 	time_t	time;
 	char	*user, *host, *reason;
 	int	i = 0;
@@ -2565,7 +2569,7 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 	/* All seems fine. */
 	if (*user == '=')
 	{
-		status = CONF_TOTHERKILL;
+		status = tkline ? CONF_TOTHERKILL : CONF_OTHERKILL;
 		user++;
 	}
 	*host++ = '\0';
@@ -2587,14 +2591,18 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 
 	return 1;
 }
+#endif /* TKLINE || KLINE */
 
+#ifdef KLINE
 int	m_kline(aClient *cptr, aClient *sptr, int parc, char **parv)
 {
 	if (!is_allowed(sptr, ACL_KLINE))
 		return m_nopriv(cptr, sptr, parc, parv);
 	return prep_kline(0, cptr, sptr, parc, parv);
 }
+#endif
 
+#ifdef TKLINE
 int	m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 {
 	if (!is_allowed(sptr, ACL_TKLINE))
@@ -2685,4 +2693,4 @@ time_t	tkline_expire(int all)
 		min = nexttkexpire + 60;
 	return min;
 }
-#endif
+#endif /* TKLINE */
