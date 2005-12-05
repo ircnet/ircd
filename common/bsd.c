@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: bsd.c,v 1.11 2004/11/16 16:39:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: bsd.c,v 1.12 2005/12/05 17:11:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -86,11 +86,16 @@ int	deliver_it(aClient *cptr, char *str, int len)
 {
 	int	retval;
 	aClient	*acpt = cptr->acpt;
+	int	savederrno = 0;
 
 #ifdef	DEBUGMODE
 	writecalls++;
 #endif
 	retval = send(cptr->fd, str, len, 0);
+
+	/* Prevent overwriting errno of send(). */
+	if (retval < 0)
+		savederrno = errno;
 	/*
 	** Convert WOULDBLOCK to a return of "0 bytes moved". This
 	** should occur only if socket was non-blocking. Note, that
@@ -113,7 +118,6 @@ int	deliver_it(aClient *cptr, char *str, int len)
 
 #ifdef DEBUGMODE
 	if (retval < 0) {
-		retval = -errno;
 		writeb[0]++;
 		Debug((DEBUG_ERROR,"write error (%s) to %s",
 			strerror(errno), cptr->name));
@@ -149,6 +153,9 @@ int	deliver_it(aClient *cptr, char *str, int len)
 			acpt->sendB += retval;
 		    }
 	    }
+	else
+		retval = -savederrno;
+	
 	return(retval);
 }
 
