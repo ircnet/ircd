@@ -1,3 +1,8 @@
+2005-12-05  Piotr Kucharski
+
+	* bsd.c/deliver_it(): return correct errno (not always EPERM) also when
+	  not in debug mode (noticed by fiction).
+
 2005-11-17  Piotr Kucharski
 
 	* s_conf.c, s_conf_ext.h: added m_kline().
