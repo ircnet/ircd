@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.259 2005/04/13 23:10:37 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.260 2005/12/06 15:11:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -251,6 +251,11 @@ int	do_nick_name(char *nick, int server)
 
 	if (strcasecmp(nick, "anonymous") == 0)
 		return 0;
+
+#ifdef MINLOCALNICKLEN
+	if (!server && nick[MINLOCALNICKLEN-1] == '\0')
+		return 0;
+#endif
 
 	for (ch = nick; *ch && (ch-nick) < (server?NICKLEN:LOCALNICKLEN); ch++)
 	{

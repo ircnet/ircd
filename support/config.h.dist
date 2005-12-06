@@ -722,6 +722,12 @@
 */
 #define LOCALNICKLEN 15
 
+/*
+** If you don't want your users to have too short nicknames, define
+** minimum nicklen allowed.
+*/
+/* #define MINLOCALNICKLEN 2 */
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
@@ -860,3 +866,12 @@
 #if defined(CLIENTS_CHANNEL) && !defined(CLIENTS_CHANNEL_LEVEL)
 #error define CLIENTS_CHANNEL_LEVEL
 #endif
+
+#if defined(MINLOCALNICKLEN) && ((MINLOCALNICKLEN + 0) < 2)
+#undef MINLOCALNICKLEN
+#endif
+
+#if defined(MINLOCALNICKLEN) && (MINLOCALNICKLEN > LOCALNICKLEN)
+#error MINLOCALNICKLEN bigger than (max)LOCALNICKLEN
+#endif
+
