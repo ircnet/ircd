@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.40 2005/01/30 13:42:03 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.41 2005/12/27 02:09:31 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -145,16 +145,18 @@ void	free_client(aClient *cptr)
 {
 	if (cptr->info != DefInfo)
 		MyFree(cptr->info);
-	if (MyConnect(cptr) && cptr->auth != cptr->username)
-	{
-	    sendto_flag(SCH_ERROR, "Please report to ircd-bug@irc.org about cptr->auth allocated but not free()d!");
-		istat.is_authmem -= strlen(cptr->auth) + 1;
-		istat.is_auth -= 1;
-		MyFree(cptr->auth);
-	}
 	/* True only for local clients */
 	if (cptr->hopcount == 0 || (IsServer(cptr) && cptr->hopcount == 1))
 	{
+		if (cptr->auth != cptr->username)
+		{
+			sendto_flag(SCH_ERROR, "Please report to ircd-bug@"
+				"irc.org about cptr->auth allocated but not"
+				" free()d!");
+			istat.is_authmem -= strlen(cptr->auth) + 1;
+			istat.is_auth -= 1;
+			MyFree(cptr->auth);
+		}
 		if (cptr->reason)
 		{
 			MyFree(cptr->reason);
