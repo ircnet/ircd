@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: bsd.c,v 1.12 2005/12/05 17:11:35 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: bsd.c,v 1.13 2005/12/27 02:23:48 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -153,7 +153,10 @@ int	deliver_it(aClient *cptr, char *str, int len)
 			acpt->sendB += retval;
 		    }
 	    }
-	else
+	/* Retval of erroneous send() would always be -1, so we return
+	** (negative) saved errno, so upper layer will give proper notice.
+	** Note above about EAGAIN or EWOULDBLOCK. --B. */
+	if (retval < 0)
 		retval = -savederrno;
 	
 	return(retval);
