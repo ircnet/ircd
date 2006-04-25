@@ -2,6 +2,8 @@
 
 	* configure, configure.in: detect Solaris 10 properly.
 	* mod_pipe.c/pipe_start(): pass chars, not integers (from Zobo).
+	* s_debug.c/show_defines(): show compiled in SPLIT_SERVERS and SPLIT_USERS.
+	* s_serv.c/m_eoback(): clear byuid so it won't notice oper later.
 
 2005-12-27  Piotr Kucharski
 
