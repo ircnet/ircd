@@ -1,3 +1,20 @@
+2006-04-25  Piotr Kucharski
+
+	* configure, configure.in: detect Solaris 10 properly.
+	* mod_pipe.c/pipe_start(): pass chars, not integers (from Zobo).
+
+2005-12-27  Piotr Kucharski
+
+	* list.c/free_client(): MyConnect is not a valid check in free_client()
+	  (noticed by fiction).
+	* bsd.c/deliver_it(): return correct errno eagain. (noticed by fiction).
+
+2005-12-06  Piotr Kucharski
+
+	* s_user.c/do_nick_name(), config.h.dist: MINLOCALNICKLEN allows
+	  enforcing minimum length of nickname for local clients.
+	* s_debug.c/send_defines(): show MINLOCALNICKLEN (as N0).
+
 2005-12-05  Piotr Kucharski
 
 	* bsd.c/deliver_it(): return correct errno (not always EPERM) also when
