@@ -195,7 +195,7 @@ else
     irc_cv_solaris_2="`uname -r | sed -e \"s/^5/2/g\"`"
     AC_MSG_RESULT([yes, Solaris $irc_cv_solaris_2])
     AC_DEFINE([SOLARIS_2], [1], [Define if the operating system is Solaris 2.x (SunOS 5.x).])
-    if echo "$irc_cv_solaris_2" | egrep "^2\.(0|1|2)" >/dev/null; then
+    if echo "$irc_cv_solaris_2" | egrep "^2\.(0|1|2)$" >/dev/null; then
       AC_DEFINE([SOLARIS_2_0_2_1_2_2], [1], [Define if the operating system is Solaris 2.[0-2] (SunOS 5.[0-2]).])
     elif echo "$irc_cv_solaris_2" | grep "^2\.3" >/dev/null; then
       AC_DEFINE([SOLARIS_2_3], [1], [Define if the operating system is Solaris 2.3 (SunOS 5.3).])
@@ -699,7 +699,7 @@ dnl main
 dnl ----
 
 AC_INIT([irc],[2.11],[ircd-bugs@irc.org])
-AC_REVISION([$Id: configure.in,v 1.72 2005/05/13 17:37:28 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.73 2006/04/25 14:41:30 chopin Exp $])
 AC_PREREQ(2.59)
 
 AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [[localstatedir/log]]], [
