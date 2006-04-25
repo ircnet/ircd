@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_debug.c,v 1.51 2005/12/06 15:11:24 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_debug.c,v 1.52 2006/04/25 21:51:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -324,10 +324,10 @@ void	send_defines(aClient *cptr, char *nick)
 		-1
 #endif
 		);
-	sendto_one(cptr, ":%s %d %s :AC:%d CA:%d S:%d SS:%d(%d) SU:%d(%d)",
+	sendto_one(cptr, ":%s %d %s :AC:%d CA:%d S:%d SS:%d/%d/%d SU:%d/%d/%d",
 		ME, RPL_STATSDEFINE, nick, iconf.aconnect, iconf.caccept, 
-		iconf.split, iconf.split_minservers, istat.is_eobservers,
-		iconf.split_minusers, istat.is_user[0] + istat.is_user[1]);
+		iconf.split, SPLIT_SERVERS, iconf.split_minservers, istat.is_eobservers,
+		SPLIT_USERS, iconf.split_minusers, istat.is_user[0] + istat.is_user[1]);
 #ifdef CLIENTS_CHANNEL
 	sendto_one(cptr, ":%s %d %s :CCL:0x%X", ME, RPL_STATSDEFINE, nick,
 		CLIENTS_CHANNEL_LEVEL);
