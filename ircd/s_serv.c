@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.276 2005/09/02 13:59:53 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.277 2006/04/25 22:15:54 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3038,6 +3038,11 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int	m_eoback(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	cptr->flags &= ~FLAGS_CBURST;
+	if (cptr->serv && cptr->serv->byuid[0])
+	{
+		/* no need to report link break few days later, is there? --B. */
+		cptr->serv->byuid[0] = '\0';
+	}
 	return 0;
 }
 
