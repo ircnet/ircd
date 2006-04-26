@@ -4,7 +4,7 @@
 
 <title>STATS unleashed
 <author>Piotr Kucharski
-<date>$Id: stats.sgml,v 1.8 2005/07/09 21:16:42 chopin Exp $
+<date>$Id: stats.sgml,v 1.9 2006/04/26 19:21:07 chopin Exp $
 <abstract>
 This document describes all STATS for ircd server 2.11.
 </abstract>
@@ -176,7 +176,7 @@ service, unregistered.
 
 <tag/o, O - operator lines/
 <tscreen><verb>o *@*.example.org * Beeth 0 10</verb></tscreen>
-1st field is operator type, lowercase is global operator, uppercase is local.
+1st field is operator type, lowercase is local operator, uppercase is global.
 2nd field is the user@hostname required to match, 3rd is password (disguised as ``*''),
 4th is the nickname, 5th is port (though unused) and 6th is the class user
 will get after becoming operator.

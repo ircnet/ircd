@@ -1,5 +1,5 @@
-This is stats.info, produced by makeinfo version 4.7 from
-/tmp/linuxdoc-dir-28792/sgmltmp.stats.info.2.
+This is stats.info, produced by makeinfo version 4.8 from
+/tmp/linuxdoc-dir-32146/sgmltmp.stats.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ STATS unleashed
 ***************
 
      Piotr Kucharski
-     $Id: stats.info,v 1.7 2005/07/09 21:16:42 chopin Exp $
+     $Id: stats.info,v 1.8 2006/04/26 19:21:07 chopin Exp $
 
    This document describes all STATS for ircd server 2.11.
 
@@ -274,11 +274,11 @@ Also ending 219 numeric is omitted in whole.
 `o, O - operator lines'
           o *@*.example.org * Beeth 0 10
 
-     1st field is operator type, lowercase is global operator,
-     uppercase is local.  2nd field is the user@hostname required to
-     match, 3rd is password (disguised as "*"), 4th is the nickname,
-     5th is port (though unused) and 6th is the class user will get
-     after becoming operator.
+     1st field is operator type, lowercase is local operator, uppercase
+     is global.  2nd field is the user@hostname required to match, 3rd
+     is password (disguised as "*"), 4th is the nickname, 5th is port
+     (though unused) and 6th is the class user will get after becoming
+     operator.
 
 `p - ping reports'
           irc.example.org[*@192.168.1.13] 11 0 0 -1
