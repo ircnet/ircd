@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.8 from
-/tmp/linuxdoc-dir-25743/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-5789/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.76 2005/11/17 17:24:51 chopin Exp $
+     $Id: INSTALL.info,v 1.77 2006/04/26 19:33:58 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -699,7 +699,9 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
      the connection.  If no reply was given then it defaults to
      "unknown" and thus the effective limit will be per host, not per
      user@host. Also, some ident servers return encrypted data which
-     changes for every connection making the limit void.
+     changes for every connection making the limit void. If you think
+     limits do not work, check ircd logs, the auth reply can be longer
+     than what ircd shows on-line.
 
 `Note'
      Only the local limitation is accurate.
@@ -1822,44 +1824,44 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top128
-Node: Installing IRC-651
-Node: The configure script880
-Node: Notes for Cygwin32 users3178
-Node: Notes concerning IPv6 support3919
-Node: The config-h file4407
-Node: DEBUGMODE5009
-Node: CHROOTDIR5594
-Node: USERS_RFC1459 USERS_SHOWS_UTMP5975
-Node: ENABLE_SUMMON6563
-Node: DEFAULT_INVISIBLE6884
-Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7217
-Node: ZIP_LINKS ZIP_LEVEL7749
-Node: SLOW_ACCEPT8794
-Node: CLONE_CHECK9432
-Node: LOG_SERVER_CHANNELS9807
-Node: Other #define's10090
-Node: Editing the Makefile and compiling10430
-Node: The ircd-conf file12156
-Node: Machine information14657
-Node: Administrative info17283
-Node: Port connections19444
-Node: Connection Classes21608
-Node: Client connections26913
-Node: Operator priviliges32698
-Node: Excluded accounts36036
-Node: X Excluded accounts39957
-Node: Server connections41256
-Node: Deny auto-connections49854
-Node: Hub connections51433
-Node: Leaf connections52931
-Node: Version limitations55025
-Node: Excluded machines56793
-Node: Service connections58108
-Node: Bounce server59712
-Node: Related resources61583
-Node: Reporting a bug62626
-Node: How to report a bug62887
-Node: Where to send a bug report63906
+Node: Top127
+Node: Installing IRC-650
+Node: The configure script879
+Node: Notes for Cygwin32 users3177
+Node: Notes concerning IPv6 support3918
+Node: The config-h file4406
+Node: DEBUGMODE5008
+Node: CHROOTDIR5593
+Node: USERS_RFC1459 USERS_SHOWS_UTMP5974
+Node: ENABLE_SUMMON6562
+Node: DEFAULT_INVISIBLE6883
+Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7216
+Node: ZIP_LINKS ZIP_LEVEL7748
+Node: SLOW_ACCEPT8793
+Node: CLONE_CHECK9431
+Node: LOG_SERVER_CHANNELS9806
+Node: Other #define's10089
+Node: Editing the Makefile and compiling10429
+Node: The ircd-conf file12155
+Node: Machine information14656
+Node: Administrative info17282
+Node: Port connections19443
+Node: Connection Classes21607
+Node: Client connections27031
+Node: Operator priviliges32816
+Node: Excluded accounts36154
+Node: X Excluded accounts40075
+Node: Server connections41374
+Node: Deny auto-connections49972
+Node: Hub connections51551
+Node: Leaf connections53049
+Node: Version limitations55143
+Node: Excluded machines56911
+Node: Service connections58226
+Node: Bounce server59830
+Node: Related resources61701
+Node: Reporting a bug62744
+Node: How to report a bug63005
+Node: Where to send a bug report64024
 
 End Tag Table

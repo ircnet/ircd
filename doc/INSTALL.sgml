@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.76 2005/11/17 17:24:52 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.77 2006/04/26 19:33:58 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -497,7 +497,9 @@ value is the ident reply for the connection.  If no reply
 was given then it defaults to ``unknown'' and thus the
 effective limit will be per host, not per user@host. Also,
 some ident servers return encrypted data which changes for
-every connection making the limit void.
+every connection making the limit void. If you think limits
+do not work, check ircd logs, the auth reply can be longer
+than what ircd shows on-line.
 <tag/Note/ Only the local limitation is accurate.
 <tag/Note/ If you define a gobal limit, you should also
 define a local limit (same or lower) as it won't take more
