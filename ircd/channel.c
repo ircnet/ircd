@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.263 2005/09/01 16:17:07 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.264 2006/04/26 16:16:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -482,7 +482,8 @@ void	remove_user_from_channel(aClient *sptr, aChannel *chptr)
 			 */
 			if (tmp->flags & CHFL_CHANOP)
 			{
-				chptr->reop = timeofday + LDELAYCHASETIMELIMIT;
+				chptr->reop = timeofday + LDELAYCHASETIMELIMIT +
+					myrand() % 300;
 			}
 
 			*curr = tmp->next;
@@ -1699,7 +1700,8 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				    lp->flags == (MODE_CHANOP|MODE_DEL))
 				{
 					chptr->reop = timeofday + 
-						LDELAYCHASETIMELIMIT;
+						LDELAYCHASETIMELIMIT +
+						myrand() % 300;
 				}
 			case MODE_UNIQOP :
 			case MODE_VOICE :
@@ -1747,7 +1749,8 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 					if (IsServer(sptr))
 					{
 						chptr->reop = timeofday +
-							LDELAYCHASETIMELIMIT;
+							LDELAYCHASETIMELIMIT +
+							myrand() % 300;
 					}
 				}
 				if (ischop &&
