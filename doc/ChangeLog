@@ -1,3 +1,13 @@
+2006-04-26  Piotr Kucharski
+
+	* channel.c/remove_user_from_channel(), set_mode(): make reop a bit random,
+	  so not always one server wins.
+	* struct_def.h, ircd.c/main(), try_connections(), s_misc.c/check_split(),
+	  initruntimeconf(), s_serv.c/m_server(), m_connect(): standalone mode.
+	* s_bsd.c/start_iauth(), s_conf.c/rehash(): "rehash a" restarts iauth
+	  (no other way to reread iauth.conf currently).
+	* s_conf.c/rehash(): "rehash d" reinitializes dns (rereads resolv.conf).
+
 2006-04-25  Piotr Kucharski
 
 	* configure, configure.in: detect Solaris 10 properly.
