@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.136 2005/11/17 15:15:41 chopin Exp $
+ *   $Id: struct_def.h,v 1.137 2006/04/26 19:22:26 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -104,6 +104,7 @@ typedef struct        LineItem aExtData;
 #define	BOOT_PROT	0x100
 #define	BOOT_STRICTPROT	0x200
 #define	BOOT_NOIAUTH	0x400
+#define	BOOT_STANDALONE	0x800
 
 typedef enum Status {
 	STAT_CONNECTING = -4,
