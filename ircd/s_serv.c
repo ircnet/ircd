@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.277 2006/04/25 22:15:54 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.278 2006/04/26 19:28:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -571,6 +571,13 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
                 sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, BadTo(parv[0]));
                 return 1;
             }
+	if ((bootopt & BOOT_STANDALONE))
+	{
+		sendto_flag(SCH_ERROR,
+			"Running in standalone mode, cannot accept %s/%s", parv[1], parv[3]);
+		return exit_client(cptr, cptr, &me,
+			"Running in standalone mode");
+	}
 	info[0] = info[REALLEN] = '\0';	/* strncpy() doesn't guarantee NULL */
 	inpath = get_client_name(cptr, FALSE);
 	if (parc < 2 || *parv[1] == '\0')
@@ -2377,6 +2384,13 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    {
 		return m_nopriv(cptr, sptr, parc, parv);
 	    }
+
+	if ((bootopt & BOOT_STANDALONE))
+	{
+		sendto_one(sptr, ":%s NOTICE %s :Connect disabled, running in"
+			" standalone mode", ME, parv[0]);
+		return 0;
+	}
 
 	if (hunt_server(cptr,sptr,":%s CONNECT %s %s :%s",
 		       3,parc,parv) != HUNTED_ISME)

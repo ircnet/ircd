@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.157 2005/03/29 22:50:15 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.158 2006/04/26 19:28:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -218,6 +218,9 @@ static	time_t	try_connections(time_t currenttime)
 #ifdef DISABLE_DOUBLE_CONNECTS
 	int	i;
 #endif
+
+	if ((bootopt & BOOT_STANDALONE))
+		return 0;
 
 	Debug((DEBUG_NOTICE,"Connection check at   : %s",
 		myctime(currenttime)));
@@ -848,6 +851,8 @@ int	main(int argc, char *argv[])
 				bootopt |= BOOT_PROT;
 			else if (!strcmp(p, "off"))
 				bootopt &= ~(BOOT_PROT|BOOT_STRICTPROT);
+			else if (!strcmp(p, "standalone"))
+				bootopt |= BOOT_STANDALONE;
 			else
 				bad_command();
 			break;

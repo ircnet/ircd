@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.103 2005/03/28 23:33:27 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.104 2006/04/26 19:28:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -992,6 +992,12 @@ void	initruntimeconf(void)
 	/* Defaults set in config.h */
 	iconf.split_minservers = SPLIT_SERVERS;
 	iconf.split_minusers = SPLIT_USERS;
+
+	if ((bootopt & BOOT_STANDALONE))
+	{
+		/* standalone mode */
+		iconf.split = 3;
+	}
 }
 
 void	tstats(aClient *cptr, char *name)
@@ -1139,6 +1145,9 @@ void	read_motd(char *filename)
 
 void	check_split(void)
 {
+	if ((bootopt & BOOT_STANDALONE))
+		return;
+
 	if (istat.is_eobservers < iconf.split_minservers ||
 	    istat.is_user[0] + istat.is_user[1] < iconf.split_minusers)
 	{
