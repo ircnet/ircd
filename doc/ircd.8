@@ -1,5 +1,5 @@
 .\" @(#)$Id ircd.8 2.0 (beta version) 29 Mar 1989 $
-.TH IRCD 8 "$Date: 2005/05/13 15:11:02 $"
+.TH IRCD 8 "$Date: 2006/04/26 20:26:07 $"
 .SH NAME
 ircd \- The Internet Relay Chat Program Server 
 .SH SYNOPSIS
@@ -100,13 +100,17 @@ protections against various type of user abuse that is
 commonly found on big public networks.  Possible modes are
 .BR strict " (default),"
 .BR on " and"
-.BR off .
+.BR off " and"
+.BR standalone .
 The
 .B strict
 option enables the protections, and refuses to establish a
 link to a server not running with this option.  This is
 useful to force all servers on an IRC network to enable
 them.
+The
+.B standalone 
+option removes split checks and disallows any server to connect.
 .TP
 .BI \-T " tunefile"
 Specifies the ircd.tune file to be used for this ircdaemon. The option
