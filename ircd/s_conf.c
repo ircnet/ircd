@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.167 2005/11/17 17:21:27 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.168 2006/04/26 20:30:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1191,6 +1191,8 @@ int	rehash(aClient *cptr, aClient *sptr, int sig)
 	for (cltmp = NextClass(FirstClass()); cltmp; cltmp = NextClass(cltmp))
 		MaxLinks(cltmp) = -1;
 
+	if (sig == 'a')
+		start_iauth(2);	/* 2 means kill iauth first */
 	if (sig == 'd')
 		flush_cache();
 #ifdef TKLINE

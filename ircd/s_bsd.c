@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.179 2005/07/09 23:37:49 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.180 2006/04/26 20:30:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -557,9 +557,18 @@ void	start_iauth(int rcvdsig)
 	static time_t last = 0;
 	static char first = 1;
 	int sp[2], fd, val;
+	static pid_t iauth_pid = 0;
 
 	if ((bootopt & BOOT_NOIAUTH) != 0)
 		return;
+	if (rcvdsig == 2)
+	{
+		sendto_flag(SCH_AUTH, "Killing iauth...");
+		if (iauth_pid)
+			kill(iauth_pid, SIGTERM);
+		iauth_pid = 0;
+	}
+	else
 	if (adfd >= 0)
 	    {
 		if (rcvdsig)
@@ -601,7 +610,7 @@ void	start_iauth(int rcvdsig)
 	    sizeof(val)) < 0)
 			sendto_flag(SCH_AUTH,
 			    "IAUTH_BUFFER too big for sp1 rcvbuf, using default");
-	switch (vfork())
+	switch ((iauth_pid = vfork()))
 	    {
 		case -1:
 			sendto_flag(SCH_ERROR, "vfork() failed!");
