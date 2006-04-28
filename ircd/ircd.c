@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.159 2006/04/26 23:54:34 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.160 2006/04/28 20:16:21 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -872,13 +872,14 @@ int	main(int argc, char *argv[])
 			tunefile = p;
 			break;
 		    case 'v':
-			(void)printf("ircd %s %s\n\tzlib %s\n\t%s #%s\n",
+			(void)printf("ircd %s %s\n\tzlib %s\n\tircd.conf delimiter %c\n\t%s #%s\n",
 				     version, serveropts,
 #ifndef	ZIP_LINKS
 				     "not used",
 #else
 				     zlib_version,
 #endif
+					IRCDCONF_DELIMITER,
 				     creation, generation);
 			  exit(0);
 		    case 'x':
