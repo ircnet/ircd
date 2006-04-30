@@ -1,3 +1,7 @@
+2006-04-30  Kurt Roeckx
+
+	* s_bsd.c/CHECK_PFD(): Initialise revents to 0 too.
+
 2006-04-26  Piotr Kucharski
 
 	* channel.c/remove_user_from_channel(), set_mode(): make reop a bit random,

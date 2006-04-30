@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.180 2006/04/26 20:30:07 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.181 2006/04/30 15:44:39 q Exp $";
 #endif
 
 #include "os.h"
@@ -2141,6 +2141,7 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 		pfd = &poll_fdarray[nbr_pfds++];\
 		pfd->fd     = thisfd;		\
 		pfd->events = 0;		\
+		pfd->revents = 0;		\
 	}
 
 	struct pollfd   poll_fdarray[MAXCONNECTIONS];
