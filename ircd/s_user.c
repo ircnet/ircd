@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.260 2005/12/06 15:11:24 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.261 2006/05/03 17:15:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -42,6 +42,11 @@ static int user_modes[]	     = { FLAGS_OPER, 'o',
 				 FLAGS_RESTRICT, 'r',
 				 FLAGS_AWAY, 'a',
 				 0, 0 };
+
+#ifdef XLINE
+/* for keeping USER 2nd and 3rd param of clients between USER and NICK */
+aUnregItem	*unregList = NULL;
+#endif
 
 /*
 ** m_functions execute protocol messages on this server:
@@ -343,6 +348,78 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #ifdef RESTRICT_USERNAMES
 		char *lbuf = NULL;
 #endif
+#ifdef XLINE
+		aUnregItem *xutmp, *xutmpprev;
+		char *server = NULL, *umodes = NULL;
+		aConfItem *xtmp;
+
+		/* 
+		** When we had USER before NICK, we had to put USER 2nd and
+		** 3rd param on unregList, so it is not lost; for simplicity,
+		** we put them there also when sequence is proper, first NICK,
+		** then USER, so this code is in one place. 
+		** Anyway, that's all for nick in X-lines to work. --B.
+		*/
+		xutmpprev = NULL;
+		for (xutmp = unregList; xutmp; xutmp = xutmp->next)
+		{
+			if (xutmp->fd == sptr->fd)
+			{
+				break;
+			}
+			xutmpprev = xutmp;
+		}
+		/* If we finish above with xutmp2 being NULL, then xutmp
+		** was first (equal unregList).
+		** register_user() is called only after NICK/USER, so it
+		** should be safe to assume we always find something in
+		** the loop above. */
+		/* assert(xutmp != NULL); */
+		umodes = xutmp->user2;
+		server = xutmp->user3;
+
+		for (xtmp = conf; xtmp; xtmp = xtmp->next)
+		{
+			if (xtmp->status != CONF_XLINE)
+				continue;
+			if (!BadPtr(xtmp->source_ip) && 
+				match(xtmp->source_ip, sptr->info))
+				continue;
+			if (!BadPtr(xtmp->host) && 
+				match(xtmp->host, username))
+				continue;
+			if (!BadPtr(xtmp->passwd) && 
+				match(xtmp->passwd, umodes))
+				continue;
+			if (!BadPtr(xtmp->name) && 
+				match(xtmp->name, server))
+				continue;
+			if (!BadPtr(xtmp->name2) && 
+				match(xtmp->name2, nick))
+				continue;
+			SetXlined(sptr);
+			break;
+		}
+
+		if (xutmpprev)
+		{
+			xutmpprev->next = xutmp->next;
+		}
+		else
+		{
+			unregList = xutmp->next;
+		}
+		MyFree(xutmp->user2);
+		MyFree(xutmp->user3);
+		MyFree(xutmp);
+
+		if (IsXlined(sptr))
+		{
+			sptr->exitc = EXITC_XLINE;
+			return exit_client(cptr, sptr, &me,
+				XLINE_EXIT_REASON);
+		}
+#endif
 
 #if defined(USE_IAUTH)
 		static time_t last = 0;
@@ -580,14 +657,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			return exit_client(cptr, sptr, &me,
 				(reason) ? buf : "K-lined");
 		}
-#ifdef XLINE
-		if (IsXlined(sptr))
-		{
-			sptr->exitc = EXITC_XLINE;
-			return exit_client(cptr, sptr, &me,
-				XLINE_EXIT_REASON);
-		}
-#endif
 	}
 	else
 	{
@@ -2181,28 +2250,6 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #ifdef	DEFAULT_INVISIBLE
 	SetInvisible(sptr);
 #endif
-#ifdef XLINE
-	{
-		aConfItem *tmp;
-
-		for (tmp = conf; tmp; tmp = tmp->next)
-		{
-			if (tmp->status != CONF_XLINE)
-				continue;
-			if (!BadPtr(tmp->source_ip) && match(tmp->source_ip, realname))
-				continue;
-			if (!BadPtr(tmp->host) && match(tmp->host, username))
-				continue;
-			if (!BadPtr(tmp->passwd) && match(tmp->passwd, umodes))
-				continue;
-			if (!BadPtr(tmp->name) && match(tmp->name, server))
-				continue;
-			SetXlined(sptr);
-			break;
-               }
-       }
-#endif
-
 	/* parse desired user modes sent in USER */
 	/* rfc behaviour - bits */
 	if (isdigit(*umodes))
@@ -2264,6 +2311,20 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (strlen(realname) > REALLEN)
 		realname[REALLEN] = '\0';
 	sptr->info = mystrdup(realname);
+#ifdef XLINE
+	{
+		aUnregItem *xtmp;
+
+		xtmp = (struct UnregItem *) MyMalloc(sizeof(aUnregItem));
+		xtmp->next = unregList;
+		/* Can we have a client with an fd already in unregList?
+		** Shall we bother checking unregList for fd? --B. */
+		xtmp->fd = cptr->fd;
+		DupString(xtmp->user2, umodes);
+		DupString(xtmp->user3, server);
+		unregList = xtmp;
+	}
+#endif
 	if (sptr->name[0]) /* NICK already received, now we have USER... */
 	{
 		return register_user(cptr, sptr, sptr->name, username);
