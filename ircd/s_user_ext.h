@@ -24,9 +24,6 @@
 /*  External definitions for global functions.
  */
 #ifndef S_USER_C
-#ifdef XLINE
-extern aUnregItem *unregList;
-#endif
 #define EXTERN extern
 #else /* S_USER_C */
 #define EXTERN
