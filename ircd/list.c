@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.42 2006/05/03 17:18:56 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.43 2006/05/03 18:56:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -137,6 +137,10 @@ aClient	*make_client(aClient *from)
 #ifdef	ZIP_LINKS
 		cptr->zip = NULL;
 #endif
+#ifdef XLINE
+		cptr->user2 = NULL;
+		cptr->user3 = NULL;
+#endif
 	    }
 	return (cptr);
 }
@@ -161,6 +165,12 @@ void	free_client(aClient *cptr)
 		{
 			MyFree(cptr->reason);
 		}
+#ifdef XLINE
+		if (cptr->user2)
+			MyFree(cptr->user2);
+		if (cptr->user3)
+			MyFree(cptr->user3);
+#endif
 	}
 	MyFree(cptr);
 }
