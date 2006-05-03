@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.138 2006/05/03 17:04:26 chopin Exp $
+ *   $Id: struct_def.h,v 1.139 2006/05/03 17:06:03 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -291,6 +291,16 @@ struct	CPing	{
 	u_long	recvd;		/* # received still in the "window" */
 	u_long	lrecvd;		/* # received */
 };
+
+#ifdef XLINE
+typedef	struct	UnregItem aUnregItem;
+struct	UnregItem {
+	int	fd;	/* client fd */
+	char	*user2;	/* 2nd param of USER */
+	char	*user3;	/* 3rd param of USER */
+	struct	UnregItem *next;
+};
+#endif
 
 struct	ConfItem	{
 	u_int	status;		/* If CONF_ILLEGAL, delete when no clients */
