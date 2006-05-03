@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.41 2005/12/27 02:09:31 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.42 2006/05/03 17:18:56 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -579,7 +579,7 @@ aConfItem	*make_conf(void)
 	bzero((char *)&aconf->ipnum, sizeof(struct IN_ADDR));
 	aconf->clients = aconf->port = 0;
 	aconf->next = NULL;
-	aconf->host = aconf->passwd = aconf->name = NULL;
+	aconf->host = aconf->passwd = aconf->name = aconf->name2 = NULL;
 	aconf->ping = NULL;
 	aconf->status = CONF_ILLEGAL;
 	aconf->pref = -1;
@@ -613,6 +613,7 @@ void	free_conf(aConfItem *aconf)
 	istat.is_confmem -= aconf->host ? strlen(aconf->host)+1 : 0;
 	istat.is_confmem -= aconf->passwd ? strlen(aconf->passwd)+1 : 0;
 	istat.is_confmem -= aconf->name ? strlen(aconf->name)+1 : 0;
+	istat.is_confmem -= aconf->name2 ? strlen(aconf->name2)+1 : 0;
 	istat.is_confmem -= aconf->ping ? sizeof(*aconf->ping) : 0;
 	istat.is_confmem -= sizeof(aConfItem);
 
@@ -625,6 +626,7 @@ void	free_conf(aConfItem *aconf)
 		MyFree(aconf->source_ip);
 	MyFree(aconf->passwd);
 	MyFree(aconf->name);
+	MyFree(aconf->name2);
 	MyFree(aconf);
 #ifdef	DEBUGMODE
 	aconfs.inuse--;
