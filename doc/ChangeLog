@@ -1,6 +1,26 @@
+2006-05-03  Piotr Kucharski
+
+	* struct_def.h: extend ConfItem to have another text field.
+	* struct_def.h: add UnregItem for temp storage of USER params.
+	* s_conf.c/initconf(): read 5th field (ie. nick) of X-line.
+	* s_user.c: remember 2nd and 3rd USER param in unregList.
+	* s_user.c: move X-line check from m_user to register_user, use
+	  unregList for it; also move exit_client for X-line up.
+	* s_misc.c/exit_client(): remove client data from unregList.
+	* list.c/make_conf(), free_conf(): update for name2 field.
+	* struct_def.h, s_user.c: get rid of unregList and remember 2nd and 3rd
+	  USER param directly in aClient struct, so it is accessible also after
+	  register_user().
+	* list.c/make_client(), free_client(): update for user2, user3 fields.
+	* s_misc.c/exit_client(): get rid of unregList.
+
 2006-04-30  Kurt Roeckx
 
 	* s_bsd.c/CHECK_PFD(): Initialise revents to 0 too.
+
+2006-04-28  Piotr Kucharski
+
+	* ircd.c/main(): show IRCDCONF_DELIMITER in 'ircd -v'.
 
 2006-04-26  Piotr Kucharski
 
@@ -11,6 +31,7 @@
 	* s_bsd.c/start_iauth(), s_conf.c/rehash(): "rehash a" restarts iauth
 	  (no other way to reread iauth.conf currently).
 	* s_conf.c/rehash(): "rehash d" reinitializes dns (rereads resolv.conf).
+	* ircd.c/s_rehash(), io_loop(): deal with consecutive SIGHUPs properly.
 
 2006-04-25  Piotr Kucharski
 
