@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.105 2006/05/03 17:16:57 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.106 2006/05/03 18:56:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -561,38 +561,6 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 				MyFree(sptr->auth);
 				sptr->auth = sptr->username;
 			}
-#ifdef XLINE
-			/* For all client exits before register_user(). --B. */
-			{
-				aUnregItem *xutmp, *xutmpprev;
-
-				xutmpprev = NULL;
-				for (xutmp = unregList; xutmp; xutmp = xutmp->next)
-				{
-					if (xutmp->fd == sptr->fd)
-					{
-						break;
-					}
-					xutmpprev = xutmp;
-				}
-				/* xutmp can be NULL, meaning we did not have
-				** that fd in unregList (it's OK to happen). */
-				if (xutmp)
-				{
-					if (xutmpprev)
-					{
-						xutmpprev->next = xutmp->next;
-					}
-					else
-					{
-						unregList = xutmp->next;
-					}
-					MyFree(xutmp->user2);
-					MyFree(xutmp->user3);
-					MyFree(xutmp);
-				}
-			}
-#endif
 		}
 		/*
 		** Currently only server connections can have
