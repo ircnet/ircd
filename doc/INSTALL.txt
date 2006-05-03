@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.77 2006/04/26 19:33:59 chopin Exp $
+  $Id: INSTALL.txt,v 1.78 2006/05/03 23:02:59 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -1076,7 +1076,7 @@
 
      FFoorrmmaatt
 
-        X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:
+        X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:nick:
 
 
 
@@ -1085,8 +1085,11 @@
 
      UUSSEERR nn--tthh aarrgg
         Given field will be matched against corresponding parameter of
-        client USER command. If left empty it matches any. It may
+        client USER command.  If left empty it matches any.  It may
         contain wildcards.
+
+     NNiicckk
+        If left empty it matches any.  It may contain wildcards.
 
      EExxaammpplleess
 
@@ -1100,10 +1103,20 @@
 
      then IMMEDIATELY REMOVE HIM from my IRCD.
 
+     X:abc:::def:woof:
+
+
+     If user registers with the following NICK and USER commands
+
+     NICK woof
+     USER abc anything anything :def
+
+
+     then IMMEDIATELY REMOVE HIM from my IRCD.
+
      NNoottee
         You need to compile server with #define XLINE to get this
         functionality.
-
 
   44..99..  SSeerrvveerr ccoonnnneeccttiioonnss
 
@@ -1170,6 +1183,7 @@
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
 
+
      PPaasssswwoorrdd
         The password of the other host.  A password must always be
         present for the line to be recognized.
@@ -1235,6 +1249,7 @@
   in that order.  So as we enter these entries into the file they must
   be done in rreevveerrssee order of how we could want to connect to them.
 
+
   Here's how it would look if we connected ``nic.funet.fi'' first:
 
   C:garfield.mit.edu::garfield.mit.edu:6667:1
@@ -1249,6 +1264,8 @@
   entry contains the password, if any, that you require other hosts to
   have before they can connect to you.  These entries are of the same
   format as the ``C'' entries.
+
+
 
      FFoorrmmaatt
         The format for the NOCONNECT entry in the ``ircd.conf'' is:
@@ -1365,7 +1382,6 @@
      SSeerrvveerr NNaammee
         This field is matched against the server name that the server
         wants to auto connect to.
-
      SSeerrvveerr CCllaassss
         This field is used to match against the class to which belong
         the servers for which an autoconnect is set.
@@ -1382,6 +1398,7 @@
         present on the network matches ``*.edu''.
 
         D::2:eff.org:3:
+
         Do not auto-connect to ``eff.org'', or any server in class ``3''
         if a server defined to be in class ``2'' is currently present on
         the network.
@@ -1431,8 +1448,6 @@
      NNoottee
         It is possible to have and use multiple H-lines (or L-lines) for
         the one server.  eg:
-
-
         H:*.edu:*:*.bu.edu::
         H:*.au:*:*.bu.edu::
 
@@ -1512,6 +1527,7 @@
      FFllaaggss
         If any flag specified in this field is found in the peer's flags
         string, it will be rejected.
+
      SSeerrvveerr MMaasskk
         This field is used to match server names.  The V line will be
         used for servers matching the mask given in this field.
@@ -1578,6 +1594,7 @@
 
      EExxaammppllee
         Q::of the security holes:foo.bar.baz::
+
         This command excludes a server named ``foo.bar.baz'', the reason
         is given to be security holes (you should give a reason, it is
         polite). The first field is unused, so leave it empty.
@@ -1628,8 +1645,6 @@
         unallowed command. Services however, are not affected by flood
         control and can be granted special privileges. It is therefore
         wwiissee ttoo oovveerrsseeee tthhee uussee ooff SS--lliinneess wwiitthh mmuucchh ccaarree..
-
-
   44..1166..  BBoouunnccee sseerrvveerr
 
 
@@ -1642,6 +1657,7 @@
      FFoorrmmaatt
 
         B:<Class|Host Mask>::<Server Name>:<Port>:
+
 
 
      BB  This specifies a Bounce record.
@@ -1691,6 +1707,7 @@
 
         Clients that connected to server-only port should really use
         port 6667.
+
 
 
   55..  RReellaatteedd rreessoouurrcceess
@@ -1754,6 +1771,7 @@
 
      FFiixx
         If you have a fix, don't forget to include it.
+
 
 
   66..22..  WWhheerree ttoo sseenndd aa bbuugg rreeppoorrtt

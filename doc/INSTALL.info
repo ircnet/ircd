@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.8 from
-/tmp/linuxdoc-dir-5789/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-7803/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.77 2006/04/26 19:33:58 chopin Exp $
+     $Id: INSTALL.info,v 1.78 2006/05/03 23:02:58 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -1148,20 +1148,25 @@ Remove an errant user from IRC on your site.
      disable his access from that IRCD Server as well.
 
 `Format'
-     X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:
+     X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:nick:
 
 `X'
      "X" tells the IRCD that you are making an XKILL USER command entry.
 
 `USER n-th arg'
      Given field will be matched against corresponding parameter of
-     client USER command. If left empty it matches any. It may contain
-     wildcards.
+     client USER command.  If left empty it matches any.  It may
+     contain wildcards.
+
+`Nick'
+     If left empty it matches any.  It may contain wildcards.
 
 `Examples'
      X:guest:::guest: If user registers with the following USER command
      USER guest anything anything :guest then IMMEDIATELY REMOVE HIM
-     from my IRCD.
+     from my IRCD.  X:abc:::def:woof: If user registers with the
+     following NICK and USER commands NICK woof USER abc anything
+     anything :def then IMMEDIATELY REMOVE HIM from my IRCD.
 
 `Note'
      You need to compile server with #define XLINE to get this
@@ -1851,17 +1856,17 @@ Node: Client connections27031
 Node: Operator priviliges32816
 Node: Excluded accounts36154
 Node: X Excluded accounts40075
-Node: Server connections41374
-Node: Deny auto-connections49972
-Node: Hub connections51551
-Node: Leaf connections53049
-Node: Version limitations55143
-Node: Excluded machines56911
-Node: Service connections58226
-Node: Bounce server59830
-Node: Related resources61701
-Node: Reporting a bug62744
-Node: How to report a bug63005
-Node: Where to send a bug report64024
+Node: Server connections41624
+Node: Deny auto-connections50222
+Node: Hub connections51801
+Node: Leaf connections53299
+Node: Version limitations55393
+Node: Excluded machines57161
+Node: Service connections58476
+Node: Bounce server60080
+Node: Related resources61951
+Node: Reporting a bug62994
+Node: How to report a bug63255
+Node: Where to send a bug report64274
 
 End Tag Table
