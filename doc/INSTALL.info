@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.78 2006/05/03 23:02:58 chopin Exp $
+     $Id: INSTALL.info,v 1.79 2006/05/03 23:04:07 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -1148,7 +1148,7 @@ Remove an errant user from IRC on your site.
      disable his access from that IRCD Server as well.
 
 `Format'
-     X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:nick:
+     X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:<Nick>:
 
 `X'
      "X" tells the IRCD that you are making an XKILL USER command entry.
