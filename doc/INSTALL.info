@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.8 from
-/tmp/linuxdoc-dir-7803/sgmltmp.INSTALL.info.2.
+/tmp/linuxdoc-dir-24087/sgmltmp.INSTALL.info.2.
 
    \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.79 2006/05/03 23:04:07 chopin Exp $
+     $Id: INSTALL.info,v 1.80 2006/06/16 18:52:40 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -448,7 +448,7 @@ File: INSTALL.info,  Node: Machine information,  Next: Administrative info,  Up:
      See Also the "Port Connections" and "Server Connections" sections.
 
 `Geographic Location'
-     Geographic Location is used to say WHERE YOUR SERVER is, and gives
+     Geographic Location is used to say where your server is, and gives
      people in other parts of the world a good idea of where you are!
      If your server is in the USA, it is usually best to say: <CITY>
      <STATE>, USA.  Like for Denver I say: "Denver Colorado, USA".
@@ -661,7 +661,8 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
      This field defines the maximum number of links this class will
      allow from automatic connections (C lines).  Using /CONNECT
      overrides this feature.  Also defines the maximum number of users
-     in this class for I/O lines per I/O line.
+     in this class for all I/O lines being in that class (or per I/O
+     line, if defined).
 
 `SendQ'
      This field defines the "SendQ" (data awaiting to be sent to the
@@ -732,6 +733,10 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
      connection in this class will only be allowed if there aren't more
      than 2 other local connections from the same IP address, or more
      than 5 other connections on the net from the same hostname.
+
+`Note'
+     The default maxlinks behaviour has changed in 2.11.2, see config.h
+     for details.
 
      Y:2:60:0:50:20000:2.1:5: (client class)
 
@@ -1037,10 +1042,10 @@ Remove an errant user from IRC on your site.
      Obviously it is hoped that you wouldn't have to use this command.
      Unfortunately sometimes a user can become unmanageable and this is
      your only recourse - the KILL USER command.  THIS COMMAND ONLY
-     AFFECTS YOUR SERVER - If this user can connect to another SERVER
-     somewhere else in the IRC-Network then you would have to talk to
+     AFFECTS YOUR SERVER - if this user can connect to another server
+     somewhere else in the IRC network then you would have to talk to
      the administrator on that site to disable his access from that
-     IRCD Server as well.
+     IRCD server as well.
 
 `Format'
      K:<Host Name>:<time interval(s)|comment>:<User>:<port>: k:<Host
@@ -1142,13 +1147,14 @@ Remove an errant user from IRC on your site.
      Obviously it is hoped that you wouldn't have to use this command.
      Unfortunately sometimes a virus can become difficult to remove by
      other means and this is your only recourse - the XKILL USER
-     command.  THIS COMMAND ONLY AFFECTS YOUR SERVER - If this user can
-     connect to another SERVER somewhere else in the IRC-Network then
+     command.  THIS COMMAND ONLY AFFECTS YOUR SERVER - if this user can
+     connect to another server somewhere else in the IRC network then
      you would have to talk to the administrator on that site to
-     disable his access from that IRCD Server as well.
+     disable his access from that IRCD server as well.
 
 `Format'
-     X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:<Nick>:
+     X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th
+     arg>:<Nick>:
 
 `X'
      "X" tells the IRCD that you are making an XKILL USER command entry.
@@ -1829,44 +1835,44 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top127
-Node: Installing IRC-650
-Node: The configure script879
-Node: Notes for Cygwin32 users3177
-Node: Notes concerning IPv6 support3918
-Node: The config-h file4406
-Node: DEBUGMODE5008
-Node: CHROOTDIR5593
-Node: USERS_RFC1459 USERS_SHOWS_UTMP5974
-Node: ENABLE_SUMMON6562
-Node: DEFAULT_INVISIBLE6883
-Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7216
-Node: ZIP_LINKS ZIP_LEVEL7748
-Node: SLOW_ACCEPT8793
-Node: CLONE_CHECK9431
-Node: LOG_SERVER_CHANNELS9806
-Node: Other #define's10089
-Node: Editing the Makefile and compiling10429
-Node: The ircd-conf file12155
-Node: Machine information14656
-Node: Administrative info17282
-Node: Port connections19443
-Node: Connection Classes21607
-Node: Client connections27031
-Node: Operator priviliges32816
-Node: Excluded accounts36154
-Node: X Excluded accounts40075
-Node: Server connections41624
-Node: Deny auto-connections50222
-Node: Hub connections51801
-Node: Leaf connections53299
-Node: Version limitations55393
-Node: Excluded machines57161
-Node: Service connections58476
-Node: Bounce server60080
-Node: Related resources61951
-Node: Reporting a bug62994
-Node: How to report a bug63255
-Node: Where to send a bug report64274
+Node: Top128
+Node: Installing IRC-651
+Node: The configure script880
+Node: Notes for Cygwin32 users3178
+Node: Notes concerning IPv6 support3919
+Node: The config-h file4407
+Node: DEBUGMODE5009
+Node: CHROOTDIR5594
+Node: USERS_RFC1459 USERS_SHOWS_UTMP5975
+Node: ENABLE_SUMMON6563
+Node: DEFAULT_INVISIBLE6884
+Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7217
+Node: ZIP_LINKS ZIP_LEVEL7749
+Node: SLOW_ACCEPT8794
+Node: CLONE_CHECK9432
+Node: LOG_SERVER_CHANNELS9807
+Node: Other #define's10090
+Node: Editing the Makefile and compiling10430
+Node: The ircd-conf file12156
+Node: Machine information14657
+Node: Administrative info17283
+Node: Port connections19444
+Node: Connection Classes21608
+Node: Client connections27176
+Node: Operator priviliges32961
+Node: Excluded accounts36299
+Node: X Excluded accounts40220
+Node: Server connections41776
+Node: Deny auto-connections50374
+Node: Hub connections51953
+Node: Leaf connections53451
+Node: Version limitations55545
+Node: Excluded machines57313
+Node: Service connections58628
+Node: Bounce server60232
+Node: Related resources62103
+Node: Reporting a bug63146
+Node: How to report a bug63407
+Node: Where to send a bug report64426
 
 End Tag Table

@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.79 2006/05/03 23:04:07 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.80 2006/06/16 18:52:40 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -304,7 +304,7 @@ connections.  This overrides overrides the ``Server NAME''.
 <p>See Also the ``Port Connections'' and ``Server Connections''
 sections.
 <tag/Geographic Location/ 
-Geographic Location is used to say WHERE YOUR SERVER is, and
+Geographic Location is used to say where your server is, and
 gives people in other parts of the world a good idea of
 where you are!  If your server is in the USA, it is usually
 best to say: &lt;CITY&gt; &lt;STATE&gt;, USA.  Like for
@@ -466,8 +466,8 @@ possible.
 <tag/Max Links/ This field defines the maximum number of
 links this class will allow from automatic connections (C
 lines).  Using /CONNECT overrides this feature.  Also
-defines the maximum number of users in this class for I/O
-lines per I/O line.
+defines the maximum number of users in this class for all I/O
+lines being in that class (or per I/O line, if defined).
 <tag/SendQ/ This field defines the ``SendQ'' (data awaiting to be sent
 to the client) value for this class. The format is &lt;x&gt;.&lt;y&gt;
 <itemize>
@@ -524,6 +524,8 @@ bytes.  A new connection in this class will only be allowed
 if there aren't more than 2 other local connections from the
 same IP address, or more than 5 other connections on the net
 from the same hostname.
+<tag/Note/ The default maxlinks behaviour has changed in 2.11.2,
+see config.h for details.
 <p>
 Y:2:60:0:50:20000:2.1:5: (client class)
 <p>
@@ -747,10 +749,10 @@ Remove an errant user from IRC on your site.
 Obviously it is hoped that you wouldn't have to use this
 command.  Unfortunately sometimes a user can become
 unmanageable and this is your only recourse - the KILL USER
-command.  THIS COMMAND ONLY AFFECTS YOUR SERVER - If this
-user can connect to another SERVER somewhere else in the
-IRC-Network then you would have to talk to the administrator
-on that site to disable his access from that IRCD Server as
+command.  THIS COMMAND ONLY AFFECTS YOUR SERVER - if this
+user can connect to another server somewhere else in the
+IRC network then you would have to talk to the administrator
+on that site to disable his access from that IRCD server as
 well.
 <tag/Format/<verb>
 K:&lt;Host Name&gt;:&lt;time interval(s)|comment&gt;:&lt;User&gt;:&lt;port&gt;:
@@ -844,10 +846,10 @@ Obviously it is hoped that you wouldn't have to use this
 command.  Unfortunately sometimes a virus can become
 difficult to remove by other means and this is your only recourse - 
 the XKILL USER
-command.  THIS COMMAND ONLY AFFECTS YOUR SERVER - If this
-user can connect to another SERVER somewhere else in the
-IRC-Network then you would have to talk to the administrator
-on that site to disable his access from that IRCD Server as
+command.  THIS COMMAND ONLY AFFECTS YOUR SERVER - if this
+user can connect to another server somewhere else in the
+IRC network then you would have to talk to the administrator
+on that site to disable his access from that IRCD server as
 well.
 <tag/Format/<verb>
 X:&lt;USER 1st arg&gt;:&lt;USER 2nd arg&gt;:&lt;USER 3rd arg&gt;:&lt;USER 4th arg&gt;:<Nick>:
