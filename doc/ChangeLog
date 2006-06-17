@@ -1,3 +1,11 @@
+2006-06-17  Piotr Kucharski
+
+	* s_serv.c, s_serv_ext.h, ircd.c/main(): be a bit more verbose about
+	  startup errors about server name.
+	* s_serv.c/m_server_estab(): show "from my.server.name" in directly
+	  received SERVER message, so it is the same as remote SERVER.
+	* s_conf.c/attach_conf(), config.h.dist: new behaviour of Y-line limits.
+
 2006-05-03  Piotr Kucharski
 
 	* struct_def.h: extend ConfItem to have another text field.
@@ -13,6 +21,7 @@
 	  register_user().
 	* list.c/make_client(), free_client(): update for user2, user3 fields.
 	* s_misc.c/exit_client(): get rid of unregList.
+	* s_serv.c/report_x_lines(): show 5th field.
 
 2006-04-30  Kurt Roeckx
 
