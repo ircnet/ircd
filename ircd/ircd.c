@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.160 2006/04/28 20:16:21 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.161 2006/06/17 00:07:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1033,10 +1033,10 @@ int	main(int argc, char *argv[])
 			"Fatal Error: No M-line in ircd.conf.\n");
 			exit(-1);
 		}
-		if (check_servername(ME))
+		if ((i=check_servername(ME)))
 		{
 			fprintf(stderr,
-			"Fatal Error: Invalid server name.\n");
+			"Fatal Error: %s.\n", check_servername_errors[i-1][1]);
 			exit(-1);
 		}
 		if (!me.serv->sid)

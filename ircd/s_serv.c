@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.279 2006/05/03 20:04:56 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.280 2006/06/17 00:07:35 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -40,7 +40,7 @@ static	void	report_listeners(aClient *, char *);
 static	void	count_servers_users(aClient *, int *, int *);
 const	char	*check_servername_errors[3][2] = {
 	{ "too long", "Bogus servername - too long" },
-	{ "invalid", "Bogus servername - invalid hostname" },
+	{ "invalid", "Bogus servername - invalid chars in hostname" },
 	{ "bogus", "Bogus servername - no dot"}};
 static	int	send_users(aClient *, aClient *, int, char **);
 

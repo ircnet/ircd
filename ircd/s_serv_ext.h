@@ -70,6 +70,7 @@ EXTERN int m_set(aClient *cptr, aClient *sptr, int parc, char *parv[]);
 void	add_server_to_tree(aClient *cptr);
 void	remove_server_from_tree(aClient *cptr);
 int	check_servername(char *);
+EXTERN const  char *check_servername_errors[3][2];
 
 EXTERN int register_server(aClient *cptr);
 EXTERN int unregister_server(aClient *cptr);
