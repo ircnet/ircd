@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.170 2006/05/03 17:07:53 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.171 2006/06/17 01:00:51 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -717,8 +717,13 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		return -1; /* EXITC_FAILURE, hmm */
 	if ((aconf->status & (CONF_OPERATOR | CONF_CLIENT )))
 	    {
-		if (aconf->clients >= ConfMaxLinks(aconf) &&
-		    ConfMaxLinks(aconf) > 0)
+		if (
+#ifdef YLINE_LIMITS_OLD_BEHAVIOUR
+			aconf->clients >= ConfMaxLinks(aconf)
+#else
+			ConfLinks(aconf) >= ConfMaxLinks(aconf)
+#endif
+			&& ConfMaxLinks(aconf) > 0)
 			return -3;    /* EXITC_YLINEMAX */
 	    }
 
