@@ -594,6 +594,14 @@
 */
 #define FASTER_ILINE_REHASH
 
+/*
+** Restores old behaviour of Y-lines maxlinks limit, which was counted
+** separately per each I-line using it.
+** Note: if you use it with FASTER_ILINE_REHASH, clients will be able
+** to exceed maxlinks limits after each rehash. Sorry.
+*/
+#undef YLINE_LIMITS_OLD_BEHAVIOUR
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 
