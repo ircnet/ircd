@@ -1,7 +1,7 @@
 2006-08-30  Piotr Kucharski
 
-	* ircd.c/try_connections(): maxlinks of 0 would wrongly disable AC (noted
-	  by fiction).
+	* ircd.c/try_connections(): maxlinks of 0 would incorrectly, even if only
+	  temporarily, disable calling try_connections (noted by fiction).
 
 2006-06-17  Piotr Kucharski
 
