@@ -1,3 +1,9 @@
+2007-03-15  Kurt Roeckx
+
+	* common/os.h: Define _GNU_SOURCE on all systems making use
+	  of glibc.  This should fix build problems on *BSD systems
+	  using glibc.  Patch from Cyril Brulebois.
+
 2006-08-30  Piotr Kucharski
 
 	* ircd.c/try_connections(): maxlinks of 0 would incorrectly, even if only
