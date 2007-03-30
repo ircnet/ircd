@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.106 2006/05/03 18:56:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.107 2007/03/30 07:54:54 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1071,6 +1071,8 @@ void	tstats(aClient *cptr, char *name)
 		ME, RPL_STATSDEBUG, name, istat.is_delayclosewait,
 		istat.is_delayclose);
 #endif
+	sendto_one(cptr, ":%s %d %s :local channels reops %d",
+		ME, RPL_STATSDEBUG, name, sp->is_reop);
 	sendto_one(cptr, ":%s %d %s :Client - Server",
 		   ME, RPL_STATSDEBUG, name);
 	sendto_one(cptr, ":%s %d %s :connected %lu %lu",
