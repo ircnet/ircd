@@ -1,3 +1,9 @@
+2007-03-30  Jakub Vlasek
+
+	* struct_def.h: Added is_reop to struct stats.
+	* channel.c/reop_channel(): Keep count of local reops made.
+	* s_misc.c/tstats(): Report number of local reops made. 
+
 2007-03-15  Kurt Roeckx
 
 	* common/os.h: Define _GNU_SOURCE on all systems making use
