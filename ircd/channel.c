@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.264 2006/04/26 16:16:24 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.265 2007/03/30 07:54:19 jv Exp $";
 #endif
 
 #include "os.h"
@@ -3670,6 +3670,7 @@ static int	reop_channel(time_t now, aChannel *chptr, int reopmode)
 		sendto_channel_butserv(chptr, &me, ":%s MODE %s +o %s",
 			ME, chptr->chname, op.value.cptr->name);
 		chptr->reop = 0;
+		ircstp->is_reop++;
 		return 1;
 	}
 	return 0;
