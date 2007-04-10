@@ -1,3 +1,9 @@
+2007-03-10  Jakub Vlasek
+
+	* struct_def.h: Added is_rreop to struct stats.
+	* channel.c/set_mode(): Count number of remote reops.
+	* s_misc.c/tstats(): Report number of remote reops seen.
+
 2007-03-30  Jakub Vlasek
 
 	* struct_def.h: Added is_reop to struct stats.
