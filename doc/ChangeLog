@@ -1,4 +1,4 @@
-2007-03-10  Jakub Vlasek
+2007-04-10  Jakub Vlasek
 
 	* struct_def.h: Added is_rreop to struct stats.
 	* channel.c/set_mode(): Count number of remote reops.
