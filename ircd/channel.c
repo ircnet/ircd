@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.265 2007/03/30 07:54:19 jv Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.266 2007/04/10 11:09:04 jv Exp $";
 #endif
 
 #include "os.h"
@@ -1012,6 +1012,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 	u_int	whatt = MODE_ADD;
 	int	limitset = 0, count = 0, chasing = 0;
 	int	nusers = 0, ischop, new, len, ulen, keychange = 0, opcnt = 0;
+	int	reopseen = 0;
 	aClient *who;
 	Mode	*mode, oldm;
 	Link	*plp = NULL;
@@ -1156,6 +1157,10 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 			    			(*curr == 'o') ? MODE_CHANOP:
 								  MODE_VOICE;
 				lp->flags |= MODE_ADD;
+				if (chptr->reop && IsServer(sptr) && !IsBursting(sptr))
+				{
+					reopseen = 1;
+				}
 			    }
 			else if (whatt == MODE_DEL)
 			    {
@@ -1474,6 +1479,11 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 		}
 #endif
 	    } /* end of while loop for MODE processing */
+
+	if (reopseen)
+	{
+		ircstp->is_rreop++;
+	}
 
 	whatt = 0;
 
