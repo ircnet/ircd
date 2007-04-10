@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.141 2007/03/30 07:53:02 jv Exp $
+ *   $Id: struct_def.h,v 1.142 2007/04/10 11:08:20 jv Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -585,6 +585,7 @@ struct	stats {
 	u_int	is_save; /* number of saved clients */
 	u_int	is_fake; /* MODE 'fakes' */
 	u_int	is_reop; /* number of local reops */
+	u_int	is_rreop; /* number of remote reops */
 	u_int	is_asuc; /* successful auth requests */
 	u_int	is_abad; /* bad auth requests */
 	u_int	is_udpok;	/* packets recv'd on udp port */
