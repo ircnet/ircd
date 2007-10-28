@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.108 2007/04/10 11:09:40 jv Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.109 2007/10/28 03:22:47 jv Exp $";
 #endif
 
 #include "os.h"
@@ -759,16 +759,16 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 		; /* Nothing */
 	}
 	else if (sptr->name[0] && !IsService(sptr)) /* clean with QUIT... */
-	    {
+	{
 		/*
 		** If this exit is generated from "m_kill", then there
 		** is no sense in sending the QUIT--KILL's have been
 		** sent instead.
 		*/
 		if ((sptr->flags & FLAGS_KILLED) == 0)
-		    {
+		{
 			if ((sptr->flags & FLAGS_SPLIT) == 0)
-			    {
+			{
 				sendto_serv_butone(cptr, ":%s QUIT :%s",
 						   sptr->user->uid, comment);
 #ifdef	USE_SERVICES
@@ -780,9 +780,9 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 						      ":%s QUIT :%s",
 						      sptr->name, comment);
 #endif
-			    }
+			}
 			else
-			    {
+			{
 				if (sptr->flags & FLAGS_HIDDEN)
 					/* joys of hostmasking */
 					for (i = fdas.highest; i >= 0; i--)
@@ -804,8 +804,23 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 						      ":%s QUIT :%s",
 						      sptr->name, comment);
 #endif
-			    }
-		    }
+			}
+		}
+#ifdef USE_SERVICES
+		else
+		{
+			/* Send QUIT to services which desire such as well.
+			** Services with both _QUIT and _KILL will get both
+			** for now --jv
+			*/
+			check_services_butone(SERVICE_WANT_QUIT, 
+					     (sptr->user) ? sptr->user->server
+						      : NULL, cptr,
+						      ":%s QUIT :%s",
+						      sptr->name, comment);
+
+		}
+#endif
 		/*
 		** If a person is on a channel, send a QUIT notice
 		** to every client (person) on the same channel (so
