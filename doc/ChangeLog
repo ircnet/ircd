@@ -1,3 +1,8 @@
+2007-10-28  Jakub Vlasek
+
+	* s_misc.c/exit_one_client(): Send QUITs of killed users to services
+	  with SERVICE_WANTS_QUIT.
+
 2007-04-10  Jakub Vlasek
 
 	* struct_def.h: Added is_rreop to struct stats.
