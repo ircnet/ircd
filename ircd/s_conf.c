@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.171 2006/06/17 01:00:51 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.172 2007/12/15 23:04:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2555,6 +2555,8 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 #ifdef TKLINE_MAXTIME
 		if (time > TKLINE_MAXTIME)
 			time = TKLINE_MAXTIME;
+		if (time < 0) /* overflown, must have wanted bignum :) */
+			time = TKLINE_MAXTIME;
 #endif
 		user = parv[2];
 		reason = parv[3];
@@ -2571,6 +2573,12 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		/* induce error */
 		i = 1;
 	}
+	if (!strcmp("@*", user) || !strcmp("*@", user) || !strcmp("@", user))
+	{
+		/* Note that we don't forbid "*@*", only those, that lack
+		** some crucial parts, which can be seen as a typo. --Beeth */
+		i = 1;
+	}
 badkline:
 	if (i || !host)
 	{
@@ -2584,7 +2592,7 @@ badkline:
 				"T/KLINE: Incorrect format");
 		}
 		sendto_one(sptr, ":%s NOTICE %s :%sKLINE: Incorrect format",
-			tkline?"T":"", ME, parv[0]);
+			ME, parv[0], tkline?"T":"");
 		return 2;
 	}
 
