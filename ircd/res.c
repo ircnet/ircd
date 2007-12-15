@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.45 2005/02/22 17:24:17 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.46 2007/12/15 23:21:12 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -716,8 +716,8 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 #endif
 #ifdef INET6
 			Debug((DEBUG_INFO,"got ip # %s for %s",
-			       inet_ntop(AF_INET6, (char *)adr, mydummy,
-					 MYDUMMY_SIZE),
+			       inet_ntop(AF_INET6, (char *)adr, ipv6string,
+					 sizeof(ipv6string)),
 			       hostbuf));
 #else
 			Debug((DEBUG_INFO,"got ip # %s for %s",
@@ -934,7 +934,7 @@ struct	hostent	*get_res(char *lp)
 		sprintf(buffer, "Bad hostname returned for %s",
 #ifdef	INET6
 			inetntop(AF_INET6, rptr->he.h_addr.s6_addr,
-				mydummy, MYDUMMY_SIZE)
+				ipv6string, sizeof(ipv6string))
 #else
 			inetntoa((char *)&rptr->he.h_addr)
 #endif
@@ -957,7 +957,7 @@ struct	hostent	*get_res(char *lp)
 		Debug((DEBUG_DNS, "relookup %s <-> %s",
 			rptr->he.h_name, inet_ntop(AF_INET6,
 						   (char *)&rptr->he.h_addr,
-						   mydummy, MYDUMMY_SIZE)));
+						   ipv6string, sizeof(ipv6string))));
 #else
 		Debug((DEBUG_DNS, "relookup %s <-> %s",
 			rptr->he.h_name, inetntoa((char *)&rptr->he.h_addr)));
@@ -1126,9 +1126,9 @@ static	aCache	*add_to_cache(aCache *ocp)
 
 #ifdef	DEBUG
 # ifdef	INET6
-	inetntop(AF_INET6, ocp->he.h_addr_list, mydummy, sizeof(mydummy));
+	inetntop(AF_INET6, ocp->he.h_addr_list, ipv6string, sizeof(ipv6string));
 	Debug((DEBUG_INFO,"add_to_cache:added %s[%s] cache %#x.",
-		ocp->he.h_name, mydummy, ocp));
+		ocp->he.h_name, ipv6string, ocp));
 # else
 	Debug((DEBUG_INFO, "add_to_cache:added %s[%08x] cache %#x.",
 		ocp->he.h_name, ocp->he.h_addr_list[0], ocp));
@@ -1266,7 +1266,7 @@ static	void	update_list(ResRQ *rptr, aCache *cachep)
 			Debug((DEBUG_DNS,"u_l:add IP %s hal %x ac %d",
 				inetntop(AF_INET6, 
 				(char *)((struct in6_addr *)s)->s6_addr,
-				mydummy, MYDUMMY_SIZE),
+				ipv6string, sizeof(ipv6string)),
 				cp->he.h_addr_list, addrcount));
 # else
 			Debug((DEBUG_DNS,"u_l:add IP %x hal %x ac %d",
@@ -1342,7 +1342,7 @@ static	aCache	*find_cache_number(ResRQ *rptr, char *numb)
 #ifdef	DEBUG
 # ifdef	INET6
 	Debug((DEBUG_DNS, "find_cache_number:find %s: hashv = %d",
-		inet_ntop(AF_INET6, numb, mydummy, MYDUMMY_SIZE), hashv));
+		inet_ntop(AF_INET6, numb, ipv6string, sizeof(ipv6string)), hashv));
 # else
 	Debug((DEBUG_DNS,"find_cache_number:find %s[%08x]: hashv = %d",
 		inetntoa(numb),	ntohl(((struct in_addr *)numb)->s_addr), 
@@ -1566,7 +1566,7 @@ static	void	rem_cache(aCache *ocp)
 #ifdef	DEBUG
 # ifdef INET6
 	Debug((DEBUG_DEBUG,"rem_cache: h_addr %s hashv %d next %#x first %#x",
-	       inet_ntop(AF_INET6, hp->h_addr, mydummy, MYDUMMY_SIZE),
+	       inet_ntop(AF_INET6, hp->h_addr, ipv6string, sizeof(ipv6string)),
 	       hashv, ocp->hnum_next, hashtable[hashv].num_list));
 # else
 	Debug((DEBUG_DEBUG,"rem_cache: h_addr %s hashv %d next %#x first %#x",
@@ -1663,8 +1663,8 @@ int	m_dns(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #ifdef INET6
 				   cp->he.h_name, inetntop(AF_INET6,
 							    cp->he.h_addr,
-							    mydummy,
-							    MYDUMMY_SIZE));
+							    ipv6string,
+							    sizeof(ipv6string)));
 #else
 				   cp->he.h_name, inetntoa(cp->he.h_addr));
 #endif
@@ -1682,7 +1682,7 @@ int	m_dns(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #ifdef INET6
 					   inetntop(AF_INET6, 
 						     cp->he.h_addr_list[i],
-						     mydummy, MYDUMMY_SIZE));
+						     ipv6string, sizeof(ipv6string)));
 #else
 					   inetntoa(cp->he.h_addr_list[i]));
 #endif

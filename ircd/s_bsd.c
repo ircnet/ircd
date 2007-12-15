@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.181 2006/04/30 15:44:39 q Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.182 2007/12/15 23:21:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -880,7 +880,7 @@ static	int	check_init(aClient *cptr, char *sockn)
 		return -1;
 	    }
 #ifdef INET6
-	inetntop(AF_INET6, (char *)&sk.sin6_addr, sockn, MYDUMMY_SIZE);
+	inetntop(AF_INET6, (char *)&sk.sin6_addr, sockn, INET6_ADDRSTRLEN);
 	Debug((DEBUG_DNS,"sockn %x",sockn));
 	Debug((DEBUG_DNS,"sockn %s",sockn));
 #else
@@ -901,14 +901,14 @@ static	int	check_init(aClient *cptr, char *sockn)
  */
 int	check_client(aClient *cptr)
 {
-	static	char	sockname[HOSTLEN+1];
+	char	sockname[HOSTLEN+1];
 	Reg	struct	hostent *hp = NULL;
 	Reg	int	i;
  
 #ifdef INET6
 	Debug((DEBUG_DNS, "ch_cl: check access for %s[%s]",
-		cptr->name, inet_ntop(AF_INET6, (char *)&cptr->ip, mydummy,
-				      MYDUMMY_SIZE)));
+		cptr->name, inet_ntop(AF_INET6, (char *)&cptr->ip, ipv6string,
+				      sizeof(ipv6string))));
 #else
 	Debug((DEBUG_DNS, "ch_cl: check access for %s[%s]",
 		cptr->name, inetntoa((char *)&cptr->ip)));
@@ -937,7 +937,7 @@ int	check_client(aClient *cptr)
 			sendto_flag(SCH_ERROR,
 				    "IP# Mismatch: %s != %s[%08x%08x%08x%08x]",
 				    inetntop(AF_INET6, (char *)&cptr->ip,
-					      mydummy,MYDUMMY_SIZE),hp->h_name,
+					      ipv6string,sizeof(ipv6string)), hp->h_name,
 				    ((unsigned long *)hp->h_addr)[0],
 				    ((unsigned long *)hp->h_addr)[1],
 				    ((unsigned long *)hp->h_addr)[2],
@@ -1105,7 +1105,7 @@ check_serverback:
 			sendto_flag(SCH_ERROR,
 				    "IP# Mismatch: %s != %s[%08x%08x%08x%08x]",
 				    inetntop(AF_INET6, (char *)&cptr->ip,
-					      mydummy,MYDUMMY_SIZE),hp->h_name,
+					      ipv6string, sizeof(ipv6string)),hp->h_name,
 				    ((unsigned long *)hp->h_addr)[0],
 				    ((unsigned long *)hp->h_addr)[1],
 				    ((unsigned long *)hp->h_addr)[2],
@@ -1739,9 +1739,9 @@ aClient	*add_connection(aClient *cptr, int fd)
 		 * have something valid to put into error messages...
 		 */
 #ifdef INET6
-		inetntop(AF_INET6, (char *)&addr.sin6_addr, mydummy,
-			  MYDUMMY_SIZE);
-		get_sockhost(acptr, (char *)mydummy);
+		inetntop(AF_INET6, (char *)&addr.sin6_addr, ipv6string,
+			  sizeof(ipv6string));
+		get_sockhost(acptr, (char *)ipv6string);
 #else
 		get_sockhost(acptr, (char *)inetntoa((char *)&addr.sin_addr));
 #endif
@@ -1774,7 +1774,7 @@ aClient	*add_connection(aClient *cptr, int fd)
 #ifdef INET6
 		Debug((DEBUG_DNS, "lookup %s",
 		       inet_ntop(AF_INET6, (char *)&addr.sin6_addr,
-				 mydummy, MYDUMMY_SIZE)));
+				 ipv6string, sizeof(ipv6string))));
 #else
 		Debug((DEBUG_DNS, "lookup %s",
 		       inetntoa((char *)&addr.sin_addr)));
@@ -2552,8 +2552,8 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 #ifdef INET6
 	Debug((DEBUG_NOTICE,"Connect to %s[%s] @%s",
 	       aconf->name, aconf->host,
-	       inet_ntop(AF_INET6, (char *)&aconf->ipnum, mydummy,
-			 MYDUMMY_SIZE)));
+	       inet_ntop(AF_INET6, (char *)&aconf->ipnum, ipv6string,
+			 sizeof(ipv6string))));
 #else
 	Debug((DEBUG_NOTICE,"Connect to %s[%s] @%s",
 	       aconf->name, aconf->host,
@@ -3213,7 +3213,7 @@ void	send_ping(aConfItem *aconf)
 	(void)gettimeofday(&pi.pi_tv, NULL);
 #ifdef INET6
 	Debug((DEBUG_SEND,"Send ping to %s,%d fd %d, %d bytes",
-	       inet_ntop(AF_INET6, (char *)&aconf->ipnum,mydummy,MYDUMMY_SIZE),
+	       inet_ntop(AF_INET6, (char *)&aconf->ipnum, ipv6string, sizeof(ipv6string)),
 	       cp->port, udpfd, sizeof(pi)));
 #else
 	Debug((DEBUG_SEND,"Send ping to %s,%d fd %d, %d bytes",
@@ -3314,7 +3314,7 @@ static	void	polludp(void)
 				== 0 ? "unknown" :
 #ifdef INET6
 				inetntop(AF_INET6, (char *)&from.sin6_addr,
-					mydummy, MYDUMMY_SIZE)
+					ipv6string, sizeof(ipv6string))
 #else
 				inetntoa((char *)&from.sin_addr)
 #endif
@@ -3335,8 +3335,8 @@ static	void	polludp(void)
 				    "udp packet dropped: %d bytes from %s.%d",
 #ifdef INET6
 					    n, inetntop(AF_INET6,
-					 (char *)&from.sin6_addr, mydummy,
-							 MYDUMMY_SIZE),
+					 (char *)&from.sin6_addr, ipv6string,
+							 sizeof(ipv6string)),
 #else
 					    n,inetntoa((char *)&from.sin_addr),
 #endif
@@ -3352,8 +3352,8 @@ static	void	polludp(void)
 
 #ifdef INET6
 	Debug((DEBUG_NOTICE, "udp (%d) %d bytes from %s,%d", cnt, n,
-	       inet_ntop(AF_INET6, (char *)&from.sin6_addr, mydummy,
-			 MYDUMMY_SIZE),
+	       inet_ntop(AF_INET6, (char *)&from.sin6_addr, ipv6string,
+			 sizeof(ipv6string)),
 	       ntohs(from.SIN_PORT)));
 #else
 	Debug((DEBUG_NOTICE, "udp (%d) %d bytes from %s,%d", cnt, n,

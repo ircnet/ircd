@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_auth.c,v 1.54 2004/10/01 20:22:14 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_auth.c,v 1.55 2007/12/15 23:21:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -340,7 +340,7 @@ void	read_iauth(void)
 #else
 		    sprintf(tbuf, "%c %d %s %u ", start[0], i,
 			    inetntop(AF_INET6, (char *)&cptr->ip, 
-			    mydummy, MYDUMMY_SIZE), cptr->port);
+			    ipv6string, sizeof(ipv6string)), cptr->port);
 #endif
 		    if (strncmp(tbuf, start, strlen(tbuf)))
 			{
@@ -589,11 +589,11 @@ void	start_auth(aClient *cptr)
 		char abuf[BUFSIZ];
 #  ifdef INET6
 		sprintf(abuf, "%d C %s %u ", cptr->fd,
-			inetntop(AF_INET6, (char *)&them.sin6_addr, mydummy,
-				 MYDUMMY_SIZE), ntohs(them.SIN_PORT));
+			inetntop(AF_INET6, (char *)&them.sin6_addr, ipv6string,
+				 sizeof(ipv6string)), ntohs(them.SIN_PORT));
 		sprintf(abuf+strlen(abuf), "%s %u",
-			inetntop(AF_INET6, (char *)&us.sin6_addr, mydummy,
-				 MYDUMMY_SIZE), ntohs(us.SIN_PORT));
+			inetntop(AF_INET6, (char *)&us.sin6_addr, ipv6string,
+				 sizeof(ipv6string)), ntohs(us.SIN_PORT));
 #  else
 		sprintf(abuf, "%d C %s %u ", cptr->fd,
 			inetntoa((char *)&them.sin_addr),ntohs(them.SIN_PORT));
@@ -611,8 +611,8 @@ void	start_auth(aClient *cptr)
 # endif
 # ifdef INET6
 	Debug((DEBUG_NOTICE,"auth(%x) from %s %x %x",
-	       cptr, inet_ntop(AF_INET6, (char *)&us.sin6_addr, mydummy,
-			       MYDUMMY_SIZE), us.sin6_addr.s6_addr[14],
+	       cptr, inet_ntop(AF_INET6, (char *)&us.sin6_addr, ipv6string,
+			       sizeof(ipv6string)), us.sin6_addr.s6_addr[14],
 	       us.sin6_addr.s6_addr[15]));
 # else
 	Debug((DEBUG_NOTICE,"auth(%x) from %s",
@@ -626,7 +626,7 @@ void	start_auth(aClient *cptr)
 # ifdef INET6
 		Debug((DEBUG_NOTICE,"auth(%x) to %s",
 			cptr, inet_ntop(AF_INET6, (char *)&them.sin6_addr,
-					mydummy, MYDUMMY_SIZE)));
+					ipv6string, sizeof(ipv6string))));
 # else
 		Debug((DEBUG_NOTICE,"auth(%x) to %s",
 			cptr, inetntoa((char *)&them.sin_addr)));
@@ -639,7 +639,7 @@ void	start_auth(aClient *cptr)
 			Debug((DEBUG_ERROR,
 				"auth(%x) connect failed to %s - %d", cptr,
 				inet_ntop(AF_INET6, (char *)&them.sin6_addr,
-					  mydummy, MYDUMMY_SIZE), errno));
+					  ipv6string, sizeof(ipv6string)), errno));
 # else
 			Debug((DEBUG_ERROR,
 				"auth(%x) connect failed to %s - %d", cptr,
@@ -663,7 +663,7 @@ void	start_auth(aClient *cptr)
 # ifdef INET6
 		Debug((DEBUG_ERROR,"auth(%x) bind failed on %s port %d - %d",
 		      cptr, inet_ntop(AF_INET6, (char *)&us.sin6_addr,
-		      mydummy, MYDUMMY_SIZE),
+		      ipv6string, sizeof(ipv6string)),
 		      ntohs(us.SIN_PORT), errno));
 # else
 		Debug((DEBUG_ERROR,"auth(%x) bind failed on %s port %d - %d",
@@ -715,7 +715,7 @@ void	send_authports(aClient *cptr)
 #ifdef INET6
 	Debug((DEBUG_SEND, "sending [%s] to auth port %s.113",
 		authbuf, inet_ntop(AF_INET6, (char *)&them.sin6_addr,
-				    mydummy, MYDUMMY_SIZE)));
+				    ipv6string, sizeof(ipv6string))));
 #else
 	Debug((DEBUG_SEND, "sending [%s] to auth port %s.113",
 		authbuf, inetntoa((char *)&them.sin_addr)));

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.281 2006/06/17 00:11:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.282 2007/12/15 23:21:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1828,7 +1828,7 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 #ifdef INET6
 		inetntop(AF_INET6,
 		(char *)&acptr->acpt->ip,
-		mydummy, MYDUMMY_SIZE);
+		ipv6string, sizeof(ipv6string));
 #else
 		inetntoa((char *)&acptr->acpt->ip);
 #endif
@@ -1843,7 +1843,7 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 #ifdef INET6
 		inetntop(AF_INET6,
 		(char *)&acptr->ip,
-		mydummy, MYDUMMY_SIZE),
+		ipv6string, sizeof(ipv6string)),
 #else
 		inetntoa((char *)&acptr->ip),
 #endif

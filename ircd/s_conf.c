@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.172 2007/12/15 23:04:33 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.173 2007/12/15 23:21:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -942,8 +942,8 @@ aConfItem	*find_Oline(char *name, aClient *cptr)
 	sprintf(userhost, "%s@%s", cptr->username, cptr->sockhost);
 	sprintf(userip, "%s@%s", cptr->username, 
 #ifdef INET6
-		(char *)inetntop(AF_INET6, (char *)&cptr->ip, mydummy,
-			MYDUMMY_SIZE)
+		(char *)inetntop(AF_INET6, (char *)&cptr->ip, ipv6string,
+			sizeof(ipv6string))
 #else
 		(char *)inetntoa((char *)&cptr->ip)
 #endif
@@ -1327,7 +1327,6 @@ char	*ipv6_convert(char *orig)
 	int	i, j;
 	int	len = 1;	/* for the '\0' in case of no @ */
 	struct	in6_addr addr;
-	char	dummy[MYDUMMY_SIZE];
 
 	if ((s = strchr(orig, '@')))
 	    {
@@ -1351,7 +1350,7 @@ char	*ipv6_convert(char *orig)
 
 	if (i > 0)
 	    {
-		t = inetntop(AF_INET6, addr.s6_addr, dummy, MYDUMMY_SIZE);
+		t = inetntop(AF_INET6, addr.s6_addr, ipv6string, sizeof(ipv6string));
 	    }
 	
 	j = len - 1;
@@ -1950,8 +1949,8 @@ int	find_kill(aClient *cptr, int timedklines, char **comment)
 
 	host = cptr->sockhost;
 #ifdef INET6
-	ip = (char *) inetntop(AF_INET6, (char *)&cptr->ip, mydummy,
-			       MYDUMMY_SIZE);
+	ip = (char *) inetntop(AF_INET6, (char *)&cptr->ip, ipv6string,
+			       sizeof(ipv6string));
 #else
 	ip = (char *) inetntoa((char *)&cptr->ip);
 #endif

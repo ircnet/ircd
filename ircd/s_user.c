@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.262 2006/05/03 18:54:58 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.263 2007/12/15 23:21:14 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2776,8 +2776,8 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			IsUnixSocket(sptr) ? sptr->sockhost :
 #endif
 #ifdef INET6
-                       inet_ntop(AF_INET6, (char *)&sptr->ip, mydummy,
-			       MYDUMMY_SIZE)
+                       inet_ntop(AF_INET6, (char *)&sptr->ip, ipv6string,
+			       sizeof(ipv6string))
 #else
                        inetntoa((char *)&sptr->ip)
 #endif
@@ -2817,7 +2817,7 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #endif
 #ifdef INET6
 				inetntop(AF_INET6, (char *)&sptr->ip,
-					mydummy, MYDUMMY_SIZE)
+					ipv6string, sizeof(ipv6string))
 #else
 				inetntoa((char *)&sptr->ip)
 #endif

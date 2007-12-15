@@ -28,6 +28,9 @@
 #else /* SUPPORT_C */
 #define EXTERN
 #endif /* SUPPORT_C */
+#ifdef INET6
+EXTERN char ipv6string[INET6_ADDRSTRLEN];
+#endif
 EXTERN char *mystrdup (char *s);
 #if !defined(HAVE_STRTOKEN)
 EXTERN char *strtoken (char **save, char *str, char *fs);

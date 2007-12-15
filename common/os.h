@@ -685,9 +685,9 @@ extern unsigned char minus_one[];
 # define	S_ADDR		s6_addr
 # define	IN_ADDR		in6_addr
 
-# define MYDUMMY_SIZE 128
-char mydummy[MYDUMMY_SIZE];
-char mydummy2[MYDUMMY_SIZE];
+#ifndef INET6_ADDRSTRLEN   
+#define INET6_ADDRSTRLEN   46
+#endif
 
 #else /* INET6 */
 

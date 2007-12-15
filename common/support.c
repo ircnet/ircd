@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.42 2005/02/04 18:08:48 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.43 2007/12/15 23:21:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -26,6 +26,10 @@ static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.42 2005/02/04 18:08
 #define SUPPORT_C
 #include "s_externs.h"
 #undef SUPPORT_C
+
+#ifdef INET6
+char ipv6string[INET6_ADDRSTRLEN];
+#endif
 
 unsigned char minus_one[]={ 255, 255, 255, 255, 255, 255, 255, 255, 255,
                                         255, 255, 255, 255, 255, 255, 255, 0};
@@ -164,14 +168,14 @@ char	*mybasename(char *path)
  */
 char	*inetntop(int af, const void *in, char *out, size_t the_size)
 {
-	static char local_dummy[MYDUMMY_SIZE];
+	static char local_ipv6string[INET6_ADDRSTRLEN];
 
-	if (the_size > sizeof(local_dummy))
+	if (the_size > sizeof(local_ipv6string))
 	{
-		the_size = sizeof(local_dummy);
+		the_size = sizeof(local_ipv6string);
 	}
 	
-	if (!inet_ntop(af, in, local_dummy, the_size))
+	if (!inet_ntop(af, in, local_ipv6string, the_size))
 	{
 		/* good that every function calling this one
 		 * checks the return value ... NOT */
@@ -183,17 +187,17 @@ char	*inetntop(int af, const void *in, char *out, size_t the_size)
 	{
 		char	*p;
 
-		if (!(p = strstr(local_dummy, ":ffff:")) &&
-			!(p = strstr(local_dummy, ":FFFF:")))
+		if (!(p = strstr(local_ipv6string, ":ffff:")) &&
+			!(p = strstr(local_ipv6string, ":FFFF:")))
 		{
 			return NULL;	/* crash and burn */
 		}
 		strcpy(out, p + 6);
 		return out;
 	}
-	if (strstr(local_dummy, "::"))
+	if (strstr(local_ipv6string, "::"))
 	    {
-		char cnt = 0, *cp = local_dummy, *op = out;
+		char cnt = 0, *cp = local_ipv6string, *op = out;
 
 		while (*cp)
 		    {
@@ -205,13 +209,13 @@ char	*inetntop(int af, const void *in, char *out, size_t the_size)
 				break;
 			    }
 		    }
-		cp = local_dummy;
+		cp = local_ipv6string;
 		while (*cp)
 		    {
 			*op++ = *cp++;
 			if (*(cp-1) == ':' && *cp == ':')
 			    {
-				if ((cp-1) == local_dummy)
+				if ((cp-1) == local_ipv6string)
 				    {
 					op--;
 					*op++ = '0';
@@ -229,12 +233,12 @@ char	*inetntop(int af, const void *in, char *out, size_t the_size)
 		if (*(op-1)==':') *op++ = '0';
 		*op = '\0';
 #ifndef	CLIENT_COMPILE
-		Debug((DEBUG_DNS,"Expanding `%s' -> `%s'", local_dummy,
+		Debug((DEBUG_DNS,"Expanding `%s' -> `%s'", local_ipv6string,
 		       out));
 #endif
 	    }
 	else
-		bcopy(local_dummy, out,	the_size);
+		bcopy(local_ipv6string, out,	the_size);
 
 	return out;
 }

@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.142 2007/04/10 11:08:20 jv Exp $
+ *   $Id: struct_def.h,v 1.143 2007/12/15 23:21:12 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -41,6 +41,11 @@ typedef struct        LineItem aExtData;
 
 #define	HOSTLEN		63	/* Length of hostname.  Updated to         */
 				/* comply with RFC1123                     */
+
+#if defined(INET6) && (INET6_ADDRSTRLEN > HOSTLEN)
+#error HOSTLEN must not be smaller than INET6_ADDRSTRLEN
+#endif
+
 #define	NICKLEN		15	/* Must be the same network-wide. */
 #define UIDLEN		9	/* must not be bigger than NICKLEN --Beeth */
 #define	USERLEN		10
