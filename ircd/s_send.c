@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_send.c,v 1.10 2005/02/08 01:49:05 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_send.c,v 1.11 2007/12/16 06:10:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -367,7 +367,7 @@ void	esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr,
 		{
 		    return;
 		}
-		if ((mask = rindex(chptr->chname, ':')))
+		if ((mask = get_channelmask(chptr->chname)))
 		{
 		    mask++;
 		}

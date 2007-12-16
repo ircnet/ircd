@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.105 2007/12/15 23:21:11 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.106 2007/12/16 06:10:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -783,7 +783,7 @@ void	sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 	    {
 		if (*chptr->chname == '&')
 			return;
-		if ((mask = (char *)rindex(chptr->chname, ':')))
+		if ((mask = get_channelmask(chptr->chname)))
 			mask++;
 	    }
 	else
@@ -818,7 +818,7 @@ int	sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
 	    {
 		if (*chptr->chname == '&')
 			return 0;
-		if ((mask = (char *)rindex(chptr->chname, ':')))
+		if ((mask = get_channelmask(chptr->chname)))
 			mask++;
 	    }
 	else
@@ -866,7 +866,7 @@ int	sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
 	    {
 		if (*chptr->chname == '&')
 			return 0;
-		if ((mask = (char *)rindex(chptr->chname, ':')))
+		if ((mask = get_channelmask(chptr->chname)))
 			mask++;
 	    }
 	else

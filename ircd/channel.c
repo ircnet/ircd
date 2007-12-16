@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.266 2007/04/10 11:09:04 jv Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.267 2007/12/16 06:10:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1964,7 +1964,7 @@ static	int	check_channelmask(aClient *sptr, aClient *cptr, char *chname)
 
 	if (*chname == '&' && IsServer(cptr))
 		return -1;
-	s = rindex(chname, ':');
+	s = get_channelmask(chname);
 	if (!s)
 		return 0;
 	s++;
@@ -1972,8 +1972,8 @@ static	int	check_channelmask(aClient *sptr, aClient *cptr, char *chname)
 		|| match(s, ME) || (IsServer(cptr) && match(s, cptr->name)))
 	{
 		if (MyClient(sptr))
-			sendto_one(sptr, replies[ERR_BADCHANMASK], ME,
-				BadTo(sptr->name), chname);
+                       sendto_one(sptr, replies[ERR_BADCHANMASK], ME,
+                               BadTo(sptr->name), chname);
 		return -1;
 	}
 	return 0;
@@ -2449,7 +2449,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/*
 	        ** notify other servers
 		*/
-		if (index(name, ':') || *chptr->chname == '!') /* compat */
+		if (get_channelmask(name) || *chptr->chname == '!') /* compat */
 		{
 			sendto_match_servs_v(chptr, cptr, SV_UID,
 				":%s NJOIN %s :%s%s", me.serv->sid, name,
@@ -2748,31 +2748,31 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	*/
 	size = BUFSIZE - strlen(parv[0]) - 10;
 	for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
-	    {
+	{
 		chptr = get_channel(sptr, name, 0);
 		if (!chptr)
-		    {
+		{
 			if (MyPerson(sptr))
 				sendto_one(sptr,
-					   replies[ERR_NOSUCHCHANNEL], ME, BadTo(parv[0]),
-					   name);
+					replies[ERR_NOSUCHCHANNEL], ME, BadTo(parv[0]),
+					name);
 			continue;
-		    }
+		}
 		if (check_channelmask(sptr, cptr, name))
 			continue;
 		if (!IsMember(sptr, chptr))
-		    {
+		{
 			sendto_one(sptr, replies[ERR_NOTONCHANNEL], ME, BadTo(parv[0]),
 				   name);
 			continue;
-		    }
+		}
 		/*
 		**  Remove user from the old channel (if any)
 		*/
-		if (!index(name, ':') && (*chptr->chname != '!'))
-		    {	/* channel:*.mask */
+		if (!get_channelmask(name) && (*chptr->chname != '!'))
+		{	/* channel:*.mask */
 			if (*name != '&')
-			    {
+			{
 				/* We could've decreased size by 1 when
 				** calculating it, but I left it like that
 				** for the sake of clarity. --B. */
@@ -2788,15 +2788,15 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				if (*buf)
 					(void)strcat(buf, ",");
 				(void)strcat(buf, name);
-			    }
-		    }
+			}
+		}
 		else
 			sendto_match_servs(chptr, cptr, PartFmt,
 				   	   sptr->user->uid, name, comment);
 		sendto_channel_butserv(chptr, sptr, PartFmt,
 				       parv[0], name, comment);
 		remove_user_from_channel(sptr, chptr);
-	    }
+	}
 	if (*buf)
 		sendto_serv_butone(cptr, PartFmt, sptr->user->uid, buf, comment);
 	return 4;
@@ -3093,46 +3093,46 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 
 	if (!chptr)
-	    {
+	{
 		sendto_prefix_one(acptr, sptr, ":%s INVITE %s :%s",
 				  parv[0], parv[1], parv[2]);
 		if (MyConnect(sptr))
-		    {
+		{
         	        sendto_one(sptr, replies[RPL_INVITING], ME, BadTo(parv[0]),
 	                           acptr->name, parv[2]);
 			if (acptr->user->flags & FLAGS_AWAY)
 					send_away(sptr, acptr);
-		    }
+		}
 		return 3;
-	    }
+	}
 
 	if (!IsMember(sptr, chptr))
-	    {
+	{
 		sendto_one(sptr, replies[ERR_NOTONCHANNEL], ME, BadTo(parv[0]), parv[2]);
 		return 1;
-	    }
+	}
 
 	if (IsMember(acptr, chptr))
-	    {
+	{
 		sendto_one(sptr, replies[ERR_USERONCHANNEL], ME, BadTo(parv[0]),
 			   parv[1], parv[2]);
 		return 1;
-	    }
+	}
 
 	if ((chptr->mode.mode & MODE_INVITEONLY) &&  !is_chan_op(sptr, chptr))
-	    {
+	{
 		sendto_one(sptr, replies[ERR_CHANOPRIVSNEEDED],
 			   ME, BadTo(parv[0]), chptr->chname);
 		return 1;
-	    }
+	}
 
 	if (MyConnect(sptr))
-	    {
+	{
 		sendto_one(sptr, replies[RPL_INVITING], ME, BadTo(parv[0]),
 			   acptr->name, ((chptr) ? (chptr->chname) : parv[2]));
 		if (acptr->user->flags & FLAGS_AWAY)
 			send_away(sptr, acptr);
-	    }
+	}
 
 	if (MyConnect(acptr))
 		if (chptr && /* (chptr->mode.mode & MODE_INVITEONLY) && */
@@ -3252,22 +3252,22 @@ end_of_list:;
 	{
 		parv[1] = canonize(parv[1]);
 		for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
-		    {
+		{
 			chptr = find_channel(name, NullChn);
 			if (chptr && ShowChannel(sptr, chptr) && sptr->user)
-			    {
+			{
 				rlen += sendto_one(sptr, replies[RPL_LIST],
 						   ME, BadTo(parv[0]), name,
 						   chptr->users, chptr->topic);
 				if (!MyConnect(sptr) && rlen > CHREPLLEN)
 					break;
-			    }
+			}
 			if (*name == '!')
-			    {
+			{
 				chptr = NULL;
 				while ((chptr = hash_find_channels(name + 1,
 					chptr)))
-				    {
+				{
 					int scr = SecretChannel(chptr) &&
 							!IsMember(sptr, chptr);
 					rlen += sendto_one(sptr,
@@ -3281,13 +3281,13 @@ end_of_list:;
 					if (!MyConnect(sptr) &&
 					    rlen > CHREPLLEN)
 						break;
-				    }		
-			    }
-		     }
+				}		
+			}
+		}
 	}
 	if (!MyConnect(sptr) && rlen > CHREPLLEN)
 		sendto_one(sptr, replies[ERR_TOOMANYMATCHES], ME,
-			   BadTo(parv[0]), "LIST");
+			BadTo(parv[0]), "LIST");
 	sendto_one(sptr, replies[RPL_LISTEND], ME, BadTo(parv[0]));
 	return 2;
     }

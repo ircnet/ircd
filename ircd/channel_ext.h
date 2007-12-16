@@ -60,3 +60,4 @@ EXTERN int m_list (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_names (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN time_t collect_channel_garbage (time_t now);
 #undef EXTERN
+#define get_channelmask(x) rindex((x), ':')
