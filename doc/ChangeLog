@@ -1,6 +1,20 @@
 2007-12-16  Piotr Kucharski
 
 	* s_conf.c/prep_kline(): tiny bug squashed, added more checks.
+	* os.h, send.c, struct_def.h, support.c, support_ext.h, res.c, s_auth.c, 
+	  s_bsd.c, s_conf.c, s_misc.c, s_serv.c, s_user.c: clean mydummy stuff, 
+	  use better descriptive name ipv6string and standard name and length for 
+	  INET6_ADDRSTRLEN (patch from fiction).
+	* s_serv.c/m_server_estab(), s_bsd.c/completed_connection(): make
+	  sending additional options in PASS more compact.
+	* channel_ext.h: define get_channelmask to rindex-find ':' in name.
+	* send.c/sendto_match_servs(), send.c/sendto_match_servs_v(),
+	  send.c/sendto_match_servs_notv(), channel.c/check_channelmask(),
+	  channel.c/m_join(), channel.c/m_part(), s_send.c/esendto_match_servs():
+	  use get_channelmask() instead of rindex() where appropriate.
+	* channel.c: change name or parv to chptr->chname where appropriate;
+	  tiny sideffect: clients will see channel names cased as created,
+	  not as they issued.
 
 2007-10-28  Jakub Vlasek
 
