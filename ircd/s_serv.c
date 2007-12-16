@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.282 2007/12/15 23:21:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.283 2007/12/16 05:46:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1037,16 +1037,14 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		    }
 
 		if (bconf->passwd[0])
-#ifndef	ZIP_LINKS
-			sendto_one(cptr, "PASS %s %s IRC|%s %s", bconf->passwd,
-				   pass_version, serveropts,
-				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
-#else
 			sendto_one(cptr, "PASS %s %s IRC|%s %s%s",
-				   bconf->passwd, pass_version, serveropts,
-			   (bconf->status == CONF_ZCONNECT_SERVER) ? "Z" : "",
-				   (bootopt & BOOT_STRICTPROT) ? "P" : "");
+				bconf->passwd, pass_version, serveropts,
+				(bootopt & BOOT_STRICTPROT) ? "P" : "",
+#ifdef	ZIP_LINKS
+				(bconf->status == CONF_ZCONNECT_SERVER) ? "Z" :
 #endif
+				""
+				);
 		/*
 		** Pass my info to the new server
 		*/
