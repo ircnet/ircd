@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.183 2007/12/16 05:46:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.184 2007/12/16 05:53:17 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1269,7 +1269,7 @@ static	int completed_connection(aClient *cptr)
 #ifdef ZIP_LINKS
 			(aconf->status == CONF_ZCONNECT_SERVER) ? "Z" :
 #endif
-			"",
+			""
 			);
 
 	aconf = find_conf(cptr->confs, cptr->name, CONF_NOCONNECT_SERVER);
