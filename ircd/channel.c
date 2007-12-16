@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.267 2007/12/16 06:10:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.268 2007/12/16 06:17:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -977,7 +977,7 @@ int	m_mode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			modebuf[1] = '\0';
 			channel_modes(sptr, modebuf, parabuf, chptr);
 			sendto_one(sptr, replies[RPL_CHANNELMODEIS], ME, BadTo(parv[0]),
-				   name, modebuf, parabuf);
+				   chptr->chname, modebuf, parabuf);
 			penalty += 1;
 		    }
 		else	/* Check parameters for the channel */
@@ -2420,19 +2420,19 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		add_user_to_channel(chptr, sptr, flags);
 		/* Notify all users on the channel */
 		sendto_channel_butserv(chptr, sptr, ":%s JOIN :%s",
-			parv[0], name);
+			parv[0], chptr->chname);
 
 		del_invite(sptr, chptr);
 		if (chptr->topic[0] != '\0')
 		{
 			sendto_one(sptr, replies[RPL_TOPIC], ME,
-				BadTo(parv[0]), name, chptr->topic);
+				BadTo(parv[0]), chptr->chname, chptr->topic);
 #ifdef TOPIC_WHO_TIME
 			if (chptr->topic_t > 0)
 			{
 				sendto_one(sptr, replies[RPL_TOPIC_WHO_TIME],
 					ME, BadTo(parv[0]),
-					name, IsAnonymous(chptr) ?
+					chptr->chname, IsAnonymous(chptr) ?
 					"anonymous!anonymous@anonymous." :
 					chptr->topic_nuh,
 					chptr->topic_t);
@@ -2681,7 +2681,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			case 2:
 				sendto_channel_butserv(chptr, &me,
 					       ":%s MODE %s +%s%c %s %s",
-						       sptr->name, parv[1],
+						       sptr->name, chptr->chname,
 						       modebuf, mbuf[0],
 						       parabuf, acptr->name);
 				if (mbuf[1])
@@ -2698,7 +2698,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			    {
 				sendto_channel_butserv(chptr, &me,
 						       ":%s MODE %s +%s %s",
-						       sptr->name, parv[1],
+						       sptr->name, chptr->chname,
 						       modebuf, parabuf);
 				cnt = 0;
 			    }
@@ -2707,7 +2707,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	/* send eventual MODE leftover */
 	if (cnt)
 		sendto_channel_butserv(chptr, &me, ":%s MODE %s +%s %s",
-				       sptr->name, parv[1], modebuf, parabuf);
+				       sptr->name, chptr->chname, modebuf, parabuf);
 
 	/* send NJOIN */
 	*u = '\0';
@@ -2794,7 +2794,7 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			sendto_match_servs(chptr, cptr, PartFmt,
 				   	   sptr->user->uid, name, comment);
 		sendto_channel_butserv(chptr, sptr, PartFmt,
-				       parv[0], name, comment);
+				       parv[0], chptr->chname, comment);
 		remove_user_from_channel(sptr, chptr);
 	}
 	if (*buf)
@@ -2900,7 +2900,7 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				/* Local clients. */
 				sendto_channel_butserv(chptr, sptr,
 					":%s KICK %s %s :%s", sptr->name,
-					name, who->name, comment);
+					chptr->chname, who->name, comment);
 
 				/* Nick buffer to kick out. */
 				/* as we need space for ",nick", we should add
@@ -3257,7 +3257,7 @@ end_of_list:;
 			if (chptr && ShowChannel(sptr, chptr) && sptr->user)
 			{
 				rlen += sendto_one(sptr, replies[RPL_LIST],
-						   ME, BadTo(parv[0]), name,
+						   ME, BadTo(parv[0]), chptr->chname,
 						   chptr->users, chptr->topic);
 				if (!MyConnect(sptr) && rlen > CHREPLLEN)
 					break;
@@ -3290,7 +3290,7 @@ end_of_list:;
 			BadTo(parv[0]), "LIST");
 	sendto_one(sptr, replies[RPL_LISTEND], ME, BadTo(parv[0]));
 	return 2;
-    }
+}
 /*
  * names_channel - send NAMES for one specific channel
  * sends RPL_ENDOFNAMES when sendeon > 0
