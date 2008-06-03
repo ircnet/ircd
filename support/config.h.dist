@@ -602,6 +602,11 @@
 */
 #undef YLINE_LIMITS_OLD_BEHAVIOUR
 
+/*
+** Define this if you want to use Japanese channel names in JIS encoding.
+*/
+#undef JAPANESE
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 

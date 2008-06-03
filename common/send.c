@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.106 2007/12/16 06:10:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.107 2008/06/03 22:32:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -796,6 +796,10 @@ void	sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
 			continue;
+#ifdef JAPANESE
+		if (!jp_valid(cptr, chptr, 0))
+			continue;
+#endif
 		if (!len)
 		    {
 			va_list	va;
@@ -831,6 +835,11 @@ int	sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
 			continue;
+#ifdef JAPANESE
+		if (!jp_valid(cptr, chptr, 0))
+			continue;
+#endif
+
 #if 0
 /* We're not using it for now, so just save some cpu.
 ** Revive once we need it --B. */
@@ -879,6 +888,10 @@ int	sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
 			continue;
 		if (!BadPtr(mask) && match(mask, cptr->name))
 			continue;
+#ifdef JAPANESE
+		if (!jp_valid(cptr, chptr, 0))
+			continue;
+#endif
 		if ((ver & cptr->serv->version) != 0)
 		    {
 			rc = 1;

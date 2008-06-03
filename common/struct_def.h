@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.143 2007/12/15 23:21:12 chopin Exp $
+ *   $Id: struct_def.h,v 1.144 2008/06/03 22:32:46 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -181,6 +181,9 @@ typedef enum Status {
 				  ** a SQUIT. */
 #define	FLAGS_EOB	0x4000000 /* EOB received */
 #define FLAGS_LISTENINACTIVE 0x8000000 /* Listener does not listen() */
+#ifdef JAPANESE
+#define	FLAGS_JP	0x10000000 /* jp version, used both for chans and servs */
+#endif
 	
 #define	FLAGS_OPER	0x0001 /* operator */
 #define	FLAGS_LOCOP	0x0002 /* local operator -- SRB */
@@ -692,6 +695,9 @@ struct Channel	{
 	Link	*clist;		/* list of local! connections which are members */
 	time_t	history;	/* channel history (aka channel delay) */
 	time_t	reop;		/* server reop stamp for !channels */
+#ifdef JAPANESE
+	int flags;
+#endif
 	char	chname[1];
 };
 

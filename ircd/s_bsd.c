@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.184 2007/12/16 05:53:17 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.185 2008/06/03 22:32:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1263,9 +1263,14 @@ static	int completed_connection(aClient *cptr)
 		return -1;
 	    }
 	if (!BadPtr(aconf->passwd))
-		sendto_one(cptr, "PASS %s %s IRC|%s %s%s", aconf->passwd,
+		sendto_one(cptr, "PASS %s %s IRC|%s %s%s%s", aconf->passwd,
 			pass_version, serveropts,
 			(bootopt & BOOT_STRICTPROT) ? "P" : "",
+#ifdef JAPANESE
+			"j",
+#else
+			"",
+#endif
 #ifdef ZIP_LINKS
 			(aconf->status == CONF_ZCONNECT_SERVER) ? "Z" :
 #endif

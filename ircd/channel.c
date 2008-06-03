@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.268 2007/12/16 06:17:19 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.269 2008/06/03 22:32:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -53,6 +53,11 @@ static	void	add_invite (aClient *, aClient *, aChannel *);
 static	int	can_join (aClient *, aChannel *, char *);
 void	channel_modes (aClient *, char *, char *, aChannel *);
 static	int	check_channelmask (aClient *, aClient *, char *);
+
+#ifdef JAPANESE
+static	int	jp_chname (char *);
+#endif
+
 static	aChannel *get_channel (aClient *, char *, int);
 static	int	set_mode (aClient *, aClient *, aChannel *, int *, 
 			int, char **);
@@ -619,6 +624,83 @@ int	can_send(aClient *cptr, aChannel *chptr)
 	return 0;
 }
 
+#ifdef JAPANESE
+char	*get_channelmask(char *chname)
+{
+	char	*mask;
+
+	mask = rindex(chname, ':');
+	if (!mask || index(mask, '\033'))
+	{
+		/* If '\033' is in the mask, well, it's not a real mask,
+		** but a JIS encoded channel name. --Beeth */
+		return NULL;
+	}
+	return mask;
+}
+
+/* This tries to find out if given chname is JIS encoded:
+** a) ":" followed somewhere by '\033'
+** b) comma in chname (impossible if not for JIS)
+** c) one of {, }, ~, \ between JIS marks.
+**
+** Returns 1 if seems JIS encoded, 0 otherwise.
+*/
+int	jp_chname(char *chname)
+{
+	char *mask, *cn;
+	int flag = 0;
+
+	if (!chname || !*chname)
+		return 0;
+	mask = rindex(chname, ':');
+	if (mask && index(mask, '\033'))
+		return 1;
+	if (index(chname, ','))
+		return 1;
+
+	cn = chname;
+	while (*cn)
+	{
+		if (cn[0] == '\033' && cn[2] == 'B'
+			&& (cn[1] == '$' || cn[1] == '('))
+		{
+			flag = (cn[1] == '$') ? 1 : 0;
+			cn += 2;
+		}
+		else if (flag == 1 &&
+			(*cn == '{' || *cn == '}' || *cn == '~' || *cn == '\\'))
+		{
+			return 1;
+		}
+		cn++; 
+	}
+	return 0;
+}
+
+#define IsJPFlag(x)	(((x)->flags & FLAGS_JP))
+#define IsJPChan(x, y)	( ((x) && IsJPFlag((x))) || jp_chname((y)) )
+
+/* 
+** This checks for valid combination of channel name and server,
+** so Japanese channels are not sent to non-Japanese servers.
+**
+** If cptr is NULL, then function is reduced to checking if channel name
+** is (likely to be) Japanese (if it is not, it can be sent anywhere).
+**
+** Otherwise cptr should be a JP flagged server or not a server at all.
+**
+** Returns 1 if it is safe to use given combination of params or 0 if not.
+**
+** Note: this should be split in two functions for clarity.
+*/
+int	jp_valid(aClient *cptr, aChannel *chptr, char *chname)
+{
+	return ( !IsJPChan(chptr, chname) ||
+		(cptr && (!IsServer(cptr) || IsJPFlag(cptr))) );
+}
+#endif
+
 aChannel	*find_channel(char *chname, aChannel *chptr)
 {
 	aChannel *achptr = chptr;
@@ -844,6 +926,12 @@ void	send_channel_modes(aClient *cptr, aChannel *chptr)
 
 	if (check_channelmask(&me, cptr, chptr->chname))
 		return;
+#ifdef JAPANESE
+	/* We did not send channel members, we don't send channel
+	** modes to servers that are not prepared to handle JIS encoding. */
+	if (!jp_valid(cptr, chptr, NULL))
+                return;
+#endif
 
 	*modebuf = *parabuf = '\0';
 	channel_modes(cptr, modebuf, parabuf, chptr);
@@ -886,6 +974,12 @@ void	send_channel_members(aClient *cptr, aChannel *chptr)
 
 	if (check_channelmask(&me, cptr, chptr->chname) == -1)
 		return;
+#ifdef JAPANESE
+	/* We do not send channel members to servers that are not prepared 
+	** to handle JIS encoding. */
+	if (!jp_valid(cptr, chptr, NULL))
+                return;
+#endif
 	sprintf(buf, ":%s NJOIN %s :", me2, chptr->chname);
 	len = strlen(buf);
 
@@ -1947,12 +2041,31 @@ static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 
 void	clean_channelname(char *cn)
 {
-	for (; *cn; cn++)
-		if (*cn == '\007' || *cn == ' ' || *cn == ',')
-		    {
+	int flag = 0;
+
+	while (*cn)
+	{
+		if (*cn == '\007' || *cn == ' ' || (!flag && *cn == ','))
+		{
 			*cn = '\0';
 			return 0;
-		    }
+		}
+#ifdef JAPANESE
+		/* Japanese channel names can have comma in their name, but
+		** only between "\033$B" (begin) and "\033(B" (end) markers.
+		** So we mark it (using flag) for above check. --Beeth */
+		if (cn[0] == '\033' && cn[2] == 'B' &&
+			(cn[1] == '$' || cn[1] == '('))
+		{
+			flag = (cn[1] == '$') ? 1 : 0;
+			cn += 2;
+		}
+#endif
+		cn++;
+	}
+	/* XXX Shouldn't we check, if flag==1 here? Wouldn that mean
+	** that Japanese channel name is incomplete? Would that be
+	** an error? --Beeth */
 }
 
 /*
@@ -1993,10 +2106,18 @@ static	aChannel *get_channel(aClient *cptr, char *chname, int flag)
 
 	len = strlen(chname);
 	if (MyClient(cptr) && len > CHANNELLEN)
-	    {
+	{
 		len = CHANNELLEN;
 		*(chname+CHANNELLEN) = '\0';
-	    }
+#ifdef JAPANESE
+#if 0
+		/* XXX-JP: I think I know why it is here, but it
+		** seems it is completely unneeded. */
+		if (check_channelmask(cptr, cptr, chname) == -1)
+			return NULL;
+#endif
+#endif
+	}
 	if ((chptr = find_channel(chname, (aChannel *)NULL)))
 		return (chptr);
 	if (flag == CREATE)
@@ -2009,6 +2130,11 @@ static	aChannel *get_channel(aClient *cptr, char *chname, int flag)
 		chptr->prevch = NULL;
 		chptr->nextch = channel;
 		chptr->history = 0;
+#ifdef JAPANESE
+		chptr->flags = 0;
+		if (jp_chname(chname))
+			chptr->flags = FLAGS_JP;
+#endif
 		channel = chptr;
 		(void)add_to_channel_hash_table(chname, chptr);
 	    }
@@ -2449,7 +2575,13 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/*
 	        ** notify other servers
 		*/
-		if (get_channelmask(name) || *chptr->chname == '!') /* compat */
+		if (get_channelmask(name) || *chptr->chname == '!' /* compat */
+#ifdef JAPANESE
+			/* sendto_match_servs_v() is checking the same
+			** and NOT sending things out. --B. */
+			|| !jp_valid(NULL, chptr, NULL)
+#endif
+			)
 		{
 			sendto_match_servs_v(chptr, cptr, SV_UID,
 				":%s NJOIN %s :%s%s", me.serv->sid, name,
@@ -2648,8 +2780,12 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		** join from netjoin. 2.10.x is using NJOIN only during
 		** burst, but 2.11 always. Hence we check for EOB from 2.11
 		** to know what kind of NJOIN it is. --B. */
-		sendto_channel_butserv(chptr, acptr, ":%s JOIN %s%s", acptr->name,
-			IsBursting(sptr) ? "" : ":", parv[1]);
+		sendto_channel_butserv(chptr, acptr, ":%s JOIN %s%s", acptr->name, (
+#ifdef JAPANESE
+			/* XXX-JP: explain why jp-patch had that! */
+			IsServer(sptr) ||
+#endif
+			IsBursting(sptr)) ? "" : ":", chptr->chname);
 		/* build MODE for local users on channel, eventually send it */
 		if (*mbuf)
 		    {
@@ -2769,7 +2905,18 @@ int	m_part(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/*
 		**  Remove user from the old channel (if any)
 		*/
-		if (!get_channelmask(name) && (*chptr->chname != '!'))
+		if (!get_channelmask(name) && (*chptr->chname != '!')
+#ifdef JAPANESE
+			/* jp_valid here because in else{} there's
+			** sendto_match_servs() which ignores such
+			** channels when sending stuff. --B. */
+			&& jp_valid(NULL, chptr, NULL)	/* XXX-JP: why not 
+							jp_valid(NULL, chptr, name)?
+							because user cannot be on 
+							jp-named channel which is not 
+							flagged JP? --B. */
+#endif
+			)
 		{	/* channel:*.mask */
 			if (*name != '&')
 			{
@@ -3086,6 +3233,15 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (*parv[2] == '&' && !MyClient(acptr))
 		return 1;
 	chptr = find_channel(parv[2], NullChn);
+
+#ifdef JAPANESE
+	if (!jp_valid(acptr->from, chptr, parv[2]))
+	{
+		sendto_one(sptr, replies[ERR_BADCHANMASK], ME,
+			chptr ? chptr->chname : parv[2]);
+		return 1;
+	}
+#endif
 	if (!chptr && parv[2][0] == '!')
 	{
 		/* Try to find !channel using shortname */

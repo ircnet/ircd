@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.43 2007/12/15 23:21:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.44 2008/06/03 22:32:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -47,6 +47,12 @@ char	*mystrdup(char *s)
 	return NULL;
 }
 
+#if defined(JAPANESE) && defined(HAVE_STRTOKEN)
+/* I doubt library strtoken knows about JIS encoding and commas. --Beeth */
+#undef HAVE_STRTOKEN
+#undef strtoken
+#endif
+
 #if !defined(HAVE_STRTOKEN)
 /*
 ** 	strtoken.c --  	walk through a string of tokens, using a set
@@ -70,8 +76,40 @@ char	*strtoken(char **save, char *str, char *fs)
 
     tmp = pos; 			/* now, keep position of the token */
 
+#ifdef JAPANESE
+    /* We have to make special case for Japanese names when comma is
+    ** a separator, as they may contain it between JIS marks. --Beeth. */
+    if (fs[0] == ',' && fs[1] == '\0')
+    {
+       int flag = 0;
+       while (*pos)
+       {
+	   if (!flag && *pos == ',')
+           {
+	       break;
+	   }
+           else if (pos[0] == '\033' && pos[2] == 'B' &&
+	   	(pos[1] == '$' || pos[1] == '('))
+           {
+	       pos += 3;
+	       flag = (pos[1] == '$') ? 1 : 0;
+	   }
+           else
+           {
+               pos++;
+	   }
+       }
+    }
+    else
+    /* This came from original jp patch, but I believe it is wrong for
+    ** cases when fs is two or more letters (index() allows it) and contains 
+    ** comma. Fortunately ircd does not use such, yet it is something 
+    ** to remember. --Beeth. */
+#endif
+    {
     while (*pos && index(fs, *pos) == NULL)
 	pos++; 			/* skip content of the token */
+    }
 
     if (*pos)
 	*pos++ = '\0';		/* remove first sep after the token */

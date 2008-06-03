@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.283 2007/12/16 05:46:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.284 2008/06/03 22:32:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -388,6 +388,11 @@ int	check_version(aClient *cptr)
 			return exit_client(cptr, cptr, &me, "Bad flags");
 		}
 	}
+
+#ifdef JAPANESE
+	if (link && strchr(link, 'j'))	/* jp version */
+		cptr->flags |= FLAGS_JP;
+#endif
 
 	/* right now, I can't code anything good for this */
 	/* Stop whining, and do it! ;) */
@@ -1037,9 +1042,14 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		    }
 
 		if (bconf->passwd[0])
-			sendto_one(cptr, "PASS %s %s IRC|%s %s%s",
+			sendto_one(cptr, "PASS %s %s IRC|%s %s%s%s",
 				bconf->passwd, pass_version, serveropts,
 				(bootopt & BOOT_STRICTPROT) ? "P" : "",
+#ifdef	JAPANESE
+				"j",
+#else
+				"",
+#endif
 #ifdef	ZIP_LINKS
 				(bconf->status == CONF_ZCONNECT_SERVER) ? "Z" :
 #endif

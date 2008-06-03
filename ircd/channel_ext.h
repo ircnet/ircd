@@ -38,6 +38,14 @@ EXTERN void remove_user_from_channel (aClient *sptr, aChannel *chptr);
 EXTERN int is_chan_op (aClient *cptr, aChannel *chptr);
 EXTERN int has_voice (aClient *cptr, aChannel *chptr);
 EXTERN int can_send (aClient *cptr, aChannel *chptr);
+
+#ifdef JAPANESE
+EXTERN char *get_channelmask (char *);
+EXTERN int jp_valid (aClient *, aChannel *, char *);
+#else
+#define get_channelmask(x) rindex((x), ':')
+#endif
+
 EXTERN aChannel *find_channel (Reg char *chname, Reg aChannel *chptr);
 EXTERN void setup_server_channels (aClient *mp);
 EXTERN void channel_modes (aClient *cptr, Reg char *mbuf, Reg char *pbuf,
@@ -60,4 +68,3 @@ EXTERN int m_list (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_names (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN time_t collect_channel_garbage (time_t now);
 #undef EXTERN
-#define get_channelmask(x) rindex((x), ':')
