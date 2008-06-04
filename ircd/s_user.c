@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.263 2007/12/15 23:21:14 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.264 2008/06/04 18:58:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -332,6 +332,11 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 	char	prefix;
 #endif
 	int	i;
+#ifdef XLINE
+	static char savedusername[USERLEN+1];
+
+	strncpyzt(savedusername, username, USERLEN+1);
+#endif
 
 	user->last = timeofday;
 	parv[0] = sptr->name;
@@ -703,11 +708,17 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 # if defined(CLIENTS_CHANNEL) && (CLIENTS_CHANNEL_LEVEL & CCL_CONN)
 		sendto_flag(SCH_CLIENT, "%s %s %s %s CONN %s"
 # if (CLIENTS_CHANNEL_LEVEL & CCL_CONNINFO)
+#  ifdef XLINE
+         " %s %s %s"
+#  endif
 			" :%s"
 # endif
 			, user->uid, nick, user->username,
 			user->host, user->sip
 # if (CLIENTS_CHANNEL_LEVEL & CCL_CONNINFO)
+#  ifdef XLINE
+         , savedusername, sptr->user2, sptr->user3
+#  endif
 			, sptr->info
 # endif
 			);
