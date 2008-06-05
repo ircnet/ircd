@@ -540,7 +540,7 @@
  *
  * Defining to 0 disables entering split-mode.
  */
-#define SPLIT_USERS	85000
+#define SPLIT_USERS	70000
 #define SPLIT_SERVERS	85
 
 /*
