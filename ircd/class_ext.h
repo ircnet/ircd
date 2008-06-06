@@ -40,7 +40,11 @@ EXTERN int get_client_ping (aClient *acptr);
 EXTERN int get_con_freq (aClass *clptr);
 EXTERN void add_class (int class, int ping, int confreq, int maxli,
 			   int sendq, int bsendq, int hlocal, int uhlocal,
-			   int hglobal, int uhglobal);
+			   int hglobal, int uhglobal
+#ifdef ENABLE_CIDR_LIMITS
+			   , char *
+#endif
+			   );
 EXTERN aClass *find_class (int cclass);
 EXTERN void check_class(void);
 EXTERN void initclass(void);

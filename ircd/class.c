@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.21 2005/02/22 17:09:37 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.22 2008/06/06 23:51:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -26,6 +26,9 @@ static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.21 2005/02/22 17:09:3
 #define CLASS_C
 #include "s_externs.h"
 #undef CLASS_C
+#ifdef ENABLE_CIDR_LIMITS
+#include "patricia_ext.h"
+#endif
 
 #define BAD_CONF_CLASS		-1
 #define BAD_PING		-2
@@ -129,9 +132,28 @@ int	get_con_freq(aClass *clptr)
  * immeadiately after the first one (class 0).
  */
 void	add_class(int class, int ping, int confreq, int maxli, int sendq,
-		int bsendq, int hlocal, int uhlocal, int hglobal, int uhglobal)
+		int bsendq, int hlocal, int uhlocal, int hglobal, int uhglobal
+#ifdef ENABLE_CIDR_LIMITS
+		, char *cidrlen_s
+#endif
+      )
 {
 	aClass *t, *p;
+#ifdef ENABLE_CIDR_LIMITS
+	char *foo;
+	int cidrlen = 0, cidramount = 0;
+
+	if(cidrlen_s)
+	{
+		if((foo = index(cidrlen_s, '/')))
+		{
+			*foo++ = '\0';
+
+			cidramount = atoi(cidrlen_s);
+			cidrlen = atoi(foo);
+		}
+	}
+#endif
 
 	t = find_class(class);
 	if ((t == classes) && (class != 0))
@@ -159,6 +181,27 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 	MaxUHLocal(p) = uhlocal;
 	MaxHGlobal(p) = hglobal;
 	MaxUHGlobal(p) = uhglobal;
+
+#ifdef ENABLE_CIDR_LIMITS
+	if (cidrlen > 0 && CidrLen(p) == 0 && p->ip_limits == NULL)
+	{
+		CidrLen(p) = cidrlen;
+#  ifdef INET6
+		p->ip_limits = (struct _patricia_tree_t *) patricia_new(128);
+#  else
+		p->ip_limits = (struct _patricia_tree_t *) patricia_new(32);
+#  endif
+	}
+	if (CidrLen(p) != cidrlen)
+	{
+		/* Hmpf, sendto_somewhere maybe to warn? --B. */
+		Debug((DEBUG_NOTICE, 
+			"Cannot change cidrlen on the fly (class %d)",
+			Class(p)));
+	}
+	if (CidrLen(p) > 0)
+		MaxCidrAmount(p) = cidramount;
+#endif
 	if (p != t)
 		Links(p) = 0;
 }
@@ -220,14 +263,23 @@ void	initclass(void)
 void	report_classes(aClient *sptr, char *to)
 {
 	Reg	aClass	*cltmp;
+	static char	foo[64] = "";
 
 	for (cltmp = FirstClass(); cltmp; cltmp = NextClass(cltmp))
 	{
+#ifdef ENABLE_CIDR_LIMITS
+		if (MaxCidrAmount(cltmp) > 0 && CidrLen(cltmp) > 0)
+			// leading space is important
+			snprintf(foo, sizeof(foo), " %d/%d",
+				MaxCidrAmount(cltmp), CidrLen(cltmp));
+		else
+			foo[0] = '\0';
+#endif
 		sendto_one(sptr, replies[RPL_STATSYLINE], ME, BadTo(to), 'Y',
 			Class(cltmp), PingFreq(cltmp), ConFreq(cltmp),
 			MaxLinks(cltmp), MaxSendq(cltmp), MaxBSendq(cltmp),
 			MaxHLocal(cltmp), MaxUHLocal(cltmp),
-			MaxHGlobal(cltmp), MaxUHGlobal(cltmp), Links(cltmp));
+			MaxHGlobal(cltmp), MaxUHGlobal(cltmp), Links(cltmp), foo);
 	}
 }
 

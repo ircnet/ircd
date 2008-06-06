@@ -17,6 +17,10 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#ifdef ENABLE_CIDR_LIMITS
+struct _patricia_tree_t;
+#endif
+
 typedef struct Class {
 	int	class;
 	int	conFreq;
@@ -29,6 +33,11 @@ typedef struct Class {
 	int	maxHGlobal;
 	int	maxUHGlobal;
 	int	links;
+#ifdef ENABLE_CIDR_LIMITS
+	int	cidr_len;
+	int	cidr_amount;
+	struct _patricia_tree_t *ip_limits;
+#endif
 	struct Class *next;
 } aClass;
 
@@ -55,6 +64,14 @@ typedef struct Class {
 #define	ConfMaxUHLocal(x)	(Class(x)->maxUHLocal)
 #define	ConfMaxHGlobal(x)	(Class(x)->maxHGlobal)
 #define	ConfMaxUHGlobal(x)	(Class(x)->maxUHGlobal)
+#ifdef ENABLE_CIDR_LIMITS
+#define	MaxCidrAmount(x)	((x)->cidr_amount)
+#define	CidrLen(x)	((x)->cidr_len)
+#define	CidrTree(x)	((x)->ip_limits)
+#define	ConfMaxCidrAmount(x)	(Class(x)->cidr_amount)
+#define	ConfCidrLen(x)	(Class(x)->cidr_len)
+#define	ConfCidrTree(x)	(Class(x)->ip_limits)
+#endif
 
 #define	FirstClass() 	classes
 #define	NextClass(x)	((x)->next)

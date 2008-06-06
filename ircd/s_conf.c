@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.173 2007/12/15 23:21:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.174 2008/06/06 23:51:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -56,6 +56,9 @@ static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.173 2007/12/15 23:21
 #define S_CONF_C
 #include "s_externs.h"
 #undef S_CONF_C
+#ifdef ENABLE_CIDR_LIMITS
+#include "patricia_ext.h"
+#endif
 
 #ifdef TIMEDKLINES
 static	int	check_time_interval (char *, char *);
@@ -631,6 +634,56 @@ aConfItem	*count_cnlines(Link *lp)
 	return nline;
 }
 
+#ifdef ENABLE_CIDR_LIMITS
+static int	add_cidr_limit(aClient *cptr, aConfItem *aconf)
+{
+	patricia_node_t *pnode;
+
+	if(aconf->class->cidr_amount == 0 || aconf->class->cidr_len == 0)
+		return -1;
+
+	pnode = patricia_match_ip(ConfCidrTree(aconf), &cptr->ip);
+
+	/* doesnt exist, create and then allow */
+	if(pnode == NULL)
+	{
+		pnode = patricia_make_and_lookup_ip(ConfCidrTree(aconf),
+					&cptr->ip,
+					aconf->class->cidr_len);
+
+		if(pnode == NULL)
+			return -1;
+
+		pnode->data++;
+		return 1;
+	}
+
+	if((long)pnode->data >= aconf->class->cidr_amount)
+		return 0;
+
+	pnode->data++;
+	return 1;
+}
+
+static void	remove_cidr_limit(aClient *cptr, aConfItem *aconf)
+{
+	patricia_node_t *pnode;
+
+	if(ConfMaxCidrAmount(aconf) == 0 || ConfCidrLen(aconf) == 0)
+		return;
+
+	pnode = patricia_match_ip(ConfCidrTree(aconf), &cptr->ip);
+
+	if(pnode == NULL)
+		return;
+
+	pnode->data--;
+
+	if(((unsigned long) pnode->data) == 0)
+		patricia_remove(ConfCidrTree(aconf), pnode);
+}
+#endif /* ENABLE_CIDR_LIMITS */
+
 /*
 ** detach_conf
 **	Disassociate configuration from the client.
@@ -650,8 +703,14 @@ int	detach_conf(aClient *cptr, aConfItem *aconf)
 			if ((aconf) && (Class(aconf)))
 			    {
 				if (aconf->status & CONF_CLIENT_MASK)
+				{
 					if (ConfLinks(aconf) > 0)
 						--ConfLinks(aconf);
+#ifdef ENABLE_CIDR_LIMITS
+					remove_cidr_limit(cptr, aconf);
+#endif
+				}
+
        				if (ConfMaxLinks(aconf) == -1 &&
 				    ConfLinks(aconf) == 0)
 		 		    {
@@ -791,6 +850,10 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 				}
 			}
 		}
+#ifdef ENABLE_CIDR_LIMITS
+		if(!add_cidr_limit(cptr, aconf))
+			return -4; /* EXITC_LHMAX */
+#endif
 	}
 
 
@@ -1393,6 +1456,9 @@ int 	initconf(int opt)
 	Reg	char	*tmp, *s;
 	int	fd, i;
 	char	*tmp2 = NULL, *tmp3 = NULL, *tmp4 = NULL;
+#ifdef ENABLE_CIDR_LIMITS
+	char	*tmp5 = NULL;
+#endif
 	int	ccount = 0, ncount = 0;
 	aConfItem *aconf = NULL;
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
@@ -1486,6 +1552,9 @@ int 	initconf(int opt)
 		if (tmp2)
 			MyFree(tmp2);
 		tmp3 = tmp4 = NULL;
+#ifdef ENABLE_CIDR_LIMITS
+		tmp5 = NULL;
+#endif
 		tmp = getfield(line);
 		if (!tmp)
 			continue;
@@ -1631,7 +1700,11 @@ int 	initconf(int opt)
 			if ((tmp3 = getfield(NULL)) == NULL)
 				break;
 			/* used in Y: global limits */
-			tmp4 = getfield(NULL);
+			if((tmp4 = getfield(NULL)) == NULL)
+				break;
+#ifdef ENABLE_CIDR_LIMITS
+			tmp5 = getfield(NULL);
+#endif
 		} while (0); /* to use break without compiler warnings */
 		istat.is_confmem += aconf->host ? strlen(aconf->host)+1 : 0;
 		istat.is_confmem += aconf->passwd ? strlen(aconf->passwd)+1 :0;
@@ -1662,7 +1735,11 @@ int 	initconf(int opt)
 					  atoi(index(tmp3, '.') + 1) : 1,
  					  tmp4 ? atoi(tmp4) : 1,
 					  (tmp4 && index(tmp4, '.')) ?
-					  atoi(index(tmp4, '.') + 1) : 1);
+					  atoi(index(tmp4, '.') + 1) : 1
+#ifdef ENABLE_CIDR_LIMITS
+					  , tmp5
+#endif
+				);
 			continue;
 		}
 		/*

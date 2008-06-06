@@ -623,7 +623,6 @@
 */
 #define	RESTRICT_USERNAMES
 
-
 /* Maximum length the queue of pending connections to one port may grow to.
  * Note that your system limits this, too. FreeBSD, for instance, has sysctl
  * kern.ipc.somaxconn for that. Such must be bigger than this define prior to
@@ -740,6 +739,12 @@
 ** minimum nicklen allowed.
 */
 /* #define MINLOCALNICKLEN 2 */
+
+/*
+** You probably don't want to disable it, but if you run into any problems,
+** here's the knob.
+*/
+#define ENABLE_CIDR_LIMITS 1
 
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */

@@ -16,7 +16,7 @@
 #*   along with this program; if not, write to the Free Software
 #*   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #*
-#*   $Id: Makefile.in,v 1.69 2005/11/17 15:26:39 chopin Exp $
+#*   $Id: Makefile.in,v 1.70 2008/06/06 23:51:26 chopin Exp $
 #*
 #*/
 
@@ -159,7 +159,7 @@ IRCD_COMMON_OBJS = bsd.o dbuf.o packet.o send.o match.o parse.o \
 IRCD_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
               s_bsd.o s_conf.o s_debug.o s_err.o s_id.o s_misc.o s_numeric.o \
               s_send.o s_serv.o s_service.o s_user.o s_zip.o whowas.o \
-              res_init.o res_comp.o res_mkquery.o
+              res_init.o res_comp.o res_mkquery.o patricia.o
 
 IAUTH_COMMON_OBJS = clsupport.o clmatch.o # This is a little evil
 IAUTH_OBJS = iauth.o a_conf.o a_io.o a_log.o \
@@ -335,6 +335,9 @@ ircd.o: ../ircd/ircd.c setup.h config.h ../common/struct_def.h
 
 list.o: ../ircd/list.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/list.c
+
+patricia.o: ../ircd/patricia.c setup.h config.h ../common/struct_def.h
+	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/patricia.c
 
 res.o: ../ircd/res.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/res.c
