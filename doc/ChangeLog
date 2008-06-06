@@ -1,3 +1,20 @@
+2008-06-06  Piotr Kucharski
+
+	* patricia.c, patricia_ext.h: new files to do CIDR limits (from anfl).
+	* class_def.h: new fields in class and macros for them (from anfl).
+	* class_ext.h, class.c/add_class(): adding and changing limits (from anfl).
+	* list.c/free_class(): freeing patricia (from anfl).
+	* s_conf.c/add_cidr_limit(), remove_cidr_limit(): functions to maintain 
+	  proper count for each CIDR subnet (from anfl).
+	* s_conf.c/detach_conf(), attach_conf(): use above two functions in proper
+	  places (from anfl).
+	* s_conf.c/initconf(): read one more field for conf line and pass it to
+	  add_class() (from anfl).
+	* Makefile.in, config.h.dist: make it work (from anfl).
+	* INSTALL.*: documentation for CIDR limits.
+	* class.c/report_classes(): show CIDR limits if they exist.
+	* s_err.c: change RPL_STATSYLINE format to output CIDR limits too.
+
 2008-06-04  Piotr Kucharski
 
 	* s_user.c/register_user(): improve CCL_CONNINFO to show all fields of
@@ -7,9 +24,8 @@
 
 2008-06-03  Piotr Kucharski
 
-	* common/send.c common/struct_def.h common/support.c
-	  ircd/channel.c ircd/channel_ext.h ircd/s_bsd.c ircd/s_debug.c
-	  ircd/s_serv.c support/config.h.dist: added JP patch (huge!).
+	* send.c, struct_def.h, support.c, channel.c, channel_ext.h, s_bsd.c,
+	  s_debug.c, s_serv.c, config.h.dist: added JP patch (huge!).
 
 2007-12-16  Piotr Kucharski
 
