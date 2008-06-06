@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.80 2006/06/16 18:52:40 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.81 2008/06/06 23:27:28 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -447,7 +447,7 @@ ping frequency, connection frequency (for servers) and
 maximum number of links that class should have.
 <p>Currently, the Y: line <bf>MUST</bf> appear in the
 ircd.conf file <bf>BEFORE</bf> it is used in any other way.
-<tag/Format/<verb>Y:&lt;Class&gt;:&lt;Ping Freq&gt;:&lt;Connect Freq&gt;:&lt;Max Links&gt;:&lt;SendQ&gt;:&lt;Local Limit&gt;:&lt;Global Limit&gt;</verb>
+<tag/Format/<verb>Y:&lt;Class&gt;:&lt;Ping Freq&gt;:&lt;Connect Freq&gt;:&lt;Max Links&gt;:&lt;SendQ&gt;:&lt;Local Limit&gt;:&lt;Global Limit&gt;:&lt;CIDR Limit&gt;</verb>
 <tag/Y/ This specifies a Class record.
 <tag/Class/ This is the class number which gains the following
 attributes and should match that which is on the end of the
@@ -488,9 +488,16 @@ Any unset value defaults to 1 (one).
 ``Local limit'' field.  But, the connection counts are done
 for all clients present on the net instead of only counting
 local clients.
+<tag/CIDR Limit/ This field is used to limit the number of local
+host counts within a given IP network. The format is &lt;x&gt/&lt;y&gt;
+<itemize>
+<item> x: defines the maximum number of clients from the same network
+<item> y: defines the length of the network in CIDR format
+</itemize>
 <tag/Note/ leaving any of the fields (except SendQ and limits) out
 means their value is 0 (ZERO)!!  The SendQ field default
-value is dynamically determined. Limits default to 1.1 (one connection).
+value is dynamically determined. Limits default to 1.1 (one connection)
+except CIDR limit, which doesn't apply at all if left empty.
 <tag/Note/ If you plan to use the local user@host limit,
 please read the following very carefully.  The ``user''
 value is the ident reply for the connection.  If no reply
@@ -530,7 +537,7 @@ see config.h for details.
 Y:2:60:0:50:20000:2.1:5: (client class)
 <p>
 In case of a client class, the fields are interpreted a bit
-differently.  This class (number 1) can be used by up to 50
+differently.  This class (number 2) can be used by up to 50
 users.  The connections are allowed to remain silent for 60
 seconds before a PING is set.  The SendQ is set to 20000
 bytes.  A new connection in this class will only be allowed
@@ -538,6 +545,13 @@ if there aren't more than 2 other local connections from the
 same IP address, 1 local connection from the same user
 from the same IP address, or more than 5 other connections
 on the net from the same hostname.
+<p>
+Y:2:60:0:50:20000:2.1:5:4/24 (client class)
+<p>
+Other numbers are exactly the same as previous. Last field
+limits connections within the same /24 to 4 hosts. It does not
+matter how many different /24 networks are using this Y:line,
+each will have separate count.
 </descrip>
 
 <sect1>Client connections

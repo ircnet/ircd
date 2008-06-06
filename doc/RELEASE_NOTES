@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.73 2008/06/06 14:16:54 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.74 2008/06/06 23:27:28 chopin Exp $
 
 This is version 2.11.2 of the IRC software.
 ===============================================================================
@@ -11,6 +11,8 @@ New features in 2.11.2:
 	* rehash a to restart iauth (to make it reread iauth.conf)
 	* standalone mode (ircd -p standalone) to avoid split mode for users 
 	  not linking any servers.
+	* ENABLE_CIDR_LIMITS (enabled by default) allows to limit client host
+	  counts in any CIDR size (per Y-line); useful for IPv6.
 
 Important changes in 2.11.2 (since 2.11.1):
 	* &CLIENTS format is changed if XLINE is defined (sends first three
@@ -22,6 +24,8 @@ Important configuration changes in 2.11.2 (since 2.11.1):
 	* Y-line limits maxlinks behaviour is changed. Now all I-lines
 	  share the same maxlink if they are in the same class. If you
 	  want old behaviour, define YLINE_LIMITS_OLD_BEHAVIOUR.
+	* Y-lines can have yet another field for CIDR limits. Format: 13/24
+	  (means: 13 clients per each /24).
 	* X-lines got another field, so now it can match also on nicks
 	  given during registration.
 

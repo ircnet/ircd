@@ -1,7 +1,7 @@
-This is INSTALL.info, produced by makeinfo version 4.8 from
-/tmp/linuxdoc-dir-24087/sgmltmp.INSTALL.info.2.
+This is INSTALL.info, produced by makeinfo version 4.11 from
+/tmp/linuxdoc-dir-3026/sgmltmp.INSTALL.2.texi.
 
-   \input texinfo
+\input texinfo
 
 
 File: INSTALL.info,  Node: Top,  Next: Installing IRC-,  Up: (dir)
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.80 2006/06/16 18:52:40 chopin Exp $
+     $Id: INSTALL.info,v 1.81 2008/06/06 23:27:28 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -635,7 +635,7 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
 
 `Format'
      Y:<Class>:<Ping Freq>:<Connect Freq>:<Max Links>:<SendQ>:<Local
-     Limit>:<Global Limit>
+     Limit>:<Global Limit>:<CIDR Limit>
 
 `Y'
      This specifies a Class record.
@@ -689,10 +689,19 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
      connection counts are done for all clients present on the net
      instead of only counting local clients.
 
+`CIDR Limit'
+     This field is used to limit the number of local host counts within
+     a given IP network. The format is <x>/<y>
+        *  x: defines the maximum number of clients from the same
+          network
+
+        *  y: defines the length of the network in CIDR format
+
 `Note'
      leaving any of the fields (except SendQ and limits) out means
      their value is 0 (ZERO)!!  The SendQ field default value is
-     dynamically determined. Limits default to 1.1 (one connection).
+     dynamically determined. Limits default to 1.1 (one connection)
+     except CIDR limit, which doesn't apply at all if left empty.
 
 `Note'
      If you plan to use the local user@host limit, please read the
@@ -728,11 +737,11 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
 
      In case of a client class, the fields are interpreted a bit
      differently.  This class (number 1) can be used by up to 50 users.
-     The connections are allowed to remain silent for 60 seconds
-     before a PING is set.  The SendQ is set to 20000 bytes.  A new
-     connection in this class will only be allowed if there aren't more
-     than 2 other local connections from the same IP address, or more
-     than 5 other connections on the net from the same hostname.
+     The connections are allowed to remain silent for 60 seconds before
+     a PING is set.  The SendQ is set to 20000 bytes.  A new connection
+     in this class will only be allowed if there aren't more than 2
+     other local connections from the same IP address, or more than 5
+     other connections on the net from the same hostname.
 
 `Note'
      The default maxlinks behaviour has changed in 2.11.2, see config.h
@@ -741,13 +750,20 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
      Y:2:60:0:50:20000:2.1:5: (client class)
 
      In case of a client class, the fields are interpreted a bit
-     differently.  This class (number 1) can be used by up to 50 users.
-     The connections are allowed to remain silent for 60 seconds
-     before a PING is set.  The SendQ is set to 20000 bytes.  A new
-     connection in this class will only be allowed if there aren't more
-     than 2 other local connections from the same IP address, 1 local
+     differently.  This class (number 2) can be used by up to 50 users.
+     The connections are allowed to remain silent for 60 seconds before
+     a PING is set.  The SendQ is set to 20000 bytes.  A new connection
+     in this class will only be allowed if there aren't more than 2
+     other local connections from the same IP address, 1 local
      connection from the same user from the same IP address, or more
      than 5 other connections on the net from the same hostname.
+
+     Y:2:60:0:50:20000:2.1:5:4/24 (client class)
+
+     Other numbers are exactly the same as previous. Last field limits
+     connections within the same /24 to 4 hosts. It does not matter how
+     many different /24 networks are using this Y:line, each will have
+     separate count.
 
 
 
@@ -1835,44 +1851,44 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top128
-Node: Installing IRC-651
-Node: The configure script880
-Node: Notes for Cygwin32 users3178
-Node: Notes concerning IPv6 support3919
-Node: The config-h file4407
-Node: DEBUGMODE5009
-Node: CHROOTDIR5594
-Node: USERS_RFC1459 USERS_SHOWS_UTMP5975
-Node: ENABLE_SUMMON6563
-Node: DEFAULT_INVISIBLE6884
-Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7217
-Node: ZIP_LINKS ZIP_LEVEL7749
-Node: SLOW_ACCEPT8794
-Node: CLONE_CHECK9432
-Node: LOG_SERVER_CHANNELS9807
-Node: Other #define's10090
-Node: Editing the Makefile and compiling10430
-Node: The ircd-conf file12156
-Node: Machine information14657
-Node: Administrative info17283
-Node: Port connections19444
-Node: Connection Classes21608
-Node: Client connections27176
-Node: Operator priviliges32961
-Node: Excluded accounts36299
-Node: X Excluded accounts40220
-Node: Server connections41776
-Node: Deny auto-connections50374
-Node: Hub connections51953
-Node: Leaf connections53451
-Node: Version limitations55545
-Node: Excluded machines57313
-Node: Service connections58628
-Node: Bounce server60232
-Node: Related resources62103
-Node: Reporting a bug63146
-Node: How to report a bug63407
-Node: Where to send a bug report64426
+Node: Top125
+Node: Installing IRC-648
+Node: The configure script877
+Node: Notes for Cygwin32 users3175
+Node: Notes concerning IPv6 support3916
+Node: The config-h file4404
+Node: DEBUGMODE5006
+Node: CHROOTDIR5591
+Node: USERS_RFC1459 USERS_SHOWS_UTMP5972
+Node: ENABLE_SUMMON6560
+Node: DEFAULT_INVISIBLE6881
+Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7214
+Node: ZIP_LINKS ZIP_LEVEL7746
+Node: SLOW_ACCEPT8791
+Node: CLONE_CHECK9429
+Node: LOG_SERVER_CHANNELS9804
+Node: Other #define's10087
+Node: Editing the Makefile and compiling10427
+Node: The ircd-conf file12153
+Node: Machine information14654
+Node: Administrative info17280
+Node: Port connections19441
+Node: Connection Classes21605
+Node: Client connections27818
+Node: Operator priviliges33603
+Node: Excluded accounts36941
+Node: X Excluded accounts40862
+Node: Server connections42418
+Node: Deny auto-connections51016
+Node: Hub connections52595
+Node: Leaf connections54093
+Node: Version limitations56187
+Node: Excluded machines57955
+Node: Service connections59270
+Node: Bounce server60874
+Node: Related resources62745
+Node: Reporting a bug63788
+Node: How to report a bug64049
+Node: Where to send a bug report65068
 
 End Tag Table
