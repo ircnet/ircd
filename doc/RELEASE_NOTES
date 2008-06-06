@@ -1,13 +1,29 @@
-# @(#)$Id: RELEASE_NOTES,v 1.72 2006/06/16 19:13:47 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.73 2008/06/06 14:16:54 chopin Exp $
 
 This is version 2.11.2 of the IRC software.
 ===============================================================================
+
+New features in 2.11.2:
+	* KLINE command (uses seperate file and is undoable other than manual
+	  edit of that file and rehash).
+	* MINLOCALNICKLEN to enforce minimum nick len used by local clients.
+	* rehash d to reread resolv.conf
+	* rehash a to restart iauth (to make it reread iauth.conf)
+	* standalone mode (ircd -p standalone) to avoid split mode for users 
+	  not linking any servers.
+
+Important changes in 2.11.2 (since 2.11.1):
+	* &CLIENTS format is changed if XLINE is defined (sends first three
+	  parameters of client USER command before fourth one). This should
+	  help dronemon even more.
 
 Important configuration changes in 2.11.2 (since 2.11.1):
 
 	* Y-line limits maxlinks behaviour is changed. Now all I-lines
 	  share the same maxlink if they are in the same class. If you
 	  want old behaviour, define YLINE_LIMITS_OLD_BEHAVIOUR.
+	* X-lines got another field, so now it can match also on nicks
+	  given during registration.
 
 This is version 2.11.2 of the IRC software.
 ===============================================================================

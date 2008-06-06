@@ -1,3 +1,8 @@
+2008-06-04  Piotr Kucharski
+
+	* s_user.c/register_user(): improve CCL_CONNINFO to show all fields of
+	  connecting USER.
+
 2.11.2a1
 
 2008-06-03  Piotr Kucharski
