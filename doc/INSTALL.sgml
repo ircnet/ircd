@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.81 2008/06/06 23:27:28 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.82 2008/06/07 21:45:56 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -866,13 +866,16 @@ IRC network then you would have to talk to the administrator
 on that site to disable his access from that IRCD server as
 well.
 <tag/Format/<verb>
-X:&lt;USER 1st arg&gt;:&lt;USER 2nd arg&gt;:&lt;USER 3rd arg&gt;:&lt;USER 4th arg&gt;:<Nick>:
+X:&lt;USER 1st arg&gt;:&lt;USER 2nd arg&gt;:&lt;USER 3rd arg&gt;:&lt;USER 4th arg&gt;:&lt;Nick&gt;:&lt;Target host addr&gt;
 </verb>
 <tag/X/``X'' tells the IRCD that you are making an XKILL USER
 command entry.
 <tag/USER n-th arg/ Given field will be matched against corresponding parameter
 of client USER command.  If left empty it matches any.  It may contain wildcards.
 <tag/Nick/ If left empty it matches any.  It may contain wildcards.
+<tag/Target host addr/ Host or IP address or Network in CIDR format. It makes given
+X:line apply only to a selected hosts. May contain wildcards. 
+If left empty it matches any.
 <tag/Examples/ 
 <verb>X:guest:::guest:</verb>
 If user registers with the following USER command

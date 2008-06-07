@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.81 2008/06/06 23:27:28 chopin Exp $
+  $Id: INSTALL.txt,v 1.82 2008/06/07 21:45:56 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -1096,7 +1096,7 @@
 
      FFoorrmmaatt
 
-        X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:<Nick>:
+        X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th arg>:<Nick>:<Target host addr>
 
 
 
@@ -1110,6 +1110,11 @@
 
      NNiicckk
         If left empty it matches any. It may contain wildcards.
+
+     TTaarrggeett hhoosstt aaddddrr
+        Host or IP address or Network in CIDR format. It makes given
+        X:line apply only to a selected hosts. May contain wildcards.
+        If left empty it matches any.
 
      EExxaammpplleess
 
@@ -1177,6 +1182,7 @@
 
 
      FFoorrmmaatt
+
 
         C:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<TARGET PORT>:<Class>:<Source IP>
 
@@ -1309,6 +1315,7 @@
      don't expect login password. The connecting host should identify
      itself as ``garfield.mit.edu''.
 
+
      NN  ``N'' corresponds to a server Noconnect option.
 
      TTAARRGGEETT HHoosstt AAddddrr
@@ -1316,6 +1323,7 @@
         to. If ``user@'' prefixes the actual hostname or IP address the
         server will require that the remote username returned by the
         ident server be the same as the one given before the ``@''.
+
      PPaasssswwoorrdd
         The password of the other host. A password must always be
         present for the line to be recognized. If CRYPT_LINK_PASSWORD is
@@ -1437,8 +1445,6 @@
 
         H:<Server Mask>:<SID Mask>:<Server Name>::
 
-
-
      SSeerrvveerr MMaasskk
         All servers that are allowed via this H-line must match the mask
         given in this field.
@@ -1503,8 +1509,6 @@
      FFoorrmmaatt
 
         L:<Server Mask>:*:<Server Name>:<Max Depth>:
-
-
 
      SSeerrvveerr MMaasskk
         Mask of which servers the leaf-like attributes are used on when
@@ -1572,7 +1576,6 @@
         V:*/0209*::::
 
         Disallows any server using the 2.9 protocol to connect.
-
      NNoottee
         It is possible to have and use multiple V-lines for the one
         server mask.
@@ -1710,7 +1713,6 @@
         This specifies the IRC server port that the client should
         connect to.
 
-
      EExxaammppllee
         B:2::irc.stealth.net:6660:
 
@@ -1768,6 +1770,7 @@
   report it.
 
 
+
   66..11..  HHooww ttoo rreeppoorrtt aa bbuugg
 
   To save everyone time, make sure that your e-mail contains all the
@@ -1777,6 +1780,7 @@
         The IRC software version you are using: please include the
         output obtained by running ``irc -v'' for the client, and/or
         ``ircd -v'' for the server.
+
         Also, let us know if you have applied any patch to the package
         or if it is the vanilla version.
 

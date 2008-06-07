@@ -1,5 +1,5 @@
 This is INSTALL.info, produced by makeinfo version 4.11 from
-/tmp/linuxdoc-dir-3026/sgmltmp.INSTALL.2.texi.
+/tmp/linuxdoc-dir-20910/sgmltmp.INSTALL.2.texi.
 
 \input texinfo
 
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.81 2008/06/06 23:27:28 chopin Exp $
+     $Id: INSTALL.info,v 1.82 2008/06/07 21:45:56 chopin Exp $
 
    This document describes how to install, and configure IRC 2.11.0
 
@@ -1170,7 +1170,7 @@ Remove an errant user from IRC on your site.
 
 `Format'
      X:<USER 1st arg>:<USER 2nd arg>:<USER 3rd arg>:<USER 4th
-     arg>:<Nick>:
+     arg>:<Nick>:<Target host addr>
 
 `X'
      "X" tells the IRCD that you are making an XKILL USER command entry.
@@ -1182,6 +1182,11 @@ Remove an errant user from IRC on your site.
 
 `Nick'
      If left empty it matches any.  It may contain wildcards.
+
+`Target host addr'
+     Host or IP address or Network in CIDR format. It makes given
+     X:line apply only to a selected hosts. May contain wildcards.  If
+     left empty it matches any.
 
 `Examples'
      X:guest:::guest: If user registers with the following USER command
@@ -1851,44 +1856,44 @@ reviewed and forwarded to the appropriate mailing list.
 
 
 Tag Table:
-Node: Top125
-Node: Installing IRC-648
-Node: The configure script877
-Node: Notes for Cygwin32 users3175
-Node: Notes concerning IPv6 support3916
-Node: The config-h file4404
-Node: DEBUGMODE5006
-Node: CHROOTDIR5591
-Node: USERS_RFC1459 USERS_SHOWS_UTMP5972
-Node: ENABLE_SUMMON6560
-Node: DEFAULT_INVISIBLE6881
-Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7214
-Node: ZIP_LINKS ZIP_LEVEL7746
-Node: SLOW_ACCEPT8791
-Node: CLONE_CHECK9429
-Node: LOG_SERVER_CHANNELS9804
-Node: Other #define's10087
-Node: Editing the Makefile and compiling10427
-Node: The ircd-conf file12153
-Node: Machine information14654
-Node: Administrative info17280
-Node: Port connections19441
-Node: Connection Classes21605
-Node: Client connections27818
-Node: Operator priviliges33603
-Node: Excluded accounts36941
-Node: X Excluded accounts40862
-Node: Server connections42418
-Node: Deny auto-connections51016
-Node: Hub connections52595
-Node: Leaf connections54093
-Node: Version limitations56187
-Node: Excluded machines57955
-Node: Service connections59270
-Node: Bounce server60874
-Node: Related resources62745
-Node: Reporting a bug63788
-Node: How to report a bug64049
-Node: Where to send a bug report65068
+Node: Top126
+Node: Installing IRC-649
+Node: The configure script878
+Node: Notes for Cygwin32 users3176
+Node: Notes concerning IPv6 support3917
+Node: The config-h file4405
+Node: DEBUGMODE5007
+Node: CHROOTDIR5592
+Node: USERS_RFC1459 USERS_SHOWS_UTMP5973
+Node: ENABLE_SUMMON6561
+Node: DEFAULT_INVISIBLE6882
+Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7215
+Node: ZIP_LINKS ZIP_LEVEL7747
+Node: SLOW_ACCEPT8792
+Node: CLONE_CHECK9430
+Node: LOG_SERVER_CHANNELS9805
+Node: Other #define's10088
+Node: Editing the Makefile and compiling10428
+Node: The ircd-conf file12154
+Node: Machine information14655
+Node: Administrative info17281
+Node: Port connections19442
+Node: Connection Classes21606
+Node: Client connections27819
+Node: Operator priviliges33604
+Node: Excluded accounts36942
+Node: X Excluded accounts40863
+Node: Server connections42626
+Node: Deny auto-connections51224
+Node: Hub connections52803
+Node: Leaf connections54301
+Node: Version limitations56395
+Node: Excluded machines58163
+Node: Service connections59478
+Node: Bounce server61082
+Node: Related resources62953
+Node: Reporting a bug63996
+Node: How to report a bug64257
+Node: Where to send a bug report65276
 
 End Tag Table
