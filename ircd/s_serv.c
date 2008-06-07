@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.284 2008/06/03 22:32:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.285 2008/06/07 21:36:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1718,11 +1718,11 @@ static  void    report_x_lines(aClient *sptr, char *to)
 		if (tmp->status != CONF_XLINE)
 			continue;
 
-		sendto_one(sptr,":%s %d %s X :%s %s %s %s %s", 
+		sendto_one(sptr,":%s %d %s X :%s %s %s %s %s %s", 
 			ME, RPL_STATSDEBUG, to,
 			BadTo(tmp->host), BadTo(tmp->passwd),
-			BadTo(tmp->name), BadTo(tmp->source_ip),
-			BadTo(tmp->name2));
+			BadTo(tmp->name), BadTo(tmp->name2),
+			BadTo(tmp->name3), BadTo(tmp->source_ip));
 	}
 }
 #endif

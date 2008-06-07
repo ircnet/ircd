@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.266 2008/06/07 15:06:34 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.267 2008/06/07 21:36:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -351,12 +351,22 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #ifdef XLINE
 		aConfItem *xtmp;
 
+		/* Just for clarification, so there's less confusion:
+		   X-lines read from config have their fields stored
+		   in aConf in the following fields:
+		   host, passwd, name, name2, name3, source_ip.
+		   (see s_conf.c/initconf(), look for XLINE);
+		   these are used to check against USER and NICK
+		   commands parameters during registration:
+		   USER 1st 2nd 3rd :4th
+		   NICK 5th
+		   additionally user ip and/or hostname are
+		   being matched against X-line last field
+		   (conveniently kept in aconf->source_ip). --B. */
+
 		for (xtmp = conf; xtmp; xtmp = xtmp->next)
 		{
 			if (xtmp->status != CONF_XLINE)
-				continue;
-			if (!BadPtr(xtmp->source_ip) && 
-				match(xtmp->source_ip, sptr->info))
 				continue;
 			if (!BadPtr(xtmp->host) && 
 				match(xtmp->host, username))
@@ -368,7 +378,17 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 				match(xtmp->name, sptr->user3))
 				continue;
 			if (!BadPtr(xtmp->name2) && 
-				match(xtmp->name2, nick))
+				match(xtmp->name2, sptr->info))
+				continue;
+			if (!BadPtr(xtmp->name3) && 
+				match(xtmp->name3, nick))
+				continue;
+			if (!BadPtr(xtmp->source_ip) &&
+				(match(xtmp->source_ip, (sptr->hostp ?
+				sptr->hostp->h_name : sptr->sockhost)) &&
+				match(xtmp->source_ip, sptr->user->sip) &&
+				strchr(xtmp->source_ip, '/') && 
+				match_ipmask(xtmp->source_ip, sptr, 0)))
 				continue;
 			SetXlined(sptr);
 			break;

@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.174 2008/06/06 23:51:26 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.175 2008/06/07 21:36:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1678,10 +1678,13 @@ int 	initconf(int opt)
 #ifdef XLINE
 			if (aconf->status == CONF_XLINE)
 			{
-				DupString(aconf->source_ip, tmp);
+				DupString(aconf->name2, tmp);
 				if ((tmp = getfield(NULL)) == NULL)
 					break;
-				DupString(aconf->name2, tmp);
+				DupString(aconf->name3, tmp);
+				if ((tmp = getfield(NULL)) == NULL)
+					break;
+				DupString(aconf->source_ip, tmp);
 				break;
 			}
 #endif
@@ -1710,6 +1713,9 @@ int 	initconf(int opt)
 		istat.is_confmem += aconf->passwd ? strlen(aconf->passwd)+1 :0;
 		istat.is_confmem += aconf->name ? strlen(aconf->name)+1 : 0;
 		istat.is_confmem += aconf->name2 ? strlen(aconf->name2)+1 : 0;
+#ifdef XLINE
+		istat.is_confmem += aconf->name3 ? strlen(aconf->name3)+1 : 0;
+#endif
 		istat.is_confmem += aconf->source_ip ? strlen(aconf->source_ip)+1 : 0;
 
 		/*

@@ -2,6 +2,20 @@
 
 	* s_user.c/who_find(): service can request who as well and it does not have
 	  user struct allocated => instant segv (reported by BR).
+	* service_def.h: add SERVICE_WANT_KLINE; unfortunately I had to change value
+	  of SERVICE_WANT_TKLINE, otherwise I'd have to rewrite a lot more for
+	  strtol() to work.
+	* s_user.c/is_allowed(): add kline acl for service.
+	* parse.c/parse(): tell service if command is unknown.
+	* struct_def.h: another field for aConf when XLINE (to keep hostmask/ip
+	  to match against).
+	* list.c/make_conf(), free_conf(): add new field.
+	* list.c/free_conf(): source_ip stats confmem stats were not updated.
+	* s_conf.c/initconf(): read new field if X-line conf (and change where
+	  they end up to be a bit more logical).
+	* s_user.c/register_user(): update changed fields and match on ip or
+	  host of the user.
+	* s_serv.c/report_x_lines(): update and add new field.
 
 2.11.2a2
 

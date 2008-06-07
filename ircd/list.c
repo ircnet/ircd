@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.44 2008/06/06 23:51:26 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.45 2008/06/07 21:36:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -595,6 +595,9 @@ aConfItem	*make_conf(void)
 	aconf->clients = aconf->port = 0;
 	aconf->next = NULL;
 	aconf->host = aconf->passwd = aconf->name = aconf->name2 = NULL;
+#ifdef XLINE
+	aconf->name3 = NULL;
+#endif
 	aconf->ping = NULL;
 	aconf->status = CONF_ILLEGAL;
 	aconf->pref = -1;
@@ -629,7 +632,11 @@ void	free_conf(aConfItem *aconf)
 	istat.is_confmem -= aconf->passwd ? strlen(aconf->passwd)+1 : 0;
 	istat.is_confmem -= aconf->name ? strlen(aconf->name)+1 : 0;
 	istat.is_confmem -= aconf->name2 ? strlen(aconf->name2)+1 : 0;
+#ifdef XLINE
+	istat.is_confmem -= aconf->name3 ? strlen(aconf->name3)+1 : 0;
+#endif
 	istat.is_confmem -= aconf->ping ? sizeof(*aconf->ping) : 0;
+	istat.is_confmem -= aconf->source_ip ? strlen(aconf->source_ip)+1 : 0;
 	istat.is_confmem -= sizeof(aConfItem);
 
 	MyFree(aconf->host);
@@ -642,6 +649,10 @@ void	free_conf(aConfItem *aconf)
 	MyFree(aconf->passwd);
 	MyFree(aconf->name);
 	MyFree(aconf->name2);
+#ifdef XLINE
+	if (aconf->name3)
+		MyFree(aconf->name3);
+#endif
 	MyFree(aconf);
 #ifdef	DEBUGMODE
 	aconfs.inuse--;
