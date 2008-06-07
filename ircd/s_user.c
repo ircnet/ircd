@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.265 2008/06/07 13:12:26 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.266 2008/06/07 15:06:34 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -3347,6 +3347,9 @@ int	is_allowed(aClient *cptr, long function)
 	{
 		if (function == ACL_TKLINE &&
 			(cptr->service->wants & SERVICE_WANT_TKLINE))
+			return 1;
+		if (function == ACL_KLINE &&
+			(cptr->service->wants & SERVICE_WANT_KLINE))
 			return 1;
 		return 0;
 	}
