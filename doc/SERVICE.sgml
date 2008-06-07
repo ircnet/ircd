@@ -4,7 +4,7 @@
 
 <title>IRC Services
 <author>Christophe Kalt
-<date>$Id: SERVICE.sgml,v 1.9 2004/07/02 15:52:06 chopin Exp $
+<date>$Id: SERVICE.sgml,v 1.10 2008/06/07 15:01:49 chopin Exp $
 <abstract>
 The IRC protocol described in RFC 1459 defines two types of
 connections (client, and server).  A third type was
@@ -144,7 +144,8 @@ SERVICE_WANT_NUMERICS	0x08000000 /* &amp;NUMERICS */
 SERVICE_WANT_USERLOG	0x10000000 /* FNAME_USERLOG */
 SERVICE_WANT_CONNLOG	0x20000000 /* FNAME_CONNLOG */
 
-SERVICE_WANT_TKLINE	0x40000000 /* service wants to use TKLINE*/
+SERVICE_WANT_TKLINE	0x00100000 /* service wants to use TKLINE*/
+SERVICE_WANT_KLINE	0x00200000 /* service wants to use KLINE*/
 </verb>
 <label id="dist">
 <tag/Distribution/  This controls the propagation of the

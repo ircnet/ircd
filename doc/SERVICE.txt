@@ -1,16 +1,16 @@
   IRC Services
   Christophe Kalt
-  $Id: SERVICE.txt,v 1.10 2004/07/02 15:52:06 chopin Exp $
+  $Id: SERVICE.txt,v 1.11 2008/06/07 15:01:49 chopin Exp $
 
   The IRC protocol described in RFC 1459 defines two types of connec-
-  tions (client, and server).  A third type was introduced with version
-  2.9 of the IRC software: service connections.  This document describes
+  tions (client, and server). A third type was introduced with version
+  2.9 of the IRC software: service connections. This document describes
   what services are, and how to use them.
 
   11..  AA nneeww ttyyppee ooff ccoonnnneeccttiioonn
 
   A service connection is something between a client and a server
-  connection.  It is not closer from any, as a matter of fact, the scope
+  connection. It is not closer from any, as a matter of fact, the scope
   is pretty broad.
 
   11..11..  AA bbiitt cclliieenntt
@@ -67,7 +67,7 @@
   22..22..  SSEERRVVLLIISSTT
 
   This new command gives the list of services currently present on the
-  IRC network.  It can take two arguments.
+  IRC network. It can take two arguments.
 
   1. a mask to limit the output to the services which names matches the
      mask.
@@ -91,7 +91,7 @@
 
   22..33..  SSQQUUEERRYY
 
-  This new command stands for ``Service Query''.  The first argument is
+  This new command stands for ``Service Query''. The first argument is
   the service name, and the second the text to be sent to the service.
 
 
@@ -101,7 +101,7 @@
 
   First of all, it is important to note that in order to be able to
   connect a service to a server, this server must have been compiled
-  with ``UUSSEE__SSEERRVVIICCEESS'' defined in the config.h file.  To know if your
+  with ``UUSSEE__SSEERRVVIICCEESS'' defined in the config.h file. To know if your
   server has been compiled with this option, check the version:
 
   351 Server irc.stealth.net: 2.9.3. AaCeEFiIkMu$_V1
@@ -112,10 +112,9 @@
   defined as the lowercase ``s'' shows in the version string.
 
   As they are special clients, services need to be allowed access to the
-  server in the configuration file.  Each service needs its own access
-  to be setup.  This is gone by adding an S: line to the configuration
-  file.  This lines defines the name of the service, as well as the
-  type.
+  server in the configuration file. Each service needs its own access to
+  be setup. This is gone by adding an S: line to the configuration file.
+  This lines defines the name of the service, as well as the type.
 
   33..22..  GGlloossssaarryy
 
@@ -123,13 +122,14 @@
 
 
      TTyyppee
-        This is a misleading name.  The type is actually a bit mask
-        which defines what information the service can see. (With
-        introduction of SERVICE_WANT_TKLINE it is even more misleading,
-        as this does not define information, but rather access control.)
-        The server configuration file limits the type allowed for a
-        service.  The meaning of the bits is defined in the
-        service_def.h file coming with the IRC software:
+        This is a misleading name. The type is actually a bit mask which
+        defines what information the service can see. (With introduction
+        of SERVICE_WANT_TKLINE it is even more misleading, as this does
+        not define information, but rather access control.) The server
+        configuration file limits the type allowed for a service. The
+        meaning of the bits is defined in the service_def.h file coming
+        with the IRC software:
+
         SERVICE_WANT_SERVICE    0x00000001 /* other services signing on/off */
         SERVICE_WANT_OPER       0x00000002 /* operators, included in umodes too */
         SERVICE_WANT_UMODE      0x00000004 /* user modes, iow + local modes */
@@ -156,18 +156,19 @@
         SERVICE_WANT_USERLOG    0x10000000 /* FNAME_USERLOG */
         SERVICE_WANT_CONNLOG    0x20000000 /* FNAME_CONNLOG */
 
-        SERVICE_WANT_TKLINE     0x40000000 /* service wants to use TKLINE*/
+        SERVICE_WANT_TKLINE     0x00100000 /* service wants to use TKLINE*/
+        SERVICE_WANT_KLINE      0x00200000 /* service wants to use KLINE*/
 
 
 
      DDiissttrriibbuuttiioonn
-        This controls the propagation of the service.  The distribution
+        This controls the propagation of the service. The distribution
         is checked against server names, the service will only be on
         servers which names matches the distribution.
 
         It also eventually limits the information received by the
-        service (depending on the service type).  A service will not
-        have any information concerning users or services connected to a
+        service (depending on the service type). A service will not have
+        any information concerning users or services connected to a
         server which name does not match the distribution.
 
         Examples:
@@ -200,7 +201,7 @@
 
      This means that the service will see information concerning the ``3
      *.no'' servers, but ``oslo.irc.no'' will have no knowledge of the
-     presence of ``MyService''.  Also, the service is unable to send
+     presence of ``MyService''. Also, the service is unable to send
      anything thru ``ircd.funet.fi''.
 
   33..33..  SSiiggnniinngg oonn aass aa sseerrvviiccee
@@ -217,12 +218,12 @@
         This is the distribution mask for this connection.
 
      sseerrvviicceettyyppee
-        This is the service type as configured by the S line.  (It must
+        This is the service type as configured by the S line. (It must
         match)
 
      IInnffoorrmmaattiioonn
-        This is any information.  It will be sent in ``SERVLIST''
-        replies and should be a short description of the service.
+        This is any information. It will be sent in ``SERVLIST'' replies
+        and should be a short description of the service.
 
   A successfull registering of a service at the server will result in a
   RPL_YOURESERVICE (383) being sent back to the service. Any other reply
@@ -236,7 +237,7 @@
   SERVSET mask1 mask2
 
      mmaasskk11
-        It is a subset of the service type.  It defines what the kind of
+        It is a subset of the service type. It defines what the kind of
         information the service wants to receive for this particular
         connection.
 
@@ -251,12 +252,11 @@
 
 
      mmaasskk22
-        It is optional.  It is a subset of mask1 that defines which
+        It is optional. It is a subset of mask1 that defines which
         information the service wants to receive in a ``connection
-        burst''.  The information is similar to a server ``connection
-        burst'', it describe the current set of the network.  The
-        service can therefore store the information in memory and update
-        it.
+        burst''. The information is similar to a server ``connection
+        burst'', it describe the current set of the network. The service
+        can therefore store the information in memory and update it.
 
      NNoottee
         The ``SERVSET'' command can only be issued once.
@@ -268,9 +268,9 @@
 
   Services can see almost as much information as a server.  This means
   that granting a service connection should be considered with as much
-  care as granting a server connection.  In particular, the service type
+  care as granting a server connection. In particular, the service type
   should be limited to the strict minimum needed for the service to be
-  operational.  In most cases, a service type of 0 is enough.
+  operational. In most cases, a service type of 0 is enough.
 
   A great care should be taken to make sure that a service cannot be
   (ab)used to obtain information not normally accessible to users (such
@@ -296,7 +296,7 @@
            Name and e-mail address of the administrator.
 
         HHEELLPP
-           List of queries understood by the service.  Each query should
+           List of queries understood by the service. Each query should
            also have an help.
 
      BBaassiicc qquueerriieess
@@ -312,7 +312,7 @@
   44..33..  FFlloooodd ccoonnttrrooll
 
   Also, since services are not affected by flood control, they can
-  easily flood the IRC network with information.  They should be
+  easily flood the IRC network with information. They should be
   conceived so this does not happen.
 
   Services should implement their own flood control (for outgoing
