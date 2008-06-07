@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.264 2008/06/04 18:58:16 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.265 2008/06/07 13:12:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1728,6 +1728,7 @@ static	void	who_find(aClient *sptr, char *mask, int oper)
 	aClient	*acptr;
 	
 	/* first, show INvisible matching users on common channels */
+	if (sptr->user) // service can request who as well
 	for (lp = sptr->user->channel; lp ;lp = lp->next)
 	{
 		chptr = lp->value.chptr;
