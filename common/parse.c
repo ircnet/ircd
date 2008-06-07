@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.93 2005/11/17 15:15:00 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.94 2008/06/07 15:28:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -643,7 +643,7 @@ int	parse(aClient *cptr, char *buffer, char *bufend)
 			if (buffer[0] != '\0')
 			    {
 				cptr->flags |= FLAGS_UNKCMD;
-				if (IsPerson(from))
+				if (IsPerson(from) || IsService(from))
 					sendto_one(from,
 					    ":%s %d %s %s :Unknown command",
 					    me.name, ERR_UNKNOWNCOMMAND,
