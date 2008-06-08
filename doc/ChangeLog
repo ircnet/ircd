@@ -9,6 +9,10 @@
 	  s_misc.c/exit_one_client(), s_serv.c/m_server_estab(), 
 	  s_user.c/hunt_server(): allow distribution to be based on SID,
 	  not only server name.
+	* s_misc.c/get_client_host(): show IP, not hostname, in all those &LOCAL
+	  notices about unauthorized access.
+	* struct_def.h: increased TOPICLEN, MAXBANS and MAXBANLENGHT.
+	* s_user.c/who_one(): show SID between hopcount and user info.
 
 2008-06-07  Piotr Kucharski
 

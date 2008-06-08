@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.77 2008/06/08 13:35:39 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.78 2008/06/08 14:55:01 chopin Exp $
 
 This is version 2.11.2 of the IRC software.
 ===============================================================================
@@ -15,11 +15,15 @@ New features in 2.11.2:
 	  counts in any CIDR size (per Y-line); useful for IPv6.
 	* opless channels can be joined by users matching +R, regardless of set
 	  channel limits.
+	* X-lines got two more fields: one for matching nicks, another for
+	  limiting scope of X-line matching user host/ip mask.
+	* services can now have their distribution based on SID (it affects not
+	  only visibility, but also scope of information they get).
 
 Important changes in 2.11.2 (since 2.11.1):
 	* &CLIENTS format is changed if XLINE is defined (sends first three
-	  parameters of client USER command before fourth one). This should
-	  help dronemon even more.
+	  parameters of client USER command before fourth one).
+	* MAXBANS increased to 64, TOPICLEN increased to 255.
 
 Important configuration changes in 2.11.2 (since 2.11.1):
 
@@ -30,6 +34,8 @@ Important configuration changes in 2.11.2 (since 2.11.1):
 	  (means: 13 clients per each /24).
 	* X-lines got another field, so now it can match also on nicks
 	  given during registration.
+	* X-lines got yet another field, so now it can match also on user
+	  host/ip mask (narrowing the scope of X-line).
 	* S-lines need to be changed if used for TKLINE service: change type
 	  from 0x40000000 to 0x00100000. Service can KLINE now too (0x00200000).
 
