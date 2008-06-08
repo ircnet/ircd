@@ -18,6 +18,7 @@
 	* s_user.c/m_oper(): different message for failed oper attempt if
 	  attach_conf() failed with correct password (reported by MJRider).
 	* s_user.c/attach_conf(): move checks around to save some cpu cycles.
+	* services_def.h, send.c/sendto_flag(): add SERVICE_WANT_CLIENTS.
 
 2008-06-07  Piotr Kucharski
 

@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.107 2008/06/03 22:32:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: send.c,v 1.108 2008/06/08 17:17:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1143,6 +1143,12 @@ void	sendto_flag(u_int chan, char *pattern, ...)
 			check_services_butone(SERVICE_WANT_NUMERICS, NULL, &me,
 					      "&NUMERICS :%s", nbuf);
 			break;
+#ifdef CLIENTS_CHANNEL
+		case SCH_CLIENT:
+			check_services_butone(SERVICE_WANT_CLIENTS, NULL, &me,
+					      "&CLIENTS :%s", nbuf);
+			break;
+#endif
 		    }
 #endif
 	    }
