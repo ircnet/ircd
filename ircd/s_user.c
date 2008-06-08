@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.271 2008/06/08 14:54:30 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.272 2008/06/08 15:46:16 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2788,10 +2788,14 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 		logstring = "";
 	}	
-	else /* Wrong password */
+	else /* Wrong password or attach_conf() failed */
 	{
 		(void)detach_conf(sptr, aconf);
-		sendto_one(sptr,replies[ERR_PASSWDMISMATCH], ME, BadTo(parv[0]));
+		if (!StrEq(encr, aconf->passwd))
+			sendto_one(sptr,replies[ERR_PASSWDMISMATCH], ME, BadTo(parv[0]));
+		else
+			sendto_one(sptr,":%s %d %s :Too many connections",
+				ME, ERR_PASSWDMISMATCH, BadTo(parv[0]));
 #ifdef FAILED_OPERLOG
 		sendto_flag(SCH_NOTICE, "FAILED OPER attempt by %s!%s@%s",
 			parv[0], sptr->user->username, sptr->user->host);
