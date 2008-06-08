@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.268 2008/06/08 05:06:10 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.269 2008/06/08 05:55:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1474,7 +1474,8 @@ static	int	m_message(aClient *cptr, aClient *sptr, int parc,
 		/*
 		** nickname addressed?
 		*/
-		if ((IsServer(cptr) && (acptr = find_uid(nick, NULL))) || 
+		if (((IsServer(cptr) || IsService(cptr))
+			&& (acptr = find_uid(nick, NULL))) || 
 			(acptr = find_person(nick, NULL)))
 		    {
 			if (!notice && MyConnect(sptr) &&
