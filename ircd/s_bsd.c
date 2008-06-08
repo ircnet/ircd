@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.185 2008/06/03 22:32:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.186 2008/06/08 15:57:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -809,7 +809,7 @@ void	daemonize(void)
 #if defined(HPUX) || defined(SVR4) || defined(DYNIXPTX) || \
     defined(_POSIX_SOURCE) || defined(SGI)
 		(void)setsid();
-#elif defined (__CYGWIN32__)
+#elif defined (__CYGWIN32__) || defined(__APPLE__)
     		(void)setpgrp();
 #else
 		(void)setpgrp(0, (int)getpid());
