@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_debug.c,v 1.53 2008/06/03 22:32:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_debug.c,v 1.54 2008/06/08 15:22:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -278,7 +278,7 @@ void	send_usage(aClient *cptr, char *nick)
 	return;
 }
 
-void	send_defines(aClient *cptr, char *nick)
+void	send_defines(aClient *cptr, char *nick, char *extend)
 {
     	sendto_one(cptr, ":%s %d %s :HUB:%s MS:%d", 
 		   ME, RPL_STATSDEFINE, nick,
@@ -335,6 +335,17 @@ void	send_defines(aClient *cptr, char *nick)
 	sendto_one(cptr, ":%s %d %s :CCL:0x%X", ME, RPL_STATSDEFINE, nick,
 		CLIENTS_CHANNEL_LEVEL);
 #endif
+	/* note that it's safe to check extend[1], it will at worst be null.
+	** if we ever need extend[2], check length first... --B. */
+	if (extend[1] == '5')
+	{
+		char **isup = isupport;
+		while (*isup)
+		{
+      	sendto_one(cptr, replies[RPL_ISUPPORT], ME, nick, *isup);
+			isup++;
+		}
+	}
 }
 
 void	count_memory(aClient *cptr, char *nick, int debug)

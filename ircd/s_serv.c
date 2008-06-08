@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.288 2008/06/08 15:17:55 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.289 2008/06/08 15:22:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2010,7 +2010,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					CONF_NOCONNECT_SERVER);
 		break;
 	case 'd' : case 'D' : /* defines */
-		send_defines(cptr, parv[0]);
+		send_defines(cptr, parv[0], parv[1]);
 		break;
 	case 'H' : case 'h' : /* H, L and D conf lines */
 		report_configured_links(cptr, parv[0],

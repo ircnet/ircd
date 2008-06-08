@@ -36,6 +36,6 @@ extern char serveropts[];
 #endif /* S_DEBUG_C */
 EXTERN void debug (int level, char *form, ...);
 EXTERN void send_usage (aClient *cptr, char *nick);
-EXTERN void send_defines (aClient *cptr, char *nick);
+EXTERN void send_defines (aClient *cptr, char *nick, char *);
 EXTERN void count_memory (aClient *cptr, char *nick, int debug);
 #undef EXTERN
