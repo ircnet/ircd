@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.82 2008/06/07 21:45:56 chopin Exp $
+  $Id: INSTALL.txt,v 1.83 2008/06/08 21:47:21 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -954,6 +954,8 @@
 
         +o  t - enables full TRACE and STATS L
 
+        +o  v - enables SIDTRACE
+
         ``L'' flag cannot be overridden by other flags.  If <Flags>
         field is left empty, no privileges will be granted.
 
@@ -1181,8 +1183,8 @@
      increased).
 
 
-     FFoorrmmaatt
 
+     FFoorrmmaatt
 
         C:<TARGET Host Addr>:<Password>:<TARGET Host NAME>:<TARGET PORT>:<Class>:<Source IP>
 
@@ -1314,8 +1316,6 @@
      This line says: expect a Connection from host ``18.72.0.252'', and
      don't expect login password. The connecting host should identify
      itself as ``garfield.mit.edu''.
-
-
      NN  ``N'' corresponds to a server Noconnect option.
 
      TTAARRGGEETT HHoosstt AAddddrr
