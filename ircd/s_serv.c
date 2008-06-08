@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.286 2008/06/08 05:06:10 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.287 2008/06/08 06:37:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1268,7 +1268,8 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 					   (*buf) ? buf : "+", acptr->info);
 		    }
 		else if (IsService(acptr) &&
-			 match(acptr->service->dist, cptr->name) == 0)
+			 (match(acptr->service->dist, cptr->name) == 0 ||
+				match(acptr->service->dist, cptr->serv->sid) == 0))
 		{
 			sendto_one(cptr, ":%s SERVICE %s %s %d :%s",
 						acptr->service->servp->sid,

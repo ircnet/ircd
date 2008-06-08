@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.111 2008/06/08 05:06:10 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.112 2008/06/08 06:37:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -928,7 +928,8 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 				{
 					continue;
 				}
-				if (match(sptr->service->dist, acptr->name))
+				if (match(sptr->service->dist, acptr->name) && 
+					match(sptr->service->dist, acptr->serv->sid))
 				{
 					continue;
 				}

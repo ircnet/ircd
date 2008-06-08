@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.269 2008/06/08 05:55:30 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.270 2008/06/08 06:37:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -207,7 +207,8 @@ int	hunt_server(aClient *cptr, aClient *sptr, char *command, int server,
 			parv[server] = acptr->name;
 		if (IsService(sptr)
 		    && (IsServer(acptr->from)
-			&& match(sptr->service->dist,acptr->name) != 0))
+			&& match(sptr->service->dist,acptr->name) != 0
+			&& match(sptr->service->dist,acptr->serv->sid) != 0))
 		    {
 			sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), 
 				   parv[server]);

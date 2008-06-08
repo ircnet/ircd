@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.67 2008/06/08 05:06:10 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.68 2008/06/08 06:37:46 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -128,7 +128,8 @@ void	check_services_butone(long action, aServer *servp, aClient *cptr,
 		** wanted AND if it comes from a server matching the dist
 		*/
 		if ((sp->wants & action)
-		    && (!servp || !match(sp->dist, servp->bcptr->name)))
+		    && (!servp || !match(sp->dist, servp->bcptr->name)
+			|| !match(sp->dist, servp->sid)))
 		{
 			if ((sp->wants & (SERVICE_WANT_PREFIX|SERVICE_WANT_UID))
 			    && cptr && IsRegisteredUser(cptr) &&
@@ -246,7 +247,8 @@ void	check_services_num(aClient *sptr, char *umode)
 		** wanted AND if it comes from a server matching the dist
 		*/
 		if ((sp->wants & SERVICE_MASK_NUM)
-		    && !match(sp->dist, sptr->user->server))
+		    && (!match(sp->dist, sptr->user->server)
+				|| !match(sp->dist, sptr->user->servp->sid)))
 		{
 			sendnum_toone(sp->bcptr, sp->wants, sptr,
 				      umode);
@@ -369,7 +371,7 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				    get_client_name(cptr, FALSE));
 			return exit_client(NULL, acptr, &me, "No Such Server");
 		}
-		if (match(dist, ME))
+		if (match(dist, ME) && match(dist, me.serv->sid))
 		{
 			sendto_flag(SCH_ERROR,
                        	    "ERROR: SERVICE:%s DIST:%s from %s", acptr->name,
@@ -592,7 +594,8 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    {
 			if (!IsServer(acptr) && !IsMe(acptr))
 				continue;
-			if (match(sptr->service->dist, acptr->name))
+			if (match(sptr->service->dist, acptr->name) &&
+					match(sptr->service->dist, acptr->serv->sid))
 				continue;
 			split = (MyConnect(acptr) &&
 				 mycmp(acptr->name, acptr->sockhost));
@@ -616,7 +619,9 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			if (IsPerson(acptr))
 			    {
 				if (match(sptr->service->dist,
-					  acptr->user->server))
+					  acptr->user->server) &&
+					match(sptr->service->dist,
+					acptr->user->servp->sid))
 					continue;
 				if (burst & SERVICE_WANT_UMODE)
 					send_umode(NULL, acptr, 0, SEND_UMODES,
@@ -631,7 +636,9 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				if (!(burst & SERVICE_WANT_SERVICE))
 					continue;
 				if (match(sptr->service->dist,
-					  acptr->service->server))
+					  acptr->service->server) &&
+					match(sptr->service->dist,
+					acptr->service->servp->sid))
 					continue;
 				sendto_one(sptr, "SERVICE %s %s %s %d %d :%s",
 					   acptr->name, acptr->service->server,
