@@ -2,6 +2,13 @@
 
 	* channel.c/can_join(): if channel is opless, allow people matching
 	  reoplist to join channel, overriding channel limit, key and bans.
+	* s_misc.c, s_serv.c, s_service.c, s_service_ext.h, s_user.c: change
+	  "server" argument of check_services_butone from char to aServer.
+	* s_user.c/m_message(): allow services to send notices to uids.
+	* s_service.c/check_services_butone(), m_service(), m_servset(), 
+	  s_misc.c/exit_one_client(), s_serv.c/m_server_estab(), 
+	  s_user.c/hunt_server(): allow distribution to be based on SID,
+	  not only server name.
 
 2008-06-07  Piotr Kucharski
 
