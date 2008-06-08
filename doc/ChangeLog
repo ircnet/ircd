@@ -19,6 +19,9 @@
 	  attach_conf() failed with correct password (reported by MJRider).
 	* s_user.c/attach_conf(): move checks around to save some cpu cycles.
 	* services_def.h, send.c/sendto_flag(): add SERVICE_WANT_CLIENTS.
+	* s_err.c: extend replies[] up to 1000 entries.
+	* numeric_def.h, parse.c, struct_def.h, s_conf.c, s_err.c, s_serv_ext.h,
+	  s_serv.c, config.h.dist: added ETRACE and SIDTRACE commands (from anfl).
 
 2008-06-07  Piotr Kucharski
 
