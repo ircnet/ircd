@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.270 2008/06/08 00:01:43 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.271 2008/06/08 00:46:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1968,7 +1968,6 @@ static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 	invLink	*lp = NULL;
 	Link	*banned;
 	int	limit = 0;
-	int	invit = 0;
 
 	if (chptr->users == 0 && (bootopt & BOOT_PROT) && 
 	    chptr->history != 0 && *chptr->chname != '!')
@@ -1999,15 +1998,15 @@ static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 		}
 	}
 
-	invit = match_modeid(CHFL_INVITE, sptr, chptr);
 	if ((chptr->mode.mode & MODE_INVITEONLY)
-	    && !invit && (lp == NULL))
+	    && !match_modeid(CHFL_INVITE, sptr, chptr)
+	    && (lp == NULL))
 		return (ERR_INVITEONLYCHAN);
 
 	if (*chptr->mode.key && (BadPtr(key) || mycmp(chptr->mode.key, key)))
 		return (ERR_BADCHANNELKEY);
 
-	if (chptr->mode.limit && (chptr->users >= chptr->mode.limit) && !invit)
+	if (chptr->mode.limit && (chptr->users >= chptr->mode.limit))
 	{
 		if (lp == NULL)
 			return (ERR_CHANNELISFULL);
