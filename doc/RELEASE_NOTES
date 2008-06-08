@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.75 2008/06/07 15:01:49 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.76 2008/06/08 03:39:21 chopin Exp $
 
 This is version 2.11.2 of the IRC software.
 ===============================================================================
@@ -13,6 +13,8 @@ New features in 2.11.2:
 	  not linking any servers.
 	* ENABLE_CIDR_LIMITS (enabled by default) allows to limit client host
 	  counts in any CIDR size (per Y-line); useful for IPv6.
+	* opless channels can be joined by users matching +R, regardless of set
+	  channel limits, keys or bans.
 
 Important changes in 2.11.2 (since 2.11.1):
 	* &CLIENTS format is changed if XLINE is defined (sends first three
