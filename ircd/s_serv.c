@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.287 2008/06/08 06:37:45 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.288 2008/06/08 15:17:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1910,10 +1910,13 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	doall = !match(name, ME) && !match(cm, ME);
 	wilds = index(cm, '*') || index(cm, '?') || index(cm, '#');
 
+#if 0
+/* That's useless. Why bother? */
 	if (parc > 1 && parv[1][1] != '\0')
 	{
 		stat = '*';
 	}
+#endif
 
 	switch (stat)
 	{
