@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.146 2008/06/08 13:57:28 chopin Exp $
+ *   $Id: struct_def.h,v 1.147 2008/06/08 14:36:26 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -57,7 +57,7 @@ typedef struct        LineItem aExtData;
 #define	BUFSIZE		512		/* WARNING: *DONT* CHANGE THIS!!!! */
 #define	MAXRECIPIENTS 	20
 #define	MAXBANS		64
-#define	MAXBANLENGTH	1024
+#define	MAXBANLENGTH	2048
 #define	BANLEN		(USERLEN + NICKLEN + HOSTLEN + 3)
 #define MAXPENALTY	10
 #define	CHIDLEN		5		/* WARNING: *DONT* CHANGE THIS!!!! */
