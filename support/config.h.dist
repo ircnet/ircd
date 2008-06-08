@@ -607,6 +607,13 @@
 */
 #undef JAPANESE
 
+/*
+** If you want to allow your opers to be able to use SIDTRACE command to
+** see all clients from all servers that share the same SID prefix as your 
+** own, enable this. Useful for server "clusters", like 0PN.
+*/
+#undef ENABLE_SIDTRACE
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /* You shouldn't change anything below this line, unless absolutely needed. */
 

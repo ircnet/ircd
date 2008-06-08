@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_debug.c,v 1.54 2008/06/08 15:22:30 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_debug.c,v 1.55 2008/06/08 21:48:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -117,6 +117,9 @@ char	serveropts[] = {
 #endif
 #ifdef	USERS_SHOWS_UTMP
 'U',
+#endif
+#ifdef	ENABLE_SIDTRACE
+'v',
 #endif
 #ifdef	UNIXPORT
 'X',

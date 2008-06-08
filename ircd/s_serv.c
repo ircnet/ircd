@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.289 2008/06/08 15:22:30 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.290 2008/06/08 21:48:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2837,6 +2837,86 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	
 	return 2;
 }
+
+/*
+ * m_etrace
+ * 	parv[0] = sender prefix
+ */
+int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+	aClient *acptr;
+	int i = 0;
+
+	if (!MyClient(sptr) || !is_allowed(sptr, ACL_TRACE))
+		return m_nopriv(cptr, sptr, parc, parv);
+
+	if (parc > 1)
+	{
+		if ((acptr = find_person(parv[1], NULL)) && MyClient(acptr))
+			sendto_one(sptr, replies[RPL_ETRACE],
+				ME, sptr->name,
+				IsOper(acptr) ? "Oper" : "User",
+				get_client_class(acptr),
+				acptr->name, acptr->user->username,
+				acptr->user->host, acptr->user->sip,
+				acptr->info);
+	}
+	else
+	{
+		for (i = 0; i <= highest_fd; i++)
+		{
+			if (!(acptr = local[i]))
+				continue;
+
+			if (!IsPerson(acptr))
+				continue;
+		
+			sendto_one(sptr, replies[RPL_ETRACE],
+				ME, sptr->name, 
+				IsOper(acptr) ? "Oper" : "User", 
+				get_client_class(acptr), 
+				acptr->name, acptr->user->username, 
+				acptr->user->host, acptr->user->sip,
+				acptr->info);
+		}
+	}
+
+	sendto_one(sptr, replies[RPL_TRACEEND], ME, sptr->name, ME,
+			version, debugmode);
+	return 2;
+}
+
+#ifdef ENABLE_SIDTRACE
+int	m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+	aClient *acptr;
+
+	if (!MyClient(sptr) || !is_allowed(sptr, ACL_SIDTRACE))
+		return m_nopriv(cptr, sptr, parc, parv);
+
+	for (acptr = client; acptr; acptr = acptr->next)
+	{
+		if (!IsPerson(acptr))
+			continue;
+
+		if (strncmp(acptr->user->uid, me.serv->sid, SIDLEN-1))
+			continue;
+
+		sendto_one(sptr, replies[RPL_ETRACE],
+			ME, sptr->name,
+			IsAnOper(acptr) ? "Oper" : "User", 
+			MyClient(acptr) ? get_client_class(acptr) : -1, 
+			acptr->name, acptr->user->username,
+			acptr->user->host, acptr->user->sip, 
+			acptr->info);
+	}
+
+	sendto_one(sptr, replies[RPL_TRACEEND], ME, sptr->name, "*",
+			version, debugmode);
+
+	return 3;
+}
+#endif
 
 /*
 ** m_motd

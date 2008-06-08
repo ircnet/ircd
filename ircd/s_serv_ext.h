@@ -53,6 +53,10 @@ EXTERN int m_wallops (aClient *cptr, aClient *sptr, int parc,
 EXTERN int m_time (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_admin (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_trace (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+EXTERN int m_etrace (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+#ifdef ENABLE_SIDTRACE
+EXTERN int m_sidtrace (aClient *cptr, aClient *sptr, int parc, char *parv[]);
+#endif
 EXTERN int m_motd (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_close (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_eob (aClient *cptr, aClient *sptr, int parc, char *parv[]);

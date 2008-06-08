@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.177 2008/06/08 16:06:45 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.178 2008/06/08 21:48:24 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -270,6 +270,10 @@ char	*oline_flags_to_string(long flags)
 		*s++ = 'p';
 	if (flags & ACL_TRACE)
 		*s++ = 't';
+#ifdef ENABLE_SIDTRACE
+	if (flags & ACL_SIDTRACE)
+		*s++ = 'v';
+#endif
 	if (s == ofsbuf)
 		*s++ = '-';
 	*s++ = '\0';
@@ -310,6 +314,9 @@ long	oline_flags_parse(char *string)
 		case 'P': tmp |= ACL_NOPENALTY; break;
 		case 'p': tmp |= ACL_CANFLOOD; break;
 		case 't': tmp |= ACL_TRACE; break;
+#ifdef ENABLE_SIDTRACE
+		case 'v': tmp |= ACL_SIDTRACE; break;
+#endif
 		}
 	}
 	if (tmp & ACL_LOCOP)
