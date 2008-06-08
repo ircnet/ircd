@@ -1,7 +1,7 @@
 2008-06-08  Piotr Kucharski
 
 	* channel.c/can_join(): if channel is opless, allow people matching
-	  reoplist to join channel, overriding channel limit, key and bans.
+	  reoplist to join channel overriding channel limit.
 	* s_misc.c, s_serv.c, s_service.c, s_service_ext.h, s_user.c: change
 	  "server" argument of check_services_butone from char to aServer.
 	* s_user.c/m_message(): allow services to send notices to uids.
