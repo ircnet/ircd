@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.175 2008/06/07 21:36:07 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.176 2008/06/08 13:36:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2661,7 +2661,9 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		** some crucial parts, which can be seen as a typo. --Beeth */
 		i = 1;
 	}
+#ifdef KLINE
 badkline:
+#endif
 	if (i || !host)
 	{
 		/* error */
