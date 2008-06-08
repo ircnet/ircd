@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_err.c,v 1.63 2008/06/06 23:51:26 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_err.c,v 1.64 2008/06/08 14:54:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -384,7 +384,7 @@ char *	replies[] = {
 /* 349 RPL_ENDOFEXCEPTLIST */	":%s 349 %s %s :End of Channel Exception List",
 /* 350 */ (char *)NULL,
 /* 351 RPL_VERSION */	":%s 351 %s %s.%s %s %s :%s",
-/* 352 RPL_WHOREPLY */	":%s 352 %s %s %s %s %s %s %s :%d %s",
+/* 352 RPL_WHOREPLY */	":%s 352 %s %s %s %s %s %s %s :%d %s %s",
 /* 353 RPL_NAMREPLY */	":%s 353 %s %s",
 /* 354 */ (char *)NULL,
 /* 355 */ (char *)NULL,

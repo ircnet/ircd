@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.270 2008/06/08 06:37:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.271 2008/06/08 14:54:30 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1698,7 +1698,7 @@ static	void	who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
 	sendto_one(sptr, replies[RPL_WHOREPLY], ME, BadTo(sptr->name),
 		   (repchan) ? (repchan->chname) : "*", acptr->user->username,
 		   acptr->user->host, acptr->user->server, acptr->name,
-		   status, acptr->hopcount, acptr->info);
+		   status, acptr->hopcount, acptr->user->servp->sid, acptr->info);
 }
 
 
