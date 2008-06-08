@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.176 2008/06/08 13:36:10 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.177 2008/06/08 16:06:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -793,6 +793,10 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		anUser *user = NULL;
 		/* check on local/global limits per host and per user@host */
 
+#ifdef ENABLE_CIDR_LIMITS
+		if(!add_cidr_limit(cptr, aconf))
+			return -4; /* EXITC_LHMAX */
+#endif
 		/*
 		** local limits first to save CPU if any is hit.
 		**	host check is done on the IP address.
@@ -807,9 +811,19 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 				if (!mycmp(cptr->sockhost, user->host))
 				{
 					ghcnt++;
+					if (ConfMaxHGlobal(aconf) > 0 &&
+					     ghcnt >= ConfMaxHGlobal(aconf))
+					{
+						return -6; /* EXITC_GHMAX */
+					}
 					if (MyConnect(user->bcptr))
 					{
 						hcnt++;
+						if (ConfMaxHLocal(aconf) > 0 &&
+						    hcnt >= ConfMaxHLocal(aconf))
+						{
+							return -4; /* EXITC_LHMAX */
+						}
 						if (!mycmp(user->bcptr->auth,
 							   cptr->auth))
 						{
@@ -832,28 +846,14 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 						return -5; /* EXITC_LUHMAX */
 					}
 	
-					if (ConfMaxHLocal(aconf) > 0 &&
-					    hcnt >= ConfMaxHLocal(aconf))
-					{
-						return -4; /* EXITC_LHMAX */
-					}
 					if (ConfMaxUHGlobal(aconf) > 0 &&
 					    gucnt >= ConfMaxUHGlobal(aconf))
 					{
 						return -7; /* EXITC_GUHMAX */
 					}
-					if (ConfMaxHGlobal(aconf) > 0 &&
-					     ghcnt >= ConfMaxHGlobal(aconf))
-					{
-						return -6; /* EXITC_GHMAX */
-					}
 				}
 			}
 		}
-#ifdef ENABLE_CIDR_LIMITS
-		if(!add_cidr_limit(cptr, aconf))
-			return -4; /* EXITC_LHMAX */
-#endif
 	}
 
 
