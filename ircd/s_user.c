@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.267 2008/06/07 21:36:07 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.268 2008/06/08 05:06:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -809,14 +809,14 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 	}	/* for(my-leaf-servers) */
 #ifdef	USE_SERVICES
 #if 0
-	check_services_butone(SERVICE_WANT_NICK, user->server, NULL,
+	check_services_butone(SERVICE_WANT_NICK, user->servp, NULL,
 			      "NICK %s :%d", nick, sptr->hopcount+1);
-	check_services_butone(SERVICE_WANT_USER, user->server, sptr,
+	check_services_butone(SERVICE_WANT_USER, user->servp, sptr,
 			      ":%s USER %s %s %s :%s", nick, user->username, 
 			      user->host, user->server, sptr->info);
 	if (MyConnect(sptr))	/* all modes about local users */
 		send_umode(NULL, sptr, 0, ALL_UMODES, buf);
-	check_services_butone(SERVICE_WANT_UMODE, user->server, sptr,
+	check_services_butone(SERVICE_WANT_UMODE, user->servp, sptr,
 			      ":%s MODE %s :%s", nick, nick, buf);
 #endif
 	if (MyConnect(sptr))	/* all modes about local users */
@@ -1165,7 +1165,7 @@ nickkilldone:
 			add_history(sptr, sptr);
 #ifdef	USE_SERVICES
 			check_services_butone(SERVICE_WANT_NICK,
-					      sptr->user->server, sptr,
+					      sptr->user->servp, sptr,
 					      ":%s NICK :%s", parv[0], nick);
 #endif
 		}
@@ -2775,7 +2775,7 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		send_umode_out(cptr, sptr, old);
  		sendto_one(sptr, replies[RPL_YOUREOPER], ME, BadTo(parv[0]));
 #ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_OPER, sptr->user->server, 
+		check_services_butone(SERVICE_WANT_OPER, sptr->user->servp, 
 				      sptr, ":%s MODE %s :+%c", parv[0],
 				      parv[0], IsOper(sptr) ? 'o' : 'O');
 #endif
@@ -3093,14 +3093,14 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					sptr->user->away = NULL;
 #ifdef  USE_SERVICES
 				check_services_butone(SERVICE_WANT_AWAY,
-						      sptr->user->server, sptr,
+						      sptr->user->servp, sptr,
 						      ":%s AWAY", parv[0]);
 #endif
 				    }
 #ifdef  USE_SERVICES
 				if (what == MODE_ADD)
 				check_services_butone(SERVICE_WANT_AWAY,
-						      sptr->user->server, sptr,
+						      sptr->user->servp, sptr,
 						      ":%s AWAY :", parv[0]);
 #endif
 			default :
@@ -3167,7 +3167,7 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		istat.is_oper++;
 		sptr->user->servp->usercnt[2]++;
 #ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_OPER, sptr->user->server,
+		check_services_butone(SERVICE_WANT_OPER, sptr->user->servp,
 				      sptr, ":%s MODE %s :+o", parv[0],
 				      parv[0]);
 #endif
@@ -3177,7 +3177,7 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		istat.is_oper--;
 		sptr->user->servp->usercnt[2]--;
 #ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_OPER, sptr->user->server,
+		check_services_butone(SERVICE_WANT_OPER, sptr->user->servp,
 				      sptr, ":%s MODE %s :-o", parv[0],
 				      parv[0]);
 #endif
@@ -3187,7 +3187,7 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		istat.is_oper--;
 		sptr->user->servp->usercnt[2]--;
 #ifdef USE_SERVICES
-		check_services_butone(SERVICE_WANT_OPER, sptr->user->server,
+		check_services_butone(SERVICE_WANT_OPER, sptr->user->servp,
 				      sptr, ":%s MODE %s :-O", parv[0],
 				      parv[0]);
 #endif
@@ -3274,7 +3274,7 @@ void	send_umode_out(aClient *cptr, aClient *sptr, int old)
 #ifdef USE_SERVICES
 	/* buf contains all modes for local users, and iow only for remotes */
 	if (*buf)
-		check_services_butone(SERVICE_WANT_UMODE, sptr->user->server,
+		check_services_butone(SERVICE_WANT_UMODE, sptr->user->servp,
 				      sptr, ":%s MODE %s :%s", sptr->name,
 				      sptr->name, buf);
 #endif
@@ -3307,7 +3307,7 @@ static	void	save_user(aClient *cptr, aClient *sptr, char *path)
 			       sptr->name, sptr->user->uid);
 	add_history(sptr, NULL);
 #ifdef	USE_SERVICES
-	check_services_butone(SERVICE_WANT_NICK, sptr->user->server, sptr,
+	check_services_butone(SERVICE_WANT_NICK, sptr->user->servp, sptr,
 			      ":%s NICK :%s", sptr->name, sptr->user->uid);
 #endif
 	sendto_serv_v(cptr, SV_UID, ":%s SAVE %s :%s%c%s", 

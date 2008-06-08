@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.110 2007/12/15 23:21:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.111 2008/06/08 05:06:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -741,7 +741,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			}
 		}
 #ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_SQUIT, sptr->name, sptr,
+		check_services_butone(SERVICE_WANT_SQUIT, sptr->serv, sptr,
 				      ":%s SQUIT %s :%s", from->name,
 				      sptr->name, comment);
 #endif
@@ -775,7 +775,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 				check_services_butone(SERVICE_WANT_QUIT|
 						      SERVICE_WANT_RQUIT, 
 						      (sptr->user) ?
-						      sptr->user->server
+						      sptr->user->servp
 						      : NULL, cptr,
 						      ":%s QUIT :%s",
 						      sptr->name, comment);
@@ -799,7 +799,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 					}
 #ifdef	USE_SERVICES
 				check_services_butone(SERVICE_WANT_QUIT, 
-					      (sptr->user) ? sptr->user->server
+					      (sptr->user) ? sptr->user->servp
 						      : NULL, cptr,
 						      ":%s QUIT :%s",
 						      sptr->name, comment);
@@ -814,7 +814,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			** for now --jv
 			*/
 			check_services_butone(SERVICE_WANT_QUIT, 
-					     (sptr->user) ? sptr->user->server
+					     (sptr->user) ? sptr->user->servp
 						      : NULL, cptr,
 						      ":%s QUIT :%s",
 						      sptr->name, comment);

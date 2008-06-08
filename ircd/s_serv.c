@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.285 2008/06/07 21:36:07 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.286 2008/06/08 05:06:10 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -802,7 +802,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 		introduce_server(cptr, acptr);
 #ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_SERVER, acptr->name, acptr,
+		check_services_butone(SERVICE_WANT_SERVER, acptr->serv, acptr,
 				      ":%s SERVER %s %d %s :%s", parv[0],
 				      acptr->name, hop+1, acptr->serv->sid,
 				      acptr->info);
@@ -1217,7 +1217,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		cptr->name, cptr->serv->version, cptr->serv->sid));
 	add_fd(cptr->fd, &fdas);
 #ifdef	USE_SERVICES
-	check_services_butone(SERVICE_WANT_SERVER, cptr->name, cptr,
+	check_services_butone(SERVICE_WANT_SERVER, cptr->serv, cptr,
 			      ":%s SERVER %s %d %s :%s", ME, cptr->name,
 			      cptr->hopcount+1, cptr->serv->sid, cptr->info);
 #endif
