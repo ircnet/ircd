@@ -13,6 +13,10 @@
 	  notices about unauthorized access.
 	* struct_def.h: increased TOPICLEN, MAXBANS and MAXBANLENGHT.
 	* s_user.c/who_one(): show SID between hopcount and user info.
+	* s_serv.c/m_stats(): allow multichar stats.
+	* s_serv.c/m_stats(), s_debug.c/send_defines(): stats d5 return 005 as well.
+	* s_user.c/m_oper(): different message for failed oper attempt if attach_conf()
+	  failed with correct password.
 
 2008-06-07  Piotr Kucharski
 
