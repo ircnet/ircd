@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.271 2008/06/08 00:46:13 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.272 2008/06/08 03:31:18 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1980,6 +1980,12 @@ static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 #endif
 	if (*chptr->chname == '&' && !strcmp(chptr->chname, "&OPER")
 		&& IsAnOper(sptr))
+		return 0;
+
+	/* ->reop is set when there are no chanops on the channel,
+	** so we allow people matching +R to join no matter ban, key
+	** or limit so they can get reopped; --B. */
+	if (chptr->reop > 0 && match_modeid(CHFL_REOPLIST, sptr, chptr))
 		return 0;
 
 	for (lp = sptr->user->invited; lp; lp = lp->next)
