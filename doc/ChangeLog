@@ -1,3 +1,8 @@
+2008-06-07  Piotr Kucharski
+
+	* configure.in, setup.h.in, os.h: check if strings.h can be included along
+	  with string.h
+
 2008-06-08  Piotr Kucharski
 
 	* channel.c/can_join(): if channel is opless, allow people matching
