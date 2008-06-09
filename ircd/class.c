@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.23 2008/06/09 17:42:26 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.24 2008/06/09 17:47:45 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -140,17 +140,17 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 {
 	aClass *t, *p;
 #ifdef ENABLE_CIDR_LIMITS
-	char *foo;
+	char *tmp;
 	int cidrlen = 0, cidramount = 0;
 
 	if(cidrlen_s)
 	{
-		if((foo = index(cidrlen_s, '/')))
+		if((tmp = index(cidrlen_s, '/')))
 		{
-			*foo++ = '\0';
+			*tmp++ = '\0';
 
 			cidramount = atoi(cidrlen_s);
-			cidrlen = atoi(foo);
+			cidrlen = atoi(tmp);
 		}
 	}
 #endif
@@ -262,28 +262,32 @@ void	initclass(void)
 	MaxUHLocal(FirstClass()) = 1;
 	MaxHGlobal(FirstClass()) = 1;
 	MaxUHGlobal(FirstClass()) = 1;
+#ifdef ENABLE_CIDR_LIMITS
+	CidrLen(FirstClass()) = 0;
+	FirstClass()->ip_limits = NULL;
+#endif
 }
 
 void	report_classes(aClient *sptr, char *to)
 {
 	Reg	aClass	*cltmp;
-	static char	foo[64] = "";
+	char	tmp[64] = "";
 
 	for (cltmp = FirstClass(); cltmp; cltmp = NextClass(cltmp))
 	{
 #ifdef ENABLE_CIDR_LIMITS
 		if (MaxCidrAmount(cltmp) > 0 && CidrLen(cltmp) > 0)
 			// leading space is important
-			snprintf(foo, sizeof(foo), " %d/%d",
+			snprintf(tmp, sizeof(tmp), " %d/%d",
 				MaxCidrAmount(cltmp), CidrLen(cltmp));
 		else
-			foo[0] = '\0';
+			tmp[0] = '\0';
 #endif
 		sendto_one(sptr, replies[RPL_STATSYLINE], ME, BadTo(to), 'Y',
 			Class(cltmp), PingFreq(cltmp), ConFreq(cltmp),
 			MaxLinks(cltmp), MaxSendq(cltmp), MaxBSendq(cltmp),
 			MaxHLocal(cltmp), MaxUHLocal(cltmp),
-			MaxHGlobal(cltmp), MaxUHGlobal(cltmp), Links(cltmp), foo);
+			MaxHGlobal(cltmp), MaxUHGlobal(cltmp), Links(cltmp), tmp);
 	}
 }
 
