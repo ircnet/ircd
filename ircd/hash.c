@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.54 2005/07/09 22:58:52 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.55 2008/06/09 17:38:48 jv Exp $";
 #endif
 
 #include "os.h"
@@ -31,17 +31,20 @@ static	aHashEntry	*uidTable = NULL;
 static	aHashEntry	*channelTable = NULL;
 static	aHashEntry	*sidTable = NULL;
 static  aHashEntry      *hostnameTable = NULL;
+static	aHashEntry	*ipTable = NULL;
 static	unsigned int	*hashtab = NULL;
 static	int	clhits = 0, clmiss = 0, clsize = 0;
 static	int	uidhits = 0, uidmiss = 0, uidsize = 0;
 static	int	chhits = 0, chmiss = 0, chsize = 0;
 static	int	sidhits = 0, sidmiss = 0, sidsize = 0;
 static  int     cnhits = 0, cnmiss = 0 ,cnsize = 0;
+static	int	iphits = 0, ipmiss = 0, ipsize = 0;
 int	_HASHSIZE = 0;
 int	_UIDSIZE = 0;
 int	_CHANNELHASHSIZE = 0;
 int	_SIDSIZE = 0;
 int     _HOSTNAMEHASHSIZE = 0;
+int	_IPHASHSIZE = 0;
 
 /*
  * Hashing.
@@ -191,6 +194,27 @@ static	u_int	hash_host_name(char *hname, u_int *store)
 	return (hash);
 }
 
+/*
+ * hash_host_name
+ */
+static	u_int	hash_ip(char *hip, u_int *store)
+{
+
+	Reg	u_char	*ip = (u_char *)hip;
+	Reg	u_int	hash = 0;
+	
+	for (; *ip; ip++)
+	{
+		hash = 31 * hash + hashtab[*ip];
+	}
+	
+	if (store)
+		*store = hash;
+	hash %= _IPHASHSIZE;
+	return (hash);
+}
+
+
 /* bigger prime
  *
  * given a positive integer, return a prime number that's larger
@@ -302,6 +326,21 @@ static	void	clear_hostname_hash_table(int size)
 		_HOSTNAMEHASHSIZE, size));
 }
 
+static	void	clear_ip_hash_table(int size)
+{
+	_IPHASHSIZE = bigger_prime(size);
+	iphits = 0;
+	ipmiss = 0;
+	ipsize = 0;
+	if (!ipTable)
+		ipTable = (aHashEntry *)MyMalloc(_IPHASHSIZE *
+						     sizeof(aHashEntry));
+	bzero((char *)ipTable, sizeof(aHashEntry) * _IPHASHSIZE);
+	Debug((DEBUG_DEBUG, "IP Hash Table Init: %d (%d)",
+		_IPHASHSIZE, size));
+}
+
+
 void	inithashtables(void)
 {
 	Reg int i;
@@ -313,6 +352,8 @@ void	inithashtables(void)
 	clear_sid_hash_table((_SIDSIZE) ? _SIDSIZE : SIDSIZE);
 	clear_hostname_hash_table((_HOSTNAMEHASHSIZE) ? _HOSTNAMEHASHSIZE : 
 				   HOSTNAMEHASHSIZE);
+	clear_ip_hash_table((_IPHASHSIZE) ? _IPHASHSIZE : IPHASHSIZE);
+
 	/*
 	 * Moved multiplication out from the hashfunctions and into
 	 * a pre-generated lookup table. Should save some CPU usage
@@ -450,6 +491,32 @@ static	void	bigger_hash_table(int *size, aHashEntry *table, int new)
 		}
 		MyFree(otab);
 	}
+	else if (otab == ipTable)
+	{
+		int	i;
+		anUser	*next,*user;
+		Debug((DEBUG_ERROR, "IP Hash Table from %d to %d (%d)",
+			    osize, new, clsize));
+		sendto_flag(SCH_HASH, "IP Hash Table from %d to %d (%d)",
+			    osize, new, clsize);
+		ipmiss = 0;
+		iphits = 0;
+		ipsize = 0;
+		ipTable = table;
+
+		for (i = 0; i < osize; i++)
+		    {
+			for (user = (anUser *)otab[i].list; user;
+				user = next)
+			    {
+				next = user->iphnext;
+				(void)add_to_ip_hash_table(user->sip,
+					user);
+			    }
+		    }
+		MyFree(otab);
+
+	}
     
 	return;
 }
@@ -544,6 +611,24 @@ int	add_to_hostname_hash_table(char *hostname, anUser *user)
 	cnsize++;
 	if (cnsize > _HOSTNAMEHASHSIZE)
 		bigger_hash_table(&_HOSTNAMEHASHSIZE, hostnameTable, 0);
+	return 0;
+}
+
+/*
+ * add_to_ip_hash_table
+ */
+int	add_to_ip_hash_table(char *ip, anUser *user)
+{
+	Reg	u_int	hashv;
+
+	hashv = hash_ip(ip, &user->iphashv);
+	user->iphnext = (anUser *)ipTable[hashv].list;
+	ipTable[hashv].list = (void *)user;
+	ipTable[hashv].links++;
+	ipTable[hashv].hits++;
+	ipsize++;
+	if (ipsize > _IPHASHSIZE)
+		bigger_hash_table(&_IPHASHSIZE, ipTable, 0);
 	return 0;
 }
 
@@ -752,6 +837,49 @@ int	del_from_hostname_hash_table(char *hostname, anUser *user)
 	    }
 	return 0;
 }
+
+/*
+ * del_from_ip_hash_table
+ */
+int	del_from_ip_hash_table(char *ip, anUser *user)
+{
+	Reg	anUser	*tmp, *prev = NULL;
+	Reg	u_int	hashv;
+
+	hashv = user->iphashv;
+	hashv %= _IPHASHSIZE;
+	for (tmp = (anUser *)ipTable[hashv].list; tmp; tmp = tmp->iphnext)
+	    {
+		if (tmp == user)
+		    {
+			if (prev)
+				prev->iphnext = tmp->iphnext;
+			else
+				ipTable[hashv].list = (void *)tmp->iphnext;
+			tmp->iphnext = NULL;
+			if (ipTable[hashv].links > 0)
+			    {
+				ipTable[hashv].links--;
+				ipsize--;
+				return 1;
+			    }
+			else
+			    {
+				sendto_flag(SCH_ERROR, "ip-hash table failure");
+				Debug((DEBUG_ERROR, "ip-hash table failure")); 
+				/*
+				 * Should never actually return from here and
+				 * if we do it is an error/inconsistency in the
+				 * hash table.
+				 */
+				return -1;
+			    }
+		    }
+		prev = tmp;
+	    }
+	return 0;
+}
+
 
 /*
  * hash_find_client
@@ -1077,6 +1205,37 @@ anUser	*hash_find_hostname(char *hostname, anUser *user)
 }
 
 /*
+ * hash_find_ip
+ */
+anUser	*hash_find_ip(char *ip, anUser *user)
+{
+	Reg	anUser	*tmp, *prv = NULL;
+	Reg	aHashEntry	*tmp3;
+	u_int	hashv, hv;
+	int	count = 0;
+
+	hashv = hash_ip(ip, &hv);
+	tmp3 = &ipTable[hashv];
+
+	for (tmp = (anUser *)tmp3->list; tmp; prv = tmp, tmp = tmp->iphnext)
+	{
+		if (hv == tmp->iphashv && !mycmp(ip, tmp->host))
+		    {
+			iphits++;
+			return (tmp);
+		    }
+		if (count++ > 21142)
+		{
+			sendto_flag(SCH_ERROR, "hash_find_ip possible loop");
+			break;
+		}
+	}
+	ipmiss++;
+	return user;
+}
+
+
+/*
  * NOTE: this command is not supposed to be an offical part of the ircd
  *       protocol.  It is simply here to help debug and to monitor the
  *       performance of the hash functions and table, enabling a better
@@ -1184,6 +1343,22 @@ static	void	show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables,
 		}
 	
 	}
+	else if (htab == ipTable)
+	{
+		auptr = (anUser *) tab->list;
+		while (auptr)
+		{
+			sendto_one(sptr,
+			 	":%s NOTICE %s :Bucket %d entry %d - %s (%s)",
+			 	ME, sptr->name, bucket, j, auptr->sip,
+				auptr->bcptr->name);	
+	
+			j++;
+			auptr = auptr->iphnext;
+		}
+	
+	}
+
 	return;
 }
 #endif /* DEBUGMODE || HASHDEBUG */
@@ -1207,6 +1382,8 @@ int	m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			hash_sid },
 		{'h', "hostname", &hostnameTable, &cnhits, &cnmiss, &cnsize,
 			&_HOSTNAMEHASHSIZE, hash_host_name},
+		{'i', "ip", &ipTable, &iphits, &ipmiss, &ipsize,
+			&_IPHASHSIZE, hash_ip},
 		{0, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
 	};
 

@@ -29,6 +29,7 @@ extern int _UIDSIZE;
 extern int _CHANNELHASHSIZE;
 extern int _SIDSIZE;
 extern int _HOSTNAMEHASHSIZE;
+extern int _IPHASHSIZE;
 #endif /* HASH_C */
 
 /*  External definitions for global functions.
@@ -44,11 +45,13 @@ EXTERN int add_to_uid_hash_table (char *uid, aClient *cptr);
 EXTERN int add_to_channel_hash_table (char *name, aChannel *chptr);
 EXTERN int add_to_sid_hash_table (char *sid, aClient *cptr);
 EXTERN int add_to_hostname_hash_table (char *hostname, anUser *user);
+EXTERN int add_to_ip_hash_table (char *ip, anUser *user);
 EXTERN int del_from_client_hash_table (char *name, aClient *cptr);
 EXTERN int del_from_uid_hash_table (char *uid, aClient *cptr);
 EXTERN int del_from_channel_hash_table (char *name, aChannel *chptr);
 EXTERN int del_from_sid_hash_table (aServer *sptr);
 EXTERN int del_from_hostname_hash_table (char *hostname, anUser *user);
+EXTERN int del_from_ip_hash_table (char *ip, anUser *user);
 EXTERN aClient *hash_find_client (char *name, aClient *cptr);
 EXTERN aClient *hash_find_uid (char *uid, aClient *cptr);
 EXTERN aClient *hash_find_server (char *server, aClient *cptr);
@@ -56,6 +59,7 @@ EXTERN aChannel *hash_find_channel (char *name, aChannel *chptr);
 EXTERN aChannel *hash_find_channels (char *name, aChannel *chptr);
 EXTERN aClient *hash_find_sid (char *sid, aClient *cptr);
 EXTERN anUser *hash_find_hostname (char *hostname, anUser *user);
+EXTERN anUser *hash_find_ip (char *ip, anUser *user);
 EXTERN int m_hash (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 
 #undef EXTERN
