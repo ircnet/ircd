@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.179 2008/06/09 17:40:16 jv Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.180 2008/06/09 18:51:20 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -714,7 +714,8 @@ int	detach_conf(aClient *cptr, aConfItem *aconf)
 					if (ConfLinks(aconf) > 0)
 						--ConfLinks(aconf);
 #ifdef ENABLE_CIDR_LIMITS
-					remove_cidr_limit(cptr, aconf);
+					if ((aconf->status & CONF_CLIENT))
+						remove_cidr_limit(cptr, aconf);
 #endif
 				}
 
