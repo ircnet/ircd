@@ -1,4 +1,6 @@
-2008-06-07  Piotr Kucharski
+2.11.2b1
+
+2008-06-09  Piotr Kucharski
 
 	* configure.in, setup.h.in, os.h: check if strings.h can be included along
 	  with string.h
