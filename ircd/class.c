@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.22 2008/06/06 23:51:26 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.23 2008/06/09 17:42:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -162,6 +162,10 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 		NextClass(p) = NextClass(t);
 		NextClass(t) = p;
 		MaxSendq(p) = QUEUELEN;
+#ifdef ENABLE_CIDR_LIMITS
+		CidrLen(p) = 0;
+		p->ip_limits = NULL;
+#endif
 		istat.is_class++;
 	    }
 	else
