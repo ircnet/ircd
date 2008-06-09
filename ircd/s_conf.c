@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.178 2008/06/08 21:48:24 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.179 2008/06/09 17:40:16 jv Exp $";
 #endif
 
 #include "os.h"
@@ -812,10 +812,10 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		if (ConfMaxHLocal(aconf) > 0 || ConfMaxUHLocal(aconf) > 0 ||
 		    ConfMaxHGlobal(aconf) > 0 || ConfMaxUHGlobal(aconf) > 0 )
 		{
-			for ((user = hash_find_hostname(cptr->sockhost, NULL));
-			     user; user = user->hhnext)
+			for ((user = hash_find_ip(cptr->user->sip, NULL));
+			     user; user = user->iphnext)
 			{
-				if (!mycmp(cptr->sockhost, user->host))
+				if (!mycmp(cptr->user->sip, user->sip))
 				{
 					ghcnt++;
 					if (ConfMaxHGlobal(aconf) > 0 &&
