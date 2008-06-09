@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.113 2008/06/08 14:20:07 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.114 2008/06/09 17:40:56 jv Exp $";
 #endif
 
 #include "os.h"
@@ -904,6 +904,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			off_history(sptr);
 			del_from_hostname_hash_table(sptr->user->host,
 						     sptr->user);
+			del_from_ip_hash_table(sptr->user->sip, sptr->user);
 		    }
 	    }
 	else if (sptr->name[0] && IsService(sptr))
