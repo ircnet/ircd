@@ -699,7 +699,7 @@ dnl main
 dnl ----
 
 AC_INIT([irc],[2.11],[ircd-bugs@irc.org])
-AC_REVISION([$Id: configure.in,v 1.73 2006/04/25 14:41:30 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.74 2008/06/09 16:16:08 chopin Exp $])
 AC_PREREQ(2.59)
 
 AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [[localstatedir/log]]], [
@@ -737,6 +737,20 @@ IRC_LINUX
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(stdio.h stdlib.h sys/types.h sys/bitypes.h stddef.h stdarg.h unistd.h ctype.h memory.h errno.h sys/errno.h sys/syscall.h pwd.h math.h utmp.h fcntl.h signal.h sys/ioctl.h sys/file.h sys/filio.h sys/socket.h sys/stat.h sys/resource.h sys/select.h sys/poll.h stropts.h netdb.h netinet/in.h arpa/inet.h sys/param.h syslog.h sys/syslog.h string.h strings.h sys/time.h time.h sys/times.h netinet/in_systm.h netinfo/ni.h arpa/nameser.h)
+
+dnl See whether we can include both string.h and strings.h.
+AC_CACHE_CHECK([whether string.h and strings.h may both be included],
+ac_cv_header_string,
+[
+    AC_COMPILE_IFELSE(
+    [#include <string.h>
+    #include <strings.h>],
+    [ac_cv_header_string=yes],
+    [ac_cv_header_string=no])
+])
+if test "$ac_cv_header_string" = "yes"; then
+    AC_DEFINE([HAVE_STRING_WITH_STRINGS], [1], [Define to 1 if string.h may be included along with strings.h])
+fi
 
 # autoconf now checks not only inclusion, but also compilation
 AC_CHECK_HEADERS([resolv.h], [], [],
