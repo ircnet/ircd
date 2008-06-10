@@ -589,20 +589,6 @@
 #undef DISABLE_NICK0_REGISTRATION
 
 /*
-** Define this to significantly speed up rehash with large amounts of I-lines.
-** Wastes some memory each rehash (luckily not indefinitely).
-*/
-#define FASTER_ILINE_REHASH
-
-/*
-** Restores old behaviour of Y-lines maxlinks limit, which was counted
-** separately per each I-line using it.
-** Note: if you use it with FASTER_ILINE_REHASH, clients will be able
-** to exceed maxlinks limits after each rehash. Sorry.
-*/
-#undef YLINE_LIMITS_OLD_BEHAVIOUR
-
-/*
 ** Define this if you want to use Japanese channel names in JIS encoding.
 */
 #undef JAPANESE
@@ -751,7 +737,28 @@
 ** You probably don't want to disable it, but if you run into any problems,
 ** here's the knob.
 */
-#define ENABLE_CIDR_LIMITS 1
+#define ENABLE_CIDR_LIMITS
+
+/*
+** Define this to significantly speed up rehash with large amounts of I-lines.
+** Wastes some memory each rehash (luckily not indefinitely).
+*/
+#define FASTER_ILINE_REHASH
+
+/*
+** Restores old behaviour of Y-lines maxlinks limit, which was counted
+** separately per each I-line using it.
+** Note: if you use it with FASTER_ILINE_REHASH, clients will be able
+** to exceed maxlinks limits after each rehash. Sorry.
+*/
+#undef YLINE_LIMITS_OLD_BEHAVIOUR
+
+/*
+** Y-line [user@]host limits are now using ip hash instead of hostname hash,
+** which means counts are against IPs, not hostnames.
+** If you don't like that behaviour, you can undefine it.
+*/
+#define YLINE_LIMITS_IPHASH
 
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
