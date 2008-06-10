@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.273 2008/06/08 13:33:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.274 2008/06/10 02:25:33 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1344,9 +1344,8 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				    {
 					lp = &chops[opcnt++];
 					lp->value.cp = *parv;
-					if (strlen(lp->value.cp) >
-					    (size_t) KEYLEN)
-						lp->value.cp[KEYLEN] = '\0';
+					lp->value.cp[0] = '*';
+					lp->value.cp[1] = '\0';
 					lp->flags = MODE_KEY|MODE_DEL;
 					keychange = 1;
 				    }
