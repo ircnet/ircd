@@ -1,7 +1,25 @@
 /*
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2, or (at your option)
+ *   any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ * $Id: patricia.c,v 1.3 2008/06/10 20:34:25 chopin Exp $
+ *
+ * Imported from ratbox with minor function name changes.
+ * Id: patricia.c,v 7.14 2003/06/12 13:46:26 androsyn Exp
+ *
  * Yanked out of Net::Patricia by Aaron Sethman <androsyn@ratbox.org>
  *
- * Imported: Id: patricia.c,v 7.14 2003/06/12 13:46:26 androsyn Exp
  * Dave Plonka <plonka@doit.wisc.edu>
  *
  * This product includes software developed by the University of Michigan,
@@ -9,8 +27,8 @@
  *
  * This file had been called "radix.c" in the MRT sources.
  *
- * I renamed it to "patricia.c" since it's not an implementation of a general
- * radix trie.  Also I pulled in various requirements from "prefix.c" and
+ * Dave Plonka renamed it to "patricia.c" since it's not an implementation of a general
+ * radix trie. He also pulled in various requirements from "prefix.c" and
  * "demo.c" so that it could be used as a standalone API.
  *
  * This product includes software developed by the University of Michigan, Merit
