@@ -5,6 +5,15 @@
 	* configure.in, setup.h.in, os.h: check if strings.h can be included along
 	  with string.h
 
+2008-06-09  Jakub Vlasek
+
+	* struct_def.h: add iphashv and iphnext used by the IP hash table.
+	* hash.c, hash_def.h, hash_ext.h: add IP hash.
+	* s_conf/attach_conf(): use hash_find_ip() to check for local and global
+	  user limits.
+	* s_user.c/register_client(): Add user to the IP hash.
+	* s_misc.c/exit_one_client(): Remove user from the IP hash.
+
 2008-06-08  Piotr Kucharski
 
 	* channel.c/can_join(): if channel is opless, allow people matching
