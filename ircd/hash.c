@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.55 2008/06/09 17:38:48 jv Exp $";
+static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.56 2008/06/10 22:06:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -30,8 +30,12 @@ static	aHashEntry	*clientTable = NULL;
 static	aHashEntry	*uidTable = NULL;
 static	aHashEntry	*channelTable = NULL;
 static	aHashEntry	*sidTable = NULL;
-static  aHashEntry      *hostnameTable = NULL;
+#ifdef USE_HOSTHASH
+static	aHashEntry	*hostnameTable = NULL;
+#endif
+#ifdef USE_IPHASH
 static	aHashEntry	*ipTable = NULL;
+#endif
 static	unsigned int	*hashtab = NULL;
 static	int	clhits = 0, clmiss = 0, clsize = 0;
 static	int	uidhits = 0, uidmiss = 0, uidsize = 0;
@@ -174,6 +178,7 @@ static	u_int	hash_channel_name(char *hname, u_int *store, int shortname)
 	return (hash);
 }
 
+#ifdef USE_HOSTHASH
 /*
  * hash_host_name
  */
@@ -193,7 +198,9 @@ static	u_int	hash_host_name(char *hname, u_int *store)
 	hash %= _HOSTNAMEHASHSIZE;
 	return (hash);
 }
+#endif
 
+#ifdef USE_IPHASH
 /*
  * hash_host_name
  */
@@ -213,7 +220,7 @@ static	u_int	hash_ip(char *hip, u_int *store)
 	hash %= _IPHASHSIZE;
 	return (hash);
 }
-
+#endif
 
 /* bigger prime
  *
@@ -312,6 +319,7 @@ static	void	clear_sid_hash_table(int size)
 	Debug((DEBUG_DEBUG, "Sid Hash Table Init: %d (%d)", _SIDSIZE, size));
 }
 
+#ifdef USE_HOSTHASH
 static	void	clear_hostname_hash_table(int size)
 {
 	_HOSTNAMEHASHSIZE = bigger_prime(size);
@@ -325,7 +333,9 @@ static	void	clear_hostname_hash_table(int size)
 	Debug((DEBUG_DEBUG, "Hostname Hash Table Init: %d (%d)",
 		_HOSTNAMEHASHSIZE, size));
 }
+#endif
 
+#ifdef USE_IPHASH
 static	void	clear_ip_hash_table(int size)
 {
 	_IPHASHSIZE = bigger_prime(size);
@@ -339,6 +349,7 @@ static	void	clear_ip_hash_table(int size)
 	Debug((DEBUG_DEBUG, "IP Hash Table Init: %d (%d)",
 		_IPHASHSIZE, size));
 }
+#endif
 
 
 void	inithashtables(void)
@@ -350,9 +361,13 @@ void	inithashtables(void)
 	clear_channel_hash_table((_CHANNELHASHSIZE) ? _CHANNELHASHSIZE
                                  : CHANNELHASHSIZE);
 	clear_sid_hash_table((_SIDSIZE) ? _SIDSIZE : SIDSIZE);
+#ifdef USE_HOSTHASH
 	clear_hostname_hash_table((_HOSTNAMEHASHSIZE) ? _HOSTNAMEHASHSIZE : 
 				   HOSTNAMEHASHSIZE);
+#endif
+#ifdef USE_IPHASH
 	clear_ip_hash_table((_IPHASHSIZE) ? _IPHASHSIZE : IPHASHSIZE);
+#endif
 
 	/*
 	 * Moved multiplication out from the hashfunctions and into
@@ -446,6 +461,7 @@ static	void	bigger_hash_table(int *size, aHashEntry *table, int new)
 				add_to_uid_hash_table(cptr->user->uid, cptr);
 		MyFree(otab);
 	    }
+#ifdef USE_HOSTHASH
 	else if (otab == hostnameTable)
 	    {
 		int	i;
@@ -471,6 +487,7 @@ static	void	bigger_hash_table(int *size, aHashEntry *table, int new)
 		    }
 		MyFree(otab);
 	    }
+#endif
 	else if (otab == sidTable)
 	{
 		Debug((DEBUG_ERROR, "sid Hash Table from %d to %d (%d)",
@@ -491,6 +508,7 @@ static	void	bigger_hash_table(int *size, aHashEntry *table, int new)
 		}
 		MyFree(otab);
 	}
+#ifdef USE_IPHASH
 	else if (otab == ipTable)
 	{
 		int	i;
@@ -515,8 +533,8 @@ static	void	bigger_hash_table(int *size, aHashEntry *table, int new)
 			    }
 		    }
 		MyFree(otab);
-
 	}
+#endif
     
 	return;
 }
@@ -596,6 +614,7 @@ int	add_to_sid_hash_table(char *sid, aClient *cptr)
 	return 0;
 }
 
+#ifdef USE_HOSTHASH
 /*
  * add_to_hostname_hash_table
  */
@@ -613,7 +632,9 @@ int	add_to_hostname_hash_table(char *hostname, anUser *user)
 		bigger_hash_table(&_HOSTNAMEHASHSIZE, hostnameTable, 0);
 	return 0;
 }
+#endif
 
+#ifdef USE_IPHASH
 /*
  * add_to_ip_hash_table
  */
@@ -631,7 +652,7 @@ int	add_to_ip_hash_table(char *ip, anUser *user)
 		bigger_hash_table(&_IPHASHSIZE, ipTable, 0);
 	return 0;
 }
-
+#endif
 
 /*
  * del_from_client_hash_table
@@ -796,6 +817,7 @@ int	del_from_sid_hash_table(aServer *sptr)
 	return 0;
 }
 
+#ifdef USE_HOSTHASH
 /*
  * del_from_hostname_hash_table
  */
@@ -837,7 +859,8 @@ int	del_from_hostname_hash_table(char *hostname, anUser *user)
 	    }
 	return 0;
 }
-
+#endif
+#ifdef USE_IPHASH
 /*
  * del_from_ip_hash_table
  */
@@ -879,6 +902,7 @@ int	del_from_ip_hash_table(char *ip, anUser *user)
 	    }
 	return 0;
 }
+#endif
 
 
 /*
@@ -1174,6 +1198,7 @@ aClient	*hash_find_sid(char *sid, aClient *cptr)
 	return (cptr);
 }
 
+#ifdef USE_HOSTHASH
 /*
  * hash_find_hostname
  */
@@ -1203,7 +1228,9 @@ anUser	*hash_find_hostname(char *hostname, anUser *user)
 	cnmiss++;
 	return user;
 }
+#endif
 
+#ifdef USE_IPHASH
 /*
  * hash_find_ip
  */
@@ -1233,6 +1260,7 @@ anUser	*hash_find_ip(char *ip, anUser *user)
 	ipmiss++;
 	return user;
 }
+#endif
 
 
 /*
@@ -1328,6 +1356,7 @@ static	void	show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables,
 		}
 	
 	}
+#ifdef USE_HOSTHASH
 	else if (htab == hostnameTable)
 	{
 		auptr = (anUser *) tab->list;
@@ -1343,6 +1372,8 @@ static	void	show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables,
 		}
 	
 	}
+#endif
+#ifdef USE_IPHASH
 	else if (htab == ipTable)
 	{
 		auptr = (anUser *) tab->list;
@@ -1356,8 +1387,8 @@ static	void	show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables,
 			j++;
 			auptr = auptr->iphnext;
 		}
-	
 	}
+#endif
 
 	return;
 }
@@ -1380,10 +1411,14 @@ int	m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			&_CHANNELHASHSIZE, NULL},
 		{'S', "SID", &sidTable, &sidhits, &sidmiss, &sidsize, &_SIDSIZE,
 			hash_sid },
+#ifdef USE_HOSTHASH
 		{'h', "hostname", &hostnameTable, &cnhits, &cnmiss, &cnsize,
 			&_HOSTNAMEHASHSIZE, hash_host_name},
+#endif
+#ifdef USE_IPHASH
 		{'i', "ip", &ipTable, &iphits, &ipmiss, &ipsize,
 			&_IPHASHSIZE, hash_ip},
+#endif
 		{0, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
 	};
 

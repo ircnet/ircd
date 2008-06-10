@@ -760,6 +760,19 @@
 */
 #define YLINE_LIMITS_IPHASH
 
+/*
+** find_userhost (used in PRIVMSG user%host@server syntax) uses hostname
+** hash. Noone really used that syntax anyway, so noone should notice.
+** If you are rebellious or just don't want to waste memory -- define it.
+** Note that if there's a hostname hash needed (and thus compiled in) 
+** for other reasons, it will be used in find_userhost anyway.
+** Also note that defining this breaks compatibility with RFC 2812, as
+** clients no longer will be able to PRIVMSG user%host@server (though they 
+** will be able to use user%ip@server), but it would still be compatible 
+** with RFC 1459, which defined only "user@server" syntax.
+*/
+#undef FIND_USERHOST_IPHASH
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
@@ -912,3 +925,13 @@
 #undef LISTENER_MAXACCEPT
 #define LISTENER_MAXACCEPT 1
 #endif
+
+/* well, we save some memory if we don't actually need either of the hashes */
+#if defined(YLINE_LIMITS_IPHASH) || defined(FIND_USERHOST_IPHASH)
+#define USE_IPHASH
+#endif
+
+#if !defined(YLINE_LIMITS_IPHASH) || !defined(FIND_USERHOST_IPHASH)
+#define USE_HOSTHASH
+#endif
+

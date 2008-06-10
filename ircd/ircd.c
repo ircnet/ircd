@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.162 2006/08/30 12:16:49 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.163 2008/06/10 22:06:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1479,8 +1479,13 @@ void ircd_readtune(char *filename)
 		ww_size = t_data[0];
 		lk_size = t_data[1];
 		_HASHSIZE = t_data[2];
+#ifdef USE_HOSTHASH
 		_HOSTNAMEHASHSIZE = t_data[2]; /* hostname has always same size
 						  as the client hash */
+#endif
+#ifdef USE_IPHASH
+		_IPHASHSIZE = t_data[2];
+#endif
 		_CHANNELHASHSIZE = t_data[3];
 		_SIDSIZE = t_data[4];
 		poolsize = t_data[5];

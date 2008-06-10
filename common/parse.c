@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.95 2008/06/08 21:48:23 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.96 2008/06/10 22:06:53 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -260,6 +260,7 @@ aClient	*find_userhost(char *user, char *host, aClient *cptr, int *count)
 		if (host)
 		{
 			anUser *auptr;
+#ifdef USE_HOSTHASH
 			for (auptr = hash_find_hostname(host, NULL); auptr;
 					auptr = auptr->hhnext)
 			{
@@ -275,6 +276,27 @@ aClient	*find_userhost(char *user, char *host, aClient *cptr, int *count)
 					res = auptr->bcptr;
 				}
 			}
+#endif
+#ifdef USE_IPHASH
+#ifdef USE_HOSTHASH
+			if (!res)
+#endif
+			for (auptr = hash_find_ip(host, NULL); auptr;
+					auptr = auptr->iphnext)
+			{
+				if (MyConnect(auptr->bcptr)
+				    && !mycmp(user, auptr->username))
+				{
+					if (++(*count) > 1)
+					{
+						/* We already failed
+						 * - just return */
+						return res;
+					}
+					res = auptr->bcptr;
+				}
+			}
+#endif
 		}
 		else
 		{
