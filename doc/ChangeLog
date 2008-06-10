@@ -1,3 +1,10 @@
+2008-06-10  Piotr Kucharski
+
+	* channel.c/set_mode(): change every unset key to '*', so in a case of desynch
+	  it will not get exposed on &CHANNEL.
+	* struct_def.h: add EXITC_TKLINE.
+	* s_conf.c/do_kline(): set properly EXITC_(T)KLINE.
+	
 2.11.2b1
 
 2008-06-09  Piotr Kucharski
