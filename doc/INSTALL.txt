@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.83 2008/06/08 21:47:21 chopin Exp $
+  $Id: INSTALL.txt,v 1.84 2008/06/10 21:14:00 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -522,6 +522,13 @@
 
         +o  S - server-only (user connections are rejected)
 
+        Using 'D' flag is a nice way to help network not get invaded
+        after restart. It does not enable listening socket on a given
+        port before server has a chance to join a network. Note that you
+        can change state of the listening sockets using SET CACCEPT oper
+        command. Current state of sockets can be seen with STATS P (case
+        sensitive).
+
      NNoottee
         You need at least one P-line or server won't start.  (Unless you
         run it from inetd.)
@@ -583,7 +590,6 @@
      SSeennddQQ
         This field defines the ``SendQ'' (data awaiting to be sent to
         the client) value for this class. The format is <x>.<y>
-
         +o  x: defines maximum size of sendq, defaults to QUEUELEN if
            unset.
 
@@ -722,6 +728,7 @@
         Wildcards are permitted unless using a bitmask (e.g.
         1.2.3.0/24). Note that bitmask are encouraged over wildcards, as
         they are more accurate.
+
         Empty field is equal to '*' (matches any).
 
      PPaasssswwoorrdd
@@ -854,6 +861,7 @@
         As of the 2.11.0 version of the server, I: line flags are
         introduced.
 
+
   44..66..  OOppeerraattoorr pprriivviilliiggeess
 
   How to become the IRC administrator on your site
@@ -975,6 +983,7 @@
         config.h.
 
 
+
   44..77..  EExxcclluuddeedd aaccccoouunnttss
 
   Remove an errant user from IRC on your site.
@@ -1041,8 +1050,6 @@
 
      EExxaammpplleess
         K:orion.cair.du.edu::jtrim:0:
-
-
         If user ``jtrim'' connects to IRC from host
         ``orion.cair.du.edu'' then IMMEDIATELY REMOVE HIM from my IRCD.
 
@@ -1109,7 +1116,6 @@
         Given field will be matched against corresponding parameter of
         client USER command. If left empty it matches any. It may
         contain wildcards.
-
      NNiicckk
         If left empty it matches any. It may contain wildcards.
 
@@ -1181,7 +1187,6 @@
   2. to save internet from extra network traffic (remember the old rwho
      program with traffic problems when the number of machines
      increased).
-
 
 
      FFoorrmmaatt
@@ -1316,6 +1321,7 @@
      This line says: expect a Connection from host ``18.72.0.252'', and
      don't expect login password. The connecting host should identify
      itself as ``garfield.mit.edu''.
+
      NN  ``N'' corresponds to a server Noconnect option.
 
      TTAARRGGEETT HHoosstt AAddddrr
@@ -1440,10 +1446,11 @@
         may ``hub for''. If a server is only going to supply its own
         name (ie act as a solitary leaf) then no H-line is required for,
         else a H-line must be added.
-
      FFoorrmmaatt
 
         H:<Server Mask>:<SID Mask>:<Server Name>::
+
+
 
      SSeerrvveerr MMaasskk
         All servers that are allowed via this H-line must match the mask
@@ -1509,6 +1516,8 @@
      FFoorrmmaatt
 
         L:<Server Mask>:*:<Server Name>:<Max Depth>:
+
+
 
      SSeerrvveerr MMaasskk
         Mask of which servers the leaf-like attributes are used on when
@@ -1576,6 +1585,7 @@
         V:*/0209*::::
 
         Disallows any server using the 2.9 protocol to connect.
+
      NNoottee
         It is possible to have and use multiple V-lines for the one
         server mask.
@@ -1764,11 +1774,11 @@
         <http://www.irc.org/techie.html>.
 
 
+
   66..  RReeppoorrttiinngg aa bbuugg
 
   If you encounter a bug in the software, here is how and where to
   report it.
-
 
 
   66..11..  HHooww ttoo rreeppoorrtt aa bbuugg

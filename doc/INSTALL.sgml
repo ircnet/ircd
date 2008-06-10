@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.83 2008/06/08 21:47:21 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.84 2008/06/10 21:14:00 chopin Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11.0
 </abstract>
@@ -428,6 +428,11 @@ or one of:
 <item>D - delayed accept (not active until first netjoin)
 <item>S - server-only (user connections are rejected)
 </itemize>
+Using 'D' flag is a nice way to help network not get invaded after restart. It
+does not enable listening socket on a given port before server has a chance to
+join a network. Note that you can change state of the listening sockets using
+SET CACCEPT oper command. Current state of sockets can be seen with STATS P
+(case sensitive).
 <tag/Note/ You need at least one P-line or server won't start.
 (Unless you run it from inetd.)
 </descrip>
