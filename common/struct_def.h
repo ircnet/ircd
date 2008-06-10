@@ -17,7 +17,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.149 2008/06/09 17:37:43 jv Exp $
+ *   $Id: struct_def.h,v 1.150 2008/06/10 02:26:58 chopin Exp $
  */
 
 typedef	struct	ConfItem aConfItem;
@@ -951,6 +951,9 @@ typedef enum ServerChannels {
 #define EXITC_BADPASS	'p'	/* bad password */
 #define EXITC_SENDQ	'Q'	/* send queue exceeded */
 #define EXITC_REF	'R'	/* Refused */
+#ifdef TKLINE
+#define EXITC_TKLINE	't'	/* tkline */
+#endif
 #define EXITC_AREF	'U'	/* Unauthorized by iauth */
 #define EXITC_AREFQ	'u'	/* Unauthorized by iauth, be quiet */
 #define EXITC_VIRUS	'v'	/* joined a channel used by PrettyPark virus */
