@@ -1,23 +1,25 @@
 2008-06-10  Piotr Kucharski
 
-	* channel.c/set_mode(): change every unset key to '*', so in a case of desynch
-	  it will not get exposed on &CHANNEL.
+	* channel.c/set_mode(): change every unset key to '*', so in a case of
+	  desynch it will not get exposed on &CHANNEL.
 	* struct_def.h: add EXITC_TKLINE.
-	* s_conf.c/do_kline(): set properly EXITC_(T)KLINE.
-	
+	* s_conf.c/do_kline(): set properly EXITC_(T)KLINE (reported by BR).
+	* s_conf.c/attach_conf(), config.h.dist: allow reverting to previous 
+	  behaviour of Y-line host limits with #undef YLINE_LIMITS_IPHASH.
+
 2.11.2b1
 
 2008-06-09  Piotr Kucharski
 
-	* configure.in, setup.h.in, os.h: check if strings.h can be included along
-	  with string.h
+	* configure.in, setup.h.in, os.h: check if strings.h can be included
+	  along with string.h
 
 2008-06-09  Jakub Vlasek
 
 	* struct_def.h: add iphashv and iphnext used by the IP hash table.
 	* hash.c, hash_def.h, hash_ext.h: add IP hash.
-	* s_conf/attach_conf(): use hash_find_ip() to check for local and global
-	  user limits.
+	* s_conf/attach_conf(): use hash_find_ip() to check for local and
+	  global user limits.
 	* s_user.c/register_client(): Add user to the IP hash.
 	* s_misc.c/exit_one_client(): Remove user from the IP hash.
 

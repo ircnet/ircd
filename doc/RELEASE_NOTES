@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.80 2008/06/10 10:15:49 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.81 2008/06/10 20:36:27 chopin Exp $
 
 This is version 2.11.2 of the IRC software.
 ===============================================================================
@@ -24,6 +24,8 @@ Important changes in 2.11.2 (since 2.11.1):
 	* &CLIENTS format is changed if XLINE is defined (sends first three
 	  parameters of client USER command before fourth one).
 	* MAXBANS increased to 64, TOPICLEN increased to 255.
+	* Y-line [user@]host limits are now counted against user IPs, not user
+	  hostnames. If you want old behaviour, undefine YLINE_LIMITS_IPHASH.
 
 Important configuration changes in 2.11.2 (since 2.11.1):
 
