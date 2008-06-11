@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.274 2008/06/10 02:25:33 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.275 2008/06/11 18:16:12 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2654,6 +2654,9 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{
 			chptr->history = timeofday + (*chptr->chname == '!' ?
 				LDELAYCHASETIMELIMIT : DELAYCHASETIMELIMIT);
+			istat.is_hchan++;
+			istat.is_hchanmem += sizeof(aChannel) +
+				strlen(chptr->chname);
 		}
 		/* There cannot be anything else in this NJOIN. */
 		return 0;
