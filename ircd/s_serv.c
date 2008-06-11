@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.291 2008/06/11 19:47:52 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.292 2008/06/11 19:53:34 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2880,7 +2880,7 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 	}
 
-	sendto_one(sptr, replies[RPL_TRACEEND], ME, sptr->name, ME,
+	sendto_one(sptr, replies[RPL_ETRACEEND], ME, sptr->name, ME,
 			version, debugmode);
 	return 2;
 }
@@ -2910,7 +2910,7 @@ int	m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			acptr->info);
 	}
 
-	sendto_one(sptr, replies[RPL_TRACEEND], ME, sptr->name, "*",
+	sendto_one(sptr, replies[RPL_ETRACEEND], ME, sptr->name, "*",
 			version, debugmode);
 
 	return 3;
