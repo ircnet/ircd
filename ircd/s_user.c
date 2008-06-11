@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.274 2008/06/09 18:51:38 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.275 2008/06/11 18:27:27 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -824,8 +824,12 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		send_umode(NULL, sptr, 0, ALL_UMODES, buf);
 	check_services_num(sptr, buf);
 #endif
+#ifdef USE_HOSTHASH
 	add_to_hostname_hash_table(user->host, user);
+#endif
+#ifdef USE_IPHASH
 	add_to_ip_hash_table(user->sip, user);
+#endif
 	return 1;
 }
 
