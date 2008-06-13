@@ -1,8 +1,8 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.85 2008/06/13 16:39:22 chopin Exp $
+  $Id: INSTALL.txt,v 1.86 2008/06/13 17:55:50 chopin Exp $
 
-  This document describes how to install, and configure IRC 2.11.0
+  This document describes how to install, and configure IRC 2.11
 
   11..  IInnssttaalllliinngg IIRRCC..
 
@@ -73,7 +73,7 @@
 
   11..22..  NNootteess ffoorr CCyyggwwiinn3322 uusseerrss
 
-  The daemon of 2.11.0 release compiles properly on W32 systems which
+  The daemon of 2.11 release compiles properly on W32 systems which
   have the GNU-Win32 environment ( <http://www.cygwin.com/>) setup. At
   the time of the release, tests were made using the version b20.1 of
   the Cygwin32 library.

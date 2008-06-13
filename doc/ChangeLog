@@ -2,7 +2,7 @@
 
 2008-06-13  Piotr Kucharski
 
-	* s_err.c: change RPL_ETRACEEND numeric to 707.
+	* s_err.c: change RPL_ETRACEEND numeric to 759.
 
 2008-06-11  Piotr Kucharski
 
