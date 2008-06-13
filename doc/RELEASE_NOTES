@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.81 2008/06/10 20:36:27 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.82 2008/06/13 16:39:22 chopin Exp $
 
 This is version 2.11.2 of the IRC software.
 ===============================================================================
@@ -19,6 +19,7 @@ New features in 2.11.2:
 	  limiting scope of X-line matching user host/ip mask.
 	* services can now have their distribution based on SID (it affects not
 	  only visibility, but also scope of information they get).
+	* new oper commands: ETRACE and SIDTRACE.
 
 Important changes in 2.11.2 (since 2.11.1):
 	* &CLIENTS format is changed if XLINE is defined (sends first three
@@ -26,6 +27,7 @@ Important changes in 2.11.2 (since 2.11.1):
 	* MAXBANS increased to 64, TOPICLEN increased to 255.
 	* Y-line [user@]host limits are now counted against user IPs, not user
 	  hostnames. If you want old behaviour, undefine YLINE_LIMITS_IPHASH.
+	* &LOCAL unauth notices show ips now, not hostnames.
 
 Important configuration changes in 2.11.2 (since 2.11.1):
 

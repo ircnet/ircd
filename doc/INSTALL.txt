@@ -1,6 +1,6 @@
   Installing IRC - The Internet Relay Chat Program
   SGML version by Christophe Kalt, updated by Piotr Kucharski
-  $Id: INSTALL.txt,v 1.84 2008/06/10 21:14:00 chopin Exp $
+  $Id: INSTALL.txt,v 1.85 2008/06/13 16:39:22 chopin Exp $
 
   This document describes how to install, and configure IRC 2.11.0
 
@@ -962,7 +962,7 @@
 
         +o  t - enables full TRACE and STATS L
 
-        +o  v - enables SIDTRACE
+        +o  v - allows SIDTRACE
 
         ``L'' flag cannot be overridden by other flags.  If <Flags>
         field is left empty, no privileges will be granted.

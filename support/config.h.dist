@@ -596,7 +596,8 @@
 /*
 ** If you want to allow your opers to be able to use SIDTRACE command to
 ** see all clients from all servers that share the same SID prefix as your 
-** own, enable this. Useful for server "clusters", like 0PN.
+** own, enable this. Useful for server "clusters", like 0PN. Requires also
+** proper ACLs in O-line.
 */
 #undef ENABLE_SIDTRACE
 

@@ -1,3 +1,15 @@
+2.11.2
+
+2008-06-13  Piotr Kucharski
+
+	* s_err.c: change RPL_ETRACEEND numeric to 707.
+
+2008-06-11  Piotr Kucharski
+
+	* channel.c/m_njoin(): fix negative history count in stats z (by fiction).
+	* s_serv.c/m_stats(), m_trace(): show unknown connections only to +w opers.
+	* s_err.c, s_serv.c/m_etrace(), m_sidtracce(): use new RPL_ETRACEEND.
+
 2008-06-10  Piotr Kucharski
 
 	* channel.c/set_mode(): change every unset key to '*', so in a case of
@@ -6,6 +18,9 @@
 	* s_conf.c/do_kline(): set properly EXITC_(T)KLINE (reported by BR).
 	* s_conf.c/attach_conf(), config.h.dist: allow reverting to previous 
 	  behaviour of Y-line host limits with #undef YLINE_LIMITS_IPHASH.
+	* parse.c, hash.c, hash_def.h, hash_ext.h, ircd.c, s_user.c, s_misc.c,
+	  config.h.dist: if ip hash or hostname hash is not needed, do not compile
+	  it in (by the power of #ifdefs).
 
 2.11.2b1
 
