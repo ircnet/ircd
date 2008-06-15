@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.56 2008/06/10 22:06:53 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.57 2008/06/15 00:57:37 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1246,7 +1246,7 @@ anUser	*hash_find_ip(char *ip, anUser *user)
 
 	for (tmp = (anUser *)tmp3->list; tmp; prv = tmp, tmp = tmp->iphnext)
 	{
-		if (hv == tmp->iphashv && !mycmp(ip, tmp->host))
+		if (hv == tmp->iphashv && !mycmp(ip, tmp->sip))
 		    {
 			iphits++;
 			return (tmp);
