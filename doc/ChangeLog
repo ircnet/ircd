@@ -1,3 +1,7 @@
+2008-06-15  Piotr Kucharski
+
+	* hash.c/hash_find_ip(): stupid bug making iphash unusable (report by tlund).
+
 2.11.2
 
 2008-06-13  Piotr Kucharski
