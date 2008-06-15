@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.292 2008/06/11 19:53:34 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.293 2008/06/15 01:24:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1924,7 +1924,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* send list of file descriptors 
 		 * Avaible only for local opers for security reasons.
 		 */
-		if (!IsAnOper(sptr) || !MyConnect(sptr))
+		if (!is_allowed(sptr, ACL_TRACE) || !MyConnect(sptr))
 		{
 			stat = '*';
 			break;
