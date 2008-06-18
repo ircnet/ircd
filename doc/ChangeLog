@@ -1,6 +1,7 @@
 2008-06-15  Piotr Kucharski
 
 	* hash.c/hash_find_ip(): stupid bug making iphash unusable (report by tlund).
+	* s_serv.c/m_stats(): guard stats f with ACL_TRACE.
 
 2.11.2
 

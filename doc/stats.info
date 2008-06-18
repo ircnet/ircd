@@ -1,7 +1,7 @@
-This is stats.info, produced by makeinfo version 4.8 from
-/tmp/linuxdoc-dir-32146/sgmltmp.stats.info.2.
+This is stats.info, produced by makeinfo version 4.11 from
+/tmp/linuxdoc-dir-31638/sgmltmp.stats.2.texi.
 
-   \input texinfo
+\input texinfo
 
 
 File: stats.info,  Node: Top,  Next: Introduction,  Up: (dir)
@@ -10,7 +10,7 @@ STATS unleashed
 ***************
 
      Piotr Kucharski
-     $Id: stats.info,v 1.8 2006/04/26 19:21:07 chopin Exp $
+     $Id: stats.info,v 1.9 2008/06/18 18:53:59 chopin Exp $
 
    This document describes all STATS for ircd server 2.11.
 
@@ -31,6 +31,8 @@ numeric ,,End of STATS report". Whether it was empty output or invalid
 parameter can be determined by the char in 219 numeric (after the
 nickname): if it is the char we passed as parameter, the output was
 empty, if it was asterisk ,,*", there was no such STATS we requested.
+
+   Note: 2.11.2 allows multi-char parameters (there's one such so far).
 
 
 File: stats.info,  Node: STATS unleashed,  Next: Enhancements,  Prev: Introduction,  Up: Top
@@ -195,6 +197,10 @@ Also ending 219 numeric is omitted in whole.
           network is below that number (current number in parens)
 
         * CCL: bitmask telling what is sent to &CLIENTS channel.
+
+`d5 - defines and 005'
+     Sends the same as stats d and also 005 (the same that is sent
+     during client registration).
 
 `f, F - file descriptors report'
           1 0.0.0.0 4444 192.168.1.13 51397 Beeth chopin 3774
@@ -387,20 +393,23 @@ Also ending 219 numeric is omitted in whole.
      all 2.10 servers compiled with 'D' (debugmode).)
 
 `X - denied connections'
-          X * . . *
+          X * . . * * *
 
      Denies client connection based on what client sends in USER
-     command. Fields of X line correspond one by one to those of USER.
+     command. First four fields of X line correspond one by one to
+     those of USER, then nick. Last field is matched against client ip
+     or host mask (defaults to any if not present).
 
 `y, Y - class lines'
-          Y 0 300 0 16000 3000000 12.2 24.2 13
+          Y 0 300 0 16000 3000000 12.2 24.2 13 13/24
 
      2nd field is class number, 3rd is ping frequency, 4th is connect
      frequency (used only by servers), 5th maximum number of clients
-     that can attach to this class, 6th is maximum sendQ for each
-     client, 7th defines local limits, 8th field global limits (read
-     the INSTALL file for details) and 9th is number of clients using
-     this Y line.
+     that can attach to this class (maxlinks), 6th is maximum sendQ for
+     each client, 7th defines local limits, 8th field global limits
+     (read the INSTALL file for details) and 9th is number of clients
+     using this Y line. 10th field is (if present) CIDR limit, here: 13
+     clients allowed in each /24 network using that Y-line.
 
 `z, Z - memory usage'
           Client Local 2749(2210196) Remote 111389(8911120) Auth 31(1030)
@@ -457,9 +466,9 @@ drop a line to `ircd-dev@irc.org'
 
 
 Tag Table:
-Node: Top124
-Node: Introduction428
-Node: STATS unleashed891
-Node: Enhancements17190
+Node: Top122
+Node: Introduction426
+Node: STATS unleashed962
+Node: Enhancements17634
 
 End Tag Table

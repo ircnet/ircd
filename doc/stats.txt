@@ -1,6 +1,6 @@
   STATS unleashed
   Piotr Kucharski
-  $Id: stats.txt,v 1.9 2006/04/26 19:21:07 chopin Exp $
+  $Id: stats.txt,v 1.10 2008/06/18 18:53:59 chopin Exp $
 
   This document describes all STATS for ircd server 2.11.
 
@@ -12,6 +12,8 @@
   the nickname): if it is the char we passed as parameter, the output
   was empty, if it was asterisk ,,*'', there was no such STATS we
   requested.
+
+  Note: 2.11.2 allows multi-char parameters (there's one such so far).
 
 
   22..  SSTTAATTSS uunnlleeaasshheedd
@@ -60,6 +62,8 @@
      guised as ``*''), 4th IRC name of a server, 5th -- port that auto-
      connection will be attempted to (non-positive disables A/C) and
      finally the class this server will be using is in 6th field.
+
+
 
           N *@192.168.0.13 * *.example.net 1 10
 
@@ -120,11 +124,13 @@
            complete (after that client quits with a ``Ping timeout''
            reason)
 
+
         +o  KCTL (KILLCHASETIMELIMIT): seconds within which KILL, KICK or
            MODE reaches target after it changed nick
 
         +o  DCTL (DELAYCHASETIMELIMIT): seconds of channel delay
            protection
+
         +o  LDCTL (LDELAYCHASETIMELIMIT): seconds of !-channel delay
            protection
 
@@ -184,6 +190,7 @@
 
         +o  AC: auto connect status (0 disabled, 1 enabled)
 
+
         +o  CA: client accept status (0 disabled, 1 enabled, 2 enabled if
            not split)
 
@@ -191,10 +198,20 @@
 
         +o  SS (SPLIT_SERVERS): state of split if number of servers on
            the network is below that number (current number in parens)
+
         +o  SU (SPLIT_USERS): state of split if number of users on the
            network is below that number (current number in parens)
 
         +o  CCL: bitmask telling what is sent to &CLIENTS channel.
+
+
+     dd55 -- ddeeffiinneess aanndd 000055
+        Sends the same as
+
+        stats d
+
+
+     during client registration).
 
 
      ff,, FF -- ffiillee ddeessccrriippttoorrss rreeppoorrtt
@@ -298,7 +315,6 @@
      This command accepts second parameter: if present, it shows the
      above info only for the specified client.
 
-
      mm,, MM -- ccoommmmaannddss uussaaggee ssttaattss
 
 
@@ -311,7 +327,6 @@
      groups shows usage within given handler (function responsible for
      dealing with command coming from a given type of client), in the
      following sequence: server, client, oper, service, unregistered.
-
 
 
      oo,, OO -- ooppeerraattoorr lliinneess
@@ -362,21 +377,19 @@
           Q <NULL> security_reasons irc.example.com 0 -1
 
 
-
      3rd field is a reason for quarantining server matching 4th field.
 
 
      rr,, RR -- ssyysstteemm uussaaggee
 
 
-
-     CPU Secs 1269:55 User 975:10 System 294:45
-     RSS 180656 ShMem 4294962080 Data 1446 Stack 4294963143
-     Swaps 0 Reclaims 882162 Faults 14516
-     Block in 13 out 0
-     Msg Rcv 21277744 Send 56443634
-     Signals 16 Context Vol. 14305344 Invol 6442565
-     DBUF alloc 60 blocks 40867
+          CPU Secs 1269:55 User 975:10 System 294:45
+          RSS 180656 ShMem 4294962080 Data 1446 Stack 4294963143
+          Swaps 0 Reclaims 882162 Faults 14516
+          Block in 13 out 0
+          Msg Rcv 21277744 Send 56443634
+          Signals 16 Context Vol. 14305344 Invol 6442565
+          DBUF alloc 60 blocks 40867
 
 
 
@@ -427,12 +440,11 @@
      Messages coming from wrong direction and empty messages.
 
 
-
-     users without servers 0 ghosts N/A
-     numerics seen 261332 mode fakes 2894
-     auth: successes 0 fails 0
-     local connections 12 udp packets 0
-     udp errors 0 udp dropped 0
+          users without servers 0 ghosts N/A
+          numerics seen 261332 mode fakes 2894
+          auth: successes 0 fails 0
+          local connections 12 udp packets 0
+          udp errors 0 udp dropped 0
 
 
 
@@ -484,10 +496,10 @@
      Most of these are self-explanatory. Should you want more words
      about some, drop me a note.
 
-
      uu,, UU -- uuppttiimmee
 
-     Server Up 0 days, 0:31:55
+
+          Server Up 0 days, 0:31:55
 
 
 
@@ -509,43 +521,47 @@
      XX -- ddeenniieedd ccoonnnneeccttiioonnss
 
 
-          X * . . *
+          X * . . * * *
 
 
 
      Denies client connection based on what client sends in USER com-
-     mand. Fields of X line correspond one by one to those of USER.
+     mand. First four fields of X line correspond one by one to those of
+     USER, then nick. Last field is matched against client ip or host
+     mask (defaults to any if not present).
 
 
      yy,, YY -- ccllaassss lliinneess
 
 
-          Y 0 300 0 16000 3000000 12.2 24.2 13
+          Y 0 300 0 16000 3000000 12.2 24.2 13 13/24
 
 
 
      2nd field is class number, 3rd is ping frequency, 4th is connect
      frequency (used only by servers), 5th maximum number of clients
-     that can attach to this class, 6th is maximum sendQ for each
-     client, 7th defines local limits, 8th field global limits (read the
-     INSTALL file for details) and 9th is number of clients using this Y
-     line.
+     that can attach to this class (maxlinks), 6th is maximum sendQ for
+     each client, 7th defines local limits, 8th field global limits
+     (read the INSTALL file for details) and 9th is number of clients
+     using this Y line. 10th field is (if present) CIDR limit, here: 13
+     clients allowed in each /24 network using that Y-line.
 
 
      zz,, ZZ -- mmeemmoorryy uussaaggee
 
 
-          Client Local 2749(2210196) Remote 111389(8911120) Auth 31(1030)
-          Users 114064 in/visible 103664/10393(17337728) Invites 17(204)
-          User channels 418848(5026176) Aways 890(29745)
-          Attached confs 2719(32628)
-          Conflines 4888(527572)
-          Classes 18(792)
-          Channels 55106(19083997) Modes 65117(1879252) History 0(0) Cache 0(0)
-          Channel members 418879(5026548) invite 17(204)
-          Whowas users 111214(16904528) away 109(3679) links 12502(150024)
-          Whowas array 133852(10172752) Delay array 133852(2677040)
-          Hash: client 135347(1624164) chan 67741(812892)
+
+     Client Local 2749(2210196) Remote 111389(8911120) Auth 31(1030)
+     Users 114064 in/visible 103664/10393(17337728) Invites 17(204)
+     User channels 418848(5026176) Aways 890(29745)
+     Attached confs 2719(32628)
+     Conflines 4888(527572)
+     Classes 18(792)
+     Channels 55106(19083997) Modes 65117(1879252) History 0(0) Cache 0(0)
+     Channel members 418879(5026548) invite 17(204)
+     Whowas users 111214(16904528) away 109(3679) links 12502(150024)
+     Whowas array 133852(10172752) Delay array 133852(2677040)
+     Hash: client 135347(1624164) chan 67741(812892)
 
 
 

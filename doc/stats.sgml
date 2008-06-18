@@ -4,7 +4,7 @@
 
 <title>STATS unleashed
 <author>Piotr Kucharski
-<date>$Id: stats.sgml,v 1.9 2006/04/26 19:21:07 chopin Exp $
+<date>$Id: stats.sgml,v 1.10 2008/06/18 18:53:59 chopin Exp $
 <abstract>
 This document describes all STATS for ircd server 2.11.
 </abstract>
@@ -16,6 +16,8 @@ So far STATS has one-char parameter. The result always ends with 219 numeric
 can be determined by the char in 219 numeric (after the nickname): if it is
 the char we passed as parameter, the output was empty, if it was asterisk ,,*'',
 there was no such STATS we requested. 
+
+Note: 2.11.2 allows multi-char parameters (there's one such so far).
 
 <sect>STATS unleashed
 <p>
@@ -111,6 +113,10 @@ compiled in the server:
 <item>SU (SPLIT_USERS): state of split if number of users on the network is below that number (current number in parens)
 <item>CCL: bitmask telling what is sent to &amp;CLIENTS channel.
 </itemize>
+
+<tag/d5 - defines and 005/
+Sends the same as <verb>stats d</verb> and also 005 (the same that is sent
+during client registration).
 
 <tag/f, F - file descriptors report/
 <tscreen><verb>1 0.0.0.0 4444 192.168.1.13 51397 Beeth chopin 3774</verb></tscreen>
@@ -273,17 +279,19 @@ You guessed right, that's ircd uptime.
 with 'D' (debugmode).)
 
 <tag/X - denied connections/
-<tscreen><verb>X * . . *</verb></tscreen>
-Denies client connection based on what client sends in USER command. Fields
-of X line correspond one by one to those of USER.
+<tscreen><verb>X * . . * * *</verb></tscreen>
+Denies client connection based on what client sends in USER command. First four
+fields of X line correspond one by one to those of USER, then nick. Last field is
+matched against client ip or host mask (defaults to any if not present).
 
 <tag/y, Y - class lines/
-<tscreen><verb>Y 0 300 0 16000 3000000 12.2 24.2 13</verb></tscreen>
+<tscreen><verb>Y 0 300 0 16000 3000000 12.2 24.2 13 13/24</verb></tscreen>
 2nd field is class number, 3rd is ping frequency, 4th is connect frequency
 (used only by servers), 5th maximum number of clients that can attach to this
-class, 6th is maximum sendQ for each client, 7th defines local limits, 8th
+class (maxlinks), 6th is maximum sendQ for each client, 7th defines local limits, 8th
 field global limits (read the INSTALL file for details) and 9th is number
-of clients using this Y line.
+of clients using this Y line. 10th field is (if present) CIDR
+limit, here: 13 clients allowed in each /24 network using that Y-line.
 
 <tag/z, Z - memory usage
 <tscreen><verb>Client Local 2749(2210196) Remote 111389(8911120) Auth 31(1030)
