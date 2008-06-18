@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.26 2008/06/09 18:12:31 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.27 2008/06/18 21:33:04 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -256,6 +256,7 @@ void	initclass(void)
 	PingFreq(FirstClass()) = PINGFREQUENCY;
 	MaxLinks(FirstClass()) = MAXIMUM_LINKS;
 	MaxSendq(FirstClass()) = QUEUELEN;
+	MaxBSendq(FirstClass()) = QUEUELEN;
 	Links(FirstClass()) = 0;
 	NextClass(FirstClass()) = NULL;
 	MaxHLocal(FirstClass()) = 1;
