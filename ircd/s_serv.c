@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.293 2008/06/15 01:24:01 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.294 2008/06/20 22:13:13 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2858,6 +2858,11 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				get_client_class(acptr),
 				acptr->name, acptr->user->username,
 				acptr->user->host, acptr->user->sip,
+#ifdef XLINE
+				acptr->user2, acptr->user3, 
+#else
+				"-", "-",
+#endif
 				acptr->info);
 	}
 	else
@@ -2876,6 +2881,11 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				get_client_class(acptr), 
 				acptr->name, acptr->user->username, 
 				acptr->user->host, acptr->user->sip,
+#ifdef XLINE
+				acptr->user2, acptr->user3, 
+#else
+				"-", "-",
+#endif
 				acptr->info);
 		}
 	}
