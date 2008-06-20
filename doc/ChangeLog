@@ -1,3 +1,11 @@
+2006-06-20  Piotr Kucharski
+
+	* s_err.c, s_serv.c/m_etrace(): add additional user fields to output.
+
+2008-06-18  Piotr Kucharski
+
+	* class.c/initclass(): add missing init for maxbsendq for class 0.
+
 2008-06-15  Piotr Kucharski
 
 	* hash.c/hash_find_ip(): stupid bug making iphash unusable (report by tlund).
