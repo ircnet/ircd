@@ -1,3 +1,11 @@
+2006-06-21  Piotr Kucharski
+
+	* s_err.c, s_serv.c/m_etrace(): turns out that more fields was granted 
+	  different numeric in ratbox, so we change to match theirs; etrace now 
+	  behave always like ratbox "etrace -full".
+	* s_serv.c/m_sidtrace(): for local clients provide extra fields as well.
+	* s_serv.c/m_etrace(): extend oper check to IsAnOper, like sidtrace has.
+
 2006-06-20  Piotr Kucharski
 
 	* s_err.c, s_serv.c/m_etrace(): add additional user fields to output.
