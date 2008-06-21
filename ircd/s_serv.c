@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.295 2008/06/21 11:59:52 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.296 2008/06/21 12:00:47 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2854,7 +2854,7 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if ((acptr = find_person(parv[1], NULL)) && MyClient(acptr))
 			sendto_one(sptr, replies[RPL_ETRACEFULL],
 				ME, sptr->name,
-				IsOper(acptr) ? "Oper" : "User",
+				IsAnOper(acptr) ? "Oper" : "User",
 				get_client_class(acptr),
 				acptr->name, acptr->user->username,
 				acptr->user->host, acptr->user->sip,
@@ -2877,7 +2877,7 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		
 			sendto_one(sptr, replies[RPL_ETRACEFULL],
 				ME, sptr->name, 
-				IsOper(acptr) ? "Oper" : "User", 
+				IsAnOper(acptr) ? "Oper" : "User", 
 				get_client_class(acptr), 
 				acptr->name, acptr->user->username, 
 				acptr->user->host, acptr->user->sip,
