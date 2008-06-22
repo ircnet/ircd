@@ -3,6 +3,10 @@
 	* class.c/add_class(), initclass(): don't set MaxBSendq if not explicitly
 	  set in Y-line (client classes have no need for it anyway).
 	* class.c/get_sendq(): don't use MaxBSendq if not set.
+	* res.c/gethost_byname_type(), proc_answer(), update_list(), make_cache(),
+	  find_cache_name(): add "valid" flags to cache entries, so we use cached
+	  entry only when it was ok in both directions; this fixes problems with
+	  dual v4/v6 names in dns and also some possible spoofs (patch from fiction).
 
 2008-06-21  Piotr Kucharski
 
