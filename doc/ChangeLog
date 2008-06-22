@@ -7,6 +7,7 @@
 	  find_cache_name(): add "valid" flags to cache entries, so we use cached
 	  entry only when it was ok in both directions; this fixes problems with
 	  dual v4/v6 names in dns and also some possible spoofs (patch from fiction).
+	* res.c: while at it, little cleanup.
 
 2008-06-21  Piotr Kucharski
 
