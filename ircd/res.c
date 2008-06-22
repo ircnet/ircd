@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.46 2007/12/15 23:21:12 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.47 2008/06/22 17:06:52 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -45,7 +45,7 @@ static	void	resend_query (ResRQ *);
 static	int	proc_answer (ResRQ *, HEADER *, char *, char *);
 static	int	query_name (char *, int, int, ResRQ *);
 static	aCache	*make_cache (ResRQ *), *rem_list (aCache *);
-static	aCache	*find_cache_name (char *);
+static	aCache	*find_cache_name (ResRQ *, char *, int);
 static	aCache	*find_cache_number (ResRQ *, char *);
 static	int	add_request (ResRQ *);
 static	ResRQ	*make_request (Link *);
@@ -389,7 +389,11 @@ struct	hostent	*gethost_byname_type(char *name, Link *lp, int type)
 	Reg	aCache	*cp;
 
 	reinfo.re_na_look++;
-	if ((cp = find_cache_name(name)))
+ 
+	if (type != T_A && type != T_AAAA) 
+		return NULL;
+	if ((cp = find_cache_name(NULL, name, 
+		(type == T_A) ? FLAGS_A_VALID : FLAGS_AAAA_VALID)))
 		return (struct hostent *)&(cp->he);
 	if (!lp)
 		return NULL;
@@ -777,8 +781,25 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 			    }
 			else
 			    {
+				aCache *cachep = NULL;
 				hp->h_name = (char *)MyMalloc(len + 1);
 				(void)strcpy(hp->h_name, hostbuf);
+
+				/* Got a good PTR record back, cache entry can
+				be used also for reverse lookups. --fiction */
+				cachep = find_cache_name(NULL, hostbuf, 
+					(FLAGS_A_VALID|FLAGS_AAAA_VALID));
+				if (cachep != NULL) 
+				{
+					if ((cachep->flags & FLAGS_PTR_PEND) != 0)
+					{
+						cachep->flags |= FLAGS_PTR_VALID;
+					}
+					else
+					{
+						cachep->flags |= FLAGS_PTR_PEND;
+					}
+				}
 			    }
 			ans++;
 			break;
@@ -1157,6 +1178,15 @@ static	aCache	*add_to_cache(aCache *ocp)
 ** update_list does not alter the cache structure passed. It is assumed that
 ** it already contains the correct expire time, if it is a new entry. Old
 ** entries have the expirey time updated.
+**
+** Actually expiry time is not touched at all, what this function does is:
+** a.) Reorder the cache linked list so cachep gets first.
+** b.) If we have a rptr, data from rptr->he is used to update the cache 
+** entry cachep.
+** An important thing was added. Based on rptr->type we can determine which
+** part of the nameserver reply is authoritative and update only that part
+** (if the reply is for an "A?" we sent, update IP list, if it is for a
+** "PTR?" request, update names - aliases). --fiction
 */
 static	void	update_list(ResRQ *rptr, aCache *cachep)
 {
@@ -1187,6 +1217,8 @@ static	void	update_list(ResRQ *rptr, aCache *cachep)
 		cp,cp->he.h_name,cp->he.h_aliases,cp->he.h_addr));
 	Debug((DEBUG_DEBUG,"u_l:rptr %#x h_n %#x", rptr, rptr->he.h_name));
 #endif
+	if (rptr->type == T_PTR) 
+	{
 	/*
 	 * Compare the cache entry against the new record.  Add any
 	 * previously missing names for this entry.
@@ -1217,6 +1249,15 @@ static	void	update_list(ResRQ *rptr, aCache *cachep)
 			base[addrcount] = NULL;
 		    }
 	    }
+	}
+
+	if (rptr->type == T_A 
+#ifdef INET6
+		|| rptr->type == T_AAAA
+#endif
+	    )
+	{
+
 #ifdef INET6
 	for (i = 0; cp->he.h_addr_list[i]; i++)
 #else
@@ -1283,10 +1324,32 @@ static	void	update_list(ResRQ *rptr, aCache *cachep)
 			bcopy(s, (char *)*--ab, sizeof(struct IN_ADDR));
 		    }
 	    }
+
+		/* Here addrcount is the number of IPs 
+		   in the cache entry --fiction */
+
+		if (addrcount > 1) 
+		{
+			/* Do not trust that cache entry for reverse lookups */
+			cp->flags &= ~(FLAGS_PTR_PEND|FLAGS_PTR_VALID);
+		}
+		else 
+		{
+			if ((cp->flags & FLAGS_PTR_PEND) != 0) 
+			{
+				cp->flags |= FLAGS_PTR_VALID;
+			}
+			else
+			{
+				cp->flags |= FLAGS_PTR_PEND;
+			}
+		}
+
+	}
 	return;
 }
 
-static	aCache	*find_cache_name(char *name)
+static	aCache	*find_cache_name(ResRQ *rptr, char *name, int flags)
 {
 	Reg	aCache	*cp;
 	Reg	char	*s;
@@ -1300,16 +1363,26 @@ static	aCache	*find_cache_name(char *name)
 #endif
 
 	for (; cp; cp = cp->hname_next)
+	{
+		if ((cp->flags & flags) == 0) 
+		{
+			continue;
+		} 
 		for (i = 0, s = cp->he.h_name; s; s = cp->he.h_aliases[i++])
 			if (mycmp(s, name) == 0)
 			    {
 				cainfo.ca_na_hits++;
-				update_list(NULL, cp);
+				update_list(rptr, cp);
 				return cp;
 			    }
+	}
 
 	for (cp = cachetop; cp; cp = cp->list_next)
 	    {
+		if ((cp->flags & flags) == 0) 
+		{
+			continue;
+		} 
 		/*
 		 * if no aliases or the hash value matches, we've already
 		 * done this entry and all possiblilities concerning it.
@@ -1321,7 +1394,7 @@ static	aCache	*find_cache_name(char *name)
 		for (i = 0, s = cp->he.h_aliases[i]; s && i < MAXALIASES; i++)
 			if (!mycmp(name, s)) {
 				cainfo.ca_na_hits++;
-				update_list(NULL, cp);
+				update_list(rptr, cp);
 				return cp;
 			    }
 	    }
@@ -1351,6 +1424,10 @@ static	aCache	*find_cache_number(ResRQ *rptr, char *numb)
 #endif
 	for (; cp; cp = cp->hnum_next) 
 	    {
+		if ((cp->flags & FLAGS_PTR_VALID) == 0) 
+		{
+			continue;
+		}
 #ifdef INET6
 		for (i = 0; cp->he.h_addr_list[i]; i++)
 #else
@@ -1368,6 +1445,10 @@ static	aCache	*find_cache_number(ResRQ *rptr, char *numb)
 	    }
 	for (cp = cachetop; cp; cp = cp->list_next)
 	    {
+		if ((cp->flags & FLAGS_PTR_VALID) == 0) 
+		{
+			continue;
+		}
 		if (!cp->he.h_addr_list && !cp->he.h_aliases)
 		    {
 			cp = rem_list(cp);
@@ -1417,12 +1498,26 @@ static	aCache	*make_cache(ResRQ *rptr)
 	*/
 	if (!rptr->he.h_name || !WHOSTENTP(rptr->he.h_addr.S_ADDR))
 		return NULL;
-#if 0
 	/*
 	** Make cache entry.  First check to see if the cache already exists
 	** and if so, return a pointer to it.
 	*/
+
+	/*
+	 * Notice that find_* will also call update_list() and thus update the
+  	 * cache entry according to our new rptr->he. However do not worry
+	 * anymore as update_list() has additional new checks too. --fiction
+	 */
+	if (rptr->type == T_PTR)
+	{
+		/*
+		 * Search cache by IP.
+		 * Idea is that IP is already known and trusted (and can be 
+		 * used for search) when the reply is for a PTR request. 
+		 * The "new" thing we get with PTR is the hostname. --fiction
+		 */
 	for (i = 0; WHOSTENTP(rptr->he.h_addr_list[i].S_ADDR); i++)
+		{
 		if ((cp = find_cache_number(rptr,
 #ifdef INET6
 				(char *)(rptr->he.h_addr_list[i].S_ADDR))))
@@ -1430,7 +1525,24 @@ static	aCache	*make_cache(ResRQ *rptr)
 				(char *)&(rptr->he.h_addr_list[i].S_ADDR))))
 #endif
 			return cp;
+		}
+	}
+	else if (rptr->type == T_A 
+#ifdef INET6
+			|| rptr->type == T_AAAA
 #endif
+		)
+	{
+		/*
+		 * Search cache by name in case of A/AAAA reply.
+		 * Problem could be if the reply contained a CNAME and that
+		 * would make it into he.h_name. But as we assume CNAMEs can
+		 * end up ONLY in aliases everything should be fine. --fiction
+		 */
+		if ((cp = find_cache_name(rptr, rptr->he.h_name,
+			(rptr->type == T_A)?FLAGS_A_VALID:FLAGS_AAAA_VALID)))
+			return cp;
+	}
 
 	/*
 	** a matching entry wasnt found in the cache so go and make one up.
@@ -1488,6 +1600,14 @@ static	aCache	*make_cache(ResRQ *rptr)
 #ifdef DEBUG
 	Debug((DEBUG_INFO,"make_cache:made cache %#x", cp));
 #endif
+        cp->flags = 0;
+        switch (rptr->type) {
+          case T_A:
+             cp->flags |= FLAGS_A_VALID;
+             break;
+          case T_AAAA:
+             cp->flags |= FLAGS_AAAA_VALID;
+        }
 	return add_to_cache(cp);
 }
 
