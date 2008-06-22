@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.27 2008/06/18 21:33:04 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.28 2008/06/22 16:09:07 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -180,7 +180,7 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 	MaxLinks(p) = maxli;
 	if (sendq)
 		MaxSendq(p) = sendq;
-	MaxBSendq(p) = bsendq ? bsendq : MaxSendq(p);
+	MaxBSendq(p) = bsendq ? bsendq : 0;
 	MaxHLocal(p) = hlocal;
 	MaxUHLocal(p) = uhlocal;
 	MaxHGlobal(p) = hglobal;
@@ -256,7 +256,7 @@ void	initclass(void)
 	PingFreq(FirstClass()) = PINGFREQUENCY;
 	MaxLinks(FirstClass()) = MAXIMUM_LINKS;
 	MaxSendq(FirstClass()) = QUEUELEN;
-	MaxBSendq(FirstClass()) = QUEUELEN;
+	MaxBSendq(FirstClass()) = 0;
 	Links(FirstClass()) = 0;
 	NextClass(FirstClass()) = NULL;
 	MaxHLocal(FirstClass()) = 1;
@@ -299,7 +299,8 @@ int	get_sendq(aClient *cptr, int bursting)
 	Reg	aClass	*cl;
 
 	if (cptr->serv && cptr->serv->nline)
-		sendq = bursting ? MaxBSendq(cptr->serv->nline->class) :
+		sendq = bursting && MaxBSendq(cptr->serv->nline->class) ?
+			MaxBSendq(cptr->serv->nline->class) :
 			MaxSendq(cptr->serv->nline->class);
 	else if (cptr && !IsMe(cptr)  && (cptr->confs))
 		for (tmp = cptr->confs; tmp; tmp = tmp->next)
@@ -307,7 +308,8 @@ int	get_sendq(aClient *cptr, int bursting)
 			if (!tmp->value.aconf ||
 			    !(cl = tmp->value.aconf->class))
 				continue;
-			sendq = bursting ? MaxBSendq(cl) : MaxSendq(cl);
+			sendq = bursting && MaxBSendq(cl) ?
+				MaxBSendq(cl) : MaxSendq(cl);
 			break;
 		    }
 	return sendq;
