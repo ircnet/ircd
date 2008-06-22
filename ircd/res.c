@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.47 2008/06/22 17:06:52 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.48 2008/06/22 22:51:50 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -87,19 +87,19 @@ int	init_resolver(int op)
 	srand48(time(NULL));
 #endif
 	if (op & RES_INITLIST)
-	    {
+	{
 		bzero((char *)&reinfo, sizeof(reinfo));
 		first = last = NULL;
-	    }
+	}
 	if (op & RES_CALLINIT)
-	    {
+	{
 		ret = ircd_res_init();
 		if (!ircd_res.nscount)
-		    {
+		{
 			ircd_res.nscount = 1;
 #ifdef INET6
 			if (!inetpton(AF_INET6, "::1",
-				    &ircd_res.nsaddr_list[0].sin6_addr.s6_addr))
+				&ircd_res.nsaddr_list[0].sin6_addr.s6_addr))
 			{
 				bcopy(minus_one,
 					ircd_res.nsaddr_list[0].sin6_addr.s6_addr,
@@ -109,18 +109,14 @@ int	init_resolver(int op)
 			ircd_res.nsaddr_list[0].sin_addr.s_addr =
 				inetaddr("127.0.0.1");
 #endif
-		    }
-	    }
+		}
+	}
 
 	if (op & RES_INITSOCK)
-	    {
+	{
 		int	on = 0;
 
-#ifdef INET6
-		ret = resfd = socket(AF_INET6, SOCK_DGRAM, 0);
-#else
-		ret = resfd = socket(AF_INET, SOCK_DGRAM, 0);
-#endif
+		ret = resfd = socket(AFINET, SOCK_DGRAM, 0);
 		(void) SETSOCKOPT(ret, SOL_SOCKET, SO_BROADCAST, &on, on);
 
 		/* The following frame is a hack to allow resolving
@@ -141,16 +137,16 @@ int	init_resolver(int op)
 #endif
 			bind(resfd, (SAP) &res_addr, sizeof(res_addr));
 		}
-	    }
+	}
 #ifdef DEBUG
 	if (op & RES_INITDEBG);
 		ircd_res.options |= RES_DEBUG;
 #endif
 	if (op & RES_INITCACH)
-	    {
+	{
 		bzero((char *)&cainfo, sizeof(cainfo));
 		bzero((char *)hashtable, sizeof(hashtable));
-	    }
+	}
 	if (op == 0)
 		ret = resfd;
 	return ret;
@@ -163,10 +159,10 @@ static	int	add_request(ResRQ *new)
 	if (!first)
 		first = last = new;
 	else
-	    {
+	{
 		last->next = new;
 		last = new;
-	    }
+	}
 	new->next = NULL;
 	reinfo.re_requests++;
 	return 0;
@@ -185,13 +181,15 @@ static	void	rem_request(ResRQ *old)
 	if (!old)
 		return;
 	for (rptr = &first; *rptr; r2ptr = *rptr, rptr = &(*rptr)->next)
+	{
 		if (*rptr == old)
-		    {
+		{
 			*rptr = old->next;
 			if (last == old)
 				last = r2ptr;
 			break;
-		    }
+		}
+	}
 #ifdef	DEBUG
 	Debug((DEBUG_INFO,"rem_request:Remove %#x at %#x %#x",
 		old, *rptr, r2ptr));
@@ -256,7 +254,7 @@ time_t	timeout_query_list(time_t now)
 			{
 #ifdef DEBUG
 				Debug((DEBUG_ERROR,"timeout %x now %d cptr %x",
-				       rptr, now, rptr->cinfo.value.cptr));
+					rptr, now, rptr->cinfo.value.cptr));
 #endif
 				reinfo.re_timeouts++;
 				cptr = rptr->cinfo.value.cptr;
@@ -270,8 +268,7 @@ time_t	timeout_query_list(time_t now)
 					break;
 				case ASYNC_CONNECT :
 					sendto_flag(SCH_ERROR,
-						    "Host %s unknown",
-						    rptr->name);
+						"Host %s unknown", rptr->name);
 					break;
 				}
 				rem_request(rptr);
@@ -285,8 +282,8 @@ time_t	timeout_query_list(time_t now)
 				tout = now + rptr->timeout;
 #ifdef DEBUG
 				Debug((DEBUG_INFO,"r %x now %d retry %d c %x",
-				       rptr, now, rptr->retries,
-				       rptr->cinfo.value.cptr));
+					rptr, now, rptr->retries,
+					rptr->cinfo.value.cptr));
 #endif
 			}
 		}
@@ -307,11 +304,11 @@ void	del_queries(char *cp)
 	Reg	ResRQ	*rptr, *r2ptr;
 
 	for (rptr = first; rptr; rptr = r2ptr)
-	    {
+	{
 		r2ptr = rptr->next;
 		if (cp == rptr->cinfo.value.cp)
 			rem_request(rptr);
-	    }
+	}
 }
 
 /*
@@ -336,30 +333,19 @@ static	int	send_res_msg(char *msg, int len, int rcount)
 		max = 1;
 
 	for (i = 0; i < max; i++)
-	    {
-#ifdef INET6
-		ircd_res.nsaddr_list[i].sin6_family = AF_INET6;
-#else
-		ircd_res.nsaddr_list[i].sin_family = AF_INET;
-#endif
-#ifdef INET6
+	{
+		ircd_res.nsaddr_list[i].SIN_FAMILY = AFINET;
 		if (sendto(resfd, msg, len, 0,
 			   (struct sockaddr *)&(ircd_res.nsaddr_list[i]),
-			   sizeof(struct sockaddr_in6)) == len)
-#else
-		if (sendto(resfd, msg, len, 0,
-			   (struct sockaddr *)&(ircd_res.nsaddr_list[i]),
-			   sizeof(struct sockaddr)) == len)
-#endif
-
-		    {
+			   sizeof(struct SOCKADDR_IN)) == len)
+		{
 			reinfo.re_sent++;
 			sent++;
-		    }
+		}
 		else
 			Debug((DEBUG_ERROR,"s_r_m:sendto: %d on %d",
 				errno, resfd));
-	    }
+	}
 
 	return (sent) ? sent : -1;
 }
@@ -411,11 +397,13 @@ struct	hostent	*gethost_byname_type(char *name, Link *lp, int type)
  */
 struct	hostent	*gethost_byname(char *name, Link *lp)
 {
+	return gethost_byname_type(name, lp,
 #ifdef	INET6
-	return gethost_byname_type(name, lp, T_AAAA);
+		T_AAAA
 #else
-	return gethost_byname_type(name, lp, T_A);
+		T_A
 #endif
+		);
 }
 
 struct	hostent	*gethost_byaddr(char *addr, Link *lp)
@@ -440,7 +428,7 @@ static	int	do_query_name(Link *lp, char *name, ResRQ *rptr, int type)
 	len = strlen(hname);
 
 	if (rptr && !index(hname, '.') && ircd_res.options & RES_DEFNAMES)
-	    {
+	{
 		if (sizeof(hname) - 1 /* ending \0 */ <
 			strlen(hname) + 1 /* dot */ + strlen(ircd_res.defdname))
 		{
@@ -450,19 +438,19 @@ static	int	do_query_name(Link *lp, char *name, ResRQ *rptr, int type)
 		(void)strncat(hname, dot, sizeof(hname) - len - 1);
 		len++;
 		(void)strncat(hname, ircd_res.defdname, sizeof(hname) - len -1);
-	    }
+	}
 
 	/*
 	 * Store the name passed as the one to lookup and generate other host
 	 * names to pass onto the nameserver(s) for lookups.
 	 */
 	if (!rptr)
-	    {
+	{
 		rptr = make_request(lp);
 		rptr->type = type;
 		rptr->name = (char *)MyMalloc(strlen(name) + 1);
 		(void)strcpy(rptr->name, name);
-	    }
+	}
 	Debug((DEBUG_DNS,"do_query_name(): %s ", hname));
 	return query_name(hname, C_IN, type, rptr);
 }
@@ -478,15 +466,15 @@ static	int	do_query_number(Link *lp, struct IN_ADDR *numb, ResRQ *rptr)
 #ifdef INET6
 	cp = (u_char *)numb->s6_addr;
 	if (cp[0]==0 && cp[1]==0 && cp[2]==0 && cp[3]==0 && cp[4]==0 && 
-	    cp[5]==0 && cp[6]==0 && cp[7]==0 && cp[8]==0 && cp[9]==0 && 
-	    ((cp[10]==0 && cp[11]==0) || (cp[10]==0xff && cp[11]==0xff)))
-	    {
+		cp[5]==0 && cp[6]==0 && cp[7]==0 && cp[8]==0 && cp[9]==0 && 
+		((cp[10]==0 && cp[11]==0) || (cp[10]==0xff && cp[11]==0xff)))
+	{
 		(void)sprintf(ipbuf, "%u.%u.%u.%u.in-addr.arpa.",
-			      (u_int)(cp[15]), (u_int)(cp[14]),
-			      (u_int)(cp[13]), (u_int)(cp[12]));
-	    }
+			(u_int)(cp[15]), (u_int)(cp[14]),
+			(u_int)(cp[13]), (u_int)(cp[12]));
+	}
 	else
-	    {
+	{
 		(void)sprintf(ipbuf,
 			"%x.%x.%x.%x.%x.%x.%x.%x."
 			"%x.%x.%x.%x.%x.%x.%x.%x."
@@ -508,16 +496,16 @@ static	int	do_query_number(Link *lp, struct IN_ADDR *numb, ResRQ *rptr)
 		(u_int)(cp[2]&0xf), (u_int)(cp[2]>>4),
 		(u_int)(cp[1]&0xf), (u_int)(cp[1]>>4),
 		(u_int)(cp[0]&0xf), (u_int)(cp[0]>>4));
-	    }
+	}
 #else
 	cp = (u_char *)&numb->s_addr;
 	(void)sprintf(ipbuf, "%u.%u.%u.%u.in-addr.arpa.",
-		      (u_int)(cp[3]), (u_int)(cp[2]),
-		      (u_int)(cp[1]), (u_int)(cp[0]));
+		(u_int)(cp[3]), (u_int)(cp[2]),
+		(u_int)(cp[1]), (u_int)(cp[0]));
 #endif
 
 	if (!rptr)
-	    {
+	{
 		rptr = make_request(lp);
 		rptr->type = T_PTR;
 #ifdef INET6
@@ -530,7 +518,7 @@ static	int	do_query_number(Link *lp, struct IN_ADDR *numb, ResRQ *rptr)
 			(char *)&rptr->he.h_addr, sizeof(struct in_addr));
 #endif
 		rptr->he.h_length = sizeof(struct IN_ADDR);
-	    }
+	}
 	return (query_name(ipbuf, C_IN, T_PTR, rptr));
 }
 
@@ -539,42 +527,44 @@ static	int	do_query_number(Link *lp, struct IN_ADDR *numb, ResRQ *rptr)
  */
 static	int	query_name(char *name, int class, int type, ResRQ *rptr)
 {
-	struct	timeval	tv;
 	char	buf[MAXPACKET];
 	int	r,s,k = 0;
 	HEADER	*hptr;
+#ifndef LRAND48
+	struct	timeval	tv;
+
+	(void) gettimeofday(&tv, NULL);
+#endif
 
 	bzero(buf, sizeof(buf));
 	r = ircd_res_mkquery(QUERY, name, class, type, NULL, 0, NULL,
 			(u_char *)buf, sizeof(buf));
 	if (r <= 0)
-	    {
+	{
 		h_errno = NO_RECOVERY;
 		return r;
-	    }
+	}
 	hptr = (HEADER *)buf;
-#ifdef LRAND48
-        do {
-		hptr->id = htons(ntohs(hptr->id) + k + lrand48() & 0xffff);
-#else
-	(void) gettimeofday(&tv, NULL);
 	do {
-		/* htons/ntohs can be assembler macros, which cannot
-		   be nested. Thus two lines.	-Vesa		    */
-		u_short nstmp = ntohs(hptr->id) + k +
-				(u_short)(tv.tv_usec & 0xffff);
+		u_short nstmp;
+
+		nstmp = ntohs(hptr->id) + k;
+#ifndef LRAND48
+		nstmp += (u_short)(tv.tv_usec & 0xffff);
+#else
+		nstmp += lrand48() & 0xffff;
+#endif
 		hptr->id = htons(nstmp);
-#endif /* LRAND48 */
 		k++;
 	} while (find_id(ntohs(hptr->id)));
 	rptr->id = ntohs(hptr->id);
 	rptr->sends++;
 	s = send_res_msg(buf, r, rptr->sends);
 	if (s == -1)
-	    {
+	{
 		h_errno = TRY_AGAIN;
 		return -1;
-	    }
+	}
 	else
 		rptr->sent += s;
 	return 0;
@@ -634,7 +624,7 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 	 */
 	while (hptr->ancount-- > 0 && cp && cp < eob) {
 		n = ircd_dn_expand((u_char *)buf, (u_char *)eob, (u_char *)cp,
-			      hostbuf, sizeof(hostbuf));
+			hostbuf, sizeof(hostbuf));
 		if (n <= 0)
 			break;
 
@@ -685,21 +675,20 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 		case T_AAAA :
 #endif
 		case T_A :
+			if (dlen != (
 #ifdef INET6
-			if (dlen != ((type==T_AAAA) ? sizeof(dr) : 
-				     sizeof(struct in_addr)))
-#else
-			if (dlen != sizeof(dr))
+				(type == T_AAAA) ? sizeof(struct in6_addr) :
 #endif
-			    {
+				sizeof(struct in_addr)))
+			{
 				sendto_flag(SCH_ERROR,
-				    "Bad IP length (%d) returned for %s", dlen,
-					    hostbuf);
+					"Bad IP length (%d) returned for %s",
+					dlen, hostbuf);
 				Debug((DEBUG_DNS,
-				       "Bad IP length (%d) returned for %s",
-				       dlen, hostbuf));
+					"Bad IP length (%d) returned for %s",
+					dlen, hostbuf));
 				return -2;
-			    }
+			}
 			hp->h_length = dlen;
 			if (ans == 1)
 				hp->h_addrtype =  (class == C_IN) ?
@@ -707,7 +696,8 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 #ifdef INET6
 			if (type == T_AAAA)
 				bcopy(cp, (char *)&dr, dlen);
-			else {
+			else
+			{
 				/* ugly hack */
 				memset(dr.s6_addr, 0, 10);
 				dr.s6_addr[10] = dr.s6_addr[11] = 0xff;
@@ -718,29 +708,27 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 			bcopy(cp, (char *)&dr, dlen);
 			adr->s_addr = dr.s_addr;
 #endif
+			Debug((DEBUG_INFO,"got ip # %s for %s",
 #ifdef INET6
-			Debug((DEBUG_INFO,"got ip # %s for %s",
-			       inet_ntop(AF_INET6, (char *)adr, ipv6string,
-					 sizeof(ipv6string)),
-			       hostbuf));
+				inet_ntop(AF_INET6, (char *)adr, ipv6string,
+					sizeof(ipv6string)),
 #else
-			Debug((DEBUG_INFO,"got ip # %s for %s",
-			       inetntoa((char *)adr),
-			       hostbuf));
+				inetntoa((char *)adr),
 #endif
-			if(len < HOSTLEN)
+				hostbuf));
+			if (len < HOSTLEN)
 			{
 				/* if we have no hostname currently,
 				 * now we have one, else we have just
 				 * another alias. -- BitKoenig */
-				if(!hp->h_name)
+				if (!hp->h_name)
 				{
 					hp->h_name = (char *)MyMalloc(len+1);
 					(void)strcpy(hp->h_name, hostbuf);
-			    	}
+				}
 				else
 				/* don't keep it if we already have it */
-				if(strcasecmp(hp->h_name, hostbuf) &&
+				if (strcasecmp(hp->h_name, hostbuf) &&
 					alias < &(hp->h_aliases[MAXALIASES-1]))
 				{
 					*alias = (char *)MyMalloc(len + 1);
@@ -753,19 +741,19 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 			cp += dlen;
  			break;
 		case T_PTR :
-			if((n = ircd_dn_expand((u_char *)buf, (u_char *)eob,
+			if ((n = ircd_dn_expand((u_char *)buf, (u_char *)eob,
 					  (u_char *)cp, hostbuf,
 					  sizeof(hostbuf) )) < 0)
-			    {
+			{
 				cp = NULL;
 				break;
-			    }
+			}
 			cp += n;
 			len = strlen(hostbuf);
 			if (len > HOSTLEN)
-			    {
+			{
 				return -1;
-			    }
+			}
 			Debug((DEBUG_INFO, "got host %s (%d vs %d)",
 				hostbuf, len, strlen(hostbuf)));
 			if (bad_hostname(hostbuf, len))
@@ -776,11 +764,11 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 			 * already.
 			 */
 			if (hp->h_name)
-			    {
+			{
 				Debug((DEBUG_INFO, "duplicate PTR ignored"));
-			    }
+			}
 			else
-			    {
+			{
 				aCache *cachep = NULL;
 				hp->h_name = (char *)MyMalloc(len + 1);
 				(void)strcpy(hp->h_name, hostbuf);
@@ -800,15 +788,15 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 						cachep->flags |= FLAGS_PTR_PEND;
 					}
 				}
-			    }
+			}
 			ans++;
 			break;
 		case T_CNAME :
 			cp += dlen;
 			if (len > HOSTLEN)
-			    {
+			{
 				return -1;
-			    }
+			}
 			Debug((DEBUG_INFO,"got cname %s",hostbuf));
 #if 0
 			/* This is overcautious (we do not use CNAME in any
@@ -821,7 +809,7 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 				break;
 			/* if we already have this alias as hostname,
 			 * don't keep it twice --BitKoenig */
-			if(hp->h_name && strcasecmp(hp->h_name, hostbuf))
+			if (hp->h_name && strcasecmp(hp->h_name, hostbuf))
 			{
 				*alias = (char *)MyMalloc(len + 1);
 				(void)strcpy(*alias++, hostbuf);
@@ -833,7 +821,7 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 			cp += dlen;
 #ifdef DEBUG
 			Debug((DEBUG_INFO,"proc_answer: type:%d for:%s",
-			      type,hostbuf));
+				type,hostbuf));
 #endif
 			break;
 		}
@@ -850,21 +838,13 @@ struct	hostent	*get_res(char *lp)
 	Reg	HEADER	*hptr;
 	Reg	ResRQ	*rptr = NULL;
 	aCache	*cp = NULL;
-#ifdef INET6
-	struct	sockaddr_in6	sin;
-#else
-	struct	sockaddr_in	sin;
-#endif
+	struct	SOCKADDR_IN	sin;
 	int	rc, a, max;
 	SOCK_LEN_TYPE len = sizeof(sin);
 	char	buffer[512];
 
 	(void)alarm((unsigned)4);
-#ifdef INET6
 	rc = recvfrom(resfd, buf, sizeof(buf), 0, (struct sockaddr *)&sin, &len);
-#else
-	rc = recvfrom(resfd, buf, sizeof(buf), 0, (struct sockaddr *)&sin, &len);
-#endif
 
 	(void)alarm((unsigned)0);
 	if (rc <= sizeof(HEADER))
@@ -898,26 +878,19 @@ struct	hostent	*get_res(char *lp)
 		max = 1;
 
 	for (a = 0; a < max; a++)
-#ifdef INET6
 		if (!ircd_res.nsaddr_list[a].SIN_ADDR.S_ADDR ||
-		    !bcmp((char *)&sin.SIN_ADDR,
+			!bcmp((char *)&sin.SIN_ADDR,
 			  (char *)&ircd_res.nsaddr_list[a].SIN_ADDR,
 			  sizeof(struct IN_ADDR)))
-#else
-		if (!ircd_res.nsaddr_list[a].sin_addr.s_addr ||
-		    !bcmp((char *)&sin.sin_addr,
-			  (char *)&ircd_res.nsaddr_list[a].sin_addr,
-			  sizeof(struct in_addr)))
-#endif
 			break;
 	if (a == max)
-	    {
+	{
 		reinfo.re_unkrep++;
 		goto getres_err;
-	    }
+	}
 
 	if ((hptr->rcode != NOERROR) || (hptr->ancount == 0))
-	    {
+	{
 		switch (hptr->rcode)
 		{
 		case NXDOMAIN:
@@ -942,14 +915,14 @@ struct	hostent	*get_res(char *lp)
 		** send any more (no retries granted).
 		*/
 		if (h_errno != TRY_AGAIN)
-		    {
+		{
 			Debug((DEBUG_DNS, "Fatal DNS error %d for %d",
 				h_errno, hptr->rcode));
 			rptr->resend = 0;
 			rptr->retries = 0;
-		    }
+		}
 		goto getres_err;
-	    }
+	}
 	a = proc_answer(rptr, hptr, buf, buf+rc);
 	if (a == -1) {
 		sprintf(buffer, "Bad hostname returned for %s",
@@ -967,22 +940,21 @@ struct	hostent	*get_res(char *lp)
 	Debug((DEBUG_INFO,"get_res:Proc answer = %d",a));
 #endif
 	if (a > 0 && rptr->type == T_PTR)
-	    {
+	{
 		struct	hostent	*hp2 = NULL;
 		int	type;
 
 		if (BadPtr(rptr->he.h_name))	/* Kludge!	960907/Vesa */
 			goto getres_err;
 
+		Debug((DEBUG_DNS, "relookup %s <-> %s", rptr->he.h_name,
 #ifdef INET6
-		Debug((DEBUG_DNS, "relookup %s <-> %s",
-			rptr->he.h_name, inet_ntop(AF_INET6,
-						   (char *)&rptr->he.h_addr,
-						   ipv6string, sizeof(ipv6string))));
+			inet_ntop(AF_INET6, (char *)&rptr->he.h_addr,
+				ipv6string, sizeof(ipv6string))
 #else
-		Debug((DEBUG_DNS, "relookup %s <-> %s",
-			rptr->he.h_name, inetntoa((char *)&rptr->he.h_addr)));
+			inetntoa((char *)&rptr->he.h_addr)
 #endif
+			));
 		/*
 		 * Lookup the 'authoritative' name that we were given for the
 		 * ip#.  By using this call rather than regenerating the
@@ -990,21 +962,14 @@ struct	hostent	*get_res(char *lp)
 		 * extra kludges.
 		 */
 #ifdef	INET6
-		if (IN6_IS_ADDR_V4MAPPED(&rptr->he.h_addr))
-		{
-			type = T_A;
-		}
-		else
-		{
+		if (!IN6_IS_ADDR_V4MAPPED(&rptr->he.h_addr))
 			type = T_AAAA;
-		}
-#else
-		type = T_A;
+		else
 #endif
-		if ((hp2 = gethost_byname_type(rptr->he.h_name, &rptr->cinfo,
-				type)))
-			if (lp)
-				bcopy((char *)&rptr->cinfo, lp, sizeof(Link));
+			type = T_A;
+		hp2 = gethost_byname_type(rptr->he.h_name, &rptr->cinfo, type);
+		if (hp2 && lp)
+			bcopy((char *)&rptr->cinfo, lp, sizeof(Link));
 		/*
 		 * If name wasn't found, a request has been queued and it will
 		 * be the last one queued.  This is rather nasty way to keep
@@ -1016,21 +981,21 @@ struct	hostent	*get_res(char *lp)
 			last->he.h_name = rptr->he.h_name;
 			rptr->he.h_name = NULL;
 			for (a = 0; rptr->he.h_aliases[a]; a++)
-			    {
+			{
 				Debug((DEBUG_DNS, "Copied CNAME %s for %s",
 					rptr->he.h_aliases[a],
 					rptr->he.h_name));
 				last->he.h_aliases[a] = rptr->he.h_aliases[a];
 				rptr->he.h_aliases[a] = NULL;
-			    }
+			}
 		}
 
 		rem_request(rptr);
 		return hp2;
-	    }
+	}
 
 	if (a > 0)
-	    {
+	{
 		if (lp)
 			bcopy((char *)&rptr->cinfo, lp, sizeof(Link));
 		cp = make_cache(rptr);
@@ -1039,7 +1004,7 @@ struct	hostent	*get_res(char *lp)
 #endif
 
 		rem_request(rptr);
-	    }
+	}
 	else
 		if (!rptr->sent)
 			rem_request(rptr);
@@ -1050,7 +1015,7 @@ getres_err:
 	 * Reprocess an error if the nameserver didnt tell us to "TRY_AGAIN".
 	 */
 	if (rptr)
-	    {
+	{
 		if (h_errno != TRY_AGAIN)
 		{
 			/*
@@ -1066,7 +1031,7 @@ getres_err:
 #ifdef INET6
 /* Comment out this ifdef to get names like ::ffff:a.b.c.d */
 /* We always want to query for both IN A and IN AAAA */
-			if(rptr->type == T_AAAA)
+			if (rptr->type == T_AAAA)
 			{
 				rptr->type = T_A;
 				query_name(rptr->name, C_IN, T_A, rptr);
@@ -1079,7 +1044,7 @@ getres_err:
 		}
 		else if (lp)
 			bcopy((char *)&rptr->cinfo, lp, sizeof(Link));
-	    }
+	}
 	return (struct hostent *)NULL;
 }
 
@@ -1130,7 +1095,7 @@ static	aCache	*add_to_cache(aCache *ocp)
 
 #ifdef DEBUG
 	Debug((DEBUG_INFO,
-	      "add_to_cache:ocp %#x he %#x name %#x addrl %#x 0 %#x",
+		"add_to_cache:ocp %#x he %#x name %#x addrl %#x 0 %#x",
 		ocp, &ocp->he, ocp->he.h_name, ocp->he.h_addr_list,
 		ocp->he.h_addr_list[0]));
 #endif
@@ -1164,11 +1129,11 @@ static	aCache	*add_to_cache(aCache *ocp)
 	 * LRU deletion of excessive cache entries.
 	 */
 	if (++incache > MAXCACHED)
-	    {
+	{
 		for (cp = cachetop; cp->list_next; cp = cp->list_next)
 			;
 		rem_cache(cp);
-	    }
+	}
 	cainfo.ca_adds++;
 
 	return ocp;
@@ -1219,111 +1184,108 @@ static	void	update_list(ResRQ *rptr, aCache *cachep)
 #endif
 	if (rptr->type == T_PTR) 
 	{
-	/*
-	 * Compare the cache entry against the new record.  Add any
-	 * previously missing names for this entry.
-	 */
-	for (i = 0; cp->he.h_aliases[i]; i++)
-		;
-	addrcount = i;
-	for (i = 0, s = rptr->he.h_name; s && i < MAXALIASES;
-	     s = rptr->he.h_aliases[i++])
-	    {
-		for (j = 0, t = cp->he.h_name; t && j < MAXALIASES;
-		     t = cp->he.h_aliases[j++])
-			if (!mycmp(t, s))
-				break;
-		if (!t && j < MAXALIASES-1)
-		    {
-			base = cp->he.h_aliases;
+		/*
+		 * Compare the cache entry against the new record.  Add any
+		 * previously missing names for this entry.
+		 */
+		for (i = 0; cp->he.h_aliases[i]; i++)
+			;
+		addrcount = i;
+		for (i = 0, s = rptr->he.h_name; s && i < MAXALIASES;
+			s = rptr->he.h_aliases[i++])
+		{
+			for (j = 0, t = cp->he.h_name; t && j < MAXALIASES;
+				t = cp->he.h_aliases[j++])
+			{
+				if (!mycmp(t, s))
+					break;
+			}
+			if (!t && j < MAXALIASES-1)
+			{
+				base = cp->he.h_aliases;
 
-			addrcount++;
-			base = (char **)MyRealloc((char *)base,
+				addrcount++;
+				base = (char **)MyRealloc((char *)base,
 					sizeof(char *) * (addrcount + 1));
-			cp->he.h_aliases = base;
+				cp->he.h_aliases = base;
 #ifdef	DEBUG
-			Debug((DEBUG_DNS,"u_l:add name %s hal %x ac %d",
-				s, cp->he.h_aliases, addrcount));
+				Debug((DEBUG_DNS,"u_l:add name %s hal %x ac %d",
+					s, cp->he.h_aliases, addrcount));
 #endif
-			base[addrcount-1] = mystrdup(s);
-			base[addrcount] = NULL;
-		    }
-	    }
+				base[addrcount-1] = mystrdup(s);
+				base[addrcount] = NULL;
+			}
+		}
 	}
 
 	if (rptr->type == T_A 
 #ifdef INET6
 		|| rptr->type == T_AAAA
 #endif
-	    )
+		)
 	{
 
-#ifdef INET6
-	for (i = 0; cp->he.h_addr_list[i]; i++)
-#else
-	for (i = 0; cp->he.h_addr_list[i]; i++)
-#endif
-		;
-	addrcount = i;
+		for (i = 0; cp->he.h_addr_list[i]; i++)
+			;
+		addrcount = i;
 
-	/*
-	 * Do the same again for IP#'s.
-	 */
-	for (j = 0; WHOSTENTP(rptr->he.h_addr_list[j].S_ADDR); j++)
-	    {
-#ifdef INET6
-		s = (char *)rptr->he.h_addr_list[j].S_ADDR;
-		for (i = 0; (t = cp->he.h_addr_list[i]); i++)
-#else
-		s = (char *)&rptr->he.h_addr_list[j].S_ADDR;
-		for (i = 0; (t = cp->he.h_addr_list[i]); i++)
-#endif
-			if (!bcmp(s, t, sizeof(struct IN_ADDR)))
-				break;
-		if (i >= MAXADDRS || addrcount >= MAXADDRS)
-			break;
 		/*
-		 * Oh man this is bad...I *HATE* it. -avalon
-		 *
-		 * Whats it do ?  Reallocate two arrays, one of pointers
-		 * to "char *" and the other of IP addresses.  Contents of
-		 * the IP array *MUST* be preserved and the pointers into
-		 * it recalculated.
+		 * Do the same again for IP#'s.
 		 */
-		if (!t)
-		    {
-			struct	IN_ADDR	**ab;
+		for (j = 0; WHOSTENTP(rptr->he.h_addr_list[j].S_ADDR); j++)
+		{
+	#ifdef INET6
+			s = (char *)rptr->he.h_addr_list[j].S_ADDR;
+	#else
+			s = (char *)&rptr->he.h_addr_list[j].S_ADDR;
+	#endif
+			for (i = 0; (t = cp->he.h_addr_list[i]); i++)
+				if (!bcmp(s, t, sizeof(struct IN_ADDR)))
+					break;
+			if (i >= MAXADDRS || addrcount >= MAXADDRS)
+				break;
+			/*
+			 * Oh man this is bad...I *HATE* it. -avalon
+			 *
+			 * Whats it do ?  Reallocate two arrays, one of pointers
+			 * to "char *" and the other of IP addresses.  Contents of
+			 * the IP array *MUST* be preserved and the pointers into
+			 * it recalculated.
+			 */
+			if (!t)
+			{
+				struct	IN_ADDR	**ab;
 
-			ab = (struct IN_ADDR **)cp->he.h_addr_list;
-			addrcount++;
-			t = (char *)MyRealloc((char *)*ab,
-					addrcount * sizeof(struct IN_ADDR));
-			base = (char **)MyRealloc((char *)ab,
-					(addrcount + 1) * sizeof(*ab));
-			cp->he.h_addr_list = base;
-			ab = (struct IN_ADDR **)base;
-#ifdef	DEBUG
-# ifdef	INET6
-			Debug((DEBUG_DNS,"u_l:add IP %s hal %x ac %d",
-				inetntop(AF_INET6, 
-				(char *)((struct in6_addr *)s)->s6_addr,
-				ipv6string, sizeof(ipv6string)),
-				cp->he.h_addr_list, addrcount));
-# else
-			Debug((DEBUG_DNS,"u_l:add IP %x hal %x ac %d",
-				ntohl(((struct in_addr *)s)->s_addr),
-				cp->he.h_addr_list, addrcount));
-# endif
-#endif
-			for (i = addrcount; i; i--)
-			    {
-				*ab++ = (struct IN_ADDR *)t;
-				t += sizeof(struct IN_ADDR);
-			    }
-			*ab = NULL;
-			bcopy(s, (char *)*--ab, sizeof(struct IN_ADDR));
-		    }
-	    }
+				ab = (struct IN_ADDR **)cp->he.h_addr_list;
+				addrcount++;
+				t = (char *)MyRealloc((char *)*ab,
+						addrcount * sizeof(struct IN_ADDR));
+				base = (char **)MyRealloc((char *)ab,
+						(addrcount + 1) * sizeof(*ab));
+				cp->he.h_addr_list = base;
+				ab = (struct IN_ADDR **)base;
+	#ifdef	DEBUG
+	# ifdef	INET6
+				Debug((DEBUG_DNS,"u_l:add IP %s hal %x ac %d",
+					inetntop(AF_INET6, 
+					(char *)((struct in6_addr *)s)->s6_addr,
+					ipv6string, sizeof(ipv6string)),
+					cp->he.h_addr_list, addrcount));
+	# else
+				Debug((DEBUG_DNS,"u_l:add IP %x hal %x ac %d",
+					ntohl(((struct in_addr *)s)->s_addr),
+					cp->he.h_addr_list, addrcount));
+	# endif
+	#endif
+				for (i = addrcount; i; i--)
+				{
+					*ab++ = (struct IN_ADDR *)t;
+					t += sizeof(struct IN_ADDR);
+				}
+				*ab = NULL;
+				bcopy(s, (char *)*--ab, sizeof(struct IN_ADDR));
+			}
+		}
 
 		/* Here addrcount is the number of IPs 
 		   in the cache entry --fiction */
@@ -1344,7 +1306,6 @@ static	void	update_list(ResRQ *rptr, aCache *cachep)
 				cp->flags |= FLAGS_PTR_PEND;
 			}
 		}
-
 	}
 	return;
 }
@@ -1370,15 +1331,15 @@ static	aCache	*find_cache_name(ResRQ *rptr, char *name, int flags)
 		} 
 		for (i = 0, s = cp->he.h_name; s; s = cp->he.h_aliases[i++])
 			if (mycmp(s, name) == 0)
-			    {
+			{
 				cainfo.ca_na_hits++;
 				update_list(rptr, cp);
 				return cp;
-			    }
+			}
 	}
 
 	for (cp = cachetop; cp; cp = cp->list_next)
-	    {
+	{
 		if ((cp->flags & flags) == 0) 
 		{
 			continue;
@@ -1392,12 +1353,13 @@ static	aCache	*find_cache_name(ResRQ *rptr, char *name, int flags)
 		if (hashv == hash_name(cp->he.h_name))
 			continue;
 		for (i = 0, s = cp->he.h_aliases[i]; s && i < MAXALIASES; i++)
-			if (!mycmp(name, s)) {
+			if (!mycmp(name, s))
+			{
 				cainfo.ca_na_hits++;
 				update_list(rptr, cp);
 				return cp;
-			    }
-	    }
+			}
+	}
 	return NULL;
 }
 
@@ -1423,46 +1385,38 @@ static	aCache	*find_cache_number(ResRQ *rptr, char *numb)
 # endif
 #endif
 	for (; cp; cp = cp->hnum_next) 
-	    {
+	{
 		if ((cp->flags & FLAGS_PTR_VALID) == 0) 
 		{
 			continue;
 		}
-#ifdef INET6
 		for (i = 0; cp->he.h_addr_list[i]; i++)
-#else
-		for (i = 0; cp->he.h_addr_list[i]; i++)
-#endif
-		    {
+		{
 			if (!bcmp(cp->he.h_addr_list[i], numb,
 				  sizeof(struct IN_ADDR)))
-			    {
+			{
 				cainfo.ca_nu_hits++;
 				update_list(rptr, cp);
 				return cp;
-			    }
-		    }
-	    }
+			}
+		}
+	}
 	for (cp = cachetop; cp; cp = cp->list_next)
-	    {
+	{
 		if ((cp->flags & FLAGS_PTR_VALID) == 0) 
 		{
 			continue;
 		}
 		if (!cp->he.h_addr_list && !cp->he.h_aliases)
-		    {
+		{
 			cp = rem_list(cp);
 			continue;
-		    }
+		}
 		/*
 		 * single address entry...would have been done by hashed
 		 * search above...
 		 */
-#ifdef INET6
 		if (!cp->he.h_addr_list[1])
-#else
-		if (!cp->he.h_addr_list[1])
-#endif
 			continue;
 		/*
 		 * if the first IP# has the same hashnumber as the IP# we
@@ -1470,19 +1424,17 @@ static	aCache	*find_cache_number(ResRQ *rptr, char *numb)
 		 */
 		if (hashv == hash_number((u_char *)cp->he.h_addr_list[0]))
 			continue;
-#ifdef INET6
 		for (i = 1; cp->he.h_addr_list[i]; i++)
-#else
-		for (i = 1; cp->he.h_addr_list[i]; i++)
-#endif
+		{
 			if (!bcmp(cp->he.h_addr_list[i], numb,
 				  sizeof(struct IN_ADDR)))
-			    {
+			{
 				cainfo.ca_nu_hits++;
 				update_list(rptr, cp);
 				return cp;
-			    }
-	    }
+			}
+		}
+	}
 	return NULL;
 }
 
@@ -1516,14 +1468,15 @@ static	aCache	*make_cache(ResRQ *rptr)
 		 * used for search) when the reply is for a PTR request. 
 		 * The "new" thing we get with PTR is the hostname. --fiction
 		 */
-	for (i = 0; WHOSTENTP(rptr->he.h_addr_list[i].S_ADDR); i++)
+		for (i = 0; WHOSTENTP(rptr->he.h_addr_list[i].S_ADDR); i++)
 		{
-		if ((cp = find_cache_number(rptr,
+			if ((cp = find_cache_number(rptr,
 #ifdef INET6
-				(char *)(rptr->he.h_addr_list[i].S_ADDR))))
+				(char *)(rptr->he.h_addr_list[i].S_ADDR)
 #else
-				(char *)&(rptr->he.h_addr_list[i].S_ADDR))))
+				(char *)&(rptr->he.h_addr_list[i].S_ADDR)
 #endif
+				)))
 			return cp;
 		}
 	}
@@ -1540,8 +1493,13 @@ static	aCache	*make_cache(ResRQ *rptr)
 		 * end up ONLY in aliases everything should be fine. --fiction
 		 */
 		if ((cp = find_cache_name(rptr, rptr->he.h_name,
-			(rptr->type == T_A)?FLAGS_A_VALID:FLAGS_AAAA_VALID)))
+#ifdef INET6
+			(rptr->type == T_AAAA) ? FLAGS_AAAA_VALID :
+#endif
+			FLAGS_A_VALID)))
+		{
 			return cp;
+		}
 	}
 
 	/*
@@ -1564,11 +1522,11 @@ static	aCache	*make_cache(ResRQ *rptr)
 	bzero(s, sizeof(struct IN_ADDR) * i);
 
 	for (n = 0; n < i; n++, s += sizeof(struct IN_ADDR))
-	    {
+	{
 		*t++ = s;
 		bcopy((char *)&rptr->he.h_addr_list[n], s,
-		      sizeof(struct IN_ADDR));
-	    }
+			sizeof(struct IN_ADDR));
+	}
 	*t = (char *)NULL;
 
 	/*
@@ -1580,19 +1538,19 @@ static	aCache	*make_cache(ResRQ *rptr)
 	i++;
 	t = hp->h_aliases = (char **)MyMalloc(sizeof(char *) * i);
 	for (n = 0; n < i; n++, t++)
-	    {
+	{
 		*t = rptr->he.h_aliases[n];
 		rptr->he.h_aliases[n] = NULL;
-	    }
+	}
 
 	hp->h_addrtype = rptr->he.h_addrtype;
 	hp->h_length = rptr->he.h_length;
 	hp->h_name = rptr->he.h_name;
 	if (rptr->ttl < 600)
-	    {
+	{
 		reinfo.re_shortttl++;
 		cp->ttl = 600;
-	    }
+	}
 	else
 		cp->ttl = rptr->ttl;
 	cp->expireat = timeofday + cp->ttl;
@@ -1600,14 +1558,16 @@ static	aCache	*make_cache(ResRQ *rptr)
 #ifdef DEBUG
 	Debug((DEBUG_INFO,"make_cache:made cache %#x", cp));
 #endif
-        cp->flags = 0;
-        switch (rptr->type) {
-          case T_A:
-             cp->flags |= FLAGS_A_VALID;
-             break;
-          case T_AAAA:
-             cp->flags |= FLAGS_AAAA_VALID;
-        }
+	cp->flags = 0;
+	switch (rptr->type)
+	{
+		case T_A:
+			cp->flags |= FLAGS_A_VALID;
+			break;
+		case T_AAAA:
+			cp->flags |= FLAGS_AAAA_VALID;
+			break;
+	}
 	return add_to_cache(cp);
 }
 
@@ -1622,12 +1582,14 @@ static	aCache	*rem_list(aCache *cp)
 	 * remove cache entry from linked list
 	 */
 	for (cpp = &cachetop; *cpp; cpp = &((*cpp)->list_next))
+	{
 		if (*cpp == cp)
-		    {
+		{
 			*cpp = cp->list_next;
 			MyFree(cp);
 			break;
-		    }
+		}
+	}
 	return cr;
 }
 
@@ -1659,11 +1621,13 @@ static	void	rem_cache(aCache *ocp)
 	 * remove cache entry from linked list
 	 */
 	for (cp = &cachetop; *cp; cp = &((*cp)->list_next))
+	{
 		if (*cp == ocp)
-		    {
+		{
 			*cp = ocp->list_next;
 			break;
-		    }
+		}
+	}
 	/*
 	 * remove cache entry from hashed name lists
 	 */
@@ -1674,32 +1638,34 @@ static	void	rem_cache(aCache *ocp)
 		hashtable[hashv].name_list));
 #endif
 	for (cp = &hashtable[hashv].name_list; *cp; cp = &((*cp)->hname_next))
+	{
 		if (*cp == ocp)
-		    {
+		{
 			*cp = ocp->hname_next;
 			break;
-		    }
+		}
+	}
 	/*
 	 * remove cache entry from hashed number list
 	 */
 	hashv = hash_number((u_char *)hp->h_addr);
 #ifdef	DEBUG
+	Debug((DEBUG_DEBUG,"rem_cache: h_addr %s hashv %d next %#x first %#x",
 # ifdef INET6
-	Debug((DEBUG_DEBUG,"rem_cache: h_addr %s hashv %d next %#x first %#x",
-	       inet_ntop(AF_INET6, hp->h_addr, ipv6string, sizeof(ipv6string)),
-	       hashv, ocp->hnum_next, hashtable[hashv].num_list));
+		inet_ntop(AF_INET6, hp->h_addr, ipv6string, sizeof(ipv6string)),
 # else
-	Debug((DEBUG_DEBUG,"rem_cache: h_addr %s hashv %d next %#x first %#x",
-	       inetntoa(hp->h_addr),
-	       hashv, ocp->hnum_next, hashtable[hashv].num_list));
+		inetntoa(hp->h_addr),
 # endif
+		hashv, ocp->hnum_next, hashtable[hashv].num_list));
 #endif
 	for (cp = &hashtable[hashv].num_list; *cp; cp = &((*cp)->hnum_next))
+	{
 		if (*cp == ocp)
-		    {
+		{
 			*cp = ocp->hnum_next;
 			break;
-		    }
+		}
+	}
 
 	/*
 	 * free memory used to hold the various host names and the array
@@ -1708,21 +1674,21 @@ static	void	rem_cache(aCache *ocp)
 	if (hp->h_name)
 		MyFree(hp->h_name);
 	if (hp->h_aliases)
-	    {
+	{
 		for (hashv = 0; hp->h_aliases[hashv]; hashv++)
 			MyFree(hp->h_aliases[hashv]);
 		MyFree(hp->h_aliases);
-	    }
+	}
 
 	/*
 	 * free memory used to hold ip numbers and the array of them.
 	 */
 	if (hp->h_addr_list)
-	    {
+	{
 		if (*hp->h_addr_list)
 			MyFree(*hp->h_addr_list);
 		MyFree(hp->h_addr_list);
-	    }
+	}
 
 	MyFree(ocp);
 
@@ -1742,17 +1708,17 @@ time_t	expire_cache(time_t now)
 	Reg	time_t	next = 0;
 
 	for (cp = cachetop; cp; cp = cp2)
-	    {
+	{
 		cp2 = cp->list_next;
 
 		if (now >= cp->expireat)
-		    {
+		{
 			cainfo.ca_expires++;
 			rem_cache(cp);
-		    }
+		}
 		else if (!next || next > cp->expireat)
 			next = cp->expireat;
-	    }
+	}
 	return (next > now) ? next : (now + AR_TTL);
 }
 
@@ -1777,37 +1743,37 @@ int	m_dns(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (parv[1] && *parv[1] == 'l') {
 		for(cp = cachetop; cp; cp = cp->list_next)
-		    {
+		{
 			sendto_one(sptr, "NOTICE %s :Ex %d ttl %d host %s(%s)",
-				   parv[0], cp->expireat - timeofday, cp->ttl,
+				parv[0], cp->expireat - timeofday, cp->ttl,
+				cp->he.h_name,
 #ifdef INET6
-				   cp->he.h_name, inetntop(AF_INET6,
-							    cp->he.h_addr,
-							    ipv6string,
-							    sizeof(ipv6string)));
+				inetntop(AF_INET6, cp->he.h_addr, ipv6string,
+					sizeof(ipv6string))
 #else
-				   cp->he.h_name, inetntoa(cp->he.h_addr));
+				inetntoa(cp->he.h_addr)
 #endif
+				);
 			for (i = 0; cp->he.h_aliases[i]; i++)
+			{
 				sendto_one(sptr,"NOTICE %s : %s = %s (CN)",
 					   parv[0], cp->he.h_name,
 					   cp->he.h_aliases[i]);
-#ifdef INET6
-			for (i = 1; cp->he.h_addr_list[i]; i++) {
-#else
-			for (i = 1; cp->he.h_addr_list[i]; i++) {
-#endif
-				sendto_one(sptr,"NOTICE %s : %s = %s (IP)",
-					   parv[0], cp->he.h_name,
-#ifdef INET6
-					   inetntop(AF_INET6, 
-						     cp->he.h_addr_list[i],
-						     ipv6string, sizeof(ipv6string)));
-#else
-					   inetntoa(cp->he.h_addr_list[i]));
-#endif
 			}
-		    }
+			for (i = 1; cp->he.h_addr_list[i]; i++)
+			{
+				sendto_one(sptr,"NOTICE %s : %s = %s (IP)",
+					parv[0], cp->he.h_name,
+#ifdef INET6
+					inetntop(AF_INET6, 
+						cp->he.h_addr_list[i],
+						ipv6string, sizeof(ipv6string))
+#else
+					inetntoa(cp->he.h_addr_list[i])
+#endif
+					);
+			}
+		}
 		return 2;
 	}
 	sendto_one(sptr,"NOTICE %s :Ca %d Cd %d Ce %d Cl %d Ch %d:%d Cu %d",
@@ -1833,29 +1799,25 @@ u_long	cres_mem(aClient *sptr, char *nick)
 	u_long	nm = 0, im = 0, sm = 0, ts = 0;
 
 	for ( ;c ; c = c->list_next)
-	    {
+	{
 		sm += sizeof(*c);
 		h = &c->he;
-#ifdef INET6
 		for (i = 0; h->h_addr_list[i]; i++)
-#else
-		for (i = 0; h->h_addr_list[i]; i++)
-#endif
-		    {
+		{
 			im += sizeof(char *);
 			im += sizeof(struct IN_ADDR);
-		    }
+		}
 		im += sizeof(char *);
 		for (i = 0; h->h_aliases[i]; i++)
-		    {
+		{
 			nm += sizeof(char *);
 			nm += strlen(h->h_aliases[i]);
-		    }
+		}
 		nm += i - 1;
 		nm += sizeof(char *);
 		if (h->h_name)
 			nm += strlen(h->h_name);
-	    }
+	}
 	ts = ARES_CACSIZE * sizeof(CacheTable);
 	sendto_one(sptr, ":%s %d %s :RES table %d",
 		   me.name, RPL_STATSDEBUG, nick, ts);
@@ -1877,17 +1839,17 @@ static	int	bad_hostname(char *name, int len)
 			continue;
 		
 		/* special case: hyphen */
-		if ((c == '-') &&	/* we accept '-', but only if... */
-		    (s != name) &&	/* not "-aaa.bbb"                */
-		    (s[-1] != '.') &&	/* not "aaa.-bbb"                */
-		    (len != 1) &&	/* not "aaa.bbb-"                */
-		    (s[1] != '.'))	/* not "aaa-.bbb"                */
+		if ((c == '-') &&		/* we accept '-' only if... */
+			(s != name) &&		/* not "-aaa.bbb"           */
+			(s[-1] != '.') &&	/* not "aaa.-bbb"           */
+			(len != 1) &&		/* not "aaa.bbb-"           */
+			(s[1] != '.'))		/* not "aaa-.bbb"           */
 			continue;
 
 		/* start of a new component */
-		if ((c == '.') &&	/* we accept '.', but only if... */
-		    (s != name) &&	/* not ".aaa.bbb"                */
-		    (s[-1] != '.'))	/* not "aaa..bbb"                */
+		if ((c == '.') &&		/* we accept '.' only if... */
+			(s != name) &&		/* not ".aaa.bbb"           */
+			(s[-1] != '.'))		/* not "aaa..bbb"           */
 			continue;
 
 #ifdef HOSTNAMES_UNDERSCORE
@@ -1900,7 +1862,7 @@ static	int	bad_hostname(char *name, int len)
 	}
 #else /* RESTRICT_HOSTNAMES */
 		if (isspace(c) || (c == 0x7) || (c == ':') ||
-		    (c == '*') || (c == '?'))
+			(c == '*') || (c == '?'))
 			return -1;
 #endif /* RESTRICT_HOSTNAMES */
 	return 0;
