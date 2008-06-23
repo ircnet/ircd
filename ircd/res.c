@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.48 2008/06/22 22:51:50 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.49 2008/06/23 15:01:18 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -376,10 +376,17 @@ struct	hostent	*gethost_byname_type(char *name, Link *lp, int type)
 
 	reinfo.re_na_look++;
  
-	if (type != T_A && type != T_AAAA) 
+	if (type != T_A 
+#ifdef INET6
+		&& type != T_AAAA
+#endif
+		)
 		return NULL;
 	if ((cp = find_cache_name(NULL, name, 
-		(type == T_A) ? FLAGS_A_VALID : FLAGS_AAAA_VALID)))
+#ifdef INET6
+		(type == T_AAAA) ? FLAGS_AAAA_VALID : 
+#endif
+		FLAGS_A_VALID)))
 		return (struct hostent *)&(cp->he);
 	if (!lp)
 		return NULL;
@@ -776,7 +783,11 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 				/* Got a good PTR record back, cache entry can
 				be used also for reverse lookups. --fiction */
 				cachep = find_cache_name(NULL, hostbuf, 
-					(FLAGS_A_VALID|FLAGS_AAAA_VALID));
+					(FLAGS_A_VALID
+#ifdef INET6
+					|FLAGS_AAAA_VALID
+#endif
+					));
 				if (cachep != NULL) 
 				{
 					if ((cachep->flags & FLAGS_PTR_PEND) != 0)
@@ -1564,9 +1575,11 @@ static	aCache	*make_cache(ResRQ *rptr)
 		case T_A:
 			cp->flags |= FLAGS_A_VALID;
 			break;
+#ifdef INET6
 		case T_AAAA:
 			cp->flags |= FLAGS_AAAA_VALID;
 			break;
+#endif
 	}
 	return add_to_cache(cp);
 }

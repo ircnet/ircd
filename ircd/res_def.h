@@ -1,5 +1,5 @@
 /*
- * $Id: res_def.h,v 1.4 2008/06/22 17:06:52 chopin Exp $
+ * $Id: res_def.h,v 1.5 2008/06/23 15:01:18 chopin Exp $
  *
  * ircd/res_def.h (C)opyright 1992 Darren Reed.
  */
@@ -17,7 +17,9 @@
 #define	AR_TTL		600	/* TTL in seconds for dns cache entries */
 
 #define FLAGS_A_VALID		1
+#ifdef INET6
 #define FLAGS_AAAA_VALID		2
+#endif
 #define FLAGS_PTR_PEND		4
 #define FLAGS_PTR_VALID		8
 
