@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.186 2008/06/24 22:18:59 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.187 2008/06/24 22:24:52 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1373,6 +1373,9 @@ int	openconf(void)
 		 */
 		(void)execlp(M4_PATH, "m4",
 #ifdef HAVE_GNU_M4
+#ifdef USE_M4_PREFIXES
+			"-P",
+#endif
 			"-I", includedir,
 #endif
 #ifdef INET6

@@ -220,8 +220,10 @@
  * To use m4 as a preprocessor on the ircd.conf file, define M4_PREPROC.
  * The server will then call m4 each time it reads the ircd.conf file,
  * reading m4 output as the server's ircd.conf file.
+ * Defining USE_M4_PREFIXES makes GNU m4 use -P flag.
  */
 #undef	M4_PREPROC
+#undef	USE_M4_PREFIXES
 
 /*
  * Define if you want to use #include "file" in ircd.conf without M4. 
