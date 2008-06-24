@@ -776,6 +776,13 @@
 */
 #undef FIND_USERHOST_IPHASH
 
+/*
+** Default behaviour of the server after the first netjoin is done.
+** Possible values: 0 (SET CACCEPT OFF), 1 (SET CACCEPT ON)
+** and 2 (SET CACCEPT SPLIT).
+*/
+#define CACCEPT_DEFAULT 2
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
@@ -938,3 +945,8 @@
 #define USE_HOSTHASH
 #endif
 
+#if defined(CACCEPT_DEFAULT)
+#if ((CACCEPT_DEFAULT) > 2) || ((CACCEPT_DEFAULT) < 0)
+#error CACCEPT_DEFAULT can be 0, 1 or 2.
+#endif
+#endif
