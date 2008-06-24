@@ -51,6 +51,9 @@
 /* Define to 1 if you have the `getrusage' function. */
 #undef HAVE_GETRUSAGE
 
+/* Define if you have GNU m4. */
+#undef HAVE_GNU_M4
+
 /* Define to 1 if you have the `index' function. */
 #undef HAVE_INDEX
 

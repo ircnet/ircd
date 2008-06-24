@@ -1,4 +1,4 @@
-dnl configure.in for irc-2.10.1
+dnl configure.in for irc-2.11.x
 dnl Matthew Green (mrg@mame.mu.oz.au), Alain Nissen (Alain.Nissen@ulg.ac.be)
 dnl using portions of Avalon's Config and GNU Autoconf 1.12.
 dnl heavily updated to autoconf 2.5x Piotr Kucharski
@@ -693,13 +693,29 @@ if test $irc_cv_func_memcmp_clean = no; then
 fi
 ])
 
+AC_DEFUN(IRC_GNUM4,
+[AC_MSG_CHECKING(for GNU m4)
+AC_CACHE_VAL(irc_cv_gnum4,
+[if test "`(echo __"gnu"__ | $M4_PATH) 2>/dev/null`" = "__"gnu"__"; then
+  irc_cv_gnum4=no
+else
+  irc_cv_gnum4=yes
+fi
+])
+if test $irc_cv_gnum4 = yes; then
+  AC_MSG_RESULT(yes)
+  AC_DEFINE([HAVE_GNU_M4], [1], [Define if you have GNU m4.])
+else
+  AC_MSG_RESULT(no)
+fi
+])
 
 dnl ----
 dnl main
 dnl ----
 
 AC_INIT([irc],[2.11],[ircd-bugs@irc.org])
-AC_REVISION([$Id: configure.in,v 1.74 2008/06/09 16:16:08 chopin Exp $])
+AC_REVISION([$Id: configure.in,v 1.75 2008/06/24 21:44:19 chopin Exp $])
 AC_PREREQ(2.59)
 
 AC_ARG_WITH(logdir, [  --with-logdir=DIR       log files in DIR [[localstatedir/log]]], [
@@ -724,6 +740,7 @@ AC_PROG_AWK
 #IRC_PROG_INSTALL
 AC_PATH_PROGS(SUM, md5sum md5 sum cksum, true)
 AC_PATH_PROGS(M4_PATH, gm4 gnum4 m4, m4)
+IRC_GNUM4
 AC_PROG_GCC_TRADITIONAL
 
 IRC_AIX
