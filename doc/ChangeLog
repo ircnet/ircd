@@ -14,6 +14,7 @@
 	  allowing easier configs (patch from peder).
 	* chkconf.c/openconf(), s_conf.c/openconf(), setup.h.dist: define to use
 	  "-P" flag for GNU m4 (courtesy to peder).
+	* s_conf.c/check_split(): set default caccept value after first netjoin.
 
 2008-06-23  Piotr Kucharski
 
