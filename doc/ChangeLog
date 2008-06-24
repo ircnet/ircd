@@ -1,3 +1,15 @@
+2008-06-24  Piotr Kucharski
+
+	* res.c/proc_answer(), update_list(): fix incorrect caching of ips looked
+	  up for C/N-lines (patch from fiction).
+	* res.c/m_dns(): show flags for cache entries.
+	* initconf(): allow '*' in username part of user@host field of C/N/S line
+	  (reported by BR).
+
+2008-06-23  Piotr Kucharski
+
+	* res.c: more cleanup, so no v6 related code is in there for #undef INET6.
+
 2008-06-22  Piotr Kucharski
 
 	* class.c/add_class(), initclass(): don't set MaxBSendq if not explicitly
