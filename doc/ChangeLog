@@ -1,3 +1,5 @@
+2.11.2p1
+
 2008-06-24  Piotr Kucharski
 
 	* res.c/proc_answer(), update_list(): fix incorrect caching of ips looked
