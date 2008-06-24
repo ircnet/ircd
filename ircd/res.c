@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.51 2008/06/24 00:10:41 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.52 2008/06/24 00:12:56 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -384,9 +384,9 @@ struct	hostent	*gethost_byname_type(char *name, Link *lp, int type)
 		return NULL;
 	if ((cp = find_cache_name(NULL, name, 
 #ifdef INET6
-		(type == T_AAAA) ? FLAGS_AAAA_VALID : 
+		(type == T_AAAA) ? FLG_AAAA_VALID : 
 #endif
-		FLAGS_A_VALID)))
+		FLG_A_VALID)))
 		return (struct hostent *)&(cp->he);
 	if (!lp)
 		return NULL;
@@ -783,21 +783,21 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 				/* Got a good PTR record back, cache entry can
 				be used also for reverse lookups. --fiction */
 				cachep = find_cache_name(NULL, hostbuf, 
-					(FLAGS_A_VALID
+					(FLG_A_VALID
 #ifdef INET6
-					|FLAGS_AAAA_VALID
+					|FLG_AAAA_VALID
 #endif
 					));
 				if (cachep != NULL) 
 				{
-					if ((cachep->flags & FLAGS_PTR_PEND_FWD) != 0)
+					if ((cachep->flags & FLG_PTR_PEND_FWD) != 0)
 					{
-						cachep->flags |= FLAGS_PTR_VALID;
-						cachep->flags &= ~FLAGS_PTR_PEND;
+						cachep->flags |= FLG_PTR_VALID;
+						cachep->flags &= ~FLG_PTR_PEND;
 					}
 					else
 					{
-						cachep->flags |= FLAGS_PTR_PEND_REV;
+						cachep->flags |= FLG_PTR_PEND_REV;
 					}
 				}
 			}
@@ -1305,18 +1305,18 @@ static	void	update_list(ResRQ *rptr, aCache *cachep)
 		if (addrcount > 1) 
 		{
 			/* Do not trust that cache entry for reverse lookups */
-			cp->flags &= ~(FLAGS_PTR_PEND_FWD|FLAGS_PTR_VALID);
+			cp->flags &= ~(FLG_PTR_PEND_FWD|FLG_PTR_VALID);
 		}
 		else 
 		{
-			if ((cp->flags & FLAGS_PTR_PEND_REV) != 0)
+			if ((cp->flags & FLG_PTR_PEND_REV) != 0)
 			{
-				cp->flags |= FLAGS_PTR_VALID;
-				cp->flags &= ~(FLAGS_PTR_PEND);
+				cp->flags |= FLG_PTR_VALID;
+				cp->flags &= ~(FLG_PTR_PEND);
 			}
 			else
 			{
-				cp->flags |= FLAGS_PTR_PEND_FWD;
+				cp->flags |= FLG_PTR_PEND_FWD;
 			}
 		}
 	}
@@ -1399,7 +1399,7 @@ static	aCache	*find_cache_number(ResRQ *rptr, char *numb)
 #endif
 	for (; cp; cp = cp->hnum_next) 
 	{
-		if ((cp->flags & FLAGS_PTR_VALID) == 0) 
+		if ((cp->flags & FLG_PTR_VALID) == 0) 
 		{
 			continue;
 		}
@@ -1416,7 +1416,7 @@ static	aCache	*find_cache_number(ResRQ *rptr, char *numb)
 	}
 	for (cp = cachetop; cp; cp = cp->list_next)
 	{
-		if ((cp->flags & FLAGS_PTR_VALID) == 0) 
+		if ((cp->flags & FLG_PTR_VALID) == 0) 
 		{
 			continue;
 		}
@@ -1507,9 +1507,9 @@ static	aCache	*make_cache(ResRQ *rptr)
 		 */
 		if ((cp = find_cache_name(rptr, rptr->he.h_name,
 #ifdef INET6
-			(rptr->type == T_AAAA) ? FLAGS_AAAA_VALID :
+			(rptr->type == T_AAAA) ? FLG_AAAA_VALID :
 #endif
-			FLAGS_A_VALID)))
+			FLG_A_VALID)))
 		{
 			return cp;
 		}
@@ -1575,11 +1575,11 @@ static	aCache	*make_cache(ResRQ *rptr)
 	switch (rptr->type)
 	{
 		case T_A:
-			cp->flags |= FLAGS_A_VALID;
+			cp->flags |= FLG_A_VALID;
 			break;
 #ifdef INET6
 		case T_AAAA:
-			cp->flags |= FLAGS_AAAA_VALID;
+			cp->flags |= FLG_AAAA_VALID;
 			break;
 #endif
 	}
