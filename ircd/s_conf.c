@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.185 2008/06/24 22:03:57 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.186 2008/06/24 22:18:59 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1325,6 +1325,14 @@ int	openconf(void)
 {
 #ifdef	M4_PREPROC
 	int	pi[2], i;
+# ifdef HAVE_GNU_M4
+	char	*includedir, *includedirptr;
+
+	includedir = strdup(IRCDM4_PATH);
+	includedirptr = strrchr(includedir, '/');
+	if (includedirptr)
+		*includedirptr = '\0';
+# endif
 #else
 	int ret;
 #endif
@@ -1364,6 +1372,9 @@ int	openconf(void)
 		 * two servers running with the same fd's >:-) -avalon
 		 */
 		(void)execlp(M4_PATH, "m4",
+#ifdef HAVE_GNU_M4
+			"-I", includedir,
+#endif
 #ifdef INET6
 			"-DINET6",
 #endif
