@@ -1,5 +1,5 @@
 /*
- * $Id: res_def.h,v 1.5 2008/06/23 15:01:18 chopin Exp $
+ * $Id: res_def.h,v 1.6 2008/06/24 00:07:47 chopin Exp $
  *
  * ircd/res_def.h (C)opyright 1992 Darren Reed.
  */
@@ -20,8 +20,10 @@
 #ifdef INET6
 #define FLAGS_AAAA_VALID		2
 #endif
-#define FLAGS_PTR_PEND		4
-#define FLAGS_PTR_VALID		8
+#define FLAGS_PTR_PEND_FWD	4
+#define FLAGS_PTR_PEND_REV	8
+#define FLAGS_PTR_PEND		(FLAGS_PTR_PEND_FWD|FLAGS_PTR_PEND_REV)
+#define FLAGS_PTR_VALID		16
 
 struct	hent {
 	char	*h_name;	/* official name of host */

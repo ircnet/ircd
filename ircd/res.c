@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.49 2008/06/23 15:01:18 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.50 2008/06/24 00:07:47 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -790,13 +790,14 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 					));
 				if (cachep != NULL) 
 				{
-					if ((cachep->flags & FLAGS_PTR_PEND) != 0)
+					if ((cachep->flags & FLAGS_PTR_PEND_FWD) != 0)
 					{
 						cachep->flags |= FLAGS_PTR_VALID;
+						cachep->flags &= ~FLAGS_PTR_PEND;
 					}
 					else
 					{
-						cachep->flags |= FLAGS_PTR_PEND;
+						cachep->flags |= FLAGS_PTR_PEND_REV;
 					}
 				}
 			}
@@ -1304,17 +1305,18 @@ static	void	update_list(ResRQ *rptr, aCache *cachep)
 		if (addrcount > 1) 
 		{
 			/* Do not trust that cache entry for reverse lookups */
-			cp->flags &= ~(FLAGS_PTR_PEND|FLAGS_PTR_VALID);
+			cp->flags &= ~(FLAGS_PTR_PEND_FWD|FLAGS_PTR_VALID);
 		}
 		else 
 		{
-			if ((cp->flags & FLAGS_PTR_PEND) != 0) 
+			if ((cp->flags & FLAGS_PTR_PEND_REV) != 0)
 			{
 				cp->flags |= FLAGS_PTR_VALID;
+				cp->flags &= ~(FLAGS_PTR_PEND);
 			}
 			else
 			{
-				cp->flags |= FLAGS_PTR_PEND;
+				cp->flags |= FLAGS_PTR_PEND_FWD;
 			}
 		}
 	}
