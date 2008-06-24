@@ -1,4 +1,4 @@
-# @(#)$Id: RELEASE_NOTES,v 1.83 2008/06/24 21:46:29 chopin Exp $
+# @(#)$Id: RELEASE_NOTES,v 1.84 2008/06/24 22:29:48 chopin Exp $
 
 This is version 2.11.2 of the IRC software.
 ===============================================================================
@@ -25,6 +25,7 @@ New features in 2.11.2:
 	* new oper command (if defined) "SIDTRACE": just like "ETRACE", but shows
 	  also remote clients from servers that share common SID prefix with us
 	  (requires new ACL_SIDTRACE oper priviledge).
+	* M4 passes INET6 define. If it's GNU variant, it also adds -I includedir.
 
 Important changes in 2.11.2 (since 2.11.1):
 	* &CLIENTS format is changed if XLINE is defined (sends first three

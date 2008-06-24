@@ -5,6 +5,13 @@
 	* res.c/m_dns(): show flags for cache entries.
 	* initconf(): allow '*' in username part of user@host field of C/N/S line
 	  (reported by BR).
+	* chkconf.c/openconf(), s_conf.c/openconf(): pass INET6 to m4, if defined
+	  (patch from peder).
+	* configure.in, configure, setup.h.in: check for GNU m4.
+	* chkconf.c/openconf(), s_conf.c/openconf(): pass -I includedir to GNU m4
+	  allowing easier configs (patch from peder).
+	* chkconf.c/openconf(), s_conf.c/openconf(), setup.h.dist: define to use
+	  "-P" flag for GNU m4 (courtesy to peder).
 
 2008-06-23  Piotr Kucharski
 
