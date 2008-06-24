@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.184 2008/06/24 14:27:27 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.185 2008/06/24 22:03:57 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1363,11 +1363,11 @@ int	openconf(void)
 		 * goes out with report_error.  Could be dangerous,
 		 * two servers running with the same fd's >:-) -avalon
 		 */
-		(void)execlp(M4_PATH, "m4", IRCDM4_PATH, 
+		(void)execlp(M4_PATH, "m4",
 #ifdef INET6
 			"-DINET6",
 #endif
-			configfile, 0);
+			IRCDM4_PATH, configfile, 0);
 		if (serverbooting)
 		{
 			fprintf(stderr,"Fatal Error: Error executing m4 (%s)",
