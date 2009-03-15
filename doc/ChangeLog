@@ -1,7 +1,14 @@
 2009-03-15  Piotr Kucharski
 
-  * support.c/strtoken(): mysterious wallops from JP fix (kudos to jilles).
-  * list.c/free_class(), patricia.c, patricia_ext.h, s_externs.h: tidy up.
+	* support.c/strtoken(): mysterious wallops from JP fix (kudos to jilles).
+	* list.c/free_class(), patricia.c, patricia_ext.h, s_externs.h: tidy up.
+	* s_conf.c/find_Oline(), s_user.c/m_oper(): better error msg for OPER
+	  failed due to class limits.
+	* s_user.c/register_user(): tiny fix for sunCC compiler.
+	* res.c: fix compilation with DEBUG problem.
+	* s_conf.c/find_Oline(): use user->sip.
+	* list.c/make_client(), s_misc.c/read_motd(): MyMalloc() does outofmemory
+	  on its own, no need to do that again.
 
 2.11.2p1
 
