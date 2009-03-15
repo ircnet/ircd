@@ -1,3 +1,7 @@
+2009-03-15  Piotr Kucharski
+
+  * support.c/strtoken(): mysterious wallops from JP fix (kudos to jilles).
+
 2.11.2p1
 
 2008-06-24  Piotr Kucharski

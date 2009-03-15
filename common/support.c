@@ -18,7 +18,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.44 2008/06/03 22:32:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.45 2009/03/15 00:03:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -91,8 +91,8 @@ char	*strtoken(char **save, char *str, char *fs)
            else if (pos[0] == '\033' && pos[2] == 'B' &&
 	   	(pos[1] == '$' || pos[1] == '('))
            {
-	       pos += 3;
 	       flag = (pos[1] == '$') ? 1 : 0;
+	       pos += 3;
 	   }
            else
            {
