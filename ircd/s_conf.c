@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.188 2009/03/15 00:36:28 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.189 2009/03/15 01:05:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1015,15 +1015,7 @@ aConfItem	*find_Oline(char *name, aClient *cptr)
 	char	userip[USERLEN+HOSTLEN+3];
 
 	sprintf(userhost, "%s@%s", cptr->username, cptr->sockhost);
-	sprintf(userip, "%s@%s", cptr->username, 
-#ifdef INET6
-		(char *)inetntop(AF_INET6, (char *)&cptr->ip, ipv6string,
-			sizeof(ipv6string))
-#else
-		(char *)inetntoa((char *)&cptr->ip)
-#endif
-	);
-
+	sprintf(userip, "%s@%s", cptr->username, cptr->user->sip);
 
 	for (tmp = conf; tmp; tmp = tmp->next)
 	    {
