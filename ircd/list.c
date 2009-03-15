@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.46 2009/03/15 00:20:43 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: list.c,v 1.47 2009/03/15 01:11:19 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -101,8 +101,7 @@ aClient	*make_client(aClient *from)
 	if (!from)
 		size = CLIENT_LOCAL_SIZE;
 
-	if (!(cptr = (aClient *)MyMalloc(size)))
-		outofmemory();
+	cptr = (aClient *)MyMalloc(size);
 	bzero((char *)cptr, (int)size);
 
 #ifdef	DEBUGMODE
