@@ -1,6 +1,6 @@
   STATS unleashed
   Piotr Kucharski
-  $Id: stats.txt,v 1.10 2008/06/18 18:53:59 chopin Exp $
+  $Id: stats.txt,v 1.11 2009/03/15 00:10:32 chopin Exp $
 
   This document describes all STATS for ircd server 2.11.
 
@@ -86,7 +86,7 @@
           H:63 N:9 D:9 U:10 R:50 T:160 C:50 P:20 K:23
           BS:512 MXR:20 MXB:30 MXBL:1024 PY:10
           ZL:-1 CM:2 CP:10 DC:15
-          AC: 1 CA:1 S:0 SS:85(109) SU:85000(121765)
+          AC: 1 CA:1 S:0 SS:85/85/109 SU:85000/85000/121765
           CCL: 0x1
 
 
@@ -196,11 +196,13 @@
 
         +o  S: split status (0 no split, 1 in split)
 
-        +o  SS (SPLIT_SERVERS): state of split if number of servers on
-           the network is below that number (current number in parens)
+        +o  SS (SPLIT_SERVERS): compiled-in define, current value, number
+           of servers on the network (server enters split mode if number
+           of servers on the network is below current value)
 
-        +o  SU (SPLIT_USERS): state of split if number of users on the
-           network is below that number (current number in parens)
+        +o  SU (SPLIT_USERS): compiled-in define, current value, number
+           of users on the network (server enters split mode if number
+           of users on the network is below current value)
 
         +o  CCL: bitmask telling what is sent to &CLIENTS channel.
 
@@ -314,7 +316,6 @@
 
      This command accepts second parameter: if present, it shows the
      above info only for the specified client.
-
      mm,, MM -- ccoommmmaannddss uussaaggee ssttaattss
 
 

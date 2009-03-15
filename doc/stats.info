@@ -1,5 +1,5 @@
 This is stats.info, produced by makeinfo version 4.11 from
-/tmp/linuxdoc-dir-31638/sgmltmp.stats.2.texi.
+/tmp/linuxdoc-tools.ABzi5Heu6f/sgmltmp.stats.2.texi.
 
 \input texinfo
 
@@ -10,7 +10,7 @@ STATS unleashed
 ***************
 
      Piotr Kucharski
-     $Id: stats.info,v 1.9 2008/06/18 18:53:59 chopin Exp $
+     $Id: stats.info,v 1.10 2009/03/15 00:10:32 chopin Exp $
 
    This document describes all STATS for ircd server 2.11.
 
@@ -86,7 +86,7 @@ Also ending 219 numeric is omitted in whole.
           H:63 N:9 D:9 U:10 R:50 T:160 C:50 P:20 K:23
           BS:512 MXR:20 MXB:30 MXBL:1024 PY:10
           ZL:-1 CM:2 CP:10 DC:15
-          AC: 1 CA:1 S:0 SS:85(109) SU:85000(121765)
+          AC: 1 CA:1 S:0 SS:85/85/109 SU:85000/85000/121765
           CCL: 0x1
 
      These shows values of most variables set in config.h or
@@ -190,11 +190,13 @@ Also ending 219 numeric is omitted in whole.
 
         * S: split status (0 no split, 1 in split)
 
-        * SS (SPLIT_SERVERS): state of split if number of servers on
-          the network is below that number (current number in parens)
+        * SS (SPLIT_SERVERS): compiled-in define, current value, number
+          of servers on the network (server enters split mode if number
+          of servers on the network is below current value)
 
-        * SU (SPLIT_USERS): state of split if number of users on the
-          network is below that number (current number in parens)
+        * SU (SPLIT_USERS): compiled-in define, current value, number
+          of users on the network (server enters split mode if number
+          of users on the network is below current value)
 
         * CCL: bitmask telling what is sent to &CLIENTS channel.
 
@@ -461,14 +463,14 @@ File: stats.info,  Node: Enhancements,  Prev: STATS unleashed,  Up: Top
 **************
 
 If you notice some errors or wish to have some things explained better,
-drop a line to `ircd-dev@irc.org'
+drop a line to *ircd-dev@irc.org*
 
 
 
 Tag Table:
-Node: Top122
-Node: Introduction426
-Node: STATS unleashed962
-Node: Enhancements17634
+Node: Top129
+Node: Introduction434
+Node: STATS unleashed970
+Node: Enhancements17777
 
 End Tag Table
