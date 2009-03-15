@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.187 2008/06/24 22:24:52 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.188 2009/03/15 00:36:28 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1010,7 +1010,7 @@ aConfItem	*find_conf_exact(char *name, char *user, char *host,
  */
 aConfItem	*find_Oline(char *name, aClient *cptr)
 {
-	Reg	aConfItem *tmp;
+	Reg	aConfItem *tmp, *tmp2 = NULL;
 	char	userhost[USERLEN+HOSTLEN+3];
 	char	userip[USERLEN+HOSTLEN+3];
 
@@ -1040,8 +1040,10 @@ aConfItem	*find_Oline(char *name, aClient *cptr)
 			continue;
 		if (tmp->clients < MaxLinks(Class(tmp)))
 			return tmp;
+		else
+			tmp2 = tmp;
 	    }
-	return NULL;
+	return tmp2;
 }
 
 

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.275 2008/06/11 18:27:27 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.276 2009/03/15 00:36:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2727,16 +2727,21 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	password = parv[2];
 
 	if (IsAnOper(sptr))
-	    {
+	{
 		if (MyConnect(sptr))
 			sendto_one(sptr, replies[RPL_YOUREOPER], ME, BadTo(parv[0]));
 		return 1;
-	    }
+	}
 	if (!(aconf = find_Oline(name, sptr)))
-	    {
+	{
 		sendto_one(sptr, replies[ERR_NOOPERHOST], ME, BadTo(parv[0]));
 		return 1;
-	    }
+	}
+	if (aconf->clients >= MaxLinks(Class(aconf)))
+	{
+		sendto_one(sptr, ":%s %d %s :Too many opers", ME, ERR_NOOPERHOST, BadTo(parv[0]));
+		return 1;
+	}
 #ifdef CRYPT_OPER_PASSWORD
 	/* pass whole aconf->passwd as salt, let crypt() deal with it */
 
