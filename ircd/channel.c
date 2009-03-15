@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.276 2009/03/15 01:25:32 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.277 2009/03/15 01:47:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1046,7 +1046,11 @@ int	m_mode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	for (name = strtoken(&p, parv[1], ","); name;
 	     name = strtoken(&p, NULL, ","))
 	    {
-		clean_channelname(name);
+		if (clean_channelname(name) == -1)
+		{
+			penalty += 1;
+			continue;
+		}
 		chptr = find_channel(name, NullChn);
 		if (chptr == NullChn)
 		    {
@@ -2044,7 +2048,7 @@ static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 ** Remove bells and commas from channel name
 */
 
-void	clean_channelname(char *cn)
+int	clean_channelname(char *cn)
 {
 	int flag = 0;
 
@@ -2069,9 +2073,8 @@ void	clean_channelname(char *cn)
 #endif
 		cn++;
 	}
-	/* XXX Shouldn't we check, if flag==1 here? Wouldn that mean
-	** that Japanese channel name is incomplete? Would that be
-	** an error? --Beeth */
+	/* If flag is 1 here, Japanese channel name is incomplete! */
+	return flag;
 }
 
 /*
@@ -2359,7 +2362,12 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			i = 1;
 			continue;
 		}
-		clean_channelname(name);
+		if (clean_channelname(name) == -1)
+		{
+			sendto_one(sptr, replies[ERR_NOSUCHCHANNEL],
+				ME, BadTo(parv[0]), name);
+			continue;
+		}
 		if (*name == '!')
 		{
 			chptr = NULL;
@@ -2484,7 +2492,9 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			continue;
 		}
 
-		clean_channelname(name);
+		/* Weren't those names just cleaned? --B. */
+		if (clean_channelname(name) == -1)
+			continue;
 
 		/* Get chptr for given name. Do not create channel yet.
 		** Can return NULL. */
@@ -3236,7 +3246,8 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[ERR_NOSUCHNICK], ME, BadTo(parv[0]), parv[1]);
 		return 1;
 	    }
-	clean_channelname(parv[2]);
+	if (clean_channelname(parv[2]) == -1)
+		return 1;
 	if (check_channelmask(sptr, acptr->user->servp->bcptr, parv[2]))
 		return 1;
 	if (*parv[2] == '&' && !MyClient(acptr))
@@ -3629,7 +3640,8 @@ int	m_names(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		for (; (name = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 		{
-			clean_channelname(name);
+			if (clean_channelname(name) == -1)
+				continue;
 			if BadPtr(name)
 			{
 				continue;

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.277 2009/03/15 00:52:26 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.278 2009/03/15 01:47:29 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1873,10 +1873,9 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (sptr->user && sptr->user->channel)
 			channame = sptr->user->channel->value.chptr->chname;
 
-#if 0
-		/* I think it's useless --Beeth */
-		clean_channelname(mask);
-#endif
+		if (clean_channelname(mask) == -1)
+			/* maybe we should tell user? --B. */
+			continue;
 
 		/*
 		** We can never have here !mask 

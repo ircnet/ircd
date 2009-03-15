@@ -53,7 +53,7 @@ EXTERN void channel_modes (aClient *cptr, Reg char *mbuf, Reg char *pbuf,
 EXTERN void send_channel_modes (aClient *cptr, aChannel *chptr);
 EXTERN void send_channel_members (aClient *cptr, aChannel *chptr);
 EXTERN int m_mode (aClient *cptr, aClient *sptr, int parc, char *parv[]);
-EXTERN void clean_channelname (Reg char *cn);
+EXTERN int clean_channelname (Reg char *cn);
 EXTERN void del_invite (aClient *cptr, aChannel *chptr);
 EXTERN int m_join (Reg aClient *cptr, Reg aClient *sptr, int parc,
 		       char *parv[]);

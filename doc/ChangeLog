@@ -9,6 +9,11 @@
 	* s_conf.c/find_Oline(): use user->sip.
 	* list.c/make_client(), s_misc.c/read_motd(): MyMalloc() does outofmemory
 	  on its own, no need to do that again.
+	* channel.c/jp_chname(), support.c/strtoken(): if cn[1] is null, cn[2]
+	  may access rubbish, reverse conditions to not allow it.
+	* channel.c/clean_channelname(): if japanese channel name is incorrect,
+	  return -1 to allow callee function to react; fix all functions that
+	  call clean_channelname() to deal with erroneous channel names.
 
 2.11.2p1
 
