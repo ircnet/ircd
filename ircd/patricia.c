@@ -13,7 +13,7 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: patricia.c,v 1.3 2008/06/10 20:34:25 chopin Exp $
+ * $Id: patricia.c,v 1.4 2009/03/15 00:20:43 chopin Exp $
  *
  * Imported from ratbox with minor function name changes.
  * Id: patricia.c,v 7.14 2003/06/12 13:46:26 androsyn Exp
@@ -37,10 +37,9 @@
  */
 #include "os.h"
 #include "s_defines.h"
-#define S_PATRICIA_C
+#define PATRICIA_C
 #include "s_externs.h"
-#undef S_PATRICIA_C
-#include "patricia_ext.h"
+#undef PATRICIA_C
 
 /* Enable both of these to debug patricia.c
  * #define PATRICIA_NOTYET 1

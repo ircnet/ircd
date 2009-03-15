@@ -1,6 +1,7 @@
 2009-03-15  Piotr Kucharski
 
   * support.c/strtoken(): mysterious wallops from JP fix (kudos to jilles).
+  * list.c/free_class(), patricia.c, patricia_ext.h, s_externs.h: tidy up.
 
 2.11.2p1
 

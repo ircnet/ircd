@@ -52,3 +52,4 @@
 #include "support_ext.h"
 #include "version_ext.h"
 #include "whowas_ext.h"
+#include "patricia_ext.h"

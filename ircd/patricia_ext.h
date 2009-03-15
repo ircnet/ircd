@@ -12,6 +12,12 @@
  * some other things it could be used as a standalone API.
  */
 
+#ifndef PATRICIA_C
+#define EXTERN extern
+#else /* PATRICIA_C */
+#define EXTERN
+#endif /* PATRICIA_C */
+
 #ifndef _PATRICIA_H
 #define _PATRICIA_H
 
@@ -77,7 +83,7 @@ typedef struct _patricia_tree_t
 patricia_tree_t;
 
 
-patricia_node_t *patricia_match_ip(patricia_tree_t *, struct IN_ADDR *);
+EXTERN patricia_node_t *patricia_match_ip(patricia_tree_t *, struct IN_ADDR *);
 patricia_node_t *patricia_match_string(patricia_tree_t *, const char *);
 patricia_node_t *patricia_match_exact_string(patricia_tree_t *, const char *);
 patricia_node_t *patricia_search_exact(patricia_tree_t *, prefix_t *);
@@ -85,10 +91,10 @@ patricia_node_t *patricia_search_best(patricia_tree_t *, prefix_t *);
 patricia_node_t *patricia_search_best2(patricia_tree_t *, prefix_t *, int);
 patricia_node_t *patricia_lookup(patricia_tree_t *, prefix_t *);
 
-void patricia_remove(patricia_tree_t *, patricia_node_t *);
-patricia_tree_t *patricia_new(int);
+EXTERN void patricia_remove(patricia_tree_t *, patricia_node_t *);
+EXTERN patricia_tree_t *patricia_new(int);
 void patricia_clear(patricia_tree_t *, void_fn_t);
-void patricia_destroy(patricia_tree_t *, void_fn_t);
+EXTERN void patricia_destroy(patricia_tree_t *, void_fn_t);
 void patricia_process(patricia_tree_t *, void_fn_t);
 void patricia_init(void);
 
@@ -97,7 +103,7 @@ void patricia_init(void);
 prefix_t *ascii2prefix(int family, char *string);
 #endif
 patricia_node_t *patricia_make_and_lookup(patricia_tree_t *, const char *);
-patricia_node_t *patricia_make_and_lookup_ip(patricia_tree_t *, struct IN_ADDR *, int);
+EXTERN patricia_node_t *patricia_make_and_lookup_ip(patricia_tree_t *, struct IN_ADDR *, int);
 
 
 #define PATRICIA_MAXBITS 128
