@@ -24,7 +24,7 @@
 #undef RES_C
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.52 2008/06/24 00:12:56 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.53 2009/03/15 01:01:04 chopin Exp $";
 #endif
 
 /* because there is a lot of debug code in here :-) */
@@ -715,14 +715,16 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 			bcopy(cp, (char *)&dr, dlen);
 			adr->s_addr = dr.s_addr;
 #endif
-			Debug((DEBUG_INFO,"got ip # %s for %s",
 #ifdef INET6
+			Debug((DEBUG_INFO,"got ip # %s for %s",
 				inet_ntop(AF_INET6, (char *)adr, ipv6string,
-					sizeof(ipv6string)),
-#else
-				inetntoa((char *)adr),
-#endif
+				sizeof(ipv6string)),
 				hostbuf));
+#else
+			Debug((DEBUG_INFO,"got ip # %s for %s",
+				inetntoa((char *)adr),
+				hostbuf));
+#endif
 			if (len < HOSTLEN)
 			{
 				/* if we have no hostname currently,
@@ -959,14 +961,16 @@ struct	hostent	*get_res(char *lp)
 		if (BadPtr(rptr->he.h_name))	/* Kludge!	960907/Vesa */
 			goto getres_err;
 
-		Debug((DEBUG_DNS, "relookup %s <-> %s", rptr->he.h_name,
 #ifdef INET6
+		Debug((DEBUG_DNS, "relookup %s <-> %s", rptr->he.h_name,
 			inet_ntop(AF_INET6, (char *)&rptr->he.h_addr,
-				ipv6string, sizeof(ipv6string))
-#else
-			inetntoa((char *)&rptr->he.h_addr)
-#endif
+			ipv6string, sizeof(ipv6string))
 			));
+#else
+		Debug((DEBUG_DNS, "relookup %s <-> %s", rptr->he.h_name,
+			inetntoa((char *)&rptr->he.h_addr)
+			));
+#endif
 		/*
 		 * Lookup the 'authoritative' name that we were given for the
 		 * ip#.  By using this call rather than regenerating the
