@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.276 2009/03/15 00:36:29 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.277 2009/03/15 00:52:26 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -349,6 +349,10 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #ifdef RESTRICT_USERNAMES
 		char *lbuf = NULL;
 #endif
+#if defined(USE_IAUTH)
+		static time_t last = 0;
+		static u_int count = 0;
+#endif
 #ifdef XLINE
 		aConfItem *xtmp;
 
@@ -404,9 +408,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #endif
 
 #if defined(USE_IAUTH)
-		static time_t last = 0;
-		static u_int count = 0;
-
 		if (iauth_options & XOPT_EARLYPARSE && DoingXAuth(cptr))
 		{
 			cptr->flags |= FLAGS_WXAUTH;
