@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.189 2009/03/15 01:05:28 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.190 2009/04/29 22:00:36 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2665,12 +2665,12 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 	int	status = tkline ? CONF_TKILL : CONF_KILL;
 	time_t	time;
 	char	*user, *host, *reason;
-	int	i = 0;
+	int	err = 0;
 
 	/* sanity checks */
 	if (tkline)
 	{
-		i = wdhms2sec(parv[1], &time);
+		err = wdhms2sec(parv[1], &time);
 #ifdef TKLINE_MAXTIME
 		if (time > TKLINE_MAXTIME)
 			time = TKLINE_MAXTIME;
@@ -2689,19 +2689,24 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 	
 	if (strlen(user) > USERLEN+HOSTLEN+1)
 	{
-		/* induce error */
-		i = 1;
+		err = 1;
 	}
 	if (!strcmp("@*", user) || !strcmp("*@", user) || !strcmp("@", user))
 	{
 		/* Note that we don't forbid "*@*", only those, that lack
 		** some crucial parts, which can be seen as a typo. --Beeth */
-		i = 1;
+		err = 1;
+	}
+	if (strchr(host, '/') && match_ipmask(host, sptr, 0) == -1)
+	{
+		/* check validity of 1.2.3.0/24 or it will be spewing errors
+		** for every connecting client. */
+		err = 1;
 	}
 #ifdef KLINE
 badkline:
 #endif
-	if (i || !host)
+	if (err || !host)
 	{
 		/* error */
 		if (!IsPerson(sptr))
@@ -2751,7 +2756,7 @@ badkline:
 		if (utmp || htmp || rtmp)
 		{
 			/* Too lazy to copy it here. --B. */
-			i = 1;
+			err = 1;
 			goto badkline;
 		}
 
