@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.190 2009/04/29 22:00:36 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.191 2009/04/29 22:05:08 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1375,7 +1375,7 @@ int	openconf(void)
 #ifdef INET6
 			"-DINET6",
 #endif
-			IRCDM4_PATH, configfile, 0);
+			IRCDM4_PATH, configfile, (char *) NULL);
 		if (serverbooting)
 		{
 			fprintf(stderr,"Fatal Error: Error executing m4 (%s)",
