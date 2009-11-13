@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.163 2008/06/10 22:06:53 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.164 2009/11/13 20:08:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -340,7 +340,8 @@ static	time_t	try_connections(time_t currenttime)
 		 * try_connections() other servers have chance. --B. */
 		con_conf->hold += get_con_freq(Class(con_conf));
 
-		if (!iconf.aconnect)
+		if (iconf.aconnect == 0 || iconf.aconnect == 2 && 
+				timeofday - iconf.split > DELAYCHASETIMELIMIT)
 		{
 			sendto_flag(SCH_NOTICE,
 				"Connection to %s deferred. Autoconnect "

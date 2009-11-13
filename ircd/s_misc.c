@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.118 2009/11/13 19:36:39 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.119 2009/11/13 20:08:11 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1177,7 +1177,7 @@ void	check_split(void)
 		{
 			sendto_flag(SCH_NOTICE,
 				"Network split detected, split mode activated");
-			iconf.split = 1;
+			iconf.split = timeofday;
 		}
 	}
 	else

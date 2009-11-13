@@ -1,3 +1,19 @@
+2.11.2p2
+
+2009-11-13  Piotr Kucharski
+
+	* channel.c/set_mode(): don't swap keys and limits on netjoin.
+	* s_misc.c/initruntimeconf(), config.h.dist: default and min. values
+	  of SPLIT vars; lower defaults to better match IRCnet status.
+	* struct_def.h, ircd.c/try_connections(), s_misc.c/check_split(),
+	  s_serv.c/m_set(): add "SET ACONNECT ND" to disable autoconnect
+	  after nickdelay expires (requested by BR); with nice sideeffect
+	  of showing in "stats d" when server entered split mode.
+
+2009-04-30  Piotr Kucharski
+
+	* s_conf.c/prep_kline(): check for erroneous netmasks in tkline.
+
 2009-03-15  Piotr Kucharski
 
 	* support.c/strtoken(): mysterious wallops from JP fix (kudos to jilles).
