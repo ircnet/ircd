@@ -9,6 +9,9 @@
 	  s_serv.c/m_set(): add "SET ACONNECT ND" to disable autoconnect
 	  after nickdelay expires (requested by BR); with nice sideeffect
 	  of showing in "stats d" when server entered split mode.
+	* s_conf.c/oline_flags_parse(), s_debug/serveropts[], config.h.dist:
+	  add OPER_SQUIT_REMOTE define and use it in version string (requested
+	  by BR to do V:line on it).
 
 2009-04-30  Piotr Kucharski
 

@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.191 2009/04/29 22:05:08 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.192 2009/11/13 20:25:55 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -333,6 +333,9 @@ long	oline_flags_parse(char *string)
 #endif
 #ifndef OPER_SQUIT
 	tmp &= ~ACL_SQUIT;
+#endif
+#ifndef OPER_SQUIT_REMOTE
+	tmp &= ~ACL_SQUITREMOTE;
 #endif
 #ifndef OPER_CONNECT
 	tmp &= ~ACL_CONNECT;

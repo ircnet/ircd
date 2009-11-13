@@ -131,6 +131,7 @@
 #define	OPER_RESTART
 #define	OPER_SET
 #define	OPER_SQUIT
+#define	OPER_SQUIT_REMOTE
 #define	OPER_KLINE
 #define	OPER_TKLINE
 /* In a perfect world these two (or at least second) would be undefined. */
