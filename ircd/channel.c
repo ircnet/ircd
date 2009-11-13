@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.277 2009/03/15 01:47:29 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.278 2009/11/13 19:32:44 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -1329,6 +1329,12 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 				break;
 			if (whatt == MODE_ADD)
 			    {
+				/* stop key swapping during netjoin
+				** (prefer "highest" key) */
+				if (IsServer(sptr) && IsBursting(sptr) &&
+				    *mode->key && strncmp(mode->key, *parv,
+				    (size_t) KEYLEN) >= 0)
+					break;
 				if (ischop)
 				    {
 					if (**parv == ':')
@@ -1469,6 +1475,9 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 #endif
 					break;
 				if (!(nusers = atoi(*++parv)))
+					break;
+				if (IsServer(sptr) && IsBursting(sptr) &&
+				    mode->limit >= nusers)
 					break;
 				lp = &chops[opcnt++];
 				lp->flags = MODE_ADD|MODE_LIMIT;
