@@ -531,7 +531,7 @@
 
 /*
  * Split detection
- * This defines thresholds for turning on and off the split-mode,
+ * This defines default thresholds for turning on and off the split-mode,
  * where joins to new channels do not give chanop status.
  * This should always be bigger than the max counts of
  * users/servers in your TLD (or some other close group), so you
@@ -542,8 +542,8 @@
  *
  * Defining to 0 disables entering split-mode.
  */
-#define SPLIT_USERS	70000
-#define SPLIT_SERVERS	85
+#define DEFAULT_SPLIT_USERS	65000
+#define DEFAULT_SPLIT_SERVERS	70
 
 /*
 ** Notice sent to connecting users if the server is in the split-mode.
@@ -782,6 +782,10 @@
 ** and 2 (SET CACCEPT SPLIT).
 */
 #define CACCEPT_DEFAULT 2
+
+/* Minimum values admin can set. */
+#define SPLIT_USERS	50000
+#define SPLIT_SERVERS	50
 
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
