@@ -1,3 +1,8 @@
+2009-12-11  Piotr Kucharski
+
+	* s_conf.c/prep_kline(): oper can crash his local ircd by issuing
+	  tkline with wrong parameters (reported by AsmPro).
+
 2.11.2p2
 
 2009-11-13  Piotr Kucharski
