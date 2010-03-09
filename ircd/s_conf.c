@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.193 2009/12/11 00:35:57 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.194 2010/03/09 15:05:01 chopin Exp $";
 #endif
 
 #include "os.h"
@@ -2700,7 +2700,7 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		** some crucial parts, which can be seen as a typo. --Beeth */
 		err = 1;
 	}
-	if (host && strchr(host, '/') && match_ipmask(host, sptr, 0) == -1)
+	if (host && strchr(host, '/') && match_ipmask(host+1, sptr, 0) == -1)
 	{
 		/* check validity of 1.2.3.0/24 or it will be spewing errors
 		** for every connecting client. */
