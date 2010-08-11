@@ -1,7 +1,7 @@
-This is INSTALL.info, produced by makeinfo version 4.11 from
-/tmp/linuxdoc-dir-1682/sgmltmp.INSTALL.2.texi.
+This is INSTALL.info, produced by makeinfo version 4.13 from
+info file generated from .//INSTALL.sgml by means of linuxdoc-tools.
 
-\input texinfo
+
 
 
 File: INSTALL.info,  Node: Top,  Next: Installing IRC-,  Up: (dir)
@@ -10,7 +10,7 @@ Installing IRC - The Internet Relay Chat Program
 ************************************************
 
      SGML version by Christophe Kalt, updated by Piotr Kucharski
-     $Id: INSTALL.info,v 1.86 2008/06/13 17:55:50 chopin Exp $
+     $Id: INSTALL.info,v 1.87 2010/08/11 17:36:56 bif Exp $
 
    This document describes how to install, and configure IRC 2.11
 
@@ -49,6 +49,7 @@ peculiarities it has and setup the Makefile and a file of default
 
    There are a few options to "configure" to help it out, or change the
 default behaviour:
+
 `--prefix=DIR'
      changes the default directory into which ircd will install using
      "make install".  This defaults to /usr/local
@@ -109,17 +110,17 @@ File: INSTALL.info,  Node: Notes for Cygwin32 users,  Next: Notes concerning IPv
 1.2 Notes for Cygwin32 users
 ============================
 
-The daemon of 2.11 release compiles properly on W32 systems which
-have the GNU-Win32 environment (  (http://www.cygwin.com/)) setup.  At
-the time of the release, tests were made using the version b20.1 of the
+The daemon of 2.11 release compiles properly on W32 systems which have
+the GNU-Win32 environment (`http://www.cygwin.com/') setup.  At the
+time of the release, tests were made using the version b20.1 of the
 Cygwin32 library.
 
    When compiling on such system, you want to make sure that you have
 carefully followed the Cygwin32 installation notes.
 
-   Also, the IRC server needs a `resolv.conf' file in order to
+   Also, the IRC server needs a *resolv.conf* file in order to
 initialize the resolver.  This file can be anywhere (see configure
-options), and is typically in `/etc' on UNIX systems.
+options), and is typically in */etc* on UNIX systems.
 
 
 File: INSTALL.info,  Node: Notes concerning IPv6 support,  Prev: Notes for Cygwin32 users,  Up: Installing IRC-
@@ -130,8 +131,8 @@ File: INSTALL.info,  Node: Notes concerning IPv6 support,  Prev: Notes for Cygwi
 This version was tested on the following IPv6 systems: BSD/OS+KAME,
 Digital Unix, FreeBSD+KAME, Linux, NetBSD+INRIA.
 
-   Because IPv6 numeric addresses contain ":" characters, `the default
-separator for the server configuration file is changed to "%"'. You can
+   Because IPv6 numeric addresses contain ":" characters, *the default
+separator for the server configuration file is changed to "%"*. You can
 adjust it to your needs in config.h file.
 
 
@@ -164,8 +165,8 @@ File: INSTALL.info,  Node: DEBUGMODE,  Next: CHROOTDIR,  Up: The config-h file
 2.1 DEBUGMODE
 =============
 
-`This should only be defined for test purposes, and never used on a
-production server.'
+*This should only be defined for test purposes, and never used on a
+production server.*
 
    Define DEBUGMODE if you want to see the ircd debugging information
 as the daemon is running. Normally this function will be undefined as
@@ -242,10 +243,10 @@ file for each server-server link.  ZIP_LEVEL allows you to control the
 compression level that will be used.  Values above 5 will noticeably
 increase the CPU used by the server.
 
-   The zlib package may be found at   (http://www.gzip.org/zlib/). The
+   The zlib package may be found at `http://www.gzip.org/zlib/'. The
 data format used by the zlib library is described by RFCs (Request for
 Comments) 1950 to 1952 in the files
-(ftp://ds.internic.net/rfc/rfc1950.txt) (zlib format), rfc1951.txt
+`ftp://ds.internic.net/rfc/rfc1950.txt' (zlib format), rfc1951.txt
 (deflate format) and rfc1952.txt (gzip format).
 
 
@@ -345,6 +346,7 @@ should probably scan through it before proceeding.
 
    The ircd.conf file contains various records that specify
 configuration options.  The record types are as follows:
+
   1. Machine information   (M)
 
   2. Administrative info   (A)
@@ -379,8 +381,8 @@ configuration options.  The record types are as follows:
 
    Except for types "M" and "A", you are allowed to have multiple
 records of the same type.  In some cases, you can have concurrent
-records.  `It is important to note that the last matching record will
-be used'.  This is especially useful when setting up I records (client
+records.  *It is important to note that the last matching record will
+be used*.  This is especially useful when setting up I records (client
 connections).
 
 `NEW!!!'
@@ -480,7 +482,7 @@ File: INSTALL.info,  Node: Machine information,  Next: Administrative info,  Up:
 
 `Note'
      Using "*" as <Your Internet IP> allows OS to choose best outgoing
-     source IP. See also `Server Connections' section for configuring
+     source IP. See also *Server Connections* section for configuring
      source IP of outgoing connections.
 
 
@@ -561,12 +563,13 @@ File: INSTALL.info,  Node: Port connections,  Next: Connection Classes,  Prev: A
 
 
    * Internet Ports
+
     `Internet IP#'
           If the host on which the server runs has several IP
           addresses, you can define for which IP address connections
           will be accepted. If none is defined here, server will bind
-          to all interfaces (INADDR_ANY).  See also `Machine
-          configuration' and `Server Connections' sections to properly
+          to all interfaces (INADDR_ANY).  See also *Machine
+          configuration* and *Server Connections* sections to properly
           configure outgoing connections.
 
     `Port'
@@ -581,6 +584,7 @@ File: INSTALL.info,  Node: Port connections,  Next: Connection Classes,  Prev: A
 
 
    *  Unix Socket Ports.
+
     `Directory'
           The path set in this field should be the directory name in
           which to create the unix socket for later listening to. The
@@ -602,6 +606,7 @@ File: INSTALL.info,  Node: Port connections,  Next: Connection Classes,  Prev: A
 `Flags'
      Flags changing behaviour of a given P-line. It can be empty or one
      of:
+
         * D - delayed accept (not active until first netjoin)
 
         * S - server-only (user connections are rejected)
@@ -637,8 +642,8 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
      connection frequency (for servers) and maximum number of links
      that class should have.
 
-     Currently, the Y: line `MUST' appear in the ircd.conf file
-     `BEFORE' it is used in any other way.
+     Currently, the Y: line *MUST* appear in the ircd.conf file
+     *BEFORE* it is used in any other way.
 
 `Format'
      Y:<Class>:<Ping Freq>:<Connect Freq>:<Max Links>:<SendQ>:<Local
@@ -674,6 +679,7 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
 `SendQ'
      This field defines the "SendQ" (data awaiting to be sent to the
      client) value for this class. The format is <x>.<y>
+
         *  x: defines maximum size of sendq, defaults to QUEUELEN if
           unset.
 
@@ -683,6 +689,7 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
 `Local limit'
      This field is used to limit the number of local concurrent
      connections.  The format is <x>.<y>
+
         *  x: defines the maximum number of clients from the same host
           (IP) will be allowed.
 
@@ -699,6 +706,7 @@ File: INSTALL.info,  Node: Connection Classes,  Next: Client connections,  Prev:
 `CIDR Limit'
      This field is used to limit the number of local host counts within
      a given IP network. The format is <x>/<y>
+
         *  x: defines the maximum number of clients from the same
           network
 
@@ -780,6 +788,7 @@ File: INSTALL.info,  Node: Client connections,  Next: Operator priviliges,  Prev
 ======================
 
 How to let clients connect to your IRCD.
+
 `Introduction'
      A client is a program that connects to the ircd daemon (ircd).
      There are clients written in C, GNU Emacs Lisp and many other
@@ -820,15 +829,15 @@ How to let clients connect to your IRCD.
      the server.  If "user@" prefixes the actual name the server will
      require that the remote username returned by the ident server be
      the same as the one given before the "@".  Wildcards are permitted,
-     but `please' rather leave this field empty and use bitmask in
-     `Host Addr' field.
+     but *please* rather leave this field empty and use bitmask in
+     *Host Addr* field.
 
      Empty field matches any. "*" also matches any, but it requires
      working DNS for a client.
 
      Using this field to enforce that clients have no Host Name set is
      not working (they will rather be denied connection). Use "N"
-     `flag'.
+     *flag*.
 
 `Port'
      Specifies the port number for which this configuration line is
@@ -841,6 +850,7 @@ How to let clients connect to your IRCD.
 `Flags'
      This field contains flags of an I:line; flags are one character in
      size, can be combined and their order does not matter.
+
         * D - restricted, when client has no reverse DNS
 
         * E - client is exempted from K-lines
@@ -864,9 +874,9 @@ How to let clients connect to your IRCD.
      = or - depending on the ident reply.
 
 `Note'
-     The server checks if the client hostname matches the `TARGET Host
-     NAME' field.  If a match is found, server checks `TARGET Host
-     Addr' field.  If a match is found, the client is accepted. Clients
+     The server checks if the client hostname matches the *TARGET Host
+     NAME* field.  If a match is found, server checks *TARGET Host
+     Addr* field.  If a match is found, the client is accepted. Clients
      host is set either to its hostname (if available) or, using "N" or
      "M" flag, to its IP.
 
@@ -893,7 +903,7 @@ How to let clients connect to your IRCD.
 
      I:128.214.6.100::nic.funet.fi::1
 
-     Allow clients from a machine with that IP number `and' that
+     Allow clients from a machine with that IP number *and* that
      hostname to connect.
 
      I::secret:*.tut.fi::1
@@ -912,7 +922,7 @@ How to let clients connect to your IRCD.
 
      I:135.11.35.0/24::*.net::1
 
-     Allows clients from machines which host name matches "*.net" `and'
+     Allows clients from machines which host name matches "*.net" *and*
      which IP address is within block "135.11.35.0/24" to connect to
      the server.
 
@@ -921,7 +931,7 @@ How to let clients connect to your IRCD.
      I:135.11.35.0/24::*.net::1
 
      This set of two I:lines allows clients from machines which host
-     name matches "*.net" `and' which IP address is within block
+     name matches "*.net" *and* which IP address is within block
      "135.11.35.0/24" to connect to the server.  If the host name does
      not match "*.net" then another I:line is used and because of "N"
      flag, the IP address is used for these clients, even if the host
@@ -945,6 +955,7 @@ File: INSTALL.info,  Node: Operator priviliges,  Next: Excluded accounts,  Prev:
 =======================
 
 How to become the IRC administrator on your site
+
 `Introduction'
      To become an IRC Administrator, IRC must know who is authorized to
      become an operator and what their "Nickname" and "Password" is.
@@ -994,6 +1005,7 @@ How to become the IRC administrator on your site
      This field contains flags of an O:line; flags are one character in
      size, can be combined and their order does not matter.  They
      define privileges of an operator.
+
         * L - local operator (disables all remote functions)
 
         * P - removes penalty
@@ -1063,6 +1075,7 @@ File: INSTALL.info,  Node: Excluded accounts,  Next: X Excluded accounts,  Prev:
 =====================
 
 Remove an errant user from IRC on your site.
+
 `Introduction'
      Obviously it is hoped that you wouldn't have to use this command.
      Unfortunately sometimes a user can become unmanageable and this is
@@ -1168,6 +1181,7 @@ File: INSTALL.info,  Node: X Excluded accounts,  Next: Server connections,  Prev
 =======================
 
 Remove an errant user from IRC on your site.
+
 `Introduction'
      Obviously it is hoped that you wouldn't have to use this command.
      Unfortunately sometimes a virus can become difficult to remove by
@@ -1217,13 +1231,14 @@ File: INSTALL.info,  Node: Server connections,  Next: Deny auto-connections,  Pr
 
 How to connect to other servers, How other servers can connect to you
 
-   `WARNING:' The hostnames used as examples are really only examples
+   *WARNING:* The hostnames used as examples are really only examples
 and not meant to be used (simply because they don't work) in real life.
 
    Now you must decide WHICH hosts you want to connect to and WHAT
 ORDER you want to connect to them in.  For my example let us assume I
 am on the machine "rieska.oulu.fi" and I want to connect to irc daemons
 on 3 other machines:
+
    * "garfield.mit.edu"        - Tertiary Connection
 
    * "irc.nada.kth.se"         - Secondary Connection
@@ -1238,6 +1253,7 @@ irc.nada.kth.se is down it will try to connect to garfield and so forth.
 
    PLEASE limit the number of hosts you will attempt to connect to down
 to 3. This is because of two main reasons:
+
   1.  to save your server from causing extra load and delays to users
 
   2.  to save internet from extra network traffic (remember the old
@@ -1287,7 +1303,9 @@ to 3. This is because of two main reasons:
      TARGET host, and your host will accept connections FROM the TARGET
      host instead.  The port field can contain 2 ports, separated by a
      . In this case, the first port is used when auto-connecting, the
-     second port is used for the UDP pings to the targer server.
+     second port is used for the UDP pings to the targer server.  It
+     can be negative to disable autoconnects, absolute value will be
+     used to connect when CONNECT command with port "0" is used.
 
 `Class'
      The class field should refer to an existing class and determines
@@ -1303,11 +1321,12 @@ to 3. This is because of two main reasons:
      with ZIP_LINKS defined, and use a _lowercase_ C line.
 
 `NEW!!!'
-     As of the 2.11.0 version of the server, `Source IP' field has been
+     As of the 2.11.0 version of the server, *Source IP* field has been
      added.
 
 
    Some examples:
+
    * C:nic.funet.fi::nic.funet.fi:6667:1 This reads: Connect to host
      "nic.funet.fi", with no password and expect this server to
      identify itself to you as "nic.funet.fi". Your machine will
@@ -1328,7 +1347,7 @@ to 3. This is because of two main reasons:
    Now back to our original problem, we wanted OUR server CONNECT to 3
 hosts,  "nic.funet.fi", "irc.nada.kth.se" and "garfield.mit.edu" in
 that order.  So as we enter these entries into the file they must be
-done in `reverse' order of how we could want to connect to them.
+done in *reverse* order of how we could want to connect to them.
 
    Here's how it would look if we connected "nic.funet.fi" first:
 
@@ -1339,7 +1358,7 @@ C:nic.funet.fi::nic.funet.fi:6667:1
    Ircd will attempt to connect to nic.funet.fi first, then to irc.nada
 and finally to garfield.
 
-   `Reciprocal entries:' Each "C" entry requires a corresponding "N"
+   *Reciprocal entries:* Each "C" entry requires a corresponding "N"
 entry that specifies connection priviliges to other hosts.  The "N"
 entry contains the password, if any, that you require other hosts to
 have before they can connect to you.  These entries are of the same
@@ -1419,7 +1438,7 @@ format as the "C" entries.
      If the wildcard count would be 2, then the wildcard domain would
      be "*.fi". Note that with wildcard name "*.fi" you could NOT
      connect to "nic.funet.fi" because that would result in a server
-     name `collision' (*.fi matches nic.funet.fi).
+     name *collision* (*.fi matches nic.funet.fi).
 
      I advise you to not to use wildcard servers before you know for
      sure how they are used, they are mostly beneficial for backbones
@@ -1597,9 +1616,9 @@ File: INSTALL.info,  Node: Version limitations,  Next: Excluded machines,  Prev:
      for servers matching the mask given in this field.
 
 `Server Type'
-     Both the `Version Mask' and the `Flags' should be prefixed with
+     Both the *Version Mask* and the *Flags* should be prefixed with
      the server type identification.  This implementation uses the id
-     "`IRC"' (starting with version 2.10).
+     "*IRC*" (starting with version 2.10).
 
 `Examples'
      V:IRC/021001*::*::
@@ -1626,13 +1645,13 @@ File: INSTALL.info,  Node: Version limitations,  Next: Excluded machines,  Prev:
      is allowed.
 
 `Protocol Version'
-     Only the 4 first digit of the `Version Number' are standard: they
+     Only the 4 first digit of the *Version Number* are standard: they
      define the protocol version.  The remaining of the string is
      implementation dependant; matches on this part should be used with
      particular identification.
 
 `Flags'
-     are not standard.  Therefore, this field `should always' contain a
+     are not standard.  Therefore, this field *should always* contain a
      specific identification.
 
 
@@ -1643,6 +1662,7 @@ File: INSTALL.info,  Node: Excluded machines,  Next: Service connections,  Prev:
 ======================
 
 Disallowing SERVERS in your irc net.
+
 `Introduction'
      In some cases people run into difficulties in net administration.
      For one reason or another you do not want a certain server to be
@@ -1652,8 +1672,8 @@ Disallowing SERVERS in your irc net.
      in Q-line, everytime some server link tries to introduce you a
      server (remember, all server names are broadcast around the net),
      that name is checked if it matches the Q-lines in your server. If
-     it matches, then `your server' disconnects the link. Note that just
-     placing Q-lines to your server probably results in `your server'
+     it matches, then *your server* disconnects the link. Note that just
+     placing Q-lines to your server probably results in *your server*
      being left alone, unless other servers have agreed to have the
      same Q-line in their ircd configuration files as well.
 
@@ -1708,8 +1728,8 @@ File: INSTALL.info,  Node: Service connections,  Next: Bounce server,  Prev: Exc
      channels or issue certain commands although most are available to
      it. Services are rejected upon sending an unknown or unallowed
      command. Services however, are not affected by flood control and
-     can be granted special privileges. It is therefore `wise to
-     oversee the use of S-lines with much care.'
+     can be granted special privileges. It is therefore *wise to
+     oversee the use of S-lines with much care.*
 
 
 
@@ -1784,27 +1804,27 @@ File: INSTALL.info,  Node: Related resources,  Next: Reporting a bug,  Prev: The
 `Mailing list'
      A list is dedicated to the people using ircd. If you have trouble
      running ircd, or wish to discuss the future, you can subscribe by
-     sending an email to majordomo@irc.org, with "`subscribe
-     ircd-users"' in the body.
+     sending an email to `majordomo@irc.org', with "*subscribe
+     ircd-users*" in the body.
 
      If you just have a question and don't want to subscribe to the
-     list, mail to ircd-users@irc.org.  Be sure to indicate which
+     list, mail to `ircd-users@irc.org'.  Be sure to indicate which
      version you are using.
 
 `Development'
      Technical discussions and development are carried on
      ircd-dev@irc.org.  People interested in very early testing, and/or
      working on the source code are welcome.  This is done by sending
-     an email to majordomo@irc.org, with "`subscribe ircd-dev"' in the
-     body.
+     an email to `majordomo@irc.org', with "*subscribe ircd-dev*" in
+     the body.
 
 `FAQ'
      It can be found on the WWW, at
-     (http://www.irc.org/tech_docs/ircnet/faq.html).
+     `http://www.irc.org/tech_docs/ircnet/faq.html'.
 
 `WWW'
      Several pages related to the ircd:
-     (http://www.irc.org/techie.html).
+     `http://www.irc.org/techie.html'.
 
 
 
@@ -1829,6 +1849,7 @@ File: INSTALL.info,  Node: How to report a bug,  Next: Where to send a bug repor
 
 To save everyone time, make sure that your e-mail contains all the
 information related to your problem.  In particular, we need to know:
+
 `Package version'
      The IRC software version you are using: please include the output
      obtained by running "irc -v" for the client, and/or "ircd -v" for
@@ -1859,50 +1880,50 @@ File: INSTALL.info,  Node: Where to send a bug report,  Prev: How to report a bu
 6.2 Where to send a bug report
 ==============================
 
-Reports should be sent to ircd-bugs@irc.org.  Your report will be
+Reports should be sent to `ircd-bugs@irc.org'.  Your report will be
 reviewed and forwarded to the appropriate mailing list.
 
 
 
 Tag Table:
-Node: Top125
-Node: Installing IRC-648
-Node: The configure script877
-Node: Notes for Cygwin32 users3175
-Node: Notes concerning IPv6 support3916
-Node: The config-h file4404
-Node: DEBUGMODE5006
-Node: CHROOTDIR5591
-Node: USERS_RFC1459 USERS_SHOWS_UTMP5972
-Node: ENABLE_SUMMON6560
-Node: DEFAULT_INVISIBLE6881
-Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7214
-Node: ZIP_LINKS ZIP_LEVEL7746
-Node: SLOW_ACCEPT8791
-Node: CLONE_CHECK9429
-Node: LOG_SERVER_CHANNELS9804
-Node: Other #define's10087
-Node: Editing the Makefile and compiling10427
-Node: The ircd-conf file12153
-Node: Machine information14654
-Node: Administrative info17280
-Node: Port connections19441
-Node: Connection Classes21966
-Node: Client connections28179
-Node: Operator priviliges33964
-Node: Excluded accounts37334
-Node: X Excluded accounts41255
-Node: Server connections43018
-Node: Deny auto-connections51616
-Node: Hub connections53195
-Node: Leaf connections54693
-Node: Version limitations56787
-Node: Excluded machines58555
-Node: Service connections59870
-Node: Bounce server61474
-Node: Related resources63345
-Node: Reporting a bug64388
-Node: How to report a bug64649
-Node: Where to send a bug report65668
+Node: Top133
+Node: Installing IRC-654
+Node: The configure script883
+Node: Notes for Cygwin32 users3182
+Node: Notes concerning IPv6 support3919
+Node: The config-h file4407
+Node: DEBUGMODE5009
+Node: CHROOTDIR5594
+Node: USERS_RFC1459 USERS_SHOWS_UTMP5975
+Node: ENABLE_SUMMON6563
+Node: DEFAULT_INVISIBLE6884
+Node: OPER_KILL OPER_CONNECT OPER_DIE OPER_REHASH OPER_RESTART OPER_SET---7217
+Node: ZIP_LINKS ZIP_LEVEL7749
+Node: SLOW_ACCEPT8792
+Node: CLONE_CHECK9430
+Node: LOG_SERVER_CHANNELS9805
+Node: Other #define's10088
+Node: Editing the Makefile and compiling10428
+Node: The ircd-conf file12154
+Node: Machine information14656
+Node: Administrative info17282
+Node: Port connections19443
+Node: Connection Classes21971
+Node: Client connections28187
+Node: Operator priviliges33974
+Node: Excluded accounts37345
+Node: X Excluded accounts41267
+Node: Server connections43031
+Node: Deny auto-connections51770
+Node: Hub connections53349
+Node: Leaf connections54847
+Node: Version limitations56941
+Node: Excluded machines58709
+Node: Service connections60025
+Node: Bounce server61629
+Node: Related resources63500
+Node: Reporting a bug64549
+Node: How to report a bug64810
+Node: Where to send a bug report65830
 
 End Tag Table

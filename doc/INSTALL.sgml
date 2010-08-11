@@ -4,7 +4,7 @@
 
 <title>Installing IRC - The Internet Relay Chat Program
 <author>SGML version by Christophe Kalt, updated by Piotr Kucharski
-<date>$Id: INSTALL.sgml,v 1.86 2008/06/13 17:55:50 chopin Exp $
+<date>$Id: INSTALL.sgml,v 1.87 2010/08/11 17:36:56 bif Exp $
 <abstract>
 This document describes how to install, and configure IRC 2.11
 </abstract>
@@ -971,6 +971,8 @@ host will accept connections FROM the TARGET host instead.
 The port field can contain 2 ports, separated by a . In this
 case, the first port is used when auto-connecting, the
 second port is used for the UDP pings to the targer server.
+It can be negative to disable autoconnects, absolute value
+will be used to connect when CONNECT command with port ``0'' is used.
 <tag/Class/ The class field should refer to an existing
 class and determines the maximum number of simultaneous uses
 of the C-line allowable through the max. links field in the
