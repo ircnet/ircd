@@ -48,7 +48,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.194 2010/03/09 15:05:01 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.195 2010/08/11 17:16:51 bif Exp $";
 #endif
 
 #include "os.h"
@@ -2694,13 +2694,16 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 	{
 		err = 1;
 	}
-	if (!strcmp("@*", user) || !strcmp("*@", user) || !strcmp("@", user))
+	if (host)
 	{
-		/* Note that we don't forbid "*@*", only those, that lack
-		** some crucial parts, which can be seen as a typo. --Beeth */
+		*host++ = '\0';
+	}
+	if (!user || !host || *user == '\0' || *host == '\0' ||
+		(!strcmp("*", user) && !strcmp("*", host))) {
+		/* disallow all forms of bad u@h format and block *@* too */
 		err = 1;
 	}
-	if (host && strchr(host, '/') && match_ipmask(host+1, sptr, 0) == -1)
+	if (!err && host && strchr(host, '/') && match_ipmask(host, sptr, 0) == -1)
 	{
 		/* check validity of 1.2.3.0/24 or it will be spewing errors
 		** for every connecting client. */
@@ -2709,7 +2712,7 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 #ifdef KLINE
 badkline:
 #endif
-	if (err || !host)
+	if (err)
 	{
 		/* error */
 		if (!IsPerson(sptr))
@@ -2731,7 +2734,6 @@ badkline:
 		status = tkline ? CONF_TOTHERKILL : CONF_OTHERKILL;
 		user++;
 	}
-	*host++ = '\0';
 #ifdef INET6
 	host = ipv6_convert(host);
 #endif

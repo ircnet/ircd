@@ -1,3 +1,13 @@
+2010-08-11  Piotr Kucharski
+
+  * s_conf.c/prep_kline(): reject all not fully specified u@h masks and
+    also *@* one.
+
+2010-03-09  Piotr Kucharski
+
+	* s_conf.c/prep_kline(): match_ipmask() was getting host with '@' char
+	  prepended, that did not work at all.
+
 2009-12-11  Piotr Kucharski
 
 	* s_conf.c/prep_kline(): oper can crash his local ircd by issuing
