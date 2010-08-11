@@ -19,7 +19,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.164 2009/11/13 20:08:11 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.165 2010/08/11 17:39:00 bif Exp $";
 #endif
 
 #include "os.h"
@@ -81,6 +81,22 @@ RETSIGTYPE s_die(int s)
 	logfiles_close();
 	ircd_writetune(tunefile);
 	flush_connections(me.fd);
+#ifdef  UNIXPORT
+	{
+		aClient *acptr;
+		char unixpath[256];
+		for (acptr = ListenerLL; acptr; acptr = acptr->next)
+		{
+			if (IsUnixSocket(acptr))
+			{
+				sprintf(unixpath, "%s/%d",
+				    acptr->confs->value.aconf->host,
+				    acptr->confs->value.aconf->port);
+				(void)unlink(unixpath);
+			}
+		}
+	}
+#endif
 	exit(-1);
 }
 
