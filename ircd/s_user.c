@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.278 2009/03/15 01:47:29 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.279 2010/08/12 16:24:31 bif Exp $";
 #endif
 
 #include "os.h"
@@ -2047,9 +2047,9 @@ static	void	send_whois(aClient *sptr, aClient *acptr)
 
 	if (acptr->user && MyConnect(acptr))
 		sendto_one(sptr, replies[RPL_WHOISIDLE], ME, BadTo(sptr->name),
-			   name, timeofday - user->last
+			   name, (long)(timeofday - user->last)
 #ifdef WHOIS_SIGNON_TIME
-			, acptr->firsttime
+			, (long)acptr->firsttime
 #endif
 			);
 }

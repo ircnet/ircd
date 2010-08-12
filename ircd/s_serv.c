@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.297 2009/11/13 20:08:11 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.298 2010/08/12 16:24:31 bif Exp $";
 #endif
 
 #include "os.h"
@@ -1864,7 +1864,7 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 
 int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	static	char	Lformat[]  = ":%s %d %s %s %u %lu %llu %lu %llu :%u";
+	static	char	Lformat[]  = ":%s %d %s %s %u %lu %llu %lu %llu :%d";
 	struct	Message	*mptr;
 	aClient	*acptr;
 	char	stat = parc > 1 ? parv[1][0] : '\0';
@@ -1983,7 +1983,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					(int)DBufLength(&acptr->sendQ),
 					acptr->sendM, acptr->sendB,
 					acptr->receiveM, acptr->receiveB,
-					timeofday - acptr->firsttime);
+					(int)(timeofday - acptr->firsttime));
 			    }
 		    }
 		else
@@ -1995,7 +1995,7 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					(int)DBufLength(&acptr->sendQ),
 					acptr->sendM, acptr->sendB,
 					acptr->receiveM, acptr->receiveB,
-					timeofday - acptr->firsttime);
+					(int)(timeofday - acptr->firsttime));
 			
 		    }
 		break;
@@ -2780,7 +2780,7 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				   acptr->from->name,
 				   acptr->from->serv->version,
 				   (acptr->from->flags & FLAGS_ZIP) ? "z" : "",
-        	               	   timeofday - acptr->from->firsttime,
+        	               	   (int)(timeofday - acptr->from->firsttime),
                 	           (int)DBufLength(&acptr->from->sendQ),
                         	   (int)DBufLength(&sptr->from->sendQ));
 
