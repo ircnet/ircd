@@ -3,6 +3,7 @@
   * s_conf.c/prep_kline(): reject all not fully specified u@h masks and
     also *@* one.
   * ircd.c/s_die(): clean up unix socket.
+  * s_service.c/m_service(): send SERVICE also to dist matching SID.
 
 2010-03-09  Piotr Kucharski
 

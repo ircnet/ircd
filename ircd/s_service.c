@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.68 2008/06/08 06:37:46 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_service.c,v 1.69 2010/08/12 01:08:02 bif Exp $";
 #endif
 
 #include "os.h"
@@ -498,7 +498,7 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (!(bcptr = local[fdas.fd[i]]) || !IsServer(bcptr) ||
 		    bcptr == cptr)
 			continue;
-		if (match(dist, bcptr->name))
+		if (match(dist, bcptr->name) && match(dist, bcptr->serv->sid))
 			continue;
 
 		sendto_one(bcptr, ":%s SERVICE %s %s %d :%s",
