@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.279 2010/08/12 16:24:31 bif Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.280 2010/08/12 16:29:30 bif Exp $";
 #endif
 
 #include "os.h"
@@ -655,7 +655,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		{
 			/* I think this is not possible anymore. --B. */
 			sendto_one(cptr, ":%s KILL %s :%s (%s != %s[%s])",
-				ME, sptr->name, ME, user->server,
+				ME, user->uid, ME, user->server,
 				acptr->from->name, acptr->from->sockhost);
 			sptr->flags |= FLAGS_KILLED;
 			return exit_client(cptr, sptr, &me,
@@ -877,8 +877,6 @@ badparamcountkills:
 				"Bad NICK param count (%d) for %s from %s via %s",
 				parc, parv[1], sptr->name,
 				get_client_name(cptr, FALSE));
-			sendto_one(cptr, ":%s KILL %s :%s (Bad NICK %d)",
-				ME, nick, ME, parc);
 			buf[0] = '\0';
 			for (k = 1; k < parc; k++)
 			{
@@ -963,7 +961,7 @@ badparamcountkills:
 				   parv[1], parv[0],
 				   get_client_name(cptr, FALSE));
                 sendto_serv_butone(NULL, ":%s KILL %s :%s (%s[%s] != %s)",
-                                   me.name, sptr->name, me.name,
+                                   me.name, sptr->user->uid, me.name,
                                    sptr->name, sptr->from->name,
                                    get_client_name(cptr, TRUE));
                 sptr->flags |= FLAGS_KILLED;
@@ -988,14 +986,14 @@ badparamcountkills:
 			sendto_flag(SCH_KILL, "Bad Nick: %s From: %s %s",
 				   parv[1], parv[0],
 				   get_client_name(cptr, FALSE));
-			sendto_one(cptr, ":%s KILL %s :%s (%s <- %s[%s])",
-				   ME, parv[1], ME, parv[1],
-				   nick, cptr->name);
-			if (sptr != cptr) /* bad nick change */
+			if (sptr != cptr && sptr->user) /* bad nick change */
 			    {
+				sendto_one(cptr, ":%s KILL %s :%s (%s <- %s[%s])",
+					   ME, sptr->user->uid, ME, parv[1],
+					   nick, cptr->name);
 				sendto_serv_butone(cptr,
 					":%s KILL %s :%s (%s <- %s!%s@%s)",
-					ME, parv[0], ME,
+					ME, sptr->user->uid, ME,
 					get_client_name(cptr, FALSE),
 					parv[0], user, host);
 				sptr->flags |= FLAGS_KILLED;

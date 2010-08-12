@@ -6,6 +6,11 @@
 	  your server (you matched the ban, but cidr exception was not even
 	  checked). allow remote clients to talk without checking for bans
 	  and exceptions. (reported by BR).
+	* s_err.c, s_serv.c, s_user.c: fix various format string errors
+	  visible on amd64 (patch from jilles).
+	* parse.c/cancel_clients(), s_user.c/register_user(): fix all kills 
+	  that sent a nick to send a UID, except the impossible nick collision
+	  kill (patch from jilles).
 
 2010-08-11  Piotr Kucharski
 
