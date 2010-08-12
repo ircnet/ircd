@@ -1,9 +1,18 @@
+2010-08-12  Piotr Kucharski
+
+	* channel.c/can_send(): bans and exceptions set with cidr work only
+	  on local server. side-effect of this was if you set non-cidr ban
+	  (say *@*) plus a cidr exception, you were no longer heard outside
+	  your server (you matched the ban, but cidr exception was not even
+	  checked). allow remote clients to talk without checking for bans
+	  and exceptions. (reported by BR).
+
 2010-08-11  Piotr Kucharski
 
-  * s_conf.c/prep_kline(): reject all not fully specified u@h masks and
-    also *@* one.
-  * ircd.c/s_die(): clean up unix socket.
-  * s_service.c/m_service(): send SERVICE also to dist matching SID.
+	* s_conf.c/prep_kline(): reject all not fully specified u@h masks and
+	  also *@* one.
+	* ircd.c/s_die(): clean up unix socket.
+	* s_service.c/m_service(): send SERVICE also to dist matching SID.
 
 2010-03-09  Piotr Kucharski
 

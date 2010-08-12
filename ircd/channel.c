@@ -32,7 +32,7 @@
  */
 
 #ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.278 2009/11/13 19:32:44 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.279 2010/08/12 16:23:14 bif Exp $";
 #endif
 
 #include "os.h"
@@ -609,17 +609,28 @@ int	can_send(aClient *cptr, aChannel *chptr)
 	member = IsMember(cptr, chptr);
 	lp = find_user_link(chptr->members, cptr);
 
-	if ((!lp || !(lp->flags & (CHFL_CHANOP | CHFL_VOICE))) &&
-	    !match_modeid(CHFL_EXCEPTION, cptr, chptr) &&
-	    match_modeid(CHFL_BAN, cptr, chptr))
-		return (MODE_BAN);
-
 	if (chptr->mode.mode & MODE_MODERATED &&
 	    (!lp || !(lp->flags & (CHFL_CHANOP|CHFL_VOICE))))
 			return (MODE_MODERATED);
 
 	if (chptr->mode.mode & MODE_NOPRIVMSGS && !member)
 		return (MODE_NOPRIVMSGS);
+
+	/* checking +be is not reliable for remote clients for case
+	** when exception is in cidr format. working around that is
+	** horrible. basically inet_pton for each UNICK and keeping
+	** it in client struct, plus dealing somehow with non-inet6
+	** servers getting inet6 clients ips from remote servers...
+	** in short it seems better to allow remote clients to just
+	** talk, trusting a bit remote servers, than to reject good
+	** messages. --B. */
+	if (!MyConnect(cptr))
+		return 0;
+
+	if ((!lp || !(lp->flags & (CHFL_CHANOP | CHFL_VOICE))) &&
+	    !match_modeid(CHFL_EXCEPTION, cptr, chptr) &&
+	    match_modeid(CHFL_BAN, cptr, chptr))
+		return (MODE_BAN);
 
 	return 0;
 }
