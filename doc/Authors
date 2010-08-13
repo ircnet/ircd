@@ -173,7 +173,7 @@ Helmut Springer <delta@RUS.Uni-Stuttgart.DE>
 Michael 'Eumel' Neumayer <eumel@42.org>
 Kurt Roeckx <kurt@roeckx.be> cleaned up the compression code, among many things
 Roar Thronæs <roart@nvg.ntnu.no> for more IPv6 work
-Piotr Kucharski <chopin@sgh.waw.pl> for his work on the anti socks module
+Piotr Kucharski <chopin@42.pl> for his work on the anti socks module
 Michal Svoboda <svobodam@eva.vsp.cz> removed useless anUser linked list
 
 Thanks go to those persons not mentioned here who have added their advice,
