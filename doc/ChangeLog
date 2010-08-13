@@ -1,3 +1,5 @@
+2.11.2p3
+
 2010-08-12  Piotr Kucharski
 
 	* channel.c/can_send(): bans and exceptions set with cidr work only
