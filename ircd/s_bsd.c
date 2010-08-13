@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.186 2008/06/08 15:57:07 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.187 2010/08/13 19:58:46 bif Exp $";
 #endif
 
 #include "os.h"
@@ -3491,7 +3491,7 @@ static	void	do_dns_async(void)
  * log such crap.
  *
  * Based on Ari `DLR' Heikkinen <aheikin@dlr.pspt.fi> irce0.9.1
- * by Piotr `Beeth' Kucharski <chopin@sgh.waw.pl>
+ * by Piotr `Beeth' Kucharski <chopin@42.pl>
  *
  * Note: calling with fd == -2 closes all delayed fds.
  */

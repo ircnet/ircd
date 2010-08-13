@@ -51,7 +51,7 @@ cat >version.c <<!SUB!THIS!
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.13 2004/12/28 20:55:12 q Exp $";
+static const volatile char rcsid[] = "@(#)\$Id: version.c.SH.in,v 1.14 2010/08/13 19:58:46 bif Exp $";
 #endif
 
 #include "os.h"
@@ -80,7 +80,7 @@ char *infotext[] =
 	"The following persons have made many changes and enhancements to the",
 	"code and still know how IRC really works if you have questions about it:",
 	"",
-	"Beeth        Piotr Kucharski          chopin@sgh.waw.pl",
+	"Beeth        Piotr Kucharski          chopin@42.pl",
 	"",
 	"Thanks to the following people for their work on 2.11:",
 	"",
@@ -97,8 +97,8 @@ char *infotext[] =
 	"Jarkko Oikarinen",
 	"Darren Reed         Vesa Ruokonen",
 	"Matthew Green       Chuck Kane          Matt Lyle",
-        "Markku Savela       Greg Lindahl        Armin Gruner",
- 	"Stellan Klebom      Dan Goodwin         Mike Bolotski",
+	"Markku Savela       Greg Lindahl        Armin Gruner",
+	"Stellan Klebom      Dan Goodwin         Mike Bolotski",
 	"Ian Frechette       Markku Jarvinen     Kimmo Suominen",
 	"Jeff Trim           Vijay Subramaniam   Karl Kleinpaste",
 	"Bill Wisner         Tom Davis           Hugo Calendar",
