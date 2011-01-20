@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.120 2011/01/20 14:03:13 bif Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.121 2011/01/20 14:26:56 bif Exp $";
 #endif
 
 #include "os.h"
@@ -1017,7 +1017,7 @@ void	initruntimeconf(void)
 	if ((bootopt & BOOT_STANDALONE))
 	{
 		/* standalone mode */
-		iconf.split = 3;
+		iconf.split = -1;
 	}
 }
 

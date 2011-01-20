@@ -35,7 +35,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.187 2010/08/13 19:58:46 bif Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.188 2011/01/20 14:26:56 bif Exp $";
 #endif
 
 #include "os.h"
@@ -1915,7 +1915,7 @@ static	void	read_listener(aClient *cptr)
 
 		/* Can cptr->confs->value.aconf be NULL? --B. */
 		if ((iconf.caccept == 0 ||
-			(iconf.caccept == 2 && iconf.split == 1))
+			(iconf.caccept == 2 && IsSplit()))
 			&& cptr->confs->value.aconf != NULL
 			&& IsConfDelayed(cptr->confs->value.aconf))
 		{

@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.298 2010/08/12 16:24:31 bif Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.299 2011/01/20 14:26:56 bif Exp $";
 #endif
 
 #include "os.h"
@@ -3817,7 +3817,7 @@ static void report_listeners(aClient *sptr, char *to)
 		{
 			if (iconf.caccept == 0)
 				what = "noaccept";
-			else if (iconf.caccept == 2 && iconf.split == 1)
+			else if (iconf.caccept == 2 && IsSplit())
 				what = "splitnoaccept";
 			else
 				what = "active";
