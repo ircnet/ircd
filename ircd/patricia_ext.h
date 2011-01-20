@@ -153,4 +153,5 @@ do { \
         } \
     } while (0)
 
+#undef EXTERN
 #endif /* _PATRICIA_H */
