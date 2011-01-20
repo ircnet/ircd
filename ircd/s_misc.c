@@ -22,7 +22,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.119 2009/11/13 20:08:11 chopin Exp $";
+static const volatile char rcsid[] = "@(#)$Id: s_misc.c,v 1.120 2011/01/20 14:03:13 bif Exp $";
 #endif
 
 #include "os.h"
@@ -1011,8 +1011,8 @@ void	initruntimeconf(void)
 	iconf.caccept = 2; /* accept clients when no split */
 
 	/* Defaults set in config.h */
-	iconf.split_minservers = DEFAULT_SPLIT_SERVERS;
-	iconf.split_minusers = DEFAULT_SPLIT_USERS;
+	iconf.split_minservers = MAX(DEFAULT_SPLIT_SERVERS, SPLIT_SERVERS);
+	iconf.split_minusers = MAX(DEFAULT_SPLIT_USERS, SPLIT_USERS);
 
 	if ((bootopt & BOOT_STANDALONE))
 	{
