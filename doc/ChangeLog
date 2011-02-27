@@ -1,3 +1,10 @@
+2011-01-20  Piotr Kucharski
+
+	* s_bsd.c/read_listener(), s_serv.c/report_listeners(): use IsSplit()
+	  instead of iconf.split==1 (reported by BR).
+	* patricia_ext.h: forgotten #undef EXTERN (from kinlo).
+	* s_misc.c/initruntimeconf(): take max of SPLIT_ and DEFAULT_SPLIT_*.
+
 2.11.2p3
 
 2010-08-12  Piotr Kucharski
