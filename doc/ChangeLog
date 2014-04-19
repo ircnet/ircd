@@ -4,6 +4,7 @@
 	  clients.
 	* s_numeric.c/do_numeric(): Initialize p to NULL for call to strtoken()
 	* whowas.c/m_whowas(): Initialize p to NULL for call to strtoken()
+	* s_bsd.c/close_client_fd(): Initialize the complete linger structure
 
 2011-01-20  Piotr Kucharski
 
