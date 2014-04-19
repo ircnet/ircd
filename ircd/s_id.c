@@ -69,7 +69,7 @@ char	*ltoid(long l, int n)
 static	char	idrpl[UIDLEN+1]; /* Currently nothing longer should be used. */
 	int	i = n - 1;
 
-	if (n > sizeof(idrpl))
+	if (n >= sizeof(idrpl))
 	{
 		/* This should not happen. */
 		return NULL;
