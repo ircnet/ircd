@@ -139,7 +139,6 @@ void	write_pidfile(void)
 	(void) truncate(IAUTHPID_PATH, 0);
 	if (( fd = open(IAUTHPID_PATH, O_CREAT|O_WRONLY, 0600)) >= 0)
 	{
-		memset(pidbuf, '0', sizeof(pidbuf));
 		(void) sprintf(pidbuf, "%d\n", (int)getpid());
 		if (write(fd, pidbuf, strlen(pidbuf)) == -1)
 		{

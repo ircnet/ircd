@@ -8,6 +8,7 @@
 	* mod_webproxy.c/proxy_init(): On unknown options free the buffer.
 	* mod_socks.c/socks_init(): On unknown options free the buffer.
 	* s_id.c/ltoid(): Fix checking of max length of UID.
+	* iauth.c/write_pidfile(): Don't create a '0' filled buffer
 
 2011-01-20  Piotr Kucharski
 
