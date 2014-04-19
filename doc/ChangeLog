@@ -1,3 +1,8 @@
+2014-04-19  Kurt Roeckx
+
+	* class.c/add_class(): Don't allow setting negative amount of max
+	  clients.
+
 2011-01-20  Piotr Kucharski
 
 	* s_bsd.c/read_listener(), s_serv.c/report_listeners(): use IsSplit()

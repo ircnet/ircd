@@ -155,6 +155,11 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 	}
 #endif
 
+	if (maxli < 0)
+	{
+		maxli = 0;
+	}
+
 	t = find_class(class);
 	if ((t == classes) && (class != 0))
 	    {
