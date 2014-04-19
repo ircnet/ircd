@@ -593,6 +593,7 @@ static	char	*socks_init(AnInstance *self)
 
 	if (mydata->options == 0)
 	{
+		free(mydata);
 		return "Aie! unknown option(s): nothing to be done!";
 	}
 
