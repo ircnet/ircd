@@ -375,7 +375,7 @@ int	m_whowas(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	int	j = 0;
 	Reg	anUser	*up = NULL;
 	int	max = -1;
-	char	*p, *nick, *s;
+	char	*p = NULL, *nick, *s;
 
  	if (parc < 2)
 	    {

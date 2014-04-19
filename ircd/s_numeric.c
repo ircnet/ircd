@@ -51,7 +51,7 @@ int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
 {
 	aClient *acptr = NULL;
 	aChannel *chptr;
-	char	*nick, *p;
+	char	*nick, *p = NULL;
 	int	i;
 
 	if (parc < 1 || !IsServer(sptr))
