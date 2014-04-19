@@ -2,6 +2,7 @@
 
 	* class.c/add_class(): Don't allow setting negative amount of max
 	  clients.
+	* s_numeric.c/do_numeric(): Initialize p to NULL for call to strtoken()
 
 2011-01-20  Piotr Kucharski
 
