@@ -139,14 +139,10 @@ void	write_pidfile(void)
 	(void) truncate(IAUTHPID_PATH, 0);
 	if (( fd = open(IAUTHPID_PATH, O_CREAT|O_WRONLY, 0600)) >= 0)
 	{
-#ifdef CVS3
 		/*
 		 * 2014-04-19  Kurt Roeckx
 		 *  * iauth.c/write_pidfile(): Don't create a '0' filled buffer
 		 */
-#else
-		memset(pidbuf, '0', sizeof(pidbuf));
-#endif
 		(void) sprintf(pidbuf, "%d\n", (int)getpid());
 		if (write(fd, pidbuf, strlen(pidbuf)) == -1)
 		{

@@ -51,15 +51,11 @@ int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
 {
 	aClient *acptr = NULL;
 	aChannel *chptr;
-#ifdef CVS3
 	/*
 	 * 2014-04-19  Kurt Roeckx
 	 *  * s_numeric.c/do_numeric(): Initialize p to NULL for call to strtoken()
 	 */
 	char	*nick, *p = NULL;
-#else
-	char	*nick, *p;
-#endif
 	int	i;
 
 	if (parc < 1 || !IsServer(sptr))

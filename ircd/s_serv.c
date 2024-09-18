@@ -3817,16 +3817,12 @@ static void report_listeners(aClient *sptr, char *to)
 		{
 			if (iconf.caccept == 0)
 				what = "noaccept";
-#ifdef CVS3
 			/*
 			 * 2011-01-20  Piotr Kucharski
 			 *  * s_bsd.c/read_listener(), s_serv.c/report_listeners(): use IsSplit()
 			 *    instead of iconf.split==1 (reported by BR).
 			 */
 			else if (iconf.caccept == 2 && IsSplit())
-#else
-			else if (iconf.caccept == 2 && iconf.split == 1)
-#endif
 				what = "splitnoaccept";
 			else
 				what = "active";

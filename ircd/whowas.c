@@ -375,15 +375,11 @@ int	m_whowas(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	int	j = 0;
 	Reg	anUser	*up = NULL;
 	int	max = -1;
-#ifdef CVS3
 	/*
 	 * 2014-04-19  Kurt Roeckx
 	 *  * whowas.c/m_whowas(): Initialize p to NULL for call to strtoken()
 	 */
 	char	*p = NULL, *nick, *s;
-#else
-	char	*p, *nick, *s;
-#endif
 
  	if (parc < 2)
 	    {

@@ -36,15 +36,11 @@ EXTERN char *mystrdup (char *s);
 EXTERN char *strtoken (char **save, char *str, char *fs);
 #endif /* HAVE_STRTOKEN */
 #if !defined(HAVE_STRTOK)
-#ifdef CVS3
 /*
  * 2014-08-21  Piotr Kucharski
  *  * support.c/support_ext.h: use const char for second param of strtok.
  */
 EXTERN char *strtok (char *str, const char *fs);
-#else
-EXTERN char *strtok (char *str, char *fs);
-#endif
 #endif /* HAVE_STRTOK */
 #if !defined(HAVE_STRERROR)
 EXTERN char *strerror (int err_no);

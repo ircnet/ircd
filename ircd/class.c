@@ -154,8 +154,6 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 		}
 	}
 #endif
-#ifdef CVS3
-
 	/*
 	 * 2014-04-19  Kurt Roeckx
 	 *  * class.c/add_class(): Don't allow setting negative amount of max
@@ -165,7 +163,6 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 	{
 		maxli = 0;
 	}
-#endif
 
 	t = find_class(class);
 	if ((t == classes) && (class != 0))
