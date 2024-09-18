@@ -1,3 +1,25 @@
+2020-01-25 mh
+
+  * ircd/version.c.SH.in: use LC_ALL=C for creation date (minor fix
+    i cant attribute to anyone particular -- mh)
+
+  * ircd/s_misc.c:initruntimeconf(), common/struct_def.h: standalone
+    split mode is -1 not 3 (unsure if this is part of any of the below
+    fixes -- mh)
+
+2014-09-02  Piotr Kucharski
+
+    * ircd.c/try_connections(): get rid of paren disambiguity warning.
+
+2014-08-21  Piotr Kucharski:
+
+    * support.c/support_ext.h: use const char for second param of
+      strtok.
+
+2014-08-19  Kurt Roeckx:
+
+    * configure: Use quotes when calling support/configure
+
 2014-04-19  Kurt Roeckx
 
 	* class.c/add_class(): Don't allow setting negative amount of max
@@ -3456,10 +3478,10 @@
 	* configure.in: check for getipnodebyname() for IPv6.
 
 	* c_bsd.c, resolv_def.h, res_init.c, s_bsd.c: updated code to
-	follow RFC 2553 (from Roar Thronæs).
+	follow RFC 2553 (from Roar Thronï¿½s).
 
 	* mod_rfc931.c: renamed _data structure which causes problems
-	under Compaq Tru64 Unix 5.0 (from Roar Thronæs).
+	under Compaq Tru64 Unix 5.0 (from Roar Thronï¿½s).
 
 1999-10-30  Kurt Roeckx
 
@@ -3947,7 +3969,7 @@
 
 1999-02-05  Christophe Kalt
 
-	* match.c/match(): removed predictable if's (from Tero Jänkä).
+	* match.c/match(): removed predictable if's (from Tero Jï¿½nkï¿½).
 
 	* s_serv.c/m_server_estab(): flush_connections() called once
 	during burst.
@@ -4088,9 +4110,9 @@
 		* [RFC] suppressed an error reply for notices in m_message().
 		* server notices to +n channels were failing. (Reported by Q).
 
-	* a_defines.h: INET6 fix for OSF (from Roar Thronæs).
+	* a_defines.h: INET6 fix for OSF (from Roar Thronï¿½s).
 
-	* os.h: INET6 fix for OSF (from Roar Thronæs).
+	* os.h: INET6 fix for OSF (from Roar Thronï¿½s).
 
 	* channel.c: added check against 'duplicate joins' in m_njoin().
 
@@ -4104,9 +4126,9 @@
 	* iauth.c, a_io.c: added nonexistant INET6 code.
 	
 	* os.h, nameser_def.h, resolv_def.h: OSF portability fix from Roar
-	Thronæs.
+	Thronï¿½s.
 
-	* s_auth.c: added missing INET6 code. (Roar Thronæs)
+	* s_auth.c: added missing INET6 code. (Roar Thronï¿½s)
 
 1998-09-25  Christophe Kalt
 	
@@ -4127,7 +4149,7 @@
 1998-04-04  Christophe Kalt
 
 	* c_version_ext.h, c_version.c, irc.c, swear.c: Digital Unix 4.0B
-	port (Roar Thronæs <roart@nvg.ntnu.no>)
+	port (Roar Thronï¿½s <roart@nvg.ntnu.no>)
 
 1998-12-12  Christophe Kalt
 
