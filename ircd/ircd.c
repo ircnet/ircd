@@ -356,8 +356,18 @@ static	time_t	try_connections(time_t currenttime)
 		 * try_connections() other servers have chance. --B. */
 		con_conf->hold += get_con_freq(Class(con_conf));
 
-		if (iconf.aconnect == 0 || iconf.aconnect == 2 && 
+#ifdef CVS3
+		/*
+		 * 2014-09-02  Piotr Kucharski
+		 *  * ircd.c/try_connections(): get rid of paren disambiguity warning.
+		 */
+		if (iconf.aconnect == 0 ||
+			(iconf.aconnect == 2 &&
+				timeofday - iconf.split > DELAYCHASETIMELIMIT))
+#else
+		if (iconf.aconnect == 0 || iconf.aconnect == 2 &&
 				timeofday - iconf.split > DELAYCHASETIMELIMIT)
+#endif
 		{
 			sendto_flag(SCH_NOTICE,
 				"Connection to %s deferred. Autoconnect "

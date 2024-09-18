@@ -1,0 +1,96 @@
+######################################################################
+
+CVS3 - cvs irc2.11.3 minor fixes for irc2.11.2p3
+
+######################################################################
+
+This patch adds some minor fixes from the cvs irc2.11.3 version to
+irc2.11.2p3.
+
+I have left out autoconf updates, and the pgsql and dnsbl iauth
+modules.
+
+overview:
+
+ standalone splitmode is -1 not 3
+ use const char for second param of strtok
+ dont use 0-filled buffer in iauth
+ free data on unknown options in iauth mod_socks and mod_webproxy
+ dont allow setting negative amount of max clients in classes
+ parens warning removed from try_connections() in ircd/ircd.c
+ add forgotten undef to irc/patricia_ext.h
+ initialise socket linger completely in ircd/s_bsd.c
+ use IsSplit() instead of iconf.split==1 in s_bsd.c and s_serv.c
+ fix checking max length of UID in s_id.c
+ use the larger of DEFAULT_SPLIT_* and SPLIT_* at startup in s_misc.c
+ initialise p to NULL for strtoken() in s_numeric.c and whowas.c
+
+ use LC_ALL=C with creation date in version.c.SH.in
+ use "$@" instead of $* to get quoted arguments in configure
+
+The last two are always active and the rest are activated in config.h
+by defining CVS3 (done by default). see below changelog for details.
+
+######################################################################
+
+changelog:
+
+ v1.00
+
+ 2020-01-25 -- mh
+
+  * ircd/version.c.SH.in: use LC_ALL=C for creation date (minor fix
+    i cant attribute to anyone particular -- mh)
+
+  * ircd/s_misc.c:initruntimeconf(), common/struct_def.h: standalone
+    split mode is -1 not 3 (unsure if this is part of any of the below
+    fixes -- mh)
+
+  * added: 2014-09-02  Piotr Kucharski
+
+    ircd.c/try_connections(): get rid of paren disambiguity warning.
+
+  * added: 2014-08-21  Piotr Kucharski:
+
+    support.c/support_ext.h: use const char for second param of
+    strtok.
+
+  * added: 2014-08-19  Kurt Roeckx:
+
+    configure: Use quotes when calling support/configure
+
+  * added: 2014-04-19  Kurt Roeckx:
+
+    class.c/add_class(): Don't allow setting negative amount of max
+    clients.
+
+    s_numeric.c/do_numeric(): Initialize p to NULL for call to
+    strtoken()
+
+    whowas.c/m_whowas(): Initialize p to NULL for call to
+    strtoken()
+
+    s_bsd.c/close_client_fd(): Initialize the complete linger
+    structure
+
+    mod_webproxy.c/proxy_init(): On unknown options free the buffer.
+
+    mod_socks.c/socks_init(): On unknown options free the buffer.
+
+    s_id.c/ltoid(): Fix checking of max length of UID.
+
+    iauth.c/write_pidfile(): Don't create a '0' filled buffer
+
+  * added: 2011-01-20  Piotr Kucharski:
+
+    s_bsd.c/read_listener(), s_serv.c/report_listeners(): use
+    IsSplit() instead of iconf.split==1 (reported by BR).
+
+    patricia_ext.h: forgotten #undef EXTERN (from kinlo).
+
+    s_misc.c/initruntimeconf(): take max of SPLIT_ and
+    DEFAULT_SPLIT_*.
+
+  * project started
+
+######################################################################

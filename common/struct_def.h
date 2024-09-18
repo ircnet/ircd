@@ -1004,11 +1004,16 @@ typedef enum ServerChannels {
 /* Runtime configuration structure */
 typedef struct
 {
-	int aconnect;	/* 0: off, 1: on, 2: ND */
+	int aconnect;	/* 0 - OFF 1 - ON */
+#ifdef CVS3
+	/* standalone splitmode is -1 not 3 */
 	int split;	/* -1: standalone, 0: no, >0 yes (and since when) */
+#else
+	int split;	/* 0 - NO 1 - YES */
+#endif
 	int split_minservers;
 	int split_minusers;
-	int caccept;	/* 0: off, 1: on, 2: split */
+	int caccept;	/* 0 - OFF 1 - ON 2 - SPLIT */
 } iconf_t;
 
 /* O:line flags, used also in is_allowed() */

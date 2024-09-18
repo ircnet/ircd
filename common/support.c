@@ -124,7 +124,15 @@ char	*strtoken(char **save, char *str, char *fs)
 ** NOT encouraged to use!
 */
 
+#ifdef CVS3
+/*
+ * 2014-08-21  Piotr Kucharski
+ *  * support.c/support_ext.h: use const char for second param of strtok.
+ */
+char	*strtok(char *str, const char *fs)
+#else
 char	*strtok(char *str, char *fs)
+#endif
 {
 	static char *pos;
 

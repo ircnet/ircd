@@ -1312,7 +1312,13 @@ void close_client_fd(aClient *cptr)
 	struct 	linger	sockling;
 
 	sockling.l_onoff = 0;
+#ifdef CVS3
+	/*
+	 * 2014-04-19  Kurt Roeckx
+	 * s_bsd.c/close_client_fd(): Initialize the complete linger structure
+	 */
 	sockling.l_linger = 0;
+#endif
 #endif
 
 	if (cptr->authfd >= 0)
@@ -1916,7 +1922,16 @@ static	void	read_listener(aClient *cptr)
 
 		/* Can cptr->confs->value.aconf be NULL? --B. */
 		if ((iconf.caccept == 0 ||
+#ifdef CVS3
+			/*
+			 * 2011-01-20  Piotr Kucharski
+			 *  * s_bsd.c/read_listener(), s_serv.c/report_listeners(): use IsSplit()
+			 *    instead of iconf.split==1 (reported by BR).
+			 */
 			(iconf.caccept == 2 && IsSplit()))
+#else
+			(iconf.caccept == 2 && iconf.split == 1))
+#endif
 			&& cptr->confs->value.aconf != NULL
 			&& IsConfDelayed(cptr->confs->value.aconf))
 		{

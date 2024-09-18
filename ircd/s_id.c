@@ -69,7 +69,15 @@ char	*ltoid(long l, int n)
 static	char	idrpl[UIDLEN+1]; /* Currently nothing longer should be used. */
 	int	i = n - 1;
 
+#ifdef CVS3
+	/*
+	 * 2014-04-19  Kurt Roeckx
+	 *  * s_id.c/ltoid(): Fix checking of max length of UID.
+	 */
 	if (n >= sizeof(idrpl))
+#else
+	if (n > sizeof(idrpl))
+#endif
 	{
 		/* This should not happen. */
 		return NULL;

@@ -153,5 +153,11 @@ do { \
         } \
     } while (0)
 
+#ifdef CVS3
+/*
+ * 2011-01-20  Piotr Kucharski
+ *  * patricia_ext.h: forgotten #undef EXTERN (from kinlo).
+ */
 #undef EXTERN
+#endif
 #endif /* _PATRICIA_H */

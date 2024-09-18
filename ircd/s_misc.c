@@ -1011,13 +1011,27 @@ void	initruntimeconf(void)
 	iconf.caccept = 2; /* accept clients when no split */
 
 	/* Defaults set in config.h */
+#ifdef CVS3
+	/*
+	 * 2011-01-20  Piotr Kucharski
+	 *  * s_misc.c/initruntimeconf(): take max of SPLIT_ and DEFAULT_SPLIT_*.
+	 */
 	iconf.split_minservers = MAX(DEFAULT_SPLIT_SERVERS, SPLIT_SERVERS);
 	iconf.split_minusers = MAX(DEFAULT_SPLIT_USERS, SPLIT_USERS);
+#else
+	iconf.split_minservers = DEFAULT_SPLIT_SERVERS;
+	iconf.split_minusers = DEFAULT_SPLIT_USERS;
+#endif
 
 	if ((bootopt & BOOT_STANDALONE))
 	{
 		/* standalone mode */
+#ifdef CVS3
+		/* standalone splitmode is -1 not 3 */
 		iconf.split = -1;
+#else
+		iconf.split = 3;
+#endif
 	}
 }
 

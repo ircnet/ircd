@@ -20,7 +20,12 @@ sumhash="`(cd ../ircd; @SUM@ hash.c)`"
 sumsmisc="`(cd ../ircd; @SUM@ s_misc.c)`"
 sumircd="`(cd ../ircd; @SUM@ ircd.c)`"
 
-creation=`date | \
+LC_ALL=C
+# CVS3
+#
+#creation=`date | \
+#
+creation=`LC_ALL=C date | \
 awk '{if (NF == 6) \
          { print $1 " "  $2 " " $3 " "  $6 " at " $4 " " $5 } \
 else \
