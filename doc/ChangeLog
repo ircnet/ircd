@@ -3478,10 +3478,10 @@
 	* configure.in: check for getipnodebyname() for IPv6.
 
 	* c_bsd.c, resolv_def.h, res_init.c, s_bsd.c: updated code to
-	follow RFC 2553 (from Roar Thron�s).
+	follow RFC 2553 (from Roar Thronæs).
 
 	* mod_rfc931.c: renamed _data structure which causes problems
-	under Compaq Tru64 Unix 5.0 (from Roar Thron�s).
+	under Compaq Tru64 Unix 5.0 (from Roar Thronæs).
 
 1999-10-30  Kurt Roeckx
 
@@ -3969,7 +3969,7 @@
 
 1999-02-05  Christophe Kalt
 
-	* match.c/match(): removed predictable if's (from Tero J�nk�).
+	* match.c/match(): removed predictable if's (from Tero Jänkä).
 
 	* s_serv.c/m_server_estab(): flush_connections() called once
 	during burst.
@@ -4110,9 +4110,9 @@
 		* [RFC] suppressed an error reply for notices in m_message().
 		* server notices to +n channels were failing. (Reported by Q).
 
-	* a_defines.h: INET6 fix for OSF (from Roar Thron�s).
+	* a_defines.h: INET6 fix for OSF (from Roar Thronæs).
 
-	* os.h: INET6 fix for OSF (from Roar Thron�s).
+	* os.h: INET6 fix for OSF (from Roar Thronæs).
 
 	* channel.c: added check against 'duplicate joins' in m_njoin().
 
@@ -4126,9 +4126,9 @@
 	* iauth.c, a_io.c: added nonexistant INET6 code.
 	
 	* os.h, nameser_def.h, resolv_def.h: OSF portability fix from Roar
-	Thron�s.
+	Thronæs.
 
-	* s_auth.c: added missing INET6 code. (Roar Thron�s)
+	* s_auth.c: added missing INET6 code. (Roar Thronæs)
 
 1998-09-25  Christophe Kalt
 	
@@ -4149,7 +4149,7 @@
 1998-04-04  Christophe Kalt
 
 	* c_version_ext.h, c_version.c, irc.c, swear.c: Digital Unix 4.0B
-	port (Roar Thron�s <roart@nvg.ntnu.no>)
+	port (Roar Thronæs <roart@nvg.ntnu.no>)
 
 1998-12-12  Christophe Kalt
 
