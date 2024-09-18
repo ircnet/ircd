@@ -1011,12 +1011,17 @@ void	initruntimeconf(void)
 	iconf.caccept = 2; /* accept clients when no split */
 
 	/* Defaults set in config.h */
+	/*
+	 * 2011-01-20  Piotr Kucharski
+	 *  * s_misc.c/initruntimeconf(): take max of SPLIT_ and DEFAULT_SPLIT_*.
+	 */
 	iconf.split_minservers = MAX(DEFAULT_SPLIT_SERVERS, SPLIT_SERVERS);
 	iconf.split_minusers = MAX(DEFAULT_SPLIT_USERS, SPLIT_USERS);
 
 	if ((bootopt & BOOT_STANDALONE))
 	{
 		/* standalone mode */
+		/* standalone splitmode is -1 not 3 */
 		iconf.split = -1;
 	}
 }

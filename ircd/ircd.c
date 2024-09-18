@@ -355,9 +355,13 @@ static	time_t	try_connections(time_t currenttime)
 		/* "Penalty" for being the best, so in next call of
 		 * try_connections() other servers have chance. --B. */
 		con_conf->hold += get_con_freq(Class(con_conf));
-
-		if (iconf.aconnect == 0 || iconf.aconnect == 2 && 
-				timeofday - iconf.split > DELAYCHASETIMELIMIT)
+		/*
+		 * 2014-09-02  Piotr Kucharski
+		 *  * ircd.c/try_connections(): get rid of paren disambiguity warning.
+		 */
+		if (iconf.aconnect == 0 ||
+			(iconf.aconnect == 2 &&
+				timeofday - iconf.split > DELAYCHASETIMELIMIT))
 		{
 			sendto_flag(SCH_NOTICE,
 				"Connection to %s deferred. Autoconnect "

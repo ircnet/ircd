@@ -375,6 +375,10 @@ int	m_whowas(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg	int	j = 0;
 	Reg	anUser	*up = NULL;
 	int	max = -1;
+	/*
+	 * 2014-04-19  Kurt Roeckx
+	 *  * whowas.c/m_whowas(): Initialize p to NULL for call to strtoken()
+	 */
 	char	*p = NULL, *nick, *s;
 
  	if (parc < 2)

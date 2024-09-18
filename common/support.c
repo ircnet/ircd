@@ -124,7 +124,11 @@ char	*strtoken(char **save, char *str, char *fs)
 ** NOT encouraged to use!
 */
 
-char	*strtok(char *str, char *fs)
+/*
+ * 2014-08-21  Piotr Kucharski
+ *  * support.c/support_ext.h: use const char for second param of strtok.
+ */
+char	*strtok(char *str, const char *fs)
 {
 	static char *pos;
 

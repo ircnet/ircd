@@ -593,6 +593,10 @@ static	char	*socks_init(AnInstance *self)
 
 	if (mydata->options == 0)
 	{
+		/*
+		 * 2014-04-19  Kurt Roeckx
+		 *  * mod_socks.c/socks_init(): On unknown options free the buffer.
+		 */
 		free(mydata);
 		return "Aie! unknown option(s): nothing to be done!";
 	}

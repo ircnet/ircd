@@ -36,7 +36,9 @@ else
      echo "copying config.h from config.h.dist..."
      cp -p ../support/config.h.dist config.h
    fi
-    ./configure $*
+    # 2014-08-19  Kurt Roeckx
+    #  * configure: Use quotes when calling support/configure
+    ./configure "$@"
     if test $? = 0
     then
       echo "Have you read doc/README? (I hope so)"

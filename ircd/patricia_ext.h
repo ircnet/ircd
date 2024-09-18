@@ -153,5 +153,9 @@ do { \
         } \
     } while (0)
 
+/*
+ * 2011-01-20  Piotr Kucharski
+ *  * patricia_ext.h: forgotten #undef EXTERN (from kinlo).
+ */
 #undef EXTERN
 #endif /* _PATRICIA_H */

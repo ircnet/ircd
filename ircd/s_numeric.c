@@ -51,6 +51,10 @@ int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
 {
 	aClient *acptr = NULL;
 	aChannel *chptr;
+	/*
+	 * 2014-04-19  Kurt Roeckx
+	 *  * s_numeric.c/do_numeric(): Initialize p to NULL for call to strtoken()
+	 */
 	char	*nick, *p = NULL;
 	int	i;
 
