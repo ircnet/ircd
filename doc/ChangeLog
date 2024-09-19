@@ -1,3 +1,5 @@
+2.11.2p4
+
 2020-01-25 mh
 
   * ircd/version.c.SH.in: use LC_ALL=C for creation date (minor fix
