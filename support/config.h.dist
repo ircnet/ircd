@@ -788,6 +788,26 @@
 #define SPLIT_USERS	50000
 #define SPLIT_SERVERS	50
 
+/************************************************************************
+ *
+ * whoistls (see doc/whoistls.txt)
+ *
+ * WHOISTLS
+ *
+ *  define to the message you want to show in WHOIS
+ *  for clients connected via SSL/TLS
+ *
+ * WHOISTLS_NOTICE
+ *
+ *  undef to disable sending a notice to clients connecting with SSL/TLS,
+ *  or define to the message you want to send
+ *
+ * *** Remember to mark SSL/TLS encrypted P-lines with the T flag ***
+ *
+ */
+#define WHOISTLS "is a Secure Connection (SSL/TLS)"
+#define WHOISTLS_NOTICE "Your connection is secure (SSL/TLS)."
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */

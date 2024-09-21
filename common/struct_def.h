@@ -195,6 +195,7 @@ typedef enum Status {
 #ifdef XLINE
 #define FLAGS_XLINED	0x0100	/* X-lined client */
 #endif
+#define FLAGS_TLS       0x0200 /* user is on a secure connection port (SSL/TLS) -- mh 2020-04-27 */
 #define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP|FLAGS_AWAY|FLAGS_RESTRICT)
 #define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP)
 
@@ -263,7 +264,8 @@ typedef enum Status {
 #define SetXlined(x)		((x)->user->flags |= FLAGS_XLINED)
 #define ClearXlined(x)		((x)->user->flags &= ~FLAGS_XLINED)
 #endif
-
+#define IsTLS(x)        ((x)->user && (x)->user->flags & FLAGS_TLS)
+#define SetTLS(x)       ((x)->user->flags |= FLAGS_TLS)
 
 /*
  * defined debugging levels
@@ -389,9 +391,11 @@ struct	ListItem	{
 
 #define PFLAG_DELAYED		0x00001
 #define PFLAG_SERVERONLY	0x00002
+#define PFLAG_TLS           0x00004
 
 #define IsConfDelayed(x)	((x)->flags & PFLAG_DELAYED)
 #define IsConfServeronly(x)	((x)->flags & PFLAG_SERVERONLY)
+#define IsConfTLS(x)        ((x)->flags & PFLAG_TLS)
 
 #define	IsIllegal(x)	((x)->status & CONF_ILLEGAL)
 
