@@ -182,6 +182,7 @@ char	*iline_flags_to_string(long flags)
 /* Convert P-line flags from string
  * D - delayed port
  * S - server only port
+ * T - secure (SSL/TLS) port
  */
 long pline_flags_parse(char *string)
 {
@@ -193,6 +194,13 @@ long pline_flags_parse(char *string)
 	if (index(string, 'S'))
 	{
 		tmp |= PFLAG_SERVERONLY;
+	}
+	/*
+	 * This only marks the port as secure, you must ensure that it actually is  -- mh 2020-04-27
+	 */
+	if (index(string, 'T'))
+	{
+		tmp |= PFLAG_TLS;
 	}
 	return tmp;
 }
@@ -212,7 +220,12 @@ char *pline_flags_to_string(long flags)
 	{
 		*s++ = 'S';
 	}
-	
+
+	if (flags & PFLAG_TLS)
+	{
+		*s++ = 'T';
+	}
+
 	if (s == pfsbuf)
 	{
 		*s++ = '-';

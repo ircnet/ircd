@@ -770,6 +770,14 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		(void)m_motd(sptr, sptr, 1, parv);
 		if (IsRestricted(sptr))
 			sendto_one(sptr, replies[ERR_RESTRICTED], ME, BadTo(nick));
+#ifdef WHOISTLS_NOTICE
+		/* send a notice to client if the connection is secure (SSL/TLS).
+		 * notice is defined as WHOISTLS_NOTICE in config.h -- mh 2020-04-27 */
+		if (IsTLS(sptr))
+		{
+			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, WHOISTLS_NOTICE);
+		}
+#endif
 		if (IsConfNoResolve(sptr->confs->value.aconf))
 		{
 			sendto_one(sptr, ":%s NOTICE %s :Due to an administrative"
@@ -2043,6 +2051,13 @@ static	void	send_whois(aClient *sptr, aClient *acptr)
 	if (IsAnOper(acptr))
 		sendto_one(sptr, replies[RPL_WHOISOPERATOR], ME, BadTo(sptr->name), name);
 
+	/* send a 320 numeric RPL_WHOISTLS reply if client is connected with SSL/TLS.
+	 * reply defined as WHOISTLS in config.h -- mh 2020-04-27 */
+	if (IsTLS(acptr))
+	{
+		sendto_one(sptr, replies[RPL_WHOISTLS], ME, BadTo(sptr->name), name, WHOISTLS);
+	}
+
 	if (acptr->user && MyConnect(acptr))
 		sendto_one(sptr, replies[RPL_WHOISIDLE], ME, BadTo(sptr->name),
 			   name, (long)(timeofday - user->last)
@@ -2240,6 +2255,12 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	user->servp = me.serv;
 	me.serv->refcnt++;
+
+	if (IsConfTLS(cptr->acpt->confs->value.aconf))
+	{
+		SetTLS(sptr);
+	}
+
 #ifdef	DEFAULT_INVISIBLE
 	SetInvisible(sptr);
 #endif

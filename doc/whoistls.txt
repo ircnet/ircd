@@ -1,0 +1,44 @@
+######################################################
+
+whoistls - SSL/TLS connected client RPL_WHOISTLS reply
+
+######################################################
+
+This will show in (local) /WHOIS if a client is connected via SSL/TLS.
+
+define WHOISTLS to the message you want to show in WHOIS reply
+
+Will use RPL_WHOISEXTRA.
+
+This is non-standard use of numeric 320.
+
+You can also define WHOISTLS_NOTICE to a message that is sent to the
+client upon connection to a secure port (undefine to disable this)
+
+This patch do not provide SSL/TLS encryption, but instead a P-line
+flag 'T' to mark a port as SSL/TLS secured - you have to ensure it
+actual is
+
+Example:
+  P:irc.example.net:::6667:::
+  P:ssl.example.net:::6679::T:
+
+  The first port (6667) is a regular unencrypted port and the second
+  port (6679) is one you have ensured provides a secure SSL/TLS
+  connection
+
+######################################################################
+
+changelog:
+
+ v1.00
+
+ 2020-04-28 -- mh
+
+  * first release
+
+ 2020-04-27 -- mh
+
+  * project started
+
+######################################################################
