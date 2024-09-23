@@ -785,8 +785,8 @@
 #define CACCEPT_DEFAULT 2
 
 /* Minimum values admin can set. */
-#define SPLIT_USERS	50000
-#define SPLIT_SERVERS	50
+#define SPLIT_USERS 5000
+#define SPLIT_SERVERS	10
 
 /************************************************************************
  *
