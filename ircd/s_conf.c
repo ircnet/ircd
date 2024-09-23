@@ -1940,7 +1940,86 @@ int 	initconf(int opt)
 				for(i = 0; i < sizeof(me.serv->sid); i++)
 					me.serv->sid[i] = toupper(tmp[i]);
 			}
-						
+
+			/* confsplit allows you to change the SS/SU values via ircd.conf
+			 * instead of recompiling with new DEFAULT_SPLIT_* or using /SET
+			 * SPLIT which is lost on server restart. See doc/confsplit.txt
+			 * for more details. -- mh 2020-01-22 */
+
+			int dosplitcheck = 0; /* we only need split check if values changed and it is a rehash */
+			if (tmp3 && *tmp3)
+			{
+				for (s = tmp3; *s; s++)
+				{
+					if (!isdigit(*s))
+					{
+						break;
+					}
+				}
+
+				if (*s == '\0')
+				{
+					i = atoi(tmp3);
+
+					if (i < SPLIT_SERVERS)
+					{
+						i = SPLIT_SERVERS;
+					}
+
+					if (i != iconf.split_minservers)
+					{
+						if (opt == 0)
+						{
+							/* it's a rehash */
+							sendto_flag(SCH_NOTICE, "changed value of SPLIT_SERVERS (min: %d) from %d to %d",
+								SPLIT_SERVERS, iconf.split_minservers, i);
+							dosplitcheck = 1;
+						}
+						iconf.split_minservers = i;
+					}
+				}
+			}
+
+			if (tmp4 && *tmp4)
+			{
+				for (s = tmp4; *s; s++)
+				{
+					if (!isdigit(*s))
+					{
+						break;
+					}
+				}
+
+				if (*s == '\0')
+				{
+					i = atoi(tmp4);
+
+					if (i < SPLIT_USERS)
+					{
+						i = SPLIT_USERS;
+					}
+
+					if (i != iconf.split_minusers)
+					{
+						if (opt == 0)
+						{
+							/* it's a rehash */
+							sendto_flag(SCH_NOTICE, "changed value of SPLIT_USERS (min: %d) from %d to %d",
+								SPLIT_USERS, iconf.split_minusers, i);
+
+							dosplitcheck = 1;
+						}
+						iconf.split_minusers = i;
+					}
+				}
+			}
+
+			/* do a split check if any values changed, but only needed in rehash */
+			if (dosplitcheck == 1)
+			{
+				check_split();
+			}
+
 			if (aconf->port)
 				setup_ping(aconf);
 		    }
