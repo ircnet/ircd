@@ -57,7 +57,7 @@
 # the server listens for UDP pings (used to determine the fastest link in a
 # class when autoconnecting)
 #
-# M:<Server NAME>:<YOUR Internet IP#>:<Geographic Location>:<Port>:<SID>:
+# M:<Server NAME>:<YOUR Internet IP#>:<Geographic Location>:<Port>:<SID>:<Split Servers>:<Split Users>:
 #
 # Note that 'server name' refers to the name of the irc-server which needs 
 # not to be the same as the hostname of the machine it's running on.
@@ -66,14 +66,16 @@
 # your local coord. If you are (BIC) Coord on IRCnet, you have a pool of
 # 36 SIDs to choose from. Check doc/ISO-3166-1 file to find your country
 # numeric code (example: 000) and assign one SID for every of your servers
-# starting from 000A, through 000Z, 0000 and ending at 0009.
+# starting from 000A, through 000Z, 0000 and ending at 0009. 'Split Servers'
+# and 'Split Users' define thresholds for turning on and off the split-mode,
+# where joins to new channels do not give chanop status.
 #
 # This let's ircd use the primary ip of your host to establish connections
-M:example.irc.org::Example Geographic Location, Planet Earth:6667:000A
+M:example.irc.org::Example Geographic Location, Planet Earth:6667:000A:0:0:
 #
 # This let's ircd use the ip 127.0.0.2 to establish connections, useful
 # if you're running virtual interfaces
-#M:example.irc.org:127.0.0.2:Example Geographic Location, Planet Earth:6667:000A:
+#M:example.irc.org:127.0.0.2:Example Geographic Location, Planet Earth:6667:000A:0:0:
 #
 #
 ############################

@@ -543,8 +543,6 @@
  *
  * Defining to 0 disables entering split-mode.
  */
-#define DEFAULT_SPLIT_USERS	65000
-#define DEFAULT_SPLIT_SERVERS	80
 
 /*
 ** Notice sent to connecting users if the server is in the split-mode.
@@ -785,8 +783,8 @@
 #define CACCEPT_DEFAULT 2
 
 /* Minimum values admin can set. */
-#define SPLIT_USERS	50000
-#define SPLIT_SERVERS	50
+#define SPLIT_USERS 5000
+#define SPLIT_SERVERS	10
 
 /************************************************************************
  *

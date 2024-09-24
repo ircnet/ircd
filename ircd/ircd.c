@@ -1082,6 +1082,11 @@ int	main(int argc, char *argv[])
 			fprintf(stderr,
 			"Warning: Network name is not set in ircd.conf\n");
 		}
+		if(iconf.split_minservers == -1 || iconf.split_minusers == -1)
+		{
+			fprintf(stderr, "Fatal Error: split servers and users are not set in ircd.conf\n");
+			exit(-1);
+		}
 		isupport = make_isupport();	/* Generate RPL_ISUPPORT (005) numerics */
 	    }
 
