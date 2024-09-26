@@ -733,7 +733,7 @@ void	setup_server_channels(aClient *mp)
 	chptr = get_channel(mp, "&ERRORS", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: server errors");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
-	chptr->mode.mode = smode;
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 	chptr = get_channel(mp, "&NOTICES", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: warnings and notices");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
@@ -757,11 +757,11 @@ void	setup_server_channels(aClient *mp)
 	chptr = get_channel(mp, "&HASH", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: hash tables growth");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
-	chptr->mode.mode = smode;
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 	chptr = get_channel(mp, "&LOCAL", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: notices about local connections");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
-	chptr->mode.mode = smode;
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 	chptr = get_channel(mp, "&SERVICES", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: services joining and leaving");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
@@ -771,7 +771,7 @@ void	setup_server_channels(aClient *mp)
 	strcpy(chptr->topic,
 	       "SERVER MESSAGES: messages from the authentication slave");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
-	chptr->mode.mode = smode;
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 #endif
 	chptr = get_channel(mp, "&SAVE", CREATE);
 	strcpy(chptr->topic,
@@ -781,7 +781,7 @@ void	setup_server_channels(aClient *mp)
 	chptr = get_channel(mp, "&DEBUG", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: debug messages [you shouldn't be here! ;)]");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
-	chptr->mode.mode = smode|MODE_SECRET;
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 	chptr = get_channel(mp, "&WALLOPS", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: wallops received");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
@@ -2002,8 +2002,16 @@ static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 		&& is_allowed(sptr, ACL_CLIENTS))
 		return 0;
 #endif
-	if (*chptr->chname == '&' && !strcmp(chptr->chname, "&OPER")
-		&& IsAnOper(sptr))
+	if (*chptr->chname == '&'
+		&& (!strcmp(chptr->chname, "&DEBUG")
+			|| !strcmp(chptr->chname, "&ERRORS")
+			|| !strcmp(chptr->chname, "&HASH")
+			|| !strcmp(chptr->chname, "&LOCAL")
+			|| !strcmp(chptr->chname, "&OPER")
+#if defined(USE_IAUTH)
+			|| !strcmp(chptr->chname, "&AUTH")
+#endif
+			) && IsAnOper(sptr))
 		return 0;
 
 	for (lp = sptr->user->invited; lp; lp = lp->next)
