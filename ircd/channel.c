@@ -1512,29 +1512,12 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 
 			if (*ip)
 			    {
-				if (*ip == MODE_ANONYMOUS &&
-				    whatt == MODE_DEL && *chptr->chname == '!')
-					sendto_one(sptr,
-					   replies[ERR_UNIQOPRIVSNEEDED],
-						   ME, BadTo(sptr->name), chptr->chname);
-				else if (((*ip == MODE_ANONYMOUS &&
-					   whatt == MODE_ADD &&
-					   *chptr->chname == '#') ||
-					  (*ip == MODE_REOP && whatt == MODE_ADD &&
-					   *chptr->chname != '!')) &&
-					 !IsServer(sptr))
+				if ((*ip == MODE_ANONYMOUS || *ip == MODE_REOP)
+					&& whatt == MODE_ADD && !IsServer(sptr))
 					sendto_one(cptr,
 						   replies[ERR_UNKNOWNMODE],
 						   ME, BadTo(sptr->name), *curr,
 						   chptr->chname);
-				else if (*ip == MODE_ANONYMOUS && whatt == MODE_ADD &&
-					 !IsServer(sptr) &&
-					 !(is_chan_op(sptr,chptr) &CHFL_UNIQOP)
-					 && *chptr->chname == '!')
-					/* 2 modes restricted to UNIQOP */
-					sendto_one(sptr,
-					   replies[ERR_UNIQOPRIVSNEEDED],
-						   ME, BadTo(sptr->name), chptr->chname);
 				else
 				    {
 					/*
