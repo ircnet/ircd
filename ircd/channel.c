@@ -2556,10 +2556,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users &&
 		    !(chptr->history && *chptr->chname == '!'))
 		{
-			if (*name == '!')
-				flags |= CHFL_UNIQOP|CHFL_CHANOP;
-			else
-				flags |= CHFL_CHANOP;
+			flags |= CHFL_CHANOP;
 		}
 		/* Complete user entry to the new channel */
 		add_user_to_channel(chptr, sptr, flags);
