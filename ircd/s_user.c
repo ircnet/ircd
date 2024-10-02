@@ -814,7 +814,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		sendto_one(acptr,
 				":%s UNICK %s %s %s %s %s %s :%s",
 				user->servp->sid, nick, user->uid,
-				user->username, user->host, user->sip,
+				user->username, user->host, get_client_ip(sptr),
 				(*buf) ? buf : "+", sptr->info);
 	}	/* for(my-leaf-servers) */
 #ifdef	USE_SERVICES

@@ -180,7 +180,7 @@ static	void	sendnum_toone(aClient *cptr, int wants, aClient *sptr,
 			sptr->user->uid,
 			(wants & SERVICE_WANT_USER) ? sptr->user->username : ".",
 			(wants & SERVICE_WANT_USER) ? sptr->user->host : ".",
-			(wants & SERVICE_WANT_USER) ? sptr->user->sip : ".",
+			(wants & SERVICE_WANT_USER) ? get_client_ip(sptr) : ".",
 			(wants & (SERVICE_WANT_UMODE|SERVICE_WANT_OPER)) ? umode : "+",
 			(wants & SERVICE_WANT_USER) ? sptr->info : "");
 	else
