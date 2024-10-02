@@ -137,6 +137,23 @@ char	*strtok(char *str, const char *fs)
 
 #endif /* HAVE_STRTOK */
 
+int snprintf_append(char *str, int size, int pos, const char *fmt, ...)
+{
+	int ret, max;
+
+	if(pos >= size)
+		return 0;
+	else
+		max = size - pos;
+
+	va_list ap;
+	va_start(ap, fmt);
+	ret = vsnprintf(str + pos, max, fmt, ap);
+	va_end(ap);
+
+	return ret;
+}
+
 #if !defined(HAVE_STRERROR)
 /*
 **	strerror - return an appropriate system error string to a given errno
