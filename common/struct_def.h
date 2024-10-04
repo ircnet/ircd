@@ -995,6 +995,9 @@ typedef enum ServerChannels {
 #   error LOCALNICKLEN must not be bigger than NICKLEN
 #endif
 
+/* Capability flags */
+#define CAP_EXTENDED_JOIN   0x0001
+
 /* WHO parameter flags */
 #define WHO_FLAG_OPERS_ONLY	0x0001
 #define WHO_FLAG_CHANNEL	0x0002
