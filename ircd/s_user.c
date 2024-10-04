@@ -814,7 +814,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		sendto_one(acptr,
 				":%s UNICK %s %s %s %s %s %s :%s",
 				user->servp->sid, nick, user->uid,
-				user->username, user->host, user->sip,
+				user->username, user->host, get_client_ip(sptr),
 				(*buf) ? buf : "+", sptr->info);
 	}	/* for(my-leaf-servers) */
 #ifdef	USE_SERVICES
@@ -1683,12 +1683,13 @@ int	m_notice(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 /*
 ** who_one
-**	sends one RPL_WHOREPLY to sptr concerning acptr & repchan
+**	sends one RPL_WHOREPLY or RPL_WHOSPCRPL to sptr concerning acptr & repchan
 */
 static	void	who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
-		Link *lp)
+		Link *lp, struct who_opts *opts)
 {
 	char	status[5];
+	char *s;
 	int	i = 0;
 
 	if (acptr->user->flags & FLAGS_AWAY)
@@ -1707,18 +1708,60 @@ static	void	who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
 			status[i++] = '+';
 	    }
 	status[i] = '\0';
-	sendto_one(sptr, replies[RPL_WHOREPLY], ME, BadTo(sptr->name),
-		   (repchan) ? (repchan->chname) : "*", acptr->user->username,
-		   acptr->user->host, acptr->user->server, acptr->name,
-		   status, acptr->hopcount, acptr->user->servp->sid, acptr->info);
-}
 
+	if((opts->flags & ~WHO_FLAG_OPERS_ONLY) != 0)
+	{
+		char buf[BUFSIZE];
+		int len = snprintf(buf, BUFSIZE, replies[RPL_WHOSPCRPL], ME, BadTo(sptr->name));
+
+		if (opts->flags & WHO_FLAG_TOKEN)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", opts->token != NULL ? opts->token : "0");
+		if (opts->flags & WHO_FLAG_CHANNEL)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", (repchan) ? (repchan->chname) : "*");
+		if (opts->flags & WHO_FLAG_USER)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->username);
+		if (opts->flags & WHO_FLAG_IP)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", get_client_ip(acptr));
+		if (opts->flags & WHO_FLAG_HOST)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->host);
+		if (opts->flags & WHO_FLAG_SERVER)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->server);
+		if (opts->flags & WHO_FLAG_NICK)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->name);
+		if (opts->flags & WHO_FLAG_FLAGS)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", status);
+		if (opts->flags & WHO_FLAG_HOP)
+			len += snprintf_append(buf, BUFSIZE, len, " %d", acptr->hopcount);
+		if (opts->flags & WHO_FLAG_IDLE)
+			len += snprintf_append(buf, BUFSIZE, len, " %ld",
+								   MyClient(acptr) ? (long) (timeofday - acptr->user->last) : 0);
+		if (opts->flags & WHO_FLAG_ACCOUNT)
+			len += snprintf_append(buf, BUFSIZE, len, " 0");
+		if (opts->flags & WHO_FLAG_OP_LEVEL)
+			len += snprintf_append(buf, BUFSIZE, len, " n/a");
+		if (opts->flags & WHO_FLAG_SID)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->servp->sid);
+		if (opts->flags & WHO_FLAG_UID)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->uid);
+		if (opts->flags & WHO_FLAG_INFO)
+			len += snprintf_append(buf, BUFSIZE, len, " :%s", acptr->info);
+
+		sendto_one(sptr, buf);
+	}
+	else
+	{
+		sendto_one(sptr, replies[RPL_WHOREPLY], ME, BadTo(sptr->name),
+				   (repchan) ? (repchan->chname) : "*", acptr->user->username,
+				   acptr->user->host, acptr->user->server, acptr->name,
+				   status, acptr->hopcount, acptr->user->servp->sid, acptr->info);
+	}
+}
 
 /*
 ** who_channel
 **	lists all users on a given channel
 */
-static	void	who_channel(aClient *sptr, aChannel *chptr, int oper)
+static	void	who_channel(aClient *sptr, aChannel *chptr, struct who_opts *opts)
 {
 	Reg	Link	*lp;
 	int	member;
@@ -1730,7 +1773,7 @@ static	void	who_channel(aClient *sptr, aChannel *chptr, int oper)
 		{
 			for (lp = chptr->members; lp; lp = lp->next)
 			{
-				if (oper && !IsAnOper(lp->value.cptr))
+				if ((opts->flags & WHO_FLAG_OPERS_ONLY) && !IsAnOper(lp->value.cptr))
 				{
 					continue;
 				}
@@ -1738,13 +1781,13 @@ static	void	who_channel(aClient *sptr, aChannel *chptr, int oper)
 				{
 					continue;
 				}
-				who_one(sptr, lp->value.cptr, chptr, lp);
+				who_one(sptr, lp->value.cptr, chptr, lp, opts);
 			}
 		}
 	}
 	else if ((lp = find_user_link(chptr->members, sptr)))
 	{
-		who_one(sptr, lp->value.cptr, chptr, lp);
+		who_one(sptr, lp->value.cptr, chptr, lp, opts);
 	}
 }
 
@@ -1755,7 +1798,7 @@ static	void	who_channel(aClient *sptr, aChannel *chptr, int oper)
 **	
 **	Reduced CPU load - 05/2001
 */
-static	void	who_find(aClient *sptr, char *mask, int oper)
+static	void	who_find(aClient *sptr, char *mask, struct who_opts *opts)
 {
 	aChannel *chptr = NULL;
 	Link	*lp,*lp2;
@@ -1778,7 +1821,7 @@ static	void	who_find(aClient *sptr, char *mask, int oper)
 				continue;
 			}
 			
-			if (oper && !IsAnOper(acptr))
+			if ((opts->flags & WHO_FLAG_OPERS_ONLY) && !IsAnOper(acptr))
 			{
 				continue;
 			}
@@ -1794,7 +1837,7 @@ static	void	who_find(aClient *sptr, char *mask, int oper)
 			     match(mask, acptr->user->host) == 0 ||
 			     match(mask, acptr->user->server) == 0 ||
 			     match(mask, acptr->info) == 0)
-				who_one(sptr, acptr, chptr, NULL);
+				who_one(sptr, acptr, chptr, NULL, opts);
 		
 		}
 	}
@@ -1822,7 +1865,7 @@ static	void	who_find(aClient *sptr, char *mask, int oper)
 		}
 		
 		/* we wanted only opers */
-		if (oper && !IsAnOper(acptr))
+		if ((opts->flags & WHO_FLAG_OPERS_ONLY) && !IsAnOper(acptr))
 		{
 			continue;
 		}
@@ -1838,11 +1881,87 @@ static	void	who_find(aClient *sptr, char *mask, int oper)
 		     match(mask, acptr->user->host) == 0 ||
 		     match(mask, acptr->user->server) == 0 ||
 		     match(mask, acptr->info) == 0)
-			who_one(sptr, acptr, NULL, NULL);
+			who_one(sptr, acptr, NULL, NULL, opts);
 	}
 	
 }
 
+void parse_who_arg(char *arg, struct who_opts *opts) {
+	char *s;
+
+	// WHO <mask> o
+	if (*arg == 'o')
+	{
+		opts->flags |= WHO_FLAG_OPERS_ONLY;
+	}
+
+	// WHOX
+	if ((s = strchr(arg, '%')) != NULL)
+	{
+		char buf[BUFSIZE];
+		s++;
+
+		for (; *s; s++)
+		{
+			switch (*s)
+			{
+				case 't' :
+					opts->flags |= WHO_FLAG_TOKEN;
+					break;
+				case 'c' :
+					opts->flags |= WHO_FLAG_CHANNEL;
+					break;
+				case 'u' :
+					opts->flags |= WHO_FLAG_USER;
+					break;
+				case 'i' :
+					opts->flags |= WHO_FLAG_IP;
+					break;
+				case 'h' :
+					opts->flags |= WHO_FLAG_HOST;
+					break;
+				case 's' :
+					opts->flags |= WHO_FLAG_SERVER;
+					break;
+				case 'n' :
+					opts->flags |= WHO_FLAG_NICK;
+					break;
+				case 'f' :
+					opts->flags |= WHO_FLAG_FLAGS;
+					break;
+				case 'd' :
+					opts->flags |= WHO_FLAG_HOP;
+					break;
+				case 'l' :
+					opts->flags |= WHO_FLAG_IDLE;
+					break;
+				case 'a' :
+					opts->flags |= WHO_FLAG_ACCOUNT;
+					break;
+				case 'o' :
+					opts->flags |= WHO_FLAG_OP_LEVEL;
+					break;
+				case 'S' :
+					opts->flags |= WHO_FLAG_SID;
+					break;
+				case 'U' :
+					opts->flags |= WHO_FLAG_UID;
+					break;
+				case 'r' :
+					opts->flags |= WHO_FLAG_INFO;
+					break;
+				case ',':
+					s++;
+					int token_len = strlen(s);
+					if (*s && token_len <= 3)
+						opts->token = s;
+					s += token_len;
+					s--;
+					break;
+			}
+		}
+	}
+}
 
 /*
 ** m_who
@@ -1853,16 +1972,23 @@ static	void	who_find(aClient *sptr, char *mask, int oper)
 int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aChannel *chptr;
-	int	oper = parc > 2 ? (*parv[2] == 'o' ): 0; /* Show OPERS only */
-	int	penalty = 0;
-	char	*p, *mask, *channame;
+	int penalty = 0;
+	char *p, *mask, *channame;
+	struct who_opts opts;
+	opts.flags = 0;
+	opts.token = NULL;
 
 	if (parc < 2)
 	{
-		who_find(sptr, NULL, oper);
+		who_find(sptr, NULL, &opts);
 		sendto_one(sptr, replies[RPL_ENDOFWHO], ME, BadTo(parv[0]), "*");
 		/* it was very CPU intensive */
 		return MAXPENALTY;
+	}
+
+	if(parc > 2)
+	{
+		parse_who_arg(parv[2], &opts);
 	}
 
 	/* get rid of duplicates */
@@ -1921,7 +2047,7 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			chptr = find_channel(channame, NULL);
 			if (chptr)
 			{
-				who_channel(sptr, chptr, oper);
+				who_channel(sptr, chptr, &opts);
 			}
 			else
 			{
@@ -1951,7 +2077,7 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			if (acptr)
 			{
 				/* We found client, so send WHO for it */
-				who_one(sptr, acptr, NULL, NULL);
+				who_one(sptr, acptr, NULL, NULL, &opts);
 			}
 			else
 			{
@@ -1963,7 +2089,7 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				/* simplify mask */
 				(void)collapse(mask);
 
-				who_find(sptr, mask, oper);
+				who_find(sptr, mask, &opts);
 				penalty += MAXPENALTY;
 			}
 		}
