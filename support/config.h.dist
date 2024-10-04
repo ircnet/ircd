@@ -497,11 +497,7 @@
 /*
 ** Define delimiter of fields in ircd.conf.
 */
-#ifdef INET6
-# define IRCDCONF_DELIMITER '%'
-#else
-# define IRCDCONF_DELIMITER ':'
-#endif
+#define IRCDCONF_DELIMITER '|'
 
 /*
  * Max number of channels a user is allowed to join.
