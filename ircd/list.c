@@ -124,7 +124,7 @@ aClient	*make_client(aClient *from)
 	(void)strcpy(cptr->username, "unknown");
 	cptr->info = DefInfo;
 	if (size == CLIENT_LOCAL_SIZE)
-	    {
+	{
 		cptr->since = cptr->lasttime = cptr->firsttime = timeofday;
 		cptr->confs = NULL;
 		cptr->sockhost[0] = '\0';
@@ -140,7 +140,9 @@ aClient	*make_client(aClient *from)
 		cptr->user2 = NULL;
 		cptr->user3 = NULL;
 #endif
-	    }
+	}
+	cptr->cap_negotation = 0;
+	cptr->caps = 0;
 	return (cptr);
 }
 

@@ -749,6 +749,53 @@ void	sendto_channel_butserv(aChannel *chptr, aClient *from, char *pattern, ...)
 }
 
 /*
+ * sendto_channel_butserv_caps
+ *
+ * Send a message to all members of a channel that are connected to this
+ * server and have the required capabilities and do not have the excluded capabilities.
+ */
+void	sendto_channel_butserv_caps(aChannel *chptr, aClient *from, int caps, int excluded_caps, char *pattern, ...)
+{
+	Reg Link *lp;
+	Reg aClient *acptr, *lfrm = from;
+	int len = 0;
+
+	if (MyClient(from))
+	{    /* Always send to the client itself */
+		if ((caps == 0 || HasCap(from, caps)) && (excluded_caps == 0 || !HasCap(from, excluded_caps)))
+		{
+			va_list va;
+			va_start(va, pattern);
+			vsendto_prefix_one(from, from, pattern, va);
+			va_end(va);
+		}
+
+		if (IsQuiet(chptr))
+			return;
+	}
+	if (IsAnonymous(chptr) && IsClient(from))
+	{
+		lfrm = &anon;
+	}
+
+	for (lp = chptr->clist; lp; lp = lp->next)
+		if (MyClient(acptr = lp->value.cptr) && acptr != from)
+		{
+			if ((caps != 0 && !HasCap(acptr, caps)) || (excluded_caps != 0 && HasCap(acptr, excluded_caps)))
+				continue;
+
+			if (!len)
+			{
+				va_list va;
+				va_start(va, pattern);
+				len = vsendpreprep(acptr, lfrm, pattern, va);
+				va_end(va);
+			}
+			(void) send_message(acptr, psendbuf, len);
+		}
+}
+
+/*
 ** send a msg to all ppl on servers/hosts that match a specified mask
 ** (used for enhanced PRIVMSGs)
 **
