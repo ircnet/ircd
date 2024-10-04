@@ -386,7 +386,7 @@ char *	replies[] = {
 /* 351 RPL_VERSION */	":%s 351 %s %s.%s %s %s :%s",
 /* 352 RPL_WHOREPLY */	":%s 352 %s %s %s %s %s %s %s :%d %s %s",
 /* 353 RPL_NAMREPLY */	":%s 353 %s %s",
-/* 354 */ (char *)NULL,
+/* 354 RPL_WHOSPCRPL */ ":%s 354 %s",
 /* 355 */ (char *)NULL,
 /* 356 */ (char *)NULL,
 /* 357 */ (char *)NULL,
