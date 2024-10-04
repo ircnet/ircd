@@ -266,6 +266,8 @@ typedef enum Status {
 #endif
 #define IsTLS(x)        ((x)->user && (x)->user->flags & FLAGS_TLS)
 #define SetTLS(x)       ((x)->user->flags |= FLAGS_TLS)
+#define IsCAPNegotiation(x)	(MyConnect(x) && (x)->cap_negotation)
+#define HasCap(x, y)		(MyConnect(x) && (x)->caps & y)
 
 /*
  * defined debugging levels
@@ -571,7 +573,8 @@ struct Client	{
 	char	*user2;	/* 2nd param of USER */
 	char	*user3;	/* 3rd param of USER */
 #endif
-
+	int caps; /* Enabled capabilities */
+	int cap_negotation; /* CAP negotiation is in progress. Registration must wait for "CAP END" */
 };
 
 #define	CLIENT_LOCAL_SIZE sizeof(aClient)
