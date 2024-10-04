@@ -1709,50 +1709,52 @@ static	void	who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
 	    }
 	status[i] = '\0';
 
-	if((opts->flags & ~WHO_FLAG_OPERS_ONLY) != 0) {
-        char buf[BUFSIZE];
-        int len = snprintf(buf, BUFSIZE, replies[RPL_WHOSPCRPL], ME, BadTo(sptr->name));
+	if((opts->flags & ~WHO_FLAG_OPERS_ONLY) != 0)
+	{
+		char buf[BUFSIZE];
+		int len = snprintf(buf, BUFSIZE, replies[RPL_WHOSPCRPL], ME, BadTo(sptr->name));
 
-        if (opts->flags & WHO_FLAG_TOKEN)
-            len += snprintf_append(buf, BUFSIZE, len, " %s", opts->token != NULL ? opts->token : "0");
-        if (opts->flags & WHO_FLAG_CHANNEL)
-            len += snprintf_append(buf, BUFSIZE, len, " %s", (repchan) ? (repchan->chname) : "*");
-        if (opts->flags & WHO_FLAG_USER)
-            len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->username);
-        if (opts->flags & WHO_FLAG_IP)
-            len += snprintf_append(buf, BUFSIZE, len, " %s", get_client_ip(acptr));
-        if (opts->flags & WHO_FLAG_HOST)
-            len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->host);
-        if (opts->flags & WHO_FLAG_SERVER)
-            len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->server);
-        if (opts->flags & WHO_FLAG_NICK)
-            len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->name);
-        if (opts->flags & WHO_FLAG_FLAGS)
-            len += snprintf_append(buf, BUFSIZE, len, " %s", status);
-        if (opts->flags & WHO_FLAG_HOP)
-            len += snprintf_append(buf, BUFSIZE, len, " %d", acptr->hopcount);
-        if (opts->flags & WHO_FLAG_IDLE)
-            len += snprintf_append(buf, BUFSIZE, len, " %ld",
-                                   MyClient(acptr) ? (long)(timeofday - acptr->user->last): 0);
-        if (opts->flags & WHO_FLAG_ACCOUNT)
+		if (opts->flags & WHO_FLAG_TOKEN)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", opts->token != NULL ? opts->token : "0");
+		if (opts->flags & WHO_FLAG_CHANNEL)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", (repchan) ? (repchan->chname) : "*");
+		if (opts->flags & WHO_FLAG_USER)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->username);
+		if (opts->flags & WHO_FLAG_IP)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", get_client_ip(acptr));
+		if (opts->flags & WHO_FLAG_HOST)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->host);
+		if (opts->flags & WHO_FLAG_SERVER)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->server);
+		if (opts->flags & WHO_FLAG_NICK)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->name);
+		if (opts->flags & WHO_FLAG_FLAGS)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", status);
+		if (opts->flags & WHO_FLAG_HOP)
+			len += snprintf_append(buf, BUFSIZE, len, " %d", acptr->hopcount);
+		if (opts->flags & WHO_FLAG_IDLE)
+			len += snprintf_append(buf, BUFSIZE, len, " %ld",
+								   MyClient(acptr) ? (long) (timeofday - acptr->user->last) : 0);
+		if (opts->flags & WHO_FLAG_ACCOUNT)
 			len += snprintf_append(buf, BUFSIZE, len, " 0");
-        if (opts->flags & WHO_FLAG_OP_LEVEL)
-            len += snprintf_append(buf, BUFSIZE, len, " n/a");
-        if (opts->flags & WHO_FLAG_SID)
-            len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->servp->sid);
-        if (opts->flags & WHO_FLAG_UID)
-            len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->uid);
-        if (opts->flags & WHO_FLAG_INFO)
-            len += snprintf_append(buf, BUFSIZE, len, " :%s", acptr->info);
+		if (opts->flags & WHO_FLAG_OP_LEVEL)
+			len += snprintf_append(buf, BUFSIZE, len, " n/a");
+		if (opts->flags & WHO_FLAG_SID)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->servp->sid);
+		if (opts->flags & WHO_FLAG_UID)
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->uid);
+		if (opts->flags & WHO_FLAG_INFO)
+			len += snprintf_append(buf, BUFSIZE, len, " :%s", acptr->info);
 
-        sendto_one(sptr, buf);
-    }
-	else {
-        sendto_one(sptr, replies[RPL_WHOREPLY], ME, BadTo(sptr->name),
-                   (repchan) ? (repchan->chname) : "*", acptr->user->username,
-                   acptr->user->host, acptr->user->server, acptr->name,
-                   status, acptr->hopcount, acptr->user->servp->sid, acptr->info);
-    }
+		sendto_one(sptr, buf);
+	}
+	else
+	{
+		sendto_one(sptr, replies[RPL_WHOREPLY], ME, BadTo(sptr->name),
+				   (repchan) ? (repchan->chname) : "*", acptr->user->username,
+				   acptr->user->host, acptr->user->server, acptr->name,
+				   status, acptr->hopcount, acptr->user->servp->sid, acptr->info);
+	}
 }
 
 /*
@@ -1884,78 +1886,81 @@ static	void	who_find(aClient *sptr, char *mask, struct who_opts *opts)
 	
 }
 
-void parse_who_arg(char *arg, struct who_opts *opts)
-{
-    char *s;
+void parse_who_arg(char *arg, struct who_opts *opts) {
+	char *s;
 
-    // WHO <mask> o
-    if(*arg == 'o') {
-        opts->flags |= WHO_FLAG_OPERS_ONLY;
-    }
+	// WHO <mask> o
+	if (*arg == 'o')
+	{
+		opts->flags |= WHO_FLAG_OPERS_ONLY;
+	}
 
-    // WHOX
-    if((s = strchr(arg, '%')) != NULL) {
-        char buf[BUFSIZE];
-        s++;
+	// WHOX
+	if ((s = strchr(arg, '%')) != NULL)
+	{
+		char buf[BUFSIZE];
+		s++;
 
-        for (; *s; s++) {
-            switch (*s) {
-                case 't' :
-                    opts->flags |= WHO_FLAG_TOKEN;
-                    break;
-                case 'c' :
-                    opts->flags |= WHO_FLAG_CHANNEL;
-                    break;
-                case 'u' :
-                    opts->flags |= WHO_FLAG_USER;
-                    break;
-                case 'i' :
-                    opts->flags |= WHO_FLAG_IP;
-                    break;
-                case 'h' :
-                    opts->flags |= WHO_FLAG_HOST;
-                    break;
-                case 's' :
-                    opts->flags |= WHO_FLAG_SERVER;
-                    break;
-                case 'n' :
-                    opts->flags |= WHO_FLAG_NICK;
-                    break;
-                case 'f' :
-                    opts->flags |= WHO_FLAG_FLAGS;
-                    break;
-                case 'd' :
-                    opts->flags |= WHO_FLAG_HOP;
-                    break;
-                case 'l' :
-                    opts->flags |= WHO_FLAG_IDLE;
-                    break;
-                case 'a' :
-                    opts->flags |= WHO_FLAG_ACCOUNT;
-                    break;
-                case 'o' :
-                    opts->flags |= WHO_FLAG_OP_LEVEL;
-                    break;
-                case 'S' :
-                    opts->flags |= WHO_FLAG_SID;
-                    break;
-                case 'U' :
-                    opts->flags |= WHO_FLAG_UID;
-                    break;
-                case 'r' :
-                    opts->flags |= WHO_FLAG_INFO;
-                    break;
-                case ',':
-                    s++;
-                    int token_len = strlen(s);
-                    if (*s && token_len <= 3)
-                        opts->token = s;
-                    s += token_len;
-                    s--;
-                    break;
-            }
-        }
-    }
+		for (; *s; s++)
+		{
+			switch (*s)
+			{
+				case 't' :
+					opts->flags |= WHO_FLAG_TOKEN;
+					break;
+				case 'c' :
+					opts->flags |= WHO_FLAG_CHANNEL;
+					break;
+				case 'u' :
+					opts->flags |= WHO_FLAG_USER;
+					break;
+				case 'i' :
+					opts->flags |= WHO_FLAG_IP;
+					break;
+				case 'h' :
+					opts->flags |= WHO_FLAG_HOST;
+					break;
+				case 's' :
+					opts->flags |= WHO_FLAG_SERVER;
+					break;
+				case 'n' :
+					opts->flags |= WHO_FLAG_NICK;
+					break;
+				case 'f' :
+					opts->flags |= WHO_FLAG_FLAGS;
+					break;
+				case 'd' :
+					opts->flags |= WHO_FLAG_HOP;
+					break;
+				case 'l' :
+					opts->flags |= WHO_FLAG_IDLE;
+					break;
+				case 'a' :
+					opts->flags |= WHO_FLAG_ACCOUNT;
+					break;
+				case 'o' :
+					opts->flags |= WHO_FLAG_OP_LEVEL;
+					break;
+				case 'S' :
+					opts->flags |= WHO_FLAG_SID;
+					break;
+				case 'U' :
+					opts->flags |= WHO_FLAG_UID;
+					break;
+				case 'r' :
+					opts->flags |= WHO_FLAG_INFO;
+					break;
+				case ',':
+					s++;
+					int token_len = strlen(s);
+					if (*s && token_len <= 3)
+						opts->token = s;
+					s += token_len;
+					s--;
+					break;
+			}
+		}
+	}
 }
 
 /*
@@ -1968,10 +1973,10 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aChannel *chptr;
 	int penalty = 0;
-    char *p, *mask, *channame;
-    struct who_opts opts;
-    opts.flags = 0;
-    opts.token = NULL;
+	char *p, *mask, *channame;
+	struct who_opts opts;
+	opts.flags = 0;
+	opts.token = NULL;
 
 	if (parc < 2)
 	{
@@ -1981,8 +1986,9 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return MAXPENALTY;
 	}
 
-	if(parc > 2) {
-        parse_who_arg(parv[2], &opts);
+	if(parc > 2)
+	{
+		parse_who_arg(parv[2], &opts);
 	}
 
 	/* get rid of duplicates */
