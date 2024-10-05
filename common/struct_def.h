@@ -67,7 +67,7 @@ typedef struct        LineItem aExtData;
 #define	LDELAYCHASETIMELIMIT	5400	/* WARNING: *DONT* CHANGE THIS!!!! */
 
 #define	READBUF_SIZE	16384	/* used in s_bsd.c *AND* s_zip.c ! */
- 
+
 /*
  * Make up some numbers which should reflect average leaf server connect
  * queue max size.
@@ -184,7 +184,7 @@ typedef enum Status {
 #ifdef JAPANESE
 #define	FLAGS_JP	0x10000000 /* jp version, used both for chans and servs */
 #endif
-	
+
 #define	FLAGS_OPER	0x0001 /* operator */
 #define	FLAGS_LOCOP	0x0002 /* local operator -- SRB */
 #define	FLAGS_WALLOP	0x0004 /* send wallops to them */
@@ -428,7 +428,7 @@ struct Zdata {
 #endif
 
 struct LineItem
-{ 
+{
     char    *line;
     struct  LineItem *next;
 };
@@ -614,7 +614,7 @@ struct	stats {
 	u_int	is_loc;	/* local connections made */
 	u_int	is_nosrv; /* user without server */
 	u_long	is_wwcnt; /* number of nicks overwritten in whowas[] */
-	unsigned long long	is_wwt;	/* sum of elapsed time on when 
+	unsigned long long	is_wwt;	/* sum of elapsed time on when
 					** overwriting whowas[] */
 	u_long	is_wwMt;  /* max elapsed time on when overwriting whowas[] */
 	u_long	is_wwmt;  /* min elapsed time on when overwriting whowas[] */
@@ -924,7 +924,7 @@ typedef enum ServerChannels {
 	SCH_CLIENT,
 #endif
 	SCH_OPER,
-	SCH_MAX	
+	SCH_MAX
 } ServerChannels;
 
 /* used for async dns values */
@@ -997,6 +997,8 @@ typedef enum ServerChannels {
 
 /* Capability flags */
 #define CAP_EXTENDED_JOIN   0x0001
+#define CAP_MULTI_PREFIX    0x0002
+#define CAP_AWAY_NOTIFY     0x0004
 
 /* WHO parameter flags */
 #define WHO_FLAG_OPERS_ONLY	0x0001

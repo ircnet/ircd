@@ -262,7 +262,7 @@ int	send_queued(aClient *to)
 		else
 		    {
 			msg = zip_buffer(to, NULL, &len, 1);
-			
+
 			if (len == -1)
 			       return dead_link(to,
 						"fatal error in zip_buffer()");
@@ -617,7 +617,7 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
 	out...but I do know the 2nd part will help big client servers
 	fairly well... - Comstud 97/04/24
 */
-     
+
 	if (highest_fd < 50) /* This part optimized for HUB servers... */
 	    {
 		if (MyConnect(user))
@@ -747,6 +747,64 @@ void	sendto_channel_butserv(aChannel *chptr, aClient *from, char *pattern, ...)
 
 	return;
 }
+
+/*
+** sendto_channels_butserv_caps
+**
+** Send a message to all members of channels that 'from' is on,
+** who have the specified capabilities, except 'from' itself.
+** Each client is notified only once, even if in multiple common channels.
+*/
+void sendto_channels_butserv_caps(aClient *from, int caps, char *pattern, ...)
+{
+    Reg Link *channels, *lp;
+    Reg aClient *cptr;
+    int len = 0;
+    va_list va;
+
+    if (!from->user)
+        return;
+
+    // Initialize sentalong array to keep track of notified clients
+    bzero((char *)&sentalong[0], sizeof(int) * MAXCONNECTIONS);
+
+    // Iterate through all channels the user is on
+    for (channels = from->user->channel; channels; channels = channels->next)
+    {
+        // Skip quiet channels
+        if (IsQuiet(channels->value.chptr))
+            continue;
+
+        // Iterate through all clients in the channel
+        for (lp = channels->value.chptr->clist; lp; lp = lp->next)
+        {
+            cptr = lp->value.cptr;
+
+            // Skip if it's the sender or we've already notified this client
+            if (cptr == from || sentalong[cptr->fd])
+                continue;
+
+            // Skip if the client doesn't have the required capabilities
+            if (!HasCap(cptr, caps))
+                continue;
+
+            // Mark this client as notified
+            sentalong[cptr->fd] = 1;
+
+            // Prepare the message if we haven't already
+            if (!len)
+            {
+                va_start(va, pattern);
+                len = vsendpreprep(cptr, from, pattern, va);
+                va_end(va);
+            }
+
+            // Send the message
+            (void)send_message(cptr, psendbuf, len);
+        }
+    }
+}
+
 
 /*
  * sendto_channel_butserv_caps
@@ -969,7 +1027,7 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what,
 	int	i;
 	aClient *cptr,
 		*srch;
-  
+
 	for (i = 0; i <= highest_fd; i++)
 	    {
 		if (!(cptr = local[i]))
@@ -999,7 +1057,7 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what,
 				continue;
 		}
 		/* my client, does he match ? */
-		else if (!(IsRegisteredUser(cptr) && 
+		else if (!(IsRegisteredUser(cptr) &&
 			   match_it(cptr, mask, what)))
 		{
 			continue;
@@ -1033,7 +1091,7 @@ void	sendto_ops_butone(aClient *one, char *from, char *pattern, ...)
 	va_end(va);
 	sendto_serv_butone(one, ":%s WALLOPS :%s", from, buf);
 	sendto_flag(SCH_WALLOP, "!%s! %s", from, buf);
-	
+
 	return;
 }
 
@@ -1277,7 +1335,7 @@ void	logfiles_close(void)
 #ifdef LOG_SERVER_CHANNELS
 	int	i;
 	SChan	*shptr;
-	
+
 	for (i = SCH_MAX - 1, shptr = svchans + i; i >= 0; i--, shptr--)
 	{
 		if (shptr->fd >= 0)
@@ -1311,7 +1369,7 @@ void	logfiles_close(void)
  */
 void	sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 {
-	/* 
+	/*
 	** One day we will rewrite linebuf to malloc()s, but for now
 	** we are lazy. The longest linebuf I saw during last year
 	** was 216. Max auth reply can be 1024, see rfc931_work() and
