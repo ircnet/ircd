@@ -26,6 +26,7 @@ static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.46 2009/03/15 01:25
 #define SUPPORT_C
 #include "s_externs.h"
 #undef SUPPORT_C
+#include "git_hash.h"
 
 #ifdef INET6
 char ipv6string[INET6_ADDRSTRLEN];
@@ -803,7 +804,7 @@ dgetsreturnbuf:
 char	*make_version(void)
 {
 	int ve, re, mi, dv, pl;
-	char ver[15];
+	char ver[32];
 
 	sscanf(PATCHLEVEL, "%2d%2d%2d%2d%2d", &ve, &re, &mi, &dv, &pl);
 	/* version & revision */
@@ -811,8 +812,14 @@ char	*make_version(void)
 	if (mi == 99) mi = -1;
 	/* minor revision */
 	sprintf(ver + strlen(ver), ".%d", dv ? mi+1 : mi);
-	if (dv)	/* alpha/beta, note how visual patchlevel is raised above */
+	if (dv)
+	{
+		/* alpha/beta, note how visual patchlevel is raised above */
 		sprintf(ver + strlen(ver), "%c%d", DEVLEVEL, dv);
+#ifdef GIT_HASH
+		sprintf(ver + strlen(ver), "(%.7s)", GIT_HASH);
+#endif
+	}
 	if (pl)	/* patchlevel */
 		sprintf(ver + strlen(ver), "p%d", pl);
 	return mystrdup(ver);

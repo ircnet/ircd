@@ -30,6 +30,7 @@ static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.299 2011/01/20 14:26
 #define S_SERV_C
 #include "s_externs.h"
 #undef S_SERV_C
+#include "git_hash.h"
 
 static	char	buf[BUFSIZE];
 
@@ -110,7 +111,7 @@ int	m_version(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	if (hunt_server(cptr,sptr,":%s VERSION :%s",1,parc,parv)==HUNTED_ISME)
 		sendto_one(sptr, replies[RPL_VERSION], ME, BadTo(parv[0]),
-			   version, debugmode, ME, me.serv->sid, serveropts);
+			   version, ME, me.serv->sid, serveropts);
 	return 2;
 }
 
@@ -1417,6 +1418,10 @@ int	m_info(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, ":%s %d %s :On-line since %s",
 			   ME, RPL_INFO, parv[0],
 			   myctime(me.firsttime));
+#ifdef GIT_HASH
+		sendto_one(sptr, ":%s %d %s :Git commit hash: %s",
+				   ME, RPL_INFO, parv[0], GIT_HASH);
+#endif
 		sendto_one(sptr, replies[RPL_ENDOFINFO], ME, BadTo(parv[0]));
 		return 5;
 	    }

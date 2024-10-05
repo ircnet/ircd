@@ -383,7 +383,7 @@ char *	replies[] = {
 /* 348 RPL_EXCEPTLIST */	":%s 348 %s %s %s!%s@%s",
 /* 349 RPL_ENDOFEXCEPTLIST */	":%s 349 %s %s :End of Channel Exception List",
 /* 350 */ (char *)NULL,
-/* 351 RPL_VERSION */	":%s 351 %s %s.%s %s %s :%s",
+/* 351 RPL_VERSION */	":%s 351 %s %s %s %s :%s",
 /* 352 RPL_WHOREPLY */	":%s 352 %s %s %s %s %s %s %s :%d %s %s",
 /* 353 RPL_NAMREPLY */	":%s 353 %s %s",
 /* 354 RPL_WHOSPCRPL */ ":%s 354 %s",
