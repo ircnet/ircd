@@ -811,7 +811,7 @@ char	*make_version(void)
 	sprintf(ver, "%d.%d", ve, (mi == 99) ? re + 1 : re);
 	if (mi == 99) mi = -1;
 	/* minor revision */
-	sprintf(ver + strlen(ver), ".%d", dv ? mi+1 : mi);
+	sprintf(ver + strlen(ver), ".%d", mi);
 	if (dv)
 	{
 		/* alpha/beta, note how visual patchlevel is raised above */
