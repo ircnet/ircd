@@ -128,7 +128,7 @@ typedef enum Status {
  * status macros.
  */
 #define	IsRegisteredUser(x)	(((x)->status == STAT_CLIENT || \
-				 (x)->status == STAT_OPER) && (x)->user)
+				 (x)->status == STAT_OPER) && (x)->user && !IsCAPNegotiation(x))
 #define	IsRegistered(x)		((x)->status >= STAT_SERVER || \
 				 (x)->status == STAT_ME)
 #define	IsConnecting(x)		((x)->status == STAT_CONNECTING)
