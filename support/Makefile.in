@@ -64,6 +64,7 @@ IAUTH = iauth
 IRCDWATCH = ircdwatch
 # TK line service binary
 TKSERV = tkserv
+GIT_HASH = git_hash.h
 
 #
 # Directories definitions
@@ -188,23 +189,32 @@ all: server
 
 server: $(IRCD_BIN) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH)
 
-$(IRCD_BIN): $(IRCD_COMMON_OBJS) $(IRCD_OBJS)
+$(GIT_HASH):
+	$(RM) $@
+	@commit_hash=`git rev-parse HEAD | tr -d "\n"`; \
+	if [ -n "$$commit_hash" ]; then \
+		echo "#define GIT_HASH \"$$commit_hash\"" > $@; \
+	else \
+		echo "#undef GIT_HASH" > $@; \
+	fi
+
+$(IRCD_BIN): $(GIT_HASH) $(IRCD_COMMON_OBJS) $(IRCD_OBJS)
 	$(RM) $@
 	./version.c.SH
 	$(CC) $(S_CFLAGS) -c -o version.o version.c
 	$(CC) $(LDFLAGS) -o $@ $(IRCD_COMMON_OBJS) version.o $(IRCD_OBJS) $(ZLIBS) $(MATHLIBS) $(LIBS)
 
-$(IAUTH): $(IAUTH_COMMON_OBJS) $(IAUTH_OBJS)
+$(IAUTH): $(GIT_HASH) $(IAUTH_COMMON_OBJS) $(IAUTH_OBJS)
 	$(RM) $@
-	$(CC) $(LDFLAGS) -o $@ $(IAUTH_COMMON_OBJS) $(IAUTH_OBJS) $(LIBS) $(DLIBS)
+	$(CC) $(LDFLAGS) -o $@ $(IAUTH_COMMON_OBJS) git_hash.h $(IAUTH_OBJS) $(LIBS) $(DLIBS)
 
-$(CHKCONF): $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
+$(CHKCONF): $(GIT_HASH) $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 	$(RM) $@
-	$(CC) $(LDFLAGS) -o $@ $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ $(CHKCONF_COMMON_OBJS) git_hash.h $(CHKCONF_OBJS) $(LIBS)
 
 # stuff in contrib/
 
-$(IRCDWATCH): ircdwatch.o clsupport.o clmatch.o
+$(IRCDWATCH): $(GIT_HASH) ircdwatch.o clsupport.o clmatch.o
 	$(RM) $(IRCDWATCH)
 	$(CC) $(LDFLAGS) -o $(IRCDWATCH) clsupport.o clmatch.o ircdwatch.o $(LIBS)
 
@@ -447,7 +457,7 @@ tkserv.o: ../contrib/tkserv/tkserv.c tkconf.h
 	$(CC) $(O_CFLAGS) -DTKSERV_LOGFILE="\"$(TKSERV_LOGFILE)\"" -DTKSERV_ACCESSFILE="\"$(TKSERV_ACCESSFILE)\"" -DCPATH="\"$(TKSERV_CONF_PATH)\"" -DPPATH="\"$(IRCDPID_PATH)\"" -c -o $@ ../contrib/tkserv/tkserv.c
 
 clean:
-	$(RM) $(IRCD_BIN) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH) $(TKSERV) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
+	$(RM) $(GIT_HASH) $(IRCD_BIN) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH) $(TKSERV) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
 
 distclean:
 	@echo "To make distclean, just delete the current directory."
