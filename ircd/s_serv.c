@@ -1262,7 +1262,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			sendto_one(cptr,
 					   ":%s UNICK %s %s %s %s %s %s :%s",
 					   acptr->user->servp->sid,
-					   acptr->name, acptr->user->uid,
+					   acptr->name, acptr->uid,
 					   acptr->user->username,
 					   acptr->user->host,
 					   get_client_ip(acptr),
@@ -2913,7 +2913,7 @@ int	m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (!IsPerson(acptr))
 			continue;
 
-		if (strncmp(acptr->user->uid, me.serv->sid, SIDLEN-1))
+		if (strncmp(acptr->uid, me.serv->sid, SIDLEN-1))
 			continue;
 
 		sendto_one(sptr, replies[RPL_ETRACEFULL],

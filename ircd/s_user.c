@@ -655,7 +655,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		{
 			/* I think this is not possible anymore. --B. */
 			sendto_one(cptr, ":%s KILL %s :%s (%s != %s[%s])",
-				ME, user->uid, ME, user->server,
+				ME, sptr->uid, ME, user->server,
 				acptr->from->name, acptr->from->sockhost);
 			sptr->flags |= FLAGS_KILLED;
 			return exit_client(cptr, sptr, &me,
@@ -720,10 +720,15 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			istat.is_l_myclnt_t = timeofday;
 			istat.is_l_myclnt = istat.is_myclnt;
 		}
-		strcpy(sptr->user->uid, next_uid());
+        // may have been set in m_authenticate() already
+		if(!*sptr->uid)
+        {
+            strcpy(sptr->uid, next_uid());
+            add_to_uid_hash_table(sptr->uid, sptr);
+        }
 		if (nick[0] == '0' && nick[1] == '\0')
 		{
-			strncpyzt(nick, sptr->user->uid, UIDLEN + 1);
+			strncpyzt(nick, sptr->uid, UIDLEN + 1);
 			(void)strcpy(sptr->name, nick);
 			(void)add_to_client_hash_table(nick, sptr);
 		}
@@ -735,7 +740,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #  endif
 			" :%s"
 # endif
-			, user->uid, nick, user->username,
+			, sptr->uid, nick, user->username,
 			user->host, user->sip
 # if (CLIENTS_CHANNEL_LEVEL & CCL_CONNINFO)
 #  ifdef XLINE
@@ -746,7 +751,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			);
 #endif
 		sprintf(buf, "%s!%s@%s", nick, user->username, user->host);
-		add_to_uid_hash_table(sptr->user->uid, sptr);
 		sptr->exitc = EXITC_REG;
 		sendto_one(sptr, replies[RPL_WELCOME], ME, BadTo(nick), buf);
 		/* This is a duplicate of the NOTICE but see below...*/
@@ -765,7 +769,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		}
 		
 		sendto_one(sptr, replies[RPL_YOURID], ME, BadTo(parv[0]),
-			sptr->user->uid);
+			sptr->uid);
 		(void)m_lusers(sptr, sptr, 1, parv);
 		(void)m_motd(sptr, sptr, 1, parv);
 		if (IsRestricted(sptr))
@@ -813,7 +817,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		}
 		sendto_one(acptr,
 				":%s UNICK %s %s %s %s %s %s :%s",
-				user->servp->sid, nick, user->uid,
+				user->servp->sid, nick, sptr->uid,
 				user->username, user->host, get_client_ip(sptr),
 				(*buf) ? buf : "+", sptr->info);
 	}	/* for(my-leaf-servers) */
@@ -943,10 +947,10 @@ badparamcountkills:
 		}
 		/* "NICK 0" or "NICK UID" received */
 		if ((nick[0] == '0' && nick[1] == '\0') ||
-		    !mycmp(nick, sptr->user->uid))
+		    !mycmp(nick, sptr->uid))
 		{
 			/* faster equivalent of
-			** !strcmp(sptr->name, sptr->user->uid) */
+			** !strcmp(sptr->name, sptr->uid) */
 			if (isdigit(sptr->name[0]))
 			{
 				/* user nick is already an UID */
@@ -955,7 +959,7 @@ badparamcountkills:
 			else
 			{
 				/* user changing his nick to UID */
-				strncpyzt(nick, sptr->user->uid, UIDLEN + 1);
+				strncpyzt(nick, sptr->uid, UIDLEN + 1);
 				goto nickkilldone;
 			}
 		}
@@ -969,7 +973,7 @@ badparamcountkills:
 				   parv[1], parv[0],
 				   get_client_name(cptr, FALSE));
                 sendto_serv_butone(NULL, ":%s KILL %s :%s (%s[%s] != %s)",
-                                   me.name, sptr->user->uid, me.name,
+                                   me.name, sptr->uid, me.name,
                                    sptr->name, sptr->from->name,
                                    get_client_name(cptr, TRUE));
                 sptr->flags |= FLAGS_KILLED;
@@ -997,11 +1001,11 @@ badparamcountkills:
 			if (sptr != cptr && sptr->user) /* bad nick change */
 			    {
 				sendto_one(cptr, ":%s KILL %s :%s (%s <- %s[%s])",
-					   ME, sptr->user->uid, ME, parv[1],
+					   ME, sptr->uid, ME, parv[1],
 					   nick, cptr->name);
 				sendto_serv_butone(cptr,
 					":%s KILL %s :%s (%s <- %s!%s@%s)",
-					ME, sptr->user->uid, ME,
+					ME, sptr->uid, ME,
 					get_client_name(cptr, FALSE),
 					parv[0], user, host);
 				sptr->flags |= FLAGS_KILLED;
@@ -1170,7 +1174,7 @@ nickkilldone:
 #if defined(CLIENTS_CHANNEL) && (CLIENTS_CHANNEL_LEVEL & CCL_NICK)
 		if (MyConnect(sptr))
 			sendto_flag(SCH_CLIENT, "%s %s %s %s NICK %s",
-				sptr->user->uid, parv[0],
+				sptr->uid, parv[0],
 				sptr->user->username, sptr->user->host, nick);
 #endif
 		if (sptr->user) /* should always be true.. */
@@ -1186,7 +1190,7 @@ nickkilldone:
 			sendto_flag(SCH_NOTICE,
 				    "Illegal NICK change: %s -> %s from %s",
 				    parv[0], nick, get_client_name(cptr,TRUE));
-		sendto_serv_butone(cptr, ":%s NICK :%s", sptr->user->uid, nick);
+		sendto_serv_butone(cptr, ":%s NICK :%s", sptr->uid, nick);
 		if (sptr->name[0])
 			(void)del_from_client_hash_table(sptr->name, sptr);
 		(void)strcpy(sptr->name, nick);
@@ -1330,7 +1334,7 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		** Ouch, this new client is trying to take an already
 		** existing nickname..
 		*/
-		if (*acptr->user->uid)
+		if (*acptr->uid)
 		    {
 			char	path[BUFSIZE];
 
@@ -1428,7 +1432,7 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	/* we don't have hopcount in unick, we take it from sptr */
 	acptr->hopcount = sptr->hopcount;
 	/* The client is already killed if the uid is too long. */
-	strcpy(acptr->user->uid, uid);
+	strcpy(acptr->uid, uid);
 	strcpy(acptr->user->sip, parv[5]);
 	add_to_uid_hash_table(uid, acptr);
 	{
@@ -1742,7 +1746,7 @@ static	void	who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
 		if (opts->flags & WHO_FLAG_SID)
 			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->servp->sid);
 		if (opts->flags & WHO_FLAG_UID)
-			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->user->uid);
+			len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->uid);
 		if (opts->flags & WHO_FLAG_INFO)
 			len += snprintf_append(buf, BUFSIZE, len, " :%s", acptr->info);
 
@@ -2113,11 +2117,10 @@ static	void	send_whois(aClient *sptr, aClient *acptr)
 		0,	/* joined */
 		0,	/* flags */
 		NULL,	/* servp */
-		0, NULL, NULL,	/* hashc, uhnext, bcptr */
+		NULL,	/* bcptr */
 		"<Unknown>",	/* user */
-		"0",		/* uid */
 		"<Unknown>",	/* host */
-		"<Unknown>",	/* server */
+		"<Unknown>"	/* server */
 	    };
 	Link	*lp;
 	anUser	*user;
@@ -2637,7 +2640,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (acptr->user)
 		    {
 			sendto_serv_v(cptr, SV_UID, ":%s KILL %s :%s!%s",
-				      parv[0], acptr->user->uid, inpath, path);
+				      parv[0], acptr->uid, inpath, path);
 		    }
 		else
 			sendto_serv_butone(cptr, ":%s KILL %s :%s!%s",
@@ -2722,7 +2725,7 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    }
 		if (sptr->user->flags & FLAGS_AWAY)
 			sendto_serv_butone(cptr, ":%s MODE %s :-a",
-				sptr->user->uid, parv[0]);
+				sptr->uid, parv[0]);
 		/* sendto_serv_butone(cptr, ":%s AWAY", parv[0]); */
 		if (MyConnect(sptr))
 			sendto_one(sptr, replies[RPL_UNAWAY], ME, BadTo(parv[0]));
@@ -2760,7 +2763,7 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		istat.is_awaymem += len;
 		away = (char *)MyMalloc(len);
 		sendto_serv_butone(cptr, ":%s MODE %s :+a",
-			sptr->user->uid, parv[0]);
+			sptr->uid, parv[0]);
 	    }
 
 	sptr->user->flags |= FLAGS_AWAY;
@@ -3427,7 +3430,7 @@ void	send_umode_out(aClient *cptr, aClient *sptr, int old)
 			if (acptr == cptr || acptr == sptr)
 				continue;
 			sendto_one(acptr, ":%s MODE %s :%s",
-				   sptr->user->uid, sptr->name, buf);
+				   sptr->uid, sptr->name, buf);
 		    }
 
 	if (cptr && MyClient(cptr))
@@ -3456,28 +3459,28 @@ static	void	save_user(aClient *cptr, aClient *sptr, char *path)
 	if (MyConnect(sptr))
 	{
 		sendto_one(sptr, replies[RPL_SAVENICK], cptr ? cptr->name : ME,
-			   sptr->name, sptr->user->uid);
+			   sptr->name, sptr->uid);
 #if defined(CLIENTS_CHANNEL) && (CLIENTS_CHANNEL_LEVEL & CCL_NICK)
 		sendto_flag(SCH_CLIENT, "%s %s %s %s NICK %s",
-			sptr->user->uid, sptr->name, sptr->user->username,
-			sptr->user->host, sptr->user->uid);
+			sptr->uid, sptr->name, sptr->user->username,
+			sptr->user->host, sptr->uid);
 #endif
 	}
 	
 	sendto_common_channels(sptr, ":%s NICK :%s",
-			       sptr->name, sptr->user->uid);
+			       sptr->name, sptr->uid);
 	add_history(sptr, NULL);
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_NICK, sptr->user->servp, sptr,
-			      ":%s NICK :%s", sptr->name, sptr->user->uid);
+			      ":%s NICK :%s", sptr->name, sptr->uid);
 #endif
 	sendto_serv_v(cptr, SV_UID, ":%s SAVE %s :%s%c%s", 
-		cptr ? cptr->serv->sid : me.serv->sid, sptr->user->uid, 
+		cptr ? cptr->serv->sid : me.serv->sid, sptr->uid,
 		cptr ? cptr->name : ME, cptr ? '!' : ' ', path);
 	sendto_flag(SCH_SAVE, "Received SAVE message for %s. Path: %s!%s",
 		    sptr->name, cptr ? cptr->name : ME, path);
 	del_from_client_hash_table(sptr->name, sptr);
-	strcpy(sptr->name, sptr->user->uid);
+	strcpy(sptr->name, sptr->uid);
 	add_to_client_hash_table(sptr->name, sptr);
 }
 
@@ -3501,7 +3504,7 @@ int	m_save(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	/* need sanity checks here -syrk */
 	acptr = find_uid(parv[1], NULL);
-	if (acptr && strcasecmp(acptr->name, acptr->user->uid))
+	if (acptr && strcasecmp(acptr->name, acptr->uid))
 	{
 		save_user(cptr, acptr, path);
 		ircstp->is_save++;

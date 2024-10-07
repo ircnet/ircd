@@ -117,15 +117,15 @@ static void	build_new_prefix(aClient *orig, char *imsg, aClient *dest,
 	{
 		return;
 	}
-	if (IsRegisteredUser(orig) && orig->user->uid[0])
+	if (IsRegisteredUser(orig) && orig->uid[0])
 	{
-		oname = orig->user->uid;
+		oname = orig->uid;
 	}
 	if (dname == NULL)
 	{
-		if (IsRegisteredUser(dest) && dest->user->uid[0])
+		if (IsRegisteredUser(dest) && dest->uid[0])
 		{
-			dname = dest->user->uid;
+			dname = dest->uid;
 		}
 		else if (oname)
 		{

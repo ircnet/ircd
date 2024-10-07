@@ -118,6 +118,8 @@ aClient	*make_client(aClient *from)
 	cptr->hnext = NULL;
 	cptr->user = NULL;
 	cptr->serv = NULL;
+	cptr->uid[0] = '\0';
+    cptr->uhnext = NULL;
 	cptr->name = cptr->namebuf;
 	cptr->status = STAT_UNKNOWN;
 	cptr->fd = -1;
@@ -202,9 +204,6 @@ anUser	*make_user(aClient *cptr, int iplen)
 		user->invited = NULL;
 		user->uwas = NULL;
 		cptr->user = user;
-		user->hashv = 0;
-		user->uhnext = NULL;
-		user->uid[0] = '\0';
 		user->servp = NULL;
 		user->bcptr = cptr;
 		if (cptr->next)	/* the only cptr->next == NULL is me */

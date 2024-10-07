@@ -458,11 +458,8 @@ struct	User	{
 				** introduced... --msa
 				** I think it's not true anymore --Beeth
 				*/
-	u_int	hashv;
-	aClient	*uhnext;
 	aClient	*bcptr;
 	char	username[USERLEN+1];
-	char	uid[UIDLEN+1];
 	char	host[HOSTLEN+1];
 	char	*server;
 	u_int	hhashv;		/* hostname hash value */
@@ -529,6 +526,9 @@ struct Client	{
 	char	namebuf[NICKLEN+1]; /* nick of the client */
 	char	username[USERLEN+1]; /* username here now for auth stuff */
 	char	*info;		/* Free form additional client information */
+	char	uid[UIDLEN+1];
+	u_int	uidhashv;   /* raw hash value of UID */
+	aClient	*uhnext;
 	/*
 	** The following fields are allocated only for local clients
 	** (directly connected to *this* server with a socket.

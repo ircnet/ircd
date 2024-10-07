@@ -903,7 +903,7 @@ static	int	cancel_clients(aClient *cptr, aClient *sptr, char *cmd)
 	    {
 		sendto_serv_butone(NULL, ":%s KILL %s :%s (%s[%s] != %s)",
 				   me.name,
-				   sptr->user ? sptr->user->uid : sptr->name,
+				   *sptr->uid ? sptr->uid : sptr->name,
 				   me.name, sptr->name, sptr->from->name,
 				   get_client_name(cptr, TRUE));
 		sptr->flags |= FLAGS_KILLED;
