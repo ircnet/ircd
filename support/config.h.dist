@@ -782,6 +782,11 @@
 #define SPLIT_USERS 5000
 #define SPLIT_SERVERS	10
 
+/*
+ ** Maximum SASL authentication attempts until the user gets disconnected.
+ */
+#define MAX_SASL_AUTH_ATTEMPTS 3
+
 /************************************************************************
  *
  * whoistls (see doc/whoistls.txt)

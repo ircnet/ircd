@@ -340,12 +340,12 @@ void initanonymous(void)
 {
 	memset(&ausr, 0, sizeof(anUser));
 	strcpy(ausr.username, "anonymous");
-	strcpy(ausr.uid, "0ANONYM");
 	strcpy(ausr.host, "anonymous.");
 	ausr.server = "anonymous.";
 
 	memset(&anon, 0, sizeof(aClient));
 	anon.user = &ausr;
+	strcpy(anon.uid, "0ANONYM");
 	anon.from = &anon;
 	anon.fd = -2;
 	anon.status = STAT_CLIENT;
