@@ -626,6 +626,15 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		{
 			find_bounce(cptr, ConfClass(aconf), -1);
 		}
+		/* Set cloaked hostname */
+		if(cptr->cloak_tmp && *cptr->cloak_tmp)
+		{
+			strncpyzt(cptr->sockhost, cptr->cloak_tmp, HOSTLEN + 1);
+			strncpyzt(cptr->user->host, cptr->cloak_tmp, HOSTLEN + 1);
+			MyFree(cptr->cloak_tmp);
+			cptr->cloak_tmp = NULL;
+			SetSpoofed(cptr);
+		}
 		break;
 	}
 	if (retval == -2)
