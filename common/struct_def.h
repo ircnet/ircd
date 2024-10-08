@@ -184,7 +184,8 @@ typedef enum Status {
 #ifdef JAPANESE
 #define	FLAGS_JP	0x10000000 /* jp version, used both for chans and servs */
 #endif
-	
+#define FLAGS_SASL  0x20000000	/* user is authenticated via SASL */
+
 #define	FLAGS_OPER	0x0001 /* operator */
 #define	FLAGS_LOCOP	0x0002 /* local operator -- SRB */
 #define	FLAGS_WALLOP	0x0004 /* send wallops to them */
@@ -268,7 +269,7 @@ typedef enum Status {
 #define SetTLS(x)       ((x)->user->flags |= FLAGS_TLS)
 #define IsCAPNegotiation(x)	(MyConnect(x) && (x)->cap_negotation)
 #define HasCap(x, y)		(MyConnect(x) && (x)->caps & y)
-
+#define IsSASLAuthed(x)		((x)->flags & FLAGS_SASL)
 /*
  * defined debugging levels
  */
@@ -529,6 +530,7 @@ struct Client	{
 	char	uid[UIDLEN+1];
 	u_int	uidhashv;   /* raw hash value of UID */
 	aClient	*uhnext;
+	char *sasl_user; /* After successful login, the SASL user name will be stored here */
 	/*
 	** The following fields are allocated only for local clients
 	** (directly connected to *this* server with a socket.
@@ -575,6 +577,8 @@ struct Client	{
 #endif
 	int caps; /* Enabled capabilities */
 	int cap_negotation; /* CAP negotiation is in progress. Registration must wait for "CAP END" */
+    aClient *sasl_service; /* The SASL service that is responsible for this user. */
+    int sasl_auth_attempts; /* Number of SASL authentication attempts */
 };
 
 #define	CLIENT_LOCAL_SIZE sizeof(aClient)
@@ -956,6 +960,7 @@ typedef enum ServerChannels {
 #define EXITC_MBUF	'M'	/* mem alloc error */
 #define EXITC_PING	'P'	/* ping timeout */
 #define EXITC_BADPASS	'p'	/* bad password */
+#define EXITC_SASL_REQUIRED	'S'	/* SASL authentication required */
 #define EXITC_SENDQ	'Q'	/* send queue exceeded */
 #define EXITC_REF	'R'	/* Refused */
 #ifdef TKLINE
@@ -997,6 +1002,7 @@ typedef enum ServerChannels {
 
 /* Capability flags */
 #define CAP_EXTENDED_JOIN   0x0001
+#define CAP_SASL        	0x0002
 
 /* WHO parameter flags */
 #define WHO_FLAG_OPERS_ONLY	0x0001

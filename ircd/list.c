@@ -120,6 +120,7 @@ aClient	*make_client(aClient *from)
 	cptr->serv = NULL;
 	cptr->uid[0] = '\0';
     cptr->uhnext = NULL;
+	cptr->sasl_user = NULL;
 	cptr->name = cptr->namebuf;
 	cptr->status = STAT_UNKNOWN;
 	cptr->fd = -1;
@@ -142,9 +143,11 @@ aClient	*make_client(aClient *from)
 		cptr->user2 = NULL;
 		cptr->user3 = NULL;
 #endif
-	}
-	cptr->cap_negotation = 0;
-	cptr->caps = 0;
+        cptr->cap_negotation = 0;
+        cptr->caps = 0;
+        cptr->sasl_service = NULL;
+        cptr->sasl_auth_attempts = 0;
+	    }
 	return (cptr);
 }
 
@@ -174,6 +177,10 @@ void	free_client(aClient *cptr)
 		if (cptr->user3)
 			MyFree(cptr->user3);
 #endif
+		if(cptr->sasl_user)
+		{
+			MyFree(cptr->sasl_user);
+		}
 	}
 	MyFree(cptr);
 }

@@ -1740,7 +1740,12 @@ static	void	who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
 			len += snprintf_append(buf, BUFSIZE, len, " %ld",
 								   MyClient(acptr) ? (long) (timeofday - acptr->user->last) : 0);
 		if (opts->flags & WHO_FLAG_ACCOUNT)
-			len += snprintf_append(buf, BUFSIZE, len, " 0");
+		{
+			if (IsSASLAuthed(acptr))
+				len += snprintf_append(buf, BUFSIZE, len, " %s", acptr->sasl_user);
+			else
+				len += snprintf_append(buf, BUFSIZE, len, " 0");
+		}
 		if (opts->flags & WHO_FLAG_OP_LEVEL)
 			len += snprintf_append(buf, BUFSIZE, len, " n/a");
 		if (opts->flags & WHO_FLAG_SID)
@@ -2179,6 +2184,12 @@ static	void	send_whois(aClient *sptr, aClient *acptr)
 
 	if (IsAnOper(acptr))
 		sendto_one(sptr, replies[RPL_WHOISOPERATOR], ME, BadTo(sptr->name), name);
+
+	/* Show SASL user to opers on this server */
+    if (IsSASLAuthed(acptr) && MyClient(sptr) && IsAnOper(sptr))
+    {
+        sendto_one(sptr, replies[RPL_WHOISLOGGEDIN], ME, BadTo(sptr->name), name, acptr->sasl_user);
+    }
 
 	/* send a 320 numeric RPL_WHOISTLS reply if client is connected with SSL/TLS.
 	 * reply defined as WHOISTLS in config.h -- mh 2020-04-27 */

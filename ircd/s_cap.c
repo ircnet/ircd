@@ -23,14 +23,18 @@
 #include "s_defines.h"
 #include "s_externs.h"
 
-struct Cap {
+struct Cap
+{
 	const char *name;
 	const int flag;
 } cap_tab[] = {
+		{"extended-join", CAP_EXTENDED_JOIN},
+		{"sasl",          CAP_SASL},
 		{NULL,            0}
 };
 
-void send_cap_list(aClient *target, char *sub_cmd, int flags) {
+void send_cap_list(aClient *target, char *sub_cmd, int flags)
+{
 	char buf[BUFSIZE];
 	int prfx_len, cnt = 0;
 	struct Cap *cap;
@@ -64,7 +68,8 @@ void send_cap_list(aClient *target, char *sub_cmd, int flags) {
 /*
  * Finds a supported cap by its name.
  */
-struct Cap *find_cap(char *name) {
+struct Cap *find_cap(char *name)
+{
 	struct Cap *cap;
 
 	if (!name)
@@ -87,8 +92,8 @@ struct Cap *find_cap(char *name) {
  * Lists the capabilities supported by this server.
  * The registration will be suspended until "CAP END" is received from the client.
  */
-void cap_ls(aClient *target, char *arg) {
-
+void cap_ls(aClient *target, char *arg)
+{
 	if (!IsRegistered(target))
 	{
 		target->cap_negotation = 1;
@@ -100,7 +105,8 @@ void cap_ls(aClient *target, char *arg) {
 /*
  * A client requests a list of the capabilities currently active for his connection.
  */
-void cap_list(aClient *target, char *arg) {
+void cap_list(aClient *target, char *arg)
+{
 	struct Cap *cap;
 	send_cap_list(target, "LIST", target->caps);
 }
@@ -108,7 +114,8 @@ void cap_list(aClient *target, char *arg) {
 /*
  * A client is changing his capabilities.
  */
-void cap_req(aClient *target, char *arg) {
+void cap_req(aClient *target, char *arg)
+{
 	char buf[2][BUFSIZE], *p = NULL, *s, *arg_copy;
 	int buf_idx = 0, prfx_len, current_caps;
 	struct Cap *cap;
@@ -178,10 +185,17 @@ void cap_req(aClient *target, char *arg) {
 /*
  * The capability negotiation is complete.
  */
-int cap_end(aClient *cptr, aClient *sptr, char *arg) {
+int cap_end(aClient *cptr, aClient *sptr, char *arg)
+{
 	if (IsRegistered(cptr))
 	{
 		return 0;
+	}
+
+	if ((sptr->sasl_service != NULL || sptr->sasl_auth_attempts > 0) && !IsSASLAuthed(sptr))
+	{
+		// SASL authentication exchange has been aborted
+		return process_implicit_sasl_abort(sptr);
 	}
 
 	cptr->cap_negotation = 0;
@@ -195,7 +209,8 @@ int cap_end(aClient *cptr, aClient *sptr, char *arg) {
 	return 0;
 }
 
-int m_cap(aClient *cptr, aClient *sptr, int parc, char *parv[]) {
+int m_cap(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
 	int ret = 0;
 
 	if (!strcasecmp(parv[1], "LS"))

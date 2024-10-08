@@ -99,7 +99,26 @@ static	aClient *best_service(char *name, aClient *cptr)
 			    }
 	return (acptr ? acptr : cptr);
 }
- 
+
+/*
+ * Finds the closest service that has the expected flags.
+ */
+aClient *best_service_with_flags(int flags) {
+    Reg aClient *acptr = NULL;
+    Reg aClient *bcptr;
+    Reg aService *sp;
+
+    for (sp = svctop; sp; sp = sp->nexts) {
+        if ((bcptr = sp->bcptr) && sp->type & flags) {
+            if (!acptr || bcptr->hopcount < acptr->hopcount) {
+                acptr = bcptr;
+            }
+        }
+    }
+
+    return acptr;
+}
+
 
 #ifdef	USE_SERVICES
 /*
