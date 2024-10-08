@@ -577,8 +577,8 @@ struct Client	{
 #endif
 	int caps; /* Enabled capabilities */
 	int cap_negotation; /* CAP negotiation is in progress. Registration must wait for "CAP END" */
-    aClient *sasl_service; /* The SASL service that is responsible for this user. */
-    int sasl_auth_attempts; /* Number of SASL authentication attempts */
+	aClient *sasl_service; /* The SASL service that is responsible for this user. */
+	int sasl_auth_attempts; /* Number of SASL authentication attempts */
 };
 
 #define	CLIENT_LOCAL_SIZE sizeof(aClient)
@@ -1001,8 +1001,8 @@ typedef enum ServerChannels {
 #endif
 
 /* Capability flags */
-#define CAP_EXTENDED_JOIN   0x0001
-#define CAP_SASL        	0x0002
+#define CAP_EXTENDED_JOIN	0x0001
+#define CAP_SASL			0x0002
 
 /* WHO parameter flags */
 #define WHO_FLAG_OPERS_ONLY	0x0001
