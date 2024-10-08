@@ -2724,8 +2724,7 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			sendto_serv_butone(cptr, ":%s MODE %s :-a",
 				sptr->user->uid, parv[0]);
 
-    //Broadcast to all servers to support away-notify
-		sendto_serv_butone(cptr, ":%s AWAY", parv[0]);
+		//sendto_serv_butone(cptr, ":%s AWAY", parv[0]);
 		sendto_channels_butserv_caps(sptr, 0, CAP_AWAY_NOTIFY, ":%s AWAY", parv[0]);
 
 		if (MyConnect(sptr))
@@ -2747,7 +2746,7 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    }
 	len++;
 
-  sendto_serv_butone(cptr, ":%s AWAY :%s", parv[0], awy2);
+  //sendto_serv_butone(cptr, ":%s AWAY :%s", parv[0], awy2);
 	sendto_channels_butserv_caps(sptr, 0, CAP_AWAY_NOTIFY, ":%s AWAY :%s", parv[0], awy2);
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_AWAY, NULL, sptr,
