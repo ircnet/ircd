@@ -549,8 +549,9 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		if ((i = check_client(sptr)))
 		{
 			struct msg_set { char shortm; char *longm; };
-#define EXIT_MSG_COUNT 8
+#define EXIT_MSG_COUNT 9
 			static struct msg_set exit_msg[EXIT_MSG_COUNT] = {
+			{ EXITC_SASL_REQUIRED, "SASL authentication required" },
 			{ EXITC_BADPASS, "Bad password" },
 			{ EXITC_GUHMAX, "Too many user connections (global)" },
 			{ EXITC_GHMAX, "Too many host connections (global)" },

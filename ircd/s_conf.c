@@ -127,6 +127,10 @@ long	iline_flags_parse(char *string)
 	{
 		tmp |= CFLAG_FALL;
 	}
+    if (index(string,'S'))
+    {
+        tmp |= CFLAG_REQUIRE_SASL;
+    }
 
 	return tmp;
 }
@@ -171,6 +175,10 @@ char	*iline_flags_to_string(long flags)
 	{
 		*s++ = 'F';
 	}
+    if (flags & CFLAG_REQUIRE_SASL)
+    {
+        *s++ = 'S';
+    }
 	if (s == ifsbuf)
 	{
 		*s++ = '-';
@@ -510,6 +518,18 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		{
 			continue;
 		}
+		if(IsConfRequireSASL(aconf) && !IsSASLAuthed(cptr))
+		{
+            if (IsConfFallThrough(aconf))
+            {
+                continue;
+            }
+            else
+            {
+                retval = -9; /* EXITC_SASL_REQUIRED */
+                break;
+            }
+        }
 		/* aconf->name can be NULL with wrong I:line in the config
 		** (without all required fields). If aconf->host can be NULL,
 		** I don't know. Anyway, this is an error! --B. */

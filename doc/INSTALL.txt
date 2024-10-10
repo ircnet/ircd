@@ -759,6 +759,8 @@
 
         +o  R - restricted
 
+        +o  S - SASL authentication is required
+
      NNoottee
         Restricted I: line means that clients matching such I line will
         not be able to use their operator privileges (no nick/mode

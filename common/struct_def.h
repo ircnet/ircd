@@ -383,6 +383,7 @@ struct	ListItem	{
 #ifdef XLINE
 #define CFLAG_XEXEMPT		0x00080
 #endif
+#define CFLAG_REQUIRE_SASL	0x00100
 
 #define IsConfRestricted(x)	((x)->flags & CFLAG_RESTRICTED)
 #define IsConfRNoDNS(x)		((x)->flags & CFLAG_RNODNS)
@@ -394,6 +395,7 @@ struct	ListItem	{
 #ifdef XLINE
 #define IsConfXlineExempt(x)	((x)->flags & CFLAG_XEXEMPT)
 #endif
+#define IsConfRequireSASL(x)	((x)->flags & CFLAG_REQUIRE_SASL)
 
 #define PFLAG_DELAYED		0x00001
 #define PFLAG_SERVERONLY	0x00002

@@ -617,6 +617,7 @@ one character in size, can be combined and their order does not matter.
 <item>M - disable resolved host name to be shown
 <item>N - disable resolved host name to be used
 <item>R - restricted
+<item>S - SASL authentication is required
 </itemize>
 <tag/Note/Restricted I: line means that
 clients matching such I line will not be able to use their operator
