@@ -245,7 +245,14 @@ char	*get_client_ip(aClient *cptr)
 {
 	if (cptr->user)
 	{
-		return cptr->user->sip;
+		if(IsSpoofed(cptr))
+		{
+			return SPOOF_IP;
+		}
+		else
+		{
+			return cptr->user->sip;
+		}
 	}
 	else
 	{
