@@ -27,7 +27,8 @@ struct Cap {
 	const char *name;
 	const int flag;
 } cap_tab[] = {
-		{NULL,            0}
+	{ "away-notify", CAP_AWAY_NOTIFY },
+		{NULL,            0},
 };
 
 void send_cap_list(aClient *target, char *sub_cmd, int flags) {
