@@ -626,6 +626,15 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		{
 			find_bounce(cptr, ConfClass(aconf), -1);
 		}
+		/* Set spoofed hostname */
+		if(cptr->spoof_tmp && *cptr->spoof_tmp)
+		{
+			strncpyzt(cptr->sockhost, cptr->spoof_tmp, HOSTLEN + 1);
+			strncpyzt(cptr->user->host, cptr->spoof_tmp, HOSTLEN + 1);
+			MyFree(cptr->spoof_tmp);
+			cptr->spoof_tmp = NULL;
+			SetSpoofed(cptr);
+		}
 		break;
 	}
 	if (retval == -2)
