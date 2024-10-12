@@ -165,7 +165,7 @@ void	check_services_butone(long action, aServer *servp, aClient *cptr,
 				va_end(va);
 				if ((sp->wants & SERVICE_WANT_UID))
 					sendto_one(sp->bcptr, ":%s%s", 
-						cptr->user ? cptr->user->uid :
+						cptr->user ? cptr->uid :
 						cptr->name, buf);
 				else
 					sendto_one(sp->bcptr, ":%s!%s@%s%s",
@@ -199,7 +199,7 @@ static	void	sendnum_toone(aClient *cptr, int wants, aClient *sptr,
 		sendto_one(cptr, ":%s UNICK %s %s %s %s %s %s :%s",
 			sptr->user->servp->sid,
 			(wants & SERVICE_WANT_NICK) ? sptr->name : ".",
-			sptr->user->uid,
+			sptr->uid,
 			(wants & SERVICE_WANT_USER) ? sptr->user->username : ".",
 			(wants & SERVICE_WANT_USER) ? sptr->user->host : ".",
 			(wants & SERVICE_WANT_USER) ? get_client_ip(sptr) : ".",
@@ -769,7 +769,7 @@ int	m_squery(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				   acptr->name, parv[2]);
 		else if (MyConnect(acptr) && 
 			(acptr->service->wants & SERVICE_WANT_UID))
-			sendto_one(acptr, ":%s SQUERY %s :%s", sptr->user->uid,
+			sendto_one(acptr, ":%s SQUERY %s :%s", sptr->uid,
 				   acptr->name, parv[2]);
 		else
 			sendto_one(acptr, ":%s SQUERY %s :%s",

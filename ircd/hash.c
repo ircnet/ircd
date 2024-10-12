@@ -454,11 +454,10 @@ static	void	bigger_hash_table(int *size, aHashEntry *table, int new)
 		uidsize = 0;
 		uidTable = table;
 		for (cptr = client; cptr; cptr = cptr->next)
-			if (cptr->user)
-				cptr->user->uhnext = NULL;
+			cptr->uhnext = NULL;
 		for (cptr = client; cptr; cptr = cptr->next)
-			if (cptr->user && cptr->user->uid[0])
-				add_to_uid_hash_table(cptr->user->uid, cptr);
+			if (cptr->uid[0])
+				add_to_uid_hash_table(cptr->uid, cptr);
 		MyFree(otab);
 	    }
 #ifdef USE_HOSTHASH
@@ -564,8 +563,8 @@ int	add_to_uid_hash_table(char *uid, aClient *cptr)
 {
 	Reg	u_int	hashv;
 
-	hashv = hash_uid(uid, &cptr->user->hashv);
-	cptr->user->uhnext = (aClient *)uidTable[hashv].list;
+	hashv = hash_uid(uid, &cptr->uidhashv);
+	cptr->uhnext = (aClient *)uidTable[hashv].list;
 	uidTable[hashv].list = (void *)cptr;
 	uidTable[hashv].links++;
 	uidTable[hashv].hits++;
@@ -704,18 +703,18 @@ int	del_from_uid_hash_table(char *uid, aClient *cptr)
 	Reg	aClient	*tmp, *prev = NULL;
 	Reg	u_int	hashv;
 
-	hashv = cptr->user->hashv;
+	hashv = cptr->uidhashv;
 	hashv %= _UIDSIZE;
 	for (tmp = (aClient *)uidTable[hashv].list; tmp;
-	     tmp = tmp->user->uhnext)
+	     tmp = tmp->uhnext)
 	    {
 		if (tmp == cptr)
 		    {
 			if (prev)
-				prev->user->uhnext = tmp->user->uhnext;
+				prev->uhnext = tmp->uhnext;
 			else
-				uidTable[hashv].list=(void *)tmp->user->uhnext;
-			tmp->user->uhnext = NULL;
+				uidTable[hashv].list=(void *)tmp->uhnext;
+			tmp->uhnext = NULL;
 			if (uidTable[hashv].links > 0)
 			    {
 				uidTable[hashv].links--;
@@ -977,9 +976,9 @@ aClient	*hash_find_uid(char *uid, aClient *cptr)
 	 * Got the bucket, now search the chain.
 	 */
 	for (tmp = (aClient *)tmp3->list; tmp;
-	     prv = tmp, tmp = tmp->user->uhnext)
+	     prv = tmp, tmp = tmp->uhnext)
 	{
-		if (hv == tmp->user->hashv && mycmp(uid, tmp->user->uid) == 0)
+		if (hv == tmp->uidhashv && mycmp(uid, tmp->uid) == 0)
 		    {
 			uidhits++;
 			/*
@@ -998,8 +997,8 @@ aClient	*hash_find_uid(char *uid, aClient *cptr)
 
 				tmp2 = (aClient *)tmp3->list;
 				tmp3->list = (void *)tmp;
-				prv->user->uhnext = tmp->user->uhnext;
-				tmp->user->uhnext = tmp2;
+				prv->uhnext = tmp->uhnext;
+				tmp->uhnext = tmp2;
 			    }
 #endif
 			return (tmp);
@@ -1323,10 +1322,10 @@ static	void	show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables,
 		{
 			sendto_one(sptr,
 			 	":%s NOTICE %s :Bucket %d entry %d - %s (%s)",
-			 	ME, sptr->name, bucket, j, acptr->user->uid,
+			 	ME, sptr->name, bucket, j, acptr->uid,
 			 	acptr->name);
 			j++;
-			acptr = acptr->user->uhnext;
+			acptr = acptr->uhnext;
 		}
 	}
 	else if (htab == channelTable)

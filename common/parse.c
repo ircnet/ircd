@@ -58,6 +58,8 @@ struct Message msgtab[] = {
 { "SAVE",     1, MPAR, { _m(m_save), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
 { "USER",     4, MPAR, { _m(m_nop), _m(m_reg), _m(m_reg), _m(m_nop), _m(m_user) } },
 { "CAP",      1, MPAR, { _m(m_nop), _m(m_cap), _m(m_cap), _m(m_nop), _m(m_cap) } },
+{ "AUTHENTICATE",   1, MPAR, { _m(m_nop), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_authenticate) } },
+{ "SASL",     4, MPAR, { _m(m_sasl), _m(m_nop), _m(m_nop), _m(m_sasl), _m(m_nop) } },
 { "AWAY",     0, MPAR, { _m(m_nop), _m(m_away), _m(m_away), _m(m_nop), _m(m_unreg) } },
 { "UMODE",    1, MPAR, { _m(m_nop), _m(m_umode), _m(m_umode), _m(m_nop), _m(m_unreg) } },
 { "ISON",     1,    1, { _m(m_ison), _m(m_ison), _m(m_ison), _m(m_ison), _m(m_unreg) } },
@@ -92,7 +94,7 @@ struct Message msgtab[] = {
 { "SERVICE",  4, MPAR, { _m(m_service), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_service) } },
 { "EOB",      0, MPAR, { _m(m_eob), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
 { "EOBACK",   0, MPAR, { _m(m_eoback), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
-{ "ENCAP",    2, MPAR, { _m(m_encap), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_nop) } },
+{ "ENCAP",    2, MPAR, { _m(m_encap), _m(m_nop), _m(m_nop), _m(m_encap), _m(m_nop) } },
 { "SDIE",     0, MPAR, { _m(m_sdie), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
 #ifdef	USE_SERVICES
 { "SERVSET",  1, MPAR, { _m(m_nop), _m(m_nop), _m(m_nop), _m(m_servset), _m(m_nop) } },
@@ -903,7 +905,7 @@ static	int	cancel_clients(aClient *cptr, aClient *sptr, char *cmd)
 	    {
 		sendto_serv_butone(NULL, ":%s KILL %s :%s (%s[%s] != %s)",
 				   me.name,
-				   sptr->user ? sptr->user->uid : sptr->name,
+				   *sptr->uid ? sptr->uid : sptr->name,
 				   me.name, sptr->name, sptr->from->name,
 				   get_client_name(cptr, TRUE));
 		sptr->flags |= FLAGS_KILLED;

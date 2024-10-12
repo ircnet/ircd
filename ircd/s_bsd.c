@@ -2700,9 +2700,9 @@ free_server:
 	if (by && IsPerson(by))
 	    {
 		(void)strcpy(cptr->serv->by, by->name);
-		if (by->user)
+		if (by->uid[0])
 		{
-			strcpy(cptr->serv->byuid, by->user->uid);
+			strcpy(cptr->serv->byuid, by->uid);
 		}
 		cptr->serv->user = by->user;
 		by->user->refcnt++;

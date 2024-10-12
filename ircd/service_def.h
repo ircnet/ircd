@@ -31,11 +31,13 @@
 
 #define	SERVICE_WANT_TKLINE	0x00100000 /* service wants to TKLINE */
 #define	SERVICE_WANT_KLINE	0x00200000 /* service wants to KLINE */
+#define	SERVICE_WANT_ENCAP	0x00400000 /* service wants to ENCAP */
+#define SERVICE_WANT_SASL	0x00800000 /* service wants SASL requests */
 
 /* masks */
 #define	SERVICE_MASK_GLOBAL	0x00007000 /*for these,service must be global*/
 #define	SERVICE_MASK_PREFIX	0x00000FFF /* these actions have a prefix */
-#define	SERVICE_MASK_ALL	0x7F30FFFF /* all possible actions */
+#define	SERVICE_MASK_ALL	0x7FF0FFFF /* all possible actions */
 #define	SERVICE_MASK_NUM	(SERVICE_WANT_NICK|SERVICE_WANT_USER|\
 				 SERVICE_WANT_UMODE)
 

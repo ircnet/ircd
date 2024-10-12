@@ -29,7 +29,8 @@ struct Cap
 	const int flag;
 } cap_tab[] = {
 		{"extended-join", CAP_EXTENDED_JOIN},
-		{NULL, 0}
+		{"sasl",          CAP_SASL},
+		{NULL,            0}
 };
 
 void send_cap_list(aClient *target, char *sub_cmd, int flags)
@@ -93,7 +94,6 @@ struct Cap *find_cap(char *name)
  */
 void cap_ls(aClient *target, char *arg)
 {
-
 	if (!IsRegistered(target))
 	{
 		target->cap_negotation = 1;
@@ -190,6 +190,12 @@ int cap_end(aClient *cptr, aClient *sptr, char *arg)
 	if (IsRegistered(cptr))
 	{
 		return 0;
+	}
+
+	if ((sptr->sasl_service != NULL || sptr->sasl_auth_attempts > 0) && !IsSASLAuthed(sptr))
+	{
+		// SASL authentication exchange has been aborted
+		return process_implicit_sasl_abort(sptr);
 	}
 
 	cptr->cap_negotation = 0;

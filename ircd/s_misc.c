@@ -481,7 +481,7 @@ int	exit_client(aClient *cptr, aClient *sptr, aClient *from,
 #  if (CLIENTS_CHANNEL_LEVEL & CCL_QUITINFO)
 				" :%s"
 #  endif
-				, sptr->user->uid, sptr->name,
+				, sptr->uid, sptr->name,
 				sptr->user->username, sptr->user->host,
 				sptr->exitc
 #  if (CLIENTS_CHANNEL_LEVEL & CCL_QUITINFO)
@@ -766,7 +766,11 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 				    ** some thougth.. but for now it plugs a
 				    ** nasty hole in the server... --msa
 				    */
-		; /* Nothing */
+		// Check if it is a client that got an UID during CAP negotiation
+		if (cptr == sptr && sptr->uid[0])
+		{
+			del_from_uid_hash_table(sptr->uid, sptr);
+		}
 	}
 	else if (sptr->name[0] && !IsService(sptr)) /* clean with QUIT... */
 	{
@@ -780,7 +784,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			if ((sptr->flags & FLAGS_SPLIT) == 0)
 			{
 				sendto_serv_butone(cptr, ":%s QUIT :%s",
-						   sptr->user->uid, comment);
+						   sptr->uid, comment);
 #ifdef	USE_SERVICES
 				check_services_butone(SERVICE_WANT_QUIT|
 						      SERVICE_WANT_RQUIT, 
@@ -804,7 +808,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 						if (acptr->flags & FLAGS_HIDDEN)
 							sendto_one(acptr,
 								":%s QUIT :%s",
-								sptr->user->uid,
+								sptr->uid,
 								comment);
 					}
 #ifdef	USE_SERVICES
@@ -901,7 +905,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 			/* remove from uid hash table */
 			if (sptr->user)
 			{
-				del_from_uid_hash_table(sptr->user->uid, sptr);
+				del_from_uid_hash_table(sptr->uid, sptr);
 			}
 
 			/* Add user to history */
