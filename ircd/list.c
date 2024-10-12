@@ -140,9 +140,9 @@ aClient	*make_client(aClient *from)
 		cptr->user2 = NULL;
 		cptr->user3 = NULL;
 #endif
+		cptr->cap_negotation = 0;
+		cptr->caps = 0;
 	}
-	cptr->cap_negotation = 0;
-	cptr->caps = 0;
 	return (cptr);
 }
 
