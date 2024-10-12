@@ -549,8 +549,9 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		if ((i = check_client(sptr)))
 		{
 			struct msg_set { char shortm; char *longm; };
-#define EXIT_MSG_COUNT 8
+#define EXIT_MSG_COUNT 9
 			static struct msg_set exit_msg[EXIT_MSG_COUNT] = {
+			{ EXITC_SASL_REQUIRED, "SASL authentication required" },
 			{ EXITC_BADPASS, "Bad password" },
 			{ EXITC_GUHMAX, "Too many user connections (global)" },
 			{ EXITC_GHMAX, "Too many host connections (global)" },
@@ -782,6 +783,12 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, WHOISTLS_NOTICE);
 		}
 #endif
+		/* send a notice to client if the connection is spoofed.
+		 * notice is defined as SPOOF_NOTICE in config.h -- mh 20191230 */
+		if (IsSpoofed(sptr))
+		{
+			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, SPOOF_NOTICE);
+		}
 		if (IsConfNoResolve(sptr->confs->value.aconf))
 		{
 			sendto_one(sptr, ":%s NOTICE %s :Due to an administrative"

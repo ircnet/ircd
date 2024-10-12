@@ -147,6 +147,7 @@ aClient	*make_client(aClient *from)
 		cptr->caps = 0;
 		cptr->sasl_service = NULL;
 		cptr->sasl_auth_attempts = 0;
+		cptr->spoof_tmp = NULL;
 	}
 	return (cptr);
 }
@@ -171,6 +172,10 @@ void	free_client(aClient *cptr)
 		{
 			MyFree(cptr->reason);
 		}
+        if(cptr->spoof_tmp)
+        {
+            MyFree(cptr->spoof_tmp);
+        }
 #ifdef XLINE
 		if (cptr->user2)
 			MyFree(cptr->user2);

@@ -867,6 +867,8 @@ How to let clients connect to your IRCD.
 
         * R - restricted
 
+        * S - SASL authentication is required
+
 `Note'
      Restricted I: line means that clients matching such I line will
      not be able to use their operator privileges (no nick/mode change,
