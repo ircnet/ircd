@@ -191,13 +191,13 @@ typedef enum Status {
 #define	FLAGS_WALLOP	0x0004 /* send wallops to them */
 #define	FLAGS_INVISIBLE	0x0008 /* makes user invisible */
 #define FLAGS_RESTRICT	0x0010 /* restricted user */
-#define FLAGS_AWAY	0x0020 /* user is away */
-#define FLAGS_EXEMPT    0x0040 /* user is exempted from k-lines */
-#define FLAGS_SPOOFED   0x0080 /* user is spoofed */
+#define FLAGS_AWAY		0x0020 /* user is away */
+#define FLAGS_EXEMPT	0x0040 /* user is exempted from k-lines */
+#define FLAGS_SPOOFED	0x0080 /* user is spoofed */
 #ifdef XLINE
 #define FLAGS_XLINED	0x0100	/* X-lined client */
 #endif
-#define FLAGS_TLS       0x0200 /* user is on a secure connection port (SSL/TLS) -- mh 2020-04-27 */
+#define FLAGS_TLS		0x0200 /* user is on a secure connection port (SSL/TLS) -- mh 2020-04-27 */
 #define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP|FLAGS_AWAY|FLAGS_RESTRICT)
 #define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP)
 
@@ -583,7 +583,7 @@ struct Client	{
 	int cap_negotation; /* CAP negotiation is in progress. Registration must wait for "CAP END" */
 	aClient *sasl_service; /* The SASL service that is responsible for this user. */
 	int sasl_auth_attempts; /* Number of SASL authentication attempts */
-	char *cloak_tmp; /* Contains the cloaked hostname until it was applied to the user */
+	char *spoof_tmp; /* Contains the spoofed hostname until it was applied to the user */
 };
 
 #define	CLIENT_LOCAL_SIZE sizeof(aClient)

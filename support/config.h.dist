@@ -787,6 +787,24 @@
  */
 #define MAX_SASL_AUTH_ATTEMPTS 3
 
+/*
+ * Define to the message you want to send to clients connecting
+ * with a spoofed hostname, undef to disable sending a notice.
+ */
+#define SPOOF_NOTICE    "Due to an administrative decision, your connection is cloaked."
+
+/*
+ * Define to the message you want to show in /WHOIS reply
+ * (RPL_WHOISCLOAKED) for spoofed local clients. (mandatory)
+ */
+#define SPOOF_WHOISCLOAKED  "is a Cloaked Connection (Spoof)"
+
+/*
+ * The IP address shown instead of the real one
+ *  (for example in /STATS L) for spoofed clients. (mandatory)
+ */
+#define SPOOF_IP    "255.255.255.255"
+
 /************************************************************************
  *
  * SPOOF_NOTICE

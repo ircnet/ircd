@@ -149,12 +149,12 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		// Login
 		acptr->sasl_user = mystrdup(parv[4]);
 		if (parc >= 6) {
-			// Store cloaked hostname. It will finally be set by attach_Iline().
-			acptr->cloak_tmp = mystrdup(parv[5]);
+			// Store spoofed hostname. It will finally be set by attach_Iline().
+			acptr->spoof_tmp = mystrdup(parv[5]);
 		}
 		sendto_one(acptr, replies[RPL_LOGGEDIN], me.name, BadTo(acptr->name), BadTo(acptr->name),
 				   acptr->user ? acptr->user->username : "unknown",
-				   acptr->cloak_tmp ? acptr->cloak_tmp : acptr->sockhost,
+				   acptr->spoof_tmp ? acptr->spoof_tmp : acptr->sockhost,
 				   parv[4], parv[4]);
 	}
 	else if (*parv[3] == 'D')
