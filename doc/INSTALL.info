@@ -1088,8 +1088,8 @@ Remove an errant user from IRC on your site.
      IRCD server as well.
 
 `Format'
-     K:<Host Name>:<time interval(s)|comment>:<User>:<port>: k:<Host
-     Name>:<time interval(s)|comment>:<Auth>:<port>:
+     K:<Host Name>:<time interval(s)|comment>:<User>:<port>:<flags>
+     k:<Host Name>:<time interval(s)|comment>:<Auth>:<port>:<flags>
 
 `K'
      "K" tells the IRCD that you are making a KILL USER command entry.
@@ -1134,6 +1134,14 @@ Remove an errant user from IRC on your site.
 `Port'
      The port on which the Kill line will be effective. 0 means all
      ports.
+
+'Flags'
+     Flags changing behaviour of a given K-line. It can be empty or one
+     of:
+
+        * S - Do not match users that are authenticated via SASL
+
+        * I - Do not match users that have ident
 
 `Examples'
      K:orion.cair.du.edu::jtrim:0:

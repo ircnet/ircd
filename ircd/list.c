@@ -172,10 +172,10 @@ void	free_client(aClient *cptr)
 		{
 			MyFree(cptr->reason);
 		}
-        if(cptr->spoof_tmp)
-        {
-            MyFree(cptr->spoof_tmp);
-        }
+		if (cptr->spoof_tmp)
+		{
+			MyFree(cptr->spoof_tmp);
+		}
 #ifdef XLINE
 		if (cptr->user2)
 			MyFree(cptr->user2);
