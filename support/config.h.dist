@@ -368,7 +368,7 @@
  * services are not fully implemented yet, so don't use it unless you really
  * know what you are doing.
  */
-#undef USE_SERVICES
+#define USE_SERVICES
 
 /*
  * Define the following to make the delay for nicks random.
