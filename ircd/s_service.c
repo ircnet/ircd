@@ -104,19 +104,22 @@ static	aClient *best_service(char *name, aClient *cptr)
  * Finds the closest service that has the expected flags.
  */
 aClient *best_service_with_flags(int flags) {
-    Reg aClient *acptr = NULL;
-    Reg aClient *bcptr;
-    Reg aService *sp;
+	Reg aClient *acptr = NULL;
+	Reg aClient *bcptr;
+	Reg aService *sp;
 
-    for (sp = svctop; sp; sp = sp->nexts) {
-        if ((bcptr = sp->bcptr) && sp->type & flags) {
-            if (!acptr || bcptr->hopcount < acptr->hopcount) {
-                acptr = bcptr;
-            }
-        }
-    }
+	for (sp = svctop; sp; sp = sp->nexts)
+	{
+		if ((bcptr = sp->bcptr) && is_allowed(sp->bcptr, flags))
+		{
+			if (!acptr || bcptr->hopcount < acptr->hopcount)
+			{
+				acptr = bcptr;
+			}
+		}
+	}
 
-    return acptr;
+	return acptr;
 }
 
 
@@ -314,6 +317,22 @@ aConfItem	*find_conf_service(aClient *cptr, int type, aConfItem *aconf)
 	    }
 	return aconf;
 }
+
+aConfItem	*find_conf_service_by_name(char *name)
+{
+	Reg	aConfItem *tmp;
+
+	for (tmp = conf; tmp; tmp = tmp->next)
+	{
+		if (!(tmp->status & CONF_SERVICE))
+			continue;
+
+		if (!mycmp(tmp->name, name))
+			return tmp;
+	}
+
+	return NULL;
+}
 #endif
 
 
@@ -423,6 +442,15 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				   ME, BadTo(parv[0]), parv[1]);
 			return 1;
 		    }
+
+		if (strchr(parv[1], '@'))
+		{
+			// double check: S-Line is not usable for local services
+			sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME],
+					   ME, BadTo(parv[0]), parv[1]);
+			return 1;
+		}
+
 		if (strlen(parv[1]) + strlen(server) + 2 >= (size_t) HOSTLEN)
 		    {
 			sendto_one(acptr, "ERROR :Servicename is too long.");
@@ -499,6 +527,19 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	acptr->info = mystrdup(info);
 	svc->wants = 0;
 	svc->type = type;
+	svc->permissions = 0;
+#ifdef  USE_SERVICES
+	if (!MyService(acptr))
+	{
+		// Check if the remote service matches an S-Line in our ircd.conf and give him the configured flags.
+		// This way we can grant access to a remote service, e.g. to TKLINE on our server.
+		aconf = find_conf_service_by_name(acptr->name);
+		if(aconf != NULL)
+		{
+			svc->permissions = svc->type & aconf->port;
+		}
+	}
+#endif
 	reorder_client_in_list(acptr);
 	(void)add_to_client_hash_table(acptr->name, acptr);
 
@@ -547,7 +588,7 @@ int	m_servlist(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		     (match(mask, acptr->name) == 0))
 			sendto_one(sptr, replies[RPL_SERVLIST], ME, BadTo(parv[0]),
 				   acptr->name, sp->server, sp->dist,
-				   sp->type, acptr->hopcount, acptr->info);
+				   sp->type, sp->permissions, acptr->hopcount, acptr->info);
 	sendto_one(sptr, replies[RPL_SERVLISTEND], ME, BadTo(parv[0]), mask, type);
 	return 2;
 }
@@ -582,6 +623,7 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	/* check against configuration */
 	sptr->service->wants = strtol(parv[1], NULL, 0) & sptr->service->type;
+	sptr->service->permissions = sptr->service->type;
 	/* check that service is global for some requests */
 	if (strcmp(sptr->service->dist, "*"))
 		sptr->service->wants &= ~SERVICE_MASK_GLOBAL;
