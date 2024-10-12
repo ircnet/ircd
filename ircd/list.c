@@ -119,7 +119,7 @@ aClient	*make_client(aClient *from)
 	cptr->user = NULL;
 	cptr->serv = NULL;
 	cptr->uid[0] = '\0';
-    cptr->uhnext = NULL;
+	cptr->uhnext = NULL;
 	cptr->sasl_user = NULL;
 	cptr->name = cptr->namebuf;
 	cptr->status = STAT_UNKNOWN;
@@ -143,11 +143,11 @@ aClient	*make_client(aClient *from)
 		cptr->user2 = NULL;
 		cptr->user3 = NULL;
 #endif
-        cptr->cap_negotation = 0;
-        cptr->caps = 0;
-        cptr->sasl_service = NULL;
-        cptr->sasl_auth_attempts = 0;
-        cptr->cloak_tmp = NULL;
+		cptr->cap_negotation = 0;
+		cptr->caps = 0;
+		cptr->sasl_service = NULL;
+		cptr->sasl_auth_attempts = 0;
+		cptr->cloak_tmp = NULL;
 	}
 	return (cptr);
 }

@@ -262,7 +262,7 @@ char *	replies[] = {
 /* 231 RPL_SERVICEINFO */	(char *)NULL,
 /* 232 RPL_ENDOFSERVICES */	(char *)NULL,
 /* 233 RPL_SERVICE */	(char *)NULL,
-/* 234 RPL_SERVLIST */	":%s 234 %s %s %s %s 0x%X %d :%s",
+/* 234 RPL_SERVLIST */	":%s 234 %s %s %s %s 0x%X 0x%X %d :%s",
 /* 235 RPL_SERVLISTEND */	":%s 235 %s %s %d :End of service listing",
 /* 236 */ (char *)NULL,
 /* 237 */ (char *)NULL,

@@ -508,6 +508,7 @@ struct	Service	{
 	char	namebuf[HOSTLEN+1];
 	int	wants;
 	int	type;
+	int permissions; /* service flags that have been granted by this server */
 	char	*server;
 	aServer	*servp;
 	struct	Service	*nexts, *prevs;
