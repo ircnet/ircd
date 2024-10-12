@@ -42,6 +42,7 @@ EXTERN void check_services_butone (long action, aServer *servp,
 EXTERN void check_services_num (aClient *sptr, char *umode);
 EXTERN aConfItem *find_conf_service (aClient *cptr, int type,
 					 aConfItem *aconf);
+EXTERN aConfItem *find_conf_service_by_name(char *name);
 EXTERN int m_servset (aClient *cptr, aClient *sptr, int parc,
 			  char *parv[]);
 #endif /* USE_SERVICES */
