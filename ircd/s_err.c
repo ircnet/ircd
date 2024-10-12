@@ -244,7 +244,7 @@ char *	replies[] = {
 /* 213 RPL_STATSCLINE */	":%s 213 %s %c %s %s %s %d %d",
 /* 214 RPL_STATSNLINE */	":%s 214 %s %c %s %s %s %d %d",
 /* 215 RPL_STATSILINE */	":%s 215 %s %c %s %s %s %d %d %s",
-/* 216 RPL_STATSKLINE */	":%s 216 %s %c %s %s %s %d %d",
+/* 216 RPL_STATSKLINE */	":%s 216 %s %c %s %s %s %d %d %s",
 /* 217 RPL_STATSQLINE */	":%s 217 %s %c %s %s %s %d %d",
 /* 218 RPL_STATSYLINE */	":%s 218 %s %c %d %d %d %d %d.%d %d.%d %d.%d %d%s",
 /* 219 RPL_ENDOFSTATS */	":%s 219 %s %c :End of STATS report",

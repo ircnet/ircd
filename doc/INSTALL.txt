@@ -1025,6 +1025,14 @@
         The port on which the Kill line will be effective. 0 means all
         ports.
 
+     FFllaaggss
+        Flags changing behaviour of a given K-line. It can be empty or
+        one of:
+
+          +o  S - Do not match users that are authenticated via SASL
+
+          +o  I - Do not match users that have ident
+
      EExxaammpplleess
         K:orion.cair.du.edu::jtrim:0:
 

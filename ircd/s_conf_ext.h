@@ -76,6 +76,8 @@ EXTERN char *iline_flags_to_string(long flags);
 EXTERN long iline_flags_parse(char *string);
 EXTERN char *pline_flags_to_string(long flags);
 EXTERN long pline_flags_parse(char *string);
+EXTERN char *kline_flags_to_string(long flags);
+EXTERN long kline_flags_parse(char *string);
 # ifdef	INET6
 EXTERN char *ipv6_convert (char *orig);
 # endif

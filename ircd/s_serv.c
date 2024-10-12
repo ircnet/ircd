@@ -1767,9 +1767,7 @@ static	void	report_configured_links(aClient *sptr, char *to, int mask)
 			 * displayed on STATS reply. 	-Vesa
 			 * Also H: is safe, we have SID mask there. --B.
 			 */
-			if (tmp->status == CONF_KILL
-			    || tmp->status == CONF_OTHERKILL
-			    || tmp->status == CONF_HUB
+			if (tmp->status == CONF_HUB
 			    || tmp->status == CONF_QUARANTINED_SERVER
 			    || tmp->status == CONF_VER)
 			{
@@ -1777,13 +1775,19 @@ static	void	report_configured_links(aClient *sptr, char *to, int mask)
 					   c, host, (pass) ? pass : null,
 					   name, port, get_conf_class(tmp));
 			}
+			else if (tmp->status == CONF_KILL || tmp->status == CONF_OTHERKILL)
+			{
+				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
+						   c, host, (pass) ? pass : null,
+						   name, port, get_conf_class(tmp), kline_flags_to_string(tmp->flags));
+			}
 #ifdef TKLINE
 			else if ((tmp->status & (CONF_TKILL|CONF_TOTHERKILL)))
 			{
 				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
 					   c, host, (pass) ? pass : null,
 					   name, tmp->hold - timeofday,
-					   get_conf_class(tmp));
+					   get_conf_class(tmp), kline_flags_to_string(tmp->flags));
 			}
 #endif
 			else if ((tmp->status & CONF_CLIENT))

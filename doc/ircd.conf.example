@@ -346,8 +346,8 @@ N|irc-2.mit.edu|andsoarellamas|irc-2.mit.edu|1|2||
 # the USER information supplied by the client if not.  'k' uses the reply from
 # the client's identd also if it's type other (it's prefixed with '-' then).
 # 
-# K|<Host Name or IP>|<time interval(s)/comment>|<User>|<port>|
-# k|<Host Name or IP>|<time interval(s)/comment>|<Auth>|<port>|
+# K|<Host Name or IP>|<time interval(s)/comment>|<User>|<port>|<flags>|
+# k|<Host Name or IP>|<time interval(s)/comment>|<Auth>|<port>|<flags>|
 #
 # wildcards are permitted in any one of the fields, in other words, you can
 # K|*||*|| if you wanted (but your server wouldn't be used much ;-)
