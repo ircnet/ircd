@@ -3540,21 +3540,14 @@ int	is_allowed(aClient *cptr, long function)
 {
 	Link	*tmp;
 
+	if (IsService(cptr))
+	{
+		return cptr->service->permissions & function;
+	}
+
 	/* We cannot judge not our clients. Yet. */
 	if (!MyConnect(cptr) || IsServer(cptr))
 		return 1;
-
-	/* minimal control, but nothing else service can do anyway. */
-	if (IsService(cptr))
-	{
-		if (function == ACL_TKLINE &&
-			(cptr->service->wants & SERVICE_WANT_TKLINE))
-			return 1;
-		if (function == ACL_KLINE &&
-			(cptr->service->wants & SERVICE_WANT_KLINE))
-			return 1;
-		return 0;
-	}
 
 	for (tmp = cptr->confs; tmp; tmp = tmp->next)
 	{
