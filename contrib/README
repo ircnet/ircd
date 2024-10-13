@@ -19,4 +19,3 @@ mkpasswd	utility to crypt a password.
 ircdwatch	utility to keep ircd running (eventually restarting it).
 tkserv		stupid toy to manage "temporary" klines.
 mod_passwd	example of DSM module for iauth
-antispoof.diff	diff file to add extra code to ircd to prevent TCP spoofing
