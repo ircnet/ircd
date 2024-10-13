@@ -35,7 +35,6 @@
 #define SERVICE_WANT_SASL	0x00800000 /* service wants SASL requests */
 
 /* masks */
-#define	SERVICE_MASK_GLOBAL	0x00007000 /*for these,service must be global*/
 #define	SERVICE_MASK_PREFIX	0x00000FFF /* these actions have a prefix */
 #define	SERVICE_MASK_ALL	0x7FF0FFFF /* all possible actions */
 #define	SERVICE_MASK_NUM	(SERVICE_WANT_NICK|SERVICE_WANT_USER|\
