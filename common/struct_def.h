@@ -385,6 +385,10 @@ struct	ListItem	{
 #endif
 #define CFLAG_REQUIRE_SASL	0x00100
 
+/* K-Line flags */
+#define KFLAG_SASL_EXCEPTION	0x00001	/* Do not match users that are authenticated via SASL */
+#define KFLAG_IDENT_EXCEPTION	0x00002	/* Do not match users that have ident */
+
 #define IsConfRestricted(x)	((x)->flags & CFLAG_RESTRICTED)
 #define IsConfRNoDNS(x)		((x)->flags & CFLAG_RNODNS)
 #define IsConfRNoIdent(x)	((x)->flags & CFLAG_RNOIDENT)
