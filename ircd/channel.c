@@ -2534,7 +2534,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 		if (!chptr)
 		{
-			if(IsSplit() && UseModes(name) && *name != '&')
+			if(IsSplit() && UseModes(name) && !(*name == '&' || *name == '!'))
 			{
 				/* Do not allow channel creation if split mode is activated */
 				sendto_one(sptr, replies[ERR_UNAVAILRESOURCE], ME, BadTo(parv[0]), name);
