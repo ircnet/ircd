@@ -1268,9 +1268,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 					   get_client_ip(acptr),
 					   (*buf) ? buf : "+", acptr->info);
 		    }
-		else if (IsService(acptr) &&
-			 (match(acptr->service->dist, cptr->name) == 0 ||
-				match(acptr->service->dist, cptr->serv->sid) == 0))
+		else if (IsService(acptr) && match_service_dist(cptr, acptr->service->dist))
 		{
 			sendto_one(cptr, ":%s SERVICE %s %s %d :%s",
 						acptr->service->servp->sid,

@@ -150,8 +150,7 @@ void	check_services_butone(long action, aServer *servp, aClient *cptr,
 		** wanted AND if it comes from a server matching the dist
 		*/
 		if ((sp->wants & action)
-		    && (!servp || !match(sp->dist, servp->bcptr->name)
-			|| !match(sp->dist, servp->sid)))
+		    && (!servp || match_service_dist(servp->bcptr, sp->dist)))
 		{
 			if ((sp->wants & (SERVICE_WANT_PREFIX|SERVICE_WANT_UID))
 			    && cptr && IsRegisteredUser(cptr) &&
@@ -269,8 +268,7 @@ void	check_services_num(aClient *sptr, char *umode)
 		** wanted AND if it comes from a server matching the dist
 		*/
 		if ((sp->wants & SERVICE_MASK_NUM)
-		    && (!match(sp->dist, sptr->user->server)
-				|| !match(sp->dist, sptr->user->servp->sid)))
+		    && (match_service_dist(sptr->user->servp->bcptr, sp->dist)))
 		{
 			sendnum_toone(sp->bcptr, sp->wants, sptr,
 				      umode);
@@ -335,6 +333,22 @@ aConfItem	*find_conf_service_by_name(char *name)
 }
 #endif
 
+int match_service_dist(aClient *cptr, char *masks)
+{
+	char *dist, *p = NULL, *masks_copy = mystrdup(masks);
+
+	for (dist = strtoken(&p, masks_copy, ","); dist; dist = strtoken(&p, NULL, ","))
+	{
+		if (!match(dist, cptr->name) || !match(dist, cptr->serv->sid))
+		{
+			MyFree(masks_copy);
+			return 1;
+		}
+	}
+
+	MyFree(masks_copy);
+	return 0;
+}
 
 /*
 ** m_service
@@ -364,7 +378,7 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aConfItem *aconf;
 #endif
 	aServer	*sp = NULL;
-	char	*dist, *server = NULL, *info;
+	char *dist, *server = NULL, *info, *p;
 	int	type, i;
 
 	if (sptr->user)
@@ -409,7 +423,7 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				    get_client_name(cptr, FALSE));
 			return exit_client(NULL, acptr, &me, "No Such Server");
 		}
-		if (match(dist, ME) && match(dist, me.serv->sid))
+		if (!match_service_dist(&me, dist))
 		{
 			sendto_flag(SCH_ERROR,
                        	    "ERROR: SERVICE:%s DIST:%s from %s", acptr->name,
@@ -555,16 +569,15 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	for (i = fdas.highest; i >= 0; i--)
 	{
-		if (!(bcptr = local[fdas.fd[i]]) || !IsServer(bcptr) ||
-		    bcptr == cptr)
+		if (!(bcptr = local[fdas.fd[i]]) || !IsServer(bcptr) || bcptr == cptr)
 			continue;
-		if (match(dist, bcptr->name) && match(dist, bcptr->serv->sid))
-			continue;
-
-		sendto_one(bcptr, ":%s SERVICE %s %s %d :%s",
-				sp->sid, acptr->name, dist, type, info);
+		if (match_service_dist(bcptr, dist))
+		{
+			sendto_one(bcptr, ":%s SERVICE %s %s %d :%s",
+					   sp->sid, acptr->name, dist, type, info);
+		}
 	}
-		
+
 	return 0;
 }
 
@@ -624,9 +637,6 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	/* check against configuration */
 	sptr->service->wants = strtol(parv[1], NULL, 0) & sptr->service->type;
 	sptr->service->permissions = sptr->service->type;
-	/* check that service is global for some requests */
-	if (strcmp(sptr->service->dist, "*"))
-		sptr->service->wants &= ~SERVICE_MASK_GLOBAL;
 	/* allow options */
 	sptr->service->wants |= (strtol(parv[1], NULL, 0) & ~SERVICE_MASK_ALL);
 	/* send accepted SERVSET */
@@ -655,8 +665,7 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    {
 			if (!IsServer(acptr) && !IsMe(acptr))
 				continue;
-			if (match(sptr->service->dist, acptr->name) &&
-					match(sptr->service->dist, acptr->serv->sid))
+			if (!match_service_dist(acptr, sptr->service->dist))
 				continue;
 			split = (MyConnect(acptr) &&
 				 mycmp(acptr->name, acptr->sockhost));
@@ -679,10 +688,7 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				continue;
 			if (IsPerson(acptr))
 			    {
-				if (match(sptr->service->dist,
-					  acptr->user->server) &&
-					match(sptr->service->dist,
-					acptr->user->servp->sid))
+				if (!match_service_dist(acptr->user->servp->bcptr, sptr->service->dist))
 					continue;
 				if (burst & SERVICE_WANT_UMODE)
 					send_umode(NULL, acptr, 0, SEND_UMODES,
@@ -696,10 +702,7 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			    {
 				if (!(burst & SERVICE_WANT_SERVICE))
 					continue;
-				if (match(sptr->service->dist,
-					  acptr->service->server) &&
-					match(sptr->service->dist,
-					acptr->service->servp->sid))
+				if (!match_service_dist(acptr->service->servp->bcptr, sptr->service->dist))
 					continue;
 				sendto_one(sptr, "SERVICE %s %s %s %d %d :%s",
 					   acptr->name, acptr->service->server,

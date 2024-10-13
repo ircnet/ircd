@@ -52,4 +52,5 @@ EXTERN int m_servlist (aClient *cptr, aClient *sptr, int parc,
 			   char *parv[]);
 EXTERN int m_squery (aClient *cptr, aClient *sptr, int parc,
 			 char *parv[]);
+EXTERN int match_service_dist(aClient *cptr, char *masks);
 #undef EXTERN
