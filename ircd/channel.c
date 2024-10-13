@@ -733,7 +733,7 @@ void	setup_server_channels(aClient *mp)
 	chptr = get_channel(mp, "&ERRORS", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: server errors");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
-	chptr->mode.mode = smode;
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 	chptr = get_channel(mp, "&NOTICES", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: warnings and notices");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
@@ -757,11 +757,11 @@ void	setup_server_channels(aClient *mp)
 	chptr = get_channel(mp, "&HASH", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: hash tables growth");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
-	chptr->mode.mode = smode;
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 	chptr = get_channel(mp, "&LOCAL", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: notices about local connections");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
-	chptr->mode.mode = smode;
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 	chptr = get_channel(mp, "&SERVICES", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: services joining and leaving");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
@@ -771,7 +771,7 @@ void	setup_server_channels(aClient *mp)
 	strcpy(chptr->topic,
 	       "SERVER MESSAGES: messages from the authentication slave");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
-	chptr->mode.mode = smode;
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 #endif
 	chptr = get_channel(mp, "&SAVE", CREATE);
 	strcpy(chptr->topic,
@@ -781,7 +781,7 @@ void	setup_server_channels(aClient *mp)
 	chptr = get_channel(mp, "&DEBUG", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: debug messages [you shouldn't be here! ;)]");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
-	chptr->mode.mode = smode|MODE_SECRET;
+	chptr->mode.mode = smode|MODE_SECRET|MODE_INVITEONLY;
 	chptr = get_channel(mp, "&WALLOPS", CREATE);
 	strcpy(chptr->topic, "SERVER MESSAGES: wallops received");
 	add_user_to_channel(chptr, mp, CHFL_CHANOP);
@@ -1512,29 +1512,12 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 
 			if (*ip)
 			    {
-				if (*ip == MODE_ANONYMOUS &&
-				    whatt == MODE_DEL && *chptr->chname == '!')
-					sendto_one(sptr,
-					   replies[ERR_UNIQOPRIVSNEEDED],
-						   ME, BadTo(sptr->name), chptr->chname);
-				else if (((*ip == MODE_ANONYMOUS &&
-					   whatt == MODE_ADD &&
-					   *chptr->chname == '#') ||
-					  (*ip == MODE_REOP && whatt == MODE_ADD &&
-					   *chptr->chname != '!')) &&
-					 !IsServer(sptr))
+				if ((*ip == MODE_ANONYMOUS || *ip == MODE_REOP)
+					&& whatt == MODE_ADD && !IsServer(sptr))
 					sendto_one(cptr,
 						   replies[ERR_UNKNOWNMODE],
 						   ME, BadTo(sptr->name), *curr,
 						   chptr->chname);
-				else if (*ip == MODE_ANONYMOUS && whatt == MODE_ADD &&
-					 !IsServer(sptr) &&
-					 !(is_chan_op(sptr,chptr) &CHFL_UNIQOP)
-					 && *chptr->chname == '!')
-					/* 2 modes restricted to UNIQOP */
-					sendto_one(sptr,
-					   replies[ERR_UNIQOPRIVSNEEDED],
-						   ME, BadTo(sptr->name), chptr->chname);
 				else
 				    {
 					/*
@@ -2002,8 +1985,16 @@ static	int	can_join(aClient *sptr, aChannel *chptr, char *key)
 		&& is_allowed(sptr, ACL_CLIENTS))
 		return 0;
 #endif
-	if (*chptr->chname == '&' && !strcmp(chptr->chname, "&OPER")
-		&& IsAnOper(sptr))
+	if (*chptr->chname == '&'
+		&& (!strcmp(chptr->chname, "&DEBUG")
+			|| !strcmp(chptr->chname, "&ERRORS")
+			|| !strcmp(chptr->chname, "&HASH")
+			|| !strcmp(chptr->chname, "&LOCAL")
+			|| !strcmp(chptr->chname, "&OPER")
+#if defined(USE_IAUTH)
+			|| !strcmp(chptr->chname, "&AUTH")
+#endif
+			) && IsAnOper(sptr))
 		return 0;
 
 	for (lp = sptr->user->invited; lp; lp = lp->next)
@@ -2543,6 +2534,13 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 		if (!chptr)
 		{
+			if(IsSplit() && UseModes(name) && !(*name == '&' || *name == '!'))
+			{
+				/* Do not allow channel creation if split mode is activated */
+				sendto_one(sptr, replies[ERR_UNAVAILRESOURCE], ME, BadTo(parv[0]), name);
+				continue;
+			}
+
 			/* Oh well, create the channel. */
 			chptr = get_channel(sptr, name, CREATE);
 		}
@@ -2573,10 +2571,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users &&
 		    !(chptr->history && *chptr->chname == '!'))
 		{
-			if (*name == '!')
-				flags |= CHFL_UNIQOP|CHFL_CHANOP;
-			else
-				flags |= CHFL_CHANOP;
+			flags |= CHFL_CHANOP;
 		}
 		/* Complete user entry to the new channel */
 		add_user_to_channel(chptr, sptr, flags);

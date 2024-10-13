@@ -352,7 +352,7 @@ char *	replies[] = {
 #endif
 /* 318 RPL_ENDOFWHOIS */	":%s 318 %s %s :End of WHOIS list.",
 /* 319 RPL_WHOISCHANNELS */	":%s 319 %s %s :%s",
-/* 320 */ (char *)NULL,
+/* 320 RPL_WHOISEXTRA */    ":%s 320 %s %s :%s",
 /* 321 RPL_LISTSTART */	":%s 321 %s Channel :Users  Name",
 /* 322 RPL_LIST */	":%s 322 %s %s %d :%s",
 /* 323 RPL_LISTEND */	":%s 323 %s :End of LIST",
@@ -386,7 +386,7 @@ char *	replies[] = {
 /* 351 RPL_VERSION */	":%s 351 %s %s.%s %s %s :%s",
 /* 352 RPL_WHOREPLY */	":%s 352 %s %s %s %s %s %s %s :%d %s %s",
 /* 353 RPL_NAMREPLY */	":%s 353 %s %s",
-/* 354 */ (char *)NULL,
+/* 354 RPL_WHOSPCRPL */ ":%s 354 %s",
 /* 355 */ (char *)NULL,
 /* 356 */ (char *)NULL,
 /* 357 */ (char *)NULL,

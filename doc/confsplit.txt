@@ -1,0 +1,76 @@
+######################################################################
+
+confsplit - SS/SU values in ircd.conf
+
+######################################################################
+
+This patch adds split-servers and split-users to ircd.conf to change
+values without recompiling the ircd.
+
+Two new MANDATORY fields have been added to the M-line after the SID:
+
+ M:<Server NAME>:<YOUR Internet IP#>:<Geographic Location>:<Port>
+  :<SID>:<SS>:<SU>:
+
+These values will be applied on server startup and on /REHASH.
+Note that they will still respect the minimum limits set in
+config.h defines SPLIT_SERVERS and SPLIT_USERS.
+
+example:
+
+ M:irc.example.net:127.0.0.1:Example server:6667:0PNX:10:10000:
+
+ Will set the split-servers (SS) current value to 10 servers minimum
+ and split-users (SU) current value to 10000 users minimum, then do
+ a check for split-mode.
+
+######################################################################
+
+changelog:
+
+ v1.03
+
+ 2024-09-23 -- patrick
+  * made SS/SU fields mandatory in ircd.conf
+  * always read new values on /REHASH, removed CONFSPLIT_*
+
+ v1.02
+
+ 2020-01-24 -- mh
+
+  * support/config.h.dist: made CONFSPLIT_REHASH undefine look less
+    silly
+
+  * ircd/s_conf.c:initconf(): added DEFAULT_SPLIT_* values to notice
+    when changing values in a rehash
+
+  * ircd/s_conf.c:initconf(): split check is only needed in a rehash,
+    not on server (re)start - same for notices to &notices. fixed
+
+ v1.01
+
+ 2020-01-23 -- mh
+
+  * common/patchlevel.h added CONFSPLIT_VERSION for good measure
+
+  * ircd/s_debug.c: 'o' (CONFSPLIT defined) and 'O' (CONFSPLIT and
+    CONFSPLIT_REHASH defined) serveropts added. they will show in
+    /VERSION and can be V-lined if one so desire.
+
+ v1.00
+
+ 2020-01-23 -- mh
+
+  * added the option to only apply the SS/SU values at server startup
+    and not during /REHASH (CONFSPLIT_REHASH define)
+
+ 2020-01-22 -- mh
+
+  * ircd/s_conf.c:initconf() added 2 more fields to M-line after SID.
+    SS and SU values respectively. these will be used on startup and
+    on /REHASH. the values are checked against minimum defined values
+    (SPLIT_SERVERS and SPLIT_USERS) before being applied.
+
+  * project started
+
+######################################################################

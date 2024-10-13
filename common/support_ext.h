@@ -42,6 +42,7 @@ EXTERN char *strtoken (char **save, char *str, char *fs);
  */
 EXTERN char *strtok (char *str, const char *fs);
 #endif /* HAVE_STRTOK */
+EXTERN int snprintf_append(char *str, int size, int pos, const char *fmt, ...);
 #if !defined(HAVE_STRERROR)
 EXTERN char *strerror (int err_no);
 #endif /* HAVE_STRERROR */
