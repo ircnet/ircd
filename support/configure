@@ -8880,7 +8880,7 @@ echo "${ECHO_T}no" >&6
 fi
 
 
-                                        ac_config_files="$ac_config_files Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../support/sums.in tkconf.h:../support/tkconf.h.dist"
+                                        ac_config_files="$ac_config_files Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../support/sums.in"
 
           ac_config_commands="$ac_config_commands chmod"
 
@@ -9415,7 +9415,6 @@ do
   "Makefile" ) CONFIG_FILES="$CONFIG_FILES Makefile:../support/Makefile.in" ;;
   "version.c.SH" ) CONFIG_FILES="$CONFIG_FILES version.c.SH:../ircd/version.c.SH.in" ;;
   "sums" ) CONFIG_FILES="$CONFIG_FILES sums:../support/sums.in" ;;
-  "tkconf.h" ) CONFIG_FILES="$CONFIG_FILES tkconf.h:../support/tkconf.h.dist" ;;
   "chmod" ) CONFIG_COMMANDS="$CONFIG_COMMANDS chmod" ;;
   "setup.h" ) CONFIG_HEADERS="$CONFIG_HEADERS setup.h:../support/setup.h.in" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
