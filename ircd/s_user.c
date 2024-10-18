@@ -207,8 +207,7 @@ int	hunt_server(aClient *cptr, aClient *sptr, char *command, int server,
 			parv[server] = acptr->name;
 		if (IsService(sptr)
 		    && (IsServer(acptr->from)
-			&& match(sptr->service->dist,acptr->name) != 0
-			&& match(sptr->service->dist,acptr->serv->sid) != 0))
+			&& !match_service_dist(acptr, sptr->service->dist)))
 		    {
 			sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), 
 				   parv[server]);

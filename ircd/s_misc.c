@@ -954,8 +954,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 				{
 					continue;
 				}
-				if (match(sptr->service->dist, acptr->name) && 
-					match(sptr->service->dist, acptr->serv->sid))
+				if (!match_service_dist(acptr, sptr->service->dist))
 				{
 					continue;
 				}
