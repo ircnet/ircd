@@ -17,5 +17,4 @@ If you want to submit a package for this directory, see the RULES file.
 
 mkpasswd	utility to crypt a password.
 ircdwatch	utility to keep ircd running (eventually restarting it).
-tkserv		stupid toy to manage "temporary" klines.
 mod_passwd	example of DSM module for iauth

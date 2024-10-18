@@ -507,10 +507,6 @@ B|*.fi||irc.funet.fi|6667|
 # Example, you want to allow a local information service:
 S|eep.local.net|thisisapassword|EepInfo|0|1
 #
-# Another example, with hex mask. This is a temporary kline service (tkserv) 
-# as you can find it in contrib/tkserv:
-S|eep.local.net|thisisapassword|TkEep|0x2000000|1
-#
 #
 ############################
 # Q: [DISCOURAGED]. These lines "quarantine" specified servers.  Because
