@@ -2569,9 +2569,14 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* Complete user entry to the new channel */
 		add_user_to_channel(chptr, sptr, flags);
 		/* Notify all users on the channel */
-		sendto_channel_butserv_caps(chptr, sptr, CAP_EXTENDED_JOIN, 0, ":%s JOIN %s %s :%s",
+		sendto_channel_butserv_caps(chptr, sptr, CAP_IRCNET_EXTENDED_JOIN, 0,
+									":%s JOIN %s %s %s %s :%s",
+									parv[0], chptr->chname, sptr->uid, get_client_ip(sptr), "*", sptr->info);
+		sendto_channel_butserv_caps(chptr, sptr, CAP_EXTENDED_JOIN, CAP_IRCNET_EXTENDED_JOIN,
+									":%s JOIN %s %s :%s",
 									parv[0], chptr->chname, "*", sptr->info);
-		sendto_channel_butserv_caps(chptr, sptr, 0, CAP_EXTENDED_JOIN, ":%s JOIN :%s", parv[0], chptr->chname);
+		sendto_channel_butserv_caps(chptr, sptr, 0, CAP_EXTENDED_JOIN|CAP_IRCNET_EXTENDED_JOIN,
+									":%s JOIN :%s", parv[0], chptr->chname);
 		del_invite(sptr, chptr);
 		if (chptr->topic[0] != '\0')
 		{
