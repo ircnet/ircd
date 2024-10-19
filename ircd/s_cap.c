@@ -29,6 +29,7 @@ struct Cap
 	const int flag;
 } cap_tab[] = {
 		{"extended-join", CAP_EXTENDED_JOIN},
+		{"multi-prefix",  CAP_MULTI_PREFIX},
 		{"sasl",          CAP_SASL},
 		{NULL,            0}
 };

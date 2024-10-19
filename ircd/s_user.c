@@ -1711,12 +1711,22 @@ static	void	who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
 	if ((repchan != NULL) && (lp == NULL))
 		lp = find_user_link(repchan->members, acptr);
 	if (lp != NULL)
-	    {
-		if (lp->flags & CHFL_CHANOP)
-			status[i++] = '@';
-		else if (lp->flags & CHFL_VOICE)
-			status[i++] = '+';
-	    }
+	{
+		if (HasCap(sptr, CAP_MULTI_PREFIX))
+		{
+			if (lp->flags & CHFL_CHANOP)
+				status[i++] = '@';
+			if (lp->flags & CHFL_VOICE)
+				status[i++] = '+';
+		}
+		else
+		{
+			if (lp->flags & CHFL_CHANOP)
+				status[i++] = '@';
+			else if (lp->flags & CHFL_VOICE)
+				status[i++] = '+';
+		}
+	}
 	status[i] = '\0';
 
 	if((opts->flags & ~WHO_FLAG_OPERS_ONLY) != 0)
@@ -2165,10 +2175,20 @@ static	void	send_whois(aClient *sptr, aClient *acptr)
 				*buf = '\0';
 				len = 0;
 			    }
-			if (is_chan_op(acptr, chptr))
-				*(buf + len++) = '@';
-			else if (has_voice(acptr, chptr))
-				*(buf + len++) = '+';
+				if(HasCap(sptr, CAP_MULTI_PREFIX))
+				{
+					if (is_chan_op(acptr, chptr))
+						*(buf + len++) = '@';
+					if (has_voice(acptr, chptr))
+						*(buf + len++) = '+';
+				}
+				else
+				{
+					if (is_chan_op(acptr, chptr))
+						*(buf + len++) = '@';
+					else if (has_voice(acptr, chptr))
+						*(buf + len++) = '+';
+				}
 			if (len)
 				*(buf + len) = '\0';
 			(void)strcpy(buf + len, chptr->chname);

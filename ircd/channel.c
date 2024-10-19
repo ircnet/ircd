@@ -3533,15 +3533,30 @@ static void names_channel(aClient *cptr, aClient *sptr, char *to,
 		{
 			if (ismember)
 			{
-				if (lp->flags & CHFL_CHANOP)
+				if (HasCap(sptr, CAP_MULTI_PREFIX))
 				{
-					*pbuf++ = '@';
+					if (lp->flags & CHFL_CHANOP)
+					{
+						*pbuf++ = '@';
+					}
+
+					if (lp->flags & CHFL_VOICE)
+					{
+						*pbuf++ = '+';
+					}
 				}
-				else if (lp->flags & CHFL_VOICE)
+				else
 				{
-					*pbuf++ = '+';
+					if (lp->flags & CHFL_CHANOP)
+					{
+						*pbuf++ = '@';
+					}
+					else if (lp->flags & CHFL_VOICE)
+					{
+						*pbuf++ = '+';
+					}
 				}
-				strcpy(pbuf,to);
+				strcpy(pbuf, to);
 			}
 			sendto_one(sptr, replies[RPL_NAMREPLY], ME, BadTo(to),
 					buf);
@@ -3575,7 +3590,8 @@ static void names_channel(aClient *cptr, aClient *sptr, char *to,
 				
 				/* Exceeded allowed length.  */
 				if (((size_t) pbuf - (size_t) buf) + nlen
-				   >= maxlen)
+					+ (HasCap(sptr, CAP_MULTI_PREFIX) ? 1 : 0) /* multi-prefix might add a second prefix -- mh */
+					>= maxlen)
 				{
 					*pbuf = '\0';
 					sendto_one(sptr,
@@ -3591,13 +3607,28 @@ static void names_channel(aClient *cptr, aClient *sptr, char *to,
 				{
 					continue;
 				}
-				if (lp->flags & CHFL_CHANOP)
+				if (HasCap(sptr, CAP_MULTI_PREFIX))
 				{
-					*pbuf++ = '@';
+					if (lp->flags & CHFL_CHANOP)
+					{
+						*pbuf++ = '@';
+					}
+
+					if (lp->flags & CHFL_VOICE)
+					{
+						*pbuf++ = '+';
+					}
 				}
-				else if (lp->flags & CHFL_VOICE)
+				else
 				{
-					*pbuf++ = '+';
+					if (lp->flags & CHFL_CHANOP)
+					{
+						*pbuf++ = '@';
+					}
+					else if (lp->flags & CHFL_VOICE)
+					{
+						*pbuf++ = '+';
+					}
 				}
 	
 				memcpy(pbuf, acptr->name, nlen);
