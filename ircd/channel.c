@@ -1245,8 +1245,7 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 			 * to make sure the right client is affected by the
 			 * mode change.
 			 */
-			if (!(IsServer(cptr) &&
-				(who = find_uid(parv[0], NULL))) &&
+			if (!(isdigit(*parv[0]) && (who = find_uid(parv[0], NULL))) &&
 				!(who = find_chasing(sptr, parv[0], &chasing)))
 				break;
 	  		if (!IsMember(who, chptr))
@@ -3066,7 +3065,7 @@ int	m_kick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		for (tmp2 = tmp; (user = strtoken(&p2, tmp2, ",")); tmp2 = NULL)
 		    {
 			penalty++;
-			if (!(IsServer(cptr) && (who = find_uid(user, NULL))) &&
+			if (!(isdigit(*user) && (who = find_uid(user, NULL))) &&
 				!(who = find_chasing(sptr, user, &chasing)))
 				continue; /* No such user left! */
 			if (IsMember(who, chptr))
@@ -3249,7 +3248,8 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aClient *acptr;
 	aChannel *chptr;
 
-	if (!(acptr = find_person(parv[1], (aClient *)NULL)))
+	if (!(isdigit(*parv[1]) && (acptr = find_uid(parv[1], (aClient *)NULL))) &&
+		!(acptr = find_person(parv[1], (aClient *)NULL)))
 	    {
 		sendto_one(sptr, replies[ERR_NOSUCHNICK], ME, BadTo(parv[0]), parv[1]);
 		return 1;
