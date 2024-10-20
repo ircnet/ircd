@@ -3248,8 +3248,7 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aClient *acptr;
 	aChannel *chptr;
 
-	if (!(isdigit(*parv[1]) && (acptr = find_uid(parv[1], (aClient *)NULL))) &&
-		!(acptr = find_person(parv[1], (aClient *)NULL)))
+	if (!(acptr = find_person(parv[1], (aClient *)NULL)))
 	    {
 		sendto_one(sptr, replies[ERR_NOSUCHNICK], ME, BadTo(parv[0]), parv[1]);
 		return 1;
