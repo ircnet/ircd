@@ -839,6 +839,6 @@ IRC_IP6
 IRC_SHAREDMODULES
 IRC_ALPHA_BETA
 
-AC_CONFIG_FILES([Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../support/sums.in tkconf.h:../support/tkconf.h.dist])
+AC_CONFIG_FILES([Makefile:../support/Makefile.in version.c.SH:../ircd/version.c.SH.in sums:../support/sums.in])
 AC_CONFIG_COMMANDS([chmod],[[chmod a+x version.c.SH]])
 AC_OUTPUT

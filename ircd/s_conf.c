@@ -1891,7 +1891,10 @@ int 	initconf(int opt)
 					iline_flags_parse(tmp3) :
 					pline_flags_parse(tmp3));
 			}
-
+			if(aconf->status & CONF_LISTEN_PORT && tmp4 && *tmp4)
+			{
+				DupString(aconf->source_ip, tmp4);
+			}
 			/* trying to find exact conf line in already existing
 			 * conf, so we don't delete old one, just update it */
 			if (
