@@ -589,7 +589,7 @@ void	start_auth(aClient *cptr)
 		&& !BadPtr(cptr->acpt->confs->value.aconf->source_ip))
 	{
 # ifdef INET6
-		inet_pton(AF_INET6, cptr->acpt->confs->value.aconf->source_ip, us.sin6_addr.s6_addr);
+		inetpton(AF_INET6, cptr->acpt->confs->value.aconf->source_ip, us.sin6_addr.s6_addr);
 # else
 		us.sin_addr.s_addr = inetaddr(cptr->acpt->confs->value.aconf->source_ip);
 # endif
