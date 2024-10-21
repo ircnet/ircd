@@ -2216,7 +2216,12 @@ static	void	send_whois(aClient *sptr, aClient *acptr)
     {
         sendto_one(sptr, replies[RPL_WHOISLOGGEDIN], ME, BadTo(sptr->name), name, acptr->sasl_user);
     }
-
+	/* send a 320 numeric RPL_WHOISCLOAKED reply if client is spoofed.
+	 * reply defined as SPOOF_WHOISCLOAKED in config.h -- mh 20191230 */
+	if (IsSpoofed(acptr))
+	{
+		sendto_one(sptr, replies[RPL_WHOISCLOAKED], ME, BadTo(sptr->name), name, SPOOF_WHOISCLOAKED);
+	}
 	/* send a 320 numeric RPL_WHOISTLS reply if client is connected with SSL/TLS.
 	 * reply defined as WHOISTLS in config.h -- mh 2020-04-27 */
 	if (IsTLS(acptr))

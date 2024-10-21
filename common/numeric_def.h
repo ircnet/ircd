@@ -237,6 +237,7 @@
 #define RPL_WHOISCHANNELS    319
 #define RPL_WHOISEXTRA       320 /* catch-all extra WHOIS information reply -- mh 2020-01-11 */
 #define RPL_WHOISTLS         RPL_WHOISEXTRA /* client is connected with SSL/TLS -- mh 2020-04-27 */
+#define RPL_WHOISCLOAKED     RPL_WHOISEXTRA /* client is cloaked/spoofed -- mh 20191230 */
 #define RPL_LISTSTART        321
 #define RPL_LIST             322
 #define RPL_LISTEND          323
