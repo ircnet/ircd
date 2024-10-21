@@ -28,10 +28,11 @@ struct Cap
 	const char *name;
 	const int flag;
 } cap_tab[] = {
-		{"extended-join", CAP_EXTENDED_JOIN},
-		{"multi-prefix",  CAP_MULTI_PREFIX},
-		{"sasl",          CAP_SASL},
-		{NULL,            0}
+		{"extended-join",            CAP_EXTENDED_JOIN},
+		{"ircnet.com/extended-join", CAP_IRCNET_EXTENDED_JOIN},
+		{"multi-prefix",             CAP_MULTI_PREFIX},
+		{"sasl",                     CAP_SASL},
+		{NULL,                       0}
 };
 
 void send_cap_list(aClient *target, char *sub_cmd, int flags)
