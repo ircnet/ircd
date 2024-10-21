@@ -9,7 +9,7 @@
 # changes with iauth -c iauth.conf.
 
 # If iauth timeouts, then reject user
-notimeout
+#notimeout
 
 # This makes the IRC server require that iauth performs the authentication
 # in order for a new user connection to be accepted
@@ -24,9 +24,9 @@ module rfc931
 #delayed
 
 # Check and reject open SOCKS proxies
-module socks
-	port = 1080
-	option = reject,paranoid
+#module socks
+#	port = 1080
+#	option = reject,paranoid
 #	reason = Denied access (insecure proxy found)
 
 #module socks
@@ -35,9 +35,9 @@ module socks
 #	reason = Denied access (insecure proxy found)
 
 # Check and reject HTTP CONNECT proxies on port 8080
-module webproxy
-	port = 8080
-	option = reject
+#module webproxy
+#	port = 8080
+#	option = reject
 #	reason = Denied access (insecure proxy found)
 
 # Check and reject HTTP CONNECT proxies on port 3128

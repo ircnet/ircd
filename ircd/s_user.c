@@ -3305,6 +3305,8 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 						      ":%s AWAY :", parv[0]);
 #endif
 			default :
+				if(*m == 'r' && cptr && !IsServer(cptr)) /* do not allow clients to set +r */
+					break;
 				for (s = user_modes; (flag = *s); s += 2)
 					if (*m == (char)(*(s+1)))
 				    {
