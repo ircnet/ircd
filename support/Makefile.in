@@ -62,6 +62,7 @@ IRCD = ircd
 IRCD_BIN = $(IRCD)
 IAUTH = iauth
 IRCDWATCH = ircdwatch
+GIT_HASH = git_hash.h
 
 #
 # Directories definitions
@@ -427,7 +428,6 @@ mkpasswd.o: ../contrib/mkpasswd/mkpasswd.c
 	$(CC) $(O_CFLAGS) -c -o $@ ../contrib/mkpasswd/mkpasswd.c
 
 clean:
-	$(RM) $(IRCD_BIN) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
 	$(RM) $(GIT_HASH) $(IRCD_BIN) $(IAUTH) $(CHKCONF) ircd-mkpasswd $(IRCDWATCH) *.CKP *.ln *.BAK *.bak *.o core errs ,* *~ *.a .emacs_* tags TAGS make.log MakeOut "#"* version.c
 
 distclean:
