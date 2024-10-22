@@ -22,37 +22,35 @@
 static const volatile char rcsid[] = "@(#)$Id: mod_webproxy.c,v 1.4 2005/01/27 19:17:44 chopin Exp $";
 #endif
 
-#include "os.h"
 #include "a_defines.h"
+#include "os.h"
 #define MOD_PROXY_C
 #include "a_externs.h"
 #undef MOD_PROXY_C
 
 /****************************** PRIVATE *************************************/
 
-static	int	proxy_start(u_int cl);
+static int proxy_start(u_int cl);
 
 #define CACHETIME 30
 #define PROXYPORT (cldata[cl].instance->port)
 
-struct proxylog
-{
+struct proxylog {
 	struct proxylog *next;
-	char ip[HOSTLEN+1];
+	char ip[HOSTLEN + 1];
 	u_char state; /* 0 = no proxy, 1 = open proxy, 2 = closed proxy */
 	time_t expire;
 };
 
-#define OPT_LOG     	0x001
-#define OPT_DENY    	0x002
-#define OPT_CAREFUL 	0x008
+#define OPT_LOG 0x001
+#define OPT_DENY 0x002
+#define OPT_CAREFUL 0x008
 
-#define PROXY_NONE		0
-#define PROXY_OPEN		1
-#define PROXY_CLOSE		2
+#define PROXY_NONE 0
+#define PROXY_OPEN 1
+#define PROXY_CLOSE 2
 
-struct proxy_private
-{
+struct proxy_private {
 	struct proxylog *cache;
 	u_int lifetime;
 	u_char options;
@@ -66,7 +64,7 @@ struct proxy_private
  *
  *	Found an open proxy for cl: deal with it!
  */
-static	void	proxy_open_proxy(int cl)
+static void proxy_open_proxy(int cl)
 {
 	struct proxy_private *mydata = cldata[cl].instance->data;
 	char *reason = cldata[cl].instance->reason;
@@ -80,13 +78,13 @@ static	void	proxy_open_proxy(int cl)
 	{
 		cldata[cl].state |= A_DENY;
 		sendto_ircd("k %d %s %u :%s", cl, cldata[cl].itsip,
-			cldata[cl].itsport, reason);
+					cldata[cl].itsport, reason);
 	}
 	if (mydata->options & OPT_LOG)
 	{
 		sendto_log(ALOG_FLOG, LOG_INFO,
-			"webproxy%u: open proxy: %s[%s]",
-			PROXYPORT, cldata[cl].host, cldata[cl].itsip);
+				   "webproxy%u: open proxy: %s[%s]",
+				   PROXYPORT, cldata[cl].host, cldata[cl].itsip);
 	}
 }
 
@@ -95,7 +93,7 @@ static	void	proxy_open_proxy(int cl)
  *
  *	Add an entry to the cache.
  */
-static	void	proxy_add_cache(int cl, int state)
+static void proxy_add_cache(int cl, int state)
 {
 	struct proxy_private *mydata = cldata[cl].instance->data;
 	struct proxylog *next;
@@ -125,14 +123,14 @@ static	void	proxy_add_cache(int cl, int state)
 	}
 
 	next = mydata->cache;
-	mydata->cache = (struct proxylog *)malloc(sizeof(struct proxylog));
+	mydata->cache = (struct proxylog *) malloc(sizeof(struct proxylog));
 	mydata->cache->expire = time(NULL) + mydata->lifetime;
 	strcpy(mydata->cache->ip, cldata[cl].itsip);
 	mydata->cache->state = state;
 	mydata->cache->next = next;
 	DebugLog((ALOG_DSOCKSC, 0,
-		"webproxy_add_cache(%d): new cache %s, open=%d",
-		cl, mydata->cache->ip, state));
+			  "webproxy_add_cache(%d): new cache %s, open=%d",
+			  cl, mydata->cache->ip, state));
 }
 
 /*
@@ -140,7 +138,7 @@ static	void	proxy_add_cache(int cl, int state)
  *
  *	Check cache for an entry.
  */
-static	int	proxy_check_cache(u_int cl)
+static int proxy_check_cache(u_int cl)
 {
 	struct proxy_private *mydata = cldata[cl].instance->data;
 	struct proxylog **last, *pl;
@@ -152,19 +150,19 @@ static	int	proxy_check_cache(u_int cl)
 	}
 
 	DebugLog((ALOG_DSOCKSC, 0,
-		"webproxy_check_cache(%d): Checking cache for %s",
-		cl, cldata[cl].itsip));
+			  "webproxy_check_cache(%d): Checking cache for %s",
+			  cl, cldata[cl].itsip));
 
 	last = &(mydata->cache);
 	while ((pl = *last))
 	{
 		DebugLog((ALOG_DSOCKSC, 0, "webproxy_check_cache(%d): cache %s",
-			cl, pl->ip));
+				  cl, pl->ip));
 		if (pl->expire < now)
 		{
 			DebugLog((ALOG_DSOCKSC, 0,
-				"webproxy_check_cache(%d): free %s (%d < %d)",
-				cl, pl->ip, pl->expire, now));
+					  "webproxy_check_cache(%d): free %s (%d < %d)",
+					  cl, pl->ip, pl->expire, now));
 			*last = pl->next;
 			free(pl);
 			mydata->cnow -= 1;
@@ -173,8 +171,8 @@ static	int	proxy_check_cache(u_int cl)
 		if (!strcasecmp(pl->ip, cldata[cl].itsip))
 		{
 			DebugLog((ALOG_DSOCKSC, 0,
-				"webproxy_check_cache(%d): match (%u)",
-				cl, pl->state));
+					  "webproxy_check_cache(%d): match (%u)",
+					  cl, pl->state));
 			pl->expire = now + mydata->lifetime; /* dubious */
 			if (pl->state == 1)
 			{
@@ -197,45 +195,46 @@ static	int	proxy_check_cache(u_int cl)
 	return 0;
 }
 
-static	int	proxy_write(u_int cl)
+static int proxy_write(u_int cl)
 {
-	char query[128];	/* big enough to hold all queries */
-	int query_len;		/* length of query */
-#ifndef	INET6
+	char query[128]; /* big enough to hold all queries */
+	int query_len;	 /* length of query */
+#ifndef INET6
 	u_int a, b, c, d;
 #else
-	struct in6_addr	addr;
+	struct in6_addr addr;
 #endif
 
-#ifndef	INET6
-	if (sscanf(cldata[cl].ourip, "%u.%u.%u.%u", &a,&b,&c,&d) != 4)
+#ifndef INET6
+	if (sscanf(cldata[cl].ourip, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
 #else
 	if (inetpton(AF_INET6, cldata[cl].ourip, (void *) addr.s6_addr) != 1)
 #endif
 	{
-		sendto_log(ALOG_DSOCKS|ALOG_IRCD, LOG_ERR,
-			"webproxy_write(%d): "
+		sendto_log(ALOG_DSOCKS | ALOG_IRCD, LOG_ERR,
+				   "webproxy_write(%d): "
 #ifndef INET6
-			"sscanf"
+				   "sscanf"
 #else
-			"inetpton"
+				   "inetpton"
 #endif
-			"(\"%s\") failed", cl, cldata[cl].ourip);
+				   "(\"%s\") failed",
+				   cl, cldata[cl].ourip);
 		close(cldata[cl].wfd);
 		cldata[cl].wfd = 0;
 		return -1;
 	}
 	query_len = sprintf(query, "CONNECT %s:%d HTTP/1.0\r\n\r\n",
-		cldata[cl].ourip, cldata[cl].ourport);
+						cldata[cl].ourip, cldata[cl].ourport);
 
 	DebugLog((ALOG_DSOCKS, 0, "webproxy_write(%d): Checking %s %u",
-		cl, cldata[cl].itsip, PROXYPORT));
+			  cl, cldata[cl].itsip, PROXYPORT));
 	if (write(cldata[cl].wfd, query, query_len) != query_len)
 	{
-	/* most likely the connection failed */
+		/* most likely the connection failed */
 		DebugLog((ALOG_DSOCKS, 0,
-			"webproxy_write(%d): write() failed: %s",
-			cl, strerror(errno)));
+				  "webproxy_write(%d): write() failed: %s",
+				  cl, strerror(errno)));
 		proxy_add_cache(cl, PROXY_NONE);
 		close(cldata[cl].wfd);
 		cldata[cl].rfd = cldata[cl].wfd = 0;
@@ -246,23 +245,24 @@ static	int	proxy_write(u_int cl)
 	return 0;
 }
 
-static	int	proxy_read(u_int cl)
+static int proxy_read(u_int cl)
 {
 	struct proxy_private *mydata = cldata[cl].instance->data;
 	u_char state = PROXY_CLOSE;
 
 	/* not enough data from the other end */
 	if (cldata[cl].buflen <
-		((mydata->options & OPT_CAREFUL) ? strConnLen + 
-		/* strlen("HTTP/1.0 200 Connection established\n\n") = */ 38 :
-			/* strlen("HTTP/1.0 200") = */ 12))
+		((mydata->options & OPT_CAREFUL) ? strConnLen +
+												   /* strlen("HTTP/1.0 200 Connection established\n\n") = */ 38
+										 :
+										 /* strlen("HTTP/1.0 200") = */ 12))
 	{
 		return 0;
 	}
 
 	/* got all we need */
 	DebugLog((ALOG_DSOCKS, 0, "webproxy%u_read(%d): Got [%-64.64s]",
-		PROXYPORT, cl, cldata[cl].inbuffer));
+			  PROXYPORT, cl, cldata[cl].inbuffer));
 
 	if (mydata->options & OPT_CAREFUL)
 	{
@@ -279,8 +279,7 @@ static	int	proxy_read(u_int cl)
 		/* Some Apache change "CONNECT" to "GET" and return
 		 * "HTTP/1.0 200 OK" -- oops. Luckily they also return
 		 * "Date:" header, let's hope it's in inbuffer already. --B. */
-		if (!strstr(cldata[cl].inbuffer, "Date:")
-			&& !strncmp(cldata[cl].inbuffer, "HTTP/1.0 200", 12))
+		if (!strstr(cldata[cl].inbuffer, "Date:") && !strncmp(cldata[cl].inbuffer, "HTTP/1.0 200", 12))
 		{
 			state = PROXY_OPEN;
 		}
@@ -295,7 +294,6 @@ static	int	proxy_read(u_int cl)
 	close(cldata[cl].rfd);
 	cldata[cl].rfd = 0;
 	return -1;
-
 }
 
 /******************************** PUBLIC ************************************/
@@ -307,7 +305,7 @@ static	int	proxy_read(u_int cl)
  *	Returns NULL if everything went fine,
  *	an error message otherwise.
  */
-static	char	*proxy_init(AnInstance *self)
+static char *proxy_init(AnInstance *self)
 {
 	struct proxy_private *mydata;
 	char tmpbuf[80], cbuf[32];
@@ -365,7 +363,7 @@ static	char	*proxy_init(AnInstance *self)
 
 	if ((ch = strstr(self->opt, "cache=")))
 	{
-		mydata->lifetime = atoi(ch+6);
+		mydata->lifetime = atoi(ch + 6);
 	}
 	sprintf(cbuf, ",cache=%d", mydata->lifetime);
 	strcat(tmpbuf, cbuf);
@@ -375,7 +373,7 @@ static	char	*proxy_init(AnInstance *self)
 
 	self->popt = mystrdup(tmpbuf);
 	self->data = mydata;
-	return txtbuf+2;
+	return txtbuf + 2;
 }
 
 /*
@@ -383,7 +381,7 @@ static	char	*proxy_init(AnInstance *self)
  *
  *	This procedure is called when a particular module is unloaded.
  */
-static	void	proxy_release(AnInstance *self)
+static void proxy_release(AnInstance *self)
 {
 	struct proxy_private *mydata = self->data;
 
@@ -396,17 +394,18 @@ static	void	proxy_release(AnInstance *self)
  *
  *	This procedure is called regularly to update statistics sent to ircd.
  */
-static	void	proxy_stats(AnInstance *self)
+static void proxy_stats(AnInstance *self)
 {
 	struct proxy_private *mydata = self->data;
 
 	sendto_ircd("S %s:%u open %u closed %u noproxy %u",
-		self->mod->name, self->port,
-		mydata->open, mydata->closed, mydata->noproxy);
+				self->mod->name, self->port,
+				mydata->open, mydata->closed, mydata->noproxy);
 	sendto_ircd("S %s:%u cache open %u closed %u noproxy %u miss %u"
-		" (%u <= %u)", self->mod->name, self->port,
-		mydata->chito, mydata->chitc, mydata->chitn,
-		mydata->cmiss, mydata->cnow, mydata->cmax);
+				" (%u <= %u)",
+				self->mod->name, self->port,
+				mydata->chito, mydata->chitc, mydata->chitn,
+				mydata->cmiss, mydata->cnow, mydata->cmax);
 }
 
 /*
@@ -420,7 +419,7 @@ static	void	proxy_stats(AnInstance *self)
  *	In case of failure, it's responsible for cleaning up (e.g. proxy_clean
  *	will NOT be called)
  */
-static	int	proxy_start(u_int cl)
+static int proxy_start(u_int cl)
 {
 	char *error;
 	int fd;
@@ -429,7 +428,7 @@ static	int	proxy_start(u_int cl)
 	{
 		/* no point of doing anything */
 		DebugLog((ALOG_DSOCKS, 0,
-			"webproxy_start(%d): A_DENY already set ", cl));
+				  "webproxy_start(%d): A_DENY already set ", cl));
 		return -1;
 	}
 
@@ -438,13 +437,13 @@ static	int	proxy_start(u_int cl)
 		return -1;
 	}
 	DebugLog((ALOG_DSOCKS, 0,
-		"webproxy_start(%d): Connecting to %s", cl, cldata[cl].itsip));
-	fd= tcp_connect(cldata[cl].ourip, cldata[cl].itsip, PROXYPORT, &error);
+			  "webproxy_start(%d): Connecting to %s", cl, cldata[cl].itsip));
+	fd = tcp_connect(cldata[cl].ourip, cldata[cl].itsip, PROXYPORT, &error);
 	if (fd < 0)
 	{
 		DebugLog((ALOG_DSOCKS, 0,
-			"webproxy_start(%d): tcp_connect() reported %s",
-			cl, error));
+				  "webproxy_start(%d): tcp_connect() reported %s",
+				  cl, error));
 		proxy_add_cache(cl, PROXY_NONE);
 		return -1;
 	}
@@ -464,12 +463,12 @@ static	int	proxy_start(u_int cl)
  *
  *	It is responsible for sending error messages where appropriate.
  */
-static	int	proxy_work(u_int cl)
+static int proxy_work(u_int cl)
 {
 
 	DebugLog((ALOG_DSOCKS, 0,
-		"webproxy_work(%d): %d %d buflen=%d",
-		cl, cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
+			  "webproxy_work(%d): %d %d buflen=%d",
+			  cl, cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
 
 	if (cldata[cl].wfd > 0)
 	{
@@ -492,7 +491,7 @@ static	int	proxy_work(u_int cl)
  *	It is responsible for cleaning up any allocated data, and in particular
  *	closing file descriptors.
  */
-static	void	proxy_clean(u_int cl)
+static void proxy_clean(u_int cl)
 {
 	DebugLog((ALOG_DSOCKS, 0, "webproxy_clean(%d): cleaning up", cl));
 	/*
@@ -518,15 +517,14 @@ static	void	proxy_clean(u_int cl)
  *
  *	Returns 0 if things are okay, -1 if check was aborted.
  */
-static	int	proxy_timeout(u_int cl)
+static int proxy_timeout(u_int cl)
 {
 	DebugLog((ALOG_DSOCKS, 0,
-		"webproxy_timeout(%d): calling proxy_clean ", cl));
+			  "webproxy_timeout(%d): calling proxy_clean ", cl));
 	proxy_clean(cl);
 	return -1;
 }
 
 aModule Module_webproxy =
-	{ "webproxy", proxy_init, proxy_release, proxy_stats,
-	  proxy_start, proxy_work, proxy_timeout, proxy_clean };
-
+		{"webproxy", proxy_init, proxy_release, proxy_stats,
+		 proxy_start, proxy_work, proxy_timeout, proxy_clean};

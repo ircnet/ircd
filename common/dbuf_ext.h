@@ -36,11 +36,11 @@ extern dbufbuf *freelist;
 #define EXTERN
 #endif /* DBUF_C */
 EXTERN void dbuf_init(void);
-EXTERN int dbuf_malloc_error (dbuf *dyn);
-EXTERN int dbuf_put (dbuf *dyn, char *buf, int length);
-EXTERN char *dbuf_map (dbuf *dyn, int *length);
-EXTERN int dbuf_delete (dbuf *dyn, int length);
-EXTERN int dbuf_get (dbuf *dyn, char *buf, int length);
-EXTERN int dbuf_copy (dbuf *dyn, register char *buf, int length);
-EXTERN int dbuf_getmsg (dbuf *dyn, char *buf, register int length);
+EXTERN int dbuf_malloc_error(dbuf *dyn);
+EXTERN int dbuf_put(dbuf *dyn, char *buf, int length);
+EXTERN char *dbuf_map(dbuf *dyn, int *length);
+EXTERN int dbuf_delete(dbuf *dyn, int length);
+EXTERN int dbuf_get(dbuf *dyn, char *buf, int length);
+EXTERN int dbuf_copy(dbuf *dyn, register char *buf, int length);
+EXTERN int dbuf_getmsg(dbuf *dyn, char *buf, register int length);
 #undef EXTERN

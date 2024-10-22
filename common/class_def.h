@@ -22,56 +22,56 @@ struct _patricia_tree_t;
 #endif
 
 typedef struct Class {
-	int	class;
-	int	conFreq;
-	int	pingFreq;
-	int	maxLinks;
-	int	maxSendq;
-	int	maxBSendq;
-	int	maxHLocal;
-	int	maxUHLocal;
-	int	maxHGlobal;
-	int	maxUHGlobal;
-	int	links;
+	int class;
+	int conFreq;
+	int pingFreq;
+	int maxLinks;
+	int maxSendq;
+	int maxBSendq;
+	int maxHLocal;
+	int maxUHLocal;
+	int maxHGlobal;
+	int maxUHGlobal;
+	int links;
 #ifdef ENABLE_CIDR_LIMITS
-	int	cidr_len;
-	int	cidr_amount;
+	int cidr_len;
+	int cidr_amount;
 	struct _patricia_tree_t *ip_limits;
 #endif
 	struct Class *next;
 } aClass;
 
-#define	Class(x)	((x)->class)
-#define	ConFreq(x)	((x)->conFreq)
-#define	PingFreq(x)	((x)->pingFreq)
-#define	MaxLinks(x)	((x)->maxLinks)
-#define	MaxSendq(x)	((x)->maxSendq)
-#define	MaxBSendq(x)	((x)->maxBSendq)
-#define	MaxHLocal(x)	((x)->maxHLocal)
-#define	MaxUHLocal(x)	((x)->maxUHLocal)
-#define	MaxHGlobal(x)	((x)->maxHGlobal)
-#define	MaxUHGlobal(x)	((x)->maxUHGlobal)
-#define	Links(x)	((x)->links)
-#define	IncSendq(x)	MaxSendq(x) = (int)((float)MaxSendq(x) * 1.1)
+#define Class(x) ((x)->class)
+#define ConFreq(x) ((x)->conFreq)
+#define PingFreq(x) ((x)->pingFreq)
+#define MaxLinks(x) ((x)->maxLinks)
+#define MaxSendq(x) ((x)->maxSendq)
+#define MaxBSendq(x) ((x)->maxBSendq)
+#define MaxHLocal(x) ((x)->maxHLocal)
+#define MaxUHLocal(x) ((x)->maxUHLocal)
+#define MaxHGlobal(x) ((x)->maxHGlobal)
+#define MaxUHGlobal(x) ((x)->maxUHGlobal)
+#define Links(x) ((x)->links)
+#define IncSendq(x) MaxSendq(x) = (int) ((float) MaxSendq(x) * 1.1)
 
-#define	ConfLinks(x)	(Class(x)->links)
-#define	ConfMaxLinks(x)	(Class(x)->maxLinks)
-#define	ConfClass(x)	(Class(x)->class)
-#define	ConfConFreq(x)	(Class(x)->conFreq)
-#define	ConfPingFreq(x)	(Class(x)->pingFreq)
-#define	ConfSendq(x)	(Class(x)->maxSendq)
-#define	ConfMaxHLocal(x)	(Class(x)->maxHLocal)
-#define	ConfMaxUHLocal(x)	(Class(x)->maxUHLocal)
-#define	ConfMaxHGlobal(x)	(Class(x)->maxHGlobal)
-#define	ConfMaxUHGlobal(x)	(Class(x)->maxUHGlobal)
+#define ConfLinks(x) (Class(x)->links)
+#define ConfMaxLinks(x) (Class(x)->maxLinks)
+#define ConfClass(x) (Class(x)->class)
+#define ConfConFreq(x) (Class(x)->conFreq)
+#define ConfPingFreq(x) (Class(x)->pingFreq)
+#define ConfSendq(x) (Class(x)->maxSendq)
+#define ConfMaxHLocal(x) (Class(x)->maxHLocal)
+#define ConfMaxUHLocal(x) (Class(x)->maxUHLocal)
+#define ConfMaxHGlobal(x) (Class(x)->maxHGlobal)
+#define ConfMaxUHGlobal(x) (Class(x)->maxUHGlobal)
 #ifdef ENABLE_CIDR_LIMITS
-#define	MaxCidrAmount(x)	((x)->cidr_amount)
-#define	CidrLen(x)	((x)->cidr_len)
-#define	CidrTree(x)	((x)->ip_limits)
-#define	ConfMaxCidrAmount(x)	(Class(x)->cidr_amount)
-#define	ConfCidrLen(x)	(Class(x)->cidr_len)
-#define	ConfCidrTree(x)	(Class(x)->ip_limits)
+#define MaxCidrAmount(x) ((x)->cidr_amount)
+#define CidrLen(x) ((x)->cidr_len)
+#define CidrTree(x) ((x)->ip_limits)
+#define ConfMaxCidrAmount(x) (Class(x)->cidr_amount)
+#define ConfCidrLen(x) (Class(x)->cidr_len)
+#define ConfCidrTree(x) (Class(x)->ip_limits)
 #endif
 
-#define	FirstClass() 	classes
-#define	NextClass(x)	((x)->next)
+#define FirstClass() classes
+#define NextClass(x) ((x)->next)

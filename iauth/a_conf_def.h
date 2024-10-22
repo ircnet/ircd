@@ -21,39 +21,36 @@ typedef struct Module aModule;
 typedef struct Instance AnInstance;
 typedef struct Target aTarget;
 
-struct Module
-{
-    char	*name;			/* module name */
-    char	*(*init)(AnInstance *);	/* instance initialization */
-    void	(*release)(AnInstance *);/* instance releasing >UNUSED< */
-    void	(*stats)(AnInstance *);	/* send instance stats to ircd */
-    int		(*start)(u_int);	/* start authentication */
-    int		(*work)(u_int);		/* called whenever something has to be
+struct Module {
+	char *name;					   /* module name */
+	char *(*init)(AnInstance *);   /* instance initialization */
+	void (*release)(AnInstance *); /* instance releasing >UNUSED< */
+	void (*stats)(AnInstance *);   /* send instance stats to ircd */
+	int (*start)(u_int);		   /* start authentication */
+	int (*work)(u_int);			   /* called whenever something has to be
 					 * done (incoming data, timeout..) */
-    int		(*timeout)(u_int);	/* called when timeout is reached */
-    void	(*clean)(u_int);	/* finish/abort: cleanup*/
+	int (*timeout)(u_int);		   /* called when timeout is reached */
+	void (*clean)(u_int);		   /* finish/abort: cleanup*/
 };
 
-struct Instance
-{
-    AnInstance	*nexti;
-    u_char	in;			/* instance number */
-    aModule	*mod;			/* module */
-    char	*opt;			/* options read from file */
-    char	*popt;			/* options to send to ircd */
-    void	*data;			/* private data: stats, ... */
-    aTarget	*address;
-    aTarget	*hostname;
-    u_int	timeout;
-    u_int	port;
-    char	*reason;		/* reject reason */
-    u_char	delayed;		/* delayed execution mode */
+struct Instance {
+	AnInstance *nexti;
+	u_char in;	  /* instance number */
+	aModule *mod; /* module */
+	char *opt;	  /* options read from file */
+	char *popt;	  /* options to send to ircd */
+	void *data;	  /* private data: stats, ... */
+	aTarget *address;
+	aTarget *hostname;
+	u_int timeout;
+	u_int port;
+	char *reason;	/* reject reason */
+	u_char delayed; /* delayed execution mode */
 };
 
-struct Target
-{
-    char	*value;
-    u_long	baseip, lmask;		/* a.b.c.d/z */
-    char	yes;
-    aTarget	*nextt;
+struct Target {
+	char *value;
+	u_long baseip, lmask; /* a.b.c.d/z */
+	char yes;
+	aTarget *nextt;
 };

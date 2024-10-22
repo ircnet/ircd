@@ -21,8 +21,8 @@
 static const volatile char rcsid[] = "@(#)$Id: a_conf.c,v 1.39 2004/11/13 16:46:18 chopin Exp $";
 #endif
 
-#include "os.h"
 #include "a_defines.h"
+#include "os.h"
 #define A_CONF_C
 #include "a_externs.h"
 #undef A_CONF_C
@@ -31,43 +31,43 @@ static aModule *Mlist[16];
 
 #define DEFAULT_TIMEOUT 30
 
-u_int	debuglevel = 0;
+u_int debuglevel = 0;
 
 AnInstance *instances = NULL;
 
-static	void	conf_err(u_int nb, char *msg, char *chk)
+static void conf_err(u_int nb, char *msg, char *chk)
 {
 	if (chk)
 		fprintf(stderr, "configuration error line %d: %s\n", nb, msg);
 	else
-		sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
-			   "Configuration error line %d: %s", nb, msg);
+		sendto_log(ALOG_IRCD | ALOG_DCONF, LOG_ERR,
+				   "Configuration error line %d: %s", nb, msg);
 	exit(1);
 }
 
 /*
  * Match address by #IP bitmask (10.11.12.128/27)
  */
-static	int	match_ipmask(aTarget *mask, char *ipaddr)
+static int match_ipmask(aTarget *mask, char *ipaddr)
 {
 #ifdef INET6
 	return 1;
 #else
-        int i1, i2, i3, i4;
+	int i1, i2, i3, i4;
 	u_long iptested;
 
-        if (sscanf(ipaddr, "%d.%d.%d.%d", &i1, &i2, &i3, &i4) != 4) 
+	if (sscanf(ipaddr, "%d.%d.%d.%d", &i1, &i2, &i3, &i4) != 4)
 		return -1;
 	iptested = htonl(i1 * 0x1000000 + i2 * 0x10000 + i3 * 0x100 + i4);
-        return ((iptested & mask->lmask) == mask->baseip) ? 0 : 1;
+	return ((iptested & mask->lmask) == mask->baseip) ? 0 : 1;
 #endif
 }
 
 /* conf_read: read the configuration file, instanciate modules */
-char	*conf_read(char *cfile)
+char *conf_read(char *cfile)
 {
 	AnInstance *ident = NULL; /* make sure this module is used */
-	u_char needh = 0; /* do we need hostname information for any host? */
+	u_char needh = 0;		  /* do we need hostname information for any host? */
 	u_char o_req = 0, o_dto = 0, o_wup = 0, o_del = 0;
 	static char o_all[5];
 	u_int timeout = DEFAULT_TIMEOUT, totto = 0;
@@ -86,17 +86,17 @@ char	*conf_read(char *cfile)
 
 	cfh = fopen((cfile) ? cfile : IAUTHCONF_PATH, "r");
 	if (!cfh)
-	    {
+	{
 		if (cfile)
-		    {
+		{
 			perror("Couldn't open config file");
 			exit(0);
-		    }
-	    }
+		}
+	}
 	else
-	    {
+	{
 		while (fgets(buffer, 160, cfh))
-		    {
+		{
 			if ((ch = index(buffer, '\n')))
 			{
 				lnnb += 1;
@@ -104,7 +104,7 @@ char	*conf_read(char *cfile)
 			else
 			{
 				conf_err(lnnb, "line too long, ignoring.",
-					 cfile);
+						 cfile);
 				/* now skip what's left */
 				while (fgets(buffer, 160, cfh))
 				{
@@ -123,131 +123,131 @@ char	*conf_read(char *cfile)
 				*ch = '\0';
 			}
 			if (!strncmp("required", buffer, 8))
-			  {
+			{
 				o_req = 1;
 				continue;
-			  }
+			}
 			if (!strncmp("notimeout", buffer, 9))
-			  {
+			{
 				o_dto = 1;
 				continue;
-			  }
+			}
 			if (!strncmp("extinfo", buffer, 7))
-			  {
+			{
 				o_wup = 1;
 				continue;
-			  }
+			}
 			if (!strncmp("delayed", buffer, 7))
-			  {
+			{
 				o_del = 1;
 				continue;
-			  }
+			}
 			if (!strncmp("timeout = ", buffer, 10))
-			    {
+			{
 				if (sscanf(buffer, "timeout = %u",
-					   &timeout) != 1)
+						   &timeout) != 1)
 					conf_err(lnnb, "Invalid setting.",
-						 cfile);
+							 cfile);
 				continue;
-			    }
+			}
 			/* debugmode setting */
 			if (!strncmp("debuglvl = 0x", buffer, 13))
-			    {
+			{
 				if (sscanf(buffer, "debuglvl = %x",
-					   &debuglevel) != 1)
+						   &debuglevel) != 1)
 					conf_err(lnnb, "Invalid setting.",
-						 cfile);
+							 cfile);
 				else if (!cfile)
 					sendto_log(ALOG_DCONF, LOG_DEBUG,
-						   "debuglevel = %X",
-						   debuglevel);
+							   "debuglevel = %X",
+							   debuglevel);
 				continue;
-			    }
+			}
 #if defined(USE_DSM)
 			if (!strncmp("shared ", buffer, 7))
-			    {
+			{
 				char lfname[80];
 				void *mod_handle;
 				aModule *(*load_func)();
 
-				ch = index(buffer+7, ' ');
+				ch = index(buffer + 7, ' ');
 				if (ch == NULL)
-				    {
+				{
 					conf_err(lnnb, "Syntax error.", cfile);
 					continue;
-				    }
+				}
 				*ch++ = '\0';
-# if defined(RTLD_NOW)
+#if defined(RTLD_NOW)
 				mod_handle = dlopen(ch, RTLD_NOW);
-# else
+#else
 				mod_handle = dlopen(ch, RTLD_LAZY);
-# endif
+#endif
 				if (mod_handle == NULL)
-				    {
+				{
 					conf_err(lnnb, dlerror(), cfile);
 					continue;
-				    }
-# if defined(DLSYM_NEEDS_UNDERSCORE)
-				sprintf(lfname, "_%s_load", buffer+7);
-# else
-				sprintf(lfname, "%s_load", buffer+7);
-# endif
-				load_func = (aModule *(*)())dlsym(mod_handle,
-								  lfname);
+				}
+#if defined(DLSYM_NEEDS_UNDERSCORE)
+				sprintf(lfname, "_%s_load", buffer + 7);
+#else
+				sprintf(lfname, "%s_load", buffer + 7);
+#endif
+				load_func = (aModule * (*) ()) dlsym(mod_handle,
+													 lfname);
 				if (load_func == NULL)
-				    {
-					conf_err(lnnb,"Invalid shared object.",
-						 cfile);
+				{
+					conf_err(lnnb, "Invalid shared object.",
+							 cfile);
 					dlclose(mod_handle);
 					continue;
-				    }
+				}
 				Mlist[Mcnt] = load_func();
 				if (Mlist[Mcnt])
-				    {
+				{
 					Mcnt += 1;
 					Mlist[Mcnt] = NULL;
-				    }
+				}
 				else
-				    {
+				{
 					conf_err(lnnb, "Failed.", cfile);
 					dlclose(mod_handle);
-				    }
+				}
 				continue;
-			    }
+			}
 #endif
 			if (!strncmp("exit", buffer, 4))
 			{
 				break;
 			}
 			if (buffer[0] == '\t')
-			    {
+			{
 				conf_err(lnnb, "Ignoring unexpected property.",
-					 cfile);
+						 cfile);
 				continue;
-			    }
+			}
 			/* at this point, it has to be the following */
 			if (strncasecmp("module ", buffer, 7))
-			    {
+			{
 				conf_err(lnnb,
-					 "Unexpected line: not a module.",
-					 cfile);
+						 "Unexpected line: not a module.",
+						 cfile);
 				continue;
-			    }
+			}
 			for (i = 0; Mlist[i] != NULL; i++)
-				if (!strcasecmp(buffer+7, Mlist[i]->name))
+				if (!strcasecmp(buffer + 7, Mlist[i]->name))
 					break;
 			if (Mlist[i] == NULL)
-			    {
+			{
 				conf_err(lnnb, "Unknown module name.", cfile);
 				continue;
-			    }
+			}
 			if (Mlist[i] == &Module_rfc931 && ident)
-			    {
-				conf_err(lnnb, 
-				 "This module can only be loaded once.",
-					 cfile);
+			{
+				conf_err(lnnb,
+						 "This module can only be loaded once.",
+						 cfile);
 				continue;
-			    }
+			}
 			*last = (AnInstance *) malloc(sizeof(AnInstance));
 			(*last)->nexti = NULL;
 			(*last)->in = icount++;
@@ -258,14 +258,14 @@ char	*conf_read(char *cfile)
 			(*last)->hostname = NULL;
 			(*last)->address = NULL;
 			(*last)->timeout = timeout;
-			(*last)->reason	= NULL;
+			(*last)->reason = NULL;
 			(*last)->delayed = o_del;
 			(*last)->port = 0;
 			if (Mlist[i] == &Module_rfc931)
 				ident = *last;
 
 			while (fgets(buffer, 160, cfh))
-			    {
+			{
 				aTarget **ttmp;
 				u_long baseip = 0, lmask = 0;
 				int inverse = 0;
@@ -277,11 +277,11 @@ char	*conf_read(char *cfile)
 				else
 				{
 					conf_err(lnnb,
-						 "line too long, ignoring.",
-						 cfile);
+							 "line too long, ignoring.",
+							 cfile);
 					/* now skip what's left */
 					while (fgets(buffer, 160, cfh))
-						if (index(buffer,'\n'))
+						if (index(buffer, '\n'))
 							break;
 					continue;
 				}
@@ -290,36 +290,36 @@ char	*conf_read(char *cfile)
 				if (buffer[0] == '\n')
 					break;
 				if (buffer[0] != '\t')
-				    {
+				{
 					conf_err(lnnb, "Invalid syntax.",
-						 cfile);
+							 cfile);
 					continue;
-				    }
+				}
 				*ch = '\0';
-				if (!strncasecmp(buffer+1, "option = ", 9))
-				    {
+				if (!strncasecmp(buffer + 1, "option = ", 9))
+				{
 					if ((*last)->opt)
 						conf_err(lnnb,
-					 "Duplicate option keyword: ignored.",
-							 cfile);
+								 "Duplicate option keyword: ignored.",
+								 cfile);
 					else
 						(*last)->opt =
-							mystrdup(buffer + 10);
+								mystrdup(buffer + 10);
 					continue;
-				    }
-				if (!strncasecmp(buffer+1, "reason = ", 9))
+				}
+				if (!strncasecmp(buffer + 1, "reason = ", 9))
 				{
 					if ((*last)->reason)
 						conf_err(lnnb,
-					"Duplicate reason keyword: ignored.",
-						cfile);
+								 "Duplicate reason keyword: ignored.",
+								 cfile);
 					else
 						(*last)->reason =
-							mystrdup(buffer + 10);
+								mystrdup(buffer + 10);
 					continue;
 				}
-				if (!strncasecmp(buffer+1, "host = ", 7))
-				    {
+				if (!strncasecmp(buffer + 1, "host = ", 7))
+				{
 					needh = 1;
 					ttmp = &((*last)->hostname);
 					ch = buffer + 8;
@@ -328,9 +328,9 @@ char	*conf_read(char *cfile)
 						inverse = 1;
 						ch++;
 					}
-				    }
-				else if (!strncasecmp(buffer+1, "ip = ", 5))
-				    {
+				}
+				else if (!strncasecmp(buffer + 1, "ip = ", 5))
+				{
 					ttmp = &((*last)->address);
 					ch = buffer + 6;
 					if (*ch == '!')
@@ -339,59 +339,59 @@ char	*conf_read(char *cfile)
 						ch++;
 					}
 					if (strchr(ch, '/'))
-					    {
+					{
 						int i1, i2, i3, i4, m;
-						
-						if (sscanf(ch,"%d.%d.%d.%d/%d",
-							   &i1, &i2, &i3, &i4,
-							   &m) != 5 ||
-						    m < 1 || m > 31)
-						    {
+
+						if (sscanf(ch, "%d.%d.%d.%d/%d",
+								   &i1, &i2, &i3, &i4,
+								   &m) != 5 ||
+							m < 1 || m > 31)
+						{
 							conf_err(lnnb,
-								 "Bad mask.",
-								 cfile);
+									 "Bad mask.",
+									 cfile);
 							continue;
-						    }
-						lmask = htonl((u_long)0xffffffffL << (32 - m));
+						}
+						lmask = htonl((u_long) 0xffffffffL << (32 - m));
 						baseip = htonl(i1 * 0x1000000 +
-							       i2 * 0x10000 +
-							       i3 * 0x100 +
-							       i4);
-					    }
+									   i2 * 0x10000 +
+									   i3 * 0x100 +
+									   i4);
+					}
 					else
-					    {
+					{
 						lmask = 0;
 						baseip = 0;
-					    }
-				    }
-				else if (!strncmp(buffer+1, "timeout = ", 10))
-				    {
+					}
+				}
+				else if (!strncmp(buffer + 1, "timeout = ", 10))
+				{
 					u_int local_timeout;
-					if (sscanf(buffer+1, "timeout = %u",
-						   &local_timeout) != 1)
+					if (sscanf(buffer + 1, "timeout = %u",
+							   &local_timeout) != 1)
 						conf_err(lnnb,
-							 "Invalid setting.",
-							 cfile);
+								 "Invalid setting.",
+								 cfile);
 					(*last)->timeout = local_timeout;
 					continue;
-				    }
-				else if (!strncmp(buffer+1, "port = ", 7))
-				    {
+				}
+				else if (!strncmp(buffer + 1, "port = ", 7))
+				{
 					u_int local_port;
-					if (sscanf(buffer+1, "port = %u",
-						   &local_port) != 1)
+					if (sscanf(buffer + 1, "port = %u",
+							   &local_port) != 1)
 						conf_err(lnnb,
-							 "Invalid setting.",
-							 cfile);
+								 "Invalid setting.",
+								 cfile);
 					(*last)->port = local_port;
 					continue;
-				    }
+				}
 				else
-				    {
+				{
 					conf_err(lnnb, "Invalid keyword.",
-						 cfile);
+							 cfile);
 					continue;
-				    }
+				}
 				if (Mlist[i] == &Module_rfc931)
 					continue;
 				while (*ttmp)
@@ -400,26 +400,26 @@ char	*conf_read(char *cfile)
 				(*ttmp)->yes = inverse ? -1 : 0;
 				(*ttmp)->value = mystrdup(ch);
 				if ((*ttmp)->baseip)
-				    {
+				{
 					(*ttmp)->lmask = lmask;
 					(*ttmp)->baseip = baseip;
-				    }
+				}
 				(*ttmp)->nextt = NULL;
-			    }
+			}
 			if ((*last)->port == 0 &&
 				(Mlist[i] == &Module_webproxy ||
-				Mlist[i] == &Module_socks))
+				 Mlist[i] == &Module_socks))
 			{
 				conf_err(lnnb, "port here is mandatory.", cfile);
 			}
 
 			last = &((*last)->nexti);
-		    }
+		}
 		fclose(cfh);
-	    }
+	}
 
 	if (ident == NULL)
-	    {
+	{
 		ident = *last = (AnInstance *) malloc(sizeof(AnInstance));
 		(*last)->nexti = NULL;
 		(*last)->opt = NULL;
@@ -432,19 +432,19 @@ char	*conf_read(char *cfile)
 		(*last)->address = NULL;
 		(*last)->delayed = o_del;
 		(*last)->port = 0;
-	    }
+	}
 	if (ident->timeout < DEFAULT_TIMEOUT)
 	{
 		if (cfile)
 		{
 			printf("Warning: rfc913 is less than %d.\n",
-				DEFAULT_TIMEOUT);
+				   DEFAULT_TIMEOUT);
 		}
 		else
 		{
-			sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
-				"Warning: rfc913 is less than %d.",
-				DEFAULT_TIMEOUT);
+			sendto_log(ALOG_IRCD | ALOG_DCONF, LOG_ERR,
+					   "Warning: rfc913 is less than %d.",
+					   DEFAULT_TIMEOUT);
 		}
 	}
 	if (ident->delayed)
@@ -455,30 +455,30 @@ char	*conf_read(char *cfile)
 		}
 		else
 		{
-			sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
-				"Warning: rfc913 should not be delayed.");
+			sendto_log(ALOG_IRCD | ALOG_DCONF, LOG_ERR,
+					   "Warning: rfc913 should not be delayed.");
 		}
 	}
 
 	itmp = instances;
 	while (itmp)
-	    {
+	{
 		if (!itmp->delayed)
-		totto += itmp->timeout;
+			totto += itmp->timeout;
 		itmp = itmp->nexti;
-	    }
+	}
 	if (totto > ACCEPTTIMEOUT)
-	    {
+	{
 		if (cfile)
 		{
 			printf("Warning: sum of timeouts exceeds "
-				"ACCEPTTIMEOUT!\n");
+				   "ACCEPTTIMEOUT!\n");
 		}
 		else
 		{
-			sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
-				"Warning: sum of timeouts exceeds "
-				"ACCEPTTIMEOUT!");
+			sendto_log(ALOG_IRCD | ALOG_DCONF, LOG_ERR,
+					   "Warning: sum of timeouts exceeds "
+					   "ACCEPTTIMEOUT!");
 		}
 		if (o_dto)
 		{
@@ -488,62 +488,62 @@ char	*conf_read(char *cfile)
 			}
 			else
 			{
-				sendto_log(ALOG_IRCD|ALOG_DCONF, LOG_ERR,
-					   "Error: \"notimeout\" is set!");
+				sendto_log(ALOG_IRCD | ALOG_DCONF, LOG_ERR,
+						   "Error: \"notimeout\" is set!");
 			}
 		}
-	    }
+	}
 
 	itmp = instances;
 	if (cfile)
-	    {
+	{
 		aTarget *ttmp;
 		char *err;
 
 		printf("\nModule(s) loaded:\n");
 		while (itmp)
-		    {
+		{
 			printf("\t%s\t%s\n", itmp->mod->name,
-			       (itmp->opt) ? itmp->opt : "");
+				   (itmp->opt) ? itmp->opt : "");
 			if ((ttmp = itmp->hostname))
-			    {
+			{
 				printf("\t\tHost = %s%s",
-				       (ttmp->yes == 0) ? "" : "!",
-				       ttmp->value);
+					   (ttmp->yes == 0) ? "" : "!",
+					   ttmp->value);
 				while ((ttmp = ttmp->nextt))
 					printf(",%s%s",
-					       (ttmp->yes == 0) ? "" : "!",
-					       ttmp->value);
+						   (ttmp->yes == 0) ? "" : "!",
+						   ttmp->value);
 				printf("\n");
-			    }
+			}
 			if ((ttmp = itmp->address))
-			    {
+			{
 				printf("\t\tIP   = %s%s",
-				       ((ttmp->yes == 0) ? "" : "!"),
-				       ttmp->value);
+					   ((ttmp->yes == 0) ? "" : "!"),
+					   ttmp->value);
 				while ((ttmp = ttmp->nextt))
 				{
 					printf(",%s%s",
-					       ((ttmp->yes == 0) ? "" : "!"),
-					       ttmp->value);
+						   ((ttmp->yes == 0) ? "" : "!"),
+						   ttmp->value);
 				}
 				printf("\n");
-			    }
+			}
 			if (itmp->timeout != DEFAULT_TIMEOUT)
 				printf("\t\ttimeout: %u seconds\n",
-				       itmp->timeout);
+					   itmp->timeout);
 			if (itmp->port != 0)
 				printf("\t\tport: %u\n",
-				       itmp->port);
+					   itmp->port);
 			if (itmp->mod->init)
-			    {
+			{
 				err = itmp->mod->init(itmp);
 				printf("\t\tInitialization: %s\n",
-				       (err) ? err : "Successful");
-			    }
+					   (err) ? err : "Successful");
+			}
 			itmp = itmp->nexti;
-		    }
-	    }
+		}
+	}
 	else
 	{
 		while (itmp)
@@ -569,7 +569,7 @@ char	*conf_read(char *cfile)
    Returns -1: no match, and never will
             0: got a match, doIt[tm]
 	    1: no match, but might be later so ask again */
-int	conf_match(u_int cl, AnInstance *inst)
+int conf_match(u_int cl, AnInstance *inst)
 {
 	aTarget *ttmp;
 
@@ -578,7 +578,7 @@ int	conf_match(u_int cl, AnInstance *inst)
 		return 0;
 	/* feature case, "host = *" to force to wait for DNS info */
 	if ((cldata[cl].state & A_NOH) && inst->hostname &&
-	    !strcmp(inst->hostname->value, "*"))
+		!strcmp(inst->hostname->value, "*"))
 		return 0;
 	/* check matches on IP addresses */
 	if ((ttmp = inst->address))
@@ -604,60 +604,59 @@ int	conf_match(u_int cl, AnInstance *inst)
 	}
 	/* check matches on hostnames */
 	if ((ttmp = inst->hostname))
-	    {
+	{
 		if (cldata[cl].state & A_GOTH)
-		    {
+		{
 			while (ttmp)
-			    {
+			{
 				if (match(ttmp->value, cldata[cl].host) == 0)
 					return ttmp->yes;
 				ttmp = ttmp->nextt;
-			    }
+			}
 			/* no match, will never match */
 			return -1;
-		    }
+		}
 		else if (cldata[cl].state & A_NOH)
 			return -1;
 		else
 			/* may be later, once we have DNS information */
 			return 1;
-	    }
+	}
 	/* fall through, no match, will never match */
 	return -1;
 }
 
 /* conf_ircd: send the configuration to the ircd daemon */
-void	conf_ircd(void)
+void conf_ircd(void)
 {
 	AnInstance *itmp = instances;
 	aTarget *ttmp;
 
 	sendto_ircd("a");
 	while (itmp)
-	    {
+	{
 		if (itmp->address == NULL && itmp->hostname == NULL)
 			sendto_ircd("A * %s %s", itmp->mod->name,
-				    (itmp->popt) ? itmp->popt : "");
+						(itmp->popt) ? itmp->popt : "");
 		else
-		    {
+		{
 			ttmp = itmp->address;
 			while (ttmp)
-			    {
+			{
 				sendto_ircd("A %s %s %s", ttmp->value,
-					    itmp->mod->name,
-					    (itmp->popt) ? itmp->popt : "");
+							itmp->mod->name,
+							(itmp->popt) ? itmp->popt : "");
 				ttmp = ttmp->nextt;
-			    }
+			}
 			ttmp = itmp->hostname;
 			while (ttmp)
-			    {
+			{
 				sendto_ircd("A %s %s %s", ttmp->value,
-					    itmp->mod->name,
-					    (itmp->popt) ? itmp->popt : "");
+							itmp->mod->name,
+							(itmp->popt) ? itmp->popt : "");
 				ttmp = ttmp->nextt;
-			    }
-		    }
+			}
+		}
 		itmp = itmp->nexti;
-	    }
+	}
 }
-

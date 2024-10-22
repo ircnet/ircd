@@ -21,48 +21,46 @@
 static const volatile char rcsid[] = "@(#)$Id: mod_socks.c,v 1.43 2004/10/03 17:13:42 chopin Exp $";
 #endif
 
-#include "os.h"
 #include "a_defines.h"
+#include "os.h"
 #define MOD_SOCKS_C
 #include "a_externs.h"
 #undef MOD_SOCKS_C
 
 /****************************** PRIVATE *************************************/
 
-static	int	socks_start(u_int cl);
+static int socks_start(u_int cl);
 
 #define CACHETIME 30
 #define SOCKSPORT (cldata[cl].instance->port)
 
-struct proxylog
-{
+struct proxylog {
 	struct proxylog *next;
-	char ip[HOSTLEN+1];
+	char ip[HOSTLEN + 1];
 	u_char state; /* 0 = no proxy, 1 = open proxy, 2 = closed proxy */
 	time_t expire;
 };
 
-#define OPT_LOG     	0x001
-#define OPT_DENY    	0x002
-#define OPT_PARANOID	0x004
-#define OPT_CAREFUL 	0x008
-#define OPT_V4ONLY  	0x010
-#define OPT_V5ONLY  	0x020
-#define OPT_PROTOCOL	0x040
-#define OPT_BOFH    	0x080
+#define OPT_LOG 0x001
+#define OPT_DENY 0x002
+#define OPT_PARANOID 0x004
+#define OPT_CAREFUL 0x008
+#define OPT_V4ONLY 0x010
+#define OPT_V5ONLY 0x020
+#define OPT_PROTOCOL 0x040
+#define OPT_BOFH 0x080
 
-#define PROXY_NONE		0
-#define PROXY_OPEN		1
-#define PROXY_CLOSE		2
-#define PROXY_UNEXPECTED	3
-#define PROXY_BADPROTO		4
+#define PROXY_NONE 0
+#define PROXY_OPEN 1
+#define PROXY_CLOSE 2
+#define PROXY_UNEXPECTED 3
+#define PROXY_BADPROTO 4
 
-#define ST_V4	0x01
-#define ST_V5	0x02
-#define ST_V5b	0x04
+#define ST_V4 0x01
+#define ST_V5 0x02
+#define ST_V5b 0x04
 
-struct socks_private
-{
+struct socks_private {
 	struct proxylog *cache;
 	u_int lifetime;
 	u_char options;
@@ -76,7 +74,7 @@ struct socks_private
  *
  *	Found an open proxy for cl: deal with it!
  */
-static	void	socks_open_proxy(int cl, char *strver)
+static void socks_open_proxy(int cl, char *strver)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
 	char *reason = cldata[cl].instance->reason;
@@ -90,13 +88,13 @@ static	void	socks_open_proxy(int cl, char *strver)
 	{
 		cldata[cl].state |= A_DENY;
 		sendto_ircd("k %d %s %u :%s", cl, cldata[cl].itsip,
-			cldata[cl].itsport, reason);
+					cldata[cl].itsport, reason);
 	}
 	if (mydata->options & OPT_LOG)
 	{
 		sendto_log(ALOG_FLOG, LOG_INFO,
-			"socks%s: open proxy: %s[%s]",
-			strver, cldata[cl].host, cldata[cl].itsip);
+				   "socks%s: open proxy: %s[%s]",
+				   strver, cldata[cl].host, cldata[cl].itsip);
 	}
 }
 
@@ -105,7 +103,7 @@ static	void	socks_open_proxy(int cl, char *strver)
  *
  *	Add an entry to the cache.
  */
-static	void	socks_add_cache(int cl, int state)
+static void socks_add_cache(int cl, int state)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
 	struct proxylog *next;
@@ -135,14 +133,14 @@ static	void	socks_add_cache(int cl, int state)
 	}
 
 	next = mydata->cache;
-	mydata->cache = (struct proxylog *)malloc(sizeof(struct proxylog));
+	mydata->cache = (struct proxylog *) malloc(sizeof(struct proxylog));
 	mydata->cache->expire = time(NULL) + mydata->lifetime;
 	strcpy(mydata->cache->ip, cldata[cl].itsip);
 	mydata->cache->state = state;
 	mydata->cache->next = next;
 	DebugLog((ALOG_DSOCKSC, 0,
-		"socks_add_cache(%d): new cache %s, open=%d",
-		cl, mydata->cache->ip, state));
+			  "socks_add_cache(%d): new cache %s, open=%d",
+			  cl, mydata->cache->ip, state));
 }
 
 /*
@@ -150,7 +148,7 @@ static	void	socks_add_cache(int cl, int state)
  *
  *	Check cache for an entry.
  */
-static	int	socks_check_cache(u_int cl)
+static int socks_check_cache(u_int cl)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
 	struct proxylog **last, *pl;
@@ -162,19 +160,19 @@ static	int	socks_check_cache(u_int cl)
 	}
 
 	DebugLog((ALOG_DSOCKSC, 0,
-		"socks_check_cache(%d): Checking cache for %s",
-		cl, cldata[cl].itsip));
+			  "socks_check_cache(%d): Checking cache for %s",
+			  cl, cldata[cl].itsip));
 
 	last = &(mydata->cache);
 	while ((pl = *last))
 	{
 		DebugLog((ALOG_DSOCKSC, 0, "socks_check_cache(%d): cache %s",
-			cl, pl->ip));
+				  cl, pl->ip));
 		if (pl->expire < now)
 		{
 			DebugLog((ALOG_DSOCKSC, 0,
-				"socks_check_cache(%d): free %s (%d < %d)",
-				cl, pl->ip, pl->expire, now));
+					  "socks_check_cache(%d): free %s (%d < %d)",
+					  cl, pl->ip, pl->expire, now));
 			*last = pl->next;
 			free(pl);
 			mydata->cnow -= 1;
@@ -183,8 +181,8 @@ static	int	socks_check_cache(u_int cl)
 		if (!strcasecmp(pl->ip, cldata[cl].itsip))
 		{
 			DebugLog((ALOG_DSOCKSC, 0,
-				"socks_check_cache(%d): match (%u)",
-				cl, pl->state));
+					  "socks_check_cache(%d): match (%u)",
+					  cl, pl->state));
 			pl->expire = now + mydata->lifetime; /* dubious */
 			if (pl->state == 1)
 			{
@@ -207,31 +205,32 @@ static	int	socks_check_cache(u_int cl)
 	return 0;
 }
 
-static	int	socks_write(u_int cl, char *strver)
+static int socks_write(u_int cl, char *strver)
 {
-	u_char query[128];	/* big enough to hold all queries */
-	int query_len;  	/* length of query */
-#ifndef	INET6
+	u_char query[128]; /* big enough to hold all queries */
+	int query_len;	   /* length of query */
+#ifndef INET6
 	u_int a, b, c, d;
 #else
-	struct in6_addr	addr;
+	struct in6_addr addr;
 	struct socks_private *mydata = cldata[cl].instance->data;
 #endif
 
-#ifndef	INET6
-	if (sscanf(cldata[cl].ourip, "%u.%u.%u.%u", &a,&b,&c,&d) != 4)
+#ifndef INET6
+	if (sscanf(cldata[cl].ourip, "%u.%u.%u.%u", &a, &b, &c, &d) != 4)
 #else
 	if (inetpton(AF_INET6, cldata[cl].ourip, (void *) addr.s6_addr) != 1)
 #endif
 	{
-		sendto_log(ALOG_DSOCKS|ALOG_IRCD, LOG_ERR,
-			"socks_write%s(%d): "
+		sendto_log(ALOG_DSOCKS | ALOG_IRCD, LOG_ERR,
+				   "socks_write%s(%d): "
 #ifndef INET6
-			"sscanf"
+				   "sscanf"
 #else
-			"inetpton"
+				   "inetpton"
 #endif
-			"(\"%s\") failed", strver, cl, cldata[cl].ourip);
+				   "(\"%s\") failed",
+				   strver, cl, cldata[cl].ourip);
 		close(cldata[cl].wfd);
 		cldata[cl].wfd = 0;
 		return -1;
@@ -246,8 +245,8 @@ static	int	socks_write(u_int cl, char *strver)
 		if (mydata->options & OPT_V4ONLY)
 		{
 			/* we cannot do work! */
-			sendto_log(ALOG_DSOCKS|ALOG_IRCD, LOG_WARNING,
-				"socks4 does not work on ipv6");
+			sendto_log(ALOG_DSOCKS | ALOG_IRCD, LOG_WARNING,
+					   "socks4 does not work on ipv6");
 			close(cldata[cl].wfd);
 			cldata[cl].wfd = 0;
 			return -1;
@@ -260,43 +259,54 @@ static	int	socks_write(u_int cl, char *strver)
 #endif
 	if (cldata[cl].mod_status == ST_V4)
 	{
-		query[0] = 4; query[1] = 1;
+		query[0] = 4;
+		query[1] = 1;
 		query[2] = ((cldata[cl].ourport & 0xff00) >> 8);
 		query[3] = (cldata[cl].ourport & 0x00ff);
-#ifndef	INET6
-		query[4] = a; query[5] = b; query[6] = c; query[7] = d;
+#ifndef INET6
+		query[4] = a;
+		query[5] = b;
+		query[6] = c;
+		query[7] = d;
 #else
 		/* socks v4 only supports IPv4,
 		 * so it must be a ipv4 mapped ipv6.
 		 * Just copy the ipv4 portion.
 		 */
-		memcpy(query + 4, ((char *)addr.s6_addr) + 12, 4);
+		memcpy(query + 4, ((char *) addr.s6_addr) + 12, 4);
 #endif
-		query[8] = 'u'; query[9] = 's';
-		query[10] = 'e'; query[11] = 'r';
+		query[8] = 'u';
+		query[9] = 's';
+		query[10] = 'e';
+		query[11] = 'r';
 		query[12] = 0;
 		query_len = 13;
 	}
-	else 
+	else
 	{
-		query[0] = 5; query[1] = 1; query[2] = 0;
+		query[0] = 5;
+		query[1] = 1;
+		query[2] = 0;
 		query_len = 3;
 		if (cldata[cl].mod_status == ST_V5b)
 		{
-#ifndef	INET6
+#ifndef INET6
 			query_len = 10;
 			query[3] = 1;
-			query[4] = a; query[5] = b; query[6] = c; query[7] = d;
-			query[8] = ((cldata[cl].ourport & 0xff00) >>8);
+			query[4] = a;
+			query[5] = b;
+			query[6] = c;
+			query[7] = d;
+			query[8] = ((cldata[cl].ourport & 0xff00) >> 8);
 			query[9] = (cldata[cl].ourport & 0x00ff);
 #else
 			if (IN6_IS_ADDR_V4MAPPED(&addr))
 			{
 				query_len = 10;
-				query[3] = 1;	/* ipv4 address */
+				query[3] = 1; /* ipv4 address */
 				memcpy(query + 4,
-					((char *)addr.s6_addr) + 12, 4);
-				query[8] = ((cldata[cl].ourport & 0xff00) >>8);
+					   ((char *) addr.s6_addr) + 12, 4);
+				query[8] = ((cldata[cl].ourport & 0xff00) >> 8);
 				query[9] = (cldata[cl].ourport & 0x00ff);
 			}
 			else
@@ -304,7 +314,7 @@ static	int	socks_write(u_int cl, char *strver)
 				query_len = 22;
 				query[3] = 4;
 				memcpy(query + 4, addr.s6_addr, 16);
-				query[20] = ((cldata[cl].ourport & 0xff00) >>8);
+				query[20] = ((cldata[cl].ourport & 0xff00) >> 8);
 				query[21] = (cldata[cl].ourport & 0x00ff);
 			}
 #endif
@@ -312,13 +322,13 @@ static	int	socks_write(u_int cl, char *strver)
 	}
 
 	DebugLog((ALOG_DSOCKS, 0, "socks%s_write(%d): Checking %s %u",
-		strver, cl, cldata[cl].ourip, SOCKSPORT));
+			  strver, cl, cldata[cl].ourip, SOCKSPORT));
 	if (write(cldata[cl].wfd, query, query_len) != query_len)
 	{
-	/* most likely the connection failed */
+		/* most likely the connection failed */
 		DebugLog((ALOG_DSOCKS, 0,
-			"socks%s_write(%d): write() failed: %s",
-			strver, cl, strerror(errno)));
+				  "socks%s_write(%d): write() failed: %s",
+				  strver, cl, strerror(errno)));
 		socks_add_cache(cl, PROXY_NONE);
 		close(cldata[cl].wfd);
 		cldata[cl].rfd = cldata[cl].wfd = 0;
@@ -329,7 +339,7 @@ static	int	socks_write(u_int cl, char *strver)
 	return 0;
 }
 
-static	int	socks_read(u_int cl, char *strver)
+static int socks_read(u_int cl, char *strver)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
 	u_char state = PROXY_CLOSE;
@@ -342,7 +352,7 @@ static	int	socks_read(u_int cl, char *strver)
 
 	/* got all we need */
 	DebugLog((ALOG_DSOCKS, 0, "socks%s_read(%d): Got [%d %d]", strver, cl,
-		cldata[cl].inbuffer[0], cldata[cl].inbuffer[1]));
+			  cldata[cl].inbuffer[0], cldata[cl].inbuffer[1]));
 
 	if (cldata[cl].mod_status == ST_V4)
 	{
@@ -355,7 +365,7 @@ static	int	socks_read(u_int cl, char *strver)
 #ifdef BROKEN_PROXIES
 			|| cldata[cl].inbuffer[0] == 4
 #endif
-			)
+		)
 		{
 			if (cldata[cl].inbuffer[1] < 90 ||
 				cldata[cl].inbuffer[1] > 93)
@@ -369,7 +379,7 @@ static	int	socks_read(u_int cl, char *strver)
 					state = PROXY_OPEN;
 				}
 				else if ((mydata->options & OPT_PARANOID) &&
-					cldata[cl].inbuffer[1] != 91)
+						 cldata[cl].inbuffer[1] != 91)
 				{
 					state = PROXY_OPEN;
 				}
@@ -392,9 +402,9 @@ static	int	socks_read(u_int cl, char *strver)
 			{
 				if (cldata[cl].mod_status == ST_V5)
 				{
-					if ((u_char)cldata[cl].inbuffer[1] == 4 ||
-						((u_char)cldata[cl].inbuffer[1] > 9 &&
-						(u_char)cldata[cl].inbuffer[1] != 255))
+					if ((u_char) cldata[cl].inbuffer[1] == 4 ||
+						((u_char) cldata[cl].inbuffer[1] > 9 &&
+						 (u_char) cldata[cl].inbuffer[1] != 255))
 					{
 						state = PROXY_UNEXPECTED;
 					}
@@ -405,8 +415,8 @@ static	int	socks_read(u_int cl, char *strver)
 					{
 						state = PROXY_UNEXPECTED;
 					}
-					else if ((mydata->options&OPT_PARANOID) &&
-						cldata[cl].inbuffer[1] != 2)
+					else if ((mydata->options & OPT_PARANOID) &&
+							 cldata[cl].inbuffer[1] != 2)
 					{
 						state = PROXY_OPEN;
 					}
@@ -447,7 +457,7 @@ static	int	socks_read(u_int cl, char *strver)
 			goto again;
 		}
 	}
-	else	/* ST_V5b */
+	else /* ST_V5b */
 	{
 		/* we just checked second phase of socks 5b.
 		   nothing left to do. */
@@ -456,12 +466,12 @@ static	int	socks_read(u_int cl, char *strver)
 	if (state == PROXY_UNEXPECTED)
 	{
 		sendto_log(ALOG_FLOG, LOG_WARNING,
-			"socks%s: unexpected reply: %u,%u %s[%s]", strver,
-			cldata[cl].inbuffer[0], cldata[cl].inbuffer[1],
-			cldata[cl].host, cldata[cl].itsip);
+				   "socks%s: unexpected reply: %u,%u %s[%s]", strver,
+				   cldata[cl].inbuffer[0], cldata[cl].inbuffer[1],
+				   cldata[cl].host, cldata[cl].itsip);
 		sendto_log(ALOG_IRCD, 0, "socks%s: unexpected reply: %u,%u",
-			strver, cldata[cl].inbuffer[0],
-			cldata[cl].inbuffer[1]);
+				   strver, cldata[cl].inbuffer[0],
+				   cldata[cl].inbuffer[1]);
 		/* oh well. unexpected response can mean anything.
 		   so if we're megaparanoid, we assume it's open proxy */
 		state = mydata->options & OPT_BOFH ? PROXY_OPEN : PROXY_CLOSE;
@@ -471,14 +481,14 @@ static	int	socks_read(u_int cl, char *strver)
 		if (mydata->options & OPT_PROTOCOL)
 		{
 			sendto_log(ALOG_FLOG, LOG_WARNING,
-				"socks%s: protocol error: %u,%u %s[%s]",
-				strver,
-				cldata[cl].inbuffer[0], cldata[cl].inbuffer[1],
-				cldata[cl].host, cldata[cl].itsip);
+					   "socks%s: protocol error: %u,%u %s[%s]",
+					   strver,
+					   cldata[cl].inbuffer[0], cldata[cl].inbuffer[1],
+					   cldata[cl].host, cldata[cl].itsip);
 			sendto_log(ALOG_IRCD, 0,
-				"socks%s: protocol error: %u,%u",
-				strver, cldata[cl].inbuffer[0],
-				cldata[cl].inbuffer[1]);
+					   "socks%s: protocol error: %u,%u",
+					   strver, cldata[cl].inbuffer[0],
+					   cldata[cl].inbuffer[1]);
 		}
 		/* oh well. protocol error can mean anything.
 		   so if we're megaparanoid, we assume it's open proxy */
@@ -516,7 +526,7 @@ again:
  *	Returns NULL if everything went fine,
  *	an error message otherwise.
  */
-static	char	*socks_init(AnInstance *self)
+static char *socks_init(AnInstance *self)
 {
 	struct socks_private *mydata;
 	char tmpbuf[80], cbuf[32];
@@ -556,7 +566,7 @@ static	char	*socks_init(AnInstance *self)
 	}
 	if (strstr(self->opt, "megaparanoid"))
 	{
-		mydata->options |= OPT_PARANOID|OPT_BOFH;
+		mydata->options |= OPT_PARANOID | OPT_BOFH;
 		strcat(tmpbuf, ",megaparanoid");
 		strcat(txtbuf, ", Megaparanoid");
 	}
@@ -607,7 +617,7 @@ static	char	*socks_init(AnInstance *self)
 
 		if (ch)
 		{
-			mydata->lifetime = atoi(ch+1);
+			mydata->lifetime = atoi(ch + 1);
 		}
 	}
 	sprintf(cbuf, ",cache=%d", mydata->lifetime);
@@ -618,7 +628,7 @@ static	char	*socks_init(AnInstance *self)
 
 	self->popt = mystrdup(tmpbuf);
 	self->data = mydata;
-	return txtbuf+2;
+	return txtbuf + 2;
 }
 
 /*
@@ -626,7 +636,7 @@ static	char	*socks_init(AnInstance *self)
  *
  *	This procedure is called when a particular module is unloaded.
  */
-static	void	socks_release(AnInstance *self)
+static void socks_release(AnInstance *self)
 {
 	struct sock_private *mydata = self->data;
 
@@ -639,17 +649,17 @@ static	void	socks_release(AnInstance *self)
  *
  *	This procedure is called regularly to update statistics sent to ircd.
  */
-static	void	socks_stats(AnInstance *self)
+static void socks_stats(AnInstance *self)
 {
 	struct socks_private *mydata = self->data;
 
 	sendto_ircd("S socks:%u open %u closed %u noproxy %u",
-		self->port,
-		mydata->open, mydata->closed, mydata->noproxy);
+				self->port,
+				mydata->open, mydata->closed, mydata->noproxy);
 	sendto_ircd("S socks:%u cache open %u closed %u noproxy %u miss %u (%u <= %u)",
-		self->port,
-		mydata->chito, mydata->chitc, mydata->chitn,
-		mydata->cmiss, mydata->cnow, mydata->cmax);
+				self->port,
+				mydata->chito, mydata->chitc, mydata->chitn,
+				mydata->cmiss, mydata->cnow, mydata->cmax);
 }
 
 /*
@@ -663,7 +673,7 @@ static	void	socks_stats(AnInstance *self)
  *	In case of failure, it's responsible for cleaning up (e.g. socks_clean
  *	will NOT be called)
  */
-static	int	socks_start(u_int cl)
+static int socks_start(u_int cl)
 {
 	char *error;
 	int fd;
@@ -672,7 +682,7 @@ static	int	socks_start(u_int cl)
 	{
 		/* no point of doing anything */
 		DebugLog((ALOG_DSOCKS, 0,
-			"socks_start(%d): A_DENY already set ", cl));
+				  "socks_start(%d): A_DENY already set ", cl));
 		return -1;
 	}
 
@@ -682,14 +692,14 @@ static	int	socks_start(u_int cl)
 	}
 
 	DebugLog((ALOG_DSOCKS, 0,
-		"socks_start(%d): Connecting to %s", cl,
-		cldata[cl].itsip));
-	fd= tcp_connect(cldata[cl].ourip, cldata[cl].itsip, SOCKSPORT, &error);
+			  "socks_start(%d): Connecting to %s", cl,
+			  cldata[cl].itsip));
+	fd = tcp_connect(cldata[cl].ourip, cldata[cl].itsip, SOCKSPORT, &error);
 	if (fd < 0)
 	{
 		DebugLog((ALOG_DSOCKS, 0,
-			"socks_start(%d): tcp_connect() reported %s",
-			cl, error));
+				  "socks_start(%d): tcp_connect() reported %s",
+				  cl, error));
 		socks_add_cache(cl, PROXY_NONE);
 		return -1;
 	}
@@ -709,7 +719,7 @@ static	int	socks_start(u_int cl)
  *
  *	It is responsible for sending error messages where appropriate.
  */
-static	int	socks_work(u_int cl)
+static int socks_work(u_int cl)
 {
 	char *strver = "4";
 	struct socks_private *mydata = cldata[cl].instance->data;
@@ -736,8 +746,8 @@ static	int	socks_work(u_int cl)
 	}
 
 	DebugLog((ALOG_DSOCKS, 0,
-		"socks%s_work(%d): %d %d buflen=%d", strver,
-		cl, cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
+			  "socks%s_work(%d): %d %d buflen=%d", strver,
+			  cl, cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
 
 	if (cldata[cl].wfd > 0)
 	{
@@ -760,7 +770,7 @@ static	int	socks_work(u_int cl)
  *	It is responsible for cleaning up any allocated data, and in particular
  *	closing file descriptors.
  */
-static	void	socks_clean(u_int cl)
+static void socks_clean(u_int cl)
 {
 	DebugLog((ALOG_DSOCKS, 0, "socks_clean(%d): cleaning up", cl));
 	/*
@@ -786,15 +796,14 @@ static	void	socks_clean(u_int cl)
  *
  *	Returns 0 if things are okay, -1 if check was aborted.
  */
-static	int	socks_timeout(u_int cl)
+static int socks_timeout(u_int cl)
 {
 	DebugLog((ALOG_DSOCKS, 0,
-		"socks_timeout(%d): calling socks_clean ", cl));
+			  "socks_timeout(%d): calling socks_clean ", cl));
 	socks_clean(cl);
 	return -1;
 }
 
 aModule Module_socks =
-	{ "socks", socks_init, socks_release, socks_stats,
-	  socks_start, socks_work, socks_timeout, socks_clean };
-
+		{"socks", socks_init, socks_release, socks_stats,
+		 socks_start, socks_work, socks_timeout, socks_clean};

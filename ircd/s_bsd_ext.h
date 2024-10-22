@@ -37,56 +37,56 @@ extern time_t timeofday;
 #else /* S_BSD_C */
 #define EXTERN
 #endif /* S_BSD_C */
-EXTERN void add_local_domain (char *hname, size_t size);
-EXTERN void report_error (char *text, aClient *cptr);
-EXTERN int inetport (aClient *cptr, char *ip, char *ipmask, int port,
-		int dolisten);
-EXTERN int add_listener (aConfItem *aconf);
+EXTERN void add_local_domain(char *hname, size_t size);
+EXTERN void report_error(char *text, aClient *cptr);
+EXTERN int inetport(aClient *cptr, char *ip, char *ipmask, int port,
+					int dolisten);
+EXTERN int add_listener(aConfItem *aconf);
 EXTERN void close_listeners(void);
 EXTERN void open_listener(aClient *cptr);
 EXTERN void reopen_listeners(void);
 EXTERN void activate_delayed_listeners(void);
-EXTERN void start_iauth (int);
+EXTERN void start_iauth(int);
 EXTERN void init_sys(void);
 EXTERN void daemonize(void);
 EXTERN void write_pidfile(void);
-EXTERN int check_client (Reg aClient *cptr);
-EXTERN int check_server_init (aClient *cptr);
-EXTERN int check_server (aClient *cptr, Reg struct hostent *hp,
-			     Reg aConfItem *c_conf, Reg aConfItem *n_conf);
-EXTERN void close_connection (aClient *cptr);
+EXTERN int check_client(Reg aClient *cptr);
+EXTERN int check_server_init(aClient *cptr);
+EXTERN int check_server(aClient *cptr, Reg struct hostent *hp,
+						Reg aConfItem *c_conf, Reg aConfItem *n_conf);
+EXTERN void close_connection(aClient *cptr);
 EXTERN void close_client_fd(aClient *cptr);
-EXTERN int get_sockerr (aClient *cptr);
-EXTERN void set_non_blocking (int fd, aClient *cptr);
-EXTERN aClient *add_connection (aClient *cptr, int fd);
-EXTERN int read_message (time_t delay, FdAry *fdp, int ro);
-EXTERN int connect_server (aConfItem *aconf, aClient *by,
-			       struct hostent *hp);
-EXTERN void get_my_name (aClient *cptr, char *name, int len);
-EXTERN int setup_ping (aConfItem *aconf);
-EXTERN void send_ping (aConfItem *aconf);
+EXTERN int get_sockerr(aClient *cptr);
+EXTERN void set_non_blocking(int fd, aClient *cptr);
+EXTERN aClient *add_connection(aClient *cptr, int fd);
+EXTERN int read_message(time_t delay, FdAry *fdp, int ro);
+EXTERN int connect_server(aConfItem *aconf, aClient *by,
+						  struct hostent *hp);
+EXTERN void get_my_name(aClient *cptr, char *name, int len);
+EXTERN int setup_ping(aConfItem *aconf);
+EXTERN void send_ping(aConfItem *aconf);
 #if defined(ENABLE_SUMMON) || defined(ENABLE_USERS)
 EXTERN int utmp_open(void);
-EXTERN int utmp_read (int fd, char *name, char *line, char *host,
-			  int hlen);
+EXTERN int utmp_read(int fd, char *name, char *line, char *host,
+					 int hlen);
 EXTERN int utmp_close(int fd);
-#ifdef  ENABLE_SUMMON
-EXTERN void summon (aClient *who, char *namebuf, char *linebuf,
-			char *chname);
+#ifdef ENABLE_SUMMON
+EXTERN void summon(aClient *who, char *namebuf, char *linebuf,
+				   char *chname);
 #endif /* ENABLE_SUMMON */
 #endif /* ENABLE_SUMMON || ENABLE_USERS */
-#ifdef	UNIXPORT
-EXTERN int unixport (aClient *cptr, char *path, int port);
+#ifdef UNIXPORT
+EXTERN int unixport(aClient *cptr, char *path, int port);
 #endif
 #ifdef DELAY_CLOSE
-EXTERN time_t delay_close (int);
+EXTERN time_t delay_close(int);
 #endif
 #undef EXTERN
 
 #ifdef DELAY_CLOSE
 #ifndef SHUT_RD
-# error SHUT_RD not defined! Report buggy OS to ircd-bugs@irc.org
+#error SHUT_RD not defined! Report buggy OS to ircd-bugs@irc.org
 /* Check shutdown(3) manpage for proper definition. */
-# define SHUT_RD 0
+#define SHUT_RD 0
 #endif
 #endif

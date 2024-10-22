@@ -17,7 +17,7 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#define	DBUF_TAIL
+#define DBUF_TAIL
 
 /*
 ** dbuf is a collection of functions which can be used to
@@ -35,27 +35,25 @@
 ** interface.
 */
 #if !defined(_SEQUENT_)
-typedef struct dbuf
-    {
-	u_int	length;	/* Current number of bytes stored */
-	u_int	offset;	/* Offset to the first byte */
-	struct	dbufbuf *head;	/* First data buffer, if length > 0 */
+typedef struct dbuf {
+	u_int length;		  /* Current number of bytes stored */
+	u_int offset;		  /* Offset to the first byte */
+	struct dbufbuf *head; /* First data buffer, if length > 0 */
 #ifdef DBUF_TAIL
 	/* added by mnystrom@mit.edu: */
-	struct  dbufbuf *tail; /* last data buffer, if length > 0 */
+	struct dbufbuf *tail; /* last data buffer, if length > 0 */
 #endif
-    } dbuf;
+} dbuf;
 #else
-typedef struct dbuf
-    {
-        uint   length; /* Current number of bytes stored */
-        uint   offset; /* Offset to the first byte */
-        struct  dbufbuf *head;  /* First data buffer, if length > 0 */
+typedef struct dbuf {
+	uint length;		  /* Current number of bytes stored */
+	uint offset;		  /* Offset to the first byte */
+	struct dbufbuf *head; /* First data buffer, if length > 0 */
 #ifdef DBUF_TAIL
 	/* added by mnystrom@mit.edu: */
-	struct  dbufbuf *tail; /* last data buffer, if length > 0 */
+	struct dbufbuf *tail; /* last data buffer, if length > 0 */
 #endif
-    } dbuf;
+} dbuf;
 #endif
 /*
 ** And this 'dbufbuf' should never be referenced outside the
@@ -66,11 +64,10 @@ typedef struct dbuf
 ** as long as a pointer is 4 bytes, we get 2032 bytes for buffer
 ** data after we take away a bit for malloc to play with. -avalon
 */
-typedef struct dbufbuf
-    {
-	struct	dbufbuf	*next;	/* Next data buffer, NULL if this is last */
-	char	data[2032];	/* Actual data stored here */
-    } dbufbuf;
+typedef struct dbufbuf {
+	struct dbufbuf *next; /* Next data buffer, NULL if this is last */
+	char data[2032];	  /* Actual data stored here */
+} dbufbuf;
 
 /*
 ** DBufLength
@@ -85,7 +82,7 @@ typedef struct dbufbuf
 **	Scratch the current content of the buffer. Release all
 **	allocated buffers and make it empty.
 */
-#define DBufClear(dyn)	dbuf_delete((dyn),DBufLength(dyn))
+#define DBufClear(dyn) dbuf_delete((dyn), DBufLength(dyn))
 
 /* This is a dangerous define because a broken compiler will set DBUFSIZ
 ** to 4, which will work but will be very inefficient. However, there
@@ -93,4 +90,4 @@ typedef struct dbufbuf
 ** up, so... -- Wumpus
 */
 
-#define DBUFSIZ sizeof(((dbufbuf *)0)->data)
+#define DBUFSIZ sizeof(((dbufbuf *) 0)->data)

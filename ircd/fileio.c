@@ -31,9 +31,9 @@ file_open(const char *filename, int mode, int fmode)
 {
 	int fd;
 	fd = open(filename, mode, fmode);
-	if(fd == MAXCONNECTIONS)
+	if (fd == MAXCONNECTIONS)
 	{
-		close(fd);	/* Too many FDs! */
+		close(fd); /* Too many FDs! */
 		errno = ENFILE;
 		fd = -1;
 	}
@@ -51,7 +51,7 @@ fbopen(const char *filename, const char *mode)
 	s_assert(filename);
 	s_assert(mode);
 
-	if(filename == NULL || mode == NULL)
+	if (filename == NULL || mode == NULL)
 	{
 		errno = EINVAL;
 		return NULL;
@@ -60,33 +60,33 @@ fbopen(const char *filename, const char *mode)
 	{
 		switch (*mode)
 		{
-		case 'r':
-			openmode = O_RDONLY;
-			break;
-		case 'w':
-			openmode = O_WRONLY | O_CREAT | O_TRUNC;
-			pmode = 0644;
-			break;
-		case 'a':
-			openmode = O_WRONLY | O_CREAT | O_APPEND;
-			pmode = 0644;
-			break;
-		case '+':
-			openmode &= ~(O_RDONLY | O_WRONLY);
-			openmode |= O_RDWR;
-			break;
-		default:
-			break;
+			case 'r':
+				openmode = O_RDONLY;
+				break;
+			case 'w':
+				openmode = O_WRONLY | O_CREAT | O_TRUNC;
+				pmode = 0644;
+				break;
+			case 'a':
+				openmode = O_WRONLY | O_CREAT | O_APPEND;
+				pmode = 0644;
+				break;
+			case '+':
+				openmode &= ~(O_RDONLY | O_WRONLY);
+				openmode |= O_RDWR;
+				break;
+			default:
+				break;
 		}
 		++mode;
 	}
 
-	if((fd = file_open(filename, openmode, pmode)) == -1)
+	if ((fd = file_open(filename, openmode, pmode)) == -1)
 	{
 		return fb;
 	}
 
-	if(NULL == (fb = fdbopen(fd, NULL)))
+	if (NULL == (fb = fdbopen(fd, NULL)))
 		close(fd);
 	return fb;
 }
@@ -99,7 +99,7 @@ fdbopen(int fd, const char *mode)
 	 * correct mode, the first use will fail
 	 */
 	FBFILE *fb = (FBFILE *) MyMalloc(sizeof(FBFILE));
-	if(NULL != fb)
+	if (NULL != fb)
 	{
 		fb->ptr = fb->endp = fb->buf;
 		fb->fd = fd;
@@ -109,80 +109,76 @@ fdbopen(int fd, const char *mode)
 	return fb;
 }
 
-void
-fbclose(FBFILE * fb)
+void fbclose(FBFILE *fb)
 {
 	s_assert(fb);
-	if(fb != NULL)
+	if (fb != NULL)
 	{
 		close(fb->fd);
 		MyFree(fb);
 	}
 	else
 		errno = EINVAL;
-
 }
 
 static int
-fbfill(FBFILE * fb)
+fbfill(FBFILE *fb)
 {
 	int n;
 	s_assert(fb);
-	if(fb == NULL)
+	if (fb == NULL)
 	{
 		errno = EINVAL;
 		return -1;
 	}
-	if(fb->flags)
+	if (fb->flags)
 		return -1;
 	n = read(fb->fd, fb->buf, BUFSIZ);
-	if(0 < n)
+	if (0 < n)
 	{
 		fb->ptr = fb->buf;
 		fb->endp = fb->buf + n;
 	}
-	else if(n < 0)
+	else if (n < 0)
 		fb->flags |= FB_FAIL;
 	else
 		fb->flags |= FB_EOF;
 	return n;
 }
 
-int
-fbgetc(FBFILE * fb)
+int fbgetc(FBFILE *fb)
 {
 	s_assert(fb);
-	if(fb == NULL)
+	if (fb == NULL)
 	{
 		errno = EINVAL;
 		return -1;
 	}
-	if(fb->pbptr)
+	if (fb->pbptr)
 	{
-		if((fb->pbptr == (fb->pbuf + BUFSIZ)) || (!*fb->pbptr))
+		if ((fb->pbptr == (fb->pbuf + BUFSIZ)) || (!*fb->pbptr))
 			fb->pbptr = NULL;
 	}
 
-	if(fb->ptr < fb->endp || fbfill(fb) > 0)
+	if (fb->ptr < fb->endp || fbfill(fb) > 0)
 		return *fb->ptr++;
 	return EOF;
 }
 
-void
-fbungetc(char c, FBFILE * fb)
+void fbungetc(char c, FBFILE *fb)
 {
 	s_assert(fb);
-	if(fb == NULL)
+	if (fb == NULL)
 	{
 		errno = EINVAL;
 		return;
 	}
-	if(!fb->pbptr)
+	if (!fb->pbptr)
 	{
 		fb->pbptr = fb->pbuf + BUFSIZ;
 	}
 
-	if(fb->pbptr != fb->pbuf)
+	if (fb->pbptr != fb->pbuf)
 	{
 		fb->pbptr--;
 		*fb->pbptr = c;
@@ -190,32 +186,32 @@ fbungetc(char c, FBFILE * fb)
 }
 
 char *
-fbgets(char *buf, size_t len, FBFILE * fb)
+fbgets(char *buf, size_t len, FBFILE *fb)
 {
 	char *p = buf;
 	s_assert(buf);
 	s_assert(fb);
 	s_assert(0 < len);
 
-	if(fb == NULL || buf == NULL)
+	if (fb == NULL || buf == NULL)
 	{
 		errno = EINVAL;
 		return NULL;
 	}
-	if(fb->pbptr)
+	if (fb->pbptr)
 	{
 		strlcpy(buf, fb->pbptr, len);
 		fb->pbptr = NULL;
 		return (buf);
 	}
 
-	if(fb->ptr == fb->endp && fbfill(fb) < 1)
+	if (fb->ptr == fb->endp && fbfill(fb) < 1)
 		return 0;
 	--len;
 	while (len--)
 	{
 		*p = *fb->ptr++;
-		if('\n' == *p)
+		if ('\n' == *p)
 		{
 			++p;
 			break;
@@ -223,51 +219,49 @@ fbgets(char *buf, size_t len, FBFILE * fb)
 		/*
 		 * deal with CR's
 		 */
-		else if('\r' == *p)
+		else if ('\r' == *p)
 		{
-			if(fb->ptr < fb->endp || fbfill(fb) > 0)
+			if (fb->ptr < fb->endp || fbfill(fb) > 0)
 			{
-				if('\n' == *fb->ptr)
+				if ('\n' == *fb->ptr)
 					++fb->ptr;
 			}
 			*p++ = '\n';
 			break;
 		}
 		++p;
-		if(fb->ptr == fb->endp && fbfill(fb) < 1)
+		if (fb->ptr == fb->endp && fbfill(fb) < 1)
 			break;
 	}
 	*p = '\0';
 	return buf;
 }
 
-int
-fbputs(const char *str, FBFILE * fb)
+int fbputs(const char *str, FBFILE *fb)
 {
 	int n = -1;
 	s_assert(str);
 	s_assert(fb);
 
-	if(str == NULL || fb == NULL)
+	if (str == NULL || fb == NULL)
 	{
 		errno = EINVAL;
 		return -1;
 	}
-	if(0 == fb->flags)
+	if (0 == fb->flags)
 	{
 		n = write(fb->fd, str, strlen(str));
-		if(-1 == n)
+		if (-1 == n)
 			fb->flags |= FB_FAIL;
 	}
 	return n;
 }
 
-int
-fbstat(struct stat *sb, FBFILE * fb)
+int fbstat(struct stat *sb, FBFILE *fb)
 {
 	s_assert(sb);
 	s_assert(fb);
-	if(sb == NULL || fb == NULL)
+	if (sb == NULL || fb == NULL)
 	{
 		errno = EINVAL;
 		return -1;

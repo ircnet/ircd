@@ -31,18 +31,18 @@ static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.299 2011/01/20 14:26
 #include "s_externs.h"
 #undef S_SERV_C
 
-static	char	buf[BUFSIZE];
+static char buf[BUFSIZE];
 
-static	int	check_link (aClient *);
-static	int	get_version (char *, char *);
-static	void	trace_one (aClient *, aClient *);
-static	void	report_listeners(aClient *, char *);
-static	void	count_servers_users(aClient *, int *, int *);
-const	char	*check_servername_errors[3][2] = {
-	{ "too long", "Bogus servername - too long" },
-	{ "invalid", "Bogus servername - invalid chars in hostname" },
-	{ "bogus", "Bogus servername - no dot"}};
-static	int	send_users(aClient *, aClient *, int, char **);
+static int check_link(aClient *);
+static int get_version(char *, char *);
+static void trace_one(aClient *, aClient *);
+static void report_listeners(aClient *, char *);
+static void count_servers_users(aClient *, int *, int *);
+const char *check_servername_errors[3][2] = {
+		{"too long", "Bogus servername - too long"},
+		{"invalid", "Bogus servername - invalid chars in hostname"},
+		{"bogus", "Bogus servername - no dot"}};
+static int send_users(aClient *, aClient *, int, char **);
 
 /*
 ** m_functions execute protocol messages on this server:
@@ -106,11 +106,11 @@ static	int	send_users(aClient *, aClient *, int, char **);
 **	parv[0] = sender prefix
 **	parv[1] = remote server
 */
-int	m_version(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_version(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	if (hunt_server(cptr,sptr,":%s VERSION :%s",1,parc,parv)==HUNTED_ISME)
+	if (hunt_server(cptr, sptr, ":%s VERSION :%s", 1, parc, parv) == HUNTED_ISME)
 		sendto_one(sptr, replies[RPL_VERSION], ME, BadTo(parv[0]),
-			   version, debugmode, ME, me.serv->sid, serveropts);
+				   version, debugmode, ME, me.serv->sid, serveropts);
 	return 2;
 }
 
@@ -120,14 +120,14 @@ int	m_version(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[1] = server name
 **	parv[2] = comment
 */
-int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Reg	aConfItem *aconf;
-	char	*server;
-	Reg	aClient	*acptr = NULL;
-	int	rsquit = 0;
-	char	*comment;
-	static char	comment2[TOPICLEN+1];
+	Reg aConfItem *aconf;
+	char *server;
+	Reg aClient *acptr = NULL;
+	int rsquit = 0;
+	char *comment;
+	static char comment2[TOPICLEN + 1];
 
 	if (!is_allowed(sptr, ACL_SQUIT))
 		return m_nopriv(cptr, sptr, parc, parv);
@@ -139,9 +139,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	** name is expanded if the incoming mask is the same as
 	** the server name for that link to the name of link.
 	*/
-	if ((*server == '*') && IsServer(cptr)
-		&& (aconf = cptr->serv->nline) != NULL
-		&& !mycmp(server, my_name_for_link(ME, aconf->port)))
+	if ((*server == '*') && IsServer(cptr) && (aconf = cptr->serv->nline) != NULL && !mycmp(server, my_name_for_link(ME, aconf->port)))
 	{
 		server = cptr->name;
 	}
@@ -158,8 +156,8 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (!acptr)
 	{
 		for (acptr = client;
-			(acptr = next_client(acptr, server));
-			acptr = acptr->next)
+			 (acptr = next_client(acptr, server));
+			 acptr = acptr->next)
 		{
 			if (IsServer(acptr) || IsMe(acptr))
 			{
@@ -182,8 +180,8 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		else
 		{
 			sendto_one(cptr, ":%s NOTICE %s :You can QUIT, "
-				"but you cannot SQUIT me.",
-				ME, cptr->name);
+							 "but you cannot SQUIT me.",
+					   ME, cptr->name);
 			return 1;
 		}
 	}
@@ -217,17 +215,17 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	** clients to do this...   --msa
 	*/
 	if (!acptr)
-	    {
+	{
 		sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), server);
 		return 1;
-	    }
+	}
 	if (!MyConnect(acptr) && !is_allowed(sptr, ACL_SQUITREMOTE))
-	    {
+	{
 		return m_nopriv(cptr, sptr, parc, parv);
-	    }
+	}
 	if (MyPerson(sptr))
 	{
-		int	k=TOPICLEN-strlen(sptr->name)-7;
+		int k = TOPICLEN - strlen(sptr->name) - 7;
 
 		/* Shorten original comment, should it be too long. */
 		if (strlen(comment) > k)
@@ -244,43 +242,42 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		/* just propagate upstream */
 		sendto_one(acptr->from, ":%s SQUIT %s :%s",
-			    IsServer(sptr) ?
-			    sptr->serv->sid : sptr->name,
-			    acptr->serv->sid, comment);
+				   IsServer(sptr) ? sptr->serv->sid : sptr->name,
+				   acptr->serv->sid, comment);
 		sendto_flag(SCH_SERVER,
-			    "Forwarding SQUIT %s (%s) from %s (%s)",
-			    acptr->name, acptr->serv->sid, parv[0],
-			    comment);
+					"Forwarding SQUIT %s (%s) from %s (%s)",
+					acptr->name, acptr->serv->sid, parv[0],
+					comment);
 		sendto_flag(SCH_DEBUG,
-			    "Forwarding SQUIT %s to %s from %s (%s)",
-			    acptr->name, acptr->from->name,
-			    parv[0], comment);
+					"Forwarding SQUIT %s to %s from %s (%s)",
+					acptr->name, acptr->from->name,
+					parv[0], comment);
 		return 1;
 	}
 	/*
 	**  Notify all opers, if my local link is remotely squitted
 	*/
 	if (MyConnect(acptr) && !IsAnOper(cptr) && !rsquit)
-	    {
+	{
 		sendto_ops_butone(NULL, ME,
-			"Received SQUIT %s from %s (%s)",
-			acptr->name, parv[0], comment);
+						  "Received SQUIT %s from %s (%s)",
+						  acptr->name, parv[0], comment);
 #if defined(USE_SYSLOG) && defined(SYSLOG_SQUIT)
-		syslog(LOG_DEBUG,"SQUIT From %s : %s (%s)",
-		       parv[0], acptr->name, comment);
+		syslog(LOG_DEBUG, "SQUIT From %s : %s (%s)",
+			   parv[0], acptr->name, comment);
 #endif
-	    }
+	}
 	if (MyConnect(acptr))
-	    {
+	{
 		int timeconnected = timeofday - acptr->firsttime;
-		sendto_flag(SCH_NOTICE, 
-			    "Closing link to %s (%d, %2d:%02d:%02d)",
-			    get_client_name(acptr, FALSE),
-			    timeconnected / 86400,
-			    (timeconnected % 86400) / 3600,
-			    (timeconnected % 3600)/60, 
-			    timeconnected % 60);
-	    }
+		sendto_flag(SCH_NOTICE,
+					"Closing link to %s (%d, %2d:%02d:%02d)",
+					get_client_name(acptr, FALSE),
+					timeconnected / 86400,
+					(timeconnected % 86400) / 3600,
+					(timeconnected % 3600) / 60,
+					timeconnected % 60);
+	}
 	return exit_client(cptr, acptr, sptr, comment);
 }
 
@@ -289,7 +286,7 @@ int	m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 ** Tries to guess what version or, rather, what
 ** capabilities remote server has.
 */
-static int	get_version(char *version, char *id)
+static int get_version(char *version, char *id)
 {
 	int result = 0;
 
@@ -297,7 +294,7 @@ static int	get_version(char *version, char *id)
 	{
 		int vers;
 
-		vers = atoi(version+4);
+		vers = atoi(version + 4);
 		if (vers >= 991200)
 		{
 			/* good beta of 2.11 */
@@ -333,11 +330,11 @@ static int	get_version(char *version, char *id)
 **	in m_pass() and processed here before the fields are natively used.
 ** Return: < 1: exit/error, > 0: no error
 */
-int	check_version(aClient *cptr)
+int check_version(aClient *cptr)
 {
 	char *id, *misc = NULL, *link = NULL;
 
-	Debug((DEBUG_INFO,"check_version: %s", cptr->info));
+	Debug((DEBUG_INFO, "check_version: %s", cptr->info));
 
 	if (cptr->info == DefInfo)
 	{
@@ -373,7 +370,7 @@ int	check_version(aClient *cptr)
 	if (find_two_masks(cptr->name, buf, CONF_VER))
 	{
 		sendto_flag(SCH_ERROR, "Bad version %s %s from %s", id,
-			    cptr->info, get_client_name(cptr, TRUE));
+					cptr->info, get_client_name(cptr, TRUE));
 		return exit_client(cptr, cptr, &me, "Bad version");
 	}
 
@@ -384,21 +381,21 @@ int	check_version(aClient *cptr)
 		if (find_conf_flags(cptr->name, buf, CONF_VER))
 		{
 			sendto_flag(SCH_ERROR, "Bad flags %s (%s) from %s",
-				    misc, id, get_client_name(cptr, TRUE));
+						misc, id, get_client_name(cptr, TRUE));
 			return exit_client(cptr, cptr, &me, "Bad flags");
 		}
 	}
 
 #ifdef JAPANESE
-	if (link && strchr(link, 'j'))	/* jp version */
+	if (link && strchr(link, 'j')) /* jp version */
 		cptr->flags |= FLAGS_JP;
 #endif
 
 	/* right now, I can't code anything good for this */
 	/* Stop whining, and do it! ;) */
-	if (link && strchr(link, 'Z'))	/* Compression requested */
+	if (link && strchr(link, 'Z')) /* Compression requested */
 	{
-                cptr->flags |= FLAGS_ZIPRQ;
+		cptr->flags |= FLAGS_ZIPRQ;
 	}
 	/*
 	 * If server was started with -p strict, be careful about the
@@ -418,7 +415,7 @@ int	check_version(aClient *cptr)
 ** send_server()
 ** Sends server server to cptr.
 */
-static	void	send_server(aClient *cptr, aClient *server)
+static void send_server(aClient *cptr, aClient *server)
 {
 	aConfItem *aconf;
 
@@ -439,14 +436,14 @@ static	void	send_server(aClient *cptr, aClient *server)
 		/* I'm masking this server, or it was introduced to us with
 		** SMASK. */
 		sendto_one(cptr, ":%s SMASK %s %s",
-			server->serv->up->serv->sid, server->serv->sid,
-			server->serv->verstr);
+				   server->serv->up->serv->sid, server->serv->sid,
+				   server->serv->verstr);
 		return;
 	}
-	sendto_one(cptr,":%s SERVER %s %d %s %s :%s",
-		server->serv->up->serv->sid, server->name,
-		server->hopcount + 1, server->serv->sid,
-		server->serv->verstr, server->info);
+	sendto_one(cptr, ":%s SERVER %s %d %s %s :%s",
+			   server->serv->up->serv->sid, server->name,
+			   server->hopcount + 1, server->serv->sid,
+			   server->serv->verstr, server->info);
 
 	return;
 }
@@ -456,7 +453,7 @@ static	void	send_server(aClient *cptr, aClient *server)
 ** introduce_server()
 ** Introduces a server I got from cptr to all my other servers.
 */
-static void	introduce_server(aClient *cptr, aClient *server)
+static void introduce_server(aClient *cptr, aClient *server)
 {
 	int i;
 	aClient *acptr;
@@ -480,7 +477,7 @@ static void	introduce_server(aClient *cptr, aClient *server)
 ** Sends all servers I know to cptr.
 ** Acptr is the current to send.
 */
-static	void	send_server_burst(aClient *cptr, aClient *acptr)
+static void send_server_burst(aClient *cptr, aClient *acptr)
 {
 	for (; acptr; acptr = acptr->serv->right)
 	{
@@ -502,24 +499,25 @@ static	void	send_server_burst(aClient *cptr, aClient *acptr)
 **     parv[1] = sid
 **     parv[2] = version
 */
-int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 
 	if (!sid_valid(parv[1]))
 	{
 		sendto_flag(SCH_ERROR,
-			"Invalid SID (%s) in SMASK from %s, dropping link",
-			parv[1],sptr->name);
+					"Invalid SID (%s) in SMASK from %s, dropping link",
+					parv[1], sptr->name);
 		return exit_client(cptr, cptr, &me, "Invalid SID");
 	}
 
-	if (find_sid(parv[1],NULL))
+	if (find_sid(parv[1], NULL))
 	{
 		char ecbuf[BUFSIZE];
 		sendto_flag(SCH_NOTICE,
-			"SID collision (SMASK) on %s brought by %s, "
-			"dropping link", parv[1],sptr->name);
+					"SID collision (SMASK) on %s brought by %s, "
+					"dropping link",
+					parv[1], sptr->name);
 		sprintf(ecbuf, "SID collision (%s)", parv[1]);
 		return exit_client(cptr, cptr, &me, ecbuf);
 	}
@@ -562,34 +560,34 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[4] = server version (remote 2.11)/serverinfo(remote 2.10+local2.11)
 **	parv[5] = serverinfo (remote 2.11)
 */
-int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	char		info[REALLEN+1], *inpath, *host;
-	char		versionbuf[11];	/* At least PATCHLEVEL size! */
-	aClient		*acptr, *bcptr;
-	aConfItem	*aconf;
-	int		hop = 0;
-	int		tmperr;
+	char info[REALLEN + 1], *inpath, *host;
+	char versionbuf[11]; /* At least PATCHLEVEL size! */
+	aClient *acptr, *bcptr;
+	aConfItem *aconf;
+	int hop = 0;
+	int tmperr;
 
 	if (sptr->user) /* in case NICK has been received already */
-            {
-                sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, BadTo(parv[0]));
-                return 1;
-            }
+	{
+		sendto_one(sptr, replies[ERR_ALREADYREGISTRED], ME, BadTo(parv[0]));
+		return 1;
+	}
 	if ((bootopt & BOOT_STANDALONE))
 	{
 		sendto_flag(SCH_ERROR,
-			"Running in standalone mode, cannot accept %s/%s", parv[1], parv[3]);
+					"Running in standalone mode, cannot accept %s/%s", parv[1], parv[3]);
 		return exit_client(cptr, cptr, &me,
-			"Running in standalone mode");
+						   "Running in standalone mode");
 	}
-	info[0] = info[REALLEN] = '\0';	/* strncpy() doesn't guarantee NULL */
+	info[0] = info[REALLEN] = '\0'; /* strncpy() doesn't guarantee NULL */
 	inpath = get_client_name(cptr, FALSE);
 	if (parc < 2 || *parv[1] == '\0')
-	    {
-			sendto_one(cptr,"ERROR :No servername");
-			return 1;
-	    }
+	{
+		sendto_one(cptr, "ERROR :No servername");
+		return 1;
+	}
 
 	if (parc < 3 || (IsServer(cptr) && parc < 4))
 	{
@@ -601,27 +599,28 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (parc < 6)
 		{
 			sendto_flag(SCH_ERROR,
-				"Not enough parameters to SERVER (%d < 6), "
-				"dropping link to %s",	parc, 
-				get_client_name(cptr,TRUE));
+						"Not enough parameters to SERVER (%d < 6), "
+						"dropping link to %s",
+						parc,
+						get_client_name(cptr, TRUE));
 			return exit_client(cptr, cptr, &me,
-				"Not enough parameters to SERVER");
+							   "Not enough parameters to SERVER");
 		}
 		if (!sid_valid(parv[3]))
 		{
 			sendto_flag(SCH_ERROR,
-				"Invalid SID %s from %s, dropping link",
-				parv[3], get_client_name(cptr, TRUE));
+						"Invalid SID %s from %s, dropping link",
+						parv[3], get_client_name(cptr, TRUE));
 			return exit_client(cptr, cptr, &me, "Invalid SID");
 		}
-		if (find_sid(parv[3],NULL))
+		if (find_sid(parv[3], NULL))
 		{
 			/* check for SID collision */
 			char ecbuf[BUFSIZE];
-	
+
 			sendto_flag(SCH_NOTICE, "Link %s tried to introduce"
-				" already existing SID (%s), dropping link",
-				get_client_name(cptr, TRUE), parv[3]);
+									" already existing SID (%s), dropping link",
+						get_client_name(cptr, TRUE), parv[3]);
 			sprintf(ecbuf, "SID collision (%s)", parv[3]);
 			return exit_client(cptr, cptr, &me, ecbuf);
 		}
@@ -629,28 +628,27 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	host = parv[1];
 	hop = atoi(parv[2]);
-	strncpyzt(info, parv[parc-1], REALLEN);
+	strncpyzt(info, parv[parc - 1], REALLEN);
 
 	/* check if the servername is valid */
 	if ((tmperr = check_servername(host)))
 	{
 		tmperr--;
 		sendto_flag(SCH_ERROR,
-			"Rejected server with %s server name (%s) from %s",
-			check_servername_errors[tmperr][0],
-			host, get_client_name(cptr, TRUE));
+					"Rejected server with %s server name (%s) from %s",
+					check_servername_errors[tmperr][0],
+					host, get_client_name(cptr, TRUE));
 		return exit_client(cptr, cptr, &me,
-			check_servername_errors[tmperr][1]);
+						   check_servername_errors[tmperr][1]);
 	}
-	
+
 	/* *WHEN* can it be that "cptr != sptr" ????? --msa */
 	/* When SERVER command (like now) has prefix. -avalon */
 
-	if (IsRegistered(cptr) && ((acptr = find_name(host, NULL))
-				   || (acptr = find_mask(host, NULL))))
-	    {
+	if (IsRegistered(cptr) && ((acptr = find_name(host, NULL)) || (acptr = find_mask(host, NULL))))
+	{
 		char tbuf[BUFSIZE];
-		sprintf(tbuf, "Server %s Exists",host);
+		sprintf(tbuf, "Server %s Exists", host);
 		/*
 		** This link is trying feed me a server that I already have
 		** access through another path -- multiple paths not accepted
@@ -659,19 +657,18 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		** Rather than KILL the link which introduced it, KILL the
 		** youngest of the two links. -avalon
 		*/
-		bcptr = (cptr->firsttime > acptr->from->firsttime) ? cptr :
-			acptr->from;
+		bcptr = (cptr->firsttime > acptr->from->firsttime) ? cptr : acptr->from;
 		sendto_one(bcptr, "ERROR :Server %s already exists", host);
 		/* in both cases the bcptr (the youngest is killed) */
 		if (bcptr == cptr)
-		    {
+		{
 			sendto_flag(SCH_ERROR,
-			    "Link %s cancelled, server %s already exists",
-				    get_client_name(bcptr, TRUE), host);
+						"Link %s cancelled, server %s already exists",
+						get_client_name(bcptr, TRUE), host);
 			return exit_client(bcptr, bcptr, &me, tbuf);
-		    }
+		}
 		else
-		    {
+		{
 			/*
 			** in this case, we are not dropping the link from
 			** which we got the SERVER message.  Thus we canNOT
@@ -679,27 +676,27 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			*/
 			strcpy(buf, get_client_name(bcptr, TRUE));
 			sendto_flag(SCH_ERROR,
-			    "Link %s cancelled, server %s reintroduced by %s",
-				    buf, host, get_client_name(cptr, TRUE));
+						"Link %s cancelled, server %s reintroduced by %s",
+						buf, host, get_client_name(cptr, TRUE));
 			(void) exit_client(bcptr, bcptr, &me, tbuf);
-		    }
-	    }
+		}
+	}
 
 	if (IsServer(cptr))
-	    {
+	{
 		/* A server can only be introduced by another server. */
 		if (!IsServer(sptr))
-		    {
+		{
 			sendto_flag(SCH_NOTICE,
-			    "Squitting %s brought by %s (introduced by %s)",
-				    host, get_client_name(cptr, FALSE),
-				    sptr->name);
+						"Squitting %s brought by %s (introduced by %s)",
+						host, get_client_name(cptr, FALSE),
+						sptr->name);
 			sendto_one(cptr,
-				   ":%s SQUIT %s :(Introduced by %s from %s)",
-				   me.name, host, sptr->name,
-				   get_client_name(cptr, FALSE));
-	  		return 1;
-		    }
+					   ":%s SQUIT %s :(Introduced by %s from %s)",
+					   me.name, host, sptr->name,
+					   get_client_name(cptr, FALSE));
+			return 1;
+		}
 		/*
 		** Server is informing about a new server behind
 		** this link. Create REMOTE server structure,
@@ -707,44 +704,43 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		** server links...
 		*/
 		if (parc == 1 || info[0] == '\0')
-		    {
-	  		sendto_one(cptr,
-				   "ERROR :No server info specified for %s",
-				   host);
+		{
+			sendto_one(cptr,
+					   "ERROR :No server info specified for %s",
+					   host);
 			sendto_flag(SCH_ERROR, "No server info for %s from %s",
-				    host, get_client_name(cptr, TRUE));
-	  		return 1;
-		    }
+						host, get_client_name(cptr, TRUE));
+			return 1;
+		}
 
 		/*
 		** See if the newly found server is behind a guaranteed
 		** leaf (L-line). If so, close the link.
 		*/
 		if ((aconf = find_conf_host(cptr->confs, host, CONF_LEAF)) &&
-		    (!aconf->port || (hop > aconf->port)))
-		    {
-	      		sendto_flag(SCH_ERROR,
-				    "Leaf-only link %s->%s - Closing",
-				    get_client_name(cptr, TRUE),
-				    aconf->host ? aconf->host : "*");
-	      		sendto_one(cptr, "ERROR :Leaf-only link, sorry.");
-      			return exit_client(cptr, cptr, &me, "Leaf Only");
-		    }
+			(!aconf->port || (hop > aconf->port)))
+		{
+			sendto_flag(SCH_ERROR,
+						"Leaf-only link %s->%s - Closing",
+						get_client_name(cptr, TRUE),
+						aconf->host ? aconf->host : "*");
+			sendto_one(cptr, "ERROR :Leaf-only link, sorry.");
+			return exit_client(cptr, cptr, &me, "Leaf Only");
+		}
 		/*
 		**
 		*/
-		if (!(aconf = 
-			find_conf_host_sid(cptr->confs, host, parv[3], CONF_HUB))
-			|| (aconf->port && (hop > aconf->port)) )
-		    {
+		if (!(aconf =
+					  find_conf_host_sid(cptr->confs, host, parv[3], CONF_HUB)) ||
+			(aconf->port && (hop > aconf->port)))
+		{
 			sendto_flag(SCH_ERROR,
-				    "Non-Hub link %s introduced %s(%s).",
-				    get_client_name(cptr, TRUE), host,
-				   aconf ? (aconf->host ? aconf->host : "*") :
-				   "!");
+						"Non-Hub link %s introduced %s(%s).",
+						get_client_name(cptr, TRUE), host,
+						aconf ? (aconf->host ? aconf->host : "*") : "!");
 			return exit_client(cptr, cptr, &me,
-					   "Too many servers");
-		    }
+							   "Too many servers");
+		}
 		/*
 		** See if the newly found server has a Q line for it in
 		** our conf. If it does, lose the link that brought it
@@ -755,22 +751,20 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		** Example:  Q:*:for the hell of it:eris.Berkeley.EDU
 		*/
 		if ((aconf = find_conf_name(host, CONF_QUARANTINED_SERVER)))
-		    {
+		{
 			sendto_ops_butone(NULL, ME,
-				"%s brought in %s, %s %s",
-				get_client_name(cptr, TRUE),
-				host, "closing link because",
-				BadPtr(aconf->passwd) ? "reason unspecified" :
-				aconf->passwd);
+							  "%s brought in %s, %s %s",
+							  get_client_name(cptr, TRUE),
+							  host, "closing link because",
+							  BadPtr(aconf->passwd) ? "reason unspecified" : aconf->passwd);
 
 			sendto_one(cptr,
-				   "ERROR :%s is not welcome: %s. %s",
-				   host, BadPtr(aconf->passwd) ?
-				   "reason unspecified" : aconf->passwd,
-				   "Go away and get a life");
+					   "ERROR :%s is not welcome: %s. %s",
+					   host, BadPtr(aconf->passwd) ? "reason unspecified" : aconf->passwd,
+					   "Go away and get a life");
 
 			return exit_client(cptr, cptr, &me, "Q-Lined Server");
-		    }
+		}
 
 		acptr = make_client(cptr);
 		make_server(acptr);
@@ -789,31 +783,31 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		add_client_to_list(acptr);
 		register_server(acptr);
 
-		strncpyzt(acptr->serv->sid, parv[3], SIDLEN+1);
+		strncpyzt(acptr->serv->sid, parv[3], SIDLEN + 1);
 		acptr->serv->version |= SV_UID;
 		add_to_sid_hash_table(parv[3], acptr);
 
 		strncpyzt(acptr->serv->verstr,
-			parv[4], sizeof(acptr->serv->verstr));
-		acptr->serv->version = get_version(parv[4],NULL);
+				  parv[4], sizeof(acptr->serv->verstr));
+		acptr->serv->version = get_version(parv[4], NULL);
 
 		add_server_to_tree(acptr);
-		(void)add_to_client_hash_table(acptr->name, acptr);
+		(void) add_to_client_hash_table(acptr->name, acptr);
 
 		introduce_server(cptr, acptr);
-#ifdef	USE_SERVICES
+#ifdef USE_SERVICES
 		check_services_butone(SERVICE_WANT_SERVER, acptr->serv, acptr,
-				      ":%s SERVER %s %d %s :%s", parv[0],
-				      acptr->name, hop+1, acptr->serv->sid,
-				      acptr->info);
+							  ":%s SERVER %s %d %s :%s", parv[0],
+							  acptr->name, hop + 1, acptr->serv->sid,
+							  acptr->info);
 #endif
 		sendto_flag(SCH_SERVER, "Received SERVER %s from %s (%d %s)",
-			    acptr->name, parv[0], hop+1, acptr->info);
+					acptr->name, parv[0], hop + 1, acptr->info);
 		return 0;
-	    }
+	}
 
 	if ((!IsUnknown(cptr) && !IsHandshake(cptr)) ||
-	    (cptr->flags & FLAGS_UNKCMD))
+		(cptr->flags & FLAGS_UNKCMD))
 		return 1;
 	/*
 	** A local link that is still in undefined state wants
@@ -830,7 +824,7 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	/* cptr->name has to exist before check_version(), and cptr->info
 	 * may not be filled before check_version(). */
 	if ((hop = check_version(cptr)) < 1)
-		return hop;	/* from exit_client() */
+		return hop; /* from exit_client() */
 	if (cptr->info != DefInfo)
 	{
 		strncpyzt(versionbuf, cptr->info, sizeof(versionbuf));
@@ -840,34 +834,34 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	switch (check_server_init(cptr))
 	{
-	case 0 :
-		return m_server_estab(cptr, (parc > 3) ? parv[3] : NULL,
-			versionbuf);
-	case 1 :
-		sendto_flag(SCH_NOTICE, "Checking access for %s",
-			    get_client_name(cptr,TRUE));
-		return 1;
-	default :
-		ircstp->is_ref++;
-		sendto_flag(SCH_NOTICE, "Unauthorized server from %s.",
-			    get_client_host(cptr));
-		return exit_client(cptr, cptr, &me, "No C/N conf lines");
+		case 0:
+			return m_server_estab(cptr, (parc > 3) ? parv[3] : NULL,
+								  versionbuf);
+		case 1:
+			sendto_flag(SCH_NOTICE, "Checking access for %s",
+						get_client_name(cptr, TRUE));
+			return 1;
+		default:
+			ircstp->is_ref++;
+			sendto_flag(SCH_NOTICE, "Unauthorized server from %s.",
+						get_client_host(cptr));
+			return exit_client(cptr, cptr, &me, "No C/N conf lines");
 	}
 }
 
-int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
+int m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 {
-	Reg	aClient	*acptr;
+	Reg aClient *acptr;
 	aClient *bysptr = NULL;
-#ifndef	HUB
-	int	i;
+#ifndef HUB
+	int i;
 #endif
-	
-	Reg	aConfItem	*aconf, *bconf;
-	char	mlname[HOSTLEN+1], *inpath, *host, *s, *encr;
+
+	Reg aConfItem *aconf, *bconf;
+	char mlname[HOSTLEN + 1], *inpath, *host, *s, *encr;
 
 	host = cptr->name;
-	inpath = get_client_name(cptr,TRUE); /* "refresh" inpath with host */
+	inpath = get_client_name(cptr, TRUE); /* "refresh" inpath with host */
 
 	if (cptr->serv && cptr->serv->byuid[0])
 	{
@@ -880,146 +874,151 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	}
 
 	if (!(aconf = find_conf(cptr->confs, host, CONF_NOCONNECT_SERVER)))
-	    {
+	{
 		ircstp->is_ref++;
 		sendto_one(cptr,
-			   "ERROR :Access denied. No N line for server %s",
-			   inpath);
+				   "ERROR :Access denied. No N line for server %s",
+				   inpath);
 		sendto_flag(SCH_ERROR,
-			    "Access denied. No N line for server %s", inpath);
+					"Access denied. No N line for server %s", inpath);
 		if (bysptr)
 		{
 			sendto_one(bysptr,
-				":%s NOTICE %s :Access denied. No N line for "
-				"server %s", ME, bysptr->name, inpath);
+					   ":%s NOTICE %s :Access denied. No N line for "
+					   "server %s",
+					   ME, bysptr->name, inpath);
 		}
-				
+
 		return exit_client(cptr, cptr, &me, "No N line for server");
-	    }
-	if (!(bconf = find_conf(cptr->confs, host, CONF_CONNECT_SERVER|
-				CONF_ZCONNECT_SERVER)))
-	    {
+	}
+	if (!(bconf = find_conf(cptr->confs, host, CONF_CONNECT_SERVER | CONF_ZCONNECT_SERVER)))
+	{
 		ircstp->is_ref++;
 		sendto_one(cptr, "ERROR :Only N (no C) field for server %s",
-			   inpath);
+				   inpath);
 		sendto_flag(SCH_ERROR,
-			    "Only N (no C) field for server %s",inpath);
+					"Only N (no C) field for server %s", inpath);
 		if (bysptr)
 		{
 			sendto_one(bysptr,
-			":%s NOTICE %s :Only N (no C) field for server %s",
-				ME, bysptr->name, inpath);
+					   ":%s NOTICE %s :Only N (no C) field for server %s",
+					   ME, bysptr->name, inpath);
 		}
 		return exit_client(cptr, cptr, &me, "No C line for server");
-	    }
+	}
 
 	if (cptr->hopcount == SV_OLD) /* lame test, should be == 0 */
-	    {
+	{
 		sendto_one(cptr, "ERROR :Server version is too old.");
 		sendto_flag(SCH_ERROR, "Old version for %s", inpath);
 		if (bysptr)
 		{
 			sendto_one(bysptr,
-				":%s NOTICE %s :Old version for %s",
-				ME, bysptr->name, inpath);
+					   ":%s NOTICE %s :Old version for %s",
+					   ME, bysptr->name, inpath);
 		}
 		return exit_client(cptr, cptr, &me, "Old version");
-	    }
+	}
 
 #ifdef CRYPT_LINK_PASSWORD
 	/* pass whole aconf->passwd as salt, let crypt() deal with it */
 
 	if (*cptr->passwd)
-	    {
-		extern  char *crypt();
+	{
+		extern char *crypt();
 
 		encr = crypt(cptr->passwd, aconf->passwd);
 		if (encr == NULL)
-		    {
+		{
 			ircstp->is_ref++;
 			sendto_one(cptr, "ERROR :No Access (crypt failed) %s",
-			  	inpath);
+					   inpath);
 			sendto_flag(SCH_ERROR,
-			    	"Access denied (crypt failed) %s", inpath);
+						"Access denied (crypt failed) %s", inpath);
 			if (bysptr)
 			{
 				sendto_one(bysptr,
-					":%s NOTICE %s :Access denied (crypt "
-					"failed %s", ME, bysptr->name, inpath);
+						   ":%s NOTICE %s :Access denied (crypt "
+						   "failed %s",
+						   ME, bysptr->name, inpath);
 			}
 			return exit_client(cptr, cptr, &me, "Bad Password");
-		    }
-	    }
+		}
+	}
 	else
 		encr = "";
 #else
 	encr = cptr->passwd;
-#endif  /* CRYPT_LINK_PASSWORD */
+#endif /* CRYPT_LINK_PASSWORD */
 	if (*aconf->passwd && !StrEq(aconf->passwd, encr))
-	    {
+	{
 		ircstp->is_ref++;
 		sendto_one(cptr, "ERROR :No Access (passwd mismatch) %s",
-			   inpath);
+				   inpath);
 		sendto_flag(SCH_ERROR,
-			    "Access denied (passwd mismatch) %s", inpath);
+					"Access denied (passwd mismatch) %s", inpath);
 		if (bysptr)
 		{
 			sendto_one(bysptr, ":%s NOTICE %s :Access denied "
-				"(passwd mismatch) %s", ME, bysptr->name,
-				inpath);
+							   "(passwd mismatch) %s",
+					   ME, bysptr->name,
+					   inpath);
 		}
 		return exit_client(cptr, cptr, &me, "Bad Password");
-	    }
+	}
 	bzero(cptr->passwd, sizeof(cptr->passwd));
 
-#ifndef	HUB
+#ifndef HUB
 	for (i = 0; i <= highest_fd; i++)
 		if (local[i] && IsServer(local[i]))
-		    {
+		{
 			ircstp->is_ref++;
 			sendto_flag(SCH_ERROR, "I'm a leaf, cannot link %s",
-				    get_client_name(cptr, TRUE));
+						get_client_name(cptr, TRUE));
 			if (bysptr)
 			{
 				sendto_one(bysptr, ":%s NOTICE %s :I'm a leaf,"
-					" cannot link %s", ME, bysptr->name,
-					get_client_name(cptr, TRUE));
+								   " cannot link %s",
+						   ME, bysptr->name,
+						   get_client_name(cptr, TRUE));
 			}
 			return exit_client(cptr, cptr, &me, "I'm a leaf");
-		    }
+		}
 #endif
 	(void) strcpy(mlname, my_name_for_link(ME, aconf->port));
 
-	if (!match(cptr->name,mlname))
+	if (!match(cptr->name, mlname))
 	{
 		sendto_flag(SCH_NOTICE, "Mask of server %s is matching "
-			"my name %s, dropping link", cptr->name, mlname);
+								"my name %s, dropping link",
+					cptr->name, mlname);
 		if (bysptr)
 		{
 			sendto_one(bysptr, ":%s NOTICE %s :Mask of server %s "
-				"is matching my name %s, dropping link",
-				ME, bysptr->name, cptr->name, mlname);
+							   "is matching my name %s, dropping link",
+					   ME, bysptr->name, cptr->name, mlname);
 		}
 		return exit_client(cptr, cptr, &me,
-			"Server exists (mask matches)");
+						   "Server exists (mask matches)");
 	}
-	if (!match(mlname,cptr->name))
+	if (!match(mlname, cptr->name))
 	{
 		sendto_flag(SCH_NOTICE, "Server %s matches my name for link "
-			"%s, dropping link", cptr->name, mlname);
+								"%s, dropping link",
+					cptr->name, mlname);
 		if (bysptr)
 		{
 			sendto_one(bysptr, ":%s NOTICE %s :Server %s "
-				"matches my name for link %s, dropping link",
-				ME, bysptr->name, cptr->name, mlname);
+							   "matches my name for link %s, dropping link",
+					   ME, bysptr->name, cptr->name, mlname);
 		}
 
 		return exit_client(cptr, cptr, &me,
-			"Server exists (matches my mask)");
+						   "Server exists (matches my mask)");
 	}
 
 	if (IsUnknown(cptr))
-	    {
+	{
 		/*
 		** If we get a connection which has been authorized to be
 		** an already existing connection, remove the already
@@ -1028,82 +1027,79 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		** Remove existing link only if it has been linked for longer
 		** and has sendq higher than a threshold. -Vesa
 		*/
-		if (((acptr = find_name(host, NULL))
-		    || (acptr = find_mask(host, NULL))) && IsServer(acptr))
-		    {
+		if (((acptr = find_name(host, NULL)) || (acptr = find_mask(host, NULL))) && IsServer(acptr))
+		{
 			if (MyConnect(acptr) &&
-			    DBufLength(&acptr->sendQ) > CHREPLLEN &&
-			    timeofday - acptr->firsttime > TIMESEC)
+				DBufLength(&acptr->sendQ) > CHREPLLEN &&
+				timeofday - acptr->firsttime > TIMESEC)
 				(void) exit_client(acptr, acptr, &me,
-						   "New Server");
+								   "New Server");
 			else
 				return exit_client(cptr, cptr, &me,
-						   "Server Exists");
-		    }
+								   "Server Exists");
+		}
 
 		if (bconf->passwd[0])
 			sendto_one(cptr, "PASS %s %s IRC|%s %s%s%s",
-				bconf->passwd, pass_version, serveropts,
-				(bootopt & BOOT_STRICTPROT) ? "P" : "",
-#ifdef	JAPANESE
-				"j",
+					   bconf->passwd, pass_version, serveropts,
+					   (bootopt & BOOT_STRICTPROT) ? "P" : "",
+#ifdef JAPANESE
+					   "j",
 #else
-				"",
+					   "",
 #endif
-#ifdef	ZIP_LINKS
-				(bconf->status == CONF_ZCONNECT_SERVER) ? "Z" :
+#ifdef ZIP_LINKS
+					   (bconf->status == CONF_ZCONNECT_SERVER) ? "Z" :
 #endif
-				""
-				);
+															   "");
 		/*
 		** Pass my info to the new server
 		*/
 		sendto_one(cptr, "SERVER %s 1 %s :%s",
-			mlname, me.serv->sid, me.info);
-
-	    }
+				   mlname, me.serv->sid, me.info);
+	}
 	else
-	    {
-		s = (char *)index(aconf->host, '@');
+	{
+		s = (char *) index(aconf->host, '@');
 		*s = '\0'; /* should never be NULL */
 		Debug((DEBUG_INFO, "Check Usernames [%s]vs[%s]",
-			aconf->host, cptr->username));
+			   aconf->host, cptr->username));
 		if (match(aconf->host, cptr->username))
-		    {
+		{
 			*s = '@';
 			ircstp->is_ref++;
 			sendto_flag(SCH_ERROR,
-				    "Username mismatch [%s]v[%s] : %s",
-				    aconf->host, cptr->username,
-				    get_client_name(cptr, TRUE));
+						"Username mismatch [%s]v[%s] : %s",
+						aconf->host, cptr->username,
+						get_client_name(cptr, TRUE));
 			sendto_one(cptr, "ERROR :No Username Match");
 			return exit_client(cptr, cptr, &me, "Bad User");
-		    }
+		}
 		*s = '@';
-	    }
+	}
 
-#ifdef	ZIP_LINKS
+#ifdef ZIP_LINKS
 	if ((cptr->flags & FLAGS_ZIPRQ) &&
-	    (bconf->status == CONF_ZCONNECT_SERVER))
-	    {
+		(bconf->status == CONF_ZCONNECT_SERVER))
+	{
 		if (zip_init(cptr) == -1)
-		    {
+		{
 			zip_free(cptr);
 			sendto_flag(SCH_ERROR,
-			    "Unable to setup compressed link for %s",
-				    get_client_name(cptr, TRUE));
+						"Unable to setup compressed link for %s",
+						get_client_name(cptr, TRUE));
 			if (bysptr)
 			{
 				sendto_one(bysptr,
-				 	":%s NOTICE %s :Unable to setup "
-					"compressed link for %s",
-				 ME, bysptr->name, get_client_name(cptr, TRUE));
+						   ":%s NOTICE %s :Unable to setup "
+						   "compressed link for %s",
+						   ME, bysptr->name, get_client_name(cptr, TRUE));
 			}
 			return exit_client(cptr, cptr, &me,
-					   "zip_init() failed");
-		    }
-		cptr->flags |= FLAGS_ZIP|FLAGS_ZIPSTART;
-	    }
+							   "zip_init() failed");
+		}
+		cptr->flags |= FLAGS_ZIP | FLAGS_ZIPSTART;
+	}
 #endif
 
 	/* version has been temporarily stored in ->hopcount */
@@ -1112,43 +1108,44 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		if (!sid)
 		{
 			sendto_flag(SCH_ERROR, "Invalid SID from %s",
-				get_client_name(cptr, TRUE));
+						get_client_name(cptr, TRUE));
 			if (bysptr)
 			{
 				sendto_one(bysptr,
-					":%s NOTICE %s :Invalid SID from %s",
-					ME, bysptr->name,
-					get_client_name(cptr, TRUE));
+						   ":%s NOTICE %s :Invalid SID from %s",
+						   ME, bysptr->name,
+						   get_client_name(cptr, TRUE));
 			}
 			return exit_client(cptr, cptr, &me, "Invalid SID");
 		}
 		if (!sid_valid(sid))
 		{
 			sendto_flag(SCH_ERROR, "Invalid SID %s from %s",
-				sid, get_client_name(cptr, TRUE));
+						sid, get_client_name(cptr, TRUE));
 			if (bysptr)
 			{
 				sendto_one(bysptr,
-					":%s NOTICE %s :Invalid SID %s from %s",
-					ME, bysptr->name, sid,
-					get_client_name(cptr, TRUE));
+						   ":%s NOTICE %s :Invalid SID %s from %s",
+						   ME, bysptr->name, sid,
+						   get_client_name(cptr, TRUE));
 			}
 			return exit_client(cptr, cptr, &me, "Invalid SID");
 		}
 		if (find_sid(sid, NULL))
 		{
-			sendto_flag(SCH_NOTICE,	"Link %s tried to introduce"
-				" already existing SID (%s), dropping link",
-				get_client_name(cptr, TRUE), sid);
+			sendto_flag(SCH_NOTICE, "Link %s tried to introduce"
+									" already existing SID (%s), dropping link",
+						get_client_name(cptr, TRUE), sid);
 			if (bysptr)
 			{
 				sendto_one(bysptr,
-					":%s NOTICE %s :Link %s tried to "
-					"introduce already existing SID (%s), "
-					"dropping link", ME, bysptr->name,
-					get_client_name(cptr, TRUE), sid);
+						   ":%s NOTICE %s :Link %s tried to "
+						   "introduce already existing SID (%s), "
+						   "dropping link",
+						   ME, bysptr->name,
+						   get_client_name(cptr, TRUE), sid);
 			}
-			return exit_client(cptr, cptr, &me,"SID collision");
+			return exit_client(cptr, cptr, &me, "SID collision");
 		}
 	}
 
@@ -1156,17 +1153,18 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	{
 		/* remote is too old */
 		sendto_flag(SCH_ERROR, "Remote server %s is too old, "
-			"dropping link", get_client_name(cptr,TRUE));
+							   "dropping link",
+					get_client_name(cptr, TRUE));
 		if (bysptr)
 		{
 			sendto_one(bysptr, ":%s NOTICE %s :Remote server %s is"
-				"too old, dropping link",
-				ME, bysptr->name, get_client_name(cptr, TRUE));
+							   "too old, dropping link",
+					   ME, bysptr->name, get_client_name(cptr, TRUE));
 		}
 		return exit_client(cptr, cptr, &me, "Too old version");
 	}
 
-	det_confs_butmask(cptr, CONF_LEAF|CONF_HUB|CONF_NOCONNECT_SERVER);
+	det_confs_butmask(cptr, CONF_LEAF | CONF_HUB | CONF_NOCONNECT_SERVER);
 	/*
 	** *WARNING*
 	** 	In the following code in place of plain server's
@@ -1189,20 +1187,20 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		istat.is_m_myserv = istat.is_myserv;
 	nextping = timeofday;
 	sendto_flag(SCH_NOTICE, "Link with %s established. (%X%s)", inpath,
-		    cptr->hopcount, (cptr->flags & FLAGS_ZIP) ? "z" : "");
+				cptr->hopcount, (cptr->flags & FLAGS_ZIP) ? "z" : "");
 	if (bysptr)
 	{
 		sendto_one(bysptr,
-			":%s NOTICE %s :Link with %s established. (%X%s)",
-			ME, bysptr->name, inpath, cptr->hopcount,
-			(cptr->flags & FLAGS_ZIP) ? "z" : "");
+				   ":%s NOTICE %s :Link with %s established. (%X%s)",
+				   ME, bysptr->name, inpath, cptr->hopcount,
+				   (cptr->flags & FLAGS_ZIP) ? "z" : "");
 	}
-	(void)add_to_client_hash_table(cptr->name, cptr);
+	(void) add_to_client_hash_table(cptr->name, cptr);
 	cptr->serv->up = &me;
 	cptr->serv->maskedby = cptr;
 	cptr->serv->nline = aconf;
-	cptr->serv->version = cptr->hopcount;   /* temporary location */
-	cptr->hopcount = 1;			/* local server connection */
+	cptr->serv->version = cptr->hopcount; /* temporary location */
+	cptr->hopcount = 1;					  /* local server connection */
 	cptr->serv->snum = find_server_num(cptr->name);
 
 	strncpyzt(cptr->serv->verstr, versionbuf, sizeof(cptr->serv->verstr));
@@ -1214,17 +1212,17 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	add_server_to_tree(cptr);
 	/* why no add_client_to_list() here? --B. */
 	Debug((DEBUG_NOTICE, "Server link established with %s V%X %s",
-		cptr->name, cptr->serv->version, cptr->serv->sid));
+		   cptr->name, cptr->serv->version, cptr->serv->sid));
 	add_fd(cptr->fd, &fdas);
-#ifdef	USE_SERVICES
+#ifdef USE_SERVICES
 	check_services_butone(SERVICE_WANT_SERVER, cptr->serv, cptr,
-			      ":%s SERVER %s %d %s :%s", ME, cptr->name,
-			      cptr->hopcount+1, cptr->serv->sid, cptr->info);
+						  ":%s SERVER %s %d %s :%s", ME, cptr->name,
+						  cptr->hopcount + 1, cptr->serv->sid, cptr->info);
 #endif
 	sendto_flag(SCH_SERVER, "Received SERVER %s from %s (%d %s)",
-		cptr->name, ME, 1, cptr->info);
+				cptr->name, ME, 1, cptr->info);
 	introduce_server(cptr, cptr);
-	
+
 	/*
 	** Pass on my client information to the new server
 	**
@@ -1246,12 +1244,12 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	send_server_burst(cptr, me.serv->down);
 
 	for (acptr = &me; acptr; acptr = acptr->prev)
-	    {
+	{
 		/* acptr->from == acptr for acptr == cptr */
 		if (acptr->from == cptr)
 			continue;
 		if (IsPerson(acptr))
-		    {
+		{
 			/*
 			** IsPerson(x) is true only when IsClient(x) is true.
 			** These are only true when *BOTH* NICK and USER have
@@ -1266,20 +1264,20 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 					   acptr->user->host,
 					   get_client_ip(acptr),
 					   (*buf) ? buf : "+", acptr->info);
-		    }
+		}
 		else if (IsService(acptr) &&
-			 (match(acptr->service->dist, cptr->name) == 0 ||
-				match(acptr->service->dist, cptr->serv->sid) == 0))
+				 (match(acptr->service->dist, cptr->name) == 0 ||
+				  match(acptr->service->dist, cptr->serv->sid) == 0))
 		{
 			sendto_one(cptr, ":%s SERVICE %s %s %d :%s",
-						acptr->service->servp->sid,
-						acptr->name,
-						acptr->service->dist,
-						acptr->service->type,
-				   		acptr->info);
+					   acptr->service->servp->sid,
+					   acptr->name,
+					   acptr->service->dist,
+					   acptr->service->type,
+					   acptr->info);
 		}
 		/* the previous if does NOT catch all services.. ! */
-	    }
+	}
 
 	flush_connections(cptr->fd);
 
@@ -1292,8 +1290,8 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	** differences)). Also send modes for such !channels. --B.
 	*/
 	{
-		Reg	aChannel *chptr;
-		int	rv = atoi(cptr->serv->verstr);
+		Reg aChannel *chptr;
+		int rv = atoi(cptr->serv->verstr);
 
 		for (chptr = channel; chptr; chptr = chptr->nextch)
 		{
@@ -1302,11 +1300,10 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 				send_channel_members(cptr, chptr);
 				send_channel_modes(cptr, chptr);
 			}
-			else
-			if (rv >= 210991700) /* XXX remove soon */
+			else if (rv >= 210991700) /* XXX remove soon */
 			{
 				sendto_one(cptr, ":%s NJOIN %s .",
-					me.serv->sid, chptr->chname);
+						   me.serv->sid, chptr->chname);
 				if (*chptr->chname == '!')
 					send_channel_modes(cptr, chptr);
 			}
@@ -1324,18 +1321,17 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		int eobmaxlen;
 
 		e = eobbuf;
-		eobmaxlen = BUFSIZE
-				- 1		/*    ":"     */
-				- SIDLEN 	/*  my SID    */
-				- 6 		/*   " EOB :" */
-				- 2;		/*   "\r\n"   */
+		eobmaxlen = BUFSIZE - 1 /*    ":"     */
+					- SIDLEN	/*  my SID    */
+					- 6			/*   " EOB :" */
+					- 2;		/*   "\r\n"   */
 
 		/* space for last comma and SID (calculation moved
 		 * from "if (e - eobbuf > eobmaxlen)" inside following
 		 * loop)
-		 */ 
+		 */
 		eobmaxlen -= SIDLEN + 1;
-		
+
 		/* send EOBs */
 		for (asptr = svrtop; asptr; asptr = asptr->nexts)
 		{
@@ -1346,15 +1342,15 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			 * finished bursting */
 			if (!IsBursting(asptr->bcptr))
 			{
-				if ((int) (e  - eobbuf) > eobmaxlen)
+				if ((int) (e - eobbuf) > eobmaxlen)
 				{
 					*e = '\0';
 					/* eobbuf always starts with
 					 * comma, so +1 gets rid of it
 					 */
 					sendto_one(cptr, ":%s EOB :%s",
-						me.serv->sid,
-						eobbuf + 1);
+							   me.serv->sid,
+							   eobbuf + 1);
 					e = eobbuf;
 				}
 
@@ -1368,24 +1364,24 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		{
 			*e = '\0';
 			sendto_one(cptr, ":%s EOB :%s", me.serv->sid,
-					eobbuf+1);
+					   eobbuf + 1);
 		}
 		else
 		{
 			sendto_one(cptr, ":%s EOB", me.serv->sid);
 		}
 	}
-#ifdef	ZIP_LINKS
- 	/*
+#ifdef ZIP_LINKS
+	/*
  	** some stats about the connect burst,
  	** they are slightly incorrect because of cptr->zip->outbuf.
  	*/
- 	if ((cptr->flags & FLAGS_ZIP) && cptr->zip->out->total_in)
-	  sendto_flag(SCH_NOTICE,
-		      "Connect burst to %s: %lu, compressed: %lu (%3.1f%%)",
-		      get_client_name(cptr, TRUE),
-		      cptr->zip->out->total_in,cptr->zip->out->total_out,
- 	    (float) 100*cptr->zip->out->total_out/cptr->zip->out->total_in);
+	if ((cptr->flags & FLAGS_ZIP) && cptr->zip->out->total_in)
+		sendto_flag(SCH_NOTICE,
+					"Connect burst to %s: %lu, compressed: %lu (%3.1f%%)",
+					get_client_name(cptr, TRUE),
+					cptr->zip->out->total_in, cptr->zip->out->total_out,
+					(float) 100 * cptr->zip->out->total_out / cptr->zip->out->total_in);
 #endif
 	return 0;
 }
@@ -1395,31 +1391,31 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 **	parv[0] = sender prefix
 **	parv[1] = servername
 */
-int	m_info(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_info(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char **text = infotext;
 
 	if (check_link(sptr))
-	    {
+	{
 		sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]),
-			   "INFO");
+				   "INFO");
 		return 5;
-	    }
-	if (hunt_server(cptr,sptr,":%s INFO :%s",1,parc,parv) == HUNTED_ISME)
-	    {
+	}
+	if (hunt_server(cptr, sptr, ":%s INFO :%s", 1, parc, parv) == HUNTED_ISME)
+	{
 		while (*text)
 			sendto_one(sptr, replies[RPL_INFO], ME, BadTo(parv[0]), *text++);
 
 		sendto_one(sptr, replies[RPL_INFO], ME, BadTo(parv[0]), "");
 		sendto_one(sptr,
-			   ":%s %d %s :Birth Date: %s, compile # %s",
-			   ME, RPL_INFO, parv[0], creation, generation);
+				   ":%s %d %s :Birth Date: %s, compile # %s",
+				   ME, RPL_INFO, parv[0], creation, generation);
 		sendto_one(sptr, ":%s %d %s :On-line since %s",
-			   ME, RPL_INFO, parv[0],
-			   myctime(me.firsttime));
+				   ME, RPL_INFO, parv[0],
+				   myctime(me.firsttime));
 		sendto_one(sptr, replies[RPL_ENDOFINFO], ME, BadTo(parv[0]));
 		return 5;
-	    }
+	}
 	else
 		return 10;
 }
@@ -1433,30 +1429,29 @@ int	m_info(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[1] = server to query 
 **      parv[2] = servername mask
 */
-int	m_links(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_links(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Reg	aServer	*asptr;
-	char	*mask;
-	aClient	*acptr;
+	Reg aServer *asptr;
+	char *mask;
+	aClient *acptr;
 
 	if (parc > 2)
-	    {
+	{
 		if (check_link(sptr))
-		    {
+		{
 			sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]),
-				   "LINKS");
+					   "LINKS");
 			return 5;
-		    }
-		if (hunt_server(cptr, sptr, ":%s LINKS %s :%s", 1, parc, parv)
-				!= HUNTED_ISME)
+		}
+		if (hunt_server(cptr, sptr, ":%s LINKS %s :%s", 1, parc, parv) != HUNTED_ISME)
 			return 5;
 		mask = parv[2];
-	    }
+	}
 	else
 		mask = parc < 2 ? NULL : parv[1];
 
-	for (asptr = svrtop, (void)collapse(mask); asptr; asptr = asptr->nexts) 
-	    {
+	for (asptr = svrtop, (void) collapse(mask); asptr; asptr = asptr->nexts)
+	{
 		acptr = asptr->bcptr;
 		if (IsMasked(acptr))
 		{
@@ -1465,14 +1460,13 @@ int	m_links(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (!BadPtr(mask) && match(mask, acptr->name))
 			continue;
 		sendto_one(sptr, replies[RPL_LINKS], ME, BadTo(parv[0]),
-			   acptr->name, acptr->serv->up->name,
-			   acptr->hopcount, acptr->serv->sid,
-			   (acptr->info[0] ? acptr->info :
-			   "(Unknown Location)"));
-	    }
+				   acptr->name, acptr->serv->up->name,
+				   acptr->hopcount, acptr->serv->sid,
+				   (acptr->info[0] ? acptr->info : "(Unknown Location)"));
+	}
 
 	sendto_one(sptr, replies[RPL_ENDOFLINKS], ME, BadTo(parv[0]),
-		   BadPtr(mask) ? "*" : mask);
+			   BadPtr(mask) ? "*" : mask);
 	return 2;
 }
 
@@ -1486,24 +1480,24 @@ int	m_links(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[2] = server
 **	parv[3] = channel (optional)
 */
-int	m_summon(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_summon(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	char	*host, *user, *chname;
-#ifdef	ENABLE_SUMMON
-	char	hostbuf[17], namebuf[10], linebuf[10];
-#  ifdef LEAST_IDLE
-	char	linetmp[10], ttyname[15]; /* Ack */
-	struct	stat stb;
-	time_t	ltime = (time_t)0;
-#  endif
-	int	fd, flag = 0;
+	char *host, *user, *chname;
+#ifdef ENABLE_SUMMON
+	char hostbuf[17], namebuf[10], linebuf[10];
+#ifdef LEAST_IDLE
+	char linetmp[10], ttyname[15]; /* Ack */
+	struct stat stb;
+	time_t ltime = (time_t) 0;
+#endif
+	int fd, flag = 0;
 #endif
 
 	if (parc < 2 || *parv[1] == '\0')
-	    {
+	{
 		sendto_one(sptr, replies[ERR_NORECIPIENT], ME, BadTo(parv[0]), "SUMMON");
 		return 1;
-	    }
+	}
 	user = parv[1];
 	host = (parc < 3 || BadPtr(parv[2])) ? ME : parv[2];
 	chname = (parc > 3) ? parv[3] : "*";
@@ -1516,64 +1510,64 @@ int	m_summon(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	parv[3] = chname;
 	parv[4] = NULL;
 	if (hunt_server(cptr, sptr, ":%s SUMMON %s %s %s", 2, parc, parv) ==
-	    HUNTED_ISME)
+		HUNTED_ISME)
 	{
 #ifdef ENABLE_SUMMON
 		if ((fd = utmp_open()) == -1)
 		{
 			sendto_one(sptr, replies[ERR_FILEERROR], ME, BadTo(parv[0]),
-				   "open", UTMP);
+					   "open", UTMP);
 			return 1;
 		}
 
-#  ifndef LEAST_IDLE
+#ifndef LEAST_IDLE
 		while ((flag = utmp_read(fd, namebuf, linebuf, hostbuf,
-					 sizeof(hostbuf))) == 0) 
+								 sizeof(hostbuf))) == 0)
 		{
-			if (StrEq(namebuf,user))
+			if (StrEq(namebuf, user))
 			{
 				break;
 			}
 		}
-#  else	/* LEAST_IDLE */
+#else  /* LEAST_IDLE */
 		/* use least-idle tty, not the first
 		 * one we find in utmp. 10/9/90 Spike@world.std.com
 		 * (loosely based on Jim Frost jimf@saber.com code)
 		 */
-		
+
 		while ((flag = utmp_read(fd, namebuf, linetmp, hostbuf,
-					 sizeof(hostbuf))) == 0)
+								 sizeof(hostbuf))) == 0)
 		{
-			if (StrEq(namebuf,user))
+			if (StrEq(namebuf, user))
 			{
-				sprintf(ttyname,"/dev/%s",linetmp);
-				if (stat(ttyname,&stb) == -1)
+				sprintf(ttyname, "/dev/%s", linetmp);
+				if (stat(ttyname, &stb) == -1)
 				{
 					sendto_one(sptr,
-						   replies[ERR_FILEERROR],
-						   ME, BadTo(sptr->name),
-						   "stat", ttyname);
+							   replies[ERR_FILEERROR],
+							   ME, BadTo(sptr->name),
+							   "stat", ttyname);
 					return 1;
 				}
 				if (!ltime)
 				{
-					ltime= stb.st_mtime;
-					(void)strcpy(linebuf,linetmp);
+					ltime = stb.st_mtime;
+					(void) strcpy(linebuf, linetmp);
 				}
 				else if (stb.st_mtime > ltime) /* less idle */
 				{
-					ltime= stb.st_mtime;
-					(void)strcpy(linebuf,linetmp);
+					ltime = stb.st_mtime;
+					(void) strcpy(linebuf, linetmp);
 				}
 			}
 		}
-#  endif /* LEAST_IDLE */
-		(void)utmp_close(fd);
-#  ifdef LEAST_IDLE
+#endif /* LEAST_IDLE */
+		(void) utmp_close(fd);
+#ifdef LEAST_IDLE
 		if (ltime == 0)
-#  else
+#else
 		if (flag == -1)
-#  endif
+#endif
 		{
 			sendto_one(sptr, replies[ERR_NOLOGIN], ME, BadTo(parv[0]), user);
 		}
@@ -1581,7 +1575,7 @@ int	m_summon(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{
 			summon(sptr, user, linebuf, chname);
 		}
-#else	/* ENABLE_SUMMON */
+#else  /* ENABLE_SUMMON */
 		sendto_one(sptr, replies[ERR_SUMMONDISABLED], ME, BadTo(parv[0]));
 #endif /* ENABLE_SUMMON */
 	}
@@ -1593,7 +1587,7 @@ int	m_summon(aClient *cptr, aClient *sptr, int parc, char *parv[])
 }
 /* stats ? - quick info about connected servers
  */
-static	void	report_myservers(aClient *sptr, char *to)
+static void report_myservers(aClient *sptr, char *to)
 {
 	int i;
 	int timeconnected;
@@ -1606,7 +1600,7 @@ static	void	report_myservers(aClient *sptr, char *to)
 		{
 			continue;
 		}
-		
+
 		if (IsMe(acptr) || !IsServer(acptr))
 		{
 			continue;
@@ -1614,26 +1608,26 @@ static	void	report_myservers(aClient *sptr, char *to)
 		timeconnected = timeofday - acptr->firsttime;
 		count_servers_users(acptr, &servers, &users);
 		sendto_one(sptr,
-			   ":%s %d %s :%s (%d, %02d:%02d:%02d) %dS %dC"
-			   " %lldkB sent %lldkB recv %ldkB sq %sV%X%s",
-			   ME, RPL_STATSDEBUG, to, acptr->name,
-			   timeconnected / 86400,
-			   (timeconnected % 86400) / 3600,
-			   (timeconnected % 3600)/60,
-			   timeconnected % 60,
-			   servers, users,
-			   (acptr->sendB / 1024) ,
-			   (acptr->receiveB / 1024),
-			   (int) ((int)DBufLength(&acptr->sendQ) / 1024),
-			   IsBursting(acptr) ? "BURST " : "",
-			   acptr->serv->version,
-			   (acptr->flags & FLAGS_ZIP) ?  "z" : "");
+				   ":%s %d %s :%s (%d, %02d:%02d:%02d) %dS %dC"
+				   " %lldkB sent %lldkB recv %ldkB sq %sV%X%s",
+				   ME, RPL_STATSDEBUG, to, acptr->name,
+				   timeconnected / 86400,
+				   (timeconnected % 86400) / 3600,
+				   (timeconnected % 3600) / 60,
+				   timeconnected % 60,
+				   servers, users,
+				   (acptr->sendB / 1024),
+				   (acptr->receiveB / 1024),
+				   (int) ((int) DBufLength(&acptr->sendQ) / 1024),
+				   IsBursting(acptr) ? "BURST " : "",
+				   acptr->serv->version,
+				   (acptr->flags & FLAGS_ZIP) ? "z" : "");
 	}
 }
 
 /* Count number of servers and users behind client cptr.
 ** Values are put on provided servers and users. */
-void	count_servers_users(aClient *cptr, int *servers, int *users)
+void count_servers_users(aClient *cptr, int *servers, int *users)
 {
 #ifdef HUB
 	aServer *asptr;
@@ -1686,31 +1680,31 @@ void	count_servers_users(aClient *cptr, int *servers, int *users)
 */
 
 static int report_array[18][3] = {
-		{ CONF_ZCONNECT_SERVER,	  RPL_STATSCLINE, 'c'},
-		{ CONF_CONNECT_SERVER,	  RPL_STATSCLINE, 'C'},
-		{ CONF_NOCONNECT_SERVER,  RPL_STATSNLINE, 'N'},
-		{ CONF_CLIENT,		  RPL_STATSILINE, 'I'},
-		{ CONF_OTHERKILL,	  RPL_STATSKLINE, 'k'},
-		{ CONF_KILL,		  RPL_STATSKLINE, 'K'},
-		{ CONF_QUARANTINED_SERVER,RPL_STATSQLINE, 'Q'},
-		{ CONF_LEAF,		  RPL_STATSLLINE, 'L'},
-		{ CONF_OPERATOR,	  RPL_STATSOLINE, 'O'},
-		{ CONF_HUB,		  RPL_STATSHLINE, 'H'},
-		{ CONF_SERVICE,		  RPL_STATSSLINE, 'S'},
-		{ CONF_VER,		  RPL_STATSVLINE, 'V'},
-		{ CONF_BOUNCE,		  RPL_STATSBLINE, 'B'},
-		{ CONF_DENY,		  RPL_STATSDLINE, 'D'},
+		{CONF_ZCONNECT_SERVER, RPL_STATSCLINE, 'c'},
+		{CONF_CONNECT_SERVER, RPL_STATSCLINE, 'C'},
+		{CONF_NOCONNECT_SERVER, RPL_STATSNLINE, 'N'},
+		{CONF_CLIENT, RPL_STATSILINE, 'I'},
+		{CONF_OTHERKILL, RPL_STATSKLINE, 'k'},
+		{CONF_KILL, RPL_STATSKLINE, 'K'},
+		{CONF_QUARANTINED_SERVER, RPL_STATSQLINE, 'Q'},
+		{CONF_LEAF, RPL_STATSLLINE, 'L'},
+		{CONF_OPERATOR, RPL_STATSOLINE, 'O'},
+		{CONF_HUB, RPL_STATSHLINE, 'H'},
+		{CONF_SERVICE, RPL_STATSSLINE, 'S'},
+		{CONF_VER, RPL_STATSVLINE, 'V'},
+		{CONF_BOUNCE, RPL_STATSBLINE, 'B'},
+		{CONF_DENY, RPL_STATSDLINE, 'D'},
 #ifdef TKLINE
-		{ CONF_TOTHERKILL,	  RPL_STATSKLINE, 'k'},
-		{ CONF_TKILL,		  RPL_STATSKLINE, 'K'},
+		{CONF_TOTHERKILL, RPL_STATSKLINE, 'k'},
+		{CONF_TKILL, RPL_STATSKLINE, 'K'},
 #else
-		{ 0, 0, 0}, { 0, 0, 0},
+		{0, 0, 0},
+		{0, 0, 0},
 #endif
-		{ 0, 0, 0}
-	};
+		{0, 0, 0}};
 
 #ifdef XLINE
-static  void    report_x_lines(aClient *sptr, char *to)
+static void report_x_lines(aClient *sptr, char *to)
 {
 	aConfItem *tmp;
 
@@ -1719,110 +1713,104 @@ static  void    report_x_lines(aClient *sptr, char *to)
 		if (tmp->status != CONF_XLINE)
 			continue;
 
-		sendto_one(sptr,":%s %d %s X :%s %s %s %s %s %s", 
-			ME, RPL_STATSDEBUG, to,
-			BadTo(tmp->host), BadTo(tmp->passwd),
-			BadTo(tmp->name), BadTo(tmp->name2),
-			BadTo(tmp->name3), BadTo(tmp->source_ip));
+		sendto_one(sptr, ":%s %d %s X :%s %s %s %s %s %s",
+				   ME, RPL_STATSDEBUG, to,
+				   BadTo(tmp->host), BadTo(tmp->passwd),
+				   BadTo(tmp->name), BadTo(tmp->name2),
+				   BadTo(tmp->name3), BadTo(tmp->source_ip));
 	}
 }
 #endif
 
-static	void	report_configured_links(aClient *sptr, char *to, int mask)
+static void report_configured_links(aClient *sptr, char *to, int mask)
 {
-	static	char	null[] = "<NULL>";
+	static char null[] = "<NULL>";
 	aConfItem *tmp;
-	int	*p, port;
-	char	c, *host, *pass, *name;
+	int *p, port;
+	char c, *host, *pass, *name;
 
-	if ((mask & (CONF_KILL|CONF_OTHERKILL)))
+	if ((mask & (CONF_KILL | CONF_OTHERKILL)))
 		tmp = kconf;
 #ifdef TKLINE
-	else if ((mask & (CONF_TKILL|CONF_TOTHERKILL)))
+	else if ((mask & (CONF_TKILL | CONF_TOTHERKILL)))
 		tmp = tkconf;
 #endif
 	else
 		tmp = conf;
-	
+
 	for (; tmp; tmp = tmp->next)
 		if (tmp->status & mask)
-		    {
+		{
 			for (p = &report_array[0][0]; *p; p += 3)
 				if (*p == tmp->status)
 					break;
 			if (!*p)
 				continue;
-			c = (char)*(p+2);
+			c = (char) *(p + 2);
 			host = BadPtr(tmp->host) ? null : tmp->host;
 			pass = BadPtr(tmp->passwd) ? NULL : tmp->passwd;
 			name = BadPtr(tmp->name) ? null : tmp->name;
-			port = (int)tmp->port;
+			port = (int) tmp->port;
 			/*
 			 * On K/V lines the passwd contents can be
 			 * displayed on STATS reply. 	-Vesa
 			 * Also H: is safe, we have SID mask there. --B.
 			 */
-			if (tmp->status == CONF_KILL
-			    || tmp->status == CONF_OTHERKILL
-			    || tmp->status == CONF_HUB
-			    || tmp->status == CONF_QUARANTINED_SERVER
-			    || tmp->status == CONF_VER)
+			if (tmp->status == CONF_KILL || tmp->status == CONF_OTHERKILL || tmp->status == CONF_HUB || tmp->status == CONF_QUARANTINED_SERVER || tmp->status == CONF_VER)
 			{
 				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
-					   c, host, (pass) ? pass : null,
-					   name, port, get_conf_class(tmp));
+						   c, host, (pass) ? pass : null,
+						   name, port, get_conf_class(tmp));
 			}
 #ifdef TKLINE
-			else if ((tmp->status & (CONF_TKILL|CONF_TOTHERKILL)))
+			else if ((tmp->status & (CONF_TKILL | CONF_TOTHERKILL)))
 			{
 				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
-					   c, host, (pass) ? pass : null,
-					   name, tmp->hold - timeofday,
-					   get_conf_class(tmp));
+						   c, host, (pass) ? pass : null,
+						   name, tmp->hold - timeofday,
+						   get_conf_class(tmp));
 			}
 #endif
 			else if ((tmp->status & CONF_CLIENT))
 			{
 				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
-					   c, host, (pass) ? "*" : null,
-					   name, port, get_conf_class(tmp),
-					   iline_flags_to_string(tmp->flags));
-
+						   c, host, (pass) ? "*" : null,
+						   name, port, get_conf_class(tmp),
+						   iline_flags_to_string(tmp->flags));
 			}
 			else if ((tmp->status & CONF_OPERATOR))
 			{
 				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
-					   c, host, (pass) ? "*" : null,
-					   name, port, get_conf_class(tmp),
-					   oline_flags_to_string(tmp->flags));
-
+						   c, host, (pass) ? "*" : null,
+						   name, port, get_conf_class(tmp),
+						   oline_flags_to_string(tmp->flags));
 			}
 			else
 				sendto_one(sptr, replies[p[1]], ME, BadTo(to),
-					   c, host, (pass) ? "*" : null,
-					   name, port, get_conf_class(tmp));
-		    }
+						   c, host, (pass) ? "*" : null,
+						   name, port, get_conf_class(tmp));
+		}
 	return;
 }
 
-static	void	report_ping(aClient *sptr, char *to)
+static void report_ping(aClient *sptr, char *to)
 {
 	aConfItem *tmp;
-	aCPing	*cp;
+	aCPing *cp;
 
 	for (tmp = conf; tmp; tmp = tmp->next)
 		if ((cp = tmp->ping) && cp->lseq)
-		    {
+		{
 			if (mycmp(tmp->name, tmp->host))
-				sprintf(buf,"%s[%s]",tmp->name, tmp->host);
+				sprintf(buf, "%s[%s]", tmp->name, tmp->host);
 			else
-				(void)strcpy(buf, tmp->name);
+				(void) strcpy(buf, tmp->name);
 			sendto_one(sptr, replies[RPL_STATSPING], ME, BadTo(to),
-				   buf, cp->lseq, cp->lrecvd,
-				   cp->ping / (cp->recvd ? cp->recvd : 1),
-				   tmp->pref);
+					   buf, cp->lseq, cp->lrecvd,
+					   cp->ping / (cp->recvd ? cp->recvd : 1),
+					   tmp->pref);
 			/* sendto_flag(SCH_DEBUG, "%s: %d", buf, cp->seq); */
-		    }
+		}
 	return;
 }
 
@@ -1833,80 +1821,85 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 
 	if (IsMe(acptr) || !acptr->acpt || !IsRegistered(acptr))
 		return;
-	ret = 
+	ret =
 #ifdef INET6
-		inetntop(AF_INET6,
-		(char *)&acptr->acpt->ip,
-		ipv6string, sizeof(ipv6string));
+			inetntop(AF_INET6,
+					 (char *) &acptr->acpt->ip,
+					 ipv6string, sizeof(ipv6string));
 #else
-		inetntoa((char *)&acptr->acpt->ip);
+			inetntoa((char *) &acptr->acpt->ip);
 #endif
 	s = strlen(ret) + 1;
 	memcpy(locip, ret, s < sizeof(locip) ? s : sizeof(locip));
 	locip[sizeof(locip) - 1] = 0;
-	sendto_one(sptr,":%s %d %s %d %s %d %s %d %s %s %d",
-		ME,RPL_STATSLINKINFO,to,
-		acptr->fd,
-		locip,
-		acptr->acpt->port,
+	sendto_one(sptr, ":%s %d %s %d %s %d %s %d %s %s %d",
+			   ME, RPL_STATSLINKINFO, to,
+			   acptr->fd,
+			   locip,
+			   acptr->acpt->port,
 #ifdef INET6
-		inetntop(AF_INET6,
-		(char *)&acptr->ip,
-		ipv6string, sizeof(ipv6string)),
+			   inetntop(AF_INET6,
+						(char *) &acptr->ip,
+						ipv6string, sizeof(ipv6string)),
 #else
-		inetntoa((char *)&acptr->ip),
+			   inetntoa((char *) &acptr->ip),
 #endif
-		acptr->port,acptr->name,
-		acptr->user ? acptr->user->username : acptr->auth,
-		acptr->user ? timeofday - acptr->user->last : -1
-		);
+			   acptr->port, acptr->name,
+			   acptr->user ? acptr->user->username : acptr->auth,
+			   acptr->user ? timeofday - acptr->user->last : -1);
 }
 
-int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	static	char	Lformat[]  = ":%s %d %s %s %u %lu %llu %lu %llu :%d";
-	struct	Message	*mptr;
-	aClient	*acptr;
-	char	stat = parc > 1 ? parv[1][0] : '\0';
-	Reg	int	i;
-	int	wilds, doall;
-	char	*name, *cm;
+	static char Lformat[] = ":%s %d %s %s %u %lu %llu %lu %llu :%d";
+	struct Message *mptr;
+	aClient *acptr;
+	char stat = parc > 1 ? parv[1][0] : '\0';
+	Reg int i;
+	int wilds, doall;
+	char *name, *cm;
 
 	/* If request from remote client, let's tame it a little. */
 	if (IsServer(cptr))
 	{
 		/* These stats usually output large quantity of lines. */
-		switch(stat)
+		switch (stat)
 		{
-		case 'i': case 'I':
-		case 'c': case 'C':
-		case 'k': case 'K':
-		case 'm': case 'M':
-		case 't': case 'T':
-		case 'z': case 'Z':
-			if (check_link(sptr))
-			{
-				sendto_one(sptr, replies[RPL_TRYAGAIN], ME,
-					BadTo(parv[0]), "STATS");
-				return 5;
-			}
+			case 'i':
+			case 'I':
+			case 'c':
+			case 'C':
+			case 'k':
+			case 'K':
+			case 'm':
+			case 'M':
+			case 't':
+			case 'T':
+			case 'z':
+			case 'Z':
+				if (check_link(sptr))
+				{
+					sendto_one(sptr, replies[RPL_TRYAGAIN], ME,
+							   BadTo(parv[0]), "STATS");
+					return 5;
+				}
 		}
 	}
 	if (parc == 3)
-	    {
+	{
 		if (hunt_server(cptr, sptr, ":%s STATS %s %s",
-				2, parc, parv) != HUNTED_ISME)
+						2, parc, parv) != HUNTED_ISME)
 			return 5;
-	    }
+	}
 	else if (parc >= 3)
-	    {
+	{
 		if (hunt_server(cptr, sptr, ":%s STATS %s %s %s",
-				2, parc, parv) != HUNTED_ISME)
+						2, parc, parv) != HUNTED_ISME)
 			return 5;
-	    }
+	}
 
 	name = (parc > 2) ? parv[2] : ME;
-	cm = (parc > 3) ? parv[3]: name;
+	cm = (parc > 3) ? parv[3] : name;
 	doall = !match(name, ME) && !match(cm, ME);
 	wilds = index(cm, '*') || index(cm, '?') || index(cm, '#');
 
@@ -1920,224 +1913,235 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	switch (stat)
 	{
-	case 'f' : case 'F' :
-		/* send list of file descriptors 
+		case 'f':
+		case 'F':
+			/* send list of file descriptors 
 		 * Avaible only for local opers for security reasons.
 		 */
-		if (!is_allowed(sptr, ACL_TRACE) || !MyConnect(sptr))
-		{
-			stat = '*';
+			if (!is_allowed(sptr, ACL_TRACE) || !MyConnect(sptr))
+			{
+				stat = '*';
+				break;
+			}
+			if (doall || wilds)
+			{
+				for (i = 0; i <= highest_fd; i++)
+				{
+					if (!(acptr = local[i]))
+						continue;
+
+					if (wilds && match(cm, acptr->name))
+						continue;
+					report_fd(sptr, acptr, parv[0]);
+				}
+			}
+			else
+			{
+				if ((acptr = find_client(cm, NULL)))
+					report_fd(sptr, acptr, parv[0]);
+			}
 			break;
-		}
-		if (doall || wilds)
-		    {
-			for (i = 0; i <= highest_fd; i++)
-			    {
-				if (!(acptr = local[i]))
-					continue;
 
-				if (wilds && match(cm, acptr->name))
-					continue;
-				report_fd(sptr, acptr, parv[0]);
-			    }
-		    }
-		else
-		    {
-			if ((acptr = find_client(cm, NULL)))
-				report_fd(sptr, acptr, parv[0]);
-		    }
-		break;
+			/* fallthru to stats l */
 
-		/* fallthru to stats l */
-		
-	case 'L' : case 'l' :
-		/*
+		case 'L':
+		case 'l':
+			/*
 		 * send info about connections which match, or all if the
 		 * mask matches ME.  Only restrictions are on those who
 		 * are invisible not being visible to 'foreigners' who use
 		 * a wild card based search to list it.
 		 */
-		if (doall || wilds)
-		    {
-			if (check_link(sptr))
-		    	{
-				sendto_one(sptr, replies[RPL_TRYAGAIN], ME,
-					BadTo(parv[0]), "STATS");
-				return 5;
-		    	}
-			for (i = 0; i <= highest_fd; i++)
-			    {
-				if (!(acptr = local[i]))
-					continue;
-				if (IsUnknown(acptr) && 
-					!(IsAnOper(sptr) && SendWallops(sptr)))
-					continue;
-				if (IsPerson(acptr) && (!MyConnect(sptr)
-				    || !is_allowed(sptr, ACL_TRACE)) && acptr != sptr)
-					continue;
-				if (wilds && match(cm, acptr->name))
-					continue;
-				sendto_one(cptr, Lformat, ME,
-					RPL_STATSLINKINFO, parv[0],
-					get_client_name(acptr, isupper(stat)),
-					(int)DBufLength(&acptr->sendQ),
-					acptr->sendM, acptr->sendB,
-					acptr->receiveM, acptr->receiveB,
-					(int)(timeofday - acptr->firsttime));
-			    }
-		    }
-		else
-		    {
-			if ((acptr = find_client(cm, NULL)) && MyConnect(acptr))
-				sendto_one(cptr, Lformat, ME,
-					RPL_STATSLINKINFO, parv[0],
-					get_client_name(acptr, isupper(stat)),
-					(int)DBufLength(&acptr->sendQ),
-					acptr->sendM, acptr->sendB,
-					acptr->receiveM, acptr->receiveB,
-					(int)(timeofday - acptr->firsttime));
-			
-		    }
-		break;
+			if (doall || wilds)
+			{
+				if (check_link(sptr))
+				{
+					sendto_one(sptr, replies[RPL_TRYAGAIN], ME,
+							   BadTo(parv[0]), "STATS");
+					return 5;
+				}
+				for (i = 0; i <= highest_fd; i++)
+				{
+					if (!(acptr = local[i]))
+						continue;
+					if (IsUnknown(acptr) &&
+						!(IsAnOper(sptr) && SendWallops(sptr)))
+						continue;
+					if (IsPerson(acptr) && (!MyConnect(sptr) || !is_allowed(sptr, ACL_TRACE)) && acptr != sptr)
+						continue;
+					if (wilds && match(cm, acptr->name))
+						continue;
+					sendto_one(cptr, Lformat, ME,
+							   RPL_STATSLINKINFO, parv[0],
+							   get_client_name(acptr, isupper(stat)),
+							   (int) DBufLength(&acptr->sendQ),
+							   acptr->sendM, acptr->sendB,
+							   acptr->receiveM, acptr->receiveB,
+							   (int) (timeofday - acptr->firsttime));
+				}
+			}
+			else
+			{
+				if ((acptr = find_client(cm, NULL)) && MyConnect(acptr))
+					sendto_one(cptr, Lformat, ME,
+							   RPL_STATSLINKINFO, parv[0],
+							   get_client_name(acptr, isupper(stat)),
+							   (int) DBufLength(&acptr->sendQ),
+							   acptr->sendM, acptr->sendB,
+							   acptr->receiveM, acptr->receiveB,
+							   (int) (timeofday - acptr->firsttime));
+			}
+			break;
 #if defined(USE_IAUTH)
-	case 'a' : case 'A' : /* iauth configuration */
-		report_iauth_conf(sptr, parv[0]);
-		break;
+		case 'a':
+		case 'A': /* iauth configuration */
+			report_iauth_conf(sptr, parv[0]);
+			break;
 #endif
-	case 'B' : case 'b' : /* B conf lines */
-		report_configured_links(cptr, parv[0], CONF_BOUNCE);
-		break;
-	case 'c': /* C and N conf lines */
-		report_configured_links(cptr, parv[0], CONF_CONNECT_SERVER|
-					CONF_ZCONNECT_SERVER|
-					CONF_NOCONNECT_SERVER);
-		break;
-	case 'd' : case 'D' : /* defines */
-		send_defines(cptr, parv[0], parv[1]);
-		break;
-	case 'H' : case 'h' : /* H, L and D conf lines */
-		report_configured_links(cptr, parv[0],
-					CONF_HUB|CONF_LEAF|CONF_DENY);
-		break;
-	case 'I' : case 'i' : /* I (and i) conf lines */
-		report_configured_links(cptr, parv[0], CONF_CLIENT);
-		break;
-	case 'k' : /* temporary K lines */
+		case 'B':
+		case 'b': /* B conf lines */
+			report_configured_links(cptr, parv[0], CONF_BOUNCE);
+			break;
+		case 'c': /* C and N conf lines */
+			report_configured_links(cptr, parv[0], CONF_CONNECT_SERVER | CONF_ZCONNECT_SERVER | CONF_NOCONNECT_SERVER);
+			break;
+		case 'd':
+		case 'D': /* defines */
+			send_defines(cptr, parv[0], parv[1]);
+			break;
+		case 'H':
+		case 'h': /* H, L and D conf lines */
+			report_configured_links(cptr, parv[0],
+									CONF_HUB | CONF_LEAF | CONF_DENY);
+			break;
+		case 'I':
+		case 'i': /* I (and i) conf lines */
+			report_configured_links(cptr, parv[0], CONF_CLIENT);
+			break;
+		case 'k': /* temporary K lines */
 #ifdef TKLINE
 #ifdef DISABLE_STATSTKLINE
-		if (!IsAnOper(sptr))
-		{
-			sendto_one(sptr, replies[ERR_NOPRIVILEGES],
-				ME, BadTo(parv[0]));
-			return 2;
-		}
-		else
-#endif
-		report_configured_links(cptr, parv[0],
-			(CONF_TKILL|CONF_TOTHERKILL));
-		break;
-#endif
-	case 'K' : /* K lines */
-#ifdef TXT_NOSTATSK
-		if (!IsAnOper(sptr))
-		{
-			sendto_one(sptr, replies[ERR_STATSKLINE],
-				ME, BadTo(parv[0]));
-			return 2;
-		}
-		else
-#endif
-		report_configured_links(cptr, parv[0],
-			(CONF_KILL|CONF_OTHERKILL));
-		break;
-	case 'M' : case 'm' : /* commands use/stats */
-		for (mptr = msgtab; mptr->cmd; mptr++)
-		{
-#define _mh(n) (mptr->handlers[n])
-			if (_mh(0).count + _mh(1).count + _mh(2).count
-				+ _mh(3).count + _mh(4).count > 0)
+			if (!IsAnOper(sptr))
 			{
-				sendto_one(cptr, replies[RPL_STATSCOMMANDS],
-					ME, BadTo(parv[0]), mptr->cmd,
-					_mh(0).count, _mh(0).bytes,
-					_mh(0).rcount, _mh(0).rbytes,
-					_mh(1).count, _mh(1).bytes,
-					_mh(1).rcount, _mh(1).rbytes,
-					_mh(2).count, _mh(2).bytes,
-					_mh(2).rcount, _mh(2).rbytes,
-					_mh(3).count, _mh(3).bytes,
-					_mh(3).rcount, _mh(3).rbytes,
-					_mh(4).count, _mh(4).bytes,
-					_mh(4).rcount, _mh(4).rbytes);
+				sendto_one(sptr, replies[ERR_NOPRIVILEGES],
+						   ME, BadTo(parv[0]));
+				return 2;
 			}
+			else
+#endif
+				report_configured_links(cptr, parv[0],
+										(CONF_TKILL | CONF_TOTHERKILL));
+			break;
+#endif
+		case 'K': /* K lines */
+#ifdef TXT_NOSTATSK
+			if (!IsAnOper(sptr))
+			{
+				sendto_one(sptr, replies[ERR_STATSKLINE],
+						   ME, BadTo(parv[0]));
+				return 2;
+			}
+			else
+#endif
+				report_configured_links(cptr, parv[0],
+										(CONF_KILL | CONF_OTHERKILL));
+			break;
+		case 'M':
+		case 'm': /* commands use/stats */
+			for (mptr = msgtab; mptr->cmd; mptr++)
+			{
+#define _mh(n) (mptr->handlers[n])
+				if (_mh(0).count + _mh(1).count + _mh(2).count + _mh(3).count + _mh(4).count > 0)
+				{
+					sendto_one(cptr, replies[RPL_STATSCOMMANDS],
+							   ME, BadTo(parv[0]), mptr->cmd,
+							   _mh(0).count, _mh(0).bytes,
+							   _mh(0).rcount, _mh(0).rbytes,
+							   _mh(1).count, _mh(1).bytes,
+							   _mh(1).rcount, _mh(1).rbytes,
+							   _mh(2).count, _mh(2).bytes,
+							   _mh(2).rcount, _mh(2).rbytes,
+							   _mh(3).count, _mh(3).bytes,
+							   _mh(3).rcount, _mh(3).rbytes,
+							   _mh(4).count, _mh(4).bytes,
+							   _mh(4).rcount, _mh(4).rbytes);
+				}
 #undef _mh
-		}
-		break;
-	case 'o' : case 'O' : /* O (and o) lines */
-		report_configured_links(cptr, parv[0], CONF_OPS);
-		break;
-	case 'P': /* ports listening */
-		report_listeners(sptr, parv[0]);
-		break;
-	case 'p' : /* ircd ping stats */
-		report_ping(sptr, parv[0]);
-		break;
-	case 'Q' : case 'q' : /* Q lines */
-		report_configured_links(cptr,parv[0],CONF_QUARANTINED_SERVER);
-		break;
-	case 'R' : case 'r' : /* usage */
-		send_usage(cptr, parv[0]);
-		break;
-	case 'S' : case 's' : /* S lines */
-		report_configured_links(cptr, parv[0], CONF_SERVICE);
-		break;
-	case 'T' : case 't' : /* various statistics */
-		tstats(cptr, parv[0]);
-		break;
-	case 'U' : case 'u' : /* uptime */
-	    {
-		register time_t now;
-
-		now = timeofday - me.since;
-		sendto_one(sptr, replies[RPL_STATSUPTIME], ME, BadTo(parv[0]),
-			   now/86400, (now/3600)%24, (now/60)%60, now%60);
-		break;
-	    }
-	case 'V' : case 'v' : /* V conf lines */
-		report_configured_links(cptr, parv[0], CONF_VER);
-		break;
-	case 'X' :
-#ifdef XLINE
-		if (IsAnOper(sptr))
+			}
+			break;
+		case 'o':
+		case 'O': /* O (and o) lines */
+			report_configured_links(cptr, parv[0], CONF_OPS);
+			break;
+		case 'P': /* ports listening */
+			report_listeners(sptr, parv[0]);
+			break;
+		case 'p': /* ircd ping stats */
+			report_ping(sptr, parv[0]);
+			break;
+		case 'Q':
+		case 'q': /* Q lines */
+			report_configured_links(cptr, parv[0], CONF_QUARANTINED_SERVER);
+			break;
+		case 'R':
+		case 'r': /* usage */
+			send_usage(cptr, parv[0]);
+			break;
+		case 'S':
+		case 's': /* S lines */
+			report_configured_links(cptr, parv[0], CONF_SERVICE);
+			break;
+		case 'T':
+		case 't': /* various statistics */
+			tstats(cptr, parv[0]);
+			break;
+		case 'U':
+		case 'u': /* uptime */
 		{
-			report_x_lines(sptr, parv[0]);
+			register time_t now;
+
+			now = timeofday - me.since;
+			sendto_one(sptr, replies[RPL_STATSUPTIME], ME, BadTo(parv[0]),
+					   now / 86400, (now / 3600) % 24, (now / 60) % 60, now % 60);
+			break;
 		}
+		case 'V':
+		case 'v': /* V conf lines */
+			report_configured_links(cptr, parv[0], CONF_VER);
+			break;
+		case 'X':
+#ifdef XLINE
+			if (IsAnOper(sptr))
+			{
+				report_x_lines(sptr, parv[0]);
+			}
 #endif
-		break;
-	case 'x' : /* lists */
+			break;
+		case 'x': /* lists */
 #ifdef DEBUGMODE
-		send_listinfo(cptr, parv[0]);
+			send_listinfo(cptr, parv[0]);
 #endif
-		break;
-	case 'Y' : case 'y' : /* Y lines */
-		report_classes(cptr, parv[0]);
-		break;
-	case 'Z':
+			break;
+		case 'Y':
+		case 'y': /* Y lines */
+			report_classes(cptr, parv[0]);
+			break;
+		case 'Z':
 #ifdef DEBUGMODE
-		/* memory use (OPER only) */
-		if (MyOper(sptr))
-			count_memory(cptr, parv[0], 1);
-		else
+			/* memory use (OPER only) */
+			if (MyOper(sptr))
+				count_memory(cptr, parv[0], 1);
+			else
 #endif
-	case 'z' :	      /* memory use */
-		count_memory(cptr, parv[0], 0);
-		break;
-	case '?' :
-		report_myservers(sptr, parv[0]);
-		break;
-	default :
-		stat = '*';
-		break;
+			case 'z': /* memory use */
+				count_memory(cptr, parv[0], 0);
+			break;
+		case '?':
+			report_myservers(sptr, parv[0]);
+			break;
+		default:
+			stat = '*';
+			break;
 	}
 	sendto_one(cptr, replies[RPL_ENDOFSTATS], ME, BadTo(parv[0]), stat);
 	return 2;
@@ -2148,11 +2152,10 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[0] = sender prefix
 **	parv[1] = servername
 */
-int	m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	if (parc > 1 &&
-		hunt_server(cptr, sptr, ":%s USERS :%s", 1, parc, parv)
-		!= HUNTED_ISME)
+		hunt_server(cptr, sptr, ":%s USERS :%s", 1, parc, parv) != HUNTED_ISME)
 	{
 		return 3;
 	}
@@ -2160,47 +2163,47 @@ int	m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #ifdef USERS_RFC1459
 	{
 #ifdef USERS_SHOWS_UTMP
-		char	namebuf[10],linebuf[10],hostbuf[17];
-		int	fd, flag = 0;
+		char namebuf[10], linebuf[10], hostbuf[17];
+		int fd, flag = 0;
 
 		if ((fd = utmp_open()) == -1)
-		    {
+		{
 			sendto_one(sptr, replies[ERR_FILEERROR], ME, BadTo(parv[0]),
-				   "open", UTMP);
+					   "open", UTMP);
 			return 1;
-		    }
+		}
 
 		sendto_one(sptr, replies[RPL_USERSSTART], ME, BadTo(parv[0]));
 		while (utmp_read(fd, namebuf, linebuf,
-				 hostbuf, sizeof(hostbuf)) == 0)
-		    {
+						 hostbuf, sizeof(hostbuf)) == 0)
+		{
 			flag = 1;
 			sendto_one(sptr, replies[RPL_USERS], ME, BadTo(parv[0]),
-				   namebuf, linebuf, hostbuf);
-		    }
-		if (flag == 0) 
+					   namebuf, linebuf, hostbuf);
+		}
+		if (flag == 0)
 			sendto_one(sptr, replies[RPL_NOUSERS], ME, BadTo(parv[0]));
 
 		sendto_one(sptr, replies[RPL_ENDOFUSERS], ME, BadTo(parv[0]));
-		(void)utmp_close(fd);
+		(void) utmp_close(fd);
 #else
 		sendto_one(sptr, replies[ERR_USERSDISABLED], ME, BadTo(parv[0]));
 #endif
 	}
-#else /* USERS_RFC1459 */
+#else  /* USERS_RFC1459 */
 	(void) send_users(cptr, sptr, parc, parv);
 #endif /* USERS_RFC1459 */
 	return 2;
 }
 
-int	send_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int send_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-        sendto_one(sptr, replies[RPL_LOCALUSERS], ME, BadTo(parv[0]),
-		istat.is_myclnt, istat.is_m_myclnt,
-		istat.is_myclnt, istat.is_m_myclnt);
-        sendto_one(sptr, replies[RPL_GLOBALUSERS], ME, BadTo(parv[0]),
-		istat.is_user[0] + istat.is_user[1], istat.is_m_users,
-		istat.is_user[0] + istat.is_user[1], istat.is_m_users);
+	sendto_one(sptr, replies[RPL_LOCALUSERS], ME, BadTo(parv[0]),
+			   istat.is_myclnt, istat.is_m_myclnt,
+			   istat.is_myclnt, istat.is_m_myclnt);
+	sendto_one(sptr, replies[RPL_GLOBALUSERS], ME, BadTo(parv[0]),
+			   istat.is_user[0] + istat.is_user[1], istat.is_m_users,
+			   istat.is_user[0] + istat.is_user[1], istat.is_m_users);
 	return 2;
 }
 
@@ -2212,14 +2215,14 @@ int	send_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[0] = sender prefix
 **	parv[*] = parameters
 */
-int	m_error(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_error(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Reg	char	*para;
+	Reg char *para;
 
 	para = (parc > 1 && *parv[1] != '\0') ? parv[1] : "<>";
 
-	Debug((DEBUG_ERROR,"Received ERROR message from %s: %s",
-	      sptr->name, para));
+	Debug((DEBUG_ERROR, "Received ERROR message from %s: %s",
+		   sptr->name, para));
 	/*
 	** Ignore error messages generated by normal user clients
 	** (because ill-behaving user clients would flood opers
@@ -2230,10 +2233,10 @@ int	m_error(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return 2;
 	if (cptr == sptr)
 		sendto_flag(SCH_ERROR, "from %s -- %s",
-			   get_client_name(cptr, FALSE), para);
+					get_client_name(cptr, FALSE), para);
 	else
 		sendto_flag(SCH_ERROR, "from %s via %s -- %s",
-			   sptr->name, get_client_name(cptr,FALSE), para);
+					sptr->name, get_client_name(cptr, FALSE), para);
 	return 2;
 }
 
@@ -2241,13 +2244,13 @@ int	m_error(aClient *cptr, aClient *sptr, int parc, char *parv[])
 ** m_help
 **	parv[0] = sender prefix
 */
-int	m_help(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_help(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	int i;
 
 	for (i = 0; msgtab[i].cmd; i++)
-	  sendto_one(sptr,":%s NOTICE %s :%s",
-		     ME, parv[0], msgtab[i].cmd);
+		sendto_one(sptr, ":%s NOTICE %s :%s",
+				   ME, parv[0], msgtab[i].cmd);
 	return 2;
 }
 
@@ -2256,29 +2259,28 @@ int	m_help(aClient *cptr, aClient *sptr, int parc, char *parv[])
  * parv[1] = host/server mask.
  * parv[2] = server to query
  */
-int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	int		all = 0;	/* showing counts of all clients */
-	int		s_count = 0,	/* server */
+	int all = 0;			/* showing counts of all clients */
+	int s_count = 0,		/* server */
 			c_count = 0,	/* client (visible) */
 			u_count = 0,	/* unknown */
 			i_count = 0,	/* invisible client */
 			o_count = 0,	/* operator */
 			v_count = 0;	/* service */
-	int		m_clients = 0,	/* my clients */
+	int m_clients = 0,		/* my clients */
 			m_servers = 0,	/* my server links */
-			m_services = 0;	/* my services */
-	
+			m_services = 0; /* my services */
+
 	if (parc > 2)
 	{
-		if (hunt_server(cptr, sptr, ":%s LUSERS %s :%s", 2, parc, parv)
-		    != HUNTED_ISME)
+		if (hunt_server(cptr, sptr, ":%s LUSERS %s :%s", 2, parc, parv) != HUNTED_ISME)
 			return 3;
 	}
 
 	if (parc > 1)
 	{
-		(void)collapse(parv[1]);
+		(void) collapse(parv[1]);
 	}
 
 	if (parc == 1 || (parv[1][0] == '*' && parv[1][1] == '\0'))
@@ -2296,10 +2298,10 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 	else
 	{
-		aClient 	*acptr;
-		aServer 	*asptr;
-		aService 	*svcp;
-		
+		aClient *acptr;
+		aServer *asptr;
+		aService *svcp;
+
 		if ((acptr = find_client(parv[1], NULL)) && IsServer(acptr))
 		{
 			/* LUSERS <server> */
@@ -2307,14 +2309,13 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			c_count = acptr->serv->usercnt[0];
 			i_count = acptr->serv->usercnt[1];
 			o_count = acptr->serv->usercnt[2];
-			
+
 			if (IsMe(acptr))
 			{
 				m_clients = istat.is_myclnt;
 				m_servers = istat.is_myserv;
 				m_services = istat.is_myservice;
 				u_count = istat.is_unknown;
-
 			}
 		}
 		else
@@ -2325,18 +2326,17 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				if (!match(parv[1], asptr->bcptr->name))
 				{
 					s_count++;
-					
+
 					c_count += asptr->usercnt[0];
 					i_count += asptr->usercnt[1];
 					o_count += asptr->usercnt[2];
-					
+
 					if (IsMe(asptr->bcptr))
 					{
 						m_clients = istat.is_myclnt;
 						m_servers = istat.is_myserv;
 						m_services = istat.is_myservice;
 						u_count = istat.is_unknown;
-
 					}
 				}
 			}
@@ -2355,30 +2355,30 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			}
 		}
 	}
-	
+
 	sendto_one(sptr, replies[RPL_LUSERCLIENT], ME, BadTo(parv[0]),
-		   c_count + i_count, v_count, s_count);
+			   c_count + i_count, v_count, s_count);
 	if (o_count)
 	{
 		sendto_one(sptr, replies[RPL_LUSEROP], ME, BadTo(parv[0]),
-			   o_count);
+				   o_count);
 	}
 	if (u_count)
 	{
 		sendto_one(sptr, replies[RPL_LUSERUNKNOWN], ME, parv[0],
-			   u_count);
+				   u_count);
 	}
 	sendto_one(sptr, replies[RPL_LUSERCHANNELS], ME, BadTo(parv[0]),
-		   istat.is_chan);
-	
+			   istat.is_chan);
+
 	sendto_one(sptr, replies[RPL_LUSERME], ME, BadTo(parv[0]), m_clients,
-		   m_services, m_servers);
+			   m_services, m_servers);
 	if (all)
 		(void) send_users(cptr, sptr, parc, parv);
 	return 2;
 }
 
-  
+
 /***********************************************************************
  * m_connect() - Added by Jto 11 Feb 1989
  ***********************************************************************/
@@ -2390,58 +2390,58 @@ int	 m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[2] = port number
 **	parv[3] = remote server
 */
-int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	int	port, tmpport, retval;
+	int port, tmpport, retval;
 	aConfItem *aconf;
 	aClient *acptr;
 
 	if (!is_allowed(sptr, parc > 3 ? ACL_CONNECTREMOTE : ACL_CONNECTLOCAL))
-	    {
+	{
 		return m_nopriv(cptr, sptr, parc, parv);
-	    }
+	}
 
 	if ((bootopt & BOOT_STANDALONE))
 	{
 		sendto_one(sptr, ":%s NOTICE %s :Connect disabled, running in"
-			" standalone mode", ME, parv[0]);
+						 " standalone mode",
+				   ME, parv[0]);
 		return 0;
 	}
 
-	if (hunt_server(cptr,sptr,":%s CONNECT %s %s :%s",
-		       3,parc,parv) != HUNTED_ISME)
+	if (hunt_server(cptr, sptr, ":%s CONNECT %s %s :%s",
+					3, parc, parv) != HUNTED_ISME)
 		return 1;
 
-	if ((acptr = find_name(parv[1], NULL))
-	    || (acptr = find_mask(parv[1], NULL)))
-	    {
+	if ((acptr = find_name(parv[1], NULL)) || (acptr = find_mask(parv[1], NULL)))
+	{
 		sendto_one(sptr, ":%s NOTICE %s :Connect: Server %s %s %s.",
-			   ME, parv[0], parv[1], "already exists from",
-			   acptr->from->name);
+				   ME, parv[0], parv[1], "already exists from",
+				   acptr->from->name);
 		return 0;
-	    }
+	}
 
 	for (aconf = conf; aconf; aconf = aconf->next)
 		if ((aconf->status == CONF_CONNECT_SERVER ||
-		     aconf->status == CONF_ZCONNECT_SERVER) &&
-		    match(parv[1], aconf->name) == 0)
-		  break;
+			 aconf->status == CONF_ZCONNECT_SERVER) &&
+			match(parv[1], aconf->name) == 0)
+			break;
 	/* Checked first servernames, then try hostnames. */
 	if (!aconf)
 		for (aconf = conf; aconf; aconf = aconf->next)
 			if ((aconf->status == CONF_CONNECT_SERVER ||
-			     aconf->status == CONF_ZCONNECT_SERVER) &&
-			    (match(parv[1], aconf->host) == 0 ||
-			     match(parv[1], index(aconf->host, '@')+1) == 0))
-		  		break;
+				 aconf->status == CONF_ZCONNECT_SERVER) &&
+				(match(parv[1], aconf->host) == 0 ||
+				 match(parv[1], index(aconf->host, '@') + 1) == 0))
+				break;
 
 	if (!aconf)
-	    {
-	      sendto_one(sptr,
-			 "NOTICE %s :Connect: Host %s not listed in ircd.conf",
-			 parv[0], parv[1]);
-	      return 0;
-	    }
+	{
+		sendto_one(sptr,
+				   "NOTICE %s :Connect: Host %s not listed in ircd.conf",
+				   parv[0], parv[1]);
+		return 0;
+	}
 	/*
 	** Get port number from user, if given. If not specified,
 	** use the default form configuration structure. If missing
@@ -2452,22 +2452,22 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		port = atoi(parv[2]);
 	}
-	
+
 	if (parc < 3 || port == 0)
 	{
 		port = abs(tmpport);
 		if (port == 0)
 		{
 			sendto_one(sptr,
-				":%s NOTICE %s :Connect: missing port number",
-				ME, parv[0]);
+					   ":%s NOTICE %s :Connect: missing port number",
+					   ME, parv[0]);
 			return 0;
 		}
 	}
 	if (port <= 0)
 	{
 		sendto_one(sptr, "NOTICE %s :Connect: Illegal port number",
-				  parv[0]);
+				   parv[0]);
 		return 0;
 	}
 
@@ -2475,45 +2475,45 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	** Notify all operators about remote connect requests
 	*/
 	if (!IsAnOper(cptr))
-	    {
+	{
 		sendto_ops_butone(NULL, ME,
-				  "Remote CONNECT %s %d from %s",
-				   parv[1], port,
-				   get_client_name(sptr,FALSE));
+						  "Remote CONNECT %s %d from %s",
+						  parv[1], port,
+						  get_client_name(sptr, FALSE));
 #if defined(USE_SYSLOG) && defined(SYSLOG_CONNECT)
 		syslog(LOG_DEBUG, "CONNECT From %s : %s %s", parv[0],
-		       parv[1], parv[2] ? parv[2] : "");
+			   parv[1], parv[2] ? parv[2] : "");
 #endif
-	    }
+	}
 	aconf->port = port;
 	switch (retval = connect_server(aconf, sptr, NULL))
 	{
-	case 0:
-		sendto_one(sptr, ":%s NOTICE %s :*** Connecting to %s[%s].",
-			   ME, parv[0], aconf->host, aconf->name);
-		sendto_flag(SCH_NOTICE, "Connecting to %s[%s] by %s",
-			    aconf->host, aconf->name,
-			    get_client_name(sptr, FALSE));
-		break;
-	case -1:
-		sendto_one(sptr, ":%s NOTICE %s :*** Couldn't connect to %s.",
-			   ME, parv[0], aconf->host);
-		sendto_flag(SCH_NOTICE, "Couldn't connect to %s by %s",
-			    aconf->host, get_client_name(sptr, FALSE));
-		break;
-	case -2:
-		sendto_one(sptr, ":%s NOTICE %s :*** Host %s is unknown.",
-			   ME, parv[0], aconf->host);
-		sendto_flag(SCH_NOTICE, "Connect by %s to unknown host %s",
-			    get_client_name(sptr, FALSE), aconf->host);
-		break;
-	default:
-		sendto_one(sptr,
-			   ":%s NOTICE %s :*** Connection to %s failed: %s",
-			   ME, parv[0], aconf->host, strerror(retval));
-		sendto_flag(SCH_NOTICE, "Connection to %s by %s failed: %s",
-			    aconf->host, get_client_name(sptr, FALSE),
-			    strerror(retval));
+		case 0:
+			sendto_one(sptr, ":%s NOTICE %s :*** Connecting to %s[%s].",
+					   ME, parv[0], aconf->host, aconf->name);
+			sendto_flag(SCH_NOTICE, "Connecting to %s[%s] by %s",
+						aconf->host, aconf->name,
+						get_client_name(sptr, FALSE));
+			break;
+		case -1:
+			sendto_one(sptr, ":%s NOTICE %s :*** Couldn't connect to %s.",
+					   ME, parv[0], aconf->host);
+			sendto_flag(SCH_NOTICE, "Couldn't connect to %s by %s",
+						aconf->host, get_client_name(sptr, FALSE));
+			break;
+		case -2:
+			sendto_one(sptr, ":%s NOTICE %s :*** Host %s is unknown.",
+					   ME, parv[0], aconf->host);
+			sendto_flag(SCH_NOTICE, "Connect by %s to unknown host %s",
+						get_client_name(sptr, FALSE), aconf->host);
+			break;
+		default:
+			sendto_one(sptr,
+					   ":%s NOTICE %s :*** Connection to %s failed: %s",
+					   ME, parv[0], aconf->host, strerror(retval));
+			sendto_flag(SCH_NOTICE, "Connection to %s by %s failed: %s",
+						aconf->host, get_client_name(sptr, FALSE),
+						strerror(retval));
 	}
 	aconf->port = tmpport;
 	return 0;
@@ -2524,12 +2524,12 @@ int	m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[0] = sender prefix
 **	parv[1] = message text
 */
-int	m_wallops(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_wallops(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	sendto_ops_butone(IsServer(cptr) ? cptr : NULL, parv[0], "%s", parv[1]);
-#ifdef	USE_SERVICES
+#ifdef USE_SERVICES
 	check_services_butone(SERVICE_WANT_WALLOP, NULL, sptr,
-			      ":%s WALLOP :%s", parv[0], parv[1]);
+						  ":%s WALLOP :%s", parv[0], parv[1]);
 #endif
 	return 2;
 }
@@ -2539,10 +2539,10 @@ int	m_wallops(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[0] = sender prefix
 **	parv[1] = servername
 */
-int	m_time(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_time(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	if (hunt_server(cptr,sptr,":%s TIME :%s",1,parc,parv) == HUNTED_ISME)
-		sendto_one(sptr, replies[RPL_TIME], ME, BadTo(parv[0]), ME, date((long)0));
+	if (hunt_server(cptr, sptr, ":%s TIME :%s", 1, parc, parv) == HUNTED_ISME)
+		sendto_one(sptr, replies[RPL_TIME], ME, BadTo(parv[0]), ME, date((long) 0));
 	return 2;
 }
 
@@ -2552,23 +2552,22 @@ int	m_time(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[0] = sender prefix
 **	parv[1] = servername
 */
-int	m_admin(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_admin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aConfItem *aconf;
 
-	if (IsRegistered(cptr) &&	/* only local query for unregistered */
-	    hunt_server(cptr,sptr,":%s ADMIN :%s",1,parc,parv) != HUNTED_ISME)
+	if (IsRegistered(cptr) && /* only local query for unregistered */
+		hunt_server(cptr, sptr, ":%s ADMIN :%s", 1, parc, parv) != HUNTED_ISME)
 		return 3;
-	if ((aconf = find_admin()) && aconf->host && aconf->passwd
-	    && aconf->name)
-	    {
+	if ((aconf = find_admin()) && aconf->host && aconf->passwd && aconf->name)
+	{
 		sendto_one(sptr, replies[RPL_ADMINME], ME, BadTo(parv[0]), ME);
 		sendto_one(sptr, replies[RPL_ADMINLOC1], ME, BadTo(parv[0]), aconf->host);
 		sendto_one(sptr, replies[RPL_ADMINLOC2], ME, BadTo(parv[0]),
-			   aconf->passwd);
+				   aconf->passwd);
 		sendto_one(sptr, replies[RPL_ADMINEMAIL], ME, BadTo(parv[0]),
-			   aconf->name);
-	    }
+				   aconf->name);
+	}
 	else
 		sendto_one(sptr, replies[ERR_NOADMININFO], ME, BadTo(parv[0]), ME);
 	return 2;
@@ -2578,15 +2577,15 @@ int	m_admin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 ** m_rehash
 **
 */
-int	m_rehash(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_rehash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	if (!is_allowed(sptr, ACL_REHASH))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	sendto_one(sptr, replies[RPL_REHASHING], ME, BadTo(parv[0]),
-		   mybasename(configfile));
+			   mybasename(configfile));
 	sendto_flag(SCH_NOTICE,
-		    "%s is rehashing Server config file", parv[0]);
+				"%s is rehashing Server config file", parv[0]);
 #ifdef USE_SYSLOG
 	syslog(LOG_INFO, "REHASH From %s\n", get_client_name(sptr, FALSE));
 #endif
@@ -2597,11 +2596,11 @@ int	m_rehash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 ** m_restart
 **
 */
-int	m_restart(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_restart(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Reg	aClient	*acptr;
-	Reg	int	i;
-	char	killer[HOSTLEN * 2 + USERLEN + 5];
+	Reg aClient *acptr;
+	Reg int i;
+	char killer[HOSTLEN * 2 + USERLEN + 5];
 
 	if (!is_allowed(sptr, ACL_RESTART))
 		return m_nopriv(cptr, sptr, parc, parv);
@@ -2609,24 +2608,24 @@ int	m_restart(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	strcpy(killer, get_client_name(sptr, TRUE));
 	sprintf(buf, "RESTART by %s", get_client_name(sptr, TRUE));
 	for (i = 0; i <= highest_fd; i++)
-	    {
+	{
 		if (!(acptr = local[i]))
 			continue;
 		if (IsClient(acptr) || IsService(acptr))
-		    {
+		{
 			sendto_one(acptr,
-				   ":%s NOTICE %s :Server Restarting. %s",
-				   ME, acptr->name, killer);
+					   ":%s NOTICE %s :Server Restarting. %s",
+					   ME, acptr->name, killer);
 			acptr->exitc = EXITC_DIE;
 			if (IsClient(acptr))
 				exit_client(acptr, acptr, &me,
-					    "Server Restarting");
+							"Server Restarting");
 			/* services are kept for logging purposes */
-		    }
+		}
 		else if (IsServer(acptr))
 			sendto_one(acptr, ":%s ERROR :Restarted by %s",
-				   ME, killer);
-	    }
+					   ME, killer);
+	}
 	flush_connections(me.fd);
 
 	restart(buf);
@@ -2634,7 +2633,7 @@ int	m_restart(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	return 0;
 }
 
-static	void	trace_one(aClient *sptr, aClient *acptr)
+static void trace_one(aClient *sptr, aClient *acptr)
 {
 	char *name;
 	int class;
@@ -2644,77 +2643,73 @@ static	void	trace_one(aClient *sptr, aClient *acptr)
 	to = sptr->name;
 	name = get_client_name(acptr, FALSE);
 	class = get_client_class(acptr);
-	
+
 	switch (acptr->status)
 	{
-                case STAT_CONNECTING:
-                        sendto_one(sptr, replies[RPL_TRACECONNECTING],ME, to,
-				   class, name);
-                        break;
-			
-                case STAT_HANDSHAKE:
-                        sendto_one(sptr, replies[RPL_TRACEHANDSHAKE], ME, to,
-				   class, name);
-                        break;
-			
-                case STAT_ME:
-                        break;
-			
+		case STAT_CONNECTING:
+			sendto_one(sptr, replies[RPL_TRACECONNECTING], ME, to,
+					   class, name);
+			break;
+
+		case STAT_HANDSHAKE:
+			sendto_one(sptr, replies[RPL_TRACEHANDSHAKE], ME, to,
+					   class, name);
+			break;
+
+		case STAT_ME:
+			break;
+
 		case STAT_UNKNOWN:
 			sendto_one(sptr, replies[RPL_TRACEUNKNOWN], ME, to,
-				   class, name);
+					   class, name);
 			break;
-			
+
 		case STAT_OPER:
-				sendto_one(sptr, replies[RPL_TRACEOPERATOR], ME,
-					to, class, name);
+			sendto_one(sptr, replies[RPL_TRACEOPERATOR], ME,
+					   to, class, name);
 			break;
 
 		case STAT_CLIENT:
-				sendto_one(sptr, replies[RPL_TRACEUSER], ME,
-					to, class, name);
+			sendto_one(sptr, replies[RPL_TRACEUSER], ME,
+					   to, class, name);
 			break;
-			
-                case STAT_SERVER:
-		{
+
+		case STAT_SERVER: {
 			/* we need to count servers/users behind this link */
 			int servers = 0, users = 0;
 			count_servers_users(acptr, &servers, &users);
-                        if (acptr->serv->user)
+			if (acptr->serv->user)
 			{
-                                sendto_one(sptr, replies[RPL_TRACESERVER], ME,
-                                           to, class, servers,
-                                           users, name, acptr->serv->by,
-                                           acptr->serv->user->username,
-                                           acptr->serv->user->host,
-                                           acptr->serv->version,
-                                           (acptr->flags & FLAGS_ZIP) ?
-					   	"z" : "");
+				sendto_one(sptr, replies[RPL_TRACESERVER], ME,
+						   to, class, servers,
+						   users, name, acptr->serv->by,
+						   acptr->serv->user->username,
+						   acptr->serv->user->host,
+						   acptr->serv->version,
+						   (acptr->flags & FLAGS_ZIP) ? "z" : "");
 			}
-                        else
+			else
 			{
-                                sendto_one(sptr, replies[RPL_TRACESERVER], ME,
-                                           to, class, servers,
-                                           users, name,
-                                           *(acptr->serv->by) ?
-                                           acptr->serv->by : "*", "*", ME,
-                                           acptr->serv->version,
-                                           (acptr->flags & FLAGS_ZIP) ?
-					   	"z" : "");
+				sendto_one(sptr, replies[RPL_TRACESERVER], ME,
+						   to, class, servers,
+						   users, name,
+						   *(acptr->serv->by) ? acptr->serv->by : "*", "*", ME,
+						   acptr->serv->version,
+						   (acptr->flags & FLAGS_ZIP) ? "z" : "");
 			}
 			break;
 		}
-		
-		case STAT_SERVICE:
-                        sendto_one(sptr, replies[RPL_TRACESERVICE], ME, to,
-				   class, name,
-				   acptr->service->type, acptr->service->wants);
-                        break;
 
-                default: /* ...we actually shouldn't come here... --msa */
-                        sendto_one(sptr, replies[RPL_TRACENEWTYPE], ME, to,
-				   name);
-                        break;
+		case STAT_SERVICE:
+			sendto_one(sptr, replies[RPL_TRACESERVICE], ME, to,
+					   class, name,
+					   acptr->service->type, acptr->service->wants);
+			break;
+
+		default: /* ...we actually shouldn't come here... --msa */
+			sendto_one(sptr, replies[RPL_TRACENEWTYPE], ME, to,
+					   name);
+			break;
 	}
 }
 
@@ -2723,13 +2718,13 @@ static	void	trace_one(aClient *sptr, aClient *acptr)
  * 	parv[0] = sender prefix
  * 	parv[1] = traced nick/server/service
  */
-int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	int maskedserv = 0;
 	int showsid = 0;
 	int i = 0;
-	
+
 	if (parc > 1)
 	{
 		/* wildcards now allowed only in server/service names */
@@ -2745,7 +2740,7 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (!acptr)
 		{
 			sendto_one(sptr, replies[ERR_NOSUCHSERVER],
-					ME, BadTo(parv[0]), parv[1]);
+					   ME, BadTo(parv[0]), parv[1]);
 			return 1;
 		}
 		if (IsServer(acptr))
@@ -2763,42 +2758,41 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		acptr = &me;
 	}
-	
+
 	if (!IsMe(acptr))
 	{
 		if (!MyConnect(acptr) || IsServer(acptr))
 		{
 			if (acptr->from == cptr)
-			{	/* eek ?! */
+			{ /* eek ?! */
 				return 1;
 			}
 			/* passthru */
-              		sendto_one(sptr, replies[RPL_TRACELINK], ME,
-				   BadTo(parv[0]), version, debugmode,
-				   (maskedserv || showsid) ?
-				   	parv[1] : acptr->name,
-				   acptr->from->name,
-				   acptr->from->serv->version,
-				   (acptr->from->flags & FLAGS_ZIP) ? "z" : "",
-        	               	   (int)(timeofday - acptr->from->firsttime),
-                	           (int)DBufLength(&acptr->from->sendQ),
-                        	   (int)DBufLength(&sptr->from->sendQ));
+			sendto_one(sptr, replies[RPL_TRACELINK], ME,
+					   BadTo(parv[0]), version, debugmode,
+					   (maskedserv || showsid) ? parv[1] : acptr->name,
+					   acptr->from->name,
+					   acptr->from->serv->version,
+					   (acptr->from->flags & FLAGS_ZIP) ? "z" : "",
+					   (int) (timeofday - acptr->from->firsttime),
+					   (int) DBufLength(&acptr->from->sendQ),
+					   (int) DBufLength(&sptr->from->sendQ));
 
 			sendto_one(acptr, ":%s TRACE :%s", sptr->name,
-			      (maskedserv || showsid) ? parv[1] : acptr->name);
+					   (maskedserv || showsid) ? parv[1] : acptr->name);
 			return 5;
 		}
 		else
 		{
 			/* tracing something local */
-			trace_one(sptr, acptr);	
+			trace_one(sptr, acptr);
 		}
 	}
 	else
 	{
 		/* report everything */
 		aClient *a2cptr;
-		
+
 		for (i = 0; i <= highest_fd; i++)
 		{
 			if (!(a2cptr = local[i]))
@@ -2809,31 +2803,31 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			{
 				continue;
 			}
-			if (IsPerson(a2cptr)	    /* if client about to
+			if (IsPerson(a2cptr)	   /* if client about to
 						     * trace is person */
-			    && !(a2cptr == sptr)    /* but not user self */
-			    && !(IsAnOper(a2cptr))  /* nor some oper */
-			    && (!MyConnect(sptr) ||
-				!is_allowed(sptr, ACL_TRACE))
-						    /* nor it is my oper
+				&& !(a2cptr == sptr)   /* but not user self */
+				&& !(IsAnOper(a2cptr)) /* nor some oper */
+				&& (!MyConnect(sptr) ||
+					!is_allowed(sptr, ACL_TRACE))
+				/* nor it is my oper
 						     * doing trace */
-			   )
+			)
 			{
-				continue;   /* then don't show the client */
+				continue; /* then don't show the client */
 			}
-			
+
 			/* Report unknown connections to opers with +w set */
 			if (IsUnknown(a2cptr) &&
 				!(IsAnOper(sptr) && SendWallops(sptr)))
 			{
 				continue;
 			}
-			trace_one(sptr, a2cptr);	
+			trace_one(sptr, a2cptr);
 		}
 	}
 	sendto_one(sptr, replies[RPL_TRACEEND], ME, BadTo(parv[0]),
-		   showsid ? me.serv->sid : acptr->name, version, debugmode);
-	
+			   showsid ? me.serv->sid : acptr->name, version, debugmode);
+
 	return 2;
 }
 
@@ -2841,7 +2835,7 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
  * m_etrace
  * 	parv[0] = sender prefix
  */
-int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	int i = 0;
@@ -2853,17 +2847,17 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		if ((acptr = find_person(parv[1], NULL)) && MyClient(acptr))
 			sendto_one(sptr, replies[RPL_ETRACEFULL],
-				ME, sptr->name,
-				IsAnOper(acptr) ? "Oper" : "User",
-				get_client_class(acptr),
-				acptr->name, acptr->user->username,
-				acptr->user->host, get_client_ip(acptr),
+					   ME, sptr->name,
+					   IsAnOper(acptr) ? "Oper" : "User",
+					   get_client_class(acptr),
+					   acptr->name, acptr->user->username,
+					   acptr->user->host, get_client_ip(acptr),
 #ifdef XLINE
-				acptr->user2, acptr->user3, 
+					   acptr->user2, acptr->user3,
 #else
-				"-", "-",
+					   "-", "-",
 #endif
-				acptr->info);
+					   acptr->info);
 	}
 	else
 	{
@@ -2874,29 +2868,29 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 			if (!IsPerson(acptr))
 				continue;
-		
+
 			sendto_one(sptr, replies[RPL_ETRACEFULL],
-				ME, sptr->name, 
-				IsAnOper(acptr) ? "Oper" : "User", 
-				get_client_class(acptr), 
-				acptr->name, acptr->user->username, 
-				acptr->user->host, get_client_ip(acptr),
+					   ME, sptr->name,
+					   IsAnOper(acptr) ? "Oper" : "User",
+					   get_client_class(acptr),
+					   acptr->name, acptr->user->username,
+					   acptr->user->host, get_client_ip(acptr),
 #ifdef XLINE
-				acptr->user2, acptr->user3, 
+					   acptr->user2, acptr->user3,
 #else
-				"-", "-",
+					   "-", "-",
 #endif
-				acptr->info);
+					   acptr->info);
 		}
 	}
 
 	sendto_one(sptr, replies[RPL_ETRACEEND], ME, sptr->name, ME,
-			version, debugmode);
+			   version, debugmode);
 	return 2;
 }
 
 #ifdef ENABLE_SIDTRACE
-int	m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 
@@ -2908,26 +2902,26 @@ int	m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (!IsPerson(acptr))
 			continue;
 
-		if (strncmp(acptr->user->uid, me.serv->sid, SIDLEN-1))
+		if (strncmp(acptr->user->uid, me.serv->sid, SIDLEN - 1))
 			continue;
 
 		sendto_one(sptr, replies[RPL_ETRACEFULL],
-			ME, sptr->name,
-			IsAnOper(acptr) ? "Oper" : "User", 
-			MyClient(acptr) ? get_client_class(acptr) : -1, 
-			acptr->name, acptr->user->username,
-			acptr->user->host, get_client_ip(acptr),
+				   ME, sptr->name,
+				   IsAnOper(acptr) ? "Oper" : "User",
+				   MyClient(acptr) ? get_client_class(acptr) : -1,
+				   acptr->name, acptr->user->username,
+				   acptr->user->host, get_client_ip(acptr),
 #ifdef XLINE
-			MyClient(acptr) ? acptr->user2 : "-",
-			MyClient(acptr) ? acptr->user3 : "-",
+				   MyClient(acptr) ? acptr->user2 : "-",
+				   MyClient(acptr) ? acptr->user3 : "-",
 #else
-			"-", "-",
+				   "-", "-",
 #endif
-			acptr->info);
+				   acptr->info);
 	}
 
 	sendto_one(sptr, replies[RPL_ETRACEEND], ME, sptr->name, "*",
-			version, debugmode);
+			   version, debugmode);
 
 	return 3;
 }
@@ -2938,33 +2932,33 @@ int	m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[0] = sender prefix
 **	parv[1] = servername
 */
-int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	register aMotd *temp;
 	struct tm *tm;
 
 	if (!IsUnknown(sptr))
 	{
-	if (check_link(sptr))
-	    {
-		sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]), "MOTD");
-		return 5;
-	    }
-	if (hunt_server(cptr, sptr, ":%s MOTD :%s", 1,parc,parv)!=HUNTED_ISME)
-		return 5;
+		if (check_link(sptr))
+		{
+			sendto_one(sptr, replies[RPL_TRYAGAIN], ME, BadTo(parv[0]), "MOTD");
+			return 5;
+		}
+		if (hunt_server(cptr, sptr, ":%s MOTD :%s", 1, parc, parv) != HUNTED_ISME)
+			return 5;
 	}
 	tm = localtime(&motd_mtime);
 	if (motd == NULL)
-	    {
+	{
 		sendto_one(sptr, replies[ERR_NOMOTD], ME, BadTo(parv[0]));
 		return 1;
-	    }
+	}
 	sendto_one(sptr, replies[RPL_MOTDSTART], ME, BadTo(parv[0]), ME);
 	sendto_one(sptr, ":%s %d %s :- %d/%d/%d %d:%02d", ME, RPL_MOTD,
-		   BadTo(parv[0]), tm->tm_mday, tm->tm_mon + 1, 1900 + tm->tm_year,
-		   tm->tm_hour, tm->tm_min);
+			   BadTo(parv[0]), tm->tm_mday, tm->tm_mon + 1, 1900 + tm->tm_year,
+			   tm->tm_hour, tm->tm_min);
 	temp = motd;
-	for(temp=motd;temp != NULL;temp = temp->next)
+	for (temp = motd; temp != NULL; temp = temp->next)
 		sendto_one(sptr, replies[RPL_MOTD], ME, BadTo(parv[0]), temp->line);
 	sendto_one(sptr, replies[RPL_ENDOFMOTD], ME, BadTo(parv[0]));
 	return IsUnknown(sptr) ? 5 : 2;
@@ -2973,35 +2967,35 @@ int	m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 /*
 ** m_close - added by Darren Reed Jul 13 1992.
 */
-int	m_close(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_close(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Reg	aClient	*acptr;
-	Reg	int	i;
-	int	closed = 0;
+	Reg aClient *acptr;
+	Reg int i;
+	int closed = 0;
 
 	if (!is_allowed(sptr, ACL_CLOSE))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	for (i = highest_fd; i; i--)
-	    {
+	{
 		if (!(acptr = local[i]))
 			continue;
 		if (!IsUnknown(acptr) && !IsConnecting(acptr) &&
-		    !IsHandshake(acptr))
+			!IsHandshake(acptr))
 			continue;
 		sendto_one(sptr, replies[RPL_CLOSING], ME, BadTo(parv[0]),
-			   get_client_name(acptr, TRUE), acptr->status);
-		(void)exit_client(acptr, acptr, &me, "Oper Closing");
+				   get_client_name(acptr, TRUE), acptr->status);
+		(void) exit_client(acptr, acptr, &me, "Oper Closing");
 		closed++;
-	    }
+	}
 	sendto_one(sptr, replies[RPL_CLOSEEND], ME, BadTo(parv[0]), closed);
 	sendto_flag(SCH_NOTICE, "%s closed %d unknown connections", sptr->name,
-		    closed);
+				closed);
 #ifdef DELAY_CLOSE
 	closed = istat.is_delayclosewait;
 	delay_close(-2);
 	sendto_flag(SCH_NOTICE, "%s closed %d delayed connections", sptr->name,
-		    closed);
+				closed);
 #endif
 	return 1;
 }
@@ -3011,10 +3005,10 @@ int	m_close(aClient *cptr, aClient *sptr, int parc, char *parv[])
 ** parv[1] - optional comma separated list of servers for which this EOB
 **           is also valid.
 */
-int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char eobbuf[BUFSIZE];
-	char *e;	
+	char *e;
 	char *sid;
 	char *p = NULL;
 	int eobmaxlen;
@@ -3029,15 +3023,15 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (MyConnect(sptr))
 		{
 			sendto_flag(SCH_NOTICE,
-			       "End of burst from %s after %d seconds.",
-			       sptr->name, timeofday - sptr->firsttime);
+						"End of burst from %s after %d seconds.",
+						sptr->name, timeofday - sptr->firsttime);
 		}
 		else
 		{
 			if (!IsMasked(sptr))
 			{
 				sendto_flag(SCH_NOTICE, "End of burst from %s",
-					sptr->name);
+							sptr->name);
 			}
 		}
 		SetEOB(sptr);
@@ -3046,30 +3040,28 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{
 			sendto_one(sptr, ":%s EOBACK", me.serv->sid);
 		}
-		
+
 		if (parc < 2)
 		{
 			sendto_serv_v(sptr, SV_UID, ":%s EOB", sptr->serv->sid);
 			return 1;
 		}
-	
 	}
 	else
 	{
 		if (parc < 2)
 		{
 			sendto_flag(SCH_ERROR,
-				"Received another EOB for server %s (%s)",
-				 sptr->serv->sid, sptr->name);
+						"Received another EOB for server %s (%s)",
+						sptr->serv->sid, sptr->name);
 			return 1;
 		}
 	}
-	
-	eobmaxlen = BUFSIZE
-		- 1             /*     ":"     */
-		- SIDLEN        /*   my SID    */
-		- 6             /*  " EOB :"   */
-		- 2;            /*   "\r\n"    */
+
+	eobmaxlen = BUFSIZE - 1 /*     ":"     */
+				- SIDLEN	/*   my SID    */
+				- 6			/*  " EOB :"   */
+				- 2;		/*   "\r\n"    */
 
 	/* space for last comma and SID (calculation moved
 	 * from "if (e - eobbuf > eobmaxlen)" inside following loop)
@@ -3077,45 +3069,46 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	eobmaxlen -= SIDLEN + 1;
 
 	e = eobbuf;
-	
+
 	for (; (sid = strtoken(&p, parv[1], ",")); parv[1] = NULL)
 	{
 		acptr = NULL;
-		
+
 		acptr = find_sid(sid, NULL);
 		if (!acptr)
 		{
 			sendto_flag(SCH_SERVER,
-				"Received EOB for unknown SID (%s) from (%s), "
-				"dropping link",
-				sid, cptr->name);
+						"Received EOB for unknown SID (%s) from (%s), "
+						"dropping link",
+						sid, cptr->name);
 			return exit_client(cptr, cptr, &me,
-				  "Unknown SID in EOB");
+							   "Unknown SID in EOB");
 		}
-		
+
 		if (acptr->from != cptr)
 		{
 			sendto_flag(SCH_NOTICE,
-				"Received EOB for (%s) from wrong direction "
-				"(%s != %s), dropping link",
-				sid, sptr->name, acptr->from->name);
+						"Received EOB for (%s) from wrong direction "
+						"(%s != %s), dropping link",
+						sid, sptr->name, acptr->from->name);
 			return exit_client(cptr, cptr, &me,
-				"Wrong EOB Direction");
+							   "Wrong EOB Direction");
 		}
-		
+
 		if (!IsBursting(acptr))
 		{
 			sendto_flag(SCH_ERROR,
-				"Received another EOB for server %s (%s) from "
-				"%s (%s) via %s", sid, acptr->name,
-				sptr->serv->sid, sptr->name, cptr->name);
+						"Received another EOB for server %s (%s) from "
+						"%s (%s) via %s",
+						sid, acptr->name,
+						sptr->serv->sid, sptr->name, cptr->name);
 
 			continue;
 		}
 
-	
+
 		sendto_flag(SCH_DEBUG, "Received EOB for %s [%s] (mass)",
-			 acptr->name, acptr->serv->sid);
+					acptr->name, acptr->serv->sid);
 
 		/* SIDLEN + 1 = ",SID" */
 		if (((int) (e - eobbuf)) > eobmaxlen)
@@ -3125,10 +3118,10 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			 * eobbuf always starts with comma, * so +1 gets
 			 * rid of it */
 			sendto_serv_v(sptr, SV_UID, ":%s EOB :%s",
-					sptr->serv->sid, eobbuf + 1);
+						  sptr->serv->sid, eobbuf + 1);
 			e = eobbuf;
 		}
-		
+
 		SetEOB(acptr);
 		istat.is_eobservers++;
 		/* regenerate buffer - it might be fake sid,
@@ -3137,15 +3130,14 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		*e++ = ',';
 		memcpy(e, acptr->serv->sid, SIDLEN);
 		e += SIDLEN;
-
 	}
-	
+
 	/* Send the rest, if any */
 	if (e > eobbuf)
 	{
 		*e = '\0';
 		sendto_serv_v(sptr, SV_UID, ":%s EOB :%s",
-			sptr->serv->sid, eobbuf + 1);
+					  sptr->serv->sid, eobbuf + 1);
 	}
 	else
 	{
@@ -3153,11 +3145,11 @@ int	m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 
 	check_split();
-	
+
 	return 1;
 }
 
-int	m_eoback(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_eoback(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	cptr->flags &= ~FLAGS_CBURST;
 	if (cptr->serv && cptr->serv->byuid[0])
@@ -3169,40 +3161,40 @@ int	m_eoback(aClient *cptr, aClient *sptr, int parc, char *parv[])
 }
 
 
-int	m_die(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_die(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Reg	aClient	*acptr;
-	Reg	int	i;
-	char	killer[HOSTLEN * 2 + USERLEN + 5];
+	Reg aClient *acptr;
+	Reg int i;
+	char killer[HOSTLEN * 2 + USERLEN + 5];
 
 	if (!is_allowed(sptr, ACL_DIE))
 		return m_nopriv(cptr, sptr, parc, parv);
 
 	strcpy(killer, get_client_name(sptr, TRUE));
 	for (i = 0; i <= highest_fd; i++)
-	    {
+	{
 		if (!(acptr = local[i]))
 			continue;
 		if (IsClient(acptr) || IsService(acptr))
-		    {
+		{
 			sendto_one(acptr,
-				   ":%s NOTICE %s :Server Terminating. %s",
-				   ME, acptr->name, killer);
+					   ":%s NOTICE %s :Server Terminating. %s",
+					   ME, acptr->name, killer);
 			acptr->exitc = EXITC_DIE;
 			if (IsClient(acptr))
 				exit_client(acptr, acptr, &me, "Server died");
 			/* services are kept for logging purposes */
-		    }
+		}
 		else if (IsServer(acptr))
 			sendto_one(acptr, ":%s ERROR :Terminated by %s",
-				   ME, killer);
-	    }
+					   ME, killer);
+	}
 	flush_connections(me.fd);
-	(void)s_die(0);
+	(void) s_die(0);
 	return 0;
 }
 
-int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	typedef struct
 	{
@@ -3211,12 +3203,11 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	} SetEntry;
 
 	SetEntry set_table[] =
-	{
-		{ TSET_POOLSIZE, "POOLSIZE" },
-		{ TSET_ACONNECT, "ACONNECT" },
-		{ TSET_CACCEPT, "CACCEPT" },
-		{ 0, NULL }
-	};
+			{
+					{TSET_POOLSIZE, "POOLSIZE"},
+					{TSET_ACONNECT, "ACONNECT"},
+					{TSET_CACCEPT, "CACCEPT"},
+					{0, NULL}};
 	int i, acmd = 0;
 
 	if (!is_allowed(sptr, ACL_SET))
@@ -3224,7 +3215,7 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (parc > 1)
 	{
-		/* Find specified command */	
+		/* Find specified command */
 		for (i = 0; set_table[i].command != NULL; i++)
 		{
 			if (!mycmp(parv[1], set_table[i].command))
@@ -3237,7 +3228,7 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (!acmd)
 		{
 			sendto_one(sptr, ":%s NOTICE %s :Invalid option %s",
-					ME, parv[0], parv[1]);
+					   ME, parv[0], parv[1]);
 		}
 	}
 	else
@@ -3251,8 +3242,7 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* Change settings */
 		switch (acmd)
 		{
-			case TSET_ACONNECT:
-			{
+			case TSET_ACONNECT: {
 				if (!mycmp(parv[2], "ON"))
 				{
 					iconf.aconnect = 1;
@@ -3268,34 +3258,35 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				else
 				{
 					sendto_one(sptr, ":%s NOTICE %s SET "
-						":Illegal value for ACONNECT. "
-						"Possible values: ON OFF ND",
-						ME, parv[0]);
+									 ":Illegal value for ACONNECT. "
+									 "Possible values: ON OFF ND",
+							   ME, parv[0]);
 					break;
 				}
 				sendto_flag(SCH_NOTICE, "%s changed value of "
-					"ACONNECT to %s", sptr->name, parv[2]);
+										"ACONNECT to %s",
+							sptr->name, parv[2]);
 				break;
 			} /* TSET_ACONNECT */
 
-			case TSET_POOLSIZE:
-			{
+			case TSET_POOLSIZE: {
 				int tmp;
 				tmp = atoi(parv[2]);
 				if (poolsize > tmp)
 				{
 					sendto_one(sptr,
-						":%s NOTICE %s SET :Poolsize"
-						" can not be made smaller", ME,
-						parv[0]);
-							
+							   ":%s NOTICE %s SET :Poolsize"
+							   " can not be made smaller",
+							   ME,
+							   parv[0]);
 				}
 				else
 				{
 					sendto_flag(SCH_NOTICE,
-						"%s changed value of poolsize"
-						" from %d to %d", sptr->name,
-						poolsize, tmp);
+								"%s changed value of poolsize"
+								" from %d to %d",
+								sptr->name,
+								poolsize, tmp);
 					poolsize = tmp;
 				}
 				break;
@@ -3321,13 +3312,14 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				else
 				{
 					sendto_one(sptr, ":%s NOTICE %s SET "
-						":Illegal value for CACCEPT. "
-						"Possible values: ON OFF SPLIT",
-						ME, parv[0]);
+									 ":Illegal value for CACCEPT. "
+									 "Possible values: ON OFF SPLIT",
+							   ME, parv[0]);
 					break;
 				}
 				sendto_flag(SCH_NOTICE, "%s changed value of "
-					"CACCEPT to %s", sptr->name, parv[2]);
+										"CACCEPT to %s",
+							sptr->name, parv[2]);
 				break;
 		} /* switch(acmd) */
 	} /* parc > 2 */
@@ -3337,19 +3329,18 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (acmd & TSET_POOLSIZE)
 		{
 			sendto_one(sptr, ":%s NOTICE %s :POOLSIZE = %d",
-				ME, parv[0], poolsize);
+					   ME, parv[0], poolsize);
 		}
 		if (acmd & TSET_ACONNECT)
 		{
 			sendto_one(sptr, ":%s NOTICE %s :ACONNECT = %s", ME,
-				parv[0], iconf.aconnect == 2 ? "ND" : 
-				(iconf.aconnect == 1 ? "ON" : "OFF"));
+					   parv[0], iconf.aconnect == 2 ? "ND" : (iconf.aconnect == 1 ? "ON" : "OFF"));
 		}
 		if (acmd & TSET_CACCEPT)
 		{
 			sendto_one(sptr, ":%s NOTICE %s :CACCEPT = %s", ME,
-				parv[0], iconf.caccept == 2 ? "SPLIT" :
-				iconf.caccept == 1 ? "ON" : "OFF");
+					   parv[0], iconf.caccept == 2 ? "SPLIT" : iconf.caccept == 1 ? "ON"
+																				  : "OFF");
 		}
 	}
 	return 1;
@@ -3361,8 +3352,8 @@ int	m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 ** A better way might be to store in Server structure and use servp. -krys
 */
 
-static char	**server_name = NULL;
-static int	server_max = 0, server_num = 0;
+static char **server_name = NULL;
+static int server_max = 0, server_num = 0;
 
 /*
 ** find_server_string
@@ -3370,13 +3361,13 @@ static int	server_max = 0, server_num = 0;
 ** Given an index, this will return a pointer to the corresponding
 ** (already allocated) string
 */
-char	*find_server_string(int snum)
+char *find_server_string(int snum)
 {
 	if (snum < server_num && snum >= 0)
 		return server_name[snum];
 	/* request for a bogus snum value, something is wrong */
 	sendto_flag(SCH_ERROR, "invalid index for server_name[] : %d (%d,%d)",
-		    snum, server_num, server_max);
+				snum, server_num, server_max);
 	return NULL;
 }
 
@@ -3387,27 +3378,27 @@ char	*find_server_string(int snum)
 ** string. This index can be used with find_server_name_from_num().
 ** If the string doesn't exist already, it will be allocated.
 */
-int	find_server_num(char *sname)
+int find_server_num(char *sname)
 {
 	Reg int i = 0;
 
 	while (i < server_num)
-	    {
+	{
 		if (!strcasecmp(server_name[i], sname))
 			break;
 		i++;
-	    }
+	}
 	if (i < server_num)
 		return i;
 	if (i == server_max)
-	  {
-	    /* server_name[] array is full, let's make it bigger! */
-	    if (server_name)
-		    server_name = (char **) MyRealloc((char *)server_name,
-					      sizeof(char *)*(server_max+=50));
-	    else
-		    server_name = (char **) MyMalloc(sizeof(char *)*(server_max=50));
-	  }
+	{
+		/* server_name[] array is full, let's make it bigger! */
+		if (server_name)
+			server_name = (char **) MyRealloc((char *) server_name,
+											  sizeof(char *) * (server_max += 50));
+		else
+			server_name = (char **) MyMalloc(sizeof(char *) * (server_max = 50));
+	}
 	server_name[server_num] = mystrdup(sname);
 	return server_num++;
 }
@@ -3419,7 +3410,7 @@ int	find_server_num(char *sname)
 **
 **	returns 0 if link load is light, -1 otherwise.
 */
-static	int	check_link(aClient *cptr)
+static int check_link(aClient *cptr)
 {
 	/* This matches opers, servers, services and local clients, so they
 	** are not subject to RPL_TRYAGAIN. --B. */
@@ -3433,7 +3424,7 @@ static	int	check_link(aClient *cptr)
 	ircstp->is_ckl++;
 
 	/* SendQ is already (too) high */
-	if ((int)DBufLength(&cptr->sendQ) > 65536)
+	if ((int) DBufLength(&cptr->sendQ) > 65536)
 	{
 		cptr->serv->lastload = timeofday;
 		ircstp->is_cklQ++;
@@ -3453,8 +3444,7 @@ static	int	check_link(aClient *cptr)
 		return 0;
 	}
 	/* last request between 15 and 30 seconds ago, but little SendQ */
-	if (timeofday - cptr->serv->lastload > 15
-		&& (int)DBufLength(&cptr->sendQ) < CHREPLLEN)
+	if (timeofday - cptr->serv->lastload > 15 && (int) DBufLength(&cptr->sendQ) < CHREPLLEN)
 	{
 		cptr->serv->lastload = timeofday;
 		ircstp->is_cklq++;
@@ -3474,7 +3464,7 @@ static	int	check_link(aClient *cptr)
 ** Returns 0 if ok, all else is some kind of error, which serves
 ** as index in check_servername_errors[] table.
 */
-int	check_servername(char *hostname)
+int check_servername(char *hostname)
 {
 	register char *ch;
 	int dots, chars, rc;
@@ -3496,9 +3486,7 @@ int	check_servername(char *hostname)
 				dots++;
 				continue;
 			}
-			if ((*ch >= 'a' && *ch <= 'z')
-				|| (*ch >= 'A' && *ch <= 'Z')
-				|| *ch == '-' || *ch == '*')
+			if ((*ch >= 'a' && *ch <= 'z') || (*ch >= 'A' && *ch <= 'Z') || *ch == '-' || *ch == '*')
 			{
 				chars++;
 				continue;
@@ -3529,7 +3517,7 @@ int	check_servername(char *hostname)
 /*
 ** adds server to server tree
 */
-void	add_server_to_tree(aClient *acptr)
+void add_server_to_tree(aClient *acptr)
 {
 	acptr->serv->up->serv->servers++;
 
@@ -3547,7 +3535,7 @@ void	add_server_to_tree(aClient *acptr)
 /* 
 ** Removes a server from the server tree.
 */
-void	remove_server_from_tree(aClient *cptr)
+void remove_server_from_tree(aClient *cptr)
 {
 	cptr->serv->up->serv->servers--;
 
@@ -3576,36 +3564,36 @@ void	remove_server_from_tree(aClient *cptr)
 	return;
 }
 
-static	void	dump_map_sid(aClient *sptr, char *mask, aClient *root, char *pbuf, int size)
+static void dump_map_sid(aClient *sptr, char *mask, aClient *root, char *pbuf, int size)
 {
-        int i = 1;
-        aClient *acptr;
-	
-        *pbuf= '\0';
+	int i = 1;
+	aClient *acptr;
+
+	*pbuf = '\0';
 	if (IsBursting(root))
 	{
 		snprintf(pbuf, size, "%s %d %s %s bursting %ds",
-			IsMasked(root) ? root->serv->maskedby->name : root->name,
-			root->serv->usercnt[0] + root->serv->usercnt[1],
-			root->serv->sid,
-			BadTo(root->serv->verstr),
-			MyConnect(root) ? (int) (timeofday - root->firsttime) : -1);
+				 IsMasked(root) ? root->serv->maskedby->name : root->name,
+				 root->serv->usercnt[0] + root->serv->usercnt[1],
+				 root->serv->sid,
+				 BadTo(root->serv->verstr),
+				 MyConnect(root) ? (int) (timeofday - root->firsttime) : -1);
 	}
 	else
 	{
 		snprintf(pbuf, size, "%s %d %s %s",
-			IsMasked(root) ? root->serv->maskedby->name : root->name,
-			root->serv->usercnt[0] + root->serv->usercnt[1],
-			root->serv->sid,
-			BadTo(root->serv->verstr));
+				 IsMasked(root) ? root->serv->maskedby->name : root->name,
+				 root->serv->usercnt[0] + root->serv->usercnt[1],
+				 root->serv->sid,
+				 BadTo(root->serv->verstr));
 	}
-	
-	if (!mask || 0==match(mask, 
-		(IsMasked(root) ? root->serv->maskedby->name : root->name)))
+
+	if (!mask || 0 == match(mask,
+							(IsMasked(root) ? root->serv->maskedby->name : root->name)))
 	{
 		sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
 	}
-	
+
 	if (root->serv->down)
 	{
 		/* we have children */
@@ -3620,7 +3608,7 @@ static	void	dump_map_sid(aClient *sptr, char *mask, aClient *root, char *pbuf, i
 			}
 		}
 	}
-	
+
 	for (acptr = root->serv->down; acptr; acptr = acptr->serv->right)
 	{
 		*pbuf = ' ';
@@ -3643,10 +3631,10 @@ static	void	dump_map_sid(aClient *sptr, char *mask, aClient *root, char *pbuf, i
 }
 
 
-static	void	dump_map(aClient *sptr, char *mask, aClient *root, aClient **prevserver, char *pbuf)
+static void dump_map(aClient *sptr, char *mask, aClient *root, aClient **prevserver, char *pbuf)
 {
 	aClient *prev = NULL;
-        aClient *acptr;
+	aClient *acptr;
 
 	/* Check if we still have space 5 - tree + \0 */
 	if (pbuf - buf > BUFSIZE - (HOSTLEN + 5))
@@ -3657,12 +3645,12 @@ static	void	dump_map(aClient *sptr, char *mask, aClient *root, aClient **prevser
 	/* Display itself if not masked */
 	if (!IsMasked(root))
 	{
-		*pbuf= '\0';
+		*pbuf = '\0';
 		strcat(pbuf, root->name);
 		if (!mask || !match(mask, root->name))
 			sendto_one(sptr, replies[RPL_MAP], ME, BadTo(sptr->name), buf);
 	}
-	
+
 	/* Clean up the output line */
 	if (root->serv->down)
 	{
@@ -3678,7 +3666,7 @@ static	void	dump_map(aClient *sptr, char *mask, aClient *root, aClient **prevser
 			}
 		}
 	}
-	
+
 	/* Iterate over children */
 	for (acptr = root->serv->down; acptr; acptr = acptr->serv->right)
 	{
@@ -3725,7 +3713,7 @@ static	void	dump_map(aClient *sptr, char *mask, aClient *root, aClient **prevser
 ** parv[1] - optional parameter "s" which causes alternate version
 **	     of map with SIDs and versions to be printed.
 */
-int	m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr = NULL;
 	int sids = 0;
@@ -3733,7 +3721,7 @@ int	m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (parc > 1)
 	{
-		if (parv[parc-1][0] == 's' && parv[parc-1][1] == '\0')
+		if (parv[parc - 1][0] == 's' && parv[parc - 1][1] == '\0')
 		{
 			sids = parc - 1;
 		}
@@ -3746,14 +3734,13 @@ int	m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		/* print full dump of the network */
 		sendto_one(sptr, replies[RPL_MAPSTART], ME, BadTo(sptr->name),
-				"Server users SID version");
-		dump_map_sid(sptr, mask, &me, buf, sizeof(buf) - 
-			strlen(BadTo(sptr->name)) - strlen(ME) - 8);
+				   "Server users SID version");
+		dump_map_sid(sptr, mask, &me, buf, sizeof(buf) - strlen(BadTo(sptr->name)) - strlen(ME) - 8);
 		sendto_one(sptr, replies[RPL_MAPEND], ME, BadTo(sptr->name));
 		return 2;
 	}
 	sendto_one(sptr, replies[RPL_MAPSTART], ME, BadTo(sptr->name),
-			"Server");
+			   "Server");
 	dump_map(sptr, mask, &me, &acptr, buf);
 	sendto_one(sptr, replies[RPL_MAPEND], ME, BadTo(sptr->name));
 	return 2;
@@ -3762,7 +3749,7 @@ int	m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 static void report_listeners(aClient *sptr, char *to)
 {
 	aConfItem *tmp;
-	aClient	*acptr;
+	aClient *acptr;
 	char *what;
 
 	for (acptr = ListenerLL; acptr; acptr = acptr->next)
@@ -3790,15 +3777,15 @@ static void report_listeners(aClient *sptr, char *to)
 			what = "active";
 
 		sendto_one(sptr, ":%s %d %s %d %s %s %u %lu %llu %lu %llu %u"
-				 " %u %s",
-			ME, RPL_STATSLINKINFO, to,
-			tmp->port, BadTo(tmp->host),
-			pline_flags_to_string(tmp->flags),
-			(uint)DBufLength(&acptr->sendQ),
-			acptr->sendM, acptr->sendB,
-			acptr->receiveM, acptr->receiveB,
-			timeofday - acptr->firsttime,
-			tmp->clients, what);
+						 " %u %s",
+				   ME, RPL_STATSLINKINFO, to,
+				   tmp->port, BadTo(tmp->host),
+				   pline_flags_to_string(tmp->flags),
+				   (uint) DBufLength(&acptr->sendQ),
+				   acptr->sendM, acptr->sendB,
+				   acptr->receiveM, acptr->receiveB,
+				   timeofday - acptr->firsttime,
+				   tmp->clients, what);
 	}
 }
 
@@ -3810,7 +3797,7 @@ static void report_listeners(aClient *sptr, char *to)
 ** the rest is optional and is used by command as its own params
 */
 
-int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char buf[BUFSIZE];
 	int i, len;
@@ -3819,7 +3806,7 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	len = sprintf(buf, ":%s ENCAP", sptr->serv->sid);
 	for (i = 1; i < parc; i++)
 	{
-		if (len + strlen(parv[i]) >= BUFSIZE-2)
+		if (len + strlen(parv[i]) >= BUFSIZE - 2)
 		{
 			/* This can get cut. */
 			sendto_flag(SCH_ERROR, "ENCAP too long (%s)", buf);
@@ -3828,9 +3815,9 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			return 1;
 		}
 		if (i >= 3 && i == parc - 1)
-			len += sprintf(buf+len, " :%s", parv[i]);
+			len += sprintf(buf + len, " :%s", parv[i]);
 		else
-			len += sprintf(buf+len, " %s", parv[i]);
+			len += sprintf(buf + len, " %s", parv[i]);
 	}
 	/* ...and broadcast it. */
 	sendto_serv_v(cptr, SV_UID, "%s", buf);
@@ -3845,7 +3832,7 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 }
 
 /* announces server DIE */
-int	m_sdie(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_sdie(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	sendto_serv_v(cptr, SV_UID, ":%s SDIE", sptr->serv->sid);
 	return 0;
@@ -3856,7 +3843,7 @@ int	m_sdie(aClient *cptr, aClient *sptr, int parc, char *parv[])
  * to be called whenever server associates client struct.
  * Also registers the server in global svrtop list.
  */
-int	register_server(aClient *cptr)
+int register_server(aClient *cptr)
 {
 
 	if (svrtop)
@@ -3865,7 +3852,7 @@ int	register_server(aClient *cptr)
 		cptr->serv->nexts = svrtop;
 	}
 	svrtop = cptr->serv;
-		
+
 	return 0;
 }
 
@@ -3874,20 +3861,20 @@ int	register_server(aClient *cptr)
  * to be called when a server loses associated client struct.
  * Also removes given server from global svrtop list.
  */
-int	unregister_server(aClient *cptr)
+int unregister_server(aClient *cptr)
 {
 	if (cptr->serv->nexts)
 		cptr->serv->nexts->prevs = cptr->serv->prevs;
-	
+
 	if (cptr->serv->prevs)
 		cptr->serv->prevs->nexts = cptr->serv->nexts;
-			
+
 	if (svrtop == cptr->serv)
 		svrtop = cptr->serv->nexts;
-		
+
 	cptr->serv->prevs = NULL;
 	cptr->serv->nexts = NULL;
 	cptr->serv->bcptr = NULL;
-	
+
 	return 0;
 }

@@ -28,5 +28,5 @@
 #else /* PACKET_C */
 #define EXTERN
 #endif /* PACKET_C */
-EXTERN int dopacket (Reg aClient *cptr, char *buffer, Reg int length);
+EXTERN int dopacket(Reg aClient *cptr, char *buffer, Reg int length);
 #undef EXTERN
