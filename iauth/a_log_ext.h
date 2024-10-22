@@ -29,14 +29,14 @@
 /*  External definitions for global functions.
  */
 #ifndef A_LOG_C
-# define EXTERN extern
+#define EXTERN extern
 #else /* A_LOG_C */
-# define EXTERN
+#define EXTERN
 #endif /* A_LOG_C */
 
 EXTERN void init_filelogs(void);
 EXTERN void init_syslog(void);
-EXTERN void vsendto_log (int, int, char *, va_list);
-EXTERN void sendto_log (int, int, char *, ...);
+EXTERN void vsendto_log(int, int, char *, va_list);
+EXTERN void sendto_log(int, int, char *, ...);
 
 #undef EXTERN

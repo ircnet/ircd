@@ -30,9 +30,9 @@ extern aModule Module_rfc931;
 /*  External definitions for global functions.
  */
 #ifndef MOD_RFC931_C
-# define EXTERN extern
+#define EXTERN extern
 #else /* MOD_RFC931_C */
-# define EXTERN
+#define EXTERN
 #endif /* MOD_RFC931_C */
 
 /*

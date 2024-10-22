@@ -28,8 +28,8 @@
 #else /* RES_MKQUERY_C */
 #define EXTERN
 #endif /* RES_MKQUERY_C */
-EXTERN int ircd_res_mkquery (int op, const char *dname, int class,
-				 int type, const u_char *data, int datalen,
-				 const u_char *newrr_in, u_char *buf,
-				 int buflen);
+EXTERN int ircd_res_mkquery(int op, const char *dname, int class,
+							int type, const u_char *data, int datalen,
+							const u_char *newrr_in, u_char *buf,
+							int buflen);
 #undef EXTERN

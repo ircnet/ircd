@@ -17,11 +17,11 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#define CREATE 1	/* whether a channel should be
+#define CREATE 1 /* whether a channel should be
 			   created or just tested for existance */
 
-#define	MODEBUFLEN	200
+#define MODEBUFLEN 200
 
-#define NullChn	((aChannel *)0)
+#define NullChn ((aChannel *) 0)
 
-#define ChannelExists(n)	(find_channel(n, NullChn) != NullChn)
+#define ChannelExists(n) (find_channel(n, NullChn) != NullChn)

@@ -78,23 +78,24 @@ static const volatile char rcsid[] = "$Id: res_mkquery.c,v 1.8 2004/10/01 20:22:
  *	u_char *buf;		buffer to put query
  *	int buflen;		size of buffer
  */
-int	ircd_res_mkquery(int op, const char *dname, int class, int type,
-		const u_char *data, int datalen, const u_char *newrr_in,
-		u_char *buf, int buflen)
+int ircd_res_mkquery(int op, const char *dname, int class, int type,
+					 const u_char *data, int datalen, const u_char *newrr_in,
+					 u_char *buf, int buflen)
 {
 	register HEADER *hp;
 	register u_char *cp;
 	register int n;
 	u_char *dnptrs[20], **dpp, **lastdnptr;
 
-	if ((ircd_res.options & RES_INIT) == 0 && ircd_res_init() == -1) {
+	if ((ircd_res.options & RES_INIT) == 0 && ircd_res_init() == -1)
+	{
 		h_errno = NETDB_INTERNAL;
 		return (-1);
 	}
 #ifdef DEBUG
 	if (ircd_res.options & RES_DEBUG)
 		printf(";; res_mkquery(%d, %s, %d, %d)\n",
-		       op, dname, class, type);
+			   op, dname, class, type);
 #endif
 	/*
 	 * Initialize header fields.
@@ -116,67 +117,68 @@ int	ircd_res_mkquery(int op, const char *dname, int class, int type,
 	/*
 	 * perform opcode specific processing
 	 */
-	switch (op) {
-	case QUERY:	/*FALLTHROUGH*/
-	case NS_NOTIFY_OP:
-		if ((buflen -= QFIXEDSZ) < 0)
-			return (-1);
-		if ((n = ircd_dn_comp(dname, cp, buflen, dnptrs, lastdnptr)) < 0)
-			return (-1);
-		cp += n;
-		buflen -= n;
-		ircd__putshort(type, cp);
-		cp += INT16SZ;
-		ircd__putshort(class, cp);
-		cp += INT16SZ;
-		hp->qdcount = htons(1);
-		if (op == QUERY || data == NULL)
-			break;
-		/*
+	switch (op)
+	{
+		case QUERY: /*FALLTHROUGH*/
+		case NS_NOTIFY_OP:
+			if ((buflen -= QFIXEDSZ) < 0)
+				return (-1);
+			if ((n = ircd_dn_comp(dname, cp, buflen, dnptrs, lastdnptr)) < 0)
+				return (-1);
+			cp += n;
+			buflen -= n;
+			ircd__putshort(type, cp);
+			cp += INT16SZ;
+			ircd__putshort(class, cp);
+			cp += INT16SZ;
+			hp->qdcount = htons(1);
+			if (op == QUERY || data == NULL)
+				break;
+			/*
 		 * Make an additional record for completion domain.
 		 */
-		buflen -= RRFIXEDSZ;
-		n = ircd_dn_comp((const char *) data, cp, buflen, dnptrs, lastdnptr);
-		if (n < 0)
-			return (-1);
-		cp += n;
-		buflen -= n;
-		ircd__putshort(T_NULL, cp);
-		cp += INT16SZ;
-		ircd__putshort(class, cp);
-		cp += INT16SZ;
-		ircd__putlong(0, cp);
-		cp += INT32SZ;
-		ircd__putshort(0, cp);
-		cp += INT16SZ;
-		hp->arcount = htons(1);
-		break;
+			buflen -= RRFIXEDSZ;
+			n = ircd_dn_comp((const char *) data, cp, buflen, dnptrs, lastdnptr);
+			if (n < 0)
+				return (-1);
+			cp += n;
+			buflen -= n;
+			ircd__putshort(T_NULL, cp);
+			cp += INT16SZ;
+			ircd__putshort(class, cp);
+			cp += INT16SZ;
+			ircd__putlong(0, cp);
+			cp += INT32SZ;
+			ircd__putshort(0, cp);
+			cp += INT16SZ;
+			hp->arcount = htons(1);
+			break;
 
-	case IQUERY:
-		/*
+		case IQUERY:
+			/*
 		 * Initialize answer section
 		 */
-		if (buflen < 1 + RRFIXEDSZ + datalen)
-			return (-1);
-		*cp++ = '\0';	/* no domain name */
-		ircd__putshort(type, cp);
-		cp += INT16SZ;
-		ircd__putshort(class, cp);
-		cp += INT16SZ;
-		ircd__putlong(0, cp);
-		cp += INT32SZ;
-		ircd__putshort(datalen, cp);
-		cp += INT16SZ;
-		if (datalen) {
-			bcopy(data, cp, datalen);
-			cp += datalen;
-		}
-		hp->ancount = htons(1);
-		break;
+			if (buflen < 1 + RRFIXEDSZ + datalen)
+				return (-1);
+			*cp++ = '\0'; /* no domain name */
+			ircd__putshort(type, cp);
+			cp += INT16SZ;
+			ircd__putshort(class, cp);
+			cp += INT16SZ;
+			ircd__putlong(0, cp);
+			cp += INT32SZ;
+			ircd__putshort(datalen, cp);
+			cp += INT16SZ;
+			if (datalen)
+			{
+				bcopy(data, cp, datalen);
+				cp += datalen;
+			}
+			hp->ancount = htons(1);
+			break;
 
-	default:
-		return (-1);
+		default:
+			return (-1);
 	}
 	return (cp - buf);
 }
-

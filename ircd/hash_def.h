@@ -17,25 +17,23 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-typedef	struct	hashentry {
-	int	hits;
-	int	links;
-	void	*list;
+typedef struct hashentry {
+	int hits;
+	int links;
+	void *list;
 } aHashEntry;
 
 /*
  * it is not important for these to be "big" as ircd will make them grow
  * as required.
  */
-#define	HASHSIZE	((int)((float)MAXCONNECTIONS*1.75))
-#define	CHANNELHASHSIZE	((int)(((float)MAXCONNECTIONS*1.75)/2.0))
-#define	SIDSIZE		(MAXCONNECTIONS/10)
+#define HASHSIZE ((int) ((float) MAXCONNECTIONS * 1.75))
+#define CHANNELHASHSIZE ((int) (((float) MAXCONNECTIONS * 1.75) / 2.0))
+#define SIDSIZE (MAXCONNECTIONS / 10)
 #ifdef USE_HOSTHASH
-#define	HOSTNAMEHASHSIZE ((int)((float)MAXCONNECTIONS*1.75))
+#define HOSTNAMEHASHSIZE ((int) ((float) MAXCONNECTIONS * 1.75))
 #endif
 #ifdef USE_IPHASH
-#define	IPHASHSIZE ((int)((float)MAXCONNECTIONS*1.75))
+#define IPHASHSIZE ((int) ((float) MAXCONNECTIONS * 1.75))
 #endif
-#define	UIDSIZE	((int)((float)MAXCONNECTIONS*1.75))
-
-
+#define UIDSIZE ((int) ((float) MAXCONNECTIONS * 1.75))

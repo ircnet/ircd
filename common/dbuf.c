@@ -33,8 +33,8 @@ static const volatile char rcsid[] = "@(#)$Id: dbuf.c,v 1.12 2004/10/01 20:22:12
 #include "s_externs.h"
 #undef DBUF_C
 
-u_int	poolsize = (BUFFERPOOL > 1500000) ? BUFFERPOOL : 1500000;
-dbufbuf	*freelist = NULL;
+u_int poolsize = (BUFFERPOOL > 1500000) ? BUFFERPOOL : 1500000;
+dbufbuf *freelist = NULL;
 
 /* dbuf_init--initialize a stretch of memory as dbufs.
    Doing this early on should save virtual memory if not real memory..
@@ -43,17 +43,17 @@ dbufbuf	*freelist = NULL;
    mika@cs.caltech.edu 6/24/95
 */
 
-void	dbuf_init(void)
+void dbuf_init(void)
 {
 	dbufbuf *dbp;
 	int i = 0, nb;
 
 	nb = poolsize / sizeof(dbufbuf);
-	freelist = (dbufbuf *)malloc(nb * sizeof(dbufbuf));
+	freelist = (dbufbuf *) malloc(nb * sizeof(dbufbuf));
 	if (!freelist)
 		return; /* screw this if it doesn't work */
 	dbp = freelist;
-	for( ; i < (nb - 1); i++, dbp++, istat.is_dbufnow++)
+	for (; i < (nb - 1); i++, dbp++, istat.is_dbufnow++)
 		dbp->next = (dbp + 1);
 	dbp->next = NULL;
 	istat.is_dbufnow++;
@@ -65,30 +65,30 @@ void	dbuf_init(void)
 ** creates a new one.
 ** Return: 0 on success, -1 on fatal alloc error, -2 on pool exceeding
 */
-static	int	dbuf_alloc(dbufbuf **dbptr)
+static int dbuf_alloc(dbufbuf **dbptr)
 {
 	if (istat.is_dbufuse++ == istat.is_dbufmax)
 		istat.is_dbufmax = istat.is_dbufuse;
 	if ((*dbptr = freelist))
-	    {
+	{
 		freelist = freelist->next;
 		return 0;
-	    }
+	}
 	if (istat.is_dbufuse * DBUFSIZ > poolsize)
-	    {
+	{
 		istat.is_dbufuse--;
-		return -2;	/* Not fatal, go back and increase poolsize */
-	    }
+		return -2; /* Not fatal, go back and increase poolsize */
+	}
 
 	istat.is_dbufnow++;
-	if (!(*dbptr = (dbufbuf *)MyMalloc(sizeof(dbufbuf))))
+	if (!(*dbptr = (dbufbuf *) MyMalloc(sizeof(dbufbuf))))
 		return -1;
 	return 0;
 }
 /*
 ** dbuf_free - return a dbufbuf structure to the freelist
 */
-static	void	dbuf_free(dbufbuf *ptr)
+static void dbuf_free(dbufbuf *ptr)
 {
 	istat.is_dbufuse--;
 	ptr->next = freelist;
@@ -107,10 +107,10 @@ int dbuf_malloc_error(dbuf *dyn)
 	dyn->length = 0;
 	dyn->offset = 0;
 	while ((p = dyn->head) != NULL)
-	    {
+	{
 		dyn->head = p->next;
 		dbuf_free(p);
-	    }
+	}
 #ifdef DBUF_TAIL
 	dyn->tail = dyn->head;
 #endif
@@ -133,32 +133,32 @@ int dbuf_malloc_error(dbuf *dyn)
 **	int	length		Number of bytes to store
 **
 */
-int	dbuf_put(dbuf *dyn, char *buf, int length)
+int dbuf_put(dbuf *dyn, char *buf, int length)
 {
-	Reg	dbufbuf	**h;
+	Reg dbufbuf **h;
 	dbufbuf *d;
 #ifdef DBUF_TAIL
 	dbufbuf *dtail;
-	Reg	int	off;
+	Reg int off;
 #else
-	Reg	int	nbr, off;
+	Reg int nbr, off;
 #endif
-	Reg	int	chunk, i, dlength;
+	Reg int chunk, i, dlength;
 
 	dlength = dyn->length;
 
 	off = (dyn->offset + dyn->length) % DBUFSIZ;
 #ifdef DBUF_TAIL
 	dtail = dyn->tail;
-        if (!dyn->length)
-                h = &(dyn->head);
-        else
-	    {
+	if (!dyn->length)
+		h = &(dyn->head);
+	else
+	{
 		if (off)
-                        h = &(dyn->tail);
-                else
-                        h = &(dyn->tail->next);
-        }
+			h = &(dyn->tail);
+		else
+			h = &(dyn->tail->next);
+	}
 #else
 	/*
 	** Locate the last non-empty buffer. If the last buffer is
@@ -174,20 +174,20 @@ int	dbuf_put(dbuf *dyn, char *buf, int length)
 	*/
 	chunk = DBUFSIZ - off;
 	dyn->length += length;
-	for ( ;length > 0; h = &(d->next))
-	    {
+	for (; length > 0; h = &(d->next))
+	{
 		if ((d = *h) == NULL)
-		    {
+		{
 			if ((i = dbuf_alloc(&d)))
-			    {
-				if (i == -1)	/* out of memory, cleanup */
+			{
+				if (i == -1) /* out of memory, cleanup */
 					/* modifies dyn->tail */
 					dbuf_malloc_error(dyn);
 				else
 				/* If we run out of bufferpool, visit upper
 				 * level to increase it and retry. -Vesa
 				 */
-				    {
+				{
 					/*
 					** Cancel this dbuf_put as well,
 					** since it is incomplete. -krys
@@ -196,15 +196,15 @@ int	dbuf_put(dbuf *dyn, char *buf, int length)
 #ifdef DBUF_TAIL
 					dyn->tail = dtail;
 #endif
-				    }
+				}
 				return i;
-			    }
+			}
 #ifdef DBUF_TAIL
 			dyn->tail = d;
 #endif
 			*h = d;
 			d->next = NULL;
-		    }
+		}
 		if (chunk > length)
 			chunk = length;
 		bcopy(buf, d->data + off, chunk);
@@ -212,9 +212,9 @@ int	dbuf_put(dbuf *dyn, char *buf, int length)
 		buf += chunk;
 		off = 0;
 		chunk = DBUFSIZ;
-	    }
+	}
 	return 1;
-    }
+}
 
 
 /*
@@ -247,16 +247,16 @@ int	dbuf_put(dbuf *dyn, char *buf, int length)
 **	int	*length		Return number of bytes accessible
 **
 */
-char	*dbuf_map(dbuf *dyn, int *length)
+char *dbuf_map(dbuf *dyn, int *length)
 {
 	if (dyn->head == NULL)
-	    {
+	{
 #ifdef DBUF_TAIL
 		dyn->tail = NULL;
 #endif
 		*length = 0;
 		return NULL;
-	    }
+	}
 	*length = DBUFSIZ - dyn->offset;
 	if (*length > dyn->length)
 		*length = dyn->length;
@@ -269,7 +269,7 @@ char	*dbuf_map(dbuf *dyn, int *length)
 **	dbuf	*dyn		Dynamic buffer header
 **	int	length		Number of bytes to delete
 */
-int	dbuf_delete(dbuf *dyn, int length)
+int dbuf_delete(dbuf *dyn, int length)
 {
 	dbufbuf *d;
 	int chunk;
@@ -278,24 +278,24 @@ int	dbuf_delete(dbuf *dyn, int length)
 		length = dyn->length;
 	chunk = DBUFSIZ - dyn->offset;
 	while (length > 0)
-	    {
+	{
 		if (chunk > length)
 			chunk = length;
 		length -= chunk;
 		dyn->offset += chunk;
 		dyn->length -= chunk;
 		if (dyn->offset == DBUFSIZ || dyn->length == 0)
-		    {
+		{
 			if ((d = dyn->head))
-			    {	/* What did I do? A memory leak.. ? */
+			{ /* What did I do? A memory leak.. ? */
 				dyn->head = d->next;
 				dbuf_free(d);
-			    }
+			}
 			dyn->offset = 0;
-		    }
+		}
 		chunk = DBUFSIZ;
-	    }
-	if (dyn->head == (dbufbuf *)NULL)
+	}
+	if (dyn->head == (dbufbuf *) NULL)
 #ifdef DBUF_TAIL
 	{
 		dyn->tail = NULL;
@@ -328,22 +328,22 @@ int	dbuf_delete(dbuf *dyn, int length)
 **	char	*buf		Pointer to buffer to receive the data
 **	int	length		Max amount of bytes that can be received
 */
-int	dbuf_get(dbuf *dyn, char *buf, int length)
+int dbuf_get(dbuf *dyn, char *buf, int length)
 {
-	int	moved = 0;
-	int	chunk;
-	char	*b;
+	int moved = 0;
+	int chunk;
+	char *b;
 
 	while (length > 0 && (b = dbuf_map(dyn, &chunk)) != NULL)
-	    {
+	{
 		if (chunk > length)
 			chunk = length;
-		bcopy(b, buf, (int)chunk);
-		(void)dbuf_delete(dyn, chunk);
+		bcopy(b, buf, (int) chunk);
+		(void) dbuf_delete(dyn, chunk);
 		buf += chunk;
 		length -= chunk;
 		moved += chunk;
-	    }
+	}
 	return moved;
 }
 
@@ -388,13 +388,13 @@ int	dbuf_copy(dbuf *dyn, char *buf, int length)
 ** either a \r or \n prsent.  If so, copy as much as possible (determined by
 ** length) into buf and return the amount copied - else return 0.
 */
-int	dbuf_getmsg(dbuf *dyn, char *buf, int length)
+int dbuf_getmsg(dbuf *dyn, char *buf, int length)
 {
-	dbufbuf	*d;
-	register char	*s;
-	register int	dlen;
-	register int	i;
-	int	copy;
+	dbufbuf *d;
+	register char *s;
+	register int dlen;
+	register int i;
+	int copy;
 
 getmsg_init:
 	d = dyn->head;
@@ -411,34 +411,34 @@ getmsg_init:
 	if (i > dlen)
 		i = dlen;
 	while (length > 0 && dlen > 0)
-	    {
+	{
 		dlen--;
 		if (*s == '\n' || *s == '\r')
-		    {
+		{
 			copy = dyn->length - dlen;
 			/*
 			** Shortcut this case here to save time elsewhere.
 			** -avalon
 			*/
 			if (copy == 1)
-			    {
-				(void)dbuf_delete(dyn, 1);
+			{
+				(void) dbuf_delete(dyn, 1);
 				goto getmsg_init;
-			    }
+			}
 			break;
-		    }
+		}
 		length--;
 		if (!--i)
-		    {
+		{
 			if ((d = d->next))
-			    {
+			{
 				s = d->data;
 				i = MIN(DBUFSIZ, dlen);
-			    }
-		    }
+			}
+		}
 		else
 			s++;
-	    }
+	}
 
 	if (copy <= 0)
 		return 0;
@@ -451,10 +451,9 @@ getmsg_init:
 	** and delete the rest of it!
 	*/
 	if (copy - i > 0)
-		(void)dbuf_delete(dyn, copy - i);
+		(void) dbuf_delete(dyn, copy - i);
 	if (i >= 0)
-		*(buf+i) = '\0';	/* mark end of messsage */
+		*(buf + i) = '\0'; /* mark end of messsage */
 
 	return i;
 }
-

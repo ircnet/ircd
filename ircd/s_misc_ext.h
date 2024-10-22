@@ -36,23 +36,23 @@ extern time_t motd_mtime;
 #else /* S_MISC_C */
 #define EXTERN
 #endif /* S_MISC_C */
-EXTERN char *date (time_t clock);
-EXTERN int check_registered_user (aClient *sptr);
-EXTERN int check_registered (aClient *sptr);
-EXTERN int check_registered_service (aClient *sptr);
-EXTERN char *get_client_name (aClient *sptr, int showip);
-EXTERN char *get_client_host (aClient *cptr);
-EXTERN char *get_client_ip (aClient *cptr);
-EXTERN void get_sockhost (Reg aClient *cptr, Reg char *host);
-EXTERN char *my_name_for_link (char *name, Reg int count);
-EXTERN int mark_blind_servers (aClient *cptr, aClient *server);
-EXTERN int exit_client (aClient *cptr, aClient *sptr, aClient *from,
-			    const char *comment);
+EXTERN char *date(time_t clock);
+EXTERN int check_registered_user(aClient *sptr);
+EXTERN int check_registered(aClient *sptr);
+EXTERN int check_registered_service(aClient *sptr);
+EXTERN char *get_client_name(aClient *sptr, int showip);
+EXTERN char *get_client_host(aClient *cptr);
+EXTERN char *get_client_ip(aClient *cptr);
+EXTERN void get_sockhost(Reg aClient *cptr, Reg char *host);
+EXTERN char *my_name_for_link(char *name, Reg int count);
+EXTERN int mark_blind_servers(aClient *cptr, aClient *server);
+EXTERN int exit_client(aClient *cptr, aClient *sptr, aClient *from,
+					   const char *comment);
 EXTERN void checklist(void);
 EXTERN void initstats(void);
 EXTERN void initruntimeconf(void);
-EXTERN void tstats (aClient *cptr, char *name);
-EXTERN void read_motd (char *filename);
+EXTERN void tstats(aClient *cptr, char *name);
+EXTERN void read_motd(char *filename);
 EXTERN void check_split(void);
 EXTERN int myrand(void);
 EXTERN void mysrand(unsigned int seed);

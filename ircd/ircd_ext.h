@@ -60,10 +60,10 @@ extern aClient *ListenerLL;
 #else /* IRCD_C */
 #define EXTERN
 #endif /* IRCD_C */
-EXTERN RETSIGTYPE s_die (int s);
-EXTERN void restart (char *mesg);
-EXTERN RETSIGTYPE s_restart (int s);
+EXTERN RETSIGTYPE s_die(int s);
+EXTERN void restart(char *mesg);
+EXTERN RETSIGTYPE s_restart(int s);
 EXTERN void server_reboot(void);
-EXTERN void ircd_writetune (char *filename);
-EXTERN void ircd_readtune (char *filename);
+EXTERN void ircd_writetune(char *filename);
+EXTERN void ircd_readtune(char *filename);
 #undef EXTERN

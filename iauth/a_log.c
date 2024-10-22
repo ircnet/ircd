@@ -21,18 +21,18 @@
 static const volatile char rcsid[] = "@(#)$Id: a_log.c,v 1.11 2004/10/01 20:22:13 chopin Exp $";
 #endif
 
-#include "os.h"
 #include "a_defines.h"
+#include "os.h"
 #define A_LOG_C
 #include "a_externs.h"
 #undef A_LOG_C
 
 #if defined(IAUTH_DEBUG)
-static FILE	*debug = NULL;
+static FILE *debug = NULL;
 #endif
-static FILE	*authlog = NULL;
+static FILE *authlog = NULL;
 
-void	init_filelogs(void)
+void init_filelogs(void)
 {
 #if defined(IAUTH_DEBUG)
 	if (debug)
@@ -40,11 +40,11 @@ void	init_filelogs(void)
 	if (debuglevel)
 	{
 		debug = fopen(IAUTHDBG_PATH, "w");
-# if defined(USE_SYSLOG)
+#if defined(USE_SYSLOG)
 		if (!debug)
 			syslog(LOG_ERR, "Failed to open \"%s\" for writing",
-			       IAUTHDBG_PATH);
-# endif
+				   IAUTHDBG_PATH);
+#endif
 	}
 #endif /* IAUTH_DEBUG */
 	if (authlog)
@@ -53,61 +53,60 @@ void	init_filelogs(void)
 #if defined(USE_SYSLOG)
 	if (!authlog)
 		syslog(LOG_NOTICE, "Failed to open \"%s\" for writing",
-		       FNAME_AUTHLOG);
+			   FNAME_AUTHLOG);
 #endif
 }
 
-void	init_syslog(void)
+void init_syslog(void)
 {
 #if defined(USE_SYSLOG)
-	openlog("iauth", LOG_PID|LOG_NDELAY, LOG_FACILITY);
+	openlog("iauth", LOG_PID | LOG_NDELAY, LOG_FACILITY);
 #endif
 }
 
-void	vsendto_log(int flags, int slflag, char *pattern, va_list va)
+void vsendto_log(int flags, int slflag, char *pattern, va_list va)
 {
-	char	logbuf[4096];
+	char logbuf[4096];
 
 	logbuf[0] = '>';
-	vsprintf(logbuf+1, pattern, va);
+	vsprintf(logbuf + 1, pattern, va);
 
 #if defined(USE_SYSLOG)
 	if (slflag)
-		syslog(slflag, "%s", logbuf+1);
+		syslog(slflag, "%s", logbuf + 1);
 #endif
 
 	strcat(logbuf, "\n");
 
 #if defined(IAUTH_DEBUG)
 	if ((flags & ALOG_DALL) && (flags & debuglevel) && debug)
-	    {
-		fprintf(debug, "%s", logbuf+1);
+	{
+		fprintf(debug, "%s", logbuf + 1);
 		fflush(debug);
-	    }
+	}
 #endif
 	if (authlog && (flags & ALOG_FLOG))
-	    {
-		fprintf(authlog, "%s: %s", myctime(time(NULL)), logbuf+1);
+	{
+		fprintf(authlog, "%s: %s", myctime(time(NULL)), logbuf + 1);
 		fflush(authlog);
-	    }
+	}
 	if (flags & ALOG_IRCD)
-	    {
+	{
 		write(0, logbuf, strlen(logbuf));
 #if defined(IAUTH_DEBUG)
 		if ((ALOG_DSPY & debuglevel) && debug)
-		    {
-			fprintf(debug, "To ircd: %s", logbuf+1);
+		{
+			fprintf(debug, "To ircd: %s", logbuf + 1);
 			fflush(debug);
-		    }
+		}
 #endif
-	    }
+	}
 }
 
-void	sendto_log(int flags, int slflag, char *pattern, ...)
+void sendto_log(int flags, int slflag, char *pattern, ...)
 {
-        va_list va;
-        va_start(va, pattern);
-        vsendto_log(flags, slflag, pattern, va);
-        va_end(va);
+	va_list va;
+	va_start(va, pattern);
+	vsendto_log(flags, slflag, pattern, va);
+	va_end(va);
 }
-

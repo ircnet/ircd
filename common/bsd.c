@@ -29,36 +29,36 @@ static const volatile char rcsid[] = "@(#)$Id: bsd.c,v 1.13 2005/12/27 02:23:48 
 #undef BSD_C
 
 #ifdef DEBUGMODE
-int	writecalls = 0, writeb[10] = {0,0,0,0,0,0,0,0,0,0};
+int writecalls = 0, writeb[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 #endif
-RETSIGTYPE	dummy(int s)
+RETSIGTYPE dummy(int s)
 {
 #ifndef HAVE_RELIABLE_SIGNALS
-	(void)signal(SIGALRM, dummy);
-	(void)signal(SIGPIPE, dummy);
-# ifndef HPUX	/* Only 9k/800 series require this, but don't know how to.. */
-#  ifdef SIGWINCH
-	(void)signal(SIGWINCH, dummy);
-#  endif
-# endif
+	(void) signal(SIGALRM, dummy);
+	(void) signal(SIGPIPE, dummy);
+#ifndef HPUX /* Only 9k/800 series require this, but don't know how to.. */
+#ifdef SIGWINCH
+	(void) signal(SIGWINCH, dummy);
+#endif
+#endif
 #else
-# if POSIX_SIGNALS
-	struct  sigaction       act;
+#if POSIX_SIGNALS
+	struct sigaction act;
 
 	act.sa_handler = dummy;
 	act.sa_flags = 0;
-	(void)sigemptyset(&act.sa_mask);
-	(void)sigaddset(&act.sa_mask, SIGALRM);
-	(void)sigaddset(&act.sa_mask, SIGPIPE);
-#  ifdef SIGWINCH
-	(void)sigaddset(&act.sa_mask, SIGWINCH);
-#  endif
-	(void)sigaction(SIGALRM, &act, (struct sigaction *)NULL);
-	(void)sigaction(SIGPIPE, &act, (struct sigaction *)NULL);
-#  ifdef SIGWINCH
-	(void)sigaction(SIGWINCH, &act, (struct sigaction *)NULL);
-#  endif
-# endif
+	(void) sigemptyset(&act.sa_mask);
+	(void) sigaddset(&act.sa_mask, SIGALRM);
+	(void) sigaddset(&act.sa_mask, SIGPIPE);
+#ifdef SIGWINCH
+	(void) sigaddset(&act.sa_mask, SIGWINCH);
+#endif
+	(void) sigaction(SIGALRM, &act, (struct sigaction *) NULL);
+	(void) sigaction(SIGPIPE, &act, (struct sigaction *) NULL);
+#ifdef SIGWINCH
+	(void) sigaction(SIGWINCH, &act, (struct sigaction *) NULL);
+#endif
+#endif
 #endif
 }
 
@@ -82,13 +82,13 @@ RETSIGTYPE	dummy(int s)
 **		work equally well whether blocking or non-blocking
 **		mode is used...
 */
-int	deliver_it(aClient *cptr, char *str, int len)
+int deliver_it(aClient *cptr, char *str, int len)
 {
-	int	retval;
-	aClient	*acpt = cptr->acpt;
-	int	savederrno = 0;
+	int retval;
+	aClient *acpt = cptr->acpt;
+	int savederrno = 0;
 
-#ifdef	DEBUGMODE
+#ifdef DEBUGMODE
 	writecalls++;
 #endif
 	retval = send(cptr->fd, str, len, 0);
@@ -105,23 +105,25 @@ int	deliver_it(aClient *cptr, char *str, int len)
 	** ...now, would this work on VMS too? --msa
 	*/
 	if (retval < 0 && (errno == EWOULDBLOCK || errno == EAGAIN ||
-#ifdef	EMSGSIZE
-			   errno == EMSGSIZE ||
+#ifdef EMSGSIZE
+					   errno == EMSGSIZE ||
 #endif
-			   errno == ENOBUFS))
-	    {
+					   errno == ENOBUFS))
+	{
 		retval = 0;
 		cptr->flags |= FLAGS_BLOCKED;
-	    }
+	}
 	else if (retval > 0)
 		cptr->flags &= ~FLAGS_BLOCKED;
 
 #ifdef DEBUGMODE
-	if (retval < 0) {
+	if (retval < 0)
+	{
 		writeb[0]++;
-		Debug((DEBUG_ERROR,"write error (%s) to %s",
-			strerror(errno), cptr->name));
-	} else if (retval == 0)
+		Debug((DEBUG_ERROR, "write error (%s) to %s",
+			   strerror(errno), cptr->name));
+	}
+	else if (retval == 0)
 		writeb[1]++;
 	else if (retval < 16)
 		writeb[2]++;
@@ -141,24 +143,23 @@ int	deliver_it(aClient *cptr, char *str, int len)
 		writeb[9]++;
 #endif
 	if (retval > 0)
-	    {
+	{
 #if defined(DEBUGMODE) && defined(DEBUG_WRITE)
 		Debug((DEBUG_WRITE, "send = %d bytes to %d[%s]:[%*.*s]\n",
-			retval, cptr->fd, cptr->name, retval, retval, str));
+			   retval, cptr->fd, cptr->name, retval, retval, str));
 #endif
 		cptr->sendB += retval;
 		me.sendB += retval;
 		if (acpt != &me)
-		    {
+		{
 			acpt->sendB += retval;
-		    }
-	    }
+		}
+	}
 	/* Retval of erroneous send() would always be -1, so we return
 	** (negative) saved errno, so upper layer will give proper notice.
 	** Note above about EAGAIN or EWOULDBLOCK. --B. */
 	if (retval < 0)
 		retval = -savederrno;
-	
-	return(retval);
-}
 
+	return (retval);
+}

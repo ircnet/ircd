@@ -21,8 +21,8 @@
 static const volatile char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.8 2006/08/08 08:42:15 chopin Exp $";
 #endif
 
-#include "os.h"
 #include "a_defines.h"
+#include "os.h"
 #define MOD_PIPE_C
 #include "a_externs.h"
 #undef MOD_PIPE_C
@@ -34,7 +34,7 @@ static const volatile char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.8 2006/08/08 08:42
  *	Returns NULL if everything went fine,
  *	an error message otherwise.
  */
-static	char	*pipe_init(AnInstance *self)
+static char *pipe_init(AnInstance *self)
 {
 	if (self->opt == NULL)
 		return "Aie! no option(s): nothing to be done!";
@@ -73,50 +73,49 @@ static	void	pipe_stats(AnInstance *self)
  *	In case of failure, it's responsible for cleaning up (e.g. pipe_clean
  *	will NOT be called)
  */
-static	int	pipe_start(u_int cl)
+static int pipe_start(u_int cl)
 {
 	int pp[2], rc;
-	
-	DebugLog((ALOG_DPIPE, 0, "pipe_start(%d): Forking for %s %u", cl,
-		  cldata[cl].itsip, cldata[cl].itsport));
-	if (pipe(pp) == -1)
-	    {
-		DebugLog((ALOG_DPIPE, 0,
-			  "pipe_start(%d): Error creating pipe: %s",
-			  cl, strerror(errno)));
-		return -1;
-	    }
-	switch (rc = vfork())
-	    {
-	    case -1 :
-		    DebugLog((ALOG_DPIPE, 0,
-			      "pipe_start(%d): Error forking: %s",
-			      cl, strerror(errno)));
-		    return -1;
-	    case 0 :
-		    {
-			char portbuf[6];	/* 5 chars to hold the port number */
 
-			(void)close(pp[0]);
+	DebugLog((ALOG_DPIPE, 0, "pipe_start(%d): Forking for %s %u", cl,
+			  cldata[cl].itsip, cldata[cl].itsport));
+	if (pipe(pp) == -1)
+	{
+		DebugLog((ALOG_DPIPE, 0,
+				  "pipe_start(%d): Error creating pipe: %s",
+				  cl, strerror(errno)));
+		return -1;
+	}
+	switch (rc = vfork())
+	{
+		case -1:
+			DebugLog((ALOG_DPIPE, 0,
+					  "pipe_start(%d): Error forking: %s",
+					  cl, strerror(errno)));
+			return -1;
+		case 0: {
+			char portbuf[6]; /* 5 chars to hold the port number */
+
+			(void) close(pp[0]);
 			for (rc = 2; rc < MAXCONNECTIONS; rc++)
 				if (rc != pp[1])
-					(void)close(rc);
+					(void) close(rc);
 			if (pp[1] != 2)
-				(void)dup2(pp[1], 2);
-			(void)dup2(2, 1);
+				(void) dup2(pp[1], 2);
+			(void) dup2(2, 1);
 			if (pp[1] != 2 && pp[1] != 1)
-				(void)close(pp[1]);
+				(void) close(pp[1]);
 			snprintf(portbuf, sizeof(portbuf), "%d", cldata[cl].itsport);
-			(void)execlp(cldata[cl].instance->popt,
-				cldata[cl].instance->popt,
-				cldata[cl].itsip, portbuf,
-				(char *) NULL);
+			(void) execlp(cldata[cl].instance->popt,
+						  cldata[cl].instance->popt,
+						  cldata[cl].itsip, portbuf,
+						  (char *) NULL);
 			_exit(-1);
-		    }
-	    default :
-		    (void)close(pp[1]);
-		    break;
-	    }
+		}
+		default:
+			(void) close(pp[1]);
+			break;
+	}
 
 	cldata[cl].rfd = pp[0];
 	return 0;
@@ -131,21 +130,21 @@ static	int	pipe_start(u_int cl)
  *
  *	It is responsible for sending error messages where appropriate.
  */
-static	int	pipe_work(u_int cl)
+static int pipe_work(u_int cl)
 {
-    	DebugLog((ALOG_DPIPE, 0, "pipe_work(%d): %d %d buflen=%d %c", cl,
-		  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen,
-		  cldata[cl].inbuffer[0]));
+	DebugLog((ALOG_DPIPE, 0, "pipe_work(%d): %d %d buflen=%d %c", cl,
+			  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen,
+			  cldata[cl].inbuffer[0]));
 
 	switch (cldata[cl].inbuffer[0])
-	    {
-	    case 'Y':
-		    break;
-	    case 'N':
-		    cldata[cl].state |= A_DENY;
-		    sendto_ircd("K %d %s %u ", cl, cldata[cl].itsip,
-				cldata[cl].itsport);
-		    break;
+	{
+		case 'Y':
+			break;
+		case 'N':
+			cldata[cl].state |= A_DENY;
+			sendto_ircd("K %d %s %u ", cl, cldata[cl].itsip,
+						cldata[cl].itsport);
+			break;
 #if 0
 		    /* hm.. need deeper mods to ircd */
 	    case 'y':
@@ -155,15 +154,15 @@ static	int	pipe_work(u_int cl)
 				cldata[cl].itsport);
 		    break;
 #endif
-	    default :
-		    /* error */
-		    sendto_log(ALOG_FLOG|ALOG_IRCD, LOG_WARNING,
-			       "pipe: unexpected %c for %s[%s]",
-			       cldata[cl].inbuffer[0],
-			       cldata[cl].host,
-			       cldata[cl].itsip);
-		    break;
-	    }
+		default:
+			/* error */
+			sendto_log(ALOG_FLOG | ALOG_IRCD, LOG_WARNING,
+					   "pipe: unexpected %c for %s[%s]",
+					   cldata[cl].inbuffer[0],
+					   cldata[cl].host,
+					   cldata[cl].itsip);
+			break;
+	}
 
 	/* We're done */
 	close(cldata[cl].rfd);
@@ -178,7 +177,7 @@ static	int	pipe_work(u_int cl)
  *	It is responsible for cleaning up any allocated data, and in particular
  *	closing file descriptors.
  */
-static	void	pipe_clean(u_int cl)
+static void pipe_clean(u_int cl)
 {
 	DebugLog((ALOG_DPIPE, 0, "pipe_clean(%d): cleaning up", cl));
 	if (cldata[cl].rfd)
@@ -194,15 +193,14 @@ static	void	pipe_clean(u_int cl)
  *
  *	Returns 0 if things are okay, -1 if authentication was aborted.
  */
-static	int	pipe_timeout(u_int cl)
+static int pipe_timeout(u_int cl)
 {
 	DebugLog((ALOG_DPIPE, 0, "pipe_timeout(%d): calling pipe_clean ",
-		  cl));
+			  cl));
 	pipe_clean(cl);
 	return -1;
 }
 
 aModule Module_pipe =
-	{ "pipe", pipe_init, NULL, NULL,
-	  pipe_start, pipe_work, pipe_timeout, pipe_clean };
-
+		{"pipe", pipe_init, NULL, NULL,
+		 pipe_start, pipe_work, pipe_timeout, pipe_clean};

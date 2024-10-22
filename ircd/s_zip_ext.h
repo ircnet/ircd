@@ -28,11 +28,11 @@
 #else /* S_ZIP_C */
 #define EXTERN
 #endif /* S_ZIP_C */
-#ifdef	ZIP_LINKS
-EXTERN int zip_init (aClient *cptr);
-EXTERN void zip_free (aClient *cptr);
-EXTERN char *unzip_packet (aClient *cptr, char *buffer, int *length);
-EXTERN char *zip_buffer (aClient *cptr, char *buffer, int *length,
-			     int flush);
+#ifdef ZIP_LINKS
+EXTERN int zip_init(aClient *cptr);
+EXTERN void zip_free(aClient *cptr);
+EXTERN char *unzip_packet(aClient *cptr, char *buffer, int *length);
+EXTERN char *zip_buffer(aClient *cptr, char *buffer, int *length,
+						int flush);
 #endif /* ZIP_LINKS */
 #undef EXTERN

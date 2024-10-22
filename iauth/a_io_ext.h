@@ -24,7 +24,7 @@
 /*  External definitions for global variables.
  */
 #ifndef A_IO_C
-extern anAuthData      cldata[MAXCONNECTIONS];
+extern anAuthData cldata[MAXCONNECTIONS];
 #endif /* A_IO_C */
 
 /*  External definitions for global functions.
@@ -36,11 +36,11 @@ extern anAuthData      cldata[MAXCONNECTIONS];
 #endif /* A_IO_C */
 
 EXTERN void io_init(void);
-EXTERN void vsendto_ircd (char *, va_list);
-EXTERN void sendto_ircd (char *, ...);
-EXTERN void init_io (void);
-EXTERN void loop_io (void);
-EXTERN int tcp_connect (char *, char *, u_short, char **);
+EXTERN void vsendto_ircd(char *, va_list);
+EXTERN void sendto_ircd(char *, ...);
+EXTERN void init_io(void);
+EXTERN void loop_io(void);
+EXTERN int tcp_connect(char *, char *, u_short, char **);
 
 EXTERN char strConn[256];
 EXTERN int strConnLen;

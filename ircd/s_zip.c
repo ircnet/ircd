@@ -27,7 +27,7 @@ static const volatile char rcsid[] = "@(#)$Id: s_zip.c,v 1.12 2005/02/20 23:09:4
 #include "s_externs.h"
 #undef S_ZIP_C
 
-#ifdef	ZIP_LINKS
+#ifdef ZIP_LINKS
 
 /*
 ** Important note:
@@ -49,7 +49,7 @@ static const volatile char rcsid[] = "@(#)$Id: s_zip.c,v 1.12 2005/02/20 23:09:4
 **	(cptr->zip->inbuf should never hold more than ONE compression block.
 **	The biggest block allowed for compression is ZIP_MAXIMUM bytes)
 */
-#define	ZIP_BUFFER_SIZE		(MAX(ZIP_MAXIMUM, READBUF_SIZE))
+#define ZIP_BUFFER_SIZE (MAX(ZIP_MAXIMUM, READBUF_SIZE))
 
 /*
 ** size of the buffer where zlib puts compressed data
@@ -63,40 +63,40 @@ static const volatile char rcsid[] = "@(#)$Id: s_zip.c,v 1.12 2005/02/20 23:09:4
 **	stopped because the buffer is too small, and calls dopacket() again
 **	to finish the work (as many times as needed).
 */
-#define	UNZIP_BUFFER_SIZE	4*ZIP_BUFFER_SIZE
+#define UNZIP_BUFFER_SIZE 4 * ZIP_BUFFER_SIZE
 
 /* buffers */
-static	char	unzipbuf[UNZIP_BUFFER_SIZE];
-static	char	zipbuf[ZIP_BUFFER_SIZE];
+static char unzipbuf[UNZIP_BUFFER_SIZE];
+static char zipbuf[ZIP_BUFFER_SIZE];
 
 /*
 ** zip_init
 **	Initialize compression structures for a server.
 **	If failed, zip_free() has to be called.
 */
-int	zip_init(aClient *cptr)
+int zip_init(aClient *cptr)
 {
-	cptr->zip  = (aZdata *) MyMalloc(sizeof(aZdata));
+	cptr->zip = (aZdata *) MyMalloc(sizeof(aZdata));
 	cptr->zip->outcount = 0;
 
-	cptr->zip->in  = (z_stream *) MyMalloc(sizeof(z_stream));
+	cptr->zip->in = (z_stream *) MyMalloc(sizeof(z_stream));
 	cptr->zip->in->avail_in = 0;
 	cptr->zip->in->total_in = 0;
 	cptr->zip->in->total_out = 0;
-	cptr->zip->in->zalloc = (alloc_func)0;
-	cptr->zip->in->zfree = (free_func)0;
+	cptr->zip->in->zalloc = (alloc_func) 0;
+	cptr->zip->in->zfree = (free_func) 0;
 	cptr->zip->in->data_type = Z_ASCII;
 	if (inflateInit(cptr->zip->in) != Z_OK)
-	    {
+	{
 		cptr->zip->out = NULL;
 		return -1;
-	    }
+	}
 
 	cptr->zip->out = (z_stream *) MyMalloc(sizeof(z_stream));
 	cptr->zip->out->total_in = 0;
 	cptr->zip->out->total_out = 0;
-	cptr->zip->out->zalloc = (alloc_func)0;
-	cptr->zip->out->zfree = (free_func)0;
+	cptr->zip->out->zalloc = (alloc_func) 0;
+	cptr->zip->out->zfree = (free_func) 0;
 	cptr->zip->out->data_type = Z_ASCII;
 	if (deflateInit(cptr->zip->out, ZIP_LEVEL) != Z_OK)
 		return -1;
@@ -107,11 +107,11 @@ int	zip_init(aClient *cptr)
 /*
 ** zip_free
 */
-void	zip_free(aClient *cptr)
+void zip_free(aClient *cptr)
 {
 	cptr->flags &= ~FLAGS_ZIP;
 	if (cptr->zip)
-	    {
+	{
 		if (cptr->zip->in)
 			inflateEnd(cptr->zip->in);
 		MyFree(cptr->zip->in);
@@ -120,7 +120,7 @@ void	zip_free(aClient *cptr)
 		MyFree(cptr->zip->out);
 		MyFree(cptr->zip);
 		cptr->zip = NULL;
-	    }
+	}
 }
 
 /*
@@ -130,66 +130,66 @@ void	zip_free(aClient *cptr)
 **	will return the uncompressed buffer, length will be updated.
 **	if a fatal error occurs, length will be set to -1
 */
-char	*unzip_packet(aClient *cptr, char *buffer, int *length)
+char *unzip_packet(aClient *cptr, char *buffer, int *length)
 {
-	Reg	z_stream *zin = cptr->zip->in;
-	int	r;
+	Reg z_stream *zin = cptr->zip->in;
+	int r;
 
 	if (*length != 0 && zin->avail_in != 0)
-	    {
+	{
 		sendto_flag(SCH_ERROR,
-			    "assertion failed in unzip_packet(): %d %d",
-			    *length, zin->avail_in);
+					"assertion failed in unzip_packet(): %d %d",
+					*length, zin->avail_in);
 		sendto_flag(SCH_ERROR, "Please report to ircd-bugs@irc.org");
 		*length = -1;
 		return NULL;
-	    }
+	}
 	if (*length)
-	    {
+	{
 		zin->next_in = (Bytef *) buffer;
 		zin->avail_in = *length;
-	    }
+	}
 	zin->next_out = (Bytef *) unzipbuf;
 	zin->avail_out = UNZIP_BUFFER_SIZE;
 	switch (r = inflate(zin, Z_SYNC_FLUSH))
-	  {
-	  case Z_OK:
-		cptr->flags &= ~FLAGS_ZIPRQ;
-		*length = UNZIP_BUFFER_SIZE - zin->avail_out;
-		return unzipbuf;
+	{
+		case Z_OK:
+			cptr->flags &= ~FLAGS_ZIPRQ;
+			*length = UNZIP_BUFFER_SIZE - zin->avail_out;
+			return unzipbuf;
 
-	  case Z_BUF_ERROR: /*no progress possible or output buffer too small*/
-		if (zin->avail_out == 0)
-		    {
-			sendto_flag(SCH_ERROR,
-				    "inflate() returned Z_BUF_ERROR: %s",
-				    (zin->msg) ? zin->msg : "?");
-			*length = -1;
-		    }
-		break;
+		case Z_BUF_ERROR: /*no progress possible or output buffer too small*/
+			if (zin->avail_out == 0)
+			{
+				sendto_flag(SCH_ERROR,
+							"inflate() returned Z_BUF_ERROR: %s",
+							(zin->msg) ? zin->msg : "?");
+				*length = -1;
+			}
+			break;
 
-	  case Z_DATA_ERROR: /* the buffer might not be compressed.. */
-		if ((cptr->flags & FLAGS_ZIPRQ) &&
-		    !strncmp("ERROR ", buffer, 6))
-		    {
-			cptr->flags &= ~(FLAGS_ZIP | FLAGS_ZIPRQ);
-			/*
+		case Z_DATA_ERROR: /* the buffer might not be compressed.. */
+			if ((cptr->flags & FLAGS_ZIPRQ) &&
+				!strncmp("ERROR ", buffer, 6))
+			{
+				cptr->flags &= ~(FLAGS_ZIP | FLAGS_ZIPRQ);
+				/*
 			 * This is not sane at all.  But if other server
 			 * has sent an error now, it is probably closing
 			 * the link as well.
 			 */
-			return buffer;
-		    }
+				return buffer;
+			}
 
-		/* no break */
+			/* no break */
 
-	  default: /* error ! */
-		/* should probably mark link as dead or something... */
-		sendto_flag(SCH_ERROR, "inflate() error(%d): %s", r,
-			    (zin->msg) ? zin->msg : "?");
-		*length = -1; /* report error condition */
-		break;
-	  }
+		default: /* error ! */
+			/* should probably mark link as dead or something... */
+			sendto_flag(SCH_ERROR, "inflate() error(%d): %s", r,
+						(zin->msg) ? zin->msg : "?");
+			*length = -1; /* report error condition */
+			break;
+	}
 	return NULL;
 }
 
@@ -205,22 +205,22 @@ char	*unzip_packet(aClient *cptr, char *buffer, int *length)
 **	will return the uncompressed buffer, length will be updated.
 **	if a fatal error occurs, length will be set to -1
 */
-char	*zip_buffer(aClient *cptr, char *buffer, int *length, int flush)
+char *zip_buffer(aClient *cptr, char *buffer, int *length, int flush)
 {
-	Reg	z_stream *zout = cptr->zip->out;
-	int	r;
+	Reg z_stream *zout = cptr->zip->out;
+	int r;
 
 	if (buffer)
-	    {
+	{
 		/* concatenate buffer in cptr->zip->outbuf */
-		bcopy(buffer, cptr->zip->outbuf + cptr->zip->outcount,*length);
+		bcopy(buffer, cptr->zip->outbuf + cptr->zip->outcount, *length);
 		cptr->zip->outcount += *length;
-	    }
+	}
 	*length = 0;
 
 	if (!flush && ((cptr->zip->outcount < ZIP_MINIMUM) ||
-		       ((cptr->zip->outcount < (ZIP_MAXIMUM - BUFSIZE)) &&
-			CBurst(cptr))))
+				   ((cptr->zip->outcount < (ZIP_MAXIMUM - BUFSIZE)) &&
+					CBurst(cptr))))
 		return NULL;
 
 	zout->next_in = cptr->zip->outbuf;
@@ -229,26 +229,25 @@ char	*zip_buffer(aClient *cptr, char *buffer, int *length, int flush)
 	zout->avail_out = ZIP_BUFFER_SIZE;
 
 	switch (r = deflate(zout, Z_SYNC_FLUSH))
-	  {
-	  case Z_OK:
-	    if (zout->avail_in)
-	      {
-		/* can this occur?? I hope not... */
-		sendto_flag(SCH_ERROR,
-			    "deflate() didn't process all available data!");
-	      }
-	    cptr->zip->outcount = 0;
-	    *length = ZIP_BUFFER_SIZE - zout->avail_out;
-	    return zipbuf;
+	{
+		case Z_OK:
+			if (zout->avail_in)
+			{
+				/* can this occur?? I hope not... */
+				sendto_flag(SCH_ERROR,
+							"deflate() didn't process all available data!");
+			}
+			cptr->zip->outcount = 0;
+			*length = ZIP_BUFFER_SIZE - zout->avail_out;
+			return zipbuf;
 
-	  default: /* error ! */
-	    sendto_flag(SCH_ERROR, "deflate() error(%d): %s", r,
-			(zout->msg) ? zout->msg : "?");
-	    *length = -1;
-	    break;
-	  }
+		default: /* error ! */
+			sendto_flag(SCH_ERROR, "deflate() error(%d): %s", r,
+						(zout->msg) ? zout->msg : "?");
+			*length = -1;
+			break;
+	}
 	return NULL;
 }
 
-#endif	/* ZIP_LINKS */
-
+#endif /* ZIP_LINKS */

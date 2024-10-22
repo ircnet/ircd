@@ -26,4 +26,3 @@
 #ifndef S_ERR_C
 extern char *replies[];
 #endif /* S_ERR_C */
-

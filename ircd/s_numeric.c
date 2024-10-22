@@ -46,8 +46,8 @@ static char buffer[1024];
 **	sending back a neat error message -- big danger of creating
 **	a ping pong error message...
 */
-int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
-	char *parv[])
+int do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
+			   char *parv[])
 {
 	aClient *acptr = NULL;
 	aChannel *chptr;
@@ -55,8 +55,8 @@ int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
 	 * 2014-04-19  Kurt Roeckx
 	 *  * s_numeric.c/do_numeric(): Initialize p to NULL for call to strtoken()
 	 */
-	char	*nick, *p = NULL;
-	int	i;
+	char *nick, *p = NULL;
+	int i;
 
 	if (parc < 1 || !IsServer(sptr))
 		return 1;
@@ -72,18 +72,18 @@ int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
 	*/
 	buffer[0] = '\0';
 	if (parc > 1)
-	    {
+	{
 		for (i = 2; i < (parc - 1); i++)
-		    {
-			(void)strcat(buffer, " ");
-			(void)strcat(buffer, parv[i]);
-		    }
-		(void)strcat(buffer, " :");
-		(void)strcat(buffer, parv[parc-1]);
-	    }
+		{
+			(void) strcat(buffer, " ");
+			(void) strcat(buffer, parv[i]);
+		}
+		(void) strcat(buffer, " :");
+		(void) strcat(buffer, parv[parc - 1]);
+	}
 	for (; (nick = strtoken(&p, parv[1], ",")); parv[1] = NULL)
-	    {
-		acptr = find_target(nick, cptr);	
+	{
+		acptr = find_target(nick, cptr);
 		if (acptr)
 		{
 			/*
@@ -99,17 +99,17 @@ int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
 			*/
 			if (IsMe(acptr) || acptr->from == cptr)
 				sendto_flag(SCH_NUM,
-					    "From %s for %s: %s %d %s %s.",
-					    get_client_name(cptr, TRUE),
-					    acptr->name, sptr->name,
-					    numeric, nick, buffer);
+							"From %s for %s: %s %d %s %s.",
+							get_client_name(cptr, TRUE),
+							acptr->name, sptr->name,
+							numeric, nick, buffer);
 			else if (IsPerson(acptr) || IsServer(acptr) ||
-				 IsService(acptr))
-				sendto_prefix_one(acptr, sptr,":%s %d %s%s",
-					parv[0], numeric, nick, buffer);
-		    }
+					 IsService(acptr))
+				sendto_prefix_one(acptr, sptr, ":%s %d %s%s",
+								  parv[0], numeric, nick, buffer);
+		}
 		/* any reason why no cptr == acptr->from checks here? -krys */
-/* because these are not used.. -Vesa
+		/* because these are not used.. -Vesa
 		else if ((acptr = find_service(nick, (aClient *)NULL)))
 			sendto_prefix_one(acptr, sptr,":%s %d %s%s",
 				parv[0], numeric, nick, buffer);
@@ -120,11 +120,10 @@ int	do_numeric(int numeric, aClient *cptr, aClient *sptr, int parc,
 					parv[0], numeric, nick, buffer);
 		    }
 ..nuke them */
-		else if ((chptr = find_channel(nick, (aChannel *)NULL)))
-			sendto_channel_butone(cptr,sptr,chptr,":%s %d %s%s",
-					      parv[0],
-					      numeric, chptr->chname, buffer);
-	    }
+		else if ((chptr = find_channel(nick, (aChannel *) NULL)))
+			sendto_channel_butone(cptr, sptr, chptr, ":%s %d %s%s",
+								  parv[0],
+								  numeric, chptr->chname, buffer);
+	}
 	return 1;
 }
-

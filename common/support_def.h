@@ -19,10 +19,10 @@
  */
 
 #ifdef __ptr_t
-#undef	__ptr_t
+#undef __ptr_t
 #endif
-#if defined (__STDC__) && __STDC__
-#define	__ptr_t	void *
+#if defined(__STDC__) && __STDC__
+#define __ptr_t void *
 #else
-#define	__ptr_t	char *
+#define __ptr_t char *
 #endif

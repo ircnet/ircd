@@ -38,47 +38,47 @@ extern char *networkname;
 #else /* S_CONF_C */
 #define EXTERN
 #endif /* S_CONF_C */
-EXTERN void det_confs_butmask (aClient *cptr, int mask);
-EXTERN int match_ipmask (char *mask, aClient *cptr,
-	int maskwithusername);
-EXTERN int attach_Iline (aClient *cptr, Reg struct hostent *hp,
-			     char *sockhost);
-EXTERN aConfItem *count_cnlines (Reg Link *lp);
-EXTERN int detach_conf (aClient *cptr, aConfItem *aconf);
-EXTERN int attach_conf (aClient *cptr, aConfItem *aconf);
+EXTERN void det_confs_butmask(aClient *cptr, int mask);
+EXTERN int match_ipmask(char *mask, aClient *cptr,
+						int maskwithusername);
+EXTERN int attach_Iline(aClient *cptr, Reg struct hostent *hp,
+						char *sockhost);
+EXTERN aConfItem *count_cnlines(Reg Link *lp);
+EXTERN int detach_conf(aClient *cptr, aConfItem *aconf);
+EXTERN int attach_conf(aClient *cptr, aConfItem *aconf);
 EXTERN aConfItem *find_admin(void);
 EXTERN aConfItem *find_me(void);
-EXTERN aConfItem *attach_confs (aClient *cptr, char *name, int statmask);
-EXTERN aConfItem *attach_confs_host (aClient *cptr, char *host,
-					 int statmask);
-EXTERN aConfItem *find_conf_exact (char *name, char *user, char *host,
-				       int statmask);
-EXTERN aConfItem *find_Oline (char *name, aClient *cptr);
-EXTERN aConfItem *find_conf_name (char *name, int statmask);
-EXTERN aConfItem *find_conf (Link *lp, char *name, int statmask);
-EXTERN aConfItem *find_conf_host (Reg Link *lp, char *host,
-				      Reg int statmask);
-EXTERN aConfItem *find_conf_host_sid (Reg Link *lp, char *host, char *sid,
-				      Reg int statmask);
-EXTERN aConfItem *find_conf_ip (Link *lp, char *ip, char *user,
-				    int statmask);
-EXTERN aConfItem *find_conf_entry (aConfItem *aconf, u_int mask);
-EXTERN int rehash (aClient *cptr, aClient *sptr, int sig);
+EXTERN aConfItem *attach_confs(aClient *cptr, char *name, int statmask);
+EXTERN aConfItem *attach_confs_host(aClient *cptr, char *host,
+									int statmask);
+EXTERN aConfItem *find_conf_exact(char *name, char *user, char *host,
+								  int statmask);
+EXTERN aConfItem *find_Oline(char *name, aClient *cptr);
+EXTERN aConfItem *find_conf_name(char *name, int statmask);
+EXTERN aConfItem *find_conf(Link *lp, char *name, int statmask);
+EXTERN aConfItem *find_conf_host(Reg Link *lp, char *host,
+								 Reg int statmask);
+EXTERN aConfItem *find_conf_host_sid(Reg Link *lp, char *host, char *sid,
+									 Reg int statmask);
+EXTERN aConfItem *find_conf_ip(Link *lp, char *ip, char *user,
+							   int statmask);
+EXTERN aConfItem *find_conf_entry(aConfItem *aconf, u_int mask);
+EXTERN int rehash(aClient *cptr, aClient *sptr, int sig);
 EXTERN int openconf(void);
-EXTERN int initconf (int opt);
-EXTERN int find_kill (aClient *cptr, int timedklines, char **comment);
-EXTERN int find_two_masks (char *name, char *host, int stat);
-EXTERN int find_conf_flags (char *name, char *key, int stat);
-EXTERN int find_restrict (aClient *cptr);
-EXTERN void find_bounce (aClient *cptr, int class, int fd);
-EXTERN aConfItem *find_denied (char *name, int class);
+EXTERN int initconf(int opt);
+EXTERN int find_kill(aClient *cptr, int timedklines, char **comment);
+EXTERN int find_two_masks(char *name, char *host, int stat);
+EXTERN int find_conf_flags(char *name, char *key, int stat);
+EXTERN int find_restrict(aClient *cptr);
+EXTERN void find_bounce(aClient *cptr, int class, int fd);
+EXTERN aConfItem *find_denied(char *name, int class);
 EXTERN char *iline_flags_to_string(long flags);
 EXTERN long iline_flags_parse(char *string);
 EXTERN char *pline_flags_to_string(long flags);
 EXTERN long pline_flags_parse(char *string);
-# ifdef	INET6
-EXTERN char *ipv6_convert (char *orig);
-# endif
+#ifdef INET6
+EXTERN char *ipv6_convert(char *orig);
+#endif
 #ifdef TKLINE
 EXTERN int m_tkline(aClient *, aClient *, int, char **);
 EXTERN int m_untkline(aClient *, aClient *, int, char **);

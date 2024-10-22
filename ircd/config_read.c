@@ -3,7 +3,7 @@
 /* used in config_error() */
 #define CF_NONE 0
 #define CF_WARN 1
-#define CF_ERR  2
+#define CF_ERR 2
 
 /* max file length */
 #define FILEMAX 255
@@ -27,8 +27,7 @@
 #endif
 
 typedef struct File aFile;
-struct File
-{
+struct File {
 	char *filename;
 	int includeline;
 	aFile *parent;
@@ -36,8 +35,7 @@ struct File
 };
 
 typedef struct Config aConfig;
-struct Config
-{
+struct Config {
 	char *line;
 	int linenum;
 	aFile *file;
@@ -45,12 +43,12 @@ struct Config
 };
 
 #ifdef CONFIG_DIRECTIVE_INCLUDE
-static aConfig	*config_read(FILE *, int, aFile *);
-static void	config_free(aConfig *);
-aFile	*new_config_file(char *, aFile *, int);
-void	config_error(int, aFile *, int, char *, ...);
+static aConfig *config_read(FILE *, int, aFile *);
+static void config_free(aConfig *);
+aFile *new_config_file(char *, aFile *, int);
+void config_error(int, aFile *, int, char *, ...);
 #else
-void	config_error(int, char *, int, char *, ...);
+void config_error(int, char *, int, char *, ...);
 #endif
 
 
@@ -70,8 +68,8 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 	int linenum = 0;
 	aConfig *ConfigTop = NULL;
 	aConfig *ConfigCur = NULL;
-	char	line[BUFSIZE+1];
-	FILE	*fdn;
+	char line[BUFSIZE + 1];
+	FILE *fdn;
 
 	if (curfile == NULL)
 	{
@@ -80,7 +78,7 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 	while (NULL != (fgets(line, sizeof(line), fd)))
 	{
 		char *p;
-		aConfig	*new;
+		aConfig *new;
 		int linelen;
 
 		linenum++;
@@ -94,13 +92,13 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 
 		if (*line == '#' && strncasecmp(line + 1, "include ", 8) == 0)
 		{
-			char	*start = line + 9;
-			char	*end = line + linelen - 1;
-			char	file[FILEMAX + 1];
-			char	*filep = file;
-			char	*savefilep;
-			aConfig	*ret;
-			aFile	*tcf;
+			char *start = line + 9;
+			char *end = line + linelen - 1;
+			char file[FILEMAX + 1];
+			char *filep = file;
+			char *savefilep;
+			aConfig *ret;
+			aFile *tcf;
 
 			/* eat all white chars around filename */
 			while (isspace(*end))
@@ -121,27 +119,28 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 			if (start >= end)
 			{
 				config_error(CF_ERR, curfile, linenum,
-					"config: empty include");
+							 "config: empty include");
 				goto eatline;
 			}
 			*filep = '\0';
 			if (depth >= MAXDEPTH)
 			{
 				config_error(CF_ERR, curfile, linenum,
-					"config: too nested (max %d)",
-					depth);
+							 "config: too nested (max %d)",
+							 depth);
 				goto eatline;
 			}
 			if (*start != '/')
 			{
 				filep += snprintf(file, FILEMAX,
-					"%s", IRCDCONF_DIR);
+								  "%s", IRCDCONF_DIR);
 			}
 			if ((end - start) + (filep - file) >= FILEMAX)
 			{
 				config_error(CF_ERR, curfile, linenum,
-					"too long filename (max %d with "
-					"path)", FILEMAX);
+							 "too long filename (max %d with "
+							 "path)",
+							 FILEMAX);
 				goto eatline;
 			}
 			savefilep = filep;
@@ -153,19 +152,19 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 				if (0 == strcmp(tcf->filename, file))
 				{
 					config_error(CF_ERR, curfile,
-						linenum,
-						"would loop include");
+								 linenum,
+								 "would loop include");
 					goto eatline;
 				}
 			}
 			if ((fdn = fopen(file, "r")) == NULL)
 			{
 				config_error(CF_ERR, curfile, linenum,
-					"cannot open \"%s\"", savefilep);
+							 "cannot open \"%s\"", savefilep);
 				goto eatline;
 			}
 			ret = config_read(fdn, depth + 1,
-				new_config_file(file, curfile, linenum));
+							  new_config_file(file, curfile, linenum));
 			fclose(fdn);
 			if (ConfigCur)
 			{
@@ -183,9 +182,9 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 			/* good #include is replaced by its content */
 			continue;
 		}
-eatline:
-		new = (aConfig *)MyMalloc(sizeof(aConfig));
-		new->line = (char *) MyMalloc((linelen+1) * sizeof(char));
+	eatline:
+		new = (aConfig *) MyMalloc(sizeof(aConfig));
+		new->line = (char *) MyMalloc((linelen + 1) * sizeof(char));
 		memcpy(new->line, line, linelen);
 		new->line[linelen] = '\0';
 		new->linenum = linenum;
@@ -216,7 +215,7 @@ void config_free(aConfig *cnf)
 	}
 
 	pf = cnf->file;
-	while(pf)
+	while (pf)
 	{
 		pt = pf;
 		pf = pf->next;
@@ -252,11 +251,11 @@ aFile *new_config_file(char *filename, aFile *parent, int fnr)
 	{
 		parent = parent->next;
 	}
-        if (parent)
-        {
+	if (parent)
+	{
 		parent->next = tmp;
-        }
-        return tmp;
+	}
+	return tmp;
 }
 #endif /* CONFIG_DIRECTIVE_INCLUDE */
 
@@ -295,18 +294,18 @@ void config_error(int level, char *filename, int line, char *pattern, ...)
 	else
 	{
 		fprintf(stderr, "%s:%d %s%s\n", filep, line,
-			((level == CF_ERR) ? "ERROR: " : "WARNING: "), vbuf);
-# ifdef CONFIG_DIRECTIVE_INCLUDE
+				((level == CF_ERR) ? "ERROR: " : "WARNING: "), vbuf);
+#ifdef CONFIG_DIRECTIVE_INCLUDE
 		while ((curF && curF->parent))
 		{
 			filep = curF->parent->filename;
 			if (0 == strncmp(filep, IRCDCONF_DIR, etclen))
 				filep += etclen;
 			fprintf(stderr, "\tincluded in %s:%d\n",
-				filep, curF->includeline);
+					filep, curF->includeline);
 			curF = curF->parent;
 		}
-# endif
+#endif
 	}
 #else
 	if (level != CF_ERR)

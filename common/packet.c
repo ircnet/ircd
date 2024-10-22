@@ -46,22 +46,22 @@ static const volatile char rcsid[] = "@(#)$Id: packet.c,v 1.13 2004/10/01 20:22:
 **	with cptr of "local" variation, which contains all the
 **	necessary fields (buffer etc..)
 */
-int	dopacket(aClient *cptr, char *buffer, int length)
+int dopacket(aClient *cptr, char *buffer, int length)
 {
-	Reg	char	*ch1;
-	Reg	char	*ch2, *bufptr;
-	aClient	*acpt = cptr->acpt;
-	int	r = 1;
+	Reg char *ch1;
+	Reg char *ch2, *bufptr;
+	aClient *acpt = cptr->acpt;
+	int r = 1;
 #ifdef ZIP_LINKS
-	int	unzipped = 0;
+	int unzipped = 0;
 #endif
- 
+
 	me.receiveB += length; /* Update bytes received */
 	cptr->receiveB += length;
 	if (acpt != &me)
-	    {
+	{
 		acpt->receiveB += length;
-	    }
+	}
 
 	bufptr = cptr->buffer;
 	ch1 = bufptr + cptr->count;
@@ -69,34 +69,34 @@ int	dopacket(aClient *cptr, char *buffer, int length)
 
 #ifdef ZIP_LINKS
 	while ((length > 0 && ch2) || ((cptr->flags & FLAGS_ZIP) &&
-				       (cptr->zip->in->avail_in ||
-					!unzipped)))
+								   (cptr->zip->in->avail_in ||
+									!unzipped)))
 #else
 	while (length > 0 && ch2)
 #endif
-	    {
-		Reg	char	c;
+	{
+		Reg char c;
 
 #ifdef ZIP_LINKS
 		if (cptr->flags & FLAGS_ZIPSTART)
-		    {
+		{
 			/*
 			** beginning of server connection, the buffer
 			** contained PASS/SERVER and is now zipped!
 			** Ignore the '\n' that should be here.
 			*/
 			if (*ch2 == '\n') /* also check \r ? */
-			    {
+			{
 				ch2++;
 				length--;
 				cptr->flags &= ~FLAGS_ZIPSTART;
-			    }
+			}
 			if (length == 0)
 				return 1;
-		    }
+		}
 
 		if ((cptr->flags & FLAGS_ZIP) && !(unzipped && length))
-		    {
+		{
 			/* uncompressed buffer first */
 			unzipped = length; /* length is register, store
 						  temp in unzipped */
@@ -105,10 +105,10 @@ int	dopacket(aClient *cptr, char *buffer, int length)
 			unzipped = 1;
 			if (length == -1)
 				return exit_client(cptr, cptr, &me,
-					"fatal error in unzip_packet()");
+								   "fatal error in unzip_packet()");
 			if (length == 0 || *ch2 == '\0')
 				break;
-		    }
+		}
 #endif
 		length--;
 		c = (*ch1 = *ch2++);
@@ -120,7 +120,7 @@ int	dopacket(aClient *cptr, char *buffer, int length)
 		 * problems will arise. - Avalon
 		 */
 		if ((c <= '\r') && (c == '\n' || c == '\r'))
-		    {
+		{
 			if (ch1 == bufptr)
 				continue; /* Skip extra LF/CR's */
 			*ch1 = '\0';
@@ -133,7 +133,7 @@ int	dopacket(aClient *cptr, char *buffer, int length)
 					 ** structure pointed by cptr... --msa
 					 */
 			if ((r = parse(cptr, bufptr, ch1)) ==
-			    FLUSH_BUFFER)
+				FLUSH_BUFFER)
 				/*
 				** FLUSH_BUFFER means actually that cptr
 				** structure *does* not exist anymore!!! --msa
@@ -144,14 +144,12 @@ int	dopacket(aClient *cptr, char *buffer, int length)
 			** FLUSH_BUFFER here).  - avalon
 			*/
 			if (IsDead(cptr))
-			    {
+			{
 				if (cptr->exitc == EXITC_REG)
 					cptr->exitc = EXITC_DEAD;
 				return exit_client(cptr, cptr, &me,
-						   (cptr->exitc == EXITC_SENDQ) ?
-						   "Max SendQ exceeded" :
-						   "Dead Socket");
-			    }
+								   (cptr->exitc == EXITC_SENDQ) ? "Max SendQ exceeded" : "Dead Socket");
+			}
 			/*
 			** Something is wrong, really wrong, and nothing
 			** else should be allowed to be parsed!
@@ -162,11 +160,10 @@ int	dopacket(aClient *cptr, char *buffer, int length)
 			if (IsServer(cptr) && (cptr->flags & FLAGS_UNKCMD))
 				break;
 			ch1 = bufptr;
-		    }
-		else if (ch1 < bufptr + (sizeof(cptr->buffer)-1))
+		}
+		else if (ch1 < bufptr + (sizeof(cptr->buffer) - 1))
 			ch1++; /* There is always room for the null */
-	    }
+	}
 	cptr->count = ch1 - bufptr;
 	return r;
 }
-

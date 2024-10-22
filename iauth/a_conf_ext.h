@@ -24,20 +24,20 @@
 /*  External definitions for global variables.
  */
 #ifndef A_CONF_C
-extern u_int	debuglevel;
+extern u_int debuglevel;
 extern AnInstance *instances;
 #endif /* A_CONF_C */
 
 /*  External definitions for global functions.
  */
 #ifndef A_CONF_C
-# define EXTERN extern
+#define EXTERN extern
 #else /* A_CONF_C */
-# define EXTERN
+#define EXTERN
 #endif /* A_CONF_C */
 
-EXTERN char *conf_read (char *);
-EXTERN int conf_match (u_int, AnInstance *);
+EXTERN char *conf_read(char *);
+EXTERN int conf_match(u_int, AnInstance *);
 EXTERN void conf_ircd(void);
 
 #undef EXTERN

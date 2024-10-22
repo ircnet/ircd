@@ -34,20 +34,20 @@ extern struct Message msgtab[];
 #else /* PARSE_C */
 #define EXTERN
 #endif /* PARSE_C */
-EXTERN aClient *find_client (char *name, Reg aClient *cptr);
-EXTERN aClient *find_uid (char *uid, Reg aClient *cptr);
-EXTERN aClient *find_sid (char *sid, Reg aClient *cptr);
-EXTERN aClient *find_service (char *name, Reg aClient *cptr);
-EXTERN aClient *find_server (char *name, Reg aClient *cptr);
-EXTERN aClient *find_mask (char *name, aClient *cptr);
-EXTERN aClient *find_name (char *name, aClient *cptr);
-EXTERN aClient *find_matching_client (char *mask);
-EXTERN aClient *find_target (char *name, aClient *cptr);
-EXTERN aClient *find_userhost (char *user, char *host, aClient *cptr,
-				   int *count);
-EXTERN aClient *find_person (char *name, aClient *cptr);
-EXTERN int parse (aClient *cptr, char *buffer, char *bufend);
-EXTERN char *getfield (char *irc_newline);
+EXTERN aClient *find_client(char *name, Reg aClient *cptr);
+EXTERN aClient *find_uid(char *uid, Reg aClient *cptr);
+EXTERN aClient *find_sid(char *sid, Reg aClient *cptr);
+EXTERN aClient *find_service(char *name, Reg aClient *cptr);
+EXTERN aClient *find_server(char *name, Reg aClient *cptr);
+EXTERN aClient *find_mask(char *name, aClient *cptr);
+EXTERN aClient *find_name(char *name, aClient *cptr);
+EXTERN aClient *find_matching_client(char *mask);
+EXTERN aClient *find_target(char *name, aClient *cptr);
+EXTERN aClient *find_userhost(char *user, char *host, aClient *cptr,
+							  int *count);
+EXTERN aClient *find_person(char *name, aClient *cptr);
+EXTERN int parse(aClient *cptr, char *buffer, char *bufend);
+EXTERN char *getfield(char *irc_newline);
 EXTERN int m_nop(aClient *, aClient *, int, char **);
 EXTERN int m_nopriv(aClient *, aClient *, int, char **);
 EXTERN int m_unreg(aClient *, aClient *, int, char **);

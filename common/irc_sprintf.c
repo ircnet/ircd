@@ -24,20 +24,28 @@ static const volatile char rcsid[] = "$Id: irc_sprintf.c,v 1.5 2004/10/01 20:22:
  * from an aClient pointer, depending on target.
  */
 
-#define	MAXDIGS	32
+#define MAXDIGS 32
 #undef _NOLONGLONG
 
-#define	MEMSET(c, n){register int k = n; while (k--) *buf++ = c;}
-#define	MEMCPY(s, n){register int k = n; while (k--) *buf++ = *s++;}
+#define MEMSET(c, n)            \
+	{                           \
+		register int k = n;     \
+		while (k--) *buf++ = c; \
+	}
+#define MEMCPY(s, n)               \
+	{                              \
+		register int k = n;        \
+		while (k--) *buf++ = *s++; \
+	}
 
-static char	dtmpbuf[MAXDIGS];	/* scratch buffer for numbers */
+static char dtmpbuf[MAXDIGS]; /* scratch buffer for numbers */
 
 int irc_sprintf(aClient *target, char *buf, char *format, ...)
 #include "irc_sprintf_body.c"
 
 #define IRC_SPRINTF_V 1
 
-int irc_vsprintf(aClient *target, char *buf, char *format, va_list ap)
+		int irc_vsprintf(aClient *target, char *buf, char *format, va_list ap)
 #include "irc_sprintf_body.c"
 
 #if 0
@@ -56,4 +64,3 @@ int irc_snprintf(aClient *target, char *buf, size_t size, char *format, ...)
 #undef IRC_SPRINTF_SN
 
 #endif /* 0 */
-

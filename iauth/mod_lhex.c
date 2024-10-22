@@ -21,17 +21,16 @@
 static const volatile char rcsid[] = "@(#)$Id mod_lhex.c,v 1.12 1999/02/06 21:43:52 kalt Exp $";
 #endif
 
-#include "os.h"
 #include "a_defines.h"
+#include "os.h"
 #define MOD_LHEX_C
 #include "a_externs.h"
 #undef MOD_LHEX_C
 
 /****************************** PRIVATE *************************************/
-#define LHEXPORT	9674
+#define LHEXPORT 9674
 
-struct lhex_private
-{
+struct lhex_private {
 	/* stats */
 	u_int ok, banned;
 	u_int tried, clean, timeout;
@@ -46,16 +45,16 @@ struct lhex_private
  *	Returns NULL if everything went fine,
  *	an error message otherwise.
  */
-static	char	*lhex_init(AnInstance *self)
+static char *lhex_init(AnInstance *self)
 {
 	struct lhex_private *mydata;
 
 #if defined(INET6)
 	return "IPv6 unsupported.";
 #endif
-	if(self->opt == NULL)
+	if (self->opt == NULL)
 		return "Aie! no option(s): no LHEx server to connect to!";
-	if(!inetaton(self->opt,NULL))
+	if (!inetaton(self->opt, NULL))
 		return "Aie! Option wasn't a valid IP address!";
 
 	/* Allocate the module data */
@@ -72,7 +71,7 @@ static	char	*lhex_init(AnInstance *self)
  *
  *	This procedure is called when a particular module is unloaded.
  */
-static	void	lhex_release(AnInstance *self)
+static void lhex_release(AnInstance *self)
 {
 	struct lhex_private *mydata = self->data;
 	free(mydata);
@@ -84,13 +83,13 @@ static	void	lhex_release(AnInstance *self)
  *
  *	This procedure is called regularly to update statistics sent to ircd.
  */
-static	void	lhex_stats(AnInstance *self)
+static void lhex_stats(AnInstance *self)
 {
 	struct lhex_private *mydata = self->data;
 
 	sendto_ircd("S lhex ok %u banned %u", mydata->ok, mydata->banned);
 	sendto_ircd("S lhex tried %u aborted %u / %u",
-		    mydata->tried, mydata->clean, mydata->timeout);
+				mydata->tried, mydata->clean, mydata->timeout);
 }
 
 /*
@@ -104,32 +103,32 @@ static	void	lhex_stats(AnInstance *self)
  *	In case of failure, it's responsible for cleaning up (e.g. lhex_clean
  *	will NOT be called)
  */
-static	int	lhex_start(u_int cl)
+static int lhex_start(u_int cl)
 {
 	char *error;
 	int fd;
 	struct lhex_private *mydata = cldata[cl].instance->data;
 
 	if (cldata[cl].state & A_DENY)
-	    {
+	{
 		/* no point of doing anything */
 		DebugLog((ALOG_DLHEX, 0,
-			  "lhex_start(%d): A_DENY already set ", cl));
+				  "lhex_start(%d): A_DENY already set ", cl));
 		return -1;
-	    }
+	}
 
 	DebugLog((ALOG_DLHEX, 0, "lhex_start(%d): Connecting to %s", cl,
-		  cldata[cl].instance->opt));
+			  cldata[cl].instance->opt));
 	mydata->tried += 1;
-	fd= tcp_connect(cldata[cl].ourip, cldata[cl].instance->opt,
-	                LHEXPORT, &error);
+	fd = tcp_connect(cldata[cl].ourip, cldata[cl].instance->opt,
+					 LHEXPORT, &error);
 	if (fd < 0)
-	    {
+	{
 		DebugLog((ALOG_DLHEX, 0,
-			  "lhex_start(%d): tcp_connect() reported %s",
-			  cl, error));
+				  "lhex_start(%d): tcp_connect() reported %s",
+				  cl, error));
 		return -1;
-	    }
+	}
 
 	cldata[cl].wfd = fd; /*so that lhex_work() is called when connected*/
 	return 0;
@@ -144,17 +143,17 @@ static	int	lhex_start(u_int cl)
  *
  *	It is responsible for sending error messages where appropriate.
  */
-static	int	lhex_work(u_int cl)
+static int lhex_work(u_int cl)
 {
-    	DebugLog((ALOG_DLHEX, 0, "lhex_work(%d): %d %d buflen=%d", cl,
-		  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
+	DebugLog((ALOG_DLHEX, 0, "lhex_work(%d): %d %d buflen=%d", cl,
+			  cldata[cl].rfd, cldata[cl].wfd, cldata[cl].buflen));
 	if (cldata[cl].wfd > 0)
-	    {
+	{
 		/*
 		** We haven't sent the query yet, the connection was just
 		** established.
 		*/
-		char query[3+7+6+4+USERLEN+2*HOSTLEN+8+3];/*strlen(atoi(cl))<=8*/
+		char query[3 + 7 + 6 + 4 + USERLEN + 2 * HOSTLEN + 8 + 3]; /*strlen(atoi(cl))<=8*/
 		char *ident = cldata[cl].authuser;
 
 		/* This is part of every request */
@@ -162,35 +161,35 @@ static	int	lhex_work(u_int cl)
 
 		/* These bits are optional, depending on what's known */
 		if (ident)
-		    {
-		    	strcat(query, " ident:");
+		{
+			strcat(query, " ident:");
 			strcat(query, ident);
-		    }
+		}
 		if (cldata[cl].state & A_GOTH)
-		    {
-		    	strcat(query, " host:");
+		{
+			strcat(query, " host:");
 			strcat(query, cldata[cl].host);
-		    }
+		}
 		/* Terminate the request */
 		strcat(query, "\r\n");
 
 		DebugLog((ALOG_DLHEX, 0, "lhex_work(%u): Sending query [%s]",
-			  cl, query));
+				  cl, query));
 		if (write(cldata[cl].wfd, query, strlen(query)) < 0)
-		    {
+		{
 			/* most likely the connection failed */
 			DebugLog((ALOG_DLHEX, 0,
-				  "lhex_work(%u): write() failed: %s",
-				  cl, strerror(errno)));
+					  "lhex_work(%u): write() failed: %s",
+					  cl, strerror(errno)));
 			close(cldata[cl].wfd);
 			cldata[cl].rfd = cldata[cl].wfd = 0;
 			return 1;
-		    }
+		}
 		cldata[cl].rfd = cldata[cl].wfd;
 		cldata[cl].wfd = 0;
-	    }
+	}
 	else
-	    {
+	{
 		/* data's in from the other end */
 		char *ch, *nch;
 		u_int id;
@@ -198,62 +197,63 @@ static	int	lhex_work(u_int cl)
 
 		cldata[cl].inbuffer[cldata[cl].buflen] = '\0';
 		nch = cldata[cl].inbuffer;
-		while((nch < (cldata[cl].inbuffer + cldata[cl].buflen)) &&
-		      (ch = index(nch, '\r')) && !retval)
-		    {
+		while ((nch < (cldata[cl].inbuffer + cldata[cl].buflen)) &&
+			   (ch = index(nch, '\r')) && !retval)
+		{
 			char *och = nch;
-			nch = ch+2;		/* Skip the \r\n */
+			nch = ch + 2; /* Skip the \r\n */
 			*ch = '\0';
 			DebugLog((ALOG_DLHEX, 0, "lhex_work(%u): Got [%s]",
-				 cl, och));
+					  cl, och));
 
 			/* Have a go at parsing the return info */
-			if(sscanf(och, "%u", &id) != 1)
+			if (sscanf(och, "%u", &id) != 1)
 				DebugLog((ALOG_DLHEX, 0, "lhex_work(%u): "
-					 "Malformed data!", cl));
+										 "Malformed data!",
+						  cl));
 			else
-			    {
-				struct lhex_private *d=cldata[cl].instance->data;
+			{
+				struct lhex_private *d = cldata[cl].instance->data;
 				ch = index(och, ':');
-				while(isspace(*(++ch)));
-				if(!strcmp(ch,"OK"))
-				    {
+				while (isspace(*(++ch)));
+				if (!strcmp(ch, "OK"))
+				{
 					d->ok++;
 					DebugLog((ALOG_DLHEX, 0,
-						 "lhex_work(%u): OK", id));
-				    	close(cldata[cl].rfd);
+							  "lhex_work(%u): OK", id));
+					close(cldata[cl].rfd);
 					cldata[cl].rfd = 0;
 					retval = -1;
-				    }
-				else if(!strcmp(ch,"Not OK"))
-				    {
-				        d->banned++;
+				}
+				else if (!strcmp(ch, "Not OK"))
+				{
+					d->banned++;
 					DebugLog((ALOG_DLHEX, 0,
-					         "lhex_work(%u): Not OK", id));
+							  "lhex_work(%u): Not OK", id));
 					cldata[cl].state |= A_DENY;
 					/* I really wish we could send the
 					   client a "reason" here :P */
 					sendto_ircd("K %d %s %u ", cl,
-						    cldata[cl].itsip,
-						    cldata[cl].itsport);
-				    	close(cldata[cl].rfd);
+								cldata[cl].itsip,
+								cldata[cl].itsport);
+					close(cldata[cl].rfd);
 					cldata[cl].rfd = 0;
 					retval = -1;
-				    }
+				}
 				else
-				    {
+				{
 #if 0
 				    	/* Call this info for the client */
 					sendto_ircd("I %d %s %u NOTICE AUTH :%s",
 						    cl, cldata[cl].itsip,
 						    cldata[cl].itsport, ch);
 #endif
-				    	retval = 0;
-				    }
-			    }
-		    }
-	    	return retval;
-	    }
+					retval = 0;
+				}
+			}
+		}
+		return retval;
+	}
 	return 0;
 }
 
@@ -264,7 +264,7 @@ static	int	lhex_work(u_int cl)
  *	It is responsible for cleaning up any allocated data, and in particular
  *	closing file descriptors.
  */
-static	void	lhex_clean(u_int cl)
+static void lhex_clean(u_int cl)
 {
 	struct lhex_private *mydata = cldata[cl].instance->data;
 
@@ -289,7 +289,7 @@ static	void	lhex_clean(u_int cl)
  *
  *	Returns 0 if things are okay, -1 if check was aborted.
  */
-static	int	lhex_timeout(u_int cl)
+static int lhex_timeout(u_int cl)
 {
 	struct lhex_private *mydata = cldata[cl].instance->data;
 
@@ -300,6 +300,5 @@ static	int	lhex_timeout(u_int cl)
 }
 
 aModule Module_lhex =
-	{ "lhex", lhex_init, lhex_release, lhex_stats,
-	  lhex_start, lhex_work, lhex_timeout, lhex_clean };
-
+		{"lhex", lhex_init, lhex_release, lhex_stats,
+		 lhex_start, lhex_work, lhex_timeout, lhex_clean};
