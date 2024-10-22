@@ -30,8 +30,8 @@ static const volatile char rcsid[] = "@(#)$Id: class.c,v 1.28 2008/06/22 16:09:0
 #include "patricia_ext.h"
 #endif
 
-#define BAD_CONF_CLASS -1
-#define BAD_PING -2
+#define BAD_CONF_CLASS	 -1
+#define BAD_PING		 -2
 #define BAD_CLIENT_CLASS -3
 
 aClass *classes;

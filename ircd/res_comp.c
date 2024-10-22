@@ -128,13 +128,13 @@ int __ircd_dn_skipname(const u_char *ptr, const u_char *eom)
  * tell us anything about network-format data.  The rest of the BIND system
  * is not careful about this, but for some reason, we're doing it right here.
  */
-#define PERIOD 0x2e
+#define PERIOD		  0x2e
 #define hyphenchar(c) ((c) == 0x2d)
 #define bslashchar(c) ((c) == 0x5c)
 #define periodchar(c) ((c) == PERIOD)
-#define asterchar(c) ((c) == 0x2a)
-#define alphachar(c) (((c) >= 0x41 && (c) <= 0x5a) || ((c) >= 0x61 && (c) <= 0x7a))
-#define digitchar(c) ((c) >= 0x30 && (c) <= 0x39)
+#define asterchar(c)  ((c) == 0x2a)
+#define alphachar(c)  (((c) >= 0x41 && (c) <= 0x5a) || ((c) >= 0x61 && (c) <= 0x7a))
+#define digitchar(c)  ((c) >= 0x30 && (c) <= 0x39)
 
 #define borderchar(c) (alphachar(c) || digitchar(c))
 #define middlechar(c) (borderchar(c) || hyphenchar(c))

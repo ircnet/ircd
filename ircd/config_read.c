@@ -3,7 +3,7 @@
 /* used in config_error() */
 #define CF_NONE 0
 #define CF_WARN 1
-#define CF_ERR 2
+#define CF_ERR	2
 
 /* max file length */
 #define FILEMAX 255
@@ -15,11 +15,11 @@
 /* Sun has a buggy implementation of FILE functions 
 ** (they do not work when fds 0-255 are already used).
 ** ircd-ratbox 1.5-3 had a nice reimplementation, so I took it. --B. */
-#define FILE FBFILE
+#define FILE   FBFILE
 #define fclose fbclose
 #define fdopen fdbopen
-#define fgets fbgets
-#define fopen fbopen
+#define fgets  fbgets
+#define fopen  fbopen
 #if !defined(HAVE_STRLCPY)
 #define strlcpy(x, y, N) strncpyzt((x), (y), (N))
 #endif

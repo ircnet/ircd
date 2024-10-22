@@ -88,7 +88,7 @@ static const volatile char rcsid[]	= "$Id: res_init.c,v 1.16 2005/01/03 22:17:00
  */
 #if defined(NEXT)
 #define NI_PATH_RESCONF "/locations/resolver"
-#define NI_TIMEOUT 10
+#define NI_TIMEOUT		10
 static int ircd_netinfo_res_init(int *haveenv, int *havesearch);
 #endif
 

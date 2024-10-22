@@ -27,7 +27,7 @@
 #ifndef INCLUDED_fileio_h
 #define INCLUDED_fileio_h
 
-#define FB_EOF 0x01
+#define FB_EOF	0x01
 #define FB_FAIL 0x02
 
 struct FileBuf {

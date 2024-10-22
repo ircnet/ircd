@@ -27,9 +27,9 @@ typedef struct hashentry {
  * it is not important for these to be "big" as ircd will make them grow
  * as required.
  */
-#define HASHSIZE ((int) ((float) MAXCONNECTIONS * 1.75))
+#define HASHSIZE		((int) ((float) MAXCONNECTIONS * 1.75))
 #define CHANNELHASHSIZE ((int) (((float) MAXCONNECTIONS * 1.75) / 2.0))
-#define SIDSIZE (MAXCONNECTIONS / 10)
+#define SIDSIZE			(MAXCONNECTIONS / 10)
 #ifdef USE_HOSTHASH
 #define HOSTNAMEHASHSIZE ((int) ((float) MAXCONNECTIONS * 1.75))
 #endif

@@ -10,9 +10,9 @@
 #define RES_INITDEBG 8
 #define RES_INITCACH 16
 
-#define MAXPACKET 1024
+#define MAXPACKET  1024
 #define MAXALIASES 35
-#define MAXADDRS 35
+#define MAXADDRS   35
 
 #define AR_TTL 600 /* TTL in seconds for dns cache entries */
 
@@ -22,8 +22,8 @@
 #endif
 #define FLG_PTR_PEND_FWD 4
 #define FLG_PTR_PEND_REV 8
-#define FLG_PTR_PEND (FLG_PTR_PEND_FWD | FLG_PTR_PEND_REV)
-#define FLG_PTR_VALID 16
+#define FLG_PTR_PEND	 (FLG_PTR_PEND_FWD | FLG_PTR_PEND_REV)
+#define FLG_PTR_VALID	 16
 
 struct hent {
 	char *h_name;				 /* official name of host */

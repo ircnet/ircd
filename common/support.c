@@ -545,10 +545,10 @@ void dumpcore(char *msg, ...)
 static char *marray[100000];
 static int	 mindex = 0;
 
-#define SZ_EX (sizeof(char *) + sizeof(size_t) + 4)
+#define SZ_EX	(sizeof(char *) + sizeof(size_t) + 4)
 #define SZ_CHST (sizeof(char *) + sizeof(size_t))
-#define SZ_CH (sizeof(char *))
-#define SZ_ST (sizeof(size_t))
+#define SZ_CH	(sizeof(char *))
+#define SZ_ST	(sizeof(size_t))
 
 char *MyMalloc(size_t x)
 {
@@ -905,7 +905,7 @@ struct hostent *solaris_gethostbyname(const char *name)
 /* Type to use for aligned memory operations.
    This should normally be the biggest type supported by a single load
    and store.  Must be an unsigned type.  */
-#define op_t unsigned long int
+#define op_t  unsigned long int
 #define OPSIZ (sizeof(op_t))
 
 /* Threshold value for when to enter the unrolled loops.  */

@@ -20,9 +20,9 @@
 
 typedef struct AuthData anAuthData;
 
-#define INBUFSIZE 4096			/* I/O buffer size */
-#define MAXI 16					/* maximum number of instances */
-#define BDSIZE ((MAXI + 7) / 8) /* bit data size */
+#define INBUFSIZE 4096			   /* I/O buffer size */
+#define MAXI	  16			   /* maximum number of instances */
+#define BDSIZE	  ((MAXI + 7) / 8) /* bit data size */
 
 struct AuthData {
 	/* the following are set by a_io.c and may be read by modules */
@@ -53,20 +53,20 @@ struct AuthData {
 };
 
 #define A_ACTIVE 0x0001 /* entry is active */
-#define A_START 0x0002	/* go through modules from beginning */
-#define A_DONE 0x0004	/* nothing left to be done */
+#define A_START	 0x0002 /* go through modules from beginning */
+#define A_DONE	 0x0004 /* nothing left to be done */
 #define A_IGNORE 0x0010 /* ignore subsequent messages from ircd */
-#define A_LATE 0x0080	/* ircd is no longer waiting for a reply */
+#define A_LATE	 0x0080 /* ircd is no longer waiting for a reply */
 
 #define A_GOTU 0x0100 /* got username (from ircd) */
 #define A_GOTP 0x0200 /* got password (from ircd) */
 #define A_GOTH 0x0400 /* got hostname (from ircd) */
-#define A_NOH 0x0800  /* no hostname available */
+#define A_NOH  0x0800 /* no hostname available */
 
-#define A_UNIX 0x1000		 /* authuser is suitable for use by ircd */
+#define A_UNIX		  0x1000 /* authuser is suitable for use by ircd */
 #define A_DELAYEDSENT 0x2000 /* client already has been let in to ircd */
-#define A_DENY 0x8000		 /* connection should be denied access */
+#define A_DENY		  0x8000 /* connection should be denied access */
 
-#define SetBit(v, n) v[n / 8] |= (1 << (n % 8))
+#define SetBit(v, n)   v[n / 8] |= (1 << (n % 8))
 #define UnsetBit(v, n) v[n / 8] &= ~(1 << (n % 8))
 #define CheckBit(v, n) (v[n / 8] & (1 << (n % 8)))

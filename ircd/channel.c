@@ -43,7 +43,7 @@ static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.279 2010/08/12 16:2
 
 static char asterix[2] = "*";
 
-#define BanLen(x) ((strlen(x->nick) + strlen(x->user) + strlen(x->host)))
+#define BanLen(x)	   ((strlen(x->nick) + strlen(x->user) + strlen(x->host)))
 #define BanMatch(x, y) ((!match(x->nick, y->nick) && !match(x->user, y->user) && !match(x->host, y->host)))
 #define BanExact(x, y) ((!mycmp(x->nick, y->nick) && !mycmp(x->user, y->user) && !mycmp(x->host, y->host)))
 
@@ -688,7 +688,7 @@ int jp_chname(char *chname)
 	return 0;
 }
 
-#define IsJPFlag(x) (((x)->flags & FLAGS_JP))
+#define IsJPFlag(x)	   (((x)->flags & FLAGS_JP))
 #define IsJPChan(x, y) (((x) && IsJPFlag((x))) || jp_chname((y)))
 
 /* 

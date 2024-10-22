@@ -2120,21 +2120,21 @@ static int read_packet(aClient *cptr, int msg_ready)
 int read_message(time_t delay, FdAry *fdp, int ro)
 {
 #if !defined(USE_POLL)
-#define SET_READ_EVENT(thisfd) FD_SET(thisfd, &read_set)
+#define SET_READ_EVENT(thisfd)	FD_SET(thisfd, &read_set)
 #define SET_WRITE_EVENT(thisfd) FD_SET(thisfd, &write_set)
-#define CLR_READ_EVENT(thisfd) FD_CLR(thisfd, &read_set)
+#define CLR_READ_EVENT(thisfd)	FD_CLR(thisfd, &read_set)
 #define CLR_WRITE_EVENT(thisfd) FD_CLR(thisfd, &write_set)
-#define TST_READ_EVENT(thisfd) FD_ISSET(thisfd, &read_set)
+#define TST_READ_EVENT(thisfd)	FD_ISSET(thisfd, &read_set)
 #define TST_WRITE_EVENT(thisfd) FD_ISSET(thisfd, &write_set)
 
 	fd_set read_set, write_set;
 	int	   highfd = -1;
 #else
 /* most of the following use pfd */
-#define POLLSETREADFLAGS (POLLIN | POLLRDNORM)
-#define POLLREADFLAGS (POLLSETREADFLAGS | POLLHUP | POLLERR)
+#define POLLSETREADFLAGS  (POLLIN | POLLRDNORM)
+#define POLLREADFLAGS	  (POLLSETREADFLAGS | POLLHUP | POLLERR)
 #define POLLSETWRITEFLAGS (POLLOUT | POLLWRNORM)
-#define POLLWRITEFLAGS (POLLOUT | POLLWRNORM | POLLHUP | POLLERR)
+#define POLLWRITEFLAGS	  (POLLOUT | POLLWRNORM | POLLHUP | POLLERR)
 
 #define SET_READ_EVENT(thisfd)           \
 	{                                    \
@@ -2147,9 +2147,9 @@ int read_message(time_t delay, FdAry *fdp, int ro)
 		pfd->events |= POLLSETWRITEFLAGS; \
 	}
 
-#define CLR_READ_EVENT(thisfd) pfd->revents &= ~POLLSETREADFLAGS
+#define CLR_READ_EVENT(thisfd)	pfd->revents &= ~POLLSETREADFLAGS
 #define CLR_WRITE_EVENT(thisfd) pfd->revents &= ~POLLSETWRITEFLAGS
-#define TST_READ_EVENT(thisfd) pfd->revents &POLLREADFLAGS
+#define TST_READ_EVENT(thisfd)	pfd->revents &POLLREADFLAGS
 #define TST_WRITE_EVENT(thisfd) pfd->revents &POLLWRITEFLAGS
 
 #define CHECK_PFD(thisfd)                         \

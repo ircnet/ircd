@@ -41,8 +41,8 @@
 /* typedef unsigned int u_int; */
 typedef void (*void_fn_t)();
 #define prefix_touchar(prefix) ((u_char *) &(prefix)->add.sin)
-#define MAXLINE 1024
-#define BIT_TEST(f, b) ((f) & (b))
+#define MAXLINE				   1024
+#define BIT_TEST(f, b)		   ((f) & (b))
 
 #include <netinet/in.h>
 #include <sys/socket.h>
@@ -99,11 +99,11 @@ patricia_node_t		   *patricia_make_and_lookup(patricia_tree_t *, const char *);
 EXTERN patricia_node_t *patricia_make_and_lookup_ip(patricia_tree_t *, struct IN_ADDR *, int);
 
 
-#define PATRICIA_MAXBITS 128
-#define PATRICIA_NBIT(x) (0x80 >> ((x) & 0x7f))
+#define PATRICIA_MAXBITS  128
+#define PATRICIA_NBIT(x)  (0x80 >> ((x) & 0x7f))
 #define PATRICIA_NBYTE(x) ((x) >> 3)
 
-#define PATRICIA_DATA_GET(node, type) (type *) ((node)->data)
+#define PATRICIA_DATA_GET(node, type)  (type *) ((node)->data)
 #define PATRICIA_DATA_SET(node, value) ((node)->data = (void *) (value))
 
 #define PATRICIA_WALK(Xhead, Xnode)                     \

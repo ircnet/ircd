@@ -41,12 +41,12 @@
 #undef isupper
 #undef isspace
 
-#define PRINT 0x0001
-#define CNTRL 0x0002
-#define ALPHA 0x0004
-#define PUNCT 0x0008
-#define DIGIT 0x0010
-#define SPACE 0x0020
+#define PRINT  0x0001
+#define CNTRL  0x0002
+#define ALPHA  0x0004
+#define PUNCT  0x0008
+#define DIGIT  0x0010
+#define SPACE  0x0020
 #define NVALID 0x0040
 #define UVALID 0x0080
 
@@ -56,7 +56,7 @@
 					((u_char) (c) > (u_char) 0x5f))
 #define isupper(c) ((char_atribs[(u_char) (c)] & ALPHA) && \
 					((u_char) (c) < (u_char) 0x60))
-#define isdigit(c) (char_atribs[(u_char) (c)] & DIGIT)
+#define isdigit(c)	(char_atribs[(u_char) (c)] & DIGIT)
 #define isxdigit(c) (isdigit(c) ||                     \
 					 ((u_char) 'a' <= (u_char) (c) &&  \
 					  (u_char) (c) <= (u_char) 'f') || \
@@ -67,7 +67,7 @@
 #define isascii(c) ((u_char) (c) <= (u_char) 0x7f)
 #define isgraph(c) ((char_atribs[(u_char) (c)] & PRINT) && \
 					((u_char) (c) != (u_char) 0x20))
-#define ispunct(c) (!(char_atribs[(u_char) (c)] & (CNTRL | ALPHA | DIGIT)))
+#define ispunct(c)	   (!(char_atribs[(u_char) (c)] & (CNTRL | ALPHA | DIGIT)))
 #define isvalidnick(c) (char_atribs[(u_char) (c)] & NVALID)
 #define isvaliduser(c) (char_atribs[(u_char) (c)] & UVALID)
 
@@ -76,7 +76,7 @@
 #define DO_DEBUG_MALLOC
 #else
 #define Debug(x) ;
-#define LOGFILE "/dev/null"
+#define LOGFILE	 "/dev/null"
 #endif
 
 #if defined(CHKCONF_COMPILE) || defined(CLIENT_COMPILE)

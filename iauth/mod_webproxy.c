@@ -42,12 +42,12 @@ struct proxylog {
 	time_t			 expire;
 };
 
-#define OPT_LOG 0x001
-#define OPT_DENY 0x002
+#define OPT_LOG		0x001
+#define OPT_DENY	0x002
 #define OPT_CAREFUL 0x008
 
-#define PROXY_NONE 0
-#define PROXY_OPEN 1
+#define PROXY_NONE	0
+#define PROXY_OPEN	1
 #define PROXY_CLOSE 2
 
 struct proxy_private {

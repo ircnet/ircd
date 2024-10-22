@@ -41,23 +41,23 @@ struct proxylog {
 	time_t			 expire;
 };
 
-#define OPT_LOG 0x001
-#define OPT_DENY 0x002
+#define OPT_LOG		 0x001
+#define OPT_DENY	 0x002
 #define OPT_PARANOID 0x004
-#define OPT_CAREFUL 0x008
-#define OPT_V4ONLY 0x010
-#define OPT_V5ONLY 0x020
+#define OPT_CAREFUL	 0x008
+#define OPT_V4ONLY	 0x010
+#define OPT_V5ONLY	 0x020
 #define OPT_PROTOCOL 0x040
-#define OPT_BOFH 0x080
+#define OPT_BOFH	 0x080
 
-#define PROXY_NONE 0
-#define PROXY_OPEN 1
-#define PROXY_CLOSE 2
+#define PROXY_NONE		 0
+#define PROXY_OPEN		 1
+#define PROXY_CLOSE		 2
 #define PROXY_UNEXPECTED 3
-#define PROXY_BADPROTO 4
+#define PROXY_BADPROTO	 4
 
-#define ST_V4 0x01
-#define ST_V5 0x02
+#define ST_V4  0x01
+#define ST_V5  0x02
 #define ST_V5b 0x04
 
 struct socks_private {

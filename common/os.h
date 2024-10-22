@@ -399,7 +399,7 @@
 #define memcpy(d, s, n) bcopy((s), (d), (n))
 #endif
 
-#define strcasecmp mycmp
+#define strcasecmp	mycmp
 #define strncasecmp myncmp
 
 /*  inet_ntoa(), inet_aton(), inet_addr() and inet_netof() portability
@@ -522,7 +522,7 @@ extern struct hostent *_switch_gethostbyname_r(const char	  *name,
 
 #if defined(HPUX) && !defined(HAVE_GETRUSAGE)
 #define getrusage(a, b) (syscall(SYS_GETRUSAGE, (a), (b)))
-#define HAVE_GETRUSAGE 1
+#define HAVE_GETRUSAGE	1
 #endif
 
 /*  select portability problems - some systems do not define FD_... macros; on
@@ -537,10 +537,10 @@ extern struct hostent *_switch_gethostbyname_r(const char	  *name,
 
 #if !defined(USE_POLL)
 #ifndef FD_ZERO
-#define FD_ZERO(set) (((set)->fds_bits[0]) = 0)
-#define FD_SET(s1, set) (((set)->fds_bits[0]) |= 1 << (s1))
+#define FD_ZERO(set)	  (((set)->fds_bits[0]) = 0)
+#define FD_SET(s1, set)	  (((set)->fds_bits[0]) |= 1 << (s1))
 #define FD_ISSET(s1, set) (((set)->fds_bits[0]) & (1 << (s1)))
-#define FD_SETSIZE 30
+#define FD_SETSIZE		  30
 #endif /* FD_ZERO */
 #if defined(HPUX) && (!defined(_XPG4_EXTENDED) || (defined(_XPG4_EXTENDED) && defined(__INCLUDE_FROM_TIME_H) && !defined(_XOPEN_SOURCE_EXTENDED)))
 #define SELECT_FDSET_TYPE int
@@ -680,14 +680,14 @@ extern int h_errno;
 extern unsigned char minus_one[];
 #define WHOSTENTP(x) ((x)[0] | (x)[1] | (x)[2] | (x)[3] | (x)[4] | (x)[5] | (x)[6] | (x)[7] | (x)[8] | (x)[9] | (x)[10] | (x)[11] | (x)[12] | (x)[13] | (x)[14] | (x)[15])
 
-#define AFINET AF_INET6
+#define AFINET		AF_INET6
 #define SOCKADDR_IN sockaddr_in6
-#define SOCKADDR sockaddr
-#define SIN_FAMILY sin6_family
-#define SIN_PORT sin6_port
-#define SIN_ADDR sin6_addr
-#define S_ADDR s6_addr
-#define IN_ADDR in6_addr
+#define SOCKADDR	sockaddr
+#define SIN_FAMILY	sin6_family
+#define SIN_PORT	sin6_port
+#define SIN_ADDR	sin6_addr
+#define S_ADDR		s6_addr
+#define IN_ADDR		in6_addr
 
 #ifndef INET6_ADDRSTRLEN
 #define INET6_ADDRSTRLEN 46
@@ -695,14 +695,14 @@ extern unsigned char minus_one[];
 
 #else /* INET6 */
 
-#define AFINET AF_INET
+#define AFINET		AF_INET
 #define SOCKADDR_IN sockaddr_in
-#define SOCKADDR sockaddr
-#define SIN_FAMILY sin_family
-#define SIN_PORT sin_port
-#define SIN_ADDR sin_addr
-#define S_ADDR s_addr
-#define IN_ADDR in_addr
+#define SOCKADDR	sockaddr
+#define SIN_FAMILY	sin_family
+#define SIN_PORT	sin_port
+#define SIN_ADDR	sin_addr
+#define S_ADDR		s_addr
+#define IN_ADDR		in_addr
 
 #define WHOSTENTP(x) (x)
 #endif

@@ -28,7 +28,7 @@ static const volatile char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.20 2004/10/01 20
 #undef MOD_RFC931_C
 
 #define OPT_PROTOCOL 0x1
-#define OPT_LAZY 0x2
+#define OPT_LAZY	 0x2
 
 struct _instance_data {
 	u_char options;

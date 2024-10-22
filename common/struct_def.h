@@ -46,24 +46,24 @@ typedef struct LineItem aExtData;
 #error HOSTLEN must not be smaller than INET6_ADDRSTRLEN
 #endif
 
-#define NICKLEN 15 /* Must be the same network-wide. */
-#define UIDLEN 9   /* must not be bigger than NICKLEN --Beeth */
-#define USERLEN 10
-#define REALLEN 50
-#define TOPICLEN 255
-#define CHANNELLEN 50
-#define PASSWDLEN 20
-#define KEYLEN 23
-#define BUFSIZE 512 /* WARNING: *DONT* CHANGE THIS!!!! */
-#define MAXRECIPIENTS 20
-#define MAXBANS 64
-#define MAXBANLENGTH 2048
-#define BANLEN (USERLEN + NICKLEN + HOSTLEN + 3)
-#define MAXPENALTY 10
-#define CHIDLEN 5				  /* WARNING: *DONT* CHANGE THIS!!!! */
-#define SIDLEN 4				  /* WARNING: *DONT* CHANGE THIS!!!! */
-#define MAXMODEPARAMS 3			  /* WARNING: *DONT* CHANGE THIS!!!! */
-#define DELAYCHASETIMELIMIT 1800  /* WARNING: *DONT* CHANGE THIS!!!! */
+#define NICKLEN				 15 /* Must be the same network-wide. */
+#define UIDLEN				 9	/* must not be bigger than NICKLEN --Beeth */
+#define USERLEN				 10
+#define REALLEN				 50
+#define TOPICLEN			 255
+#define CHANNELLEN			 50
+#define PASSWDLEN			 20
+#define KEYLEN				 23
+#define BUFSIZE				 512 /* WARNING: *DONT* CHANGE THIS!!!! */
+#define MAXRECIPIENTS		 20
+#define MAXBANS				 64
+#define MAXBANLENGTH		 2048
+#define BANLEN				 (USERLEN + NICKLEN + HOSTLEN + 3)
+#define MAXPENALTY			 10
+#define CHIDLEN				 5	  /* WARNING: *DONT* CHANGE THIS!!!! */
+#define SIDLEN				 4	  /* WARNING: *DONT* CHANGE THIS!!!! */
+#define MAXMODEPARAMS		 3	  /* WARNING: *DONT* CHANGE THIS!!!! */
+#define DELAYCHASETIMELIMIT	 1800 /* WARNING: *DONT* CHANGE THIS!!!! */
 #define LDELAYCHASETIMELIMIT 5400 /* WARNING: *DONT* CHANGE THIS!!!! */
 
 #define READBUF_SIZE 16384 /* used in s_bsd.c *AND* s_zip.c ! */
@@ -100,16 +100,16 @@ typedef struct LineItem aExtData;
 ** flags for bootup options (command line flags)
 */
 #define BOOT_CONSOLE 0x001
-#define BOOT_QUICK 0x002
-#define BOOT_DEBUG 0x004
-#define BOOT_INETD 0x008
-#define BOOT_TTY 0x010
+#define BOOT_QUICK	 0x002
+#define BOOT_DEBUG	 0x004
+#define BOOT_INETD	 0x008
+#define BOOT_TTY	 0x010
 
-#define BOOT_AUTODIE 0x040
-#define BOOT_BADTUNE 0x080
-#define BOOT_PROT 0x100
+#define BOOT_AUTODIE	0x040
+#define BOOT_BADTUNE	0x080
+#define BOOT_PROT		0x100
 #define BOOT_STRICTPROT 0x200
-#define BOOT_NOIAUTH 0x400
+#define BOOT_NOIAUTH	0x400
 #define BOOT_STANDALONE 0x800
 
 typedef enum Status
@@ -135,164 +135,164 @@ typedef enum Status
 #define IsRegistered(x) ((x)->status >= STAT_SERVER || \
 						 (x)->status == STAT_ME)
 #define IsConnecting(x) ((x)->status == STAT_CONNECTING)
-#define IsHandshake(x) ((x)->status == STAT_HANDSHAKE)
-#define IsMe(x) ((x)->status == STAT_ME)
-#define IsUnknown(x) ((x)->status == STAT_UNKNOWN)
-#define IsServer(x) ((x)->status == STAT_SERVER)
-#define IsClient(x) ((x)->status == STAT_CLIENT || \
+#define IsHandshake(x)	((x)->status == STAT_HANDSHAKE)
+#define IsMe(x)			((x)->status == STAT_ME)
+#define IsUnknown(x)	((x)->status == STAT_UNKNOWN)
+#define IsServer(x)		((x)->status == STAT_SERVER)
+#define IsClient(x)		((x)->status == STAT_CLIENT || \
 					 (x)->status == STAT_OPER)
 #define IsService(x) ((x)->status == STAT_SERVICE && (x)->service)
 
 #define SetConnecting(x) ((x)->status = STAT_CONNECTING)
-#define SetHandshake(x) ((x)->status = STAT_HANDSHAKE)
-#define SetMe(x) ((x)->status = STAT_ME)
-#define SetUnknown(x) ((x)->status = STAT_UNKNOWN)
-#define SetServer(x) ((x)->status = STAT_SERVER)
-#define SetClient(x) ((x)->status = IsAnOper((x)) ? STAT_OPER : STAT_CLIENT)
-#define SetService(x) ((x)->status = STAT_SERVICE)
+#define SetHandshake(x)	 ((x)->status = STAT_HANDSHAKE)
+#define SetMe(x)		 ((x)->status = STAT_ME)
+#define SetUnknown(x)	 ((x)->status = STAT_UNKNOWN)
+#define SetServer(x)	 ((x)->status = STAT_SERVER)
+#define SetClient(x)	 ((x)->status = IsAnOper((x)) ? STAT_OPER : STAT_CLIENT)
+#define SetService(x)	 ((x)->status = STAT_SERVICE)
 
 #define FLAGS_PINGSENT 0x0000001 /* Unreplied ping sent */
 #define FLAGS_DEADSOCK 0x0000002 /* Local socket is dead--Exiting soon */
-#define FLAGS_KILLED 0x0000004	 /* Prevents "QUIT" from being sent for this */
-#define FLAGS_BLOCKED 0x0000008	 /* socket is in blocked condition [unused] */
+#define FLAGS_KILLED   0x0000004 /* Prevents "QUIT" from being sent for this */
+#define FLAGS_BLOCKED  0x0000008 /* socket is in blocked condition [unused] */
 #ifdef UNIXPORT
 #define FLAGS_UNIX 0x0000010 /* socket is in the unix domain, not inet */
 #endif
-#define FLAGS_CLOSING 0x0000020		   /* set when closing to suppress errors */
-#define FLAGS_LISTEN 0x0000040		   /* used to mark clients which we listen() on */
-#define FLAGS_XAUTHDONE 0x0000080	   /* iauth is finished with this client */
-#define FLAGS_DOINGDNS 0x0000100	   /* client is waiting for a DNS response */
-#define FLAGS_AUTH 0x0000200		   /* client is waiting on rfc931 response */
-#define FLAGS_WRAUTH 0x0000400		   /* set if we havent writen to ident server */
-#define FLAGS_LOCAL 0x0000800		   /* set for local clients */
-#define FLAGS_GOTID 0x0001000		   /* successful ident lookup achieved */
-#define FLAGS_XAUTH 0x0002000		   /* waiting on external authentication */
-#define FLAGS_WXAUTH 0x0004000		   /* same as above, but also prevent parsing */
-#define FLAGS_NONL 0x0008000		   /* No \n in buffer */
-#define FLAGS_CBURST 0x0010000		   /* set to mark connection burst being sent */
-#define FLAGS_QUIT 0x0040000		   /* QUIT :comment shows it's not a split */
-#define FLAGS_SPLIT 0x0080000		   /* client QUITting because of a netsplit */
-#define FLAGS_HIDDEN 0x0100000		   /* netsplit is behind a hostmask,
+#define FLAGS_CLOSING		 0x0000020 /* set when closing to suppress errors */
+#define FLAGS_LISTEN		 0x0000040 /* used to mark clients which we listen() on */
+#define FLAGS_XAUTHDONE		 0x0000080 /* iauth is finished with this client */
+#define FLAGS_DOINGDNS		 0x0000100 /* client is waiting for a DNS response */
+#define FLAGS_AUTH			 0x0000200 /* client is waiting on rfc931 response */
+#define FLAGS_WRAUTH		 0x0000400 /* set if we havent writen to ident server */
+#define FLAGS_LOCAL			 0x0000800 /* set for local clients */
+#define FLAGS_GOTID			 0x0001000 /* successful ident lookup achieved */
+#define FLAGS_XAUTH			 0x0002000 /* waiting on external authentication */
+#define FLAGS_WXAUTH		 0x0004000 /* same as above, but also prevent parsing */
+#define FLAGS_NONL			 0x0008000 /* No \n in buffer */
+#define FLAGS_CBURST		 0x0010000 /* set to mark connection burst being sent */
+#define FLAGS_QUIT			 0x0040000 /* QUIT :comment shows it's not a split */
+#define FLAGS_SPLIT			 0x0080000 /* client QUITting because of a netsplit */
+#define FLAGS_HIDDEN		 0x0100000 /* netsplit is behind a hostmask,
 				     also used for marking clients in who_find
 				   */
-#define FLAGS_UNKCMD 0x0200000		   /* has sent an unknown command */
-#define FLAGS_ZIP 0x0400000			   /* link is zipped */
-#define FLAGS_ZIPRQ 0x0800000		   /* zip requested */
-#define FLAGS_ZIPSTART 0x1000000	   /* start of zip (ignore any CRLF) */
-#define FLAGS_SQUIT 0x2000000		   /* This is set when we send the last
+#define FLAGS_UNKCMD		 0x0200000 /* has sent an unknown command */
+#define FLAGS_ZIP			 0x0400000 /* link is zipped */
+#define FLAGS_ZIPRQ			 0x0800000 /* zip requested */
+#define FLAGS_ZIPSTART		 0x1000000 /* start of zip (ignore any CRLF) */
+#define FLAGS_SQUIT			 0x2000000 /* This is set when we send the last
 				  ** server, so we know we have to send
 				  ** a SQUIT. */
-#define FLAGS_EOB 0x4000000			   /* EOB received */
+#define FLAGS_EOB			 0x4000000 /* EOB received */
 #define FLAGS_LISTENINACTIVE 0x8000000 /* Listener does not listen() */
 #ifdef JAPANESE
 #define FLAGS_JP 0x10000000 /* jp version, used both for chans and servs */
 #endif
 
-#define FLAGS_OPER 0x0001	   /* operator */
-#define FLAGS_LOCOP 0x0002	   /* local operator -- SRB */
-#define FLAGS_WALLOP 0x0004	   /* send wallops to them */
+#define FLAGS_OPER		0x0001 /* operator */
+#define FLAGS_LOCOP		0x0002 /* local operator -- SRB */
+#define FLAGS_WALLOP	0x0004 /* send wallops to them */
 #define FLAGS_INVISIBLE 0x0008 /* makes user invisible */
-#define FLAGS_RESTRICT 0x0010  /* restricted user */
-#define FLAGS_AWAY 0x0020	   /* user is away */
-#define FLAGS_EXEMPT 0x0040	   /* user is exempted from k-lines */
+#define FLAGS_RESTRICT	0x0010 /* restricted user */
+#define FLAGS_AWAY		0x0020 /* user is away */
+#define FLAGS_EXEMPT	0x0040 /* user is exempted from k-lines */
 #ifdef XLINE
 #define FLAGS_XLINED 0x0100 /* X-lined client */
 #endif
-#define FLAGS_TLS 0x0200 /* user is on a secure connection port (SSL/TLS) -- mh 2020-04-27 */
+#define FLAGS_TLS	0x0200 /* user is on a secure connection port (SSL/TLS) -- mh 2020-04-27 */
 #define SEND_UMODES (FLAGS_INVISIBLE | FLAGS_OPER | FLAGS_WALLOP | FLAGS_AWAY | FLAGS_RESTRICT)
-#define ALL_UMODES (SEND_UMODES | FLAGS_LOCOP)
+#define ALL_UMODES	(SEND_UMODES | FLAGS_LOCOP)
 
 /*
  * user flags macros.
  */
-#define IsOper(x) ((x)->user && (x)->user->flags & FLAGS_OPER)
-#define IsLocOp(x) ((x)->user && (x)->user->flags & FLAGS_LOCOP)
-#define IsInvisible(x) ((x)->user->flags & FLAGS_INVISIBLE)
+#define IsOper(x)		((x)->user && (x)->user->flags & FLAGS_OPER)
+#define IsLocOp(x)		((x)->user && (x)->user->flags & FLAGS_LOCOP)
+#define IsInvisible(x)	((x)->user->flags & FLAGS_INVISIBLE)
 #define IsRestricted(x) ((x)->user && \
 						 (x)->user->flags & FLAGS_RESTRICT)
 #define IsAnOper(x) ((x)->user && \
 					 (x)->user->flags & (FLAGS_OPER | FLAGS_LOCOP))
-#define IsPerson(x) ((x)->user && IsClient(x))
+#define IsPerson(x)		((x)->user && IsClient(x))
 #define IsPrivileged(x) (IsServer(x) || IsAnOper(x))
-#define SendWallops(x) ((x)->user->flags & FLAGS_WALLOP)
+#define SendWallops(x)	((x)->user->flags & FLAGS_WALLOP)
 #ifdef UNIXPORT
 #define IsUnixSocket(x) ((x)->flags & FLAGS_UNIX)
 #endif
-#define IsListener(x) ((x)->flags & FLAGS_LISTEN)
+#define IsListener(x)		  ((x)->flags & FLAGS_LISTEN)
 #define IsListenerInactive(x) ((x)->flags & FLAGS_LISTENINACTIVE)
-#define IsLocal(x) (MyConnect(x) && (x)->flags & FLAGS_LOCAL)
-#define IsDead(x) ((x)->flags & FLAGS_DEADSOCK)
-#define IsBursting(x) (!((x)->flags & FLAGS_EOB))
-#define IsKlineExempt(x) ((x)->user && (x)->user->flags & FLAGS_EXEMPT)
+#define IsLocal(x)			  (MyConnect(x) && (x)->flags & FLAGS_LOCAL)
+#define IsDead(x)			  ((x)->flags & FLAGS_DEADSOCK)
+#define IsBursting(x)		  (!((x)->flags & FLAGS_EOB))
+#define IsKlineExempt(x)	  ((x)->user && (x)->user->flags & FLAGS_EXEMPT)
 
 #define SetDead(x) ((x)->flags |= FLAGS_DEADSOCK)
-#define CBurst(x) ((x)->flags & FLAGS_CBURST)
+#define CBurst(x)  ((x)->flags & FLAGS_CBURST)
 #define SetOper(x) ((x)->user->flags |= FLAGS_OPER, \
 					(x)->status = STAT_OPER)
 #define SetLocOp(x) ((x)->user->flags |= FLAGS_LOCOP, \
 					 (x)->status = STAT_OPER)
-#define SetInvisible(x) ((x)->user->flags |= FLAGS_INVISIBLE)
+#define SetInvisible(x)	 ((x)->user->flags |= FLAGS_INVISIBLE)
 #define SetRestricted(x) ((x)->user->flags |= FLAGS_RESTRICT)
-#define SetWallops(x) ((x)->user->flags |= FLAGS_WALLOP)
+#define SetWallops(x)	 ((x)->user->flags |= FLAGS_WALLOP)
 #ifdef UNIXPORT
 #define SetUnixSock(x) ((x)->flags |= FLAGS_UNIX)
 #endif
-#define SetDNS(x) ((x)->flags |= FLAGS_DOINGDNS)
-#define SetDoneXAuth(x) ((x)->flags |= FLAGS_XAUTHDONE)
-#define SetEOB(x) ((x)->flags |= FLAGS_EOB)
+#define SetDNS(x)			   ((x)->flags |= FLAGS_DOINGDNS)
+#define SetDoneXAuth(x)		   ((x)->flags |= FLAGS_XAUTHDONE)
+#define SetEOB(x)			   ((x)->flags |= FLAGS_EOB)
 #define SetListenerInactive(x) ((x)->flags |= FLAGS_LISTENINACTIVE)
-#define SetKlineExempt(x) ((x)->user->flags |= FLAGS_EXEMPT)
+#define SetKlineExempt(x)	   ((x)->user->flags |= FLAGS_EXEMPT)
 
-#define DoingDNS(x) ((x)->flags & FLAGS_DOINGDNS)
-#define DoingAuth(x) ((x)->flags & FLAGS_AUTH)
-#define DoingXAuth(x) ((x)->flags & FLAGS_XAUTH)
+#define DoingDNS(x)		((x)->flags & FLAGS_DOINGDNS)
+#define DoingAuth(x)	((x)->flags & FLAGS_AUTH)
+#define DoingXAuth(x)	((x)->flags & FLAGS_XAUTH)
 #define WaitingXAuth(x) ((x)->flags & FLAGS_WXAUTH)
-#define DoneXAuth(x) ((x)->flags & FLAGS_XAUTHDONE)
-#define NoNewLine(x) ((x)->flags & FLAGS_NONL)
+#define DoneXAuth(x)	((x)->flags & FLAGS_XAUTHDONE)
+#define NoNewLine(x)	((x)->flags & FLAGS_NONL)
 
 #define ClearOper(x) ((x)->user->flags &= ~FLAGS_OPER, \
 					  (x)->status = STAT_CLIENT)
 #define ClearLocOp(x) ((x)->user->flags &= ~FLAGS_LOCOP, \
 					   (x)->status = STAT_CLIENT)
-#define ClearInvisible(x) ((x)->user->flags &= ~FLAGS_INVISIBLE)
-#define ClearRestricted(x) ((x)->user->flags &= ~FLAGS_RESTRICT)
-#define ClearWallops(x) ((x)->user->flags &= ~FLAGS_WALLOP)
-#define ClearDNS(x) ((x)->flags &= ~FLAGS_DOINGDNS)
-#define ClearAuth(x) ((x)->flags &= ~FLAGS_AUTH)
-#define ClearXAuth(x) ((x)->flags &= ~FLAGS_XAUTH)
-#define ClearWXAuth(x) ((x)->flags &= ~FLAGS_WXAUTH)
+#define ClearInvisible(x)		 ((x)->user->flags &= ~FLAGS_INVISIBLE)
+#define ClearRestricted(x)		 ((x)->user->flags &= ~FLAGS_RESTRICT)
+#define ClearWallops(x)			 ((x)->user->flags &= ~FLAGS_WALLOP)
+#define ClearDNS(x)				 ((x)->flags &= ~FLAGS_DOINGDNS)
+#define ClearAuth(x)			 ((x)->flags &= ~FLAGS_AUTH)
+#define ClearXAuth(x)			 ((x)->flags &= ~FLAGS_XAUTH)
+#define ClearWXAuth(x)			 ((x)->flags &= ~FLAGS_WXAUTH)
 #define ClearListenerInactive(x) ((x)->flags &= ~FLAGS_LISTENINACTIVE)
 #ifdef XLINE
-#define IsXlined(x) ((x)->user && (x)->user->flags & FLAGS_XLINED)
-#define SetXlined(x) ((x)->user->flags |= FLAGS_XLINED)
+#define IsXlined(x)	   ((x)->user && (x)->user->flags & FLAGS_XLINED)
+#define SetXlined(x)   ((x)->user->flags |= FLAGS_XLINED)
 #define ClearXlined(x) ((x)->user->flags &= ~FLAGS_XLINED)
 #endif
-#define IsTLS(x) ((x)->user && (x)->user->flags & FLAGS_TLS)
+#define IsTLS(x)  ((x)->user && (x)->user->flags & FLAGS_TLS)
 #define SetTLS(x) ((x)->user->flags |= FLAGS_TLS)
 
 /*
  * defined debugging levels
  */
-#define DEBUG_FATAL 0
-#define DEBUG_ERROR 1 /* report_error() and other errors that are found */
-#define DEBUG_READ 2
-#define DEBUG_WRITE 2
+#define DEBUG_FATAL	 0
+#define DEBUG_ERROR	 1 /* report_error() and other errors that are found */
+#define DEBUG_READ	 2
+#define DEBUG_WRITE	 2
 #define DEBUG_NOTICE 3
-#define DEBUG_DNS 4	   /* used by all DNS related routines - a *lot* */
-#define DEBUG_INFO 5   /* general usful info */
-#define DEBUG_NUM 6	   /* numerics */
-#define DEBUG_SEND 7   /* everything that is sent out */
-#define DEBUG_DEBUG 8  /* anything to do with debugging, ie unimportant :) */
-#define DEBUG_MALLOC 9 /* malloc/free calls */
-#define DEBUG_LIST 10  /* debug list use */
-#define DEBUG_L10 10
-#define DEBUG_L11 11
+#define DEBUG_DNS	 4	/* used by all DNS related routines - a *lot* */
+#define DEBUG_INFO	 5	/* general usful info */
+#define DEBUG_NUM	 6	/* numerics */
+#define DEBUG_SEND	 7	/* everything that is sent out */
+#define DEBUG_DEBUG	 8	/* anything to do with debugging, ie unimportant :) */
+#define DEBUG_MALLOC 9	/* malloc/free calls */
+#define DEBUG_LIST	 10 /* debug list use */
+#define DEBUG_L10	 10
+#define DEBUG_L11	 11
 
 /*
  * defines for curses in client
  */
-#define DUMMY_TERM 0
-#define CURSES_TERM 1
+#define DUMMY_TERM	 0
+#define CURSES_TERM	 1
 #define TERMCAP_TERM 2
 
 struct CPing {
@@ -335,70 +335,70 @@ struct ListItem {
 };
 
 /* these define configuration lines (A:, M:, I:, K:, etc.) */
-#define CONF_ILLEGAL 0x80000000
-#define CONF_MATCH 0x40000000
+#define CONF_ILLEGAL			0x80000000
+#define CONF_MATCH				0x40000000
 #define CONF_QUARANTINED_SERVER 0x000001
-#define CONF_CLIENT 0x000002
+#define CONF_CLIENT				0x000002
 
-#define CONF_CONNECT_SERVER 0x000008
+#define CONF_CONNECT_SERVER	  0x000008
 #define CONF_NOCONNECT_SERVER 0x000010
-#define CONF_ZCONNECT_SERVER 0x000020
+#define CONF_ZCONNECT_SERVER  0x000020
 
-#define CONF_OPERATOR 0x000080
-#define CONF_ME 0x000100
-#define CONF_KILL 0x000200
-#define CONF_ADMIN 0x000400
-#define CONF_CLASS 0x001000
-#define CONF_SERVICE 0x002000
-#define CONF_LEAF 0x004000
+#define CONF_OPERATOR	 0x000080
+#define CONF_ME			 0x000100
+#define CONF_KILL		 0x000200
+#define CONF_ADMIN		 0x000400
+#define CONF_CLASS		 0x001000
+#define CONF_SERVICE	 0x002000
+#define CONF_LEAF		 0x004000
 #define CONF_LISTEN_PORT 0x008000
-#define CONF_HUB 0x010000
-#define CONF_VER 0x020000
-#define CONF_BOUNCE 0x040000
-#define CONF_OTHERKILL 0x080000
-#define CONF_DENY 0x100000
+#define CONF_HUB		 0x010000
+#define CONF_VER		 0x020000
+#define CONF_BOUNCE		 0x040000
+#define CONF_OTHERKILL	 0x080000
+#define CONF_DENY		 0x100000
 #ifdef TKLINE
-#define CONF_TKILL 0x200000
+#define CONF_TKILL		0x200000
 #define CONF_TOTHERKILL 0x400000
 #endif
 #ifdef XLINE
 #define CONF_XLINE 0x800000
 #endif
-#define CONF_OPS CONF_OPERATOR
+#define CONF_OPS		 CONF_OPERATOR
 #define CONF_SERVER_MASK (CONF_CONNECT_SERVER | CONF_NOCONNECT_SERVER | \
 						  CONF_ZCONNECT_SERVER)
 #define CONF_CLIENT_MASK (CONF_CLIENT | CONF_SERVICE | CONF_OPS | \
 						  CONF_SERVER_MASK)
 
-#define CFLAG_RESTRICTED 0x00001
-#define CFLAG_RNODNS 0x00002
-#define CFLAG_RNOIDENT 0x00004
-#define CFLAG_KEXEMPT 0x00008
-#define CFLAG_NORESOLVE 0x00010
-#define CFLAG_FALL 0x00020
+#define CFLAG_RESTRICTED	 0x00001
+#define CFLAG_RNODNS		 0x00002
+#define CFLAG_RNOIDENT		 0x00004
+#define CFLAG_KEXEMPT		 0x00008
+#define CFLAG_NORESOLVE		 0x00010
+#define CFLAG_FALL			 0x00020
 #define CFLAG_NORESOLVEMATCH 0x00040
 #ifdef XLINE
 #define CFLAG_XEXEMPT 0x00080
 #endif
 
-#define IsConfRestricted(x) ((x)->flags & CFLAG_RESTRICTED)
-#define IsConfRNoDNS(x) ((x)->flags & CFLAG_RNODNS)
-#define IsConfRNoIdent(x) ((x)->flags & CFLAG_RNOIDENT)
-#define IsConfKlineExempt(x) ((x)->flags & CFLAG_KEXEMPT)
-#define IsConfNoResolve(x) ((x)->flags & CFLAG_NORESOLVE)
+#define IsConfRestricted(x)		((x)->flags & CFLAG_RESTRICTED)
+#define IsConfRNoDNS(x)			((x)->flags & CFLAG_RNODNS)
+#define IsConfRNoIdent(x)		((x)->flags & CFLAG_RNOIDENT)
+#define IsConfKlineExempt(x)	((x)->flags & CFLAG_KEXEMPT)
+#define IsConfNoResolve(x)		((x)->flags & CFLAG_NORESOLVE)
 #define IsConfNoResolveMatch(x) ((x)->flags & CFLAG_NORESOLVEMATCH)
-#define IsConfFallThrough(x) ((x)->flags & CFLAG_FALL)
+#define IsConfFallThrough(x)	((x)->flags & CFLAG_FALL)
 #ifdef XLINE
 #define IsConfXlineExempt(x) ((x)->flags & CFLAG_XEXEMPT)
 #endif
 
-#define PFLAG_DELAYED 0x00001
+#define PFLAG_DELAYED	 0x00001
 #define PFLAG_SERVERONLY 0x00002
-#define PFLAG_TLS 0x00004
+#define PFLAG_TLS		 0x00004
 
-#define IsConfDelayed(x) ((x)->flags & PFLAG_DELAYED)
+#define IsConfDelayed(x)	((x)->flags & PFLAG_DELAYED)
 #define IsConfServeronly(x) ((x)->flags & PFLAG_SERVERONLY)
-#define IsConfTLS(x) ((x)->flags & PFLAG_TLS)
+#define IsConfTLS(x)		((x)->flags & PFLAG_TLS)
 
 #define IsIllegal(x) ((x)->status & CONF_ILLEGAL)
 
@@ -574,7 +574,7 @@ struct Client {
 #endif
 };
 
-#define CLIENT_LOCAL_SIZE sizeof(aClient)
+#define CLIENT_LOCAL_SIZE  sizeof(aClient)
 #define CLIENT_REMOTE_SIZE offsetof(aClient, count)
 
 /*
@@ -717,35 +717,35 @@ struct Channel {
 
 /* Channel related flags */
 
-#define CHFL_UNIQOP 0x0001	  /* Channel creator */
-#define CHFL_CHANOP 0x0002	  /* Channel operator */
-#define CHFL_VOICE 0x0004	  /* the power to speak */
-#define CHFL_BAN 0x0008		  /* ban channel flag */
+#define CHFL_UNIQOP	   0x0001 /* Channel creator */
+#define CHFL_CHANOP	   0x0002 /* Channel operator */
+#define CHFL_VOICE	   0x0004 /* the power to speak */
+#define CHFL_BAN	   0x0008 /* ban channel flag */
 #define CHFL_EXCEPTION 0x0010 /* exception channel flag */
-#define CHFL_INVITE 0x0020	  /* invite channel flag */
-#define CHFL_REOPLIST 0x0040  /* reoplist channel flag */
+#define CHFL_INVITE	   0x0020 /* invite channel flag */
+#define CHFL_REOPLIST  0x0040 /* reoplist channel flag */
 
 /* Channel Visibility macros */
 
-#define MODE_UNIQOP CHFL_UNIQOP
-#define MODE_CHANOP CHFL_CHANOP
-#define MODE_VOICE CHFL_VOICE
-#define MODE_PRIVATE 0x00008
-#define MODE_SECRET 0x00010
-#define MODE_MODERATED 0x00020
+#define MODE_UNIQOP		CHFL_UNIQOP
+#define MODE_CHANOP		CHFL_CHANOP
+#define MODE_VOICE		CHFL_VOICE
+#define MODE_PRIVATE	0x00008
+#define MODE_SECRET		0x00010
+#define MODE_MODERATED	0x00020
 #define MODE_TOPICLIMIT 0x00040
 #define MODE_INVITEONLY 0x00080
 #define MODE_NOPRIVMSGS 0x00100
-#define MODE_KEY 0x00200
-#define MODE_BAN 0x00400
-#define MODE_LIMIT 0x00800
-#define MODE_ANONYMOUS 0x01000
-#define MODE_QUIET 0x02000
-#define MODE_EXCEPTION 0x04000
-#define MODE_INVITE 0x08000
-#define MODE_REOP 0x10000
-#define MODE_REOPLIST 0x20000
-#define MODE_FLAGS 0x3ffff
+#define MODE_KEY		0x00200
+#define MODE_BAN		0x00400
+#define MODE_LIMIT		0x00800
+#define MODE_ANONYMOUS	0x01000
+#define MODE_QUIET		0x02000
+#define MODE_EXCEPTION	0x04000
+#define MODE_INVITE		0x08000
+#define MODE_REOP		0x10000
+#define MODE_REOPLIST	0x20000
+#define MODE_FLAGS		0x3ffff
 /*
  * mode flags which take another parameter (With PARAmeterS)
  */
@@ -764,8 +764,8 @@ struct Channel {
 #define HiddenChannel(x) ((x) && ((x)->mode.mode & MODE_PRIVATE))
 /* channel visible */
 #define ShowChannel(v, c) (PubChannel(c) || IsMember((v), (c)))
-#define IsAnonymous(c) ((c) && ((c)->mode.mode & MODE_ANONYMOUS))
-#define PubChannel(x) ((!x) || ((x)->mode.mode & \
+#define IsAnonymous(c)	  ((c) && ((c)->mode.mode & MODE_ANONYMOUS))
+#define PubChannel(x)	  ((!x) || ((x)->mode.mode & \
 								(MODE_PRIVATE | MODE_SECRET)) == 0)
 
 /*
@@ -779,22 +779,22 @@ struct Channel {
 #define IsChannelName(n) ((n) && (*(n) == '#' || *(n) == '&' || \
 								  *(n) == '+' ||                \
 								  (*(n) == '!' && cid_ok(n, CHIDLEN))))
-#define IsQuiet(x) ((x)->mode.mode & MODE_QUIET)
+#define IsQuiet(x)	((x)->mode.mode & MODE_QUIET)
 #define UseModes(n) ((n) && (*(n) == '#' || *(n) == '&' || \
 							 *(n) == '!'))
 
 /* Misc macros */
 
 #define BadPtr(x) (!(x) || (*(x) == '\0'))
-#define BadTo(x) (BadPtr((x)) ? "*" : (x))
+#define BadTo(x)  (BadPtr((x)) ? "*" : (x))
 
 #define MyConnect(x) ((x)->fd >= 0)
-#define MyClient(x) (MyConnect(x) && IsClient(x))
-#define MyPerson(x) (MyConnect(x) && IsPerson(x))
-#define MyOper(x) (MyConnect(x) && IsOper(x))
+#define MyClient(x)	 (MyConnect(x) && IsClient(x))
+#define MyPerson(x)	 (MyConnect(x) && IsPerson(x))
+#define MyOper(x)	 (MyConnect(x) && IsOper(x))
 #define MyService(x) (MyConnect(x) && IsService(x))
-#define ME me.name
-#define MES me.serv->sid
+#define ME			 me.name
+#define MES			 me.serv->sid
 
 #define GotDependantClient(x) (x->prev &&                            \
 							   ((IsRegisteredUser(x->prev) &&        \
@@ -880,24 +880,24 @@ typedef struct {
 /* used in SetMode() in channel.c and m_umode() in s_msg.c */
 
 #define MODE_NULL 0
-#define MODE_ADD 0x40000000
-#define MODE_DEL 0x20000000
+#define MODE_ADD  0x40000000
+#define MODE_DEL  0x20000000
 
 /* return values for hunt_server() */
 
 #define HUNTED_NOSUCH (-1) /* if the hunted server is not found */
-#define HUNTED_ISME 0	   /* if this server should execute the command */
-#define HUNTED_PASS 1	   /* if message passed onwards successfully */
+#define HUNTED_ISME	  0	   /* if this server should execute the command */
+#define HUNTED_PASS	  1	   /* if message passed onwards successfully */
 
 /* used when sending to $#mask or $$mask */
 
 #define MATCH_SERVER 1
-#define MATCH_HOST 2
+#define MATCH_HOST	 2
 
 /* used for sendto_serv */
 
-#define SV_OLD 0x0000
-#define SV_UID 0x0001
+#define SV_OLD	0x0000
+#define SV_UID	0x0001
 #define SV_2_11 SV_UID
 
 /* used for sendto_flag */
@@ -933,39 +933,39 @@ typedef enum ServerChannels
 
 /* used for async dns values */
 
-#define ASYNC_NONE (-1)
-#define ASYNC_CLIENT 0
+#define ASYNC_NONE	  (-1)
+#define ASYNC_CLIENT  0
 #define ASYNC_CONNECT 1
-#define ASYNC_CONF 2
-#define ASYNC_SERVER 3
+#define ASYNC_CONF	  2
+#define ASYNC_SERVER  3
 
 /* Client exit codes for log file */
-#define EXITC_UNDEF '-'	   /* unregistered client */
-#define EXITC_REG '0'	   /* normal exit */
+#define EXITC_UNDEF	   '-' /* unregistered client */
+#define EXITC_REG	   '0' /* normal exit */
 #define EXITC_AUTHFAIL 'A' /* Authentication failure (iauth problem) */
 #define EXITC_AUTHTOUT 'a' /* Authentication time out */
-#define EXITC_CLONE 'C'	   /* CLONE_CHECK */
-#define EXITC_DIE 'd'	   /* server died */
-#define EXITC_DEAD 'D'	   /* socket died */
-#define EXITC_ERROR 'E'	   /* socket error */
-#define EXITC_FLOOD 'F'	   /* client flooding */
-#define EXITC_FAILURE 'f'  /* connect failure */
-#define EXITC_GHMAX 'G'	   /* global clients per host max limit */
-#define EXITC_GUHMAX 'g'   /* global clients per user@host max limit */
-#define EXITC_NOILINE 'I'  /* No matching I:line */
-#define EXITC_KLINE 'k'	   /* K-lined */
-#define EXITC_KILL 'K'	   /* KILLed */
-#define EXITC_LHMAX 'L'	   /* local clients per host max limit */
-#define EXITC_LUHMAX 'l'   /* local clients per user@host max limit */
-#define EXITC_MBUF 'M'	   /* mem alloc error */
-#define EXITC_PING 'P'	   /* ping timeout */
-#define EXITC_BADPASS 'p'  /* bad password */
-#define EXITC_SENDQ 'Q'	   /* send queue exceeded */
-#define EXITC_REF 'R'	   /* Refused */
+#define EXITC_CLONE	   'C' /* CLONE_CHECK */
+#define EXITC_DIE	   'd' /* server died */
+#define EXITC_DEAD	   'D' /* socket died */
+#define EXITC_ERROR	   'E' /* socket error */
+#define EXITC_FLOOD	   'F' /* client flooding */
+#define EXITC_FAILURE  'f' /* connect failure */
+#define EXITC_GHMAX	   'G' /* global clients per host max limit */
+#define EXITC_GUHMAX   'g' /* global clients per user@host max limit */
+#define EXITC_NOILINE  'I' /* No matching I:line */
+#define EXITC_KLINE	   'k' /* K-lined */
+#define EXITC_KILL	   'K' /* KILLed */
+#define EXITC_LHMAX	   'L' /* local clients per host max limit */
+#define EXITC_LUHMAX   'l' /* local clients per user@host max limit */
+#define EXITC_MBUF	   'M' /* mem alloc error */
+#define EXITC_PING	   'P' /* ping timeout */
+#define EXITC_BADPASS  'p' /* bad password */
+#define EXITC_SENDQ	   'Q' /* send queue exceeded */
+#define EXITC_REF	   'R' /* Refused */
 #ifdef TKLINE
 #define EXITC_TKLINE 't' /* tkline */
 #endif
-#define EXITC_AREF 'U'	/* Unauthorized by iauth */
+#define EXITC_AREF	'U' /* Unauthorized by iauth */
 #define EXITC_AREFQ 'u' /* Unauthorized by iauth, be quiet */
 #define EXITC_VIRUS 'v' /* joined a channel used by PrettyPark virus */
 #ifdef XLINE
@@ -974,17 +974,17 @@ typedef enum ServerChannels
 #define EXITC_YLINEMAX 'Y' /* Y:line max clients limit */
 
 /* eXternal authentication slave OPTions */
-#define XOPT_REQUIRED 0x01	 /* require authentication be done by iauth */
-#define XOPT_NOTIMEOUT 0x02	 /* disallow iauth time outs */
-#define XOPT_EXTWAIT 0x10	 /* extend registration ping timeout */
+#define XOPT_REQUIRED	0x01 /* require authentication be done by iauth */
+#define XOPT_NOTIMEOUT	0x02 /* disallow iauth time outs */
+#define XOPT_EXTWAIT	0x10 /* extend registration ping timeout */
 #define XOPT_EARLYPARSE 0x20 /* allow early parsing and send USER/PASS
 				   information to iauth */
 
 /* misc defines */
 
 #define FLUSH_BUFFER -2
-#define UTMP "/etc/utmp"
-#define COMMA ","
+#define UTMP		 "/etc/utmp"
+#define COMMA		 ","
 
 #define SAP struct SOCKADDR *
 
@@ -1001,21 +1001,21 @@ typedef enum ServerChannels
 
 /* WHO parameter flags */
 #define WHO_FLAG_OPERS_ONLY 0x0001
-#define WHO_FLAG_CHANNEL 0x0002
-#define WHO_FLAG_HOP 0x0004
-#define WHO_FLAG_FLAGS 0x0008
-#define WHO_FLAG_HOST 0x0010
-#define WHO_FLAG_IP 0x0020
-#define WHO_FLAG_IDLE 0x0040
-#define WHO_FLAG_NICK 0x0080
-#define WHO_FLAG_INFO 0x0100
-#define WHO_FLAG_SERVER 0x0200
-#define WHO_FLAG_TOKEN 0x0400
-#define WHO_FLAG_USER 0x0800
-#define WHO_FLAG_ACCOUNT 0x1000
-#define WHO_FLAG_OP_LEVEL 0x2000
-#define WHO_FLAG_SID 0x4000
-#define WHO_FLAG_UID 0x8000
+#define WHO_FLAG_CHANNEL	0x0002
+#define WHO_FLAG_HOP		0x0004
+#define WHO_FLAG_FLAGS		0x0008
+#define WHO_FLAG_HOST		0x0010
+#define WHO_FLAG_IP			0x0020
+#define WHO_FLAG_IDLE		0x0040
+#define WHO_FLAG_NICK		0x0080
+#define WHO_FLAG_INFO		0x0100
+#define WHO_FLAG_SERVER		0x0200
+#define WHO_FLAG_TOKEN		0x0400
+#define WHO_FLAG_USER		0x0800
+#define WHO_FLAG_ACCOUNT	0x1000
+#define WHO_FLAG_OP_LEVEL	0x2000
+#define WHO_FLAG_SID		0x4000
+#define WHO_FLAG_UID		0x8000
 
 struct who_opts {
 	int			flags;
@@ -1031,8 +1031,8 @@ struct who_opts {
 /* Defines used for SET command */
 #define TSET_ACONNECT 0x001
 #define TSET_POOLSIZE 0x002
-#define TSET_CACCEPT 0x004
-#define TSET_SHOWALL (int) ~0
+#define TSET_CACCEPT  0x004
+#define TSET_SHOWALL  (int) ~0
 
 /* Runtime configuration structure */
 typedef struct
@@ -1046,40 +1046,40 @@ typedef struct
 } iconf_t;
 
 /* O:line flags, used also in is_allowed() */
-#define ACL_LOCOP 0x00001
-#define ACL_KILLLOCAL 0x00002
-#define ACL_KILLREMOTE 0x00004
-#define ACL_KILL (ACL_KILLLOCAL | ACL_KILLREMOTE)
-#define ACL_SQUITLOCAL 0x00008
-#define ACL_SQUITREMOTE 0x00010
-#define ACL_SQUIT (ACL_SQUITLOCAL | ACL_SQUITREMOTE)
-#define ACL_CONNECTLOCAL 0x00020
+#define ACL_LOCOP		  0x00001
+#define ACL_KILLLOCAL	  0x00002
+#define ACL_KILLREMOTE	  0x00004
+#define ACL_KILL		  (ACL_KILLLOCAL | ACL_KILLREMOTE)
+#define ACL_SQUITLOCAL	  0x00008
+#define ACL_SQUITREMOTE	  0x00010
+#define ACL_SQUIT		  (ACL_SQUITLOCAL | ACL_SQUITREMOTE)
+#define ACL_CONNECTLOCAL  0x00020
 #define ACL_CONNECTREMOTE 0x00040
-#define ACL_CONNECT (ACL_CONNECTLOCAL | ACL_CONNECTREMOTE)
-#define ACL_CLOSE 0x00080
-#define ACL_HAZH 0x00100
-#define ACL_DNS 0x00200
-#define ACL_REHASH 0x00400
-#define ACL_RESTART 0x00800
-#define ACL_DIE 0x01000
-#define ACL_SET 0x02000
-#define ACL_TKLINE 0x04000
-#define ACL_UNTKLINE ACL_TKLINE
-#define ACL_CLIENTS 0x08000
-#define ACL_CANFLOOD 0x10000
-#define ACL_NOPENALTY 0x20000
-#define ACL_TRACE 0x40000
-#define ACL_KLINE 0x80000
-#define ACL_SIDTRACE 0x100000
+#define ACL_CONNECT		  (ACL_CONNECTLOCAL | ACL_CONNECTREMOTE)
+#define ACL_CLOSE		  0x00080
+#define ACL_HAZH		  0x00100
+#define ACL_DNS			  0x00200
+#define ACL_REHASH		  0x00400
+#define ACL_RESTART		  0x00800
+#define ACL_DIE			  0x01000
+#define ACL_SET			  0x02000
+#define ACL_TKLINE		  0x04000
+#define ACL_UNTKLINE	  ACL_TKLINE
+#define ACL_CLIENTS		  0x08000
+#define ACL_CANFLOOD	  0x10000
+#define ACL_NOPENALTY	  0x20000
+#define ACL_TRACE		  0x40000
+#define ACL_KLINE		  0x80000
+#define ACL_SIDTRACE	  0x100000
 
 #define ACL_ALL_REMOTE (ACL_KILLREMOTE | ACL_SQUITREMOTE | ACL_CONNECTREMOTE)
-#define ACL_ALL 0x1FFFFF
+#define ACL_ALL		   0x1FFFFF
 
 #ifdef CLIENTS_CHANNEL
 /* information scope of &CLIENTS channel. */
-#define CCL_CONN 0x01	  /* connections */
+#define CCL_CONN	 0x01 /* connections */
 #define CCL_CONNINFO 0x02 /* if connections, then with realname */
-#define CCL_QUIT 0x04	  /* quits */
+#define CCL_QUIT	 0x04 /* quits */
 #define CCL_QUITINFO 0x08 /* if quits, then with quit message */
-#define CCL_NICK 0x10	  /* nick changes */
+#define CCL_NICK	 0x10 /* nick changes */
 #endif

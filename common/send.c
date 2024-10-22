@@ -1394,7 +1394,7 @@ void sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 									inetntoa((char *) &cptr->ip),
 #endif
 						 /* client (remote) port */
-						 cptr->port,
+						 cptr->por:,
 						 /* server sockhost (IP plus port or unix socket path) */
 						 cptr->acpt ? cptr->acpt->sockhost : "?",
 						 /* messages and bytes sent to client */
