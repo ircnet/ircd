@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const volatile char sccsid[] = "@(#)res_mkquery.c	8.1 (Berkeley) 6/4/93";
-static const volatile char rcsid[] = "$Id: res_mkquery.c,v 1.8 2004/10/01 20:22:14 chopin Exp $";
+static const volatile char rcsid[]	= "$Id: res_mkquery.c,v 1.8 2004/10/01 20:22:14 chopin Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -103,16 +103,16 @@ int ircd_res_mkquery(int op, const char *dname, int class, int type,
 	if ((buf == NULL) || (buflen < HFIXEDSZ))
 		return (-1);
 	bzero(buf, HFIXEDSZ);
-	hp = (HEADER *) buf;
-	hp->id = htons(++ircd_res.id);
+	hp		   = (HEADER *) buf;
+	hp->id	   = htons(++ircd_res.id);
 	hp->opcode = op;
-	hp->rd = (ircd_res.options & RES_RECURSE) != 0;
-	hp->rcode = NOERROR;
-	cp = buf + HFIXEDSZ;
+	hp->rd	   = (ircd_res.options & RES_RECURSE) != 0;
+	hp->rcode  = NOERROR;
+	cp		   = buf + HFIXEDSZ;
 	buflen -= HFIXEDSZ;
-	dpp = dnptrs;
-	*dpp++ = buf;
-	*dpp++ = NULL;
+	dpp		  = dnptrs;
+	*dpp++	  = buf;
+	*dpp++	  = NULL;
 	lastdnptr = dnptrs + sizeof dnptrs / sizeof dnptrs[0];
 	/*
 	 * perform opcode specific processing

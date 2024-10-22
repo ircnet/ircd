@@ -357,7 +357,7 @@ aClient *find_mask(char *name, aClient *cptr)
 {
 	static char servermask[HOSTLEN + 1];
 	Reg aClient *c2ptr = cptr;
-	Reg char *mask = servermask;
+	Reg char *mask	   = servermask;
 
 	if (!name || !*name)
 		return c2ptr;
@@ -386,7 +386,7 @@ aClient *find_mask(char *name, aClient *cptr)
 aClient *find_name(char *name, aClient *cptr)
 {
 	Reg aClient *c2ptr = cptr;
-	Reg aServer *sp = NULL;
+	Reg aServer *sp	   = NULL;
 
 	if (!name || !*name)
 		return c2ptr;
@@ -583,7 +583,7 @@ int parse(aClient *cptr, char *buffer, char *bufend)
 	if (IsDead(cptr))
 		return -1;
 
-	s = sender;
+	s  = sender;
 	*s = '\0';
 	for (ch = buffer; *ch == ' '; ch++);
 	para[0] = from->name;
@@ -633,12 +633,12 @@ int parse(aClient *cptr, char *buffer, char *bufend)
 	** numerics must have paramters and thus a space after the command
 	** code. -avalon
 	*/
-	s = (char *) index(ch, ' '); /* s -> End of the command code */
+	s	= (char *) index(ch, ' '); /* s -> End of the command code */
 	len = (s) ? (s - ch) : 0;
 	if (len == 3 &&
 		isdigit(*ch) && isdigit(*(ch + 1)) && isdigit(*(ch + 2)))
 	{
-		numeric = (*ch - '0') * 100 + (*(ch + 1) - '0') * 10 + (*(ch + 2) - '0');
+		numeric	   = (*ch - '0') * 100 + (*(ch + 1) - '0') * 10 + (*(ch + 2) - '0');
 		paramcount = MPAR;
 		ircstp->is_num++;
 	}
@@ -682,10 +682,10 @@ int parse(aClient *cptr, char *buffer, char *bufend)
 			return -1;
 		}
 		paramcount = mptr->maxparams;
-		i = bufend - ((s) ? s : ch);
-		status = from->status < STAT_SERVER ? STAT_UNREG : from->status;
-		handler = &(mptr->handlers[status]);
-		fhandler = handler->handler;
+		i		   = bufend - ((s) ? s : ch);
+		status	   = from->status < STAT_SERVER ? STAT_UNREG : from->status;
+		handler	   = &(mptr->handlers[status]);
+		fhandler   = handler->handler;
 		handler->count++;
 		handler->bytes += i;
 		if (!MyConnect(from))

@@ -110,7 +110,7 @@ EXTERN patricia_node_t *patricia_make_and_lookup_ip(patricia_tree_t *, struct IN
 	do {                                               \
 		patricia_node_t *Xstack[PATRICIA_MAXBITS + 1]; \
 		patricia_node_t **Xsp = Xstack;                \
-		patricia_node_t *Xrn = (Xhead);                \
+		patricia_node_t *Xrn  = (Xhead);               \
 		while ((Xnode = Xrn))                          \
 		{                                              \
 			if (Xnode->prefix)
@@ -119,7 +119,7 @@ EXTERN patricia_node_t *patricia_make_and_lookup_ip(patricia_tree_t *, struct IN
 	do {                                               \
 		patricia_node_t *Xstack[PATRICIA_MAXBITS + 1]; \
 		patricia_node_t **Xsp = Xstack;                \
-		patricia_node_t *Xrn = (Xhead);                \
+		patricia_node_t *Xrn  = (Xhead);               \
 		while ((Xnode = Xrn))                          \
 		{                                              \
 			if (1)

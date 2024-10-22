@@ -280,7 +280,7 @@ char *canonize(char *buffer)
 	static char cbuf[BUFSIZ];
 	Reg char *s, *t, *cp = cbuf;
 	Reg int l = 0;
-	char *p = NULL, *p2;
+	char *p	  = NULL, *p2;
 
 	*cp = '\0';
 
@@ -337,7 +337,7 @@ int register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #endif
 
 	user->last = timeofday;
-	parv[0] = sptr->name;
+	parv[0]	   = sptr->name;
 	parv[1] = parv[2] = NULL;
 
 	if (MyConnect(sptr))
@@ -409,7 +409,7 @@ int register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			cptr->flags |= FLAGS_WXAUTH;
 			/* fool check_pings() and give iauth more time! */
 			cptr->firsttime = timeofday;
-			cptr->lasttime = timeofday;
+			cptr->lasttime	= timeofday;
 			strncpyzt(sptr->user->username, username, USERLEN + 1);
 			if (sptr->passwd[0])
 				sendto_iauth("%d P %s", sptr->fd, sptr->passwd);
@@ -716,7 +716,7 @@ int register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 						istat.is_l_myclnt, istat.is_myclnt,
 						timeofday - istat.is_l_myclnt_t);
 			istat.is_l_myclnt_t = timeofday;
-			istat.is_l_myclnt = istat.is_myclnt;
+			istat.is_l_myclnt	= istat.is_myclnt;
 		}
 		strcpy(sptr->user->uid, next_uid());
 		if (nick[0] == '0' && nick[1] == '\0')
@@ -1257,9 +1257,9 @@ int m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char *uid, nick[NICKLEN + 2], *user, *host, *realname;
 
 	strncpyzt(nick, parv[1], NICKLEN + 1);
-	uid = parv[2];
-	user = parv[3];
-	host = parv[4];
+	uid		 = parv[2];
+	user	 = parv[3];
+	host	 = parv[4];
 	realname = parv[7];
 
 	/*
@@ -1632,7 +1632,7 @@ static int m_message(aClient *cptr, aClient *sptr, int parc,
 			** user%host addressed?
 			*/
 			*host++ = '\0';
-			acptr = find_userhost(nick, host, NULL, &count);
+			acptr	= find_userhost(nick, host, NULL, &count);
 			*--host = '%';
 			if (acptr)
 			{
@@ -2014,7 +2014,7 @@ int m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			/*
 			** 'WHO 0' - do who_find() later
 			*/
-			mask = NULL;
+			mask	 = NULL;
 			channame = NULL;
 		}
 		else if (mask[1] == '\0' && mask[0] == '*')
@@ -2142,7 +2142,7 @@ static void send_whois(aClient *sptr, aClient *acptr)
 						   RPL_WHOISCHANNELS, sptr->name, name,
 						   buf);
 				*buf = '\0';
-				len = 0;
+				len	 = 0;
 			}
 			if (is_chan_op(acptr, chptr))
 				*(buf + len++) = '@';
@@ -2198,7 +2198,7 @@ int m_whois(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aClient *acptr;
 	aChannel *chptr;
 	char *nick, *tmp, *tmp2;
-	char *p = NULL;
+	char *p	  = NULL;
 	int found = 0;
 
 	if (parc < 2)
@@ -2265,10 +2265,10 @@ int m_whois(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			 * - only send replies about common or public channels
 			 *   the target user(s) are on;
 			 */
-			invis = (acptr->user) ? (acptr->user->flags & FLAGS_INVISIBLE) : 0;
-			member = (acptr->user && acptr->user->channel) ? 1 : 0;
+			invis	   = (acptr->user) ? (acptr->user->flags & FLAGS_INVISIBLE) : 0;
+			member	   = (acptr->user && acptr->user->channel) ? 1 : 0;
 			showperson = (wilds && !invis && !member) || !wilds;
-			for (lp = (acptr->user) ? acptr->user->channel : NULL;
+			for (lp		= (acptr->user) ? acptr->user->channel : NULL;
 				 lp; lp = lp->next)
 			{
 				chptr = lp->value.chptr;
@@ -2359,8 +2359,8 @@ int m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	/* Copy parameters into better documenting variables */
 
 	username = parv[1];
-	umodes = parv[2];
-	server = parv[3];
+	umodes	 = parv[2];
+	server	 = parv[3];
 	realname = parv[4];
 
 #ifdef INET6
@@ -2501,7 +2501,7 @@ int m_quit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr = NULL;
-	char *inpath = cptr->name;
+	char *inpath   = cptr->name;
 	char *user, *path, *killer;
 	int chasing = 0;
 
@@ -2728,7 +2728,7 @@ int m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if ((len = strlen(awy2)) > (size_t) TOPICLEN)
 	{
-		len = TOPICLEN;
+		len			   = TOPICLEN;
 		awy2[TOPICLEN] = '\0';
 	}
 	len++;
@@ -2774,7 +2774,7 @@ int m_ping(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	aClient *acptr;
 	char *origin, *destination;
 
-	origin = parv[1];
+	origin		= parv[1];
 	destination = parv[2]; /* Will get NULL or pointer (parc >= 2!!) */
 
 	acptr = find_client(origin, NULL);
@@ -2817,7 +2817,7 @@ int m_pong(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return 1;
 	}
 
-	origin = parv[1];
+	origin		= parv[1];
 	destination = parv[2];
 
 	sptr->flags &= ~FLAGS_PINGSENT;
@@ -2858,7 +2858,7 @@ int m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char *name, *password, *encr;
 	char *logstring = NULL;
 
-	name = parv[1];
+	name	 = parv[1];
 	password = parv[2];
 
 	if (IsAnOper(sptr))
@@ -2904,7 +2904,7 @@ int m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		int old = (sptr->user->flags & ALL_UMODES);
 		char *s;
 
-		s = index(aconf->host, '@');
+		s	 = index(aconf->host, '@');
 		*s++ = '\0';
 #ifndef NO_OPER_REMOTE
 		if (aconf->flags & ACL_LOCOP)
@@ -3082,7 +3082,7 @@ int m_userhost(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	int idx = 1;
 
 	(void) sprintf(buf, replies[RPL_USERHOST], ME, BadTo(parv[0]));
-	len = strlen(buf);
+	len	  = strlen(buf);
 	*buf2 = '\0';
 
 	for (i = 5, s = strtoken(&p, parv[idx], " "); i && s; i--)
@@ -3102,7 +3102,7 @@ int m_userhost(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				sendto_one(sptr, "%s", buf);
 				(void) sprintf(buf, replies[RPL_USERHOST],
 							   ME, BadTo(parv[0]));
-				len = strlen(buf);
+				len	  = strlen(buf);
 				*buf2 = '\0';
 			}
 		}
@@ -3132,7 +3132,7 @@ int m_ison(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg aClient *acptr;
 	Reg char *s, **pav = parv;
 	Reg int len = 0, i;
-	char *p = NULL;
+	char *p		= NULL;
 
 	(void) sprintf(buf, replies[RPL_ISON], ME, BadTo(*parv));
 	len = strlen(buf);
@@ -3195,7 +3195,7 @@ int m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (parc < 3)
 	{
-		m = buf;
+		m	 = buf;
 		*m++ = '+';
 		for (s = user_modes; (flag = *s) && (m - buf < BUFSIZE - 4);
 			 s += 2)
@@ -3367,7 +3367,7 @@ void send_umode(aClient *cptr, aClient *sptr, int old, int sendmask,
 	 * build a string in umode_buf to represent the change in the user's
 	 * mode between the new (sptr->flag) and 'old'.
 	 */
-	m = umode_buf;
+	m  = umode_buf;
 	*m = '\0';
 	for (s = user_modes; (flag = *s); s += 2)
 	{

@@ -126,8 +126,8 @@ int close_chid(char *id)
 
 	if (timeofday - last > 900 || id[0] == current)
 	{
-		last = timeofday;
-		curid = get_chid();
+		last	= timeofday;
+		curid	= get_chid();
 		current = curid[0];
 	}
 	if (id_alphabet[1 + alphabet_id[(unsigned char) current]] == id[1])
@@ -157,7 +157,7 @@ void cache_chid(aChannel *chptr)
 	}
 
 	chptr->nextch = idcache;
-	idcache = chptr;
+	idcache		  = chptr;
 	istat.is_cchan++;
 	istat.is_cchanmem += sizeof(aChannel) + strlen(chptr->chname);
 }
@@ -187,7 +187,7 @@ void collect_chid(void)
 	{
 		if (close_chid((*chptr)->chname) == 0)
 		{
-			del = *chptr;
+			del	   = *chptr;
 			*chptr = del->nextch;
 			istat.is_cchan--;
 			istat.is_cchanmem -= sizeof(aChannel) + strlen(del->chname);
@@ -256,7 +256,7 @@ void	init_sid(char *conf)
 char *next_uid(void)
 {
 	static char uid[UIDLEN + 1 + 5]; /* why +5? --Beeth */
-	static long curr_cid = 0;
+	static long curr_cid   = 0;
 	static int needfinduid = 0;
 
 	do
@@ -279,7 +279,7 @@ char *next_uid(void)
 			** Note: after we increase UIDLEN to 12 this uptime would
 			** have to be almost 90 thousands years!
 			*/
-			curr_cid = 0;
+			curr_cid	= 0;
 			needfinduid = 1;
 		}
 	} while (needfinduid && find_uid(uid, NULL) != NULL);

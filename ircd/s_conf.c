@@ -69,8 +69,8 @@ static int lookup_confhost(aConfItem *);
 #include "config_read.c"
 #endif
 
-aConfItem *conf = NULL;
-aConfItem *kconf = NULL;
+aConfItem *conf	  = NULL;
+aConfItem *kconf  = NULL;
 char *networkname = NULL;
 #ifdef TKLINE
 aConfItem *tkconf = NULL;
@@ -469,7 +469,7 @@ int match_ipmask(char *mask, aClient *cptr, int maskwithusername)
 #ifndef INET6
 	if (m < 0 || m > 32)
 		goto badmask;
-	lmask = htonl((u_long) 0xffffffffL << (32 - m));
+	lmask		= htonl((u_long) 0xffffffffL << (32 - m));
 	addr.s_addr = inetaddr(mask);
 	return ((addr.s_addr ^ cptr->ip.s_addr) & lmask) ? 1 : 0;
 #else
@@ -525,8 +525,8 @@ int attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 	Reg aConfItem *aconf;
 	char uhost[HOSTLEN + USERLEN + 2];
 	char uaddr[HOSTLEN + USERLEN + 2];
-	int ulen = strlen(cptr->username) + 1; /* for '@' */
-	int retval = -2;					   /* EXITC_NOILINE in register_user() */
+	int ulen   = strlen(cptr->username) + 1; /* for '@' */
+	int retval = -2;						 /* EXITC_NOILINE in register_user() */
 
 	/* We fill uaddr and uhost now, before aconf loop. */
 	sprintf(uaddr, "%s@%s", cptr->username, sockhost);
@@ -794,7 +794,7 @@ int detach_conf(aClient *cptr, aConfItem *aconf)
 				{
 					if (aconf3 == aconf)
 					{
-						*aconf2 = aconf3->next;
+						*aconf2		 = aconf3->next;
 						aconf3->next = NULL;
 						free_conf(aconf);
 					}
@@ -931,10 +931,10 @@ int attach_conf(aClient *cptr, aConfItem *aconf)
 
 	lp = make_link();
 	istat.is_conflink++;
-	lp->next = cptr->confs;
+	lp->next		= cptr->confs;
 	lp->value.aconf = aconf;
-	cptr->confs = lp;
-	cptr->ping = get_client_ping(cptr);
+	cptr->confs		= lp;
+	cptr->ping		= get_client_ping(cptr);
 	aconf->clients++;
 	if (aconf->status & CONF_CLIENT_MASK)
 		ConfLinks(aconf)++;
@@ -973,7 +973,7 @@ aConfItem *attach_confs(aClient *cptr, char *name, int statmask)
 {
 	Reg aConfItem *tmp;
 	aConfItem *first = NULL;
-	int len = strlen(name);
+	int len			 = strlen(name);
 
 	if (!name || len > HOSTLEN)
 		return NULL;
@@ -1004,7 +1004,7 @@ aConfItem *attach_confs_host(aClient *cptr, char *host, int statmask)
 {
 	Reg aConfItem *tmp;
 	aConfItem *first = NULL;
-	int len = strlen(host);
+	int len			 = strlen(host);
 
 	if (!host || len > HOSTLEN)
 		return NULL;
@@ -1195,7 +1195,7 @@ aConfItem *find_conf_ip(Link *lp, char *ip, char *user, int statmask)
 		tmp = lp->value.aconf;
 		if (!(tmp->status & statmask))
 			continue;
-		s = index(tmp->host, '@');
+		s  = index(tmp->host, '@');
 		*s = '\0';
 		if (match(tmp->host, user))
 		{
@@ -1297,7 +1297,7 @@ int rehash(aClient *cptr, aClient *sptr, int sig)
 			*/
 			if (!(tmp2->status & (CONF_LISTEN_PORT | CONF_CLIENT)))
 			{
-				*tmp = tmp2->next;
+				*tmp	   = tmp2->next;
 				tmp2->next = NULL;
 			}
 			else
@@ -1348,7 +1348,7 @@ int rehash(aClient *cptr, aClient *sptr, int sig)
 			tmp = &tmp2->next;
 		else
 		{
-			*tmp = tmp2->next;
+			*tmp	   = tmp2->next;
 			tmp2->next = NULL;
 			free_conf(tmp2);
 		}
@@ -1381,7 +1381,7 @@ int openconf(void)
 #ifdef HAVE_GNU_M4
 	char *includedir, *includedirptr;
 
-	includedir = strdup(IRCDM4_PATH);
+	includedir	  = strdup(IRCDM4_PATH);
 	includedirptr = strrchr(includedir, '/');
 	if (includedirptr)
 		*includedirptr = '\0';
@@ -1476,14 +1476,14 @@ char *ipv6_convert(char *orig)
 
 	if ((s = strchr(orig, '@')))
 	{
-		*s = '\0';
+		*s	= '\0';
 		len = strlen(orig) + 2; /* +2 for '@' and '\0' */
 		buf = (char *) MyMalloc(len);
 		(void *) strcpy(buf, orig);
 		buf[len - 2] = '@';
 		buf[len - 1] = '\0';
-		*s = '@';
-		orig = s + 1;
+		*s			 = '@';
+		orig		 = s + 1;
 	}
 
 	if ((s = strchr(orig, '/')))
@@ -1510,9 +1510,9 @@ char *ipv6_convert(char *orig)
 	if (s)
 	{
 		*(s - 1) = '/'; /* put the '/' back, not sure it's needed tho */
-		j = len;
+		j		 = len;
 		len += strlen(s) + 1;
-		buf = (char *) MyRealloc(buf, len);
+		buf		   = (char *) MyRealloc(buf, len);
 		buf[j - 1] = '/';
 		strcpy(buf + j, s);
 	}
@@ -2079,12 +2079,12 @@ int initconf(int opt)
 		if (aconf->status & (CONF_KILL | CONF_OTHERKILL))
 		{
 			aconf->next = kconf;
-			kconf = aconf;
+			kconf		= aconf;
 		}
 		else
 		{
 			aconf->next = conf;
-			conf = aconf;
+			conf		= aconf;
 		}
 		aconf = NULL;
 	}
@@ -2136,7 +2136,7 @@ static int lookup_confhost(aConfItem *aconf)
 	** reply which we get later and store away.
 	*/
 	ln.value.aconf = aconf;
-	ln.flags = ASYNC_CONF;
+	ln.flags	   = ASYNC_CONF;
 
 #ifdef INET6
 	if (inetpton(AF_INET6, s, aconf->ipnum.s6_addr))
@@ -2381,7 +2381,7 @@ static int check_time_interval(char *interval, char *reply)
 	int now, perm_min, perm_max;
 
 	tptr = localtime(&timeofday);
-	now = tptr->tm_hour * 60 + tptr->tm_min;
+	now	 = tptr->tm_hour * 60 + tptr->tm_min;
 
 	while (interval)
 	{
@@ -2548,7 +2548,7 @@ aConfItem *find_denied(char *name, int class)
 		if (aconf->host)
 		{
 			aServer *asptr;
-			char *host = aconf->host;
+			char *host	 = aconf->host;
 			int reversed = 0;
 
 			if (*host == '!')
@@ -2659,12 +2659,12 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 	}
 	if (aconf == NULL)
 	{
-		aconf = make_conf();
-		aconf->next = NULL;
+		aconf		  = make_conf();
+		aconf->next	  = NULL;
 		aconf->status = status;
-		aconf->hold = timeofday + time;
-		aconf->port = 0;
-		Class(aconf) = find_class(0);
+		aconf->hold	  = timeofday + time;
+		aconf->port	  = 0;
+		Class(aconf)  = find_class(0);
 		DupString(aconf->name, BadTo(user));
 		DupString(aconf->host, BadTo(host));
 		DupString(aconf->passwd, reason);
@@ -2797,12 +2797,12 @@ int prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		if (time < 0) /* overflown, must have wanted bignum :) */
 			time = TKLINE_MAXTIME;
 #endif
-		user = parv[2];
+		user   = parv[2];
 		reason = parv[3];
 	}
 	else
 	{
-		user = parv[1];
+		user   = parv[1];
 		reason = parv[2];
 	}
 	host = strchr(user, '@');
@@ -2900,7 +2900,7 @@ badkline:
 						 sptr->user ? sptr->user->username : "",
 						 sptr->user ? "@" : "",
 						 sptr->user ? sptr->user->host : "", (int) timeofday);
-		kret = write(kfd, kbuf, ksize);
+		kret  = write(kfd, kbuf, ksize);
 		close(kfd);
 		if (kret != ksize)
 		{

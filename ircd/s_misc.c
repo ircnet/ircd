@@ -525,7 +525,7 @@ int exit_client(aClient *cptr, aClient *sptr, aClient *from,
 							istat.is_l_myclnt, istat.is_myclnt,
 							timeofday - istat.is_l_myclnt_t);
 				istat.is_l_myclnt_t = timeofday;
-				istat.is_l_myclnt = istat.is_myclnt;
+				istat.is_l_myclnt	= istat.is_myclnt;
 			}
 			/* Send SQUIT message to 2.11 servers to tell them
 			 * the squit reason for rebroadcast on the other side
@@ -628,7 +628,7 @@ int exit_client(aClient *cptr, aClient *sptr, aClient *from,
 		else
 		{
 			const char *c = comment;
-			int i = 0;
+			int i		  = 0;
 			while (*c && *c != ' ')
 				if (*c++ == '.')
 					i++;
@@ -987,9 +987,9 @@ void checklist(void)
 void initstats(void)
 {
 	bzero((char *) &istat, sizeof(istat));
-	istat.is_serv = 1;
-	istat.is_localc = 1; /* me */
-	istat.is_m_users_t = timeofday;
+	istat.is_serv		= 1;
+	istat.is_localc		= 1; /* me */
+	istat.is_m_users_t	= timeofday;
 	istat.is_m_myclnt_t = timeofday;
 	istat.is_l_myclnt_t = timeofday;
 	bzero((char *) &ircst, sizeof(ircst));
@@ -998,11 +998,11 @@ void initstats(void)
 void initruntimeconf(void)
 {
 	memset((char *) &iconf, 0, sizeof(iconf));
-	iconf.aconnect = 1;			 /* default to ON */
-	iconf.split = 1;			 /* ircd starts in split-mode */
-	iconf.caccept = 2;			 /* accept clients when no split */
+	iconf.aconnect		   = 1;	 /* default to ON */
+	iconf.split			   = 1;	 /* ircd starts in split-mode */
+	iconf.caccept		   = 2;	 /* accept clients when no split */
 	iconf.split_minservers = -1; /* must be specified in ircd.conf */
-	iconf.split_minusers = -1;	 /* must be specified in ircd.conf */
+	iconf.split_minusers   = -1; /* must be specified in ircd.conf */
 
 	if ((bootopt & BOOT_STANDALONE))
 	{
@@ -1142,7 +1142,7 @@ void read_motd(char *filename)
 			*tmp = (char) 0;
 		else
 			line[len] = '\0';
-		temp = (aMotd *) MyMalloc(sizeof(aMotd));
+		temp	   = (aMotd *) MyMalloc(sizeof(aMotd));
 		temp->line = mystrdup(line);
 		temp->next = NULL;
 		if (!motd)

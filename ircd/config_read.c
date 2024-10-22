@@ -65,7 +65,7 @@ void config_error(int, char *, int, char *, ...);
 ** calls itself recursively for each #include directive */
 aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 {
-	int linenum = 0;
+	int linenum		   = 0;
 	aConfig *ConfigTop = NULL;
 	aConfig *ConfigCur = NULL;
 	char line[BUFSIZE + 1];
@@ -93,7 +93,7 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 		if (*line == '#' && strncasecmp(line + 1, "include ", 8) == 0)
 		{
 			char *start = line + 9;
-			char *end = line + linelen - 1;
+			char *end	= line + linelen - 1;
 			char file[FILEMAX + 1];
 			char *filep = file;
 			char *savefilep;
@@ -183,13 +183,13 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 			continue;
 		}
 	eatline:
-		new = (aConfig *) MyMalloc(sizeof(aConfig));
+		new		  = (aConfig *) MyMalloc(sizeof(aConfig));
 		new->line = (char *) MyMalloc((linelen + 1) * sizeof(char));
 		memcpy(new->line, line, linelen);
 		new->line[linelen] = '\0';
-		new->linenum = linenum;
-		new->file = curfile;
-		new->next = NULL;
+		new->linenum	   = linenum;
+		new->file		   = curfile;
+		new->next		   = NULL;
 		if (ConfigCur)
 		{
 			ConfigCur->next = new;
@@ -224,7 +224,7 @@ void config_free(aConfig *cnf)
 	}
 	while (cnf)
 	{
-		p = cnf;
+		p	= cnf;
 		cnf = cnf->next;
 		MyFree(p->line);
 		MyFree(p);
@@ -236,10 +236,10 @@ aFile *new_config_file(char *filename, aFile *parent, int fnr)
 {
 	aFile *tmp = (aFile *) MyMalloc(sizeof(aFile));
 
-	tmp->filename = mystrdup(filename);
+	tmp->filename	 = mystrdup(filename);
 	tmp->includeline = fnr;
-	tmp->parent = parent;
-	tmp->next = NULL;
+	tmp->parent		 = parent;
+	tmp->next		 = NULL;
 
 	/* First get to the root of the file tree */
 	while (parent && parent->parent)

@@ -51,7 +51,7 @@ int dopacket(aClient *cptr, char *buffer, int length)
 	Reg char *ch1;
 	Reg char *ch2, *bufptr;
 	aClient *acpt = cptr->acpt;
-	int r = 1;
+	int r		  = 1;
 #ifdef ZIP_LINKS
 	int unzipped = 0;
 #endif
@@ -64,8 +64,8 @@ int dopacket(aClient *cptr, char *buffer, int length)
 	}
 
 	bufptr = cptr->buffer;
-	ch1 = bufptr + cptr->count;
-	ch2 = buffer;
+	ch1	   = bufptr + cptr->count;
+	ch2	   = buffer;
 
 #ifdef ZIP_LINKS
 	while ((length > 0 && ch2) || ((cptr->flags & FLAGS_ZIP) &&
@@ -100,8 +100,8 @@ int dopacket(aClient *cptr, char *buffer, int length)
 			/* uncompressed buffer first */
 			unzipped = length; /* length is register, store
 						  temp in unzipped */
-			ch2 = unzip_packet(cptr, ch2, &unzipped);
-			length = unzipped;
+			ch2		 = unzip_packet(cptr, ch2, &unzipped);
+			length	 = unzipped;
 			unzipped = 1;
 			if (length == -1)
 				return exit_client(cptr, cptr, &me,

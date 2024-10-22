@@ -16,16 +16,16 @@
 #endif
 	int n;					   /* (calculated) size of parameter */
 	int count = 0;			   /* counter of bytes written to buffer */
-	int mult = 0;			   /* multiplicator or shift for numbers */
+	int mult  = 0;			   /* multiplicator or shift for numbers */
 	int radix;				   /* parameter base of numbers (8,10,16) */
-	static int width = 0;	   /* width of pad */
-	static int precision = 0;  /* precision width */
+	static int width	  = 0; /* width of pad */
+	static int precision  = 0; /* precision width */
 	static char plusminus = 0; /* keeps sign (+/- or space) */
-	static int zeropad = 0;	   /* padding with zeroes */
-	static int minus = 0;	   /* padding to left or right */
-	static int unsig = 0;	   /* unsigned mark */
-	static int dotseen = 0;	   /* dot mark, precision mode */
-	static int hash = 0;	   /* #-mark for 0 to octals and 0x to hex */
+	static int zeropad	  = 0; /* padding with zeroes */
+	static int minus	  = 0; /* padding to left or right */
+	static int unsig	  = 0; /* unsigned mark */
+	static int dotseen	  = 0; /* dot mark, precision mode */
+	static int hash		  = 0; /* #-mark for 0 to octals and 0x to hex */
 	unsigned long val;		   /* va_args for ints and longs */
 	unsigned long nqval;	   /* temp for ints and longs */
 #ifndef _NOLONGLONG
@@ -35,7 +35,7 @@
 	const char *tab;  /* pointer to proper ato(o,dd,x) table */
 	register char cc; /* current fmt char */
 	register char nomodifiers = 1;
-	register char ilong = 0; /* long */
+	register char ilong		  = 0; /* long */
 
 #ifdef IRC_SPRINTF_SN
 #define CONT goto farend
@@ -79,7 +79,7 @@
 		{
 			width = zeropad = minus = plusminus = ilong =
 					hash = unsig = dotseen = precision = 0;
-			nomodifiers = 1;
+			nomodifiers								   = 1;
 		}
 
 	chswitch:
@@ -119,7 +119,7 @@
 			{
 				register int fil;
 
-				n = count - n;
+				n	= count - n;
 				fil = width - n;
 				if (fil > 0)
 				{
@@ -145,11 +145,11 @@
 		if (cc == 'd')
 		decimal: {
 			register char *pdtmpbuf = &dtmpbuf[MAXDIGS]; /* pointer inside scratch buffer */
-			register int fil = 0;
+			register int fil		= 0;
 
-			hash = 0;
+			hash  = 0;
 			radix = 10;
-			tab = atod_tab + 2;
+			tab	  = atod_tab + 2;
 		numbers:
 #ifndef _NOLONGLONG
 			if (ilong == 2)
@@ -157,7 +157,7 @@
 				ll_val = va_arg(ap, long long);
 				if (!unsig && (long long) ll_val < 0)
 				{
-					fil = -1;
+					fil	   = -1;
 					ll_val = -(long long) ll_val;
 				}
 				val = ll_val;
@@ -216,10 +216,10 @@
 					{
 						do
 						{
-							ll_nqval = ll_val / 1000;
-							pp = tab + ((ll_val -
-										 (ll_nqval * 1000))
-										<< 2);
+							ll_nqval	= ll_val / 1000;
+							pp			= tab + ((ll_val -
+										  (ll_nqval * 1000))
+										 << 2);
 							*--pdtmpbuf = *pp--;
 							*--pdtmpbuf = *pp--;
 							*--pdtmpbuf = *pp;
@@ -231,10 +231,10 @@
 						   advantage of shifting */
 						do
 						{
-							ll_nqval = ll_val >> mult;
-							pp = tab + ((ll_val -
-										 (ll_nqval << mult))
-										<< 1);
+							ll_nqval	= ll_val >> mult;
+							pp			= tab + ((ll_val -
+										  (ll_nqval << mult))
+										 << 1);
 							*--pdtmpbuf = *pp--;
 							*--pdtmpbuf = *pp;
 						} while ((ll_val = ll_nqval) > 0);
@@ -249,10 +249,10 @@
 					{
 						do
 						{
-							nqval = val / 1000;
-							pp = tab + ((val -
-										 (nqval * 1000))
-										<< 2);
+							nqval		= val / 1000;
+							pp			= tab + ((val -
+										  (nqval * 1000))
+										 << 2);
 							*--pdtmpbuf = *pp--;
 							*--pdtmpbuf = *pp--;
 							*--pdtmpbuf = *pp;
@@ -264,10 +264,10 @@
 						   we take advantage of shifting */
 						do
 						{
-							nqval = val >> mult;
-							pp = tab + ((val -
-										 (nqval << mult))
-										<< 1);
+							nqval		= val >> mult;
+							pp			= tab + ((val -
+										  (nqval << mult))
+										 << 1);
 							*--pdtmpbuf = *pp--;
 							*--pdtmpbuf = *pp;
 						} while ((val = nqval) > 0);
@@ -398,8 +398,8 @@
 		}
 		if (cc == '-')
 		{
-			minus = 1;
-			zeropad = 0;
+			minus		= 1;
+			zeropad		= 0;
 			nomodifiers = 0;
 			goto chswitch;
 		}
@@ -426,8 +426,8 @@
 		{
 			unsig = 1;
 			radix = 16;
-			mult = 8;
-			tab = atox_tab + 1;
+			mult  = 8;
+			tab	  = atox_tab + 1;
 			if (hash)
 				hash = 'x';
 			goto numbers;
@@ -436,8 +436,8 @@
 		{
 			unsig = 1;
 			radix = 16;
-			mult = 8;
-			tab = atoxx_tab + 1;
+			mult  = 8;
+			tab	  = atoxx_tab + 1;
 			if (hash)
 				hash = 'X';
 			goto numbers;
@@ -446,15 +446,15 @@
 		{
 			unsig = 1;
 			radix = 8;
-			mult = 6;
-			tab = atoo_tab + 1;
+			mult  = 6;
+			tab	  = atoo_tab + 1;
 			if (hash)
 				hash = 8;
 			goto numbers;
 		}
 		if (cc == '#')
 		{
-			hash = 1;
+			hash		= 1;
 			nomodifiers = 0;
 			goto chswitch;
 		}
@@ -470,13 +470,13 @@
 		}
 		if (cc == '+')
 		{
-			plusminus = '+';
+			plusminus	= '+';
 			nomodifiers = 0;
 			goto chswitch;
 		}
 		if (cc == ' ')
 		{
-			plusminus = ' ';
+			plusminus	= ' ';
 			nomodifiers = 0;
 			goto chswitch;
 		}
@@ -487,9 +487,9 @@
 				width = va_arg(ap, int);
 				if (width < 0)
 				{
-					minus = 1;
+					minus	= 1;
 					zeropad = 0;
-					width = -width;
+					width	= -width;
 				}
 			}
 			else
@@ -498,7 +498,7 @@
 				if (precision < 0)
 				{
 					precision = 0;
-					dotseen = 0;
+					dotseen	  = 0;
 				}
 			}
 			nomodifiers = 0;
@@ -506,7 +506,7 @@
 		}
 		if (cc == '.')
 		{
-			dotseen = 1;
+			dotseen		= 1;
 			nomodifiers = 0;
 			goto chswitch;
 		}
@@ -559,7 +559,7 @@ farend:
 	if (count >= size)
 	{
 		bufstart[size - 1] = '\0';
-		count = size;
+		count			   = size;
 		break;
 	}
 #endif
@@ -569,7 +569,7 @@ if (!nomodifiers)
 	/* clear them for next sprintf call */
 	width = zeropad = minus = plusminus = ilong =
 			hash = unsig = dotseen = precision = 0;
-	nomodifiers = 1;
+	nomodifiers								   = 1;
 }
 #ifndef IRC_SPRINTF_V
 va_end(ap);

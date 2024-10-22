@@ -67,7 +67,7 @@ struct proxy_private {
 static void proxy_open_proxy(int cl)
 {
 	struct proxy_private *mydata = cldata[cl].instance->data;
-	char *reason = cldata[cl].instance->reason;
+	char *reason				 = cldata[cl].instance->reason;
 
 	if (!reason)
 	{
@@ -122,12 +122,12 @@ static void proxy_add_cache(int cl, int state)
 		mydata->cmax = mydata->cnow;
 	}
 
-	next = mydata->cache;
-	mydata->cache = (struct proxylog *) malloc(sizeof(struct proxylog));
+	next				  = mydata->cache;
+	mydata->cache		  = (struct proxylog *) malloc(sizeof(struct proxylog));
 	mydata->cache->expire = time(NULL) + mydata->lifetime;
 	strcpy(mydata->cache->ip, cldata[cl].itsip);
 	mydata->cache->state = state;
-	mydata->cache->next = next;
+	mydata->cache->next	 = next;
 	DebugLog((ALOG_DSOCKSC, 0,
 			  "webproxy_add_cache(%d): new cache %s, open=%d",
 			  cl, mydata->cache->ip, state));
@@ -248,7 +248,7 @@ static int proxy_write(u_int cl)
 static int proxy_read(u_int cl)
 {
 	struct proxy_private *mydata = cldata[cl].instance->data;
-	u_char state = PROXY_CLOSE;
+	u_char state				 = PROXY_CLOSE;
 
 	/* not enough data from the other end */
 	if (cldata[cl].buflen <
@@ -319,7 +319,7 @@ static char *proxy_init(AnInstance *self)
 
 	mydata = (struct proxy_private *) malloc(sizeof(struct proxy_private));
 	bzero((char *) mydata, sizeof(struct proxy_private));
-	mydata->cache = NULL;
+	mydata->cache	 = NULL;
 	mydata->lifetime = CACHETIME;
 
 	tmpbuf[0] = txtbuf[0] = '\0';

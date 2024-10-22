@@ -153,7 +153,7 @@ static int openconf(void)
 #ifdef HAVE_GNU_M4
 	char *includedir, *includedirptr;
 
-	includedir = strdup(IRCDM4_PATH);
+	includedir	  = strdup(IRCDM4_PATH);
 	includedirptr = strrchr(includedir, '/');
 	if (includedirptr)
 		*includedirptr = '\0';
@@ -235,7 +235,7 @@ static void showconf(void)
 		etclen = strlen(IRCDCONF_DIR);
 	}
 	fdn = fdopen(fd, "r");
-	p2 = config_read(fdn, 0, new_config_file(configfile, NULL, 0));
+	p2	= config_read(fdn, 0, new_config_file(configfile, NULL, 0));
 	for (p = p2; p; p = p->next)
 	{
 		if (debugflag)
@@ -304,8 +304,8 @@ static aConfItem *initconf(void)
 	}
 
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
-	ftop = new_config_file(configfile, NULL, 0);
-	fdn = fdopen(fd, "r");
+	ftop  = new_config_file(configfile, NULL, 0);
+	fdn	  = fdopen(fd, "r");
 	files = ConfigTop = config_read(fdn, 0, ftop);
 	for (filelist = ConfigTop; filelist; filelist = filelist->next)
 #else
@@ -325,10 +325,10 @@ static aConfItem *initconf(void)
 		}
 		else
 			aconf = (aConfItem *) malloc(sizeof(*aconf));
-		aconf->host = (char *) NULL;
+		aconf->host	  = (char *) NULL;
 		aconf->passwd = (char *) NULL;
-		aconf->name = (char *) NULL;
-		aconf->class = (aClass *) NULL;
+		aconf->name	  = (char *) NULL;
+		aconf->class  = (aClass *) NULL;
 		/* abusing clients to store ircd.conf line number */
 		aconf->clients = ++nr;
 
@@ -404,7 +404,7 @@ static aConfItem *initconf(void)
 		}
 
 		aconf->status = CONF_ILLEGAL;
-		aconf->flags = 0L;
+		aconf->flags  = 0L;
 
 		switch (*tmp)
 		{
@@ -762,8 +762,8 @@ static aConfItem *initconf(void)
 		if (aconf->status & (CONF_SERVER_MASK | CONF_HUB | CONF_LEAF))
 		{
 			aconf->next = ctop;
-			ctop = aconf;
-			aconf = NULL;
+			ctop		= aconf;
+			aconf		= NULL;
 		}
 	}
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
@@ -897,7 +897,7 @@ static int dgets(int fd, char *buf, int num)
 	if (!num)
 	{
 		head = tail = dgbuf;
-		*head = '\0';
+		*head		= '\0';
 		return 0;
 	}
 	if (num > sizeof(dgbuf) - 1)
@@ -931,7 +931,7 @@ dgetsagain:
 		goto dgetsreturnbuf;
 	}
 
-	n = sizeof(dgbuf) - (tail - dgbuf) - 1;
+	n  = sizeof(dgbuf) - (tail - dgbuf) - 1;
 	nr = read(fd, tail, n);
 	if (nr == -1)
 	{
@@ -1039,7 +1039,7 @@ static void validate(aConfItem *top)
 			valid++;
 		else
 		{
-			nr = aconf->clients;
+			nr		 = aconf->clients;
 			filelist = findConfLineNumber(nr);
 			config_error(CF_WARN, CK_FILE, CK_LINE,
 						 "unmatched %c%c%s%c%s%c%s",
@@ -1061,13 +1061,13 @@ static int simulateM4Include(struct wordcount *filelist, int nr, char *filename,
 	char *inc;
 #endif
 
-	listnew = (struct wordcount *) malloc(sizeof(struct wordcount));
-	filelist->next = listnew;
-	filelist = filelist->next;
-	filelist->min = nr - fnrmin;
+	listnew			   = (struct wordcount *) malloc(sizeof(struct wordcount));
+	filelist->next	   = listnew;
+	filelist		   = filelist->next;
+	filelist->min	   = nr - fnrmin;
 	filelist->filename = strdup(filename);
-	filelist->max = 0;
-	filelist->next = NULL;
+	filelist->max	   = 0;
+	filelist->next	   = NULL;
 	if ((fd = open(filename, O_RDONLY)) == -1)
 	{
 		perror(filename);
@@ -1096,7 +1096,7 @@ static int simulateM4Include(struct wordcount *filelist, int nr, char *filename,
 				if (inc)
 				{
 					filelist->max = --nr;
-					nr = simulateM4Include(filelist, nr, inc, 0);
+					nr			  = simulateM4Include(filelist, nr, inc, 0);
 					while (filelist->next) filelist = filelist->next;
 					nr = simulateM4Include(filelist, nr, filename, fnr);
 					break;
@@ -1135,11 +1135,11 @@ static void mywc(void)
 
 	/* Dealing with ircd.m4 */
 	files = listtmp = (struct wordcount *) malloc(sizeof(struct wordcount));
-	listtmp->min = 0;
+	listtmp->min	= 0;
 #ifdef M4_PREPROC
 	listtmp->filename = strdup(IRCDM4_PATH);
-	inc = configfile;
-	configfile = 0; /* used to have openconf launch only m4 ircd.m4 */
+	inc				  = configfile;
+	configfile		  = 0; /* used to have openconf launch only m4 ircd.m4 */
 #else
 	listtmp->filename = strdup("ircd.conf");
 #endif
@@ -1158,7 +1158,7 @@ static void mywc(void)
 #ifdef M4_PREPROC
 	(void) wait(0);
 	configfile = inc;
-	nr = simulateM4Include(listtmp, nr, configfile, 0);
+	nr		   = simulateM4Include(listtmp, nr, configfile, 0);
 #endif
 }
 #endif /* CONFIG_DIRECTIVE_INCLUDE */
@@ -1166,7 +1166,7 @@ static void mywc(void)
 static char confchar(u_int status)
 {
 	static char letrs[] = "QIicNCoOMKARYSLPHV";
-	char *s = letrs;
+	char *s				= letrs;
 
 	status &= ~(CONF_MATCH | CONF_ILLEGAL);
 
@@ -1248,7 +1248,7 @@ static char *mystrinclude(char *s, int nr)
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 static aConfig *findConfLineNumber(int nr)
 {
-	int mynr = 1;
+	int mynr   = 1;
 	aConfig *p = files;
 
 	for (; p->next && mynr < nr; p = p->next)

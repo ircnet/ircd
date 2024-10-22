@@ -76,15 +76,15 @@ static char zipbuf[ZIP_BUFFER_SIZE];
 */
 int zip_init(aClient *cptr)
 {
-	cptr->zip = (aZdata *) MyMalloc(sizeof(aZdata));
+	cptr->zip			= (aZdata *) MyMalloc(sizeof(aZdata));
 	cptr->zip->outcount = 0;
 
-	cptr->zip->in = (z_stream *) MyMalloc(sizeof(z_stream));
-	cptr->zip->in->avail_in = 0;
-	cptr->zip->in->total_in = 0;
+	cptr->zip->in			 = (z_stream *) MyMalloc(sizeof(z_stream));
+	cptr->zip->in->avail_in	 = 0;
+	cptr->zip->in->total_in	 = 0;
 	cptr->zip->in->total_out = 0;
-	cptr->zip->in->zalloc = (alloc_func) 0;
-	cptr->zip->in->zfree = (free_func) 0;
+	cptr->zip->in->zalloc	 = (alloc_func) 0;
+	cptr->zip->in->zfree	 = (free_func) 0;
 	cptr->zip->in->data_type = Z_ASCII;
 	if (inflateInit(cptr->zip->in) != Z_OK)
 	{
@@ -92,11 +92,11 @@ int zip_init(aClient *cptr)
 		return -1;
 	}
 
-	cptr->zip->out = (z_stream *) MyMalloc(sizeof(z_stream));
-	cptr->zip->out->total_in = 0;
+	cptr->zip->out			  = (z_stream *) MyMalloc(sizeof(z_stream));
+	cptr->zip->out->total_in  = 0;
 	cptr->zip->out->total_out = 0;
-	cptr->zip->out->zalloc = (alloc_func) 0;
-	cptr->zip->out->zfree = (free_func) 0;
+	cptr->zip->out->zalloc	  = (alloc_func) 0;
+	cptr->zip->out->zfree	  = (free_func) 0;
 	cptr->zip->out->data_type = Z_ASCII;
 	if (deflateInit(cptr->zip->out, ZIP_LEVEL) != Z_OK)
 		return -1;
@@ -146,10 +146,10 @@ char *unzip_packet(aClient *cptr, char *buffer, int *length)
 	}
 	if (*length)
 	{
-		zin->next_in = (Bytef *) buffer;
+		zin->next_in  = (Bytef *) buffer;
 		zin->avail_in = *length;
 	}
-	zin->next_out = (Bytef *) unzipbuf;
+	zin->next_out  = (Bytef *) unzipbuf;
 	zin->avail_out = UNZIP_BUFFER_SIZE;
 	switch (r = inflate(zin, Z_SYNC_FLUSH))
 	{
@@ -223,9 +223,9 @@ char *zip_buffer(aClient *cptr, char *buffer, int *length, int flush)
 					CBurst(cptr))))
 		return NULL;
 
-	zout->next_in = cptr->zip->outbuf;
-	zout->avail_in = cptr->zip->outcount;
-	zout->next_out = (Bytef *) zipbuf;
+	zout->next_in	= cptr->zip->outbuf;
+	zout->avail_in	= cptr->zip->outcount;
+	zout->next_out	= (Bytef *) zipbuf;
 	zout->avail_out = ZIP_BUFFER_SIZE;
 
 	switch (r = deflate(zout, Z_SYNC_FLUSH))
@@ -238,7 +238,7 @@ char *zip_buffer(aClient *cptr, char *buffer, int *length, int flush)
 							"deflate() didn't process all available data!");
 			}
 			cptr->zip->outcount = 0;
-			*length = ZIP_BUFFER_SIZE - zout->avail_out;
+			*length				= ZIP_BUFFER_SIZE - zout->avail_out;
 			return zipbuf;
 
 		default: /* error ! */

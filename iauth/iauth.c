@@ -45,7 +45,7 @@ static RETSIGTYPE dummy(int s)
 	struct sigaction act;
 
 	act.sa_handler = dummy;
-	act.sa_flags = 0;
+	act.sa_flags   = 0;
 	(void) sigemptyset(&act.sa_mask);
 	(void) sigaddset(&act.sa_mask, SIGALRM);
 	(void) sigaddset(&act.sa_mask, SIGPIPE);
@@ -67,7 +67,7 @@ static RETSIGTYPE s_log(int s)
 	struct sigaction act;
 
 	act.sa_handler = s_log;
-	act.sa_flags = 0;
+	act.sa_flags   = 0;
 	(void) sigemptyset(&act.sa_mask);
 	(void) sigaddset(&act.sa_mask, SIGUSR2);
 	(void) sigaction(SIGUSR2, &act, NULL);
@@ -84,7 +84,7 @@ static void init_signals(void)
 	struct sigaction act;
 
 	act.sa_handler = SIG_IGN;
-	act.sa_flags = 0;
+	act.sa_flags   = 0;
 	(void) sigemptyset(&act.sa_mask);
 	(void) sigaddset(&act.sa_mask, SIGPIPE);
 	(void) sigaddset(&act.sa_mask, SIGALRM);

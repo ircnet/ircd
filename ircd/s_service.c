@@ -48,7 +48,7 @@ aService *make_service(aClient *cptr)
 		svctop->prevs = svc;
 	svc->nexts = svctop;
 	svc->prevs = NULL; /* useless */
-	svctop = svc;
+	svctop	   = svc;
 	return svc;
 }
 
@@ -343,7 +343,7 @@ int m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (IsServer(cptr))
 	{
 		acptr = make_client(cptr);
-		svc = make_service(acptr);
+		svc	  = make_service(acptr);
 		add_client_to_list(acptr);
 		strncpyzt(acptr->service->namebuf, parv[1],
 				  sizeof(acptr->service->namebuf));
@@ -351,7 +351,7 @@ int m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* 2.11 protocol - :SID SERVICE ..
 		 * - we know that the sptr contains the correct server */
 		acptr->hopcount = sptr->hopcount;
-		sp = sptr->serv;
+		sp				= sptr->serv;
 
 		if (sp == NULL)
 		{
@@ -384,10 +384,10 @@ int m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		char **isup = isupport;
 
-		svc = make_service(sptr);
+		svc			   = make_service(sptr);
 		sptr->hopcount = 0;
-		server = ME;
-		sp = me.serv;
+		server		   = ME;
+		sp			   = me.serv;
 		if (!do_nick_name(parv[1], 0))
 		{
 			sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME],
@@ -468,8 +468,8 @@ int m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		MyFree(acptr->info);
 	if (strlen(info) > REALLEN) info[REALLEN] = '\0';
 	acptr->info = mystrdup(info);
-	svc->wants = 0;
-	svc->type = type;
+	svc->wants	= 0;
+	svc->type	= type;
 	reorder_client_in_list(acptr);
 	(void) add_to_client_hash_table(acptr->name, acptr);
 
@@ -509,7 +509,7 @@ int m_servlist(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg aService *sp;
 	Reg aClient *acptr;
 	char *mask = BadPtr(parv[1]) ? "*" : parv[1];
-	int type = 0;
+	int type   = 0;
 
 	if (parc > 2)
 		type = BadPtr(parv[2]) ? 0 : strtol(parv[2], NULL, 0);
@@ -654,7 +654,7 @@ int m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			if (burst & SERVICE_WANT_MODE)
 			{
 				*modebuf = *parabuf = '\0';
-				modebuf[1] = '\0';
+				modebuf[1]			= '\0';
 				channel_modes(&me, modebuf, parabuf, chptr);
 				sendto_one(sptr, "MODE %s %s", chptr->chname,
 						   modebuf);

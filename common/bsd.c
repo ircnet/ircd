@@ -46,7 +46,7 @@ RETSIGTYPE dummy(int s)
 	struct sigaction act;
 
 	act.sa_handler = dummy;
-	act.sa_flags = 0;
+	act.sa_flags   = 0;
 	(void) sigemptyset(&act.sa_mask);
 	(void) sigaddset(&act.sa_mask, SIGALRM);
 	(void) sigaddset(&act.sa_mask, SIGPIPE);
@@ -85,7 +85,7 @@ RETSIGTYPE dummy(int s)
 int deliver_it(aClient *cptr, char *str, int len)
 {
 	int retval;
-	aClient *acpt = cptr->acpt;
+	aClient *acpt  = cptr->acpt;
 	int savederrno = 0;
 
 #ifdef DEBUGMODE

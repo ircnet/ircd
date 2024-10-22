@@ -311,7 +311,7 @@ int send_queued(aClient *to)
 			** uncompressed and try to send it too
 			*/
 			more = 0;
-			msg = zip_buffer(to, NULL, &len, 1);
+			msg	 = zip_buffer(to, NULL, &len, 1);
 
 			if (len == -1)
 				return dead_link(to,
@@ -344,14 +344,14 @@ void initanonymous(void)
 	ausr.server = "anonymous.";
 
 	memset(&anon, 0, sizeof(aClient));
-	anon.user = &ausr;
-	anon.from = &anon;
-	anon.fd = -2;
+	anon.user	= &ausr;
+	anon.from	= &anon;
+	anon.fd		= -2;
 	anon.status = STAT_CLIENT;
-	anon.name = anon.namebuf;
+	anon.name	= anon.namebuf;
 	strcpy(anon.namebuf, "anonymous");
 	strcpy(anon.username, "anonymous");
-	anon.info = "anonymous identity hider";
+	anon.info  = "anonymous identity hider";
 	anon.exitc = EXITC_UNDEF;
 }
 
@@ -372,7 +372,7 @@ static int vsendprep(char *pattern, va_list va)
 	sendbuf[len++] = '\r';
 #endif
 	sendbuf[len++] = '\n';
-	sendbuf[len] = '\0';
+	sendbuf[len]   = '\0';
 	return len;
 }
 
@@ -414,7 +414,7 @@ static int vsendpreprep(aClient *to, aClient *from, char *pattern, va_list va)
 	psendbuf[len++] = '\r';
 #endif
 	psendbuf[len++] = '\n';
-	psendbuf[len] = '\0';
+	psendbuf[len]	= '\0';
 	return len;
 }
 
@@ -452,7 +452,7 @@ void sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr,
 {
 	Reg Link *lp;
 	Reg aClient *acptr, *lfrm = from;
-	int len1, len2 = 0;
+	int len1, len2			  = 0;
 
 	if (IsAnonymous(chptr) && IsClient(from))
 	{

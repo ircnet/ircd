@@ -192,7 +192,7 @@ static int rfc931_work(u_int cl)
 		u_char bad = 0;
 
 		cldata[cl].inbuffer[cldata[cl].buflen] = '\0';
-		ch = index(cldata[cl].inbuffer, '\r');
+		ch									   = index(cldata[cl].inbuffer, '\r');
 		if (ch)
 		{
 			/* got all of it! */

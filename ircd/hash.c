@@ -26,10 +26,10 @@ static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.57 2008/06/15 00:57:37
 #include "s_externs.h"
 #undef HASH_C
 
-static aHashEntry *clientTable = NULL;
-static aHashEntry *uidTable = NULL;
+static aHashEntry *clientTable	= NULL;
+static aHashEntry *uidTable		= NULL;
 static aHashEntry *channelTable = NULL;
-static aHashEntry *sidTable = NULL;
+static aHashEntry *sidTable		= NULL;
 #ifdef USE_HOSTHASH
 static aHashEntry *hostnameTable = NULL;
 #endif
@@ -43,12 +43,12 @@ static int chhits = 0, chmiss = 0, chsize = 0;
 static int sidhits = 0, sidmiss = 0, sidsize = 0;
 static int cnhits = 0, cnmiss = 0, cnsize = 0;
 static int iphits = 0, ipmiss = 0, ipsize = 0;
-int _HASHSIZE = 0;
-int _UIDSIZE = 0;
-int _CHANNELHASHSIZE = 0;
-int _SIDSIZE = 0;
+int _HASHSIZE		  = 0;
+int _UIDSIZE		  = 0;
+int _CHANNELHASHSIZE  = 0;
+int _SIDSIZE		  = 0;
 int _HOSTNAMEHASHSIZE = 0;
-int _IPHASHSIZE = 0;
+int _IPHASHSIZE		  = 0;
 
 /*
  * Hashing.
@@ -162,7 +162,7 @@ static u_int hash_channel_name(char *hname, u_int *store, int shortname)
 {
 	Reg u_char *name = (u_char *) hname;
 	Reg u_char ch;
-	Reg int i = 30;
+	Reg int i	   = 30;
 	Reg u_int hash = 5;
 
 	if (*name == '!' && shortname == 0)
@@ -186,7 +186,7 @@ static u_int hash_host_name(char *hname, u_int *store)
 {
 
 	Reg u_char *name = (u_char *) hname;
-	Reg u_int hash = 0;
+	Reg u_int hash	 = 0;
 
 	for (; *name; name++)
 	{
@@ -244,7 +244,7 @@ static int bigger_prime(int size)
 	for (;; size += 2) /* ...no point checking even numbers - Core */
 	{
 		failure = 0;
-		sq = (int) sqrt((double) size);
+		sq		= (int) sqrt((double) size);
 		for (trial = 3; trial <= sq; trial += 2)
 		{
 			if ((size % trial) == 0)
@@ -267,9 +267,9 @@ static int bigger_prime(int size)
 static void clear_client_hash_table(int size)
 {
 	_HASHSIZE = bigger_prime(size);
-	clhits = 0;
-	clmiss = 0;
-	clsize = 0;
+	clhits	  = 0;
+	clmiss	  = 0;
+	clsize	  = 0;
 	if (!clientTable)
 		clientTable = (aHashEntry *) MyMalloc(_HASHSIZE *
 											  sizeof(aHashEntry));
@@ -281,9 +281,9 @@ static void clear_client_hash_table(int size)
 static void clear_uid_hash_table(int size)
 {
 	_UIDSIZE = bigger_prime(size);
-	uidhits = 0;
-	uidmiss = 0;
-	uidsize = 0;
+	uidhits	 = 0;
+	uidmiss	 = 0;
+	uidsize	 = 0;
 	if (!uidTable)
 		uidTable = (aHashEntry *) MyMalloc(_UIDSIZE *
 										   sizeof(aHashEntry));
@@ -294,9 +294,9 @@ static void clear_uid_hash_table(int size)
 static void clear_channel_hash_table(int size)
 {
 	_CHANNELHASHSIZE = bigger_prime(size);
-	chmiss = 0;
-	chhits = 0;
-	chsize = 0;
+	chmiss			 = 0;
+	chhits			 = 0;
+	chsize			 = 0;
 	if (!channelTable)
 		channelTable = (aHashEntry *) MyMalloc(_CHANNELHASHSIZE *
 											   sizeof(aHashEntry));
@@ -309,9 +309,9 @@ static void clear_channel_hash_table(int size)
 static void clear_sid_hash_table(int size)
 {
 	_SIDSIZE = bigger_prime(size);
-	sidhits = 0;
-	sidmiss = 0;
-	sidsize = 0;
+	sidhits	 = 0;
+	sidmiss	 = 0;
+	sidsize	 = 0;
 	if (!sidTable)
 		sidTable = (aHashEntry *) MyMalloc(_SIDSIZE *
 										   sizeof(aHashEntry));
@@ -323,9 +323,9 @@ static void clear_sid_hash_table(int size)
 static void clear_hostname_hash_table(int size)
 {
 	_HOSTNAMEHASHSIZE = bigger_prime(size);
-	cnhits = 0;
-	cnmiss = 0;
-	cnsize = 0;
+	cnhits			  = 0;
+	cnmiss			  = 0;
+	cnsize			  = 0;
 	if (!hostnameTable)
 		hostnameTable = (aHashEntry *) MyMalloc(_HOSTNAMEHASHSIZE *
 												sizeof(aHashEntry));
@@ -339,9 +339,9 @@ static void clear_hostname_hash_table(int size)
 static void clear_ip_hash_table(int size)
 {
 	_IPHASHSIZE = bigger_prime(size);
-	iphits = 0;
-	ipmiss = 0;
-	ipsize = 0;
+	iphits		= 0;
+	ipmiss		= 0;
+	ipsize		= 0;
 	if (!ipTable)
 		ipTable = (aHashEntry *) MyMalloc(_IPHASHSIZE *
 										  sizeof(aHashEntry));
@@ -384,7 +384,7 @@ static void bigger_hash_table(int *size, aHashEntry *table, int new)
 	Reg aChannel *chptr;
 	Reg aServer *sptr;
 	aHashEntry *otab = table;
-	int osize = *size;
+	int osize		 = *size;
 
 	while (!new || new <= osize)
 		if (!new)
@@ -409,9 +409,9 @@ static void bigger_hash_table(int *size, aHashEntry *table, int new)
 			   osize, new, chsize));
 		sendto_flag(SCH_HASH, "Channel Hash Table from %d to %d (%d)",
 					osize, new, chsize);
-		chmiss = 0;
-		chhits = 0;
-		chsize = 0;
+		chmiss		 = 0;
+		chhits		 = 0;
+		chsize		 = 0;
 		channelTable = table;
 		for (chptr = channel; chptr; chptr = chptr->nextch)
 			(void) add_to_channel_hash_table(chptr->chname, chptr);
@@ -425,9 +425,9 @@ static void bigger_hash_table(int *size, aHashEntry *table, int new)
 			   osize, new, clsize));
 		sendto_flag(SCH_HASH, "Client Hash Table from %d to %d (%d)",
 					osize, new, clsize);
-		clmiss = 0;
-		clhits = 0;
-		clsize = 0;
+		clmiss		= 0;
+		clhits		= 0;
+		clsize		= 0;
 		clientTable = table;
 
 		for (i = 0; i < osize; i++)
@@ -448,9 +448,9 @@ static void bigger_hash_table(int *size, aHashEntry *table, int new)
 			   osize, new, uidsize));
 		sendto_flag(SCH_HASH, "uid Hash Table from %d to %d (%d)",
 					osize, new, uidsize);
-		uidmiss = 0;
-		uidhits = 0;
-		uidsize = 0;
+		uidmiss	 = 0;
+		uidhits	 = 0;
+		uidsize	 = 0;
 		uidTable = table;
 		for (cptr = client; cptr; cptr = cptr->next)
 			if (cptr->user)
@@ -469,9 +469,9 @@ static void bigger_hash_table(int *size, aHashEntry *table, int new)
 			   osize, new, clsize));
 		sendto_flag(SCH_HASH, "Hostname Hash Table from %d to %d (%d)",
 					osize, new, clsize);
-		cnmiss = 0;
-		cnhits = 0;
-		cnsize = 0;
+		cnmiss		  = 0;
+		cnhits		  = 0;
+		cnsize		  = 0;
 		hostnameTable = table;
 
 		for (i = 0; i < osize; i++)
@@ -493,9 +493,9 @@ static void bigger_hash_table(int *size, aHashEntry *table, int new)
 			   osize, new, sidsize));
 		sendto_flag(SCH_HASH, "sid Hash Table from %d to %d (%d)",
 					osize, new, sidsize);
-		sidmiss = 0;
-		sidhits = 0;
-		sidsize = 0;
+		sidmiss	 = 0;
+		sidhits	 = 0;
+		sidsize	 = 0;
 		sidTable = table;
 		for (sptr = svrtop; sptr; sptr = sptr->nexts)
 		{
@@ -516,9 +516,9 @@ static void bigger_hash_table(int *size, aHashEntry *table, int new)
 			   osize, new, clsize));
 		sendto_flag(SCH_HASH, "IP Hash Table from %d to %d (%d)",
 					osize, new, clsize);
-		ipmiss = 0;
-		iphits = 0;
-		ipsize = 0;
+		ipmiss	= 0;
+		iphits	= 0;
+		ipsize	= 0;
 		ipTable = table;
 
 		for (i = 0; i < osize; i++)
@@ -545,8 +545,8 @@ int add_to_client_hash_table(char *name, aClient *cptr)
 {
 	Reg u_int hashv;
 
-	hashv = hash_nick_name(name, &cptr->hashv);
-	cptr->hnext = (aClient *) clientTable[hashv].list;
+	hashv					= hash_nick_name(name, &cptr->hashv);
+	cptr->hnext				= (aClient *) clientTable[hashv].list;
 	clientTable[hashv].list = (void *) cptr;
 	clientTable[hashv].links++;
 	clientTable[hashv].hits++;
@@ -563,8 +563,8 @@ int add_to_uid_hash_table(char *uid, aClient *cptr)
 {
 	Reg u_int hashv;
 
-	hashv = hash_uid(uid, &cptr->user->hashv);
-	cptr->user->uhnext = (aClient *) uidTable[hashv].list;
+	hashv				 = hash_uid(uid, &cptr->user->hashv);
+	cptr->user->uhnext	 = (aClient *) uidTable[hashv].list;
 	uidTable[hashv].list = (void *) cptr;
 	uidTable[hashv].links++;
 	uidTable[hashv].hits++;
@@ -581,8 +581,8 @@ int add_to_channel_hash_table(char *name, aChannel *chptr)
 {
 	Reg u_int hashv;
 
-	hashv = hash_channel_name(name, &chptr->hashv, 0);
-	chptr->hnextch = (aChannel *) channelTable[hashv].list;
+	hashv					 = hash_channel_name(name, &chptr->hashv, 0);
+	chptr->hnextch			 = (aChannel *) channelTable[hashv].list;
 	channelTable[hashv].list = (void *) chptr;
 	channelTable[hashv].links++;
 	channelTable[hashv].hits++;
@@ -600,7 +600,7 @@ int add_to_sid_hash_table(char *sid, aClient *cptr)
 {
 	Reg u_int hashv;
 
-	hashv = hash_sid(sid, &cptr->serv->sidhashv);
+	hashv				 = hash_sid(sid, &cptr->serv->sidhashv);
 	cptr->serv->sidhnext = (aServer *) sidTable[hashv].list;
 	sidTable[hashv].list = (void *) cptr->serv;
 	sidTable[hashv].links++;
@@ -621,8 +621,8 @@ int add_to_hostname_hash_table(char *hostname, anUser *user)
 {
 	Reg u_int hashv;
 
-	hashv = hash_host_name(hostname, &user->hhashv);
-	user->hhnext = (anUser *) hostnameTable[hashv].list;
+	hashv					  = hash_host_name(hostname, &user->hhashv);
+	user->hhnext			  = (anUser *) hostnameTable[hashv].list;
 	hostnameTable[hashv].list = (void *) user;
 	hostnameTable[hashv].links++;
 	hostnameTable[hashv].hits++;
@@ -641,8 +641,8 @@ int add_to_ip_hash_table(char *ip, anUser *user)
 {
 	Reg u_int hashv;
 
-	hashv = hash_ip(ip, &user->iphashv);
-	user->iphnext = (anUser *) ipTable[hashv].list;
+	hashv				= hash_ip(ip, &user->iphashv);
+	user->iphnext		= (anUser *) ipTable[hashv].list;
 	ipTable[hashv].list = (void *) user;
 	ipTable[hashv].links++;
 	ipTable[hashv].hits++;
@@ -916,7 +916,7 @@ aClient *hash_find_client(char *name, aClient *cptr)
 	int count = 0;
 
 	hashv = hash_nick_name(name, &hv);
-	tmp3 = &clientTable[hashv];
+	tmp3  = &clientTable[hashv];
 
 	/*
 	 * Got the bucket, now search the chain.
@@ -970,7 +970,7 @@ aClient *hash_find_uid(char *uid, aClient *cptr)
 	int count = 0;
 
 	hashv = hash_uid(uid, &hv);
-	tmp3 = &uidTable[hashv];
+	tmp3  = &uidTable[hashv];
 
 	/*
 	 * Got the bucket, now search the chain.
@@ -1026,7 +1026,7 @@ aClient *hash_find_server(char *server, aClient *cptr)
 	int count = 0;
 
 	hashv = hash_nick_name(server, &hv);
-	tmp3 = &clientTable[hashv];
+	tmp3  = &clientTable[hashv];
 
 	for (tmp = (aClient *) tmp3->list; tmp; prv = tmp, tmp = tmp->hnext)
 	{
@@ -1098,7 +1098,7 @@ aChannel *hash_find_channel(char *name, aChannel *chptr)
 	int count = 0;
 
 	hashv = hash_channel_name(name, &hv, 0);
-	tmp3 = &channelTable[hashv];
+	tmp3  = &channelTable[hashv];
 
 	for (tmp = (aChannel *) tmp3->list; tmp; prv = tmp, tmp = tmp->hnextch)
 	{
@@ -1143,12 +1143,12 @@ aChannel *hash_find_channels(char *name, aChannel *chptr)
 		aHashEntry *tmp3;
 
 		hashv = hash_channel_name(name, &hv, 1);
-		tmp3 = &channelTable[hashv];
+		tmp3  = &channelTable[hashv];
 		chptr = (aChannel *) tmp3->list;
 	}
 	else
 	{
-		hv = chptr->hashv;
+		hv	  = chptr->hashv;
 		chptr = chptr->hnextch;
 	}
 
@@ -1178,7 +1178,7 @@ aClient *hash_find_sid(char *sid, aClient *cptr)
 	int count = 0;
 
 	hashv = hash_sid(sid, &hv);
-	tmp3 = &sidTable[hashv];
+	tmp3  = &sidTable[hashv];
 
 	for (tmp = (aServer *) tmp3->list; tmp; prv = tmp, tmp = tmp->sidhnext)
 	{
@@ -1209,7 +1209,7 @@ anUser *hash_find_hostname(char *hostname, anUser *user)
 	int count = 0;
 
 	hashv = hash_host_name(hostname, &hv);
-	tmp3 = &hostnameTable[hashv];
+	tmp3  = &hostnameTable[hashv];
 
 	for (tmp = (anUser *) tmp3->list; tmp; prv = tmp, tmp = tmp->hhnext)
 	{
@@ -1241,7 +1241,7 @@ anUser *hash_find_ip(char *ip, anUser *user)
 	int count = 0;
 
 	hashv = hash_ip(ip, &hv);
-	tmp3 = &ipTable[hashv];
+	tmp3  = &ipTable[hashv];
 
 	for (tmp = (anUser *) tmp3->list; tmp; prv = tmp, tmp = tmp->iphnext)
 	{
@@ -1292,7 +1292,7 @@ static void show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables,
 	aChannel *chptr;
 
 	htab = *(HashTables[shash].table);
-	tab = &htab[bucket];
+	tab	 = &htab[bucket];
 
 	/* Nothing in bucket, skip */
 	if (!tab->links)
@@ -1392,7 +1392,7 @@ static void show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables,
 int m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aHashEntry *hashtab = NULL, *tab;
-	int shash = -1, i, l;
+	int shash			= -1, i, l;
 	int deepest = 0, deeplink = 0, totlink = 0, mosthits = 0, mosthit = 0;
 	int tothits = 0, used = 0, used_now = 0, link_pop[11];
 
@@ -1454,7 +1454,7 @@ int m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		if (parv[1][0] == HashTables[i].hash)
 		{
-			shash = i;
+			shash	= i;
 			hashtab = *(HashTables[i].table);
 			break;
 		}
@@ -1537,7 +1537,7 @@ int m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	for (i = 0; i < *(HashTables[shash].size); i++)
 	{
 		tab = &hashtab[i];
-		l = tab->links;
+		l	= tab->links;
 		/* How populated buckets are... */
 		if (l > 0)
 		{
@@ -1553,7 +1553,7 @@ int m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			totlink += l;
 			if (l > deepest)
 			{
-				deepest = l;
+				deepest	 = l;
 				deeplink = i;
 			}
 		}
@@ -1570,7 +1570,7 @@ int m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			if (l > mosthits)
 			{
 				mosthits = l;
-				mosthit = i;
+				mosthit	 = i;
 			}
 		}
 	}

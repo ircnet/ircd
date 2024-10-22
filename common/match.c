@@ -195,8 +195,8 @@ int match(char *mask, char *name)
 			while (*m == '*')
 				m++;
 			wild = 1;
-			ma = (char *) m;
-			na = (char *) n;
+			ma	 = (char *) m;
+			na	 = (char *) n;
 		}
 
 		if (!*m)
@@ -326,7 +326,7 @@ int myncmp(char *str1, char *str2, int n)
 int isvalidusername(char *username)
 {
 	Reg char *ch;
-	int an = 0;
+	int an	= 0;
 	int nan = 0;
 
 	ch = username;

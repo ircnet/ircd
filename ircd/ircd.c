@@ -40,30 +40,30 @@ static RETSIGTYPE s_slave(int s);
 istat_t istat;
 iconf_t iconf;
 char **myargv;
-int rehashed = 0;
-int portnum = -1;						   /* Server port number, listening this */
-char *configfile = IRCDCONF_PATH;		   /* Server configuration file */
-int debuglevel = -1;					   /* Server debug level */
-int bootopt = BOOT_PROT | BOOT_STRICTPROT; /* Server boot option flags */
-int serverbooting = 1;
-int firstrejoindone = 0; /* Server rejoined the network after
+int rehashed		= 0;
+int portnum			= -1;						   /* Server port number, listening this */
+char *configfile	= IRCDCONF_PATH;			   /* Server configuration file */
+int debuglevel		= -1;						   /* Server debug level */
+int bootopt			= BOOT_PROT | BOOT_STRICTPROT; /* Server boot option flags */
+int serverbooting	= 1;
+int firstrejoindone = 0;  /* Server rejoined the network after
 					   start */
-char *debugmode = "";	 /*  -"-    -"-   -"-   -"- */
-char *sbrk0;			 /* initial sbrk(0) */
-char *tunefile = IRCDTUNE_PATH;
-volatile static int dorehash = 0,
-					dorestart = 0,
+char *debugmode		= ""; /*  -"-    -"-   -"-   -"- */
+char *sbrk0;			  /* initial sbrk(0) */
+char *tunefile					  = IRCDTUNE_PATH;
+volatile static int dorehash	  = 0,
+					dorestart	  = 0,
 					restart_iauth = 0;
 
 #ifdef DELAY_CLOSE
 time_t nextdelayclose = 0; /* time for next delayed close */
 #endif
-time_t nextconnect = 1;	   /* time for next try_connections call */
-time_t nextgarbage = 1;	   /* time for next collect_channel_garbage call*/
-time_t nextping = 1;	   /* same as above for check_pings() */
-time_t nextdnscheck = 0;   /* next time to poll dns to force timeouts */
-time_t nextexpire = 1;	   /* next expire run on the dns cache */
-time_t nextiarestart = 1;  /* next time to check if iauth is alive */
+time_t nextconnect	  = 1; /* time for next try_connections call */
+time_t nextgarbage	  = 1; /* time for next collect_channel_garbage call*/
+time_t nextping		  = 1; /* same as above for check_pings() */
+time_t nextdnscheck	  = 0; /* next time to poll dns to force timeouts */
+time_t nextexpire	  = 1; /* next expire run on the dns cache */
+time_t nextiarestart  = 1; /* next time to check if iauth is alive */
 time_t nextpreference = 1; /* time for next calculate_preference call */
 #ifdef TKLINE
 time_t nexttkexpire = 0; /* time for next tkline_expire call */
@@ -107,7 +107,7 @@ static RETSIGTYPE s_slave(int s)
 	struct sigaction act;
 
 	act.sa_handler = s_slave;
-	act.sa_flags = 0;
+	act.sa_flags   = 0;
 	(void) sigemptyset(&act.sa_mask);
 	(void) sigaddset(&act.sa_mask, SIGUSR1);
 	(void) sigaction(SIGUSR1, &act, NULL);
@@ -124,7 +124,7 @@ static RETSIGTYPE s_rehash(int s)
 	struct sigaction act;
 
 	act.sa_handler = s_rehash;
-	act.sa_flags = 0;
+	act.sa_flags   = 0;
 	(void) sigemptyset(&act.sa_mask);
 	(void) sigaddset(&act.sa_mask, SIGHUP);
 	(void) sigaction(SIGHUP, &act, NULL);
@@ -154,7 +154,7 @@ RETSIGTYPE s_restart(int s)
 	struct sigaction act;
 
 	act.sa_handler = s_restart;
-	act.sa_flags = 0;
+	act.sa_flags   = 0;
 	(void) sigemptyset(&act.sa_mask);
 	(void) sigaddset(&act.sa_mask, SIGINT);
 	(void) sigaction(SIGINT, &act, NULL);
@@ -233,7 +233,7 @@ static time_t try_connections(time_t currenttime)
 	time_t next = 0;
 	aClass *cltmp;
 	aConfItem *con_conf = NULL;
-	int allheld = 1;
+	int allheld			= 1;
 #ifdef DISABLE_DOUBLE_CONNECTS
 	int i;
 #endif
@@ -274,7 +274,7 @@ static time_t try_connections(time_t currenttime)
 			continue;
 
 		/* next possible check after connfreq secs for this C-line */
-		confrq = get_con_freq(cltmp);
+		confrq		= get_con_freq(cltmp);
 		aconf->hold = currenttime + confrq;
 
 		/* is this server already connected? */
@@ -415,14 +415,14 @@ time_t calculate_preference(time_t currenttime)
 		}
 		else
 		{
-			f = (double) cp->recvd / (double) cp->seq;
+			f  = (double) cp->recvd / (double) cp->seq;
 			f2 = pow(f, (double) 20.0);
 			if (f2 < (double) 0.001)
 				f = (double) 0.001;
 			else
 				f = f2;
 			f2 = (double) cp->ping / (double) cp->recvd;
-			f = f2 / f;
+			f  = f2 / f;
 			if (f > 100000.0)
 				f = 100000.0;
 			aconf->pref = (u_int) (f * (double) 100.0);
@@ -447,9 +447,9 @@ static int delayed_kills(time_t currenttime)
 	if (dk_rehashed == 0)
 	{
 		dk_rehashed = currenttime;
-		dk_checked = 0;
-		dk_killed = 0;
-		dk_lastfd = highest_fd;
+		dk_checked	= 0;
+		dk_killed	= 0;
+		dk_lastfd	= highest_fd;
 	}
 #ifdef MAXDELAYEDKILLS
 	/* checking only this many clients each time */
@@ -460,7 +460,7 @@ static int delayed_kills(time_t currenttime)
 
 	for (i = dk_lastfd; i >= j; i--)
 	{
-		int kflag = 0;
+		int kflag	 = 0;
 		char *reason = NULL;
 
 		if (!(cptr = local[i]) || !IsPerson(cptr))
@@ -519,11 +519,11 @@ static time_t check_pings(time_t currenttime)
 	static time_t lkill = 0;
 #endif
 	Reg aClient *cptr;
-	Reg int kflag = 0;
+	Reg int kflag	= 0;
 	aClient *bysptr = NULL;
-	int ping = 0, i;
-	time_t oldest = 0, timeout;
-	char *reason = NULL;
+	int ping		= 0, i;
+	time_t oldest	= 0, timeout;
+	char *reason	= NULL;
 
 	for (i = highest_fd; i >= 0; i--)
 	{
@@ -531,7 +531,7 @@ static time_t check_pings(time_t currenttime)
 			continue;
 
 #ifdef TIMEDKLINES
-		kflag = 0;
+		kflag  = 0;
 		reason = NULL;
 		/* 
 		** Once per TIMEDKLINES seconds.
@@ -572,8 +572,8 @@ static time_t check_pings(time_t currenttime)
 				if (cptr->authfd >= 0)
 				{
 					(void) close(cptr->authfd);
-					cptr->authfd = -1;
-					cptr->count = 0;
+					cptr->authfd  = -1;
+					cptr->count	  = 0;
 					*cptr->buffer = '\0';
 				}
 				Debug((DEBUG_NOTICE, "%s/%c%s timeout %s",
@@ -612,7 +612,7 @@ static time_t check_pings(time_t currenttime)
 				ClearXAuth(cptr);
 				ClearWXAuth(cptr);
 				cptr->firsttime = currenttime;
-				cptr->lasttime = currenttime;
+				cptr->lasttime	= currenttime;
 				continue;
 			}
 			if (IsServer(cptr) || IsConnecting(cptr) ||
@@ -711,22 +711,22 @@ static void setup_me(aClient *mp)
 	if (me.info == DefInfo)
 		me.info = mystrdup("IRCers United");
 	mp->lasttime = mp->since = mp->firsttime = time(NULL);
-	mp->hopcount = 0;
-	mp->authfd = -1;
-	mp->auth = mp->username;
-	mp->confs = NULL;
-	mp->flags = 0;
+	mp->hopcount							 = 0;
+	mp->authfd								 = -1;
+	mp->auth								 = mp->username;
+	mp->confs								 = NULL;
+	mp->flags								 = 0;
 	mp->acpt = mp->from = mp;
-	mp->next = NULL;
-	mp->user = NULL;
-	mp->fd = -1;
+	mp->next			= NULL;
+	mp->user			= NULL;
+	mp->fd				= -1;
 	SetMe(mp);
 	mp->serv->snum = find_server_num(ME);
 	/* we don't fill our own IP -> 0 as ip lenght */
 	(void) make_user(mp, 0);
 	istat.is_users++; /* here, cptr->next is NULL, see make_user() */
 	mp->user->flags |= FLAGS_OPER;
-	mp->serv->up = mp;
+	mp->serv->up	   = mp;
 	mp->serv->maskedby = mp;
 	mp->serv->version |= SV_UID;
 	mp->user->server = find_server_string(mp->serv->snum);
@@ -772,8 +772,8 @@ int main(int argc, char *argv[])
 	uid_t uid, euid;
 
 	sbrk0 = (char *) sbrk((size_t) 0);
-	uid = getuid();
-	euid = geteuid();
+	uid	  = getuid();
+	euid  = geteuid();
 
 #ifdef CHROOTDIR
 	ircd_res_init();
@@ -827,7 +827,7 @@ int main(int argc, char *argv[])
 	*/
 	while (--argc > 0 && (*++argv)[0] == '-')
 	{
-		char *p = argv[0] + 1;
+		char *p	 = argv[0] + 1;
 		int flag = *p++;
 
 		if (flag == '\0' || *p == '\0')
@@ -910,7 +910,7 @@ int main(int argc, char *argv[])
 #ifdef DEBUGMODE
 				(void) setuid((uid_t) uid);
 				debuglevel = atoi(p);
-				debugmode = *p ? p : "0";
+				debugmode  = *p ? p : "0";
 				bootopt |= BOOT_DEBUG;
 				break;
 #else
@@ -1102,10 +1102,10 @@ int main(int argc, char *argv[])
 		make_server(tmp);
 		register_server(tmp);
 
-		tmp->fd = 0;
-		tmp->flags = FLAGS_LISTEN;
-		tmp->acpt = tmp;
-		tmp->from = tmp;
+		tmp->fd		   = 0;
+		tmp->flags	   = FLAGS_LISTEN;
+		tmp->acpt	   = tmp;
+		tmp->from	   = tmp;
 		tmp->firsttime = time(NULL);
 
 		SetMe(tmp);
@@ -1116,14 +1116,14 @@ int main(int argc, char *argv[])
 			tmp->fd = -1;
 		if (tmp->fd == 0)
 		{
-			aconf = make_conf();
+			aconf		  = make_conf();
 			aconf->status = CONF_LISTEN_PORT;
 			aconf->clients++;
 			aconf->next = conf;
-			conf = aconf;
+			conf		= aconf;
 
-			tmp->confs = make_link();
-			tmp->confs->next = NULL;
+			tmp->confs				= make_link();
+			tmp->confs->next		= NULL;
 			tmp->confs->value.aconf = aconf;
 			add_fd(tmp->fd, &fdas);
 			add_fd(tmp->fd, &fdall);
@@ -1166,7 +1166,7 @@ int main(int argc, char *argv[])
 static void io_loop(void)
 {
 	static time_t delay = 0;
-	int maxs = 4;
+	int maxs			= 4;
 
 	if (timeofday >= nextpreference)
 		nextpreference = calculate_preference(timeofday);
@@ -1347,7 +1347,7 @@ static void setup_signals(void)
 	struct sigaction act;
 
 	act.sa_handler = SIG_IGN;
-	act.sa_flags = 0;
+	act.sa_flags   = 0;
 	(void) sigemptyset(&act.sa_mask);
 	(void) sigaddset(&act.sa_mask, SIGPIPE);
 	(void) sigaddset(&act.sa_mask, SIGALRM);
@@ -1390,7 +1390,7 @@ static void setup_signals(void)
 	/* Don't core after detaching from gdb on fbsd */
 
 	act.sa_handler = SIG_IGN;
-	act.sa_flags = 0;
+	act.sa_flags   = 0;
 	(void) sigaddset(&act.sa_mask, SIGTRAP);
 	(void) sigaction(SIGTRAP, &act, NULL);
 #endif /* __FreeBSD__ */
@@ -1501,8 +1501,8 @@ void ircd_readtune(char *filename)
 		** Initiate the tune-values after successfully
 		** reading the tune-file.
 		*/
-		ww_size = t_data[0];
-		lk_size = t_data[1];
+		ww_size	  = t_data[0];
+		lk_size	  = t_data[1];
 		_HASHSIZE = t_data[2];
 #ifdef USE_HOSTHASH
 		_HOSTNAMEHASHSIZE = t_data[2]; /* hostname has always same size
@@ -1512,9 +1512,9 @@ void ircd_readtune(char *filename)
 		_IPHASHSIZE = t_data[2];
 #endif
 		_CHANNELHASHSIZE = t_data[3];
-		_SIDSIZE = t_data[4];
-		poolsize = t_data[5];
-		_UIDSIZE = t_data[6];
+		_SIDSIZE		 = t_data[4];
+		poolsize		 = t_data[5];
+		_UIDSIZE		 = t_data[6];
 
 		/*
 		** the lock array only grows if the whowas array grows,

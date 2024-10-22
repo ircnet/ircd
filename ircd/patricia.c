@@ -154,8 +154,8 @@ patricia_new_prefix2(int family, void *dest, int bitlen, prefix_t *prefix)
 			return (NULL);
 		}
 
-	prefix->bitlen = (bitlen >= 0) ? bitlen : default_bitlen;
-	prefix->family = family;
+	prefix->bitlen	  = (bitlen >= 0) ? bitlen : default_bitlen;
+	prefix->family	  = family;
 	prefix->ref_count = 0;
 	if (dynamic_allocated)
 	{
@@ -215,7 +215,7 @@ ascii2prefix(int family, const char *string)
 		assert(cp - string < MAXLINE);
 		memcpy(save, string, cp - string);
 		save[cp - string] = '\0';
-		string = save;
+		string			  = save;
 		if (bitlen < 0 || bitlen > maxbitlen)
 			bitlen = maxbitlen;
 	}
@@ -286,8 +286,8 @@ patricia_new(int maxbits)
 {
 	patricia_tree_t *patricia = (patricia_tree_t *) MyMalloc(sizeof(patricia_tree_t));
 
-	patricia->maxbits = maxbits;
-	patricia->head = NULL;
+	patricia->maxbits		  = maxbits;
+	patricia->head			  = NULL;
 	patricia->num_active_node = 0;
 	assert(maxbits <= PATRICIA_MAXBITS); /* XXX */
 	num_active_patricia++;
@@ -308,7 +308,7 @@ void patricia_clear(patricia_tree_t *patricia, void_fn_t func)
 
 		patricia_node_t *Xstack[PATRICIA_MAXBITS + 1];
 		patricia_node_t **Xsp = Xstack;
-		patricia_node_t *Xrn = patricia->head;
+		patricia_node_t *Xrn  = patricia->head;
 
 		while (Xrn)
 		{
@@ -392,8 +392,8 @@ patricia_search_exact(patricia_tree_t *patricia, prefix_t *prefix)
 	if (patricia->head == NULL)
 		return (NULL);
 
-	node = patricia->head;
-	addr = prefix_touchar(prefix);
+	node   = patricia->head;
+	addr   = prefix_touchar(prefix);
 	bitlen = prefix->bitlen;
 
 	while (node->bit < bitlen)
@@ -469,8 +469,8 @@ patricia_search_best2(patricia_tree_t *patricia, prefix_t *prefix, int inclusive
 	if (patricia->head == NULL)
 		return (NULL);
 
-	node = patricia->head;
-	addr = prefix_touchar(prefix);
+	node   = patricia->head;
+	addr   = prefix_touchar(prefix);
 	bitlen = prefix->bitlen;
 
 	while (node->bit < bitlen)
@@ -576,13 +576,13 @@ patricia_lookup(patricia_tree_t *patricia, prefix_t *prefix)
 
 	if (patricia->head == NULL)
 	{
-		node = (patricia_node_t *) MyMalloc(sizeof(patricia_node_t));
-		node->bit = prefix->bitlen;
+		node		 = (patricia_node_t *) MyMalloc(sizeof(patricia_node_t));
+		node->bit	 = prefix->bitlen;
 		node->prefix = patricia_ref_prefix(prefix);
 		node->parent = NULL;
 		node->l = node->r = NULL;
-		node->data = NULL;
-		patricia->head = node;
+		node->data		  = NULL;
+		patricia->head	  = node;
 #ifdef PATRICIA_DEBUG
 		fprintf(stderr,
 				"patricia_lookup: new_node #0 %s/%d (head)\n",
@@ -592,9 +592,9 @@ patricia_lookup(patricia_tree_t *patricia, prefix_t *prefix)
 		return (node);
 	}
 
-	addr = prefix_touchar(prefix);
+	addr   = prefix_touchar(prefix);
 	bitlen = prefix->bitlen;
-	node = patricia->head;
+	node   = patricia->head;
 
 	while (node->bit < bitlen || node->prefix == NULL)
 	{
@@ -640,7 +640,7 @@ patricia_lookup(patricia_tree_t *patricia, prefix_t *prefix)
 
 	test_addr = prefix_touchar(node->prefix);
 	/* find the first bit different */
-	check_bit = (node->bit < bitlen) ? node->bit : bitlen;
+	check_bit  = (node->bit < bitlen) ? node->bit : bitlen;
 	differ_bit = 0;
 	for (i = 0; i * 8 < check_bit; i++)
 	{
@@ -669,7 +669,7 @@ patricia_lookup(patricia_tree_t *patricia, prefix_t *prefix)
 	parent = node->parent;
 	while (parent && parent->bit >= differ_bit)
 	{
-		node = parent;
+		node   = parent;
 		parent = node->parent;
 #ifdef PATRICIA_DEBUG
 		if (node->prefix)
@@ -700,12 +700,12 @@ patricia_lookup(patricia_tree_t *patricia, prefix_t *prefix)
 		return (node);
 	}
 
-	new_node = (patricia_node_t *) MyMalloc(sizeof(patricia_node_t));
-	new_node->bit = prefix->bitlen;
+	new_node		 = (patricia_node_t *) MyMalloc(sizeof(patricia_node_t));
+	new_node->bit	 = prefix->bitlen;
 	new_node->prefix = patricia_ref_prefix(prefix);
 	new_node->parent = NULL;
 	new_node->l = new_node->r = NULL;
-	new_node->data = NULL;
+	new_node->data			  = NULL;
 	patricia->num_active_node++;
 
 	if (node->bit == differ_bit)
@@ -764,11 +764,11 @@ patricia_lookup(patricia_tree_t *patricia, prefix_t *prefix)
 	}
 	else
 	{
-		glue = (patricia_node_t *) MyMalloc(sizeof(patricia_node_t));
-		glue->bit = differ_bit;
+		glue		 = (patricia_node_t *) MyMalloc(sizeof(patricia_node_t));
+		glue->bit	 = differ_bit;
 		glue->prefix = NULL;
 		glue->parent = node->parent;
-		glue->data = NULL;
+		glue->data	 = NULL;
 		patricia->num_active_node++;
 		if (differ_bit < patricia->maxbits &&
 			BIT_TEST(addr[differ_bit >> 3], 0x80 >> (differ_bit & 0x07)))
@@ -852,13 +852,13 @@ void patricia_remove(patricia_tree_t *patricia, patricia_node_t *node)
 		if (parent->r == node)
 		{
 			parent->r = NULL;
-			child = parent->l;
+			child	  = parent->l;
 		}
 		else
 		{
 			assert(parent->l == node);
 			parent->l = NULL;
-			child = parent->r;
+			child	  = parent->r;
 		}
 
 		MyFree(node);
@@ -900,7 +900,7 @@ void patricia_remove(patricia_tree_t *patricia, patricia_node_t *node)
 		assert(node->l);
 		child = node->l;
 	}
-	parent = node->parent;
+	parent		  = node->parent;
 	child->parent = parent;
 
 	patricia_deref_prefix(node->prefix);

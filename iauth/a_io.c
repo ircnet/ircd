@@ -95,10 +95,10 @@ static void next_io(int cl, AnInstance *last)
 		cldata[cl].rfd = cldata[cl].wfd = 0;
 	}
 
-	cldata[cl].buflen = 0;
+	cldata[cl].buflen	  = 0;
 	cldata[cl].mod_status = 0;
-	cldata[cl].instance = NULL;
-	cldata[cl].timeout = 0;
+	cldata[cl].instance	  = NULL;
+	cldata[cl].timeout	  = 0;
 
 	/* third, if A_START is set, a new pass has to be started */
 	if (cldata[cl].state & A_START)
@@ -113,7 +113,7 @@ static void next_io(int cl, AnInstance *last)
 	if (last == NULL)
 	{
 		cldata[cl].instance = instances;
-		cldata[cl].ileft = 0;
+		cldata[cl].ileft	= 0;
 	}
 	else
 		cldata[cl].instance = last->nexti;
@@ -182,7 +182,7 @@ static void next_io(int cl, AnInstance *last)
 		}
 
 		cldata[cl].timeout = time(NULL) + cldata[cl].instance->timeout;
-		r = cldata[cl].instance->mod->start(cl);
+		r				   = cldata[cl].instance->mod->start(cl);
 		DebugLog((ALOG_DIO, 0,
 				  "next_io(#%d, %x): %s->start() returned %d",
 				  cl, last, cldata[cl].instance->mod->name, r));
@@ -259,9 +259,9 @@ static void parse_ircd(void)
 					free(cldata[cl].inbuffer);
 					cldata[cl].inbuffer = NULL;
 				}
-				cldata[cl].user[0] = '\0';
+				cldata[cl].user[0]	 = '\0';
 				cldata[cl].passwd[0] = '\0';
-				cldata[cl].host[0] = '\0';
+				cldata[cl].host[0]	 = '\0';
 				bzero(cldata[cl].idone, BDSIZE);
 				cldata[cl].buflen = 0;
 				if (chp[0] == 'C')
@@ -352,9 +352,9 @@ static void parse_ircd(void)
 
 				cldata[cl].state = 0;
 				cldata[cl].rfd = cldata[cl].wfd = 0;
-				cldata[cl].instance = NULL;
-				cldata[cl].authuser = NULL;
-				cldata[cl].inbuffer = NULL;
+				cldata[cl].instance				= NULL;
+				cldata[cl].authuser				= NULL;
+				cldata[cl].inbuffer				= NULL;
 				/*
 			** this is the ugly part of having a slave (considering
 			** that ircd remaps fd's: there is lag between the
@@ -477,7 +477,7 @@ static void parse_ircd(void)
 
 		buf = ch + 1;
 	}
-	rb_len = 0;
+	rb_len	= 0;
 	iob_len = 0;
 	if (strlen(buf))
 		bcopy(buf, rbuf, rb_len = strlen(buf));
@@ -524,17 +524,17 @@ void loop_io(void)
 #define TST_READ_EVENT(thisfd) pfd->revents &POLLREADFLAGS
 #define TST_WRITE_EVENT(thisfd) pfd->revents &POLLWRITEFLAGS
 
-#define CHECK_PFD(thisfd)                \
-	if (pfd->fd != thisfd)               \
-	{                                    \
-		pfd = &poll_fdarray[nbr_pfds++]; \
-		pfd->fd = thisfd;                \
-		pfd->events = 0;                 \
+#define CHECK_PFD(thisfd)                        \
+	if (pfd->fd != thisfd)                       \
+	{                                            \
+		pfd			= &poll_fdarray[nbr_pfds++]; \
+		pfd->fd		= thisfd;                    \
+		pfd->events = 0;                         \
 	}
 
 	struct pollfd poll_fdarray[MAXCONNECTIONS];
 	struct pollfd *pfd = poll_fdarray;
-	int nbr_pfds = 0;
+	int nbr_pfds	   = 0;
 #endif
 
 	int i, nfds = 0;
@@ -548,8 +548,8 @@ void loop_io(void)
 #else
 	/* set up such that CHECK_FD works */
 	nbr_pfds = 0;
-	pfd = poll_fdarray;
-	pfd->fd = -1;
+	pfd		 = poll_fdarray;
+	pfd->fd	 = -1;
 #endif /* USE_POLL */
 
 	SET_READ_EVENT(0);
@@ -594,7 +594,7 @@ void loop_io(void)
 	}
 
 	DebugLog((ALOG_DIO, 0, "io_loop(): checking for %d fd's", nfds));
-	wait.tv_sec = 5;
+	wait.tv_sec	 = 5;
 	wait.tv_usec = 0;
 #if !defined(USE_POLL)
 	nfds = select(highfd + 1, (SELECT_FDSET_TYPE *) &read_set,

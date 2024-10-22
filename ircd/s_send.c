@@ -48,10 +48,10 @@ static void esend_message(aClient *to)
 	{
 		if (maxplen + slen > 512)
 		{
-			slen = 510 - maxplen;
+			slen			  = 510 - maxplen;
 			suffixbuf[slen++] = '\r';
 			suffixbuf[slen++] = '\n';
-			suffixbuf[slen] = '0';
+			suffixbuf[slen]	  = '0';
 		}
 		lastmax = maxplen;
 	}
@@ -210,10 +210,10 @@ static void build_suffix(char *format, va_list va)
 		return;
 	}
 
-	slen = vsprintf(suffixbuf, format, va);
+	slen			  = vsprintf(suffixbuf, format, va);
 	suffixbuf[slen++] = '\r';
 	suffixbuf[slen++] = '\n';
-	suffixbuf[slen] = '0';
+	suffixbuf[slen]	  = '0';
 }
 
 /*

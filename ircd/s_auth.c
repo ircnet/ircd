@@ -91,10 +91,10 @@ static void set_clean_username(aClient *cptr)
 #if defined(USE_IAUTH)
 
 u_char iauth_options = 0;
-u_int iauth_spawn = 0;
-char *iauth_version = NULL;
+u_int iauth_spawn	 = 0;
+char *iauth_version	 = NULL;
 
-static aExtCf *iauth_conf = NULL;
+static aExtCf *iauth_conf	 = NULL;
 static aExtData *iauth_stats = NULL;
 
 /*
@@ -115,7 +115,7 @@ int vsendto_iauth(char *pattern, va_list va)
 
 	vsprintf(abuf, pattern, va);
 	strcat(abuf, "\n");
-	p = abuf;
+	p	= abuf;
 	len = strlen(p);
 
 	do
@@ -188,11 +188,11 @@ void read_iauth(void)
 		}
 		olen += i;
 		buf[olen] = '\0';
-		start = buf;
+		start	  = buf;
 		while ((end = index(start, '\n')))
 		{
 			*end++ = '\0';
-			last = *start;
+			last   = *start;
 			if (*start == '>')
 			{
 				sendto_flag(SCH_AUTH, "%s", start + 1);
@@ -256,10 +256,10 @@ void read_iauth(void)
 
 				while (*ectmp)
 					ectmp = &((*ectmp)->next);
-				*ectmp = (aExtCf *) MyMalloc(sizeof(aExtCf));
+				*ectmp		   = (aExtCf *) MyMalloc(sizeof(aExtCf));
 				(*ectmp)->line = mystrdup(start + 2);
 				(*ectmp)->next = NULL;
-				start = end;
+				start		   = end;
 				continue;
 			}
 			if (*start == 's')
@@ -286,7 +286,7 @@ void read_iauth(void)
 						iauth_spawn, iauth_options,
 						(iauth_version) ? iauth_version : "???");
 				iauth_stats->next->next = NULL;
-				start = end;
+				start					= end;
 				continue;
 			}
 			if (*start == 'S')
@@ -295,10 +295,10 @@ void read_iauth(void)
 
 				while (*ectmp)
 					ectmp = &((*ectmp)->next);
-				*ectmp = (aExtData *) MyMalloc(sizeof(aExtData));
+				*ectmp		   = (aExtData *) MyMalloc(sizeof(aExtData));
 				(*ectmp)->line = mystrdup(start + 2);
 				(*ectmp)->next = NULL;
-				start = end;
+				start		   = end;
 				continue;
 			}
 			if (*start != 'U' && *start != 'u' && *start != 'o' &&
@@ -395,7 +395,7 @@ void read_iauth(void)
 					istat.is_auth -= 1;
 					MyFree(cptr->auth);
 				}
-				cptr->auth = MyMalloc(strlen(start + strlen(tbuf)) + 2);
+				cptr->auth	= MyMalloc(strlen(start + strlen(tbuf)) + 2);
 				*cptr->auth = '-';
 				strcpy(cptr->auth + 1, start + strlen(tbuf));
 				set_clean_username(cptr);
@@ -630,7 +630,7 @@ void start_auth(aClient *cptr)
 		   cptr, inetntoa((char *) &us.sin_addr)));
 #endif
 	them.SIN_PORT = htons(113);
-	us.SIN_PORT = htons(0); /* bind assigns us a port */
+	us.SIN_PORT	  = htons(0); /* bind assigns us a port */
 	if (bind(cptr->authfd, (struct SOCKADDR *) &us, ulen) >= 0)
 	{
 		(void) getsockname(cptr->fd, (struct SOCKADDR *) &us, &ulen);
@@ -781,7 +781,7 @@ void read_authports(aClient *cptr)
 		(sscanf(cptr->buffer, "%hd , %hd : USERID : %*[^:]: %512s",
 				&remp, &locp, ruser) == 3))
 	{
-		s = rindex(cptr->buffer, ':');
+		s	 = rindex(cptr->buffer, ':');
 		*s++ = '\0';
 		for (t = (rindex(cptr->buffer, ':') + 1); *t; t++)
 			if (!isspace(*t))
@@ -806,7 +806,7 @@ void read_authports(aClient *cptr)
 	if (cptr->authfd == highest_fd)
 		while (!local[highest_fd])
 			highest_fd--;
-	cptr->count = 0;
+	cptr->count	 = 0;
 	cptr->authfd = -1;
 	ClearAuth(cptr);
 	if (len > 0)
@@ -826,7 +826,7 @@ void read_authports(aClient *cptr)
 	}
 	if (!strncmp(system, "OTHER", 5))
 	{ /* OTHER type of identifier */
-		cptr->auth = MyMalloc(strlen(ruser) + 2);
+		cptr->auth	= MyMalloc(strlen(ruser) + 2);
 		*cptr->auth = '-';
 		strcpy(cptr->auth + 1, ruser);
 	}

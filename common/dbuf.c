@@ -33,7 +33,7 @@ static const volatile char rcsid[] = "@(#)$Id: dbuf.c,v 1.12 2004/10/01 20:22:12
 #include "s_externs.h"
 #undef DBUF_C
 
-u_int poolsize = (BUFFERPOOL > 1500000) ? BUFFERPOOL : 1500000;
+u_int poolsize	  = (BUFFERPOOL > 1500000) ? BUFFERPOOL : 1500000;
 dbufbuf *freelist = NULL;
 
 /* dbuf_init--initialize a stretch of memory as dbufs.
@@ -48,7 +48,7 @@ void dbuf_init(void)
 	dbufbuf *dbp;
 	int i = 0, nb;
 
-	nb = poolsize / sizeof(dbufbuf);
+	nb		 = poolsize / sizeof(dbufbuf);
 	freelist = (dbufbuf *) malloc(nb * sizeof(dbufbuf));
 	if (!freelist)
 		return; /* screw this if it doesn't work */
@@ -92,7 +92,7 @@ static void dbuf_free(dbufbuf *ptr)
 {
 	istat.is_dbufuse--;
 	ptr->next = freelist;
-	freelist = ptr;
+	freelist  = ptr;
 }
 /*
 ** This is called when malloc fails. Scrap the whole content
@@ -202,7 +202,7 @@ int dbuf_put(dbuf *dyn, char *buf, int length)
 #ifdef DBUF_TAIL
 			dyn->tail = d;
 #endif
-			*h = d;
+			*h		= d;
 			d->next = NULL;
 		}
 		if (chunk > length)
@@ -210,7 +210,7 @@ int dbuf_put(dbuf *dyn, char *buf, int length)
 		bcopy(buf, d->data + off, chunk);
 		length -= chunk;
 		buf += chunk;
-		off = 0;
+		off	  = 0;
 		chunk = DBUFSIZ;
 	}
 	return 1;
@@ -397,9 +397,9 @@ int dbuf_getmsg(dbuf *dyn, char *buf, int length)
 	int copy;
 
 getmsg_init:
-	d = dyn->head;
+	d	 = dyn->head;
 	dlen = dyn->length;
-	i = DBUFSIZ - dyn->offset;
+	i	 = DBUFSIZ - dyn->offset;
 	if (i <= 0)
 		return -1;
 	copy = 0;

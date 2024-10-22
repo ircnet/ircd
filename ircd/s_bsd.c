@@ -319,7 +319,7 @@ int inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 #else
 	cptr->ip.s_addr = server.sin_addr.s_addr; /* broken on linux at least*/
 #endif
-	cptr->port = port;
+	cptr->port		= port;
 	local[cptr->fd] = cptr;
 	if (dolisten)
 	{
@@ -339,17 +339,17 @@ int add_listener(aConfItem *aconf)
 {
 	aClient *cptr;
 
-	cptr = make_client(NULL);
-	cptr->flags = FLAGS_LISTEN;
-	cptr->acpt = cptr;
-	cptr->from = cptr;
+	cptr			= make_client(NULL);
+	cptr->flags		= FLAGS_LISTEN;
+	cptr->acpt		= cptr;
+	cptr->from		= cptr;
 	cptr->firsttime = time(NULL);
-	cptr->name = ME;
+	cptr->name		= ME;
 	SetMe(cptr);
 
 
-	cptr->confs = make_link();
-	cptr->confs->next = NULL;
+	cptr->confs				 = make_link();
+	cptr->confs->next		 = NULL;
 	cptr->confs->value.aconf = aconf;
 
 	open_listener(cptr);
@@ -418,7 +418,7 @@ int unixport(aClient *cptr, char *path, int port)
 	(void) chmod(path, 0755);
 	(void) chmod(unixpath, 0777);
 	SetUnixSock(cptr);
-	cptr->port = 0;
+	cptr->port		= 0;
 	local[cptr->fd] = cptr;
 
 	return 0;
@@ -554,7 +554,7 @@ void start_iauth(int rcvdsig)
 {
 #if defined(USE_IAUTH)
 	static time_t last = 0;
-	static char first = 1;
+	static char first  = 1;
 	int sp[2], fd, val;
 	static pid_t iauth_pid = 0;
 
@@ -945,7 +945,7 @@ int check_client(aClient *cptr)
 						inetntoa((char *) &cptr->ip), hp->h_name,
 						*((unsigned long *) hp->h_addr));
 #endif
-			hp = NULL;
+			hp			= NULL;
 			cptr->hostp = NULL;
 		}
 	}
@@ -1065,8 +1065,8 @@ int check_server_init(aClient *cptr)
 			** well.
 			*/
 			lin.value.aconf = aconf;
-			lin.flags = ASYNC_CONF;
-			nextdnscheck = 1;
+			lin.flags		= ASYNC_CONF;
+			nextdnscheck	= 1;
 			if ((s = index(aconf->host, '@')))
 				s++;
 			else
@@ -1638,7 +1638,7 @@ static int check_clones(aClient *cptr)
 		time_t PT;
 		struct abacklog *next;
 	};
-	static struct abacklog *backlog = NULL;
+	static struct abacklog *backlog	 = NULL;
 	register struct abacklog **blscn = &backlog,
 							 *blptr;
 	register int count = 0;
@@ -1648,7 +1648,7 @@ static int check_clones(aClient *cptr)
 	{
 		if ((*blscn)->PT + CLONE_PERIOD < timeofday)
 		{
-			blptr = *blscn;
+			blptr  = *blscn;
 			*blscn = blptr->next;
 			MyFree(blptr);
 		}
@@ -1662,9 +1662,9 @@ static int check_clones(aClient *cptr)
 #else
 	blptr->ip.s_addr = cptr->ip.s_addr;
 #endif
-	blptr->PT = timeofday;
+	blptr->PT	= timeofday;
 	blptr->next = backlog;
-	backlog = blptr;
+	backlog		= blptr;
 
 	/* Count the number of entries from the same host */
 	blptr = backlog;
@@ -1708,9 +1708,9 @@ aClient *add_connection(aClient *cptr, int fd)
 	Link lin;
 	aClient *acptr;
 	aConfItem *aconf = NULL;
-	acptr = make_client(NULL);
+	acptr			 = make_client(NULL);
 
-	aconf = cptr->confs->value.aconf;
+	aconf		= cptr->confs->value.aconf;
 	acptr->acpt = cptr;
 
 	/* Removed preliminary access check. Full check is performed in
@@ -1774,9 +1774,9 @@ aClient *add_connection(aClient *cptr, int fd)
 			return NULL;
 		}
 #endif
-		lin.flags = ASYNC_CLIENT;
+		lin.flags	   = ASYNC_CLIENT;
 		lin.value.cptr = acptr;
-		lin.next = NULL;
+		lin.next	   = NULL;
 #ifdef INET6
 		Debug((DEBUG_DNS, "lookup %s",
 			   inet_ntop(AF_INET6, (char *) &addr.sin6_addr,
@@ -2152,20 +2152,20 @@ int read_message(time_t delay, FdAry *fdp, int ro)
 #define TST_READ_EVENT(thisfd) pfd->revents &POLLREADFLAGS
 #define TST_WRITE_EVENT(thisfd) pfd->revents &POLLWRITEFLAGS
 
-#define CHECK_PFD(thisfd)                \
-	if (pfd->fd != thisfd)               \
-	{                                    \
-		pfd = &poll_fdarray[nbr_pfds++]; \
-		pfd->fd = thisfd;                \
-		pfd->events = 0;                 \
-		pfd->revents = 0;                \
+#define CHECK_PFD(thisfd)                         \
+	if (pfd->fd != thisfd)                        \
+	{                                             \
+		pfd			 = &poll_fdarray[nbr_pfds++]; \
+		pfd->fd		 = thisfd;                    \
+		pfd->events	 = 0;                         \
+		pfd->revents = 0;                         \
 	}
 
 	struct pollfd poll_fdarray[MAXCONNECTIONS];
-	struct pollfd *pfd = poll_fdarray;
+	struct pollfd *pfd	   = poll_fdarray;
 	struct pollfd *res_pfd = NULL;
 	struct pollfd *udp_pfd = NULL;
-	struct pollfd *ad_pfd = NULL;
+	struct pollfd *ad_pfd  = NULL;
 	aClient *authclnts[MAXCONNECTIONS]; /* mapping of auth fds to client ptrs */
 	int nbr_pfds = 0;
 #endif
@@ -2186,11 +2186,11 @@ int read_message(time_t delay, FdAry *fdp, int ro)
 #else
 		/* set up such that CHECK_FD works */
 		nbr_pfds = 0;
-		pfd = poll_fdarray;
-		pfd->fd = -1;
-		res_pfd = NULL;
-		udp_pfd = NULL;
-		ad_pfd = NULL;
+		pfd		 = poll_fdarray;
+		pfd->fd	 = -1;
+		res_pfd	 = NULL;
+		udp_pfd	 = NULL;
+		ad_pfd	 = NULL;
 #endif /* USE_POLL */
 		auth = 0;
 
@@ -2329,7 +2329,7 @@ int read_message(time_t delay, FdAry *fdp, int ro)
 		Debug((DEBUG_L11, "highfd %d", highfd));
 #endif
 
-		wait.tv_sec = MIN(delay2, delay);
+		wait.tv_sec	 = MIN(delay2, delay);
 		wait.tv_usec = (delay == 0) ? 200000 : 0;
 #if !defined(USE_POLL)
 		nfds = select(highfd + 1, (SELECT_FDSET_TYPE *) &read_set,
@@ -2595,10 +2595,10 @@ int connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 	{
 		Link lin;
 
-		lin.flags = ASYNC_CONNECT;
+		lin.flags		= ASYNC_CONNECT;
 		lin.value.aconf = aconf;
-		nextdnscheck = 1;
-		s = (char *) index(aconf->host, '@');
+		nextdnscheck	= 1;
+		s				= (char *) index(aconf->host, '@');
 		s++; /* should NEVER be NULL */
 #ifdef INET6
 		if (!inetpton(AF_INET6, s, aconf->ipnum.s6_addr))
@@ -2711,14 +2711,14 @@ int connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 	}
 	else
 		(void) strcpy(cptr->serv->by, "AutoConn.");
-	cptr->serv->up = &me;
+	cptr->serv->up		 = &me;
 	cptr->serv->maskedby = cptr;
-	cptr->serv->nline = aconf;
+	cptr->serv->nline	 = aconf;
 	if (cptr->fd > highest_fd)
 		highest_fd = cptr->fd;
 	add_fd(cptr->fd, &fdall);
 	local[cptr->fd] = cptr;
-	cptr->acpt = &me;
+	cptr->acpt		= &me;
 	SetConnecting(cptr);
 
 	get_sockhost(cptr, aconf->host);
@@ -2757,7 +2757,7 @@ static struct SOCKADDR *connect_inet(aConfItem *aconf, aClient *cptr,
 	if (!BadPtr(aconf->source_ip))
 	{
 		memset(&outip, 0, sizeof(outip));
-		outip.SIN_PORT = 0;
+		outip.SIN_PORT	 = 0;
 		outip.SIN_FAMILY = AFINET;
 #ifdef INET6
 		if (!inetpton(AF_INET6, aconf->source_ip, outip.sin6_addr.s6_addr))
@@ -2819,7 +2819,7 @@ static struct SOCKADDR *connect_inet(aConfItem *aconf, aClient *cptr,
 		  sizeof(struct IN_ADDR));
 	bcopy((char *) &aconf->ipnum, (char *) &cptr->ip,
 		  sizeof(struct IN_ADDR));
-	cptr->port = (aconf->port > 0) ? aconf->port : portnum;
+	cptr->port		= (aconf->port > 0) ? aconf->port : portnum;
 	server.SIN_PORT = htons(cptr->port);
 	/*
 	 * Look for a duplicate IP#,port pair among already open connections
@@ -2861,7 +2861,7 @@ static struct SOCKADDR *connect_unix(aConfItem *aconf, aClient *cptr,
 	get_sockhost(cptr, aconf->host);
 	strncpyzt(sock.sun_path, aconf->host + 2, sizeof(sock.sun_path));
 	sock.sun_family = AF_UNIX;
-	*lenp = strlen(sock.sun_path) + 2;
+	*lenp			= strlen(sock.sun_path) + 2;
 
 	SetUnixSock(cptr);
 	return (struct sockaddr *) &sock;
@@ -3040,7 +3040,7 @@ void get_my_name(aClient *cptr, char *name, int len)
 	*/
 	bzero((char *) &mysk, sizeof(mysk));
 	mysk.SIN_FAMILY = AFINET;
-	mysk.SIN_PORT = 0;
+	mysk.SIN_PORT	= 0;
 
 	if ((aconf = find_me())->passwd && isdigit(*aconf->passwd))
 #ifdef INET6
@@ -3141,7 +3141,7 @@ int setup_ping(aConfItem *aconf)
 #else
 			from.sin_addr.s_addr = htonl(INADDR_ANY); /* hmmpf */
 #endif
-	from.SIN_PORT = htons((u_short) aconf->port);
+	from.SIN_PORT	= htons((u_short) aconf->port);
 	from.SIN_FAMILY = AFINET;
 
 	if ((udpfd = socket(AFINET, SOCK_DGRAM, 0)) == -1)
@@ -3196,8 +3196,8 @@ void send_ping(aConfItem *aconf)
 		return;
 	if (aconf->class->conFreq == 0) /* avoid flooding */
 		return;
-	pi.pi_cp = aconf;
-	pi.pi_id = htonl(PING_CPING);
+	pi.pi_cp  = aconf;
+	pi.pi_id  = htonl(PING_CPING);
 	pi.pi_seq = cp->lseq++;
 	cp->seq++;
 	/*
@@ -3223,7 +3223,7 @@ void send_ping(aConfItem *aconf)
 #else
 		sin.sin_addr.s_addr = aconf->ipnum.s_addr;
 #endif
-	sin.SIN_PORT = htons(cp->port);
+	sin.SIN_PORT   = htons(cp->port);
 	sin.SIN_FAMILY = AFINET;
 	(void) gettimeofday(&pi.pi_tv, NULL);
 #ifdef INET6
@@ -3268,7 +3268,7 @@ static int check_ping(char *buf, int len)
 	cp->rtt += rtt;
 	if (cp->rtt > 1000000)
 	{
-		cp->ping = (cp->rtt /= cp->lrecvd);
+		cp->ping  = (cp->rtt /= cp->lrecvd);
 		cp->recvd = cp->lrecvd = 1;
 		cp->seq = cp->lseq = 1;
 	}
@@ -3426,7 +3426,7 @@ static void do_dns_async(void)
 
 	do {
 		ln.flags = -1;
-		hp = get_res((char *) &ln);
+		hp		 = get_res((char *) &ln);
 
 		Debug((DEBUG_DNS, "%#x = get_res(%d,%#x)", hp, ln.flags,
 			   ln.value.cptr));
@@ -3516,7 +3516,7 @@ time_t delay_close(int fd)
 	};
 	static struct fdlog *first = NULL, *last = NULL;
 	struct fdlog *next = first, *tmp;
-	int tmpdel = 0;
+	int tmpdel		   = 0;
 
 	if (fd == -2)
 	{
@@ -3568,9 +3568,9 @@ time_t delay_close(int fd)
 		shutdown(fd, SHUT_RD);
 
 		/* create a new entry with fd and time of close */
-		tmp = (struct fdlog *) MyMalloc(sizeof(*tmp));
+		tmp		  = (struct fdlog *) MyMalloc(sizeof(*tmp));
 		tmp->next = NULL;
-		tmp->fd = fd;
+		tmp->fd	  = fd;
 		tmp->time = timeofday + DELAY_CLOSE;
 		istat.is_delayclosewait++;
 		istat.is_delayclose++;
@@ -3579,7 +3579,7 @@ time_t delay_close(int fd)
 		if (last)
 		{
 			last->next = tmp;
-			last = tmp;
+			last	   = tmp;
 		}
 		else
 		{

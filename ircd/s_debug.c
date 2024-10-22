@@ -206,7 +206,7 @@ void send_usage(aClient *cptr, char *nick)
 		return;
 	}
 	secs = rus.ru_utime.tv_sec + rus.ru_stime.tv_sec;
-	rup = timeofday - me.since;
+	rup	 = timeofday - me.since;
 	if (secs == 0)
 		secs = 1;
 
@@ -409,23 +409,23 @@ void count_memory(aClient *cptr, char *nick, int debug)
 		start = time(NULL);
 		count_whowas_memory(&d_wwu, &d_wwa, &d_wwam, &d_wwuw);
 		d_wwm = sizeof(aName) * ww_size;
-		d_dm = sizeof(aLock) * lk_size;
+		d_dm  = sizeof(aLock) * lk_size;
 	}
-	wwu = istat.is_wwusers;
-	wwa = istat.is_wwaways;
+	wwu	 = istat.is_wwusers;
+	wwa	 = istat.is_wwaways;
 	wwam = istat.is_wwawaysmem;
 	wwuw = istat.is_wwuwas;
-	wwm = sizeof(aName) * ww_size;
-	dm = sizeof(aLock) * lk_size;
+	wwm	 = sizeof(aName) * ww_size;
+	dm	 = sizeof(aLock) * lk_size;
 
 	/*lc = istat.is_unknown + istat.is_myclnt + istat.is_serv;*/
-	lc = istat.is_localc;
+	lc	= istat.is_localc;
 	lcc = istat.is_conflink;
-	rc = istat.is_remc;
-	us = istat.is_users;
+	rc	= istat.is_remc;
+	us	= istat.is_users;
 	usi = istat.is_useri;
 	usc = istat.is_userc;
-	aw = istat.is_away;
+	aw	= istat.is_away;
 	awm = istat.is_awaymem;
 
 	if (debug)
@@ -470,14 +470,14 @@ void count_memory(aClient *cptr, char *nick, int debug)
 	d_lcm = d_lc * CLIENT_LOCAL_SIZE;
 	d_rcm = d_rc * CLIENT_REMOTE_SIZE;
 
-	ch = istat.is_chan;
-	chm = istat.is_chanmem;
-	chh = istat.is_hchan;
+	ch	 = istat.is_chan;
+	chm	 = istat.is_chanmem;
+	chh	 = istat.is_hchan;
 	chhm = istat.is_hchanmem;
-	chi = istat.is_invite;
-	chb = istat.is_bans;
+	chi	 = istat.is_invite;
+	chb	 = istat.is_bans;
 	chbm = istat.is_banmem + chb * sizeof(Link);
-	chu = istat.is_chanusers;
+	chu	 = istat.is_chanusers;
 
 	if (debug)
 	{
@@ -511,9 +511,9 @@ void count_memory(aClient *cptr, char *nick, int debug)
 		d_chbm += d_chb * sizeof(Link);
 	}
 
-	co = istat.is_conf;
+	co	= istat.is_conf;
 	com = istat.is_confmem;
-	cl = istat.is_class;
+	cl	= istat.is_class;
 
 	if (debug)
 	{
@@ -622,7 +622,7 @@ void count_memory(aClient *cptr, char *nick, int debug)
 				   me.name, RPL_STATSDEBUG, nick, d_chu,
 				   d_chu * sizeof(Link), d_chi, d_chi * sizeof(Link));
 	}
-	totch = chm + chhm + chbm + chu * sizeof(Link) + chi * sizeof(Link);
+	totch	= chm + chhm + chbm + chu * sizeof(Link) + chi * sizeof(Link);
 	d_totch = d_chm + d_chhm + d_chbm + d_chu * sizeof(Link) + d_chi * sizeof(Link);
 
 	sendto_one(cptr,
@@ -649,7 +649,7 @@ void count_memory(aClient *cptr, char *nick, int debug)
 				   d_wwm, lk_size, d_dm);
 	}
 
-	totww = wwu * sizeof(anUser) + wwam + wwm;
+	totww	= wwu * sizeof(anUser) + wwam + wwm;
 	d_totww = d_wwu * sizeof(anUser) + d_wwam + d_wwm;
 
 	sendto_one(cptr, ":%s %d %s :Hash: client %d(%lu) chan %d(%lu)",
@@ -657,7 +657,7 @@ void count_memory(aClient *cptr, char *nick, int debug)
 			   sizeof(aHashEntry) * _HASHSIZE,
 			   _CHANNELHASHSIZE, sizeof(aHashEntry) * _CHANNELHASHSIZE);
 	d_db = db = istat.is_dbufnow * sizeof(dbufbuf);
-	db = istat.is_dbufnow * sizeof(dbufbuf);
+	db		  = istat.is_dbufnow * sizeof(dbufbuf);
 	sendto_one(cptr,
 			   ":%s %d %s :Dbuf blocks %lu(%lu) (> %lu [%lu]) (%lu < %lu) "
 			   "[%lu]",

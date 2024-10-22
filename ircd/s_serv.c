@@ -125,14 +125,14 @@ int m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	Reg aConfItem *aconf;
 	char *server;
 	Reg aClient *acptr = NULL;
-	int rsquit = 0;
+	int rsquit		   = 0;
 	char *comment;
 	static char comment2[TOPICLEN + 1];
 
 	if (!is_allowed(sptr, ACL_SQUIT))
 		return m_nopriv(cptr, sptr, parc, parv);
 
-	server = parv[1];
+	server	= parv[1];
 	comment = parv[2];
 	/*
 	** To accomodate host masking, a squit for a masked server
@@ -174,7 +174,7 @@ int m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 		if (IsServer(cptr))
 		{
-			acptr = cptr;
+			acptr  = cptr;
 			server = cptr->sockhost;
 		}
 		else
@@ -355,7 +355,7 @@ int check_version(aClient *cptr)
 		else
 		{
 			misc = id;
-			id = "";
+			id	 = "";
 		}
 	}
 	else
@@ -526,11 +526,11 @@ int m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	make_server(acptr);
 	acptr->hopcount = sptr->hopcount + 1;
 	strncpyzt(acptr->serv->namebuf, sptr->name, sizeof(acptr->serv->namebuf));
-	acptr->info = mystrdup("Masked Server");
-	acptr->serv->up = sptr;
+	acptr->info		  = mystrdup("Masked Server");
+	acptr->serv->up	  = sptr;
 	acptr->serv->snum = sptr->serv->maskedby->serv->snum;
 	strncpyzt(acptr->serv->verstr, parv[2], sizeof(acptr->serv->verstr));
-	acptr->serv->version = get_version(parv[2], NULL);
+	acptr->serv->version  = get_version(parv[2], NULL);
 	acptr->serv->maskedby = sptr->serv->maskedby;
 	SetServer(acptr);
 	istat.is_masked++;
@@ -582,7 +582,7 @@ int m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 						   "Running in standalone mode");
 	}
 	info[0] = info[REALLEN] = '\0'; /* strncpy() doesn't guarantee NULL */
-	inpath = get_client_name(cptr, FALSE);
+	inpath					= get_client_name(cptr, FALSE);
 	if (parc < 2 || *parv[1] == '\0')
 	{
 		sendto_one(cptr, "ERROR :No servername");
@@ -627,7 +627,7 @@ int m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 
 	host = parv[1];
-	hop = atoi(parv[2]);
+	hop	 = atoi(parv[2]);
 	strncpyzt(info, parv[parc - 1], REALLEN);
 
 	/* check if the servername is valid */
@@ -772,9 +772,9 @@ int m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		strncpyzt(acptr->serv->namebuf, host, sizeof(acptr->serv->namebuf));
 		if (acptr->info != DefInfo)
 			MyFree(acptr->info);
-		acptr->info = mystrdup(info);
-		acptr->serv->up = sptr;
-		acptr->serv->snum = find_server_num(acptr->name);
+		acptr->info			  = mystrdup(info);
+		acptr->serv->up		  = sptr;
+		acptr->serv->snum	  = find_server_num(acptr->name);
 		acptr->serv->maskedby = acptr;
 		SetServer(acptr);
 		istat.is_serv++;
@@ -860,7 +860,7 @@ int m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	Reg aConfItem *aconf, *bconf;
 	char mlname[HOSTLEN + 1], *inpath, *host, *s, *encr;
 
-	host = cptr->name;
+	host   = cptr->name;
 	inpath = get_client_name(cptr, TRUE); /* "refresh" inpath with host */
 
 	if (cptr->serv && cptr->serv->byuid[0])
@@ -1060,7 +1060,7 @@ int m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	}
 	else
 	{
-		s = (char *) index(aconf->host, '@');
+		s  = (char *) index(aconf->host, '@');
 		*s = '\0'; /* should never be NULL */
 		Debug((DEBUG_INFO, "Check Usernames [%s]vs[%s]",
 			   aconf->host, cptr->username));
@@ -1196,12 +1196,12 @@ int m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 				   (cptr->flags & FLAGS_ZIP) ? "z" : "");
 	}
 	(void) add_to_client_hash_table(cptr->name, cptr);
-	cptr->serv->up = &me;
+	cptr->serv->up		 = &me;
 	cptr->serv->maskedby = cptr;
-	cptr->serv->nline = aconf;
-	cptr->serv->version = cptr->hopcount; /* temporary location */
-	cptr->hopcount = 1;					  /* local server connection */
-	cptr->serv->snum = find_server_num(cptr->name);
+	cptr->serv->nline	 = aconf;
+	cptr->serv->version	 = cptr->hopcount; /* temporary location */
+	cptr->hopcount		 = 1;			   /* local server connection */
+	cptr->serv->snum	 = find_server_num(cptr->name);
 
 	strncpyzt(cptr->serv->verstr, versionbuf, sizeof(cptr->serv->verstr));
 	strcpy(cptr->serv->sid, sid);
@@ -1320,7 +1320,7 @@ int m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 		char *e;
 		int eobmaxlen;
 
-		e = eobbuf;
+		e		  = eobbuf;
 		eobmaxlen = BUFSIZE - 1 /*    ":"     */
 					- SIDLEN	/*  my SID    */
 					- 6			/*   " EOB :" */
@@ -1498,8 +1498,8 @@ int m_summon(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[ERR_NORECIPIENT], ME, BadTo(parv[0]), "SUMMON");
 		return 1;
 	}
-	user = parv[1];
-	host = (parc < 3 || BadPtr(parv[2])) ? ME : parv[2];
+	user   = parv[1];
+	host   = (parc < 3 || BadPtr(parv[2])) ? ME : parv[2];
 	chname = (parc > 3) ? parv[3] : "*";
 	/*
 	** Summoning someone on remote server, find out which link to
@@ -1633,7 +1633,7 @@ void count_servers_users(aClient *cptr, int *servers, int *users)
 	aServer *asptr;
 
 	*servers = 0;
-	*users = 0;
+	*users	 = 0;
 	for (asptr = svrtop; asptr; asptr = asptr->nexts)
 	{
 		if (asptr->bcptr->from == cptr)
@@ -1649,7 +1649,7 @@ void count_servers_users(aClient *cptr, int *servers, int *users)
 #else /* !HUB */
 	/* we can have only one server linked */
 	*servers = istat.is_serv - 1;
-	*users = istat.is_user[0];
+	*users	 = istat.is_user[0];
 	*users += istat.is_user[1];
 	/* is_user includes myclnt, so we have to subtract it */
 	*users -= istat.is_myclnt;
@@ -1746,7 +1746,7 @@ static void report_configured_links(aClient *sptr, char *to, int mask)
 					break;
 			if (!*p)
 				continue;
-			c = (char) *(p + 2);
+			c	 = (char) *(p + 2);
 			host = BadPtr(tmp->host) ? null : tmp->host;
 			pass = BadPtr(tmp->passwd) ? NULL : tmp->passwd;
 			name = BadPtr(tmp->name) ? null : tmp->name;
@@ -1898,8 +1898,8 @@ int m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			return 5;
 	}
 
-	name = (parc > 2) ? parv[2] : ME;
-	cm = (parc > 3) ? parv[3] : name;
+	name  = (parc > 2) ? parv[2] : ME;
+	cm	  = (parc > 3) ? parv[3] : name;
 	doall = !match(name, ME) && !match(cm, ME);
 	wilds = index(cm, '*') || index(cm, '?') || index(cm, '#');
 
@@ -2261,15 +2261,15 @@ int m_help(aClient *cptr, aClient *sptr, int parc, char *parv[])
  */
 int m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	int all = 0;			/* showing counts of all clients */
-	int s_count = 0,		/* server */
-			c_count = 0,	/* client (visible) */
-			u_count = 0,	/* unknown */
-			i_count = 0,	/* invisible client */
-			o_count = 0,	/* operator */
-			v_count = 0;	/* service */
-	int m_clients = 0,		/* my clients */
-			m_servers = 0,	/* my server links */
+	int all			   = 0; /* showing counts of all clients */
+	int s_count		   = 0, /* server */
+			c_count	   = 0, /* client (visible) */
+			u_count	   = 0, /* unknown */
+			i_count	   = 0, /* invisible client */
+			o_count	   = 0, /* operator */
+			v_count	   = 0; /* service */
+	int m_clients	   = 0, /* my clients */
+			m_servers  = 0, /* my server links */
 			m_services = 0; /* my services */
 
 	if (parc > 2)
@@ -2285,15 +2285,15 @@ int m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (parc == 1 || (parv[1][0] == '*' && parv[1][1] == '\0'))
 	{
-		all = 1;
-		s_count = istat.is_serv;
-		c_count = istat.is_user[0];
-		i_count = istat.is_user[1];
-		u_count = istat.is_unknown;
-		o_count = istat.is_oper;
-		v_count = istat.is_service;
-		m_clients = istat.is_myclnt;
-		m_servers = istat.is_myserv;
+		all		   = 1;
+		s_count	   = istat.is_serv;
+		c_count	   = istat.is_user[0];
+		i_count	   = istat.is_user[1];
+		u_count	   = istat.is_unknown;
+		o_count	   = istat.is_oper;
+		v_count	   = istat.is_service;
+		m_clients  = istat.is_myclnt;
+		m_servers  = istat.is_myserv;
 		m_services = istat.is_myservice;
 	}
 	else
@@ -2312,10 +2312,10 @@ int m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 			if (IsMe(acptr))
 			{
-				m_clients = istat.is_myclnt;
-				m_servers = istat.is_myserv;
+				m_clients  = istat.is_myclnt;
+				m_servers  = istat.is_myserv;
 				m_services = istat.is_myservice;
-				u_count = istat.is_unknown;
+				u_count	   = istat.is_unknown;
 			}
 		}
 		else
@@ -2333,10 +2333,10 @@ int m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 					if (IsMe(asptr->bcptr))
 					{
-						m_clients = istat.is_myclnt;
-						m_servers = istat.is_myserv;
+						m_clients  = istat.is_myclnt;
+						m_servers  = istat.is_myserv;
 						m_services = istat.is_myservice;
-						u_count = istat.is_unknown;
+						u_count	   = istat.is_unknown;
 					}
 				}
 			}
@@ -2640,8 +2640,8 @@ static void trace_one(aClient *sptr, aClient *acptr)
 	char *to;
 
 	/* to = #ST_UID#IsServer(acptr) && sptr->user ? sptr->user->uid : sptr->name; */
-	to = sptr->name;
-	name = get_client_name(acptr, FALSE);
+	to	  = sptr->name;
+	name  = get_client_name(acptr, FALSE);
 	class = get_client_class(acptr);
 
 	switch (acptr->status)
@@ -2722,8 +2722,8 @@ int m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	int maskedserv = 0;
-	int showsid = 0;
-	int i = 0;
+	int showsid	   = 0;
+	int i		   = 0;
 
 	if (parc > 1)
 	{
@@ -3469,9 +3469,9 @@ int check_servername(char *hostname)
 	register char *ch;
 	int dots, chars, rc;
 
-	dots = 0;
+	dots  = 0;
 	chars = 0;
-	rc = 0;
+	rc	  = 0;
 
 	if (strlen(hostname) > HOSTLEN)
 	{
@@ -3526,7 +3526,7 @@ void add_server_to_tree(aClient *acptr)
 		acptr->serv->up->serv->down->serv->left = acptr;
 	}
 
-	acptr->serv->right = acptr->serv->up->serv->down;
+	acptr->serv->right			= acptr->serv->up->serv->down;
 	acptr->serv->up->serv->down = acptr;
 
 	return;
@@ -3677,7 +3677,7 @@ static void dump_map(aClient *sptr, char *mask, aClient *root, aClient **prevser
 			 * in this masked tree */
 			if (*prevserver)
 			{
-				*pbuf = ' ';
+				*pbuf		= ' ';
 				*(pbuf + 1) = '|';
 				*(pbuf + 2) = '-';
 				*(pbuf + 3) = ' ';
@@ -3698,7 +3698,7 @@ static void dump_map(aClient *sptr, char *mask, aClient *root, aClient **prevser
 		if (!acptr->serv->right && *prevserver &&
 			(!acptr->serv->up || !IsMasked(acptr->serv->up)))
 		{
-			*pbuf = ' ';
+			*pbuf		= ' ';
 			*(pbuf + 1) = '`';
 			*(pbuf + 2) = '-';
 			*(pbuf + 3) = ' ';
@@ -3716,8 +3716,8 @@ static void dump_map(aClient *sptr, char *mask, aClient *root, aClient **prevser
 int m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr = NULL;
-	int sids = 0;
-	char *mask = NULL;
+	int sids	   = 0;
+	char *mask	   = NULL;
 
 	if (parc > 1)
 	{
@@ -3848,7 +3848,7 @@ int register_server(aClient *cptr)
 
 	if (svrtop)
 	{
-		svrtop->prevs = cptr->serv;
+		svrtop->prevs	  = cptr->serv;
 		cptr->serv->nexts = svrtop;
 	}
 	svrtop = cptr->serv;

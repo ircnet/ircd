@@ -67,11 +67,11 @@ static int match_ipmask(aTarget *mask, char *ipaddr)
 char *conf_read(char *cfile)
 {
 	AnInstance *ident = NULL; /* make sure this module is used */
-	u_char needh = 0;		  /* do we need hostname information for any host? */
+	u_char needh	  = 0;	  /* do we need hostname information for any host? */
 	u_char o_req = 0, o_dto = 0, o_wup = 0, o_del = 0;
 	static char o_all[5];
 	u_int timeout = DEFAULT_TIMEOUT, totto = 0;
-	u_int lnnb = 0, i;
+	u_int lnnb	  = 0, i;
 	u_char icount = 0, Mcnt = 0;
 	char buffer[160], *ch;
 	AnInstance **last = &instances, *itmp;
@@ -82,7 +82,7 @@ char *conf_read(char *cfile)
 	Mlist[Mcnt++] = &Module_pipe;
 	Mlist[Mcnt++] = &Module_lhex;
 	Mlist[Mcnt++] = &Module_webproxy;
-	Mlist[Mcnt] = NULL;
+	Mlist[Mcnt]	  = NULL;
 
 	cfh = fopen((cfile) ? cfile : IAUTHCONF_PATH, "r");
 	if (!cfh)
@@ -248,19 +248,19 @@ char *conf_read(char *cfile)
 						 cfile);
 				continue;
 			}
-			*last = (AnInstance *) malloc(sizeof(AnInstance));
-			(*last)->nexti = NULL;
-			(*last)->in = icount++;
-			(*last)->mod = Mlist[i];
-			(*last)->opt = NULL;
-			(*last)->popt = NULL;
-			(*last)->data = NULL;
+			*last			  = (AnInstance *) malloc(sizeof(AnInstance));
+			(*last)->nexti	  = NULL;
+			(*last)->in		  = icount++;
+			(*last)->mod	  = Mlist[i];
+			(*last)->opt	  = NULL;
+			(*last)->popt	  = NULL;
+			(*last)->data	  = NULL;
 			(*last)->hostname = NULL;
-			(*last)->address = NULL;
-			(*last)->timeout = timeout;
-			(*last)->reason = NULL;
-			(*last)->delayed = o_del;
-			(*last)->port = 0;
+			(*last)->address  = NULL;
+			(*last)->timeout  = timeout;
+			(*last)->reason	  = NULL;
+			(*last)->delayed  = o_del;
+			(*last)->port	  = 0;
 			if (Mlist[i] == &Module_rfc931)
 				ident = *last;
 
@@ -321,8 +321,8 @@ char *conf_read(char *cfile)
 				if (!strncasecmp(buffer + 1, "host = ", 7))
 				{
 					needh = 1;
-					ttmp = &((*last)->hostname);
-					ch = buffer + 8;
+					ttmp  = &((*last)->hostname);
+					ch	  = buffer + 8;
 					if (*ch == '!')
 					{
 						inverse = 1;
@@ -332,7 +332,7 @@ char *conf_read(char *cfile)
 				else if (!strncasecmp(buffer + 1, "ip = ", 5))
 				{
 					ttmp = &((*last)->address);
-					ch = buffer + 6;
+					ch	 = buffer + 6;
 					if (*ch == '!')
 					{
 						inverse = 1;
@@ -352,7 +352,7 @@ char *conf_read(char *cfile)
 									 cfile);
 							continue;
 						}
-						lmask = htonl((u_long) 0xffffffffL << (32 - m));
+						lmask  = htonl((u_long) 0xffffffffL << (32 - m));
 						baseip = htonl(i1 * 0x1000000 +
 									   i2 * 0x10000 +
 									   i3 * 0x100 +
@@ -360,7 +360,7 @@ char *conf_read(char *cfile)
 					}
 					else
 					{
-						lmask = 0;
+						lmask  = 0;
 						baseip = 0;
 					}
 				}
@@ -396,12 +396,12 @@ char *conf_read(char *cfile)
 					continue;
 				while (*ttmp)
 					ttmp = &((*ttmp)->nextt);
-				*ttmp = (aTarget *) malloc(sizeof(aTarget));
-				(*ttmp)->yes = inverse ? -1 : 0;
+				*ttmp		   = (aTarget *) malloc(sizeof(aTarget));
+				(*ttmp)->yes   = inverse ? -1 : 0;
 				(*ttmp)->value = mystrdup(ch);
 				if ((*ttmp)->baseip)
 				{
-					(*ttmp)->lmask = lmask;
+					(*ttmp)->lmask	= lmask;
 					(*ttmp)->baseip = baseip;
 				}
 				(*ttmp)->nextt = NULL;
@@ -420,18 +420,18 @@ char *conf_read(char *cfile)
 
 	if (ident == NULL)
 	{
-		ident = *last = (AnInstance *) malloc(sizeof(AnInstance));
-		(*last)->nexti = NULL;
-		(*last)->opt = NULL;
-		(*last)->mod = &Module_rfc931;
+		ident = *last	  = (AnInstance *) malloc(sizeof(AnInstance));
+		(*last)->nexti	  = NULL;
+		(*last)->opt	  = NULL;
+		(*last)->mod	  = &Module_rfc931;
 		(*last)->hostname = NULL;
-		(*last)->address = NULL;
-		(*last)->timeout = DEFAULT_TIMEOUT;
-		(*last)->in = icount;
-		(*last)->popt = NULL;
-		(*last)->address = NULL;
-		(*last)->delayed = o_del;
-		(*last)->port = 0;
+		(*last)->address  = NULL;
+		(*last)->timeout  = DEFAULT_TIMEOUT;
+		(*last)->in		  = icount;
+		(*last)->popt	  = NULL;
+		(*last)->address  = NULL;
+		(*last)->delayed  = o_del;
+		(*last)->port	  = 0;
 	}
 	if (ident->timeout < DEFAULT_TIMEOUT)
 	{

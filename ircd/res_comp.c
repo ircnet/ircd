@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const volatile char sccsid[] = "@(#)res_comp.c	8.1 (Berkeley) 6/4/93";
-static const volatile char rcsid[] = "$Id: res_comp.c,v 1.10 2004/10/01 20:22:14 chopin Exp $";
+static const volatile char rcsid[]	= "$Id: res_comp.c,v 1.10 2004/10/01 20:22:14 chopin Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -321,8 +321,8 @@ static int ns_name_ntop(const u_char *src, char *dst, size_t dstsiz)
 	u_char c;
 	u_int n;
 
-	cp = src;
-	dn = dst;
+	cp	= src;
+	dn	= dst;
 	eom = dst + dstsiz;
 
 	while ((n = *cp++) != 0)
@@ -419,9 +419,9 @@ static int ns_name_pton(const char *src, u_char *dst, size_t dstsiz)
 	char *cp;
 
 	escaped = 0;
-	bp = dst;
-	eom = dst + dstsiz;
-	label = bp++;
+	bp		= dst;
+	eom		= dst + dstsiz;
+	label	= bp++;
 
 	while ((c = *src++) != 0)
 	{
@@ -548,11 +548,11 @@ static int ns_name_unpack(const u_char *msg, const u_char *eom,
 	u_char *dstp;
 	int n, len, checked;
 
-	len = -1;
+	len		= -1;
 	checked = 0;
-	dstp = dst;
-	srcp = src;
-	dstlim = dst + dstsiz;
+	dstp	= dst;
+	srcp	= src;
+	dstlim	= dst + dstsiz;
 	if (srcp < msg || srcp >= eom)
 	{
 		errno = EMSGSIZE;
@@ -643,7 +643,7 @@ static int ns_name_pack(const u_char *src, u_char *dst, int dstsiz,
 
 	srcp = src;
 	dstp = dst;
-	eob = dstp + dstsiz;
+	eob	 = dstp + dstsiz;
 	lpp = cpp = NULL;
 	if (dnptrs != NULL)
 	{
@@ -699,7 +699,7 @@ static int ns_name_pack(const u_char *src, u_char *dst, int dstsiz,
 				(dstp - msg) < 0x4000)
 			{
 				*cpp++ = dstp;
-				*cpp = NULL;
+				*cpp   = NULL;
 			}
 		}
 		/* copy label to buffer */

@@ -45,7 +45,7 @@ static void grow_whowas(void)
 	Debug((DEBUG_ERROR, "grow_whowas ww:%d, lk:%d, #%d, %#x/%#x",
 		   ww_size, lk_size, numclients, was, locked));
 	ww_size = (int) ((float) numclients * 1.1);
-	was = (aName *) MyRealloc((char *) was, sizeof(*was) * ww_size);
+	was		= (aName *) MyRealloc((char *) was, sizeof(*was) * ww_size);
 	bzero((char *) (was + osize), sizeof(*was) * (ww_size - osize));
 	Debug((DEBUG_ERROR, "grow_whowas %#x", was));
 	ircd_writetune(tunefile);
@@ -56,7 +56,7 @@ static void grow_locked(void)
 	int osize = lk_size;
 
 	lk_size = ww_size;
-	locked = (aLock *) MyRealloc((char *) locked, sizeof(*locked) * lk_size);
+	locked	= (aLock *) MyRealloc((char *) locked, sizeof(*locked) * lk_size);
 	bzero((char *) (locked + osize), sizeof(*locked) * (lk_size - osize));
 }
 
@@ -97,7 +97,7 @@ void add_history(aClient *cptr, aClient *nodelay)
 		/* (*old_uwas) should NEVER happen to be NULL. -krys */
 		while ((*old_uwas)->value.i != ww_index)
 			old_uwas = &((*old_uwas)->next);
-		uwas = *old_uwas;
+		uwas	  = *old_uwas;
 		*old_uwas = uwas->next;
 		free_link(uwas);
 		free_user(np->ww_user);
@@ -180,14 +180,14 @@ void add_history(aClient *cptr, aClient *nodelay)
 		** because of reallocs, one can not store a pointer inside
 		** the array. store the index instead.
 		*/
-		uwas->value.i = ww_index;
-		uwas->flags = timeofday;
-		uwas->next = cptr->user->uwas;
+		uwas->value.i	 = ww_index;
+		uwas->flags		 = timeofday;
+		uwas->next		 = cptr->user->uwas;
 		cptr->user->uwas = uwas;
 	}
 
 	np->ww_logout = timeofday;
-	np->ww_user = cptr->user;
+	np->ww_user	  = cptr->user;
 	np->ww_online = (nodelay != NULL) ? nodelay : NULL;
 
 	strncpyzt(np->ww_nick, cptr->name, NICKLEN + 1);
@@ -211,7 +211,7 @@ aClient *get_history(char *nick, time_t timelimit)
 {
 	Reg aName *wp, *wp2;
 
-	wp = wp2 = &was[ww_index];
+	wp = wp2  = &was[ww_index];
 	timelimit = timeofday - timelimit;
 
 	do
@@ -329,7 +329,7 @@ void off_history(aClient *cptr)
 		** locked). &me can safely be used, it is constant.
 		*/
 		was[uwas->value.i].ww_online = &me;
-		cptr->user->uwas = uwas->next;
+		cptr->user->uwas			 = uwas->next;
 		free_link(uwas);
 		istat.is_wwuwas--;
 	}
@@ -369,9 +369,9 @@ void initwhowas(void)
 int m_whowas(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg aName *wp, *wp2 = NULL;
-	Reg int j = 0;
+	Reg int j	   = 0;
 	Reg anUser *up = NULL;
-	int max = -1;
+	int max		   = -1;
 	/*
 	 * 2014-04-19  Kurt Roeckx
 	 *  * whowas.c/m_whowas(): Initialize p to NULL for call to strtoken()
@@ -396,7 +396,7 @@ int m_whowas(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	for (s = parv[1]; (nick = strtoken(&p, s, ",")); s = NULL)
 	{
 		wp = wp2 = &was[(ww_index ? ww_index : ww_size) - 1];
-		j = 0;
+		j		 = 0;
 
 		do {
 			if (mycmp(nick, wp->ww_nick) == 0)
@@ -475,8 +475,8 @@ void count_whowas_memory(int *wwu, int *wwa, u_long *wwam, int *wwuw)
 				}
 			}
 		}
-	*wwu = u;
-	*wwa = a;
+	*wwu  = u;
+	*wwa  = a;
 	*wwam = am;
 	*wwuw = w;
 

@@ -77,7 +77,7 @@ struct socks_private {
 static void socks_open_proxy(int cl, char *strver)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
-	char *reason = cldata[cl].instance->reason;
+	char *reason				 = cldata[cl].instance->reason;
 
 	if (!reason)
 	{
@@ -132,12 +132,12 @@ static void socks_add_cache(int cl, int state)
 		mydata->cmax = mydata->cnow;
 	}
 
-	next = mydata->cache;
-	mydata->cache = (struct proxylog *) malloc(sizeof(struct proxylog));
+	next				  = mydata->cache;
+	mydata->cache		  = (struct proxylog *) malloc(sizeof(struct proxylog));
 	mydata->cache->expire = time(NULL) + mydata->lifetime;
 	strcpy(mydata->cache->ip, cldata[cl].itsip);
 	mydata->cache->state = state;
-	mydata->cache->next = next;
+	mydata->cache->next	 = next;
 	DebugLog((ALOG_DSOCKSC, 0,
 			  "socks_add_cache(%d): new cache %s, open=%d",
 			  cl, mydata->cache->ip, state));
@@ -275,8 +275,8 @@ static int socks_write(u_int cl, char *strver)
 		 */
 		memcpy(query + 4, ((char *) addr.s6_addr) + 12, 4);
 #endif
-		query[8] = 'u';
-		query[9] = 's';
+		query[8]  = 'u';
+		query[9]  = 's';
 		query[10] = 'e';
 		query[11] = 'r';
 		query[12] = 0;
@@ -284,26 +284,26 @@ static int socks_write(u_int cl, char *strver)
 	}
 	else
 	{
-		query[0] = 5;
-		query[1] = 1;
-		query[2] = 0;
+		query[0]  = 5;
+		query[1]  = 1;
+		query[2]  = 0;
 		query_len = 3;
 		if (cldata[cl].mod_status == ST_V5b)
 		{
 #ifndef INET6
 			query_len = 10;
-			query[3] = 1;
-			query[4] = a;
-			query[5] = b;
-			query[6] = c;
-			query[7] = d;
-			query[8] = ((cldata[cl].ourport & 0xff00) >> 8);
-			query[9] = (cldata[cl].ourport & 0x00ff);
+			query[3]  = 1;
+			query[4]  = a;
+			query[5]  = b;
+			query[6]  = c;
+			query[7]  = d;
+			query[8]  = ((cldata[cl].ourport & 0xff00) >> 8);
+			query[9]  = (cldata[cl].ourport & 0x00ff);
 #else
 			if (IN6_IS_ADDR_V4MAPPED(&addr))
 			{
 				query_len = 10;
-				query[3] = 1; /* ipv4 address */
+				query[3]  = 1; /* ipv4 address */
 				memcpy(query + 4,
 					   ((char *) addr.s6_addr) + 12, 4);
 				query[8] = ((cldata[cl].ourport & 0xff00) >> 8);
@@ -312,7 +312,7 @@ static int socks_write(u_int cl, char *strver)
 			else
 			{
 				query_len = 22;
-				query[3] = 4;
+				query[3]  = 4;
 				memcpy(query + 4, addr.s6_addr, 16);
 				query[20] = ((cldata[cl].ourport & 0xff00) >> 8);
 				query[21] = (cldata[cl].ourport & 0x00ff);
@@ -342,7 +342,7 @@ static int socks_write(u_int cl, char *strver)
 static int socks_read(u_int cl, char *strver)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
-	u_char state = PROXY_CLOSE;
+	u_char state				 = PROXY_CLOSE;
 
 	/* not enough data from the other end */
 	if (cldata[cl].buflen < 2)
@@ -437,7 +437,7 @@ static int socks_read(u_int cl, char *strver)
 			/* if we're not configured to do only v4
 			   and proxy state was not OPEN, try v5 */
 			cldata[cl].mod_status = ST_V5;
-			cldata[cl].buflen = 0;
+			cldata[cl].buflen	  = 0;
 			close(cldata[cl].rfd);
 			cldata[cl].rfd = 0;
 			goto again;
@@ -451,9 +451,9 @@ static int socks_read(u_int cl, char *strver)
 			/* we found socks 5 OPEN, but (option says so)
 			   we will double check in second stage */
 			cldata[cl].mod_status = ST_V5b;
-			cldata[cl].buflen = 0;
-			cldata[cl].wfd = cldata[cl].rfd;
-			cldata[cl].rfd = 0;
+			cldata[cl].buflen	  = 0;
+			cldata[cl].wfd		  = cldata[cl].rfd;
+			cldata[cl].rfd		  = 0;
 			goto again;
 		}
 	}
@@ -539,7 +539,7 @@ static char *socks_init(AnInstance *self)
 
 	mydata = (struct socks_private *) malloc(sizeof(struct socks_private));
 	bzero((char *) mydata, sizeof(struct socks_private));
-	mydata->cache = NULL;
+	mydata->cache	 = NULL;
 	mydata->lifetime = CACHETIME;
 
 	tmpbuf[0] = txtbuf[0] = '\0';
@@ -721,7 +721,7 @@ static int socks_start(u_int cl)
  */
 static int socks_work(u_int cl)
 {
-	char *strver = "4";
+	char *strver				 = "4";
 	struct socks_private *mydata = cldata[cl].instance->data;
 
 	if (cldata[cl].mod_status == 0)

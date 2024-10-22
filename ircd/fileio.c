@@ -35,7 +35,7 @@ file_open(const char *filename, int mode, int fmode)
 	{
 		close(fd); /* Too many FDs! */
 		errno = ENFILE;
-		fd = -1;
+		fd	  = -1;
 	}
 
 	return fd;
@@ -45,8 +45,8 @@ FBFILE *
 fbopen(const char *filename, const char *mode)
 {
 	int openmode = 0;
-	int pmode = 0;
-	FBFILE *fb = NULL;
+	int pmode	 = 0;
+	FBFILE *fb	 = NULL;
 	int fd;
 	s_assert(filename);
 	s_assert(mode);
@@ -65,11 +65,11 @@ fbopen(const char *filename, const char *mode)
 				break;
 			case 'w':
 				openmode = O_WRONLY | O_CREAT | O_TRUNC;
-				pmode = 0644;
+				pmode	 = 0644;
 				break;
 			case 'a':
 				openmode = O_WRONLY | O_CREAT | O_APPEND;
-				pmode = 0644;
+				pmode	 = 0644;
 				break;
 			case '+':
 				openmode &= ~(O_RDONLY | O_WRONLY);
@@ -102,9 +102,9 @@ fdbopen(int fd, const char *mode)
 	if (NULL != fb)
 	{
 		fb->ptr = fb->endp = fb->buf;
-		fb->fd = fd;
-		fb->flags = 0;
-		fb->pbptr = (char *) NULL;
+		fb->fd			   = fd;
+		fb->flags		   = 0;
+		fb->pbptr		   = (char *) NULL;
 	}
 	return fb;
 }
@@ -136,7 +136,7 @@ fbfill(FBFILE *fb)
 	n = read(fb->fd, fb->buf, BUFSIZ);
 	if (0 < n)
 	{
-		fb->ptr = fb->buf;
+		fb->ptr	 = fb->buf;
 		fb->endp = fb->buf + n;
 	}
 	else if (n < 0)

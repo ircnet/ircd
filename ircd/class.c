@@ -149,7 +149,7 @@ void add_class(int class, int ping, int confreq, int maxli, int sendq,
 			*tmp++ = '\0';
 
 			cidramount = atoi(cidrlen_s);
-			cidrlen = atoi(tmp);
+			cidrlen	   = atoi(tmp);
 		}
 	}
 #endif
@@ -166,12 +166,12 @@ void add_class(int class, int ping, int confreq, int maxli, int sendq,
 	t = find_class(class);
 	if ((t == classes) && (class != 0))
 	{
-		p = (aClass *) make_class();
+		p			 = (aClass *) make_class();
 		NextClass(p) = NextClass(t);
 		NextClass(t) = p;
-		MaxSendq(p) = QUEUELEN;
+		MaxSendq(p)	 = QUEUELEN;
 #ifdef ENABLE_CIDR_LIMITS
-		CidrLen(p) = 0;
+		CidrLen(p)	 = 0;
 		p->ip_limits = NULL;
 #endif
 		istat.is_class++;
@@ -182,16 +182,16 @@ void add_class(int class, int ping, int confreq, int maxli, int sendq,
 		   "Add Class %d: p %x t %x - cf: %d pf: %d ml: %d sq: %d.%d ml: %d.%d mg: %d.%d",
 		   class, p, t, confreq, ping, maxli, sendq, bsendq, hlocal, uhlocal,
 		   hglobal, uhglobal));
-	Class(p) = class;
-	ConFreq(p) = confreq;
+	Class(p)	= class;
+	ConFreq(p)	= confreq;
 	PingFreq(p) = ping;
 	MaxLinks(p) = maxli;
 	if (sendq)
 		MaxSendq(p) = sendq;
-	MaxBSendq(p) = bsendq ? bsendq : 0;
-	MaxHLocal(p) = hlocal;
-	MaxUHLocal(p) = uhlocal;
-	MaxHGlobal(p) = hglobal;
+	MaxBSendq(p)   = bsendq ? bsendq : 0;
+	MaxHLocal(p)   = hlocal;
+	MaxUHLocal(p)  = uhlocal;
+	MaxHGlobal(p)  = hglobal;
 	MaxUHGlobal(p) = uhglobal;
 
 #ifdef ENABLE_CIDR_LIMITS
@@ -259,20 +259,20 @@ void initclass(void)
 	classes = (aClass *) make_class();
 	istat.is_class++;
 
-	Class(FirstClass()) = 0;
-	ConFreq(FirstClass()) = CONNECTFREQUENCY;
-	PingFreq(FirstClass()) = PINGFREQUENCY;
-	MaxLinks(FirstClass()) = MAXIMUM_LINKS;
-	MaxSendq(FirstClass()) = QUEUELEN;
-	MaxBSendq(FirstClass()) = 0;
-	Links(FirstClass()) = 0;
-	NextClass(FirstClass()) = NULL;
-	MaxHLocal(FirstClass()) = 1;
-	MaxUHLocal(FirstClass()) = 1;
-	MaxHGlobal(FirstClass()) = 1;
+	Class(FirstClass())		  = 0;
+	ConFreq(FirstClass())	  = CONNECTFREQUENCY;
+	PingFreq(FirstClass())	  = PINGFREQUENCY;
+	MaxLinks(FirstClass())	  = MAXIMUM_LINKS;
+	MaxSendq(FirstClass())	  = QUEUELEN;
+	MaxBSendq(FirstClass())	  = 0;
+	Links(FirstClass())		  = 0;
+	NextClass(FirstClass())	  = NULL;
+	MaxHLocal(FirstClass())	  = 1;
+	MaxUHLocal(FirstClass())  = 1;
+	MaxHGlobal(FirstClass())  = 1;
 	MaxUHGlobal(FirstClass()) = 1;
 #ifdef ENABLE_CIDR_LIMITS
-	CidrLen(FirstClass()) = 0;
+	CidrLen(FirstClass())	= 0;
 	FirstClass()->ip_limits = NULL;
 #endif
 }

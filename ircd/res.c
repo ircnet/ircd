@@ -31,7 +31,7 @@ static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.53 2009/03/15 01:01:04 
 /* #undef	DEBUG */
 
 static char hostbuf[HOSTLEN + 1 + 100]; /* +100 for INET6 */
-static char dot[] = ".";
+static char dot[]  = ".";
 static int incache = 0;
 static CacheTable hashtable[ARES_CACSIZE];
 static aCache *cachetop = NULL;
@@ -162,7 +162,7 @@ static int add_request(ResRQ *new)
 	else
 	{
 		last->next = new;
-		last = new;
+		last	   = new;
 	}
 	new->next = NULL;
 	reinfo.re_requests++;
@@ -217,18 +217,18 @@ static ResRQ *make_request(Link *lp)
 
 	nreq = (ResRQ *) MyMalloc(sizeof(ResRQ));
 	bzero((char *) nreq, sizeof(ResRQ));
-	nreq->next = NULL; /* where NULL is non-zero ;) */
-	nreq->sentat = timeofday;
+	nreq->next	  = NULL; /* where NULL is non-zero ;) */
+	nreq->sentat  = timeofday;
 	nreq->retries = 3;
-	nreq->resend = 1;
-	nreq->srch = -1;
+	nreq->resend  = 1;
+	nreq->srch	  = -1;
 	if (lp)
 		bcopy((char *) lp, (char *) &nreq->cinfo, sizeof(Link));
 	else
 		bzero((char *) &nreq->cinfo, sizeof(Link));
-	nreq->timeout = 4; /* start at 4 and exponential inc. */
-	nreq->he.h_addrtype = AFINET;
-	nreq->he.h_name = NULL;
+	nreq->timeout		  = 4; /* start at 4 and exponential inc. */
+	nreq->he.h_addrtype	  = AFINET;
+	nreq->he.h_name		  = NULL;
 	nreq->he.h_aliases[0] = NULL;
 	(void) add_request(nreq);
 	return nreq;
@@ -248,7 +248,7 @@ time_t timeout_query_list(time_t now)
 	for (rptr = first; rptr; rptr = r2ptr)
 	{
 		r2ptr = rptr->next;
-		tout = rptr->sentat + rptr->timeout;
+		tout  = rptr->sentat + rptr->timeout;
 		if (now >= tout)
 		{
 			if (--rptr->retries <= 0)
@@ -454,7 +454,7 @@ static int do_query_name(Link *lp, char *name, ResRQ *rptr, int type)
 	 */
 	if (!rptr)
 	{
-		rptr = make_request(lp);
+		rptr	   = make_request(lp);
 		rptr->type = type;
 		rptr->name = (char *) MyMalloc(strlen(name) + 1);
 		(void) strcpy(rptr->name, name);
@@ -514,7 +514,7 @@ static int do_query_number(Link *lp, struct IN_ADDR *numb, ResRQ *rptr)
 
 	if (!rptr)
 	{
-		rptr = make_request(lp);
+		rptr	   = make_request(lp);
 		rptr->type = T_PTR;
 #ifdef INET6
 		bcopy(numb->s6_addr, rptr->addr.s6_addr, IN6ADDRSZ);
@@ -610,8 +610,8 @@ static int proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 	int class, type, dlen, len, ans = 0, n;
 	struct IN_ADDR dr, *adr;
 
-	cp = buf + sizeof(HEADER);
-	hp = (struct hent *) &(rptr->he);
+	cp	= buf + sizeof(HEADER);
+	hp	= (struct hent *) &(rptr->he);
 	adr = &hp->h_addr;
 	while (WHOSTENTP(adr->S_ADDR))
 		adr++;
@@ -781,7 +781,7 @@ static int proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 				else
 				{
 					aCache *cachep = NULL;
-					hp->h_name = (char *) MyMalloc(len + 1);
+					hp->h_name	   = (char *) MyMalloc(len + 1);
 					(void) strcpy(hp->h_name, hostbuf);
 
 					/* Got a good PTR record back, cache entry can
@@ -853,7 +853,7 @@ struct hostent *get_res(char *lp)
 	static char buf[sizeof(HEADER) + MAXPACKET];
 	Reg HEADER *hptr;
 	Reg ResRQ *rptr = NULL;
-	aCache *cp = NULL;
+	aCache *cp		= NULL;
 	struct SOCKADDR_IN sin;
 	int rc, a, max;
 	SOCK_LEN_TYPE len = sizeof(sin);
@@ -868,8 +868,8 @@ struct hostent *get_res(char *lp)
 	/*
 	 * convert DNS reply reader from Network byte order to CPU byte order.
 	 */
-	hptr = (HEADER *) buf;
-	hptr->id = ntohs(hptr->id);
+	hptr		  = (HEADER *) buf;
+	hptr->id	  = ntohs(hptr->id);
 	hptr->ancount = ntohs(hptr->ancount);
 	hptr->qdcount = ntohs(hptr->qdcount);
 	hptr->nscount = ntohs(hptr->nscount);
@@ -934,7 +934,7 @@ struct hostent *get_res(char *lp)
 		{
 			Debug((DEBUG_DNS, "Fatal DNS error %d for %d",
 				   h_errno, hptr->rcode));
-			rptr->resend = 0;
+			rptr->resend  = 0;
 			rptr->retries = 0;
 		}
 		goto getres_err;
@@ -1041,8 +1041,8 @@ getres_err:
 			if (ircd_res.options & RES_DEFNAMES && ++rptr->srch == 0)
 			{
 				rptr->retries = ircd_res.retry;
-				rptr->sends = 0;
-				rptr->resend = 1;
+				rptr->sends	  = 0;
+				rptr->resend  = 1;
 			}
 #ifdef INET6
 			/* Comment out this ifdef to get names like ::ffff:a.b.c.d */
@@ -1117,14 +1117,14 @@ static aCache *add_to_cache(aCache *ocp)
 		   ocp->he.h_addr_list[0]));
 #endif
 	ocp->list_next = cachetop;
-	cachetop = ocp;
+	cachetop	   = ocp;
 
-	hashv = hash_name(ocp->he.h_name);
-	ocp->hname_next = hashtable[hashv].name_list;
+	hashv					   = hash_name(ocp->he.h_name);
+	ocp->hname_next			   = hashtable[hashv].name_list;
 	hashtable[hashv].name_list = ocp;
 
-	hashv = hash_number((u_char *) ocp->he.h_addr);
-	ocp->hnum_next = hashtable[hashv].num_list;
+	hashv					  = hash_number((u_char *) ocp->he.h_addr);
+	ocp->hnum_next			  = hashtable[hashv].num_list;
 	hashtable[hashv].num_list = ocp;
 
 #ifdef DEBUG
@@ -1187,9 +1187,9 @@ static void update_list(ResRQ *rptr, aCache *cachep)
 			break;
 	if (!*cpp)
 		return;
-	*cpp = cp->list_next;
+	*cpp		  = cp->list_next;
 	cp->list_next = cachetop;
-	cachetop = cp;
+	cachetop	  = cp;
 	if (!rptr)
 		return;
 
@@ -1220,15 +1220,15 @@ static void update_list(ResRQ *rptr, aCache *cachep)
 				base = cp->he.h_aliases;
 
 				addrcount++;
-				base = (char **) MyRealloc((char *) base,
-										   sizeof(char *) * (addrcount + 1));
+				base			 = (char **) MyRealloc((char *) base,
+													   sizeof(char *) * (addrcount + 1));
 				cp->he.h_aliases = base;
 #ifdef DEBUG
 				Debug((DEBUG_DNS, "u_l:add name %s hal %x ac %d",
 					   s, cp->he.h_aliases, addrcount));
 #endif
 				base[addrcount - 1] = mystrdup(s);
-				base[addrcount] = NULL;
+				base[addrcount]		= NULL;
 			}
 		}
 	}
@@ -1272,12 +1272,12 @@ static void update_list(ResRQ *rptr, aCache *cachep)
 
 				ab = (struct IN_ADDR **) cp->he.h_addr_list;
 				addrcount++;
-				t = (char *) MyRealloc((char *) *ab,
-									   addrcount * sizeof(struct IN_ADDR));
-				base = (char **) MyRealloc((char *) ab,
-										   (addrcount + 1) * sizeof(*ab));
+				t				   = (char *) MyRealloc((char *) *ab,
+														addrcount * sizeof(struct IN_ADDR));
+				base			   = (char **) MyRealloc((char *) ab,
+														 (addrcount + 1) * sizeof(*ab));
 				cp->he.h_addr_list = base;
-				ab = (struct IN_ADDR **) base;
+				ab				   = (struct IN_ADDR **) base;
 #ifdef DEBUG
 #ifdef INET6
 				Debug((DEBUG_DNS, "u_l:add IP %s hal %x ac %d",
@@ -1554,13 +1554,13 @@ static aCache *make_cache(ResRQ *rptr)
 	t = hp->h_aliases = (char **) MyMalloc(sizeof(char *) * i);
 	for (n = 0; n < i; n++, t++)
 	{
-		*t = rptr->he.h_aliases[n];
+		*t					  = rptr->he.h_aliases[n];
 		rptr->he.h_aliases[n] = NULL;
 	}
 
 	hp->h_addrtype = rptr->he.h_addrtype;
-	hp->h_length = rptr->he.h_length;
-	hp->h_name = rptr->he.h_name;
+	hp->h_length   = rptr->he.h_length;
+	hp->h_name	   = rptr->he.h_name;
 	if (rptr->ttl < 600)
 	{
 		reinfo.re_shortttl++;
@@ -1568,7 +1568,7 @@ static aCache *make_cache(ResRQ *rptr)
 	}
 	else
 		cp->ttl = rptr->ttl;
-	cp->expireat = timeofday + cp->ttl;
+	cp->expireat	= timeofday + cp->ttl;
 	rptr->he.h_name = NULL;
 #ifdef DEBUG
 	Debug((DEBUG_INFO, "make_cache:made cache %#x", cp));

@@ -112,26 +112,26 @@ aClient *make_client(aClient *from)
 #endif
 
 	/* Note:  structure is zero (calloc) */
-	cptr->from = from ? from : cptr; /* 'from' of local client is self! */
-	cptr->next = NULL;				 /* For machines with NON-ZERO NULL pointers >;) */
-	cptr->prev = NULL;
-	cptr->hnext = NULL;
-	cptr->user = NULL;
-	cptr->serv = NULL;
-	cptr->name = cptr->namebuf;
+	cptr->from	 = from ? from : cptr; /* 'from' of local client is self! */
+	cptr->next	 = NULL;			   /* For machines with NON-ZERO NULL pointers >;) */
+	cptr->prev	 = NULL;
+	cptr->hnext	 = NULL;
+	cptr->user	 = NULL;
+	cptr->serv	 = NULL;
+	cptr->name	 = cptr->namebuf;
 	cptr->status = STAT_UNKNOWN;
-	cptr->fd = -1;
+	cptr->fd	 = -1;
 	(void) strcpy(cptr->username, "unknown");
 	cptr->info = DefInfo;
 	if (size == CLIENT_LOCAL_SIZE)
 	{
 		cptr->since = cptr->lasttime = cptr->firsttime = timeofday;
-		cptr->confs = NULL;
-		cptr->sockhost[0] = '\0';
-		cptr->buffer[0] = '\0';
-		cptr->authfd = -1;
-		cptr->auth = cptr->username;
-		cptr->exitc = EXITC_UNDEF;
+		cptr->confs									   = NULL;
+		cptr->sockhost[0]							   = '\0';
+		cptr->buffer[0]								   = '\0';
+		cptr->authfd								   = -1;
+		cptr->auth									   = cptr->username;
+		cptr->exitc									   = EXITC_UNDEF;
 		cptr->receiveB = cptr->sendB = cptr->receiveM = cptr->sendM = 0;
 #ifdef ZIP_LINKS
 		cptr->zip = NULL;
@@ -192,19 +192,19 @@ anUser *make_user(aClient *cptr, int iplen)
 #ifdef DEBUGMODE
 		users.inuse++;
 #endif
-		user->away = NULL;
-		user->refcnt = 1;
-		user->joined = 0;
-		user->flags = 0;
+		user->away	  = NULL;
+		user->refcnt  = 1;
+		user->joined  = 0;
+		user->flags	  = 0;
 		user->channel = NULL;
 		user->invited = NULL;
-		user->uwas = NULL;
-		cptr->user = user;
-		user->hashv = 0;
-		user->uhnext = NULL;
-		user->uid[0] = '\0';
-		user->servp = NULL;
-		user->bcptr = cptr;
+		user->uwas	  = NULL;
+		cptr->user	  = user;
+		user->hashv	  = 0;
+		user->uhnext  = NULL;
+		user->uid[0]  = '\0';
+		user->servp	  = NULL;
+		user->bcptr	  = cptr;
 		if (cptr->next) /* the only cptr->next == NULL is me */
 			istat.is_users++;
 	}
@@ -222,17 +222,17 @@ aServer *make_server(aClient *cptr)
 #ifdef DEBUGMODE
 		servs.inuse++;
 #endif
-		cptr->serv = serv;
-		cptr->name = serv->namebuf;
+		cptr->serv	   = serv;
+		cptr->name	   = serv->namebuf;
 		*serv->namebuf = '\0';
-		serv->user = NULL;
-		serv->snum = -1;
-		*serv->by = '\0';
-		serv->up = NULL;
-		serv->refcnt = 1;
-		serv->nexts = NULL;
-		serv->prevs = NULL;
-		serv->bcptr = cptr;
+		serv->user	   = NULL;
+		serv->snum	   = -1;
+		*serv->by	   = '\0';
+		serv->up	   = NULL;
+		serv->refcnt   = 1;
+		serv->nexts	   = NULL;
+		serv->prevs	   = NULL;
+		serv->bcptr	   = cptr;
 		serv->lastload = 0;
 	}
 	return cptr->serv;
@@ -293,7 +293,7 @@ void free_user(anUser *user)
 
 		if ((serv = user->servp))
 		{
-			user->servp = NULL;		/* to avoid some impossible loop */
+			user->servp	 = NULL;	/* to avoid some impossible loop */
 			user->refcnt = -211000; /* For loop detection */
 			free_server(serv);
 		}
@@ -330,10 +330,10 @@ void free_server(aServer *serv)
 		 */
 		if (serv->user)
 		{
-			int cnt = serv->refcnt;
+			int cnt		 = serv->refcnt;
 			serv->refcnt = -211000; /* Loop detection */
 			free_user(serv->user);
-			serv->user = NULL;
+			serv->user	 = NULL;
 			serv->refcnt = cnt;
 		}
 
@@ -382,7 +382,7 @@ void remove_client_from_list(aClient *cptr)
 		cptr->prev->next = cptr->next;
 	else
 	{
-		client = cptr->next;
+		client		 = cptr->next;
 		client->prev = NULL;
 	}
 	if (cptr->next)
@@ -483,7 +483,7 @@ void add_client_to_list(aClient *cptr)
 		istat.is_users++;
 
 	cptr->next = client;
-	client = cptr;
+	client	   = cptr;
 
 	if (cptr->next)
 		cptr->next->prev = cptr;
@@ -591,18 +591,18 @@ aConfItem *make_conf(void)
 
 	bzero((char *) &aconf->ipnum, sizeof(struct IN_ADDR));
 	aconf->clients = aconf->port = 0;
-	aconf->next = NULL;
+	aconf->next					 = NULL;
 	aconf->host = aconf->passwd = aconf->name = aconf->name2 = NULL;
 #ifdef XLINE
 	aconf->name3 = NULL;
 #endif
-	aconf->ping = NULL;
-	aconf->status = CONF_ILLEGAL;
-	aconf->pref = -1;
-	aconf->hold = time(NULL);
+	aconf->ping		 = NULL;
+	aconf->status	 = CONF_ILLEGAL;
+	aconf->pref		 = -1;
+	aconf->hold		 = time(NULL);
 	aconf->source_ip = NULL;
-	aconf->flags = 0L;
-	Class(aconf) = NULL;
+	aconf->flags	 = 0L;
+	Class(aconf)	 = NULL;
 	return (aconf);
 }
 

@@ -196,13 +196,13 @@ static int lhex_work(u_int cl)
 		int retval = 0;
 
 		cldata[cl].inbuffer[cldata[cl].buflen] = '\0';
-		nch = cldata[cl].inbuffer;
+		nch									   = cldata[cl].inbuffer;
 		while ((nch < (cldata[cl].inbuffer + cldata[cl].buflen)) &&
 			   (ch = index(nch, '\r')) && !retval)
 		{
 			char *och = nch;
-			nch = ch + 2; /* Skip the \r\n */
-			*ch = '\0';
+			nch		  = ch + 2; /* Skip the \r\n */
+			*ch		  = '\0';
 			DebugLog((ALOG_DLHEX, 0, "lhex_work(%u): Got [%s]",
 					  cl, och));
 
@@ -214,7 +214,7 @@ static int lhex_work(u_int cl)
 			else
 			{
 				struct lhex_private *d = cldata[cl].instance->data;
-				ch = index(och, ':');
+				ch					   = index(och, ':');
 				while (isspace(*(++ch)));
 				if (!strcmp(ch, "OK"))
 				{
@@ -223,7 +223,7 @@ static int lhex_work(u_int cl)
 							  "lhex_work(%u): OK", id));
 					close(cldata[cl].rfd);
 					cldata[cl].rfd = 0;
-					retval = -1;
+					retval		   = -1;
 				}
 				else if (!strcmp(ch, "Not OK"))
 				{
@@ -238,7 +238,7 @@ static int lhex_work(u_int cl)
 								cldata[cl].itsport);
 					close(cldata[cl].rfd);
 					cldata[cl].rfd = 0;
-					retval = -1;
+					retval		   = -1;
 				}
 				else
 				{

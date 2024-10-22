@@ -55,7 +55,7 @@
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static const volatile char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static const volatile char rcsid[] = "$Id: res_init.c,v 1.16 2005/01/03 22:17:00 q Exp $";
+static const volatile char rcsid[]	= "$Id: res_init.c,v 1.16 2005/01/03 22:17:00 q Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "os.h"
@@ -147,8 +147,8 @@ int ircd_res_init(void)
 	register char *cp, **pp;
 	register int n;
 	char buf[MAXDNAME];
-	int nserv = 0; /* number of nameserver records read from file */
-	int haveenv = 0;
+	int nserv	   = 0; /* number of nameserver records read from file */
+	int haveenv	   = 0;
 	int havesearch = 0;
 #ifdef RESOLVSORT
 	int nsort = 0;
@@ -205,10 +205,10 @@ int ircd_res_init(void)
 #endif
 #endif /* INET6 */
 	ircd_res.nsaddr.SIN_FAMILY = AFINET;
-	ircd_res.nsaddr.SIN_PORT = htons(NAMESERVER_PORT);
-	ircd_res.nscount = 1;
-	ircd_res.ndots = 1;
-	ircd_res.pfcode = 0;
+	ircd_res.nsaddr.SIN_PORT   = htons(NAMESERVER_PORT);
+	ircd_res.nscount		   = 1;
+	ircd_res.ndots			   = 1;
+	ircd_res.pfcode			   = 0;
 
 	/* Allow user to override the local domain definition */
 	if ((cp = getenv("LOCALDOMAIN")) != NULL)
@@ -223,8 +223,8 @@ int ircd_res_init(void)
 		 * one that they want to use as an individual (even more
 		 * important now that the rfc1535 stuff restricts searches)
 		 */
-		cp = ircd_res.defdname;
-		pp = ircd_res.dnsrch;
+		cp	  = ircd_res.defdname;
+		pp	  = ircd_res.dnsrch;
 		*pp++ = cp;
 		for (n = 0; *cp && pp < ircd_res.dnsrch + MAXDNSRCH; cp++)
 		{
@@ -233,19 +233,19 @@ int ircd_res_init(void)
 			else if (*cp == ' ' || *cp == '\t')
 			{
 				*cp = 0;
-				n = 1;
+				n	= 1;
 			}
 			else if (n)
 			{
-				*pp++ = cp;
-				n = 0;
+				*pp++	   = cp;
+				n		   = 0;
 				havesearch = 1;
 			}
 		}
 		/* null terminate last domain if there are excess */
 		while (*cp != '\0' && *cp != ' ' && *cp != '\t' && *cp != '\n')
 			cp++;
-		*cp = '\0';
+		*cp	  = '\0';
 		*pp++ = 0;
 	}
 
@@ -298,27 +298,27 @@ int ircd_res_init(void)
 		     * Set search list to be blank-separated strings
 		     * on rest of line.
 		     */
-					cp = ircd_res.defdname;
-					pp = ircd_res.dnsrch;
+					cp	  = ircd_res.defdname;
+					pp	  = ircd_res.dnsrch;
 					*pp++ = cp;
 					for (n = 0; *cp && pp < ircd_res.dnsrch + MAXDNSRCH; cp++)
 					{
 						if (*cp == ' ' || *cp == '\t')
 						{
 							*cp = 0;
-							n = 1;
+							n	= 1;
 						}
 						else if (n)
 						{
 							*pp++ = cp;
-							n = 0;
+							n	  = 0;
 						}
 					}
 					/* null terminate last domain if there are excess */
 					while (*cp != '\0' && *cp != ' ' && *cp != '\t')
 						cp++;
-					*cp = '\0';
-					*pp++ = 0;
+					*cp		   = '\0';
+					*pp++	   = 0;
 					havesearch = 1;
 					continue;
 				}
@@ -344,7 +344,7 @@ int ircd_res_init(void)
 #endif
 					)
 					{
-						ircd_res.nsaddr_list[nserv].SIN_ADDR = a;
+						ircd_res.nsaddr_list[nserv].SIN_ADDR   = a;
 						ircd_res.nsaddr_list[nserv].SIN_FAMILY = AFINET;
 						ircd_res.nsaddr_list[nserv].SIN_PORT =
 								htons(NAMESERVER_PORT);
@@ -371,7 +371,7 @@ int ircd_res_init(void)
 						while (*cp && !ISSORTMASK(*cp) && *cp != ';' &&
 							   isascii(*cp) && !isspace(*cp))
 							cp++;
-						n = *cp;
+						n	= *cp;
 						*cp = 0;
 						if (inetaton(net, &a))
 						{
@@ -379,11 +379,11 @@ int ircd_res_init(void)
 							if (ISSORTMASK(n))
 							{
 								*cp++ = n;
-								net = cp;
+								net	  = cp;
 								while (*cp && *cp != ';' &&
 									   isascii(*cp) && !isspace(*cp))
 									cp++;
-								n = *cp;
+								n	= *cp;
 								*cp = 0;
 								if (inetaton(net, &a))
 								{
@@ -428,9 +428,9 @@ int ircd_res_init(void)
 	/* find components of local domain that might be searched */
 	if (havesearch == 0)
 	{
-		pp = ircd_res.dnsrch;
+		pp	  = ircd_res.dnsrch;
 		*pp++ = ircd_res.defdname;
-		*pp = NULL;
+		*pp	  = NULL;
 
 #ifndef RFC1535
 		dots = 0;
@@ -442,7 +442,7 @@ int ircd_res_init(void)
 		{
 			if (dots < LOCALDOMAINPARTS)
 				break;
-			cp = strchr(cp, '.') + 1; /* we know there is one */
+			cp	  = strchr(cp, '.') + 1; /* we know there is one */
 			*pp++ = cp;
 			dots--;
 		}
@@ -613,7 +613,7 @@ static int ircd_netinfo_res_init(int *haveenv, int *havesearch)
 
 						if (inetaton(nl.ni_namelist_val[n], &a))
 						{
-							ircd_res.nsaddr_list[nserv].sin_addr = a;
+							ircd_res.nsaddr_list[nserv].sin_addr   = a;
 							ircd_res.nsaddr_list[nserv].sin_family = AF_INET;
 							ircd_res.nsaddr_list[nserv].sin_port =
 									htons(NAMESERVER_PORT);
@@ -654,7 +654,7 @@ static int ircd_netinfo_res_init(int *haveenv, int *havesearch)
 						}
 						if (cp != NULL)
 						{
-							ch = *cp;
+							ch	= *cp;
 							*cp = '\0';
 							break;
 						}
