@@ -36,9 +36,9 @@ extern unsigned char char_atribs[];
 #else /* MATCH_C */
 #define EXTERN
 #endif /* MATCH_C */
-EXTERN int match(char *mask, char *name);
+EXTERN int	 match(char *mask, char *name);
 EXTERN char *collapse(char *pattern);
-EXTERN int mycmp(char *s1, char *s2);
-EXTERN int myncmp(char *str1, char *str2, int n);
-EXTERN int isvalidusername(char *username);
+EXTERN int	 mycmp(char *s1, char *s2);
+EXTERN int	 myncmp(char *str1, char *str2, int n);
+EXTERN int	 isvalidusername(char *username);
 #undef EXTERN

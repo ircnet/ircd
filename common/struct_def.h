@@ -22,17 +22,17 @@
 
 typedef struct ConfItem aConfItem;
 typedef struct ListItem aListItem;
-typedef struct Client aClient;
-typedef struct Channel aChannel;
-typedef struct User anUser;
-typedef struct Server aServer;
-typedef struct Service aService;
-typedef struct SLink Link;
+typedef struct Client	aClient;
+typedef struct Channel	aChannel;
+typedef struct User		anUser;
+typedef struct Server	aServer;
+typedef struct Service	aService;
+typedef struct SLink	Link;
 typedef struct invSLink invLink;
-typedef struct SMode Mode;
-typedef struct fdarray FdAry;
-typedef struct CPing aCPing;
-typedef struct Zdata aZdata;
+typedef struct SMode	Mode;
+typedef struct fdarray	FdAry;
+typedef struct CPing	aCPing;
+typedef struct Zdata	aZdata;
 typedef struct LineItem aMotd;
 #if defined(USE_IAUTH)
 typedef struct LineItem aExtCf;
@@ -297,31 +297,31 @@ typedef enum Status
 
 struct CPing {
 	u_short port; /* port to send pings to */
-	u_long rtt;	  /* average RTT */
-	u_long ping;
-	u_long seq;	   /* # sent still in the "window" */
-	u_long lseq;   /* sequence # of last sent */
-	u_long recvd;  /* # received still in the "window" */
-	u_long lrecvd; /* # received */
+	u_long	rtt;  /* average RTT */
+	u_long	ping;
+	u_long	seq;	/* # sent still in the "window" */
+	u_long	lseq;	/* sequence # of last sent */
+	u_long	recvd;	/* # received still in the "window" */
+	u_long	lrecvd; /* # received */
 };
 
 struct ConfItem {
-	u_int status;		  /* If CONF_ILLEGAL, delete when no clients */
-	int clients;		  /* Number of *LOCAL* clients using this */
-	struct IN_ADDR ipnum; /* ip number of host field */
-	char *host;
-	char *passwd;
-	char *name;
-	char *name2;
+	u_int		   status;	/* If CONF_ILLEGAL, delete when no clients */
+	int			   clients; /* Number of *LOCAL* clients using this */
+	struct IN_ADDR ipnum;	/* ip number of host field */
+	char		  *host;
+	char		  *passwd;
+	char		  *name;
+	char		  *name2;
 #ifdef XLINE
 	char *name3;
 #endif
-	int port;
-	long flags; /* I-line flags */
-	int pref;	/* preference value */
+	int			  port;
+	long		  flags; /* I-line flags */
+	int			  pref;	 /* preference value */
 	struct CPing *ping;
-	time_t hold; /* Hold action until this time (calendar time) */
-	char *source_ip;
+	time_t		  hold; /* Hold action until this time (calendar time) */
+	char		 *source_ip;
 #ifndef VMSP
 	aClass *class; /* Class of connection */
 #endif
@@ -403,10 +403,10 @@ struct ListItem {
 #define IsIllegal(x) ((x)->status & CONF_ILLEGAL)
 
 typedef struct {
-	u_long pi_id;
-	u_long pi_seq;
+	u_long		   pi_id;
+	u_long		   pi_seq;
 	struct timeval pi_tv;
-	aConfItem *pi_cp;
+	aConfItem	  *pi_cp;
 } Ping;
 
 
@@ -421,15 +421,15 @@ typedef struct {
 #define ZIP_MAXIMUM 8192 /* WARNING: *DON'T* CHANGE THIS!!!! */
 
 struct Zdata {
-	z_stream *in;			   /* input zip stream data */
-	z_stream *out;			   /* output zip stream data */
-	Bytef outbuf[ZIP_MAXIMUM]; /* outgoing (unzipped) buffer */
-	int outcount;			   /* size of outbuf content */
+	z_stream *in;				   /* input zip stream data */
+	z_stream *out;				   /* output zip stream data */
+	Bytef	  outbuf[ZIP_MAXIMUM]; /* outgoing (unzipped) buffer */
+	int		  outcount;			   /* size of outbuf content */
 };
 #endif
 
 struct LineItem {
-	char *line;
+	char			*line;
 	struct LineItem *next;
 };
 
@@ -437,17 +437,17 @@ struct LineItem {
  * Client structures
  */
 struct User {
-	Link *channel;	  /* chain of channel pointer blocks */
-	invLink *invited; /* chain of invite pointer blocks */
-	Link *uwas;		  /* chain of whowas pointer blocks */
-	char *away;		  /* pointer to away message */
-	time_t last;	  /* "idle" time */
-	int refcnt;		  /* Number of times this block is referenced
+	Link		  *channel; /* chain of channel pointer blocks */
+	invLink		  *invited; /* chain of invite pointer blocks */
+	Link		  *uwas;	/* chain of whowas pointer blocks */
+	char		  *away;	/* pointer to away message */
+	time_t		   last;	/* "idle" time */
+	int			   refcnt;	/* Number of times this block is referenced
 				** from aClient (field user), aServer (field
 				** by) and whowas array (field ww_user).
 				*/
-	int joined;		  /* number of channels joined */
-	int flags;		  /* user modes */
+	int			   joined;	/* number of channels joined */
+	int			   flags;	/* user modes */
 	struct Server *servp;
 	/*
 				** In a perfect world the 'server' name
@@ -458,15 +458,15 @@ struct User {
 				** introduced... --msa
 				** I think it's not true anymore --Beeth
 				*/
-	u_int hashv;
-	aClient *uhnext;
-	aClient *bcptr;
-	char username[USERLEN + 1];
-	char uid[UIDLEN + 1];
-	char host[HOSTLEN + 1];
-	char *server;
-	u_int hhashv;		  /* hostname hash value */
-	u_int iphashv;		  /* IP hash value */
+	u_int		 hashv;
+	aClient		*uhnext;
+	aClient		*bcptr;
+	char		 username[USERLEN + 1];
+	char		 uid[UIDLEN + 1];
+	char		 host[HOSTLEN + 1];
+	char		*server;
+	u_int		 hhashv;  /* hostname hash value */
+	u_int		 iphashv; /* IP hash value */
 	struct User *hhnext;  /* next entry in hostname hash */
 	struct User *iphnext; /* next entry in IP hash */
 						  /* sip MUST be the last in this struct!!! */
@@ -475,59 +475,59 @@ struct User {
 };
 
 struct Server {
-	char namebuf[HOSTLEN + 1];
-	anUser *user;	  /* who activated this connection */
-	aClient *up;	  /* uplink for this server */
-	aConfItem *nline; /* N-line pointer for this server */
-	int version;	  /* version id for local client */
-	int snum;
-	int refcnt;		/* Number of times this block is referenced
+	char		   namebuf[HOSTLEN + 1];
+	anUser		  *user;	/* who activated this connection */
+	aClient		  *up;		/* uplink for this server */
+	aConfItem	  *nline;	/* N-line pointer for this server */
+	int			   version; /* version id for local client */
+	int			   snum;
+	int			   refcnt;	   /* Number of times this block is referenced
 				** from anUser (field servp), aService (field
 				** servp) and aClient (field serv) */
-	int usercnt[3]; /* # of clients - visible, invisible, opers */
+	int			   usercnt[3]; /* # of clients - visible, invisible, opers */
 	struct Server *nexts, *prevs, *shnext;
-	aClient *bcptr;
-	aClient *maskedby; /* Pointer to server masking this server.
+	aClient		  *bcptr;
+	aClient		  *maskedby; /* Pointer to server masking this server.
 				** Self if not masked, *NEVER* NULL. */
-	char by[NICKLEN + 1];
-	char byuid[UIDLEN + 1];
-	char sid[SIDLEN + 1];  /* The Server ID. */
-	char verstr[11];	   /* server version, PATCHLEVEL format */
-	u_int sidhashv;		   /* Raw hash value. */
-	aServer *sidhnext;	   /* Next server in the sid hash. */
-	time_t lastload;	   /* penalty like counters, see s_serv.c
+	char		   by[NICKLEN + 1];
+	char		   byuid[UIDLEN + 1];
+	char		   sid[SIDLEN + 1]; /* The Server ID. */
+	char		   verstr[11];		/* server version, PATCHLEVEL format */
+	u_int		   sidhashv;		/* Raw hash value. */
+	aServer		  *sidhnext;		/* Next server in the sid hash. */
+	time_t		   lastload;		/* penalty like counters, see s_serv.c
 				** should be in the local part, but.. */
-	int servers;		   /* Number of downlinks of this server. */
-	aClient *left, *right; /* Left and right nodes in server tree. */
-	aClient *down;		   /* Ptr to first downlink of this server. */
+	int			   servers;			/* Number of downlinks of this server. */
+	aClient		  *left, *right;	/* Left and right nodes in server tree. */
+	aClient		  *down;			/* Ptr to first downlink of this server. */
 };
 
 struct Service {
-	char namebuf[HOSTLEN + 1];
-	int wants;
-	int type;
-	char *server;
-	aServer *servp;
+	char			namebuf[HOSTLEN + 1];
+	int				wants;
+	int				type;
+	char		   *server;
+	aServer		   *servp;
 	struct Service *nexts, *prevs;
-	aClient *bcptr;
-	char dist[HOSTLEN + 1];
+	aClient		   *bcptr;
+	char			dist[HOSTLEN + 1];
 };
 
 struct Client {
 	struct Client *next, *prev, *hnext;
-	anUser *user;  /* ...defined, if this is a User */
-	aServer *serv; /* ...defined, if this is a server */
-	aService *service;
-	u_int hashv;				/* raw hash value */
-	long flags;					/* client flags */
-	aClient *from;				/* == self, if Local Client, *NEVER* NULL! */
-	int fd;						/* >= 0, for local clients */
-	int hopcount;				/* number of servers to this 0 = local */
-	short status;				/* Client type */
-	char *name;					/* Pointer to unique name of the client */
-	char namebuf[NICKLEN + 1];	/* nick of the client */
-	char username[USERLEN + 1]; /* username here now for auth stuff */
-	char *info;					/* Free form additional client information */
+	anUser		  *user; /* ...defined, if this is a User */
+	aServer		  *serv; /* ...defined, if this is a server */
+	aService	  *service;
+	u_int		   hashv;				  /* raw hash value */
+	long		   flags;				  /* client flags */
+	aClient		  *from;				  /* == self, if Local Client, *NEVER* NULL! */
+	int			   fd;					  /* >= 0, for local clients */
+	int			   hopcount;			  /* number of servers to this 0 = local */
+	short		   status;				  /* Client type */
+	char		  *name;				  /* Pointer to unique name of the client */
+	char		   namebuf[NICKLEN + 1];  /* nick of the client */
+	char		   username[USERLEN + 1]; /* username here now for auth stuff */
+	char		  *info;				  /* Free form additional client information */
 	/*
 	** The following fields are allocated only for local clients
 	** (directly connected to *this* server with a socket.
@@ -535,36 +535,36 @@ struct Client {
 	** to which the allocation is tied to! *Never* refer to
 	** these fields, if (from != self).
 	*/
-	int count;			  /* Amount of data in buffer */
+	int	 count;			  /* Amount of data in buffer */
 	char buffer[BUFSIZE]; /* Incoming message buffer */
 #ifdef ZIP_LINKS
 	aZdata *zip; /* zip data */
 #endif
-	short lastsq;				 /* # of 2k blocks when sendqueued called last*/
-	dbuf sendQ;					 /* Outgoing message queue--if socket full */
-	dbuf recvQ;					 /* Hold for data incoming yet to be parsed */
-	long sendM;					 /* Statistics: protocol messages send */
-	long receiveM;				 /* Statistics: protocol messages received */
-	unsigned long long sendB;	 /* Statistics: total bytes send */
-	unsigned long long receiveB; /* Statistics: total bytes received */
-	time_t lasttime;			 /* last time we received data */
-	time_t firsttime;			 /* time client was created */
-	time_t since;				 /* last time we parsed something */
-	aClient *acpt;				 /* listening client which we accepted from */
-	Link *confs;				 /* Configuration record associated */
-	int ping;
-	int authfd; /* fd for rfc931 authentication */
-	char *auth;
-	u_short port;	   /* and the remote port# too :-) */
-	struct IN_ADDR ip; /* keep real ip# too */
-	struct hostent *hostp;
-	char sockhost[HOSTLEN + 1]; /* This is the host name from the socket
+	short			   lastsq;	  /* # of 2k blocks when sendqueued called last*/
+	dbuf			   sendQ;	  /* Outgoing message queue--if socket full */
+	dbuf			   recvQ;	  /* Hold for data incoming yet to be parsed */
+	long			   sendM;	  /* Statistics: protocol messages send */
+	long			   receiveM;  /* Statistics: protocol messages received */
+	unsigned long long sendB;	  /* Statistics: total bytes send */
+	unsigned long long receiveB;  /* Statistics: total bytes received */
+	time_t			   lasttime;  /* last time we received data */
+	time_t			   firsttime; /* time client was created */
+	time_t			   since;	  /* last time we parsed something */
+	aClient			  *acpt;	  /* listening client which we accepted from */
+	Link			  *confs;	  /* Configuration record associated */
+	int				   ping;
+	int				   authfd; /* fd for rfc931 authentication */
+	char			  *auth;
+	u_short			   port; /* and the remote port# too :-) */
+	struct IN_ADDR	   ip;	 /* keep real ip# too */
+	struct hostent	  *hostp;
+	char			   sockhost[HOSTLEN + 1]; /* This is the host name from the socket
 				  ** and after which the connection was
 				  ** accepted.
 				  */
-	char passwd[PASSWDLEN + 1];
-	char exitc;
-	char *reason; /* additional exit message */
+	char			   passwd[PASSWDLEN + 1];
+	char			   exitc;
+	char			  *reason; /* additional exit message */
 #ifdef XLINE
 	/* Those logically should be in anUser struct, but would be null for
 	** all remote users... so better waste two pointers for all local
@@ -581,59 +581,59 @@ struct Client {
  * statistics structures
  */
 struct stats {
-	u_int is_cl;			   /* number of client connections */
-	u_int is_sv;			   /* number of server connections */
-	u_int is_ni;			   /* connection but no idea who it was
+	u_int			   is_cl;	   /* number of client connections */
+	u_int			   is_sv;	   /* number of server connections */
+	u_int			   is_ni;	   /* connection but no idea who it was
 			 * (can be a P: line that has been removed -krys) */
-	unsigned long long is_cbs; /* bytes sent to clients */
-	unsigned long long is_cbr; /* bytes received to clients */
-	unsigned long long is_sbs; /* bytes sent to servers */
-	unsigned long long is_sbr; /* bytes received to servers */
-	time_t is_cti;			   /* time spent connected by clients */
-	time_t is_sti;			   /* time spent connected by servers */
-	u_int is_ac;			   /* connections accepted */
-	u_int is_ref;			   /* accepts refused */
-	u_int is_unco;			   /* unknown commands */
-	u_int is_wrdi;			   /* command going in wrong direction */
-	u_int is_unpf;			   /* unknown prefix */
-	u_int is_empt;			   /* empty message */
-	u_int is_num;			   /* numeric message */
-	u_int is_kill;			   /* number of kills generated on collisions */
-	u_int is_save;			   /* number of saved clients */
-	u_int is_fake;			   /* MODE 'fakes' */
-	u_int is_reop;			   /* number of local reops */
-	u_int is_rreop;			   /* number of remote reops */
-	u_int is_asuc;			   /* successful auth requests */
-	u_int is_abad;			   /* bad auth requests */
-	u_int is_udpok;			   /* packets recv'd on udp port */
-	u_int is_udperr;		   /* packets recvfrom errors on udp port */
-	u_int is_udpdrop;		   /* packets recv'd but dropped on udp port */
-	u_int is_loc;			   /* local connections made */
-	u_int is_nosrv;			   /* user without server */
-	u_long is_wwcnt;		   /* number of nicks overwritten in whowas[] */
-	unsigned long long is_wwt; /* sum of elapsed time on when 
+	unsigned long long is_cbs;	   /* bytes sent to clients */
+	unsigned long long is_cbr;	   /* bytes received to clients */
+	unsigned long long is_sbs;	   /* bytes sent to servers */
+	unsigned long long is_sbr;	   /* bytes received to servers */
+	time_t			   is_cti;	   /* time spent connected by clients */
+	time_t			   is_sti;	   /* time spent connected by servers */
+	u_int			   is_ac;	   /* connections accepted */
+	u_int			   is_ref;	   /* accepts refused */
+	u_int			   is_unco;	   /* unknown commands */
+	u_int			   is_wrdi;	   /* command going in wrong direction */
+	u_int			   is_unpf;	   /* unknown prefix */
+	u_int			   is_empt;	   /* empty message */
+	u_int			   is_num;	   /* numeric message */
+	u_int			   is_kill;	   /* number of kills generated on collisions */
+	u_int			   is_save;	   /* number of saved clients */
+	u_int			   is_fake;	   /* MODE 'fakes' */
+	u_int			   is_reop;	   /* number of local reops */
+	u_int			   is_rreop;   /* number of remote reops */
+	u_int			   is_asuc;	   /* successful auth requests */
+	u_int			   is_abad;	   /* bad auth requests */
+	u_int			   is_udpok;   /* packets recv'd on udp port */
+	u_int			   is_udperr;  /* packets recvfrom errors on udp port */
+	u_int			   is_udpdrop; /* packets recv'd but dropped on udp port */
+	u_int			   is_loc;	   /* local connections made */
+	u_int			   is_nosrv;   /* user without server */
+	u_long			   is_wwcnt;   /* number of nicks overwritten in whowas[] */
+	unsigned long long is_wwt;	   /* sum of elapsed time on when 
 					** overwriting whowas[] */
-	u_long is_wwMt;			   /* max elapsed time on when overwriting whowas[] */
-	u_long is_wwmt;			   /* min elapsed time on when overwriting whowas[] */
-	u_long is_lkcnt;		   /* number of nicks overwritten in locked[] */
-	unsigned long long is_lkt; /* sum of elapsed time on when
+	u_long			   is_wwMt;	   /* max elapsed time on when overwriting whowas[] */
+	u_long			   is_wwmt;	   /* min elapsed time on when overwriting whowas[] */
+	u_long			   is_lkcnt;   /* number of nicks overwritten in locked[] */
+	unsigned long long is_lkt;	   /* sum of elapsed time on when
 					** overwriting locked[]*/
-	u_long is_lkMt;			   /* max elapsed time on when overwriting locked[] */
-	u_long is_lkmt;			   /* min elapsed time on when overwriting locked[] */
-	u_int is_ckl;			   /* calls to check_link() */
-	u_int is_cklQ;			   /* rejected: SendQ too high */
-	u_int is_ckly;			   /* rejected: link too young */
-	u_int is_cklno;			   /* rejected: "flood" */
-	u_int is_cklok;			   /* accepted */
-	u_int is_cklq;			   /* accepted early */
+	u_long			   is_lkMt;	   /* max elapsed time on when overwriting locked[] */
+	u_long			   is_lkmt;	   /* min elapsed time on when overwriting locked[] */
+	u_int			   is_ckl;	   /* calls to check_link() */
+	u_int			   is_cklQ;	   /* rejected: SendQ too high */
+	u_int			   is_ckly;	   /* rejected: link too young */
+	u_int			   is_cklno;   /* rejected: "flood" */
+	u_int			   is_cklok;   /* accepted */
+	u_int			   is_cklq;	   /* accepted early */
 };
 
 /* mode structure for channels */
 
 struct SMode {
 	u_int mode;
-	int limit;
-	char key[KEYLEN + 1];
+	int	  limit;
+	char  key[KEYLEN + 1];
 };
 
 /* Message table structure */
@@ -642,16 +642,16 @@ typedef int (*CmdHandler)(aClient *, aClient *, int, char **);
 
 struct Cmd {
 	CmdHandler handler; /* command */
-	u_int count;		/* total count */
-	u_int rcount;		/* remote count */
-	u_long bytes;
-	u_long rbytes;
+	u_int	   count;	/* total count */
+	u_int	   rcount;	/* remote count */
+	u_long	   bytes;
+	u_long	   rbytes;
 };
 
 struct Message {
-	char *cmd;
-	int minparams;
-	int maxparams;
+	char	  *cmd;
+	int		   minparams;
+	int		   maxparams;
 	struct Cmd handlers[STAT_MAX];
 };
 
@@ -668,12 +668,12 @@ struct SLink {
 	struct SLink *next;
 	union
 	{
-		aClient *cptr;
-		aChannel *chptr;
+		aClient	  *cptr;
+		aChannel  *chptr;
 		aConfItem *aconf;
 		aListItem *alist;
-		char *cp;
-		int i;
+		char	  *cp;
+		int		   i;
 	} value;
 	int flags;
 };
@@ -682,27 +682,27 @@ struct SLink {
 
 struct invSLink {
 	struct invSLink *next;
-	aChannel *chptr;
-	char *who;
-	int flags;
+	aChannel		*chptr;
+	char			*who;
+	int				 flags;
 };
 
 /* channel structure */
 
 struct Channel {
 	struct Channel *nextch, *prevch, *hnextch;
-	u_int hashv; /* raw hash value */
-	Mode mode;
-	char topic[TOPICLEN + 1];
+	u_int			hashv; /* raw hash value */
+	Mode			mode;
+	char			topic[TOPICLEN + 1];
 #ifdef TOPIC_WHO_TIME
-	char topic_nuh[BANLEN + 1];
+	char   topic_nuh[BANLEN + 1];
 	time_t topic_t;
 #endif
-	int users;		/* current membership total */
-	Link *members;	/* channel members */
-	Link *invites;	/* outstanding invitations */
-	Link *mlist;	/* list of extended modes: +b/+e/+I */
-	Link *clist;	/* list of local! connections which are members */
+	int	   users;	/* current membership total */
+	Link  *members; /* channel members */
+	Link  *invites; /* outstanding invitations */
+	Link  *mlist;	/* list of extended modes: +b/+e/+I */
+	Link  *clist;	/* list of local! connections which are members */
 	time_t history; /* channel history (aka channel delay) */
 	time_t reop;	/* server reop stamp for !channels */
 #ifdef JAPANESE
@@ -844,12 +844,12 @@ typedef struct {
 	u_long is_userc;  /* user links to channels */
 	u_long is_auth;	  /* OTHER ident reply block */
 	u_long is_authmem;
-	u_int is_dbuf;		   /* number of dbuf allocated (originally) */
-	u_int is_dbufnow;	   /* number of dbuf allocated */
-	u_int is_dbufuse;	   /* number of dbuf in use */
-	u_int is_dbufmin;	   /* min number of dbuf in use */
-	u_int is_dbufmax;	   /* max number of dbuf in use */
-	u_int is_dbufmore;	   /* how many times we increased the bufferpool*/
+	u_int  is_dbuf;		   /* number of dbuf allocated (originally) */
+	u_int  is_dbufnow;	   /* number of dbuf allocated */
+	u_int  is_dbufuse;	   /* number of dbuf in use */
+	u_int  is_dbufmin;	   /* min number of dbuf in use */
+	u_int  is_dbufmax;	   /* max number of dbuf in use */
+	u_int  is_dbufmore;	   /* how many times we increased the bufferpool*/
 	u_long is_m_users;	   /* maximum users connected */
 	time_t is_m_users_t;   /* timestamp of last maximum users */
 	u_long is_m_serv;	   /* maximum servers connected */
@@ -861,8 +861,8 @@ typedef struct {
 	u_long is_l_myclnt;	   /* last local user count */
 	time_t is_l_myclnt_t;  /* timestamp for last count */
 #ifdef DELAY_CLOSE
-	u_long is_delayclose;	 /* number of fds that got delayed close() */
-	u_int is_delayclosewait; /* number of fds that wait for delayed close() */
+	u_long is_delayclose;	  /* number of fds that got delayed close() */
+	u_int  is_delayclosewait; /* number of fds that wait for delayed close() */
 #endif
 } istat_t;
 
@@ -903,10 +903,10 @@ typedef struct {
 /* used for sendto_flag */
 
 typedef struct {
-	int svc_chan;
-	char *svc_chname;
+	int				svc_chan;
+	char		   *svc_chname;
 	struct Channel *svc_ptr;
-	int fd;
+	int				fd;
 } SChan;
 
 typedef enum ServerChannels
@@ -1018,7 +1018,7 @@ typedef enum ServerChannels
 #define WHO_FLAG_UID 0x8000
 
 struct who_opts {
-	int flags;
+	int			flags;
 	const char *token;
 };
 

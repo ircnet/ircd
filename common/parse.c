@@ -129,7 +129,7 @@ struct Message msgtab[] = {
 static char *para[MPAR + 1];
 
 static char sender[HOSTLEN + 1];
-static int cancel_clients(aClient *, aClient *, char *);
+static int	cancel_clients(aClient *, aClient *, char *);
 static void remove_unknown(aClient *, char *);
 
 static int find_sender(aClient *cptr, aClient **sptr, char *sender,
@@ -184,11 +184,11 @@ aClient *find_service(char *name, aClient *cptr)
 
 aClient *find_matching_client(char *mask)
 {
-	aClient *acptr;
-	aServer *asptr;
+	aClient	 *acptr;
+	aServer	 *asptr;
 	aService *sp;
-	char *ch;
-	int wild = 0, dot = 0;
+	char	 *ch;
+	int		  wild = 0, dot = 0;
 
 	/* try to find exact match */
 	acptr = find_client(mask, NULL);
@@ -355,9 +355,9 @@ aClient *find_server(char *name, aClient *cptr)
 */
 aClient *find_mask(char *name, aClient *cptr)
 {
-	static char servermask[HOSTLEN + 1];
+	static char	 servermask[HOSTLEN + 1];
 	Reg aClient *c2ptr = cptr;
-	Reg char *mask	   = servermask;
+	Reg char	*mask  = servermask;
 
 	if (!name || !*name)
 		return c2ptr;
@@ -569,14 +569,14 @@ aClient *find_target(char *name, aClient *cptr)
  */
 int parse(aClient *cptr, char *buffer, char *bufend)
 {
-	aClient *from = cptr;
-	Reg char *ch, *s;
-	Reg int len, i, numeric = 0, paramcount;
+	aClient			   *from = cptr;
+	Reg char		   *ch, *s;
+	Reg int				len, i, numeric = 0, paramcount;
 	Reg struct Message *mptr = NULL;
-	int ret;
-	int status = STAT_UNREG;
-	struct Cmd *handler;
-	CmdHandler fhandler = m_nop;
+	int					ret;
+	int					status = STAT_UNREG;
+	struct Cmd		   *handler;
+	CmdHandler			fhandler = m_nop;
 
 	Debug((DEBUG_DEBUG, "Parsing %s: %s",
 		   get_client_name(cptr, FALSE), buffer));
@@ -813,7 +813,7 @@ int parse(aClient *cptr, char *buffer, char *bufend)
 char *getfield(char *irc_newline)
 {
 	static char *line = NULL;
-	char *end, *field;
+	char		*end, *field;
 
 	if (irc_newline)
 		line = irc_newline;

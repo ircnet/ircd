@@ -145,13 +145,13 @@ int ircd_res_init(void)
 {
 	register FILE *fp;
 	register char *cp, **pp;
-	register int n;
-	char buf[MAXDNAME];
-	int nserv	   = 0; /* number of nameserver records read from file */
-	int haveenv	   = 0;
-	int havesearch = 0;
+	register int   n;
+	char		   buf[MAXDNAME];
+	int			   nserv	  = 0; /* number of nameserver records read from file */
+	int			   haveenv	  = 0;
+	int			   havesearch = 0;
 #ifdef RESOLVSORT
-	int nsort = 0;
+	int	  nsort = 0;
 	char *net;
 #endif
 #ifndef RFC1535
@@ -326,7 +326,7 @@ int ircd_res_init(void)
 				if (MATCH(buf, "nameserver") && nserv < MAXNS)
 				{
 					struct IN_ADDR a;
-					char *tmp;
+					char		  *tmp;
 
 					cp = buf + sizeof("nameserver") - 1;
 					while (*cp == ' ' || *cp == '\t')
@@ -468,7 +468,7 @@ int ircd_res_init(void)
 static void ircd_res_setoptions(char *options, char *source)
 {
 	char *cp = options;
-	int i;
+	int	  i;
 
 #ifdef DEBUG
 	if (ircd_res.options & RES_DEBUG)
@@ -540,11 +540,11 @@ static u_int32_t ircd_net_mask(struct in_addr in)
 static int ircd_netinfo_res_init(int *haveenv, int *havesearch)
 {
 	register int n;
-	void *domain, *parent;
-	ni_id dir;
-	ni_status status;
-	ni_namelist nl;
-	int nserv = 0;
+	void		*domain, *parent;
+	ni_id		 dir;
+	ni_status	 status;
+	ni_namelist	 nl;
+	int			 nserv = 0;
 #ifdef RESOLVSORT
 	int nsort = 0;
 #endif
@@ -637,9 +637,9 @@ static int ircd_netinfo_res_init(int *haveenv, int *havesearch)
 						 n < nl.ni_namelist_len && nsort < MAXRESOLVSORT;
 						 n++)
 					{
-						char ch;
-						char *cp;
-						const char *sp;
+						char		   ch;
+						char		  *cp;
+						const char	  *sp;
 						struct in_addr a;
 
 						cp = NULL;

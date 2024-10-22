@@ -33,7 +33,7 @@ static const volatile char rcsid[] = "@(#)$Id: dbuf.c,v 1.12 2004/10/01 20:22:12
 #include "s_externs.h"
 #undef DBUF_C
 
-u_int poolsize	  = (BUFFERPOOL > 1500000) ? BUFFERPOOL : 1500000;
+u_int	 poolsize = (BUFFERPOOL > 1500000) ? BUFFERPOOL : 1500000;
 dbufbuf *freelist = NULL;
 
 /* dbuf_init--initialize a stretch of memory as dbufs.
@@ -46,7 +46,7 @@ dbufbuf *freelist = NULL;
 void dbuf_init(void)
 {
 	dbufbuf *dbp;
-	int i = 0, nb;
+	int		 i = 0, nb;
 
 	nb		 = poolsize / sizeof(dbufbuf);
 	freelist = (dbufbuf *) malloc(nb * sizeof(dbufbuf));
@@ -136,10 +136,10 @@ int dbuf_malloc_error(dbuf *dyn)
 int dbuf_put(dbuf *dyn, char *buf, int length)
 {
 	Reg dbufbuf **h;
-	dbufbuf *d;
+	dbufbuf		 *d;
 #ifdef DBUF_TAIL
 	dbufbuf *dtail;
-	Reg int off;
+	Reg int	 off;
 #else
 	Reg int nbr, off;
 #endif
@@ -272,7 +272,7 @@ char *dbuf_map(dbuf *dyn, int *length)
 int dbuf_delete(dbuf *dyn, int length)
 {
 	dbufbuf *d;
-	int chunk;
+	int		 chunk;
 
 	if (length > dyn->length)
 		length = dyn->length;
@@ -330,8 +330,8 @@ int dbuf_delete(dbuf *dyn, int length)
 */
 int dbuf_get(dbuf *dyn, char *buf, int length)
 {
-	int moved = 0;
-	int chunk;
+	int	  moved = 0;
+	int	  chunk;
 	char *b;
 
 	while (length > 0 && (b = dbuf_map(dyn, &chunk)) != NULL)
@@ -390,11 +390,11 @@ int	dbuf_copy(dbuf *dyn, char *buf, int length)
 */
 int dbuf_getmsg(dbuf *dyn, char *buf, int length)
 {
-	dbufbuf *d;
+	dbufbuf		  *d;
 	register char *s;
-	register int dlen;
-	register int i;
-	int copy;
+	register int   dlen;
+	register int   i;
+	int			   copy;
 
 getmsg_init:
 	d	 = dyn->head;

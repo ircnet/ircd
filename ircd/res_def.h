@@ -28,37 +28,37 @@
 struct hent {
 	char *h_name;				 /* official name of host */
 	char *h_aliases[MAXALIASES]; /* alias list */
-	int h_addrtype;				 /* host address type */
-	int h_length;				 /* length of address */
+	int	  h_addrtype;			 /* host address type */
+	int	  h_length;				 /* length of address */
 	/* list of addresses from name server */
 	struct IN_ADDR h_addr_list[MAXADDRS];
 #define h_addr h_addr_list[0] /* address, for backward compatiblity */
 };
 
 typedef struct reslist {
-	int id;
-	int sent; /* number of requests sent */
-	int srch;
-	time_t ttl;
-	char type;
-	char retries; /* retry counter */
-	char sends;	  /* number of sends (>1 means resent) */
-	char resend;  /* send flag. 0 == dont resend */
-	time_t sentat;
-	time_t timeout;
-	struct IN_ADDR addr;
-	char *name;
+	int				id;
+	int				sent; /* number of requests sent */
+	int				srch;
+	time_t			ttl;
+	char			type;
+	char			retries; /* retry counter */
+	char			sends;	 /* number of sends (>1 means resent) */
+	char			resend;	 /* send flag. 0 == dont resend */
+	time_t			sentat;
+	time_t			timeout;
+	struct IN_ADDR	addr;
+	char		   *name;
 	struct reslist *next;
-	Link cinfo;
-	struct hent he;
+	Link			cinfo;
+	struct hent		he;
 } ResRQ;
 
 typedef struct cache {
-	time_t expireat;
-	time_t ttl;
-	int flags;
+	time_t		   expireat;
+	time_t		   ttl;
+	int			   flags;
 	struct hostent he;
-	struct cache *hname_next, *hnum_next, *list_next;
+	struct cache  *hname_next, *hnum_next, *list_next;
 } aCache;
 
 typedef struct cachetable {

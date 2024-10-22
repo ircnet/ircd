@@ -28,12 +28,12 @@
 #else /* SEND_C */
 #define EXTERN
 #endif /* SEND_C */
-EXTERN int send_queued(aClient *to);
-EXTERN int vsendto_one(aClient *to, char *pattern, va_list va);
-EXTERN int sendto_one(aClient *to, char *pattern, ...);
+EXTERN int	send_queued(aClient *to);
+EXTERN int	vsendto_one(aClient *to, char *pattern, va_list va);
+EXTERN int	sendto_one(aClient *to, char *pattern, ...);
 EXTERN void logfiles_open(void);
 EXTERN void logfiles_close(void);
-EXTERN int send_message(aClient *, char *, int);
+EXTERN int	send_message(aClient *, char *, int);
 EXTERN void flush_connections(int fd);
 EXTERN void flush_fdary(FdAry *);
 EXTERN void setup_svchans(void);
@@ -42,14 +42,14 @@ EXTERN void sendto_flog(aClient *cptr, char msg,
 EXTERN void sendto_channel_butone(aClient *one, aClient *from,
 								  aChannel *chptr, char *pattern, ...);
 EXTERN void sendto_serv_butone(aClient *one, char *pattern, ...);
-EXTERN int sendto_serv_v(aClient *one, int ver, char *pattern, ...);
+EXTERN int	sendto_serv_v(aClient *one, int ver, char *pattern, ...);
 EXTERN void sendto_common_channels(aClient *user, char *pattern, ...);
 EXTERN void sendto_channel_butserv(aChannel *chptr, aClient *from,
 								   char *pattern, ...);
 EXTERN void sendto_match_servs(aChannel *chptr, aClient *from,
 							   char *format, ...);
-EXTERN int sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
-								char *format, ...);
+EXTERN int	sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
+								 char *format, ...);
 #if 0
 EXTERN int sendto_serv_notv (aClient *one, int ver, char *pattern, ...);
 EXTERN int sendto_match_servs_notv (aChannel *chptr, aClient *from, int ver,

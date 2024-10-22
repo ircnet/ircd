@@ -37,9 +37,9 @@ static int proxy_start(u_int cl);
 
 struct proxylog {
 	struct proxylog *next;
-	char ip[HOSTLEN + 1];
-	u_char state; /* 0 = no proxy, 1 = open proxy, 2 = closed proxy */
-	time_t expire;
+	char			 ip[HOSTLEN + 1];
+	u_char			 state; /* 0 = no proxy, 1 = open proxy, 2 = closed proxy */
+	time_t			 expire;
 };
 
 #define OPT_LOG 0x001
@@ -52,8 +52,8 @@ struct proxylog {
 
 struct proxy_private {
 	struct proxylog *cache;
-	u_int lifetime;
-	u_char options;
+	u_int			 lifetime;
+	u_char			 options;
 	/* stats */
 	u_int chitc, chito, chitn, cmiss, cnow, cmax;
 	u_int noproxy, open, closed;
@@ -67,7 +67,7 @@ struct proxy_private {
 static void proxy_open_proxy(int cl)
 {
 	struct proxy_private *mydata = cldata[cl].instance->data;
-	char *reason				 = cldata[cl].instance->reason;
+	char				 *reason = cldata[cl].instance->reason;
 
 	if (!reason)
 	{
@@ -96,7 +96,7 @@ static void proxy_open_proxy(int cl)
 static void proxy_add_cache(int cl, int state)
 {
 	struct proxy_private *mydata = cldata[cl].instance->data;
-	struct proxylog *next;
+	struct proxylog		 *next;
 
 	if (state == PROXY_OPEN)
 	{
@@ -141,8 +141,8 @@ static void proxy_add_cache(int cl, int state)
 static int proxy_check_cache(u_int cl)
 {
 	struct proxy_private *mydata = cldata[cl].instance->data;
-	struct proxylog **last, *pl;
-	time_t now = time(NULL);
+	struct proxylog		**last, *pl;
+	time_t				  now = time(NULL);
 
 	if (mydata->lifetime == 0)
 	{
@@ -198,7 +198,7 @@ static int proxy_check_cache(u_int cl)
 static int proxy_write(u_int cl)
 {
 	char query[128]; /* big enough to hold all queries */
-	int query_len;	 /* length of query */
+	int	 query_len;	 /* length of query */
 #ifndef INET6
 	u_int a, b, c, d;
 #else
@@ -248,7 +248,7 @@ static int proxy_write(u_int cl)
 static int proxy_read(u_int cl)
 {
 	struct proxy_private *mydata = cldata[cl].instance->data;
-	u_char state				 = PROXY_CLOSE;
+	u_char				  state	 = PROXY_CLOSE;
 
 	/* not enough data from the other end */
 	if (cldata[cl].buflen <
@@ -308,9 +308,9 @@ static int proxy_read(u_int cl)
 static char *proxy_init(AnInstance *self)
 {
 	struct proxy_private *mydata;
-	char tmpbuf[80], cbuf[32];
-	static char txtbuf[80];
-	char *ch;
+	char				  tmpbuf[80], cbuf[32];
+	static char			  txtbuf[80];
+	char				 *ch;
 
 	if (self->opt == NULL)
 	{
@@ -422,7 +422,7 @@ static void proxy_stats(AnInstance *self)
 static int proxy_start(u_int cl)
 {
 	char *error;
-	int fd;
+	int	  fd;
 
 	if (cldata[cl].state & A_DENY)
 	{

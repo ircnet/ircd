@@ -36,7 +36,7 @@ static int fd2cl[MAXCONNECTIONS]; /* fd -> cl mapping */
 #define IOBUFSIZE 4096
 static char iobuf[IOBUFSIZE + 1];
 static char rbuf[IOBUFSIZE + 1]; /* incoming ircd stream */
-static int iob_len = 0, rb_len = 0;
+static int	iob_len = 0, rb_len = 0;
 
 void init_io(void)
 {
@@ -205,7 +205,7 @@ static void next_io(int cl, AnInstance *last)
 static void parse_ircd(void)
 {
 	char *ch, *chp, *buf = iobuf;
-	int cl = -1, ncl;
+	int	  cl = -1, ncl;
 
 	iobuf[iob_len] = '\0';
 	while ((ch = index(buf, '\n')))
@@ -500,7 +500,7 @@ void loop_io(void)
 #define TST_WRITE_EVENT(thisfd) FD_ISSET(thisfd, &write_set)
 
 	fd_set read_set, write_set;
-	int highfd = -1;
+	int	   highfd = -1;
 #else
 /* most of the following use pfd */
 #define POLLSETREADFLAGS (POLLIN | POLLRDNORM)
@@ -532,14 +532,14 @@ void loop_io(void)
 		pfd->events = 0;                         \
 	}
 
-	struct pollfd poll_fdarray[MAXCONNECTIONS];
-	struct pollfd *pfd = poll_fdarray;
-	int nbr_pfds	   = 0;
+	struct pollfd  poll_fdarray[MAXCONNECTIONS];
+	struct pollfd *pfd		= poll_fdarray;
+	int			   nbr_pfds = 0;
 #endif
 
-	int i, nfds = 0;
+	int			   i, nfds = 0;
 	struct timeval wait;
-	time_t now = time(NULL);
+	time_t		   now = time(NULL);
 
 #if !defined(USE_POLL)
 	FD_ZERO(&read_set);
@@ -789,8 +789,8 @@ static void set_non_blocking(int fd, char *ip, u_short port)
  */
 int tcp_connect(char *ourIP, char *theirIP, u_short port, char **error)
 {
-	int fd;
-	static char errbuf[BUFSIZ];
+	int				   fd;
+	static char		   errbuf[BUFSIZ];
 	struct SOCKADDR_IN sk;
 
 	fd = socket(AFINET, SOCK_STREAM, 0);

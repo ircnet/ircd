@@ -185,7 +185,7 @@ void send_usage(aClient *cptr, char *nick)
 {
 #if HAVE_GETRUSAGE
 	struct rusage rus;
-	time_t secs, rup;
+	time_t		  secs, rup;
 #ifdef hz
 #define hzz hz
 #else
@@ -235,9 +235,9 @@ void send_usage(aClient *cptr, char *nick)
 #else /* HAVE_GETRUSAGE */
 #if HAVE_TIMES
 	struct tms tmsbuf;
-	time_t secs, mins;
-	int hzz = 1, ticpermin;
-	int umin, smin, usec, ssec;
+	time_t	   secs, mins;
+	int		   hzz = 1, ticpermin;
+	int		   umin, smin, usec, ssec;
 
 #ifdef HPUX
 	hzz = sysconf(_SC_CLK_TCK);
@@ -356,16 +356,16 @@ void send_defines(aClient *cptr, char *nick, char *extend)
 
 void count_memory(aClient *cptr, char *nick, int debug)
 {
-	extern aChannel *channel;
-	extern aClass *classes;
+	extern aChannel	 *channel;
+	extern aClass	 *classes;
 	extern aConfItem *conf;
-	extern int _HASHSIZE, _CHANNELHASHSIZE;
+	extern int		  _HASHSIZE, _CHANNELHASHSIZE;
 
-	Reg aClient *acptr;
-	Reg Link *link;
-	Reg aChannel *chptr;
+	Reg aClient	  *acptr;
+	Reg Link	  *link;
+	Reg aChannel  *chptr;
 	Reg aConfItem *aconf;
-	Reg aClass *cltmp;
+	Reg aClass	  *cltmp;
 
 	int lc = 0, d_lc = 0,		/* local clients */
 			ch = 0, d_ch = 0,	/* channels */

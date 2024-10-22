@@ -48,29 +48,29 @@ static aConfig *files;
 static struct wordcount *findConfLineNumber(int);
 static struct wordcount *files;
 struct wordcount {
-	char *filename;
-	int min;
-	int max;
+	char			 *filename;
+	int				  min;
+	int				  max;
 	struct wordcount *next;
 };
 static void mywc(void);
 #ifdef M4_PREPROC
 static char *mystrinclude(char *, int);
-static int simulateM4Include(struct wordcount *, int, char *, int);
+static int	 simulateM4Include(struct wordcount *, int, char *, int);
 #endif
 static int dgets(int, char *, int);
 #endif
 
-static void new_class(int);
-static char *getfield(char *), confchar(u_int);
-static int openconf(void);
-static void validate(aConfItem *);
-static aClass *get_class(int, int);
+static void		  new_class(int);
+static char		 *getfield(char *), confchar(u_int);
+static int		  openconf(void);
+static void		  validate(aConfItem *);
+static aClass	 *get_class(int, int);
 static aConfItem *initconf(void);
-static void showconf(void);
-static int checkSID(char *, int);
+static void		  showconf(void);
+static int		  checkSID(char *, int);
 
-static int numclasses = 0, *classarr = (int *) NULL, debugflag = 0;
+static int	numclasses = 0, *classarr = (int *) NULL, debugflag = 0;
 static char nullfield[] = "";
 static char maxsendq[12];
 
@@ -79,7 +79,7 @@ static char maxsendq[12];
 int main(int argc, char *argv[])
 {
 	aConfItem *result;
-	int showflag = 0;
+	int		   showflag = 0;
 
 	if (argc > 1 && !strncmp(argv[1], "-h", 2))
 	{
@@ -213,10 +213,10 @@ static void showconf(void)
 {
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
 	aConfig *p, *p2;
-	int etclen = 0;
-	FILE *fdn;
+	int		 etclen = 0;
+	FILE	*fdn;
 #else
-	int dh;
+	int	 dh;
 	char line[512], c[80], *tmp;
 #endif
 	int fd;
@@ -278,20 +278,20 @@ static void showconf(void)
 
 static aConfItem *initconf(void)
 {
-	int fd;
-	char *tmp, *tmp3 = NULL, *s;
-	int ccount = 0, ncount = 0, flags = 0, nr = 0;
+	int		   fd;
+	char	  *tmp, *tmp3 = NULL, *s;
+	int		   ccount = 0, ncount = 0, flags = 0, nr = 0;
 	aConfItem *aconf = NULL, *ctop = NULL;
-	int mandatory_found = 0, valid = 1;
+	int		   mandatory_found = 0, valid = 1;
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
-	char *line;
+	char	*line;
 	aConfig *ConfigTop, *filelist;
-	aFile *ftop;
-	FILE *fdn;
+	aFile	*ftop;
+	FILE	*fdn;
 #else
-	int dh;
+	int				  dh;
 	struct wordcount *filelist = files;
-	char line[512], c[80], *ftop;
+	char			  line[512], c[80], *ftop;
 #endif
 
 	(void) fprintf(stderr, "initconf(): ircd.conf = %s\n", configfile);
@@ -685,7 +685,7 @@ static aConfItem *initconf(void)
 			if (!index(aconf->host, '@'))
 			{
 				char *newhost;
-				int len = 3; /* *@\0 = 3 */
+				int	  len = 3; /* *@\0 = 3 */
 
 				len += strlen(aconf->host);
 				newhost = (char *) MyMalloc(len);
@@ -810,7 +810,7 @@ static aConfItem *initconf(void)
 static aClass *get_class(int cn, int nr)
 {
 	static aClass cls;
-	int i = numclasses - 1;
+	int			  i = numclasses - 1;
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 	aConfig *filelist;
 #else
@@ -849,7 +849,7 @@ static void new_class(int cn)
 static char *getfield(char *irc_newline)
 {
 	static char *line = NULL;
-	char *end, *field;
+	char		*end, *field;
 
 	if (irc_newline)
 		line = irc_newline;
@@ -884,10 +884,10 @@ static char *getfield(char *irc_newline)
 */
 static int dgets(int fd, char *buf, int num)
 {
-	static char dgbuf[8192];
-	static char *head = dgbuf, *tail = dgbuf;
+	static char	   dgbuf[8192];
+	static char	  *head = dgbuf, *tail = dgbuf;
 	register char *s, *t;
-	register int n, nr;
+	register int   n, nr;
 
 	/*
 	** Sanity checks.
@@ -983,8 +983,8 @@ dgetsagain:
 static void validate(aConfItem *top)
 {
 	Reg aConfItem *aconf, *bconf;
-	u_int otype = 0, valid = 0;
-	int nr;
+	u_int		   otype = 0, valid = 0;
+	int			   nr;
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 	aConfig *filelist;
 #else
@@ -1054,8 +1054,8 @@ static void validate(aConfItem *top)
 #ifdef M4_PREPROC
 static int simulateM4Include(struct wordcount *filelist, int nr, char *filename, int fnrmin)
 {
-	int fd, dh, fnr = 0, finalnewline = 0;
-	char line[512];
+	int				  fd, dh, fnr = 0, finalnewline = 0;
+	char			  line[512];
 	struct wordcount *listnew;
 #ifdef M4_PREPROC
 	char *inc;
@@ -1126,8 +1126,8 @@ static int simulateM4Include(struct wordcount *filelist, int nr, char *filename,
 #ifndef CONFIG_DIRECTIVE_INCLUDE
 static void mywc(void)
 {
-	int fd, dh, nr = 0;
-	char line[512];
+	int				  fd, dh, nr = 0;
+	char			  line[512];
 	struct wordcount *listtmp;
 #ifdef M4_PREPROC
 	char *inc;
@@ -1166,7 +1166,7 @@ static void mywc(void)
 static char confchar(u_int status)
 {
 	static char letrs[] = "QIicNCoOMKARYSLPHV";
-	char *s				= letrs;
+	char	   *s		= letrs;
 
 	status &= ~(CONF_MATCH | CONF_ILLEGAL);
 
@@ -1178,8 +1178,8 @@ static char confchar(u_int status)
 
 static int checkSID(char *sid, int nr)
 {
-	char *s = sid;
-	int len = 0, rc = 0;
+	char *s	  = sid;
+	int	  len = 0, rc = 0;
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 	aConfig *filelist;
 #else
@@ -1219,9 +1219,9 @@ static int checkSID(char *sid, int nr)
  * and checks that it's not "commented out" */
 static char *mystrinclude(char *s, int nr)
 {
-	int off;
+	int				  off;
 	struct wordcount *filelist;
-	char *match = strstr(s, "include(");
+	char			 *match = strstr(s, "include(");
 
 	if (!match)
 		return 0;
@@ -1248,8 +1248,8 @@ static char *mystrinclude(char *s, int nr)
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 static aConfig *findConfLineNumber(int nr)
 {
-	int mynr   = 1;
-	aConfig *p = files;
+	int		 mynr = 1;
+	aConfig *p	  = files;
 
 	for (; p->next && mynr < nr; p = p->next)
 		mynr++;

@@ -84,9 +84,9 @@ RETSIGTYPE dummy(int s)
 */
 int deliver_it(aClient *cptr, char *str, int len)
 {
-	int retval;
-	aClient *acpt  = cptr->acpt;
-	int savederrno = 0;
+	int		 retval;
+	aClient *acpt		= cptr->acpt;
+	int		 savederrno = 0;
 
 #ifdef DEBUGMODE
 	writecalls++;

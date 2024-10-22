@@ -28,25 +28,25 @@
 
 typedef struct File aFile;
 struct File {
-	char *filename;
-	int includeline;
+	char  *filename;
+	int	   includeline;
 	aFile *parent;
 	aFile *next;
 };
 
 typedef struct Config aConfig;
 struct Config {
-	char *line;
-	int linenum;
-	aFile *file;
+	char	*line;
+	int		 linenum;
+	aFile	*file;
 	aConfig *next;
 };
 
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 static aConfig *config_read(FILE *, int, aFile *);
-static void config_free(aConfig *);
-aFile *new_config_file(char *, aFile *, int);
-void config_error(int, aFile *, int, char *, ...);
+static void		config_free(aConfig *);
+aFile		   *new_config_file(char *, aFile *, int);
+void			config_error(int, aFile *, int, char *, ...);
 #else
 void config_error(int, char *, int, char *, ...);
 #endif
@@ -65,11 +65,11 @@ void config_error(int, char *, int, char *, ...);
 ** calls itself recursively for each #include directive */
 aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 {
-	int linenum		   = 0;
+	int		 linenum   = 0;
 	aConfig *ConfigTop = NULL;
 	aConfig *ConfigCur = NULL;
-	char line[BUFSIZE + 1];
-	FILE *fdn;
+	char	 line[BUFSIZE + 1];
+	FILE	*fdn;
 
 	if (curfile == NULL)
 	{
@@ -92,13 +92,13 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 
 		if (*line == '#' && strncasecmp(line + 1, "include ", 8) == 0)
 		{
-			char *start = line + 9;
-			char *end	= line + linelen - 1;
-			char file[FILEMAX + 1];
-			char *filep = file;
-			char *savefilep;
+			char	*start = line + 9;
+			char	*end   = line + linelen - 1;
+			char	 file[FILEMAX + 1];
+			char	*filep = file;
+			char	*savefilep;
 			aConfig *ret;
-			aFile *tcf;
+			aFile	*tcf;
 
 			/* eat all white chars around filename */
 			while (isspace(*end))
@@ -207,7 +207,7 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 void config_free(aConfig *cnf)
 {
 	aConfig *p;
-	aFile *pf, *pt;
+	aFile	*pf, *pt;
 
 	if (cnf == NULL)
 	{
@@ -266,9 +266,9 @@ void config_error(int level, char *filename, int line, char *pattern, ...)
 #endif
 {
 	static int etclen = 0;
-	va_list va;
-	char vbuf[8192];
-	char *filep;
+	va_list	   va;
+	char	   vbuf[8192];
+	char	  *filep;
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 	char *filename = curF->filename;
 #endif

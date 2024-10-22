@@ -69,9 +69,9 @@ static int lookup_confhost(aConfItem *);
 #include "config_read.c"
 #endif
 
-aConfItem *conf	  = NULL;
-aConfItem *kconf  = NULL;
-char *networkname = NULL;
+aConfItem *conf		   = NULL;
+aConfItem *kconf	   = NULL;
+char	  *networkname = NULL;
 #ifdef TKLINE
 aConfItem *tkconf = NULL;
 #endif
@@ -135,7 +135,7 @@ long iline_flags_parse(char *string)
 char *iline_flags_to_string(long flags)
 {
 	static char ifsbuf[BUFSIZE];
-	char *s = ifsbuf;
+	char	   *s = ifsbuf;
 
 	if (flags & CFLAG_RNODNS)
 	{
@@ -209,7 +209,7 @@ long pline_flags_parse(char *string)
 char *pline_flags_to_string(long flags)
 {
 	static char pfsbuf[BUFSIZE];
-	char *s = pfsbuf;
+	char	   *s = pfsbuf;
 
 	if (flags & PFLAG_DELAYED)
 	{
@@ -239,7 +239,7 @@ char *pline_flags_to_string(long flags)
 char *oline_flags_to_string(long flags)
 {
 	static char ofsbuf[BUFSIZE];
-	char *s = ofsbuf;
+	char	   *s = ofsbuf;
 
 	if (flags & ACL_LOCOP)
 		*s++ = 'L';
@@ -295,7 +295,7 @@ char *oline_flags_to_string(long flags)
 /* convert string from config to flags */
 long oline_flags_parse(char *string)
 {
-	long tmp = 0;
+	long  tmp = 0;
 	char *s;
 
 	for (s = string; *s; s++)
@@ -436,12 +436,12 @@ void det_confs_butmask(aClient *cptr, int mask)
  */
 int match_ipmask(char *mask, aClient *cptr, int maskwithusername)
 {
-	int m;
-	char *p;
+	int			   m;
+	char		  *p;
 	struct IN_ADDR addr;
-	char dummy[128];
-	char *omask;
-	u_long lmask;
+	char		   dummy[128];
+	char		  *omask;
+	u_long		   lmask;
 #ifdef INET6
 	int j;
 #endif
@@ -523,10 +523,10 @@ badmask:
 int attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 {
 	Reg aConfItem *aconf;
-	char uhost[HOSTLEN + USERLEN + 2];
-	char uaddr[HOSTLEN + USERLEN + 2];
-	int ulen   = strlen(cptr->username) + 1; /* for '@' */
-	int retval = -2;						 /* EXITC_NOILINE in register_user() */
+	char		   uhost[HOSTLEN + USERLEN + 2];
+	char		   uaddr[HOSTLEN + USERLEN + 2];
+	int			   ulen	  = strlen(cptr->username) + 1; /* for '@' */
+	int			   retval = -2;							/* EXITC_NOILINE in register_user() */
 
 	/* We fill uaddr and uhost now, before aconf loop. */
 	sprintf(uaddr, "%s@%s", cptr->username, sockhost);
@@ -759,7 +759,7 @@ static void remove_cidr_limit(aClient *cptr, aConfItem *aconf)
 */
 int detach_conf(aClient *cptr, aConfItem *aconf)
 {
-	Reg Link **lp, *tmp;
+	Reg Link  **lp, *tmp;
 	aConfItem **aconf2, *aconf3;
 
 	lp = &(cptr->confs);
@@ -857,8 +857,8 @@ int attach_conf(aClient *cptr, aConfItem *aconf)
 
 	if ((aconf->status & CONF_CLIENT))
 	{
-		int hcnt = 0, ucnt = 0;
-		int ghcnt = 0, gucnt = 0;
+		int		hcnt = 0, ucnt = 0;
+		int		ghcnt = 0, gucnt = 0;
 		anUser *user = NULL;
 		/* check on local/global limits per host and per user@host */
 
@@ -972,8 +972,8 @@ aConfItem *find_me(void)
 aConfItem *attach_confs(aClient *cptr, char *name, int statmask)
 {
 	Reg aConfItem *tmp;
-	aConfItem *first = NULL;
-	int len			 = strlen(name);
+	aConfItem	  *first = NULL;
+	int			   len	 = strlen(name);
 
 	if (!name || len > HOSTLEN)
 		return NULL;
@@ -1003,8 +1003,8 @@ aConfItem *attach_confs(aClient *cptr, char *name, int statmask)
 aConfItem *attach_confs_host(aClient *cptr, char *host, int statmask)
 {
 	Reg aConfItem *tmp;
-	aConfItem *first = NULL;
-	int len			 = strlen(host);
+	aConfItem	  *first = NULL;
+	int			   len	 = strlen(host);
 
 	if (!host || len > HOSTLEN)
 		return NULL;
@@ -1036,7 +1036,7 @@ aConfItem *find_conf_exact(char *name, char *user, char *host,
 						   int statmask)
 {
 	Reg aConfItem *tmp;
-	char userhost[USERLEN + HOSTLEN + 3];
+	char		   userhost[USERLEN + HOSTLEN + 3];
 
 	sprintf(userhost, "%s@%s", user, host);
 
@@ -1071,8 +1071,8 @@ aConfItem *find_conf_exact(char *name, char *user, char *host,
 aConfItem *find_Oline(char *name, aClient *cptr)
 {
 	Reg aConfItem *tmp, *tmp2 = NULL;
-	char userhost[USERLEN + HOSTLEN + 3];
-	char userip[USERLEN + HOSTLEN + 3];
+	char		   userhost[USERLEN + HOSTLEN + 3];
+	char		   userip[USERLEN + HOSTLEN + 3];
 
 	sprintf(userhost, "%s@%s", cptr->username, cptr->sockhost);
 	sprintf(userip, "%s@%s", cptr->username, cptr->user->sip);
@@ -1118,7 +1118,7 @@ aConfItem *find_conf_name(char *name, int statmask)
 aConfItem *find_conf(Link *lp, char *name, int statmask)
 {
 	Reg aConfItem *tmp;
-	int namelen = name ? strlen(name) : 0;
+	int			   namelen = name ? strlen(name) : 0;
 
 	if (namelen > HOSTLEN)
 		return (aConfItem *) 0;
@@ -1142,7 +1142,7 @@ aConfItem *find_conf(Link *lp, char *name, int statmask)
 aConfItem *find_conf_host(Link *lp, char *host, int statmask)
 {
 	Reg aConfItem *tmp;
-	int hostlen = host ? strlen(host) : 0;
+	int			   hostlen = host ? strlen(host) : 0;
 
 	if (hostlen > HOSTLEN || BadPtr(host))
 		return (aConfItem *) NULL;
@@ -1160,7 +1160,7 @@ aConfItem *find_conf_host(Link *lp, char *host, int statmask)
 aConfItem *find_conf_host_sid(Link *lp, char *host, char *sid, int statmask)
 {
 	Reg aConfItem *tmp;
-	int hostlen = host ? strlen(host) : 0;
+	int			   hostlen = host ? strlen(host) : 0;
 
 	if (hostlen > HOSTLEN || BadPtr(host))
 		return (aConfItem *) NULL;
@@ -1188,7 +1188,7 @@ aConfItem *find_conf_host_sid(Link *lp, char *host, char *sid, int statmask)
 aConfItem *find_conf_ip(Link *lp, char *ip, char *user, int statmask)
 {
 	Reg aConfItem *tmp;
-	Reg char *s;
+	Reg char	  *s;
 
 	for (; lp; lp = lp->next)
 	{
@@ -1256,10 +1256,10 @@ aConfItem *find_conf_entry(aConfItem *aconf, u_int mask)
 int rehash(aClient *cptr, aClient *sptr, int sig)
 {
 	Reg aConfItem **tmp = &conf, *tmp2 = NULL;
-	Reg aClass *cltmp;
-	Reg aClient *acptr;
-	Reg int i;
-	int ret = 0;
+	Reg aClass	   *cltmp;
+	Reg aClient	   *acptr;
+	Reg int			i;
+	int				ret = 0;
 
 	if (sig == 1)
 	{
@@ -1469,9 +1469,9 @@ int openconf(void)
 #ifdef INET6
 char *ipv6_convert(char *orig)
 {
-	char *s, *t, *buf = NULL;
-	int i, j;
-	int len = 1; /* for the '\0' in case of no @ */
+	char		   *s, *t, *buf = NULL;
+	int				i, j;
+	int				len = 1; /* for the '\0' in case of no @ */
 	struct in6_addr addr;
 
 	if ((s = strchr(orig, '@')))
@@ -1534,18 +1534,18 @@ char *ipv6_convert(char *orig)
 int initconf(int opt)
 {
 	static char quotes[9][2] = {{'b', '\b'}, {'f', '\f'}, {'n', '\n'}, {'r', '\r'}, {'t', '\t'}, {'v', '\v'}, {'\\', '\\'}, {0, 0}};
-	Reg char *tmp, *s;
-	int fd, i;
-	char *tmp2 = NULL, *tmp3 = NULL, *tmp4 = NULL;
+	Reg char   *tmp, *s;
+	int			fd, i;
+	char	   *tmp2 = NULL, *tmp3 = NULL, *tmp4 = NULL;
 #ifdef ENABLE_CIDR_LIMITS
 	char *tmp5 = NULL;
 #endif
-	int ccount = 0, ncount = 0;
+	int		   ccount = 0, ncount = 0;
 	aConfItem *aconf = NULL;
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
-	char *line;
+	char	*line;
 	aConfig *ConfigTop, *p;
-	FILE *fdn;
+	FILE	*fdn;
 #else
 	char line[512], c[80];
 #endif
@@ -1909,7 +1909,7 @@ int initconf(int opt)
 			if (!index(aconf->host, '@') && *aconf->host != '/')
 			{
 				char *newhost;
-				int len = 3; /* *@\0 = 3 */
+				int	  len = 3; /* *@\0 = 3 */
 
 				len += strlen(aconf->host);
 				newhost = (char *) MyMalloc(len);
@@ -2114,9 +2114,9 @@ int initconf(int opt)
  */
 static int lookup_confhost(aConfItem *aconf)
 {
-	Reg char *s;
+	Reg char		   *s;
 	Reg struct hostent *hp;
-	Link ln;
+	Link				ln;
 
 	if (BadPtr(aconf->host) || BadPtr(aconf->name))
 		goto badlookup;
@@ -2178,9 +2178,9 @@ int find_kill(aClient *cptr, int timedklines, char **comment)
 {
 #ifdef TIMEDKLINES
 	static char reply[256];
-	int now = 0;
+	int			now = 0;
 #endif
-	char *host, *ip, *name, *ident, *check;
+	char	  *host, *ip, *name, *ident, *check;
 	aConfItem *tmp;
 #ifdef TKLINE
 	int tklines = 1;
@@ -2353,7 +2353,7 @@ int find_two_masks(char *name, char *host, int stat)
 int find_conf_flags(char *name, char *key, int stat)
 {
 	aConfItem *tmp;
-	int l;
+	int		   l;
 
 	if (index(key, '/') == NULL)
 		return 0;
@@ -2375,8 +2375,8 @@ int find_conf_flags(char *name, char *key, int stat)
 static int check_time_interval(char *interval, char *reply)
 {
 	struct tm *tptr;
-	char *p;
-	int perm_min_hours, perm_min_minutes,
+	char	  *p;
+	int		   perm_min_hours, perm_min_minutes,
 			perm_max_hours, perm_max_minutes;
 	int now, perm_min, perm_max;
 
@@ -2533,7 +2533,7 @@ aConfItem *find_denied(char *name, int class)
 		if (isdigit(*aconf->passwd))
 		{
 			aConfItem *aconf2;
-			int ck = atoi(aconf->passwd);
+			int		   ck = atoi(aconf->passwd);
 
 			for (aconf2 = conf; aconf2; aconf2 = aconf2->next)
 			{
@@ -2548,8 +2548,8 @@ aConfItem *find_denied(char *name, int class)
 		if (aconf->host)
 		{
 			aServer *asptr;
-			char *host	 = aconf->host;
-			int reversed = 0;
+			char	*host	  = aconf->host;
+			int		 reversed = 0;
 
 			if (*host == '!')
 			{
@@ -2581,8 +2581,8 @@ int wdhms2sec(char *input, time_t *output)
 #ifndef TKLINE_MULTIPLIER
 #define TKLINE_MULTIPLIER 60
 #endif
-	int multi;
-	int tmp = 0;
+	int	  multi;
+	int	  tmp = 0;
 	char *s;
 
 	*output = 0;
@@ -2640,10 +2640,10 @@ int wdhms2sec(char *input, time_t *output)
  */
 void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *reason, int status)
 {
-	char buff[BUFSIZE];
-	aClient *acptr;
+	char	   buff[BUFSIZE];
+	aClient	  *acptr;
 	aConfItem *aconf;
-	int i, count = 0;
+	int		   i, count = 0;
 
 	buff[0] = '\0';
 
@@ -2782,10 +2782,10 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 
 int prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 {
-	int status = tkline ? CONF_TKILL : CONF_KILL;
+	int	   status = tkline ? CONF_TKILL : CONF_KILL;
 	time_t time;
-	char *user, *host, *reason;
-	int err = 0;
+	char  *user, *host, *reason;
+	int	   err = 0;
 
 	/* sanity checks */
 	if (tkline)
@@ -2863,8 +2863,8 @@ badkline:
 #ifdef KLINE
 	if (!tkline)
 	{
-		int kfd, ksize, kret;
-		char kbuf[2 * BUFSIZE];
+		int	  kfd, ksize, kret;
+		char  kbuf[2 * BUFSIZE];
 		char *utmp, *htmp, *rtmp;
 
 		if (!strcmp(KLINE_PATH, IRCDCONF_PATH))
@@ -2942,8 +2942,8 @@ int m_tkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 int m_untkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 {
 	aConfItem *tmp, *prev;
-	char *user, *host;
-	int deleted = 0;
+	char	  *user, *host;
+	int		   deleted = 0;
 
 	if (!is_allowed(sptr, ACL_UNTKLINE))
 		return m_nopriv(cptr, sptr, parc, parv);
@@ -2998,7 +2998,7 @@ int m_untkline(aClient *cptr, aClient *sptr, int parc, char **parv)
 time_t tkline_expire(int all)
 {
 	aConfItem *tmp = NULL, *tmp2 = tkconf, *prev = tkconf;
-	time_t min = 0;
+	time_t	   min = 0;
 
 	while ((tmp = tmp2))
 	{

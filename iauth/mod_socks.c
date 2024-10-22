@@ -36,9 +36,9 @@ static int socks_start(u_int cl);
 
 struct proxylog {
 	struct proxylog *next;
-	char ip[HOSTLEN + 1];
-	u_char state; /* 0 = no proxy, 1 = open proxy, 2 = closed proxy */
-	time_t expire;
+	char			 ip[HOSTLEN + 1];
+	u_char			 state; /* 0 = no proxy, 1 = open proxy, 2 = closed proxy */
+	time_t			 expire;
 };
 
 #define OPT_LOG 0x001
@@ -62,8 +62,8 @@ struct proxylog {
 
 struct socks_private {
 	struct proxylog *cache;
-	u_int lifetime;
-	u_char options;
+	u_int			 lifetime;
+	u_char			 options;
 	/* stats */
 	u_int chitc, chito, chitn, cmiss, cnow, cmax;
 	u_int noproxy, open, closed;
@@ -77,7 +77,7 @@ struct socks_private {
 static void socks_open_proxy(int cl, char *strver)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
-	char *reason				 = cldata[cl].instance->reason;
+	char				 *reason = cldata[cl].instance->reason;
 
 	if (!reason)
 	{
@@ -106,7 +106,7 @@ static void socks_open_proxy(int cl, char *strver)
 static void socks_add_cache(int cl, int state)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
-	struct proxylog *next;
+	struct proxylog		 *next;
 
 	if (state == PROXY_OPEN)
 	{
@@ -151,8 +151,8 @@ static void socks_add_cache(int cl, int state)
 static int socks_check_cache(u_int cl)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
-	struct proxylog **last, *pl;
-	time_t now = time(NULL);
+	struct proxylog		**last, *pl;
+	time_t				  now = time(NULL);
 
 	if (mydata->lifetime == 0)
 	{
@@ -208,11 +208,11 @@ static int socks_check_cache(u_int cl)
 static int socks_write(u_int cl, char *strver)
 {
 	u_char query[128]; /* big enough to hold all queries */
-	int query_len;	   /* length of query */
+	int	   query_len;  /* length of query */
 #ifndef INET6
 	u_int a, b, c, d;
 #else
-	struct in6_addr addr;
+	struct in6_addr		  addr;
 	struct socks_private *mydata = cldata[cl].instance->data;
 #endif
 
@@ -342,7 +342,7 @@ static int socks_write(u_int cl, char *strver)
 static int socks_read(u_int cl, char *strver)
 {
 	struct socks_private *mydata = cldata[cl].instance->data;
-	u_char state				 = PROXY_CLOSE;
+	u_char				  state	 = PROXY_CLOSE;
 
 	/* not enough data from the other end */
 	if (cldata[cl].buflen < 2)
@@ -529,8 +529,8 @@ again:
 static char *socks_init(AnInstance *self)
 {
 	struct socks_private *mydata;
-	char tmpbuf[80], cbuf[32];
-	static char txtbuf[80];
+	char				  tmpbuf[80], cbuf[32];
+	static char			  txtbuf[80];
 
 	if (self->opt == NULL)
 	{
@@ -676,7 +676,7 @@ static void socks_stats(AnInstance *self)
 static int socks_start(u_int cl)
 {
 	char *error;
-	int fd;
+	int	  fd;
 
 	if (cldata[cl].state & A_DENY)
 	{
@@ -721,7 +721,7 @@ static int socks_start(u_int cl)
  */
 static int socks_work(u_int cl)
 {
-	char *strver				 = "4";
+	char				 *strver = "4";
 	struct socks_private *mydata = cldata[cl].instance->data;
 
 	if (cldata[cl].mod_status == 0)

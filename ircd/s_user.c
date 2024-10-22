@@ -278,9 +278,9 @@ int do_nick_name(char *nick, int server)
 char *canonize(char *buffer)
 {
 	static char cbuf[BUFSIZ];
-	Reg char *s, *t, *cp = cbuf;
-	Reg int l = 0;
-	char *p	  = NULL, *p2;
+	Reg char   *s, *t, *cp = cbuf;
+	Reg int		l = 0;
+	char	   *p = NULL, *p2;
 
 	*cp = '\0';
 
@@ -323,9 +323,9 @@ char *canonize(char *buffer)
 int register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 {
 	Reg aConfItem *aconf;
-	aClient *acptr;
-	anUser *user = sptr->user;
-	char *parv[3];
+	aClient		  *acptr;
+	anUser		  *user = sptr->user;
+	char		  *parv[3];
 #ifndef NO_PREFIX
 	char prefix;
 #endif
@@ -347,8 +347,8 @@ int register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		char *lbuf = NULL;
 #endif
 #if defined(USE_IAUTH)
-		static time_t last = 0;
-		static u_int count = 0;
+		static time_t last	= 0;
+		static u_int  count = 0;
 #endif
 #ifdef XLINE
 		aConfItem *xtmp;
@@ -544,7 +544,7 @@ int register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		if ((i = check_client(sptr)))
 		{
 			struct msg_set {
-				char shortm;
+				char  shortm;
 				char *longm;
 			};
 #define EXIT_MSG_COUNT 8
@@ -851,10 +851,10 @@ int register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 int m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	int delayed = 0;
-	char nick[NICKLEN + 2], *user, *host;
-	Link *lp = NULL;
-	int allowednicklen;
+	int		 delayed = 0;
+	char	 nick[NICKLEN + 2], *user, *host;
+	Link	*lp = NULL;
+	int		 allowednicklen;
 
 	if (MyConnect(cptr) && IsUnknown(cptr) &&
 		IsConfServeronly(cptr->acpt->confs->value.aconf))
@@ -880,7 +880,7 @@ int m_nick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (parc != 2)
 		{
 			char buf[BUFSIZE];
-			int k;
+			int	 k;
 
 		badparamcountkills:
 			sendto_flag(SCH_NOTICE,
@@ -1254,7 +1254,7 @@ nickkilldone:
 int m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	char *uid, nick[NICKLEN + 2], *user, *host, *realname;
+	char	*uid, nick[NICKLEN + 2], *user, *host, *realname;
 
 	strncpyzt(nick, parv[1], NICKLEN + 1);
 	uid		 = parv[2];
@@ -1459,10 +1459,10 @@ static int m_message(aClient *cptr, aClient *sptr, int parc,
 					 char *parv[], int notice)
 {
 	Reg aClient *acptr;
-	Reg char *s;
-	aChannel *chptr;
-	char *nick, *server, *p, *cmd, *user, *host;
-	int count = 0, penalty = 0, syntax = 0;
+	Reg char	*s;
+	aChannel	*chptr;
+	char		*nick, *server, *p, *cmd, *user, *host;
+	int			 count = 0, penalty = 0, syntax = 0;
 
 	cmd = notice ? "NOTICE" : "PRIVMSG";
 
@@ -1686,9 +1686,9 @@ int m_notice(aClient *cptr, aClient *sptr, int parc, char *parv[])
 static void who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
 					Link *lp, struct who_opts *opts)
 {
-	char status[5];
+	char  status[5];
 	char *s;
-	int i = 0;
+	int	  i = 0;
 
 	if (acptr->user->flags & FLAGS_AWAY)
 		status[i++] = 'G';
@@ -1710,7 +1710,7 @@ static void who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
 	if ((opts->flags & ~WHO_FLAG_OPERS_ONLY) != 0)
 	{
 		char buf[BUFSIZE];
-		int len = snprintf(buf, BUFSIZE, replies[RPL_WHOSPCRPL], ME, BadTo(sptr->name));
+		int	 len = snprintf(buf, BUFSIZE, replies[RPL_WHOSPCRPL], ME, BadTo(sptr->name));
 
 		if (opts->flags & WHO_FLAG_TOKEN)
 			len += snprintf_append(buf, BUFSIZE, len, " %s", opts->token != NULL ? opts->token : "0");
@@ -1762,7 +1762,7 @@ static void who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
 static void who_channel(aClient *sptr, aChannel *chptr, struct who_opts *opts)
 {
 	Reg Link *lp;
-	int member;
+	int		  member;
 
 	if (!IsAnonymous(chptr))
 	{
@@ -1799,8 +1799,8 @@ static void who_channel(aClient *sptr, aChannel *chptr, struct who_opts *opts)
 static void who_find(aClient *sptr, char *mask, struct who_opts *opts)
 {
 	aChannel *chptr = NULL;
-	Link *lp, *lp2;
-	aClient *acptr;
+	Link	 *lp, *lp2;
+	aClient	 *acptr;
 
 	/* first, show INvisible matching users on common channels */
 	if (sptr->user) /* service can request who as well */
@@ -1965,9 +1965,9 @@ void parse_who_arg(char *arg, struct who_opts *opts)
 */
 int m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	aChannel *chptr;
-	int penalty = 0;
-	char *p, *mask, *channame;
+	aChannel	   *chptr;
+	int				penalty = 0;
+	char		   *p, *mask, *channame;
 	struct who_opts opts;
 	opts.flags = 0;
 	opts.token = NULL;
@@ -2113,12 +2113,12 @@ static void send_whois(aClient *sptr, aClient *acptr)
 					"<Unknown>",   /* host */
 					"<Unknown>",   /* server */
 			};
-	Link *lp;
-	anUser *user;
+	Link	 *lp;
+	anUser	 *user;
 	aChannel *chptr;
-	aClient *a2cptr;
-	int len, mlen;
-	char *name;
+	aClient	 *a2cptr;
+	int		  len, mlen;
+	char	 *name;
 
 	user = acptr->user ? acptr->user : &UnknownUser;
 	name = (!*acptr->name) ? "?" : acptr->name;
@@ -2194,12 +2194,12 @@ static void send_whois(aClient *sptr, aClient *acptr)
 */
 int m_whois(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Link *lp;
-	aClient *acptr;
+	Link	 *lp;
+	aClient	 *acptr;
 	aChannel *chptr;
-	char *nick, *tmp, *tmp2;
-	char *p	  = NULL;
-	int found = 0;
+	char	 *nick, *tmp, *tmp2;
+	char	 *p		= NULL;
+	int		  found = 0;
 
 	if (parc < 2)
 	{
@@ -2325,18 +2325,18 @@ int m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #define UFLAGS (FLAGS_INVISIBLE | FLAGS_WALLOP | FLAGS_RESTRICT)
 	struct umodes_arr_s {
 		char umode;
-		int flag;
+		int	 flag;
 	} umodes_arr[] =
 			{{'i', FLAGS_INVISIBLE},
 			 {'r', FLAGS_RESTRICT},
 			 {'w', FLAGS_WALLOP},
 			 {'\0', 0}};
 
-	char *username, *umodes, *server, *realname;
+	char   *username, *umodes, *server, *realname;
 	anUser *user;
-	char ipbuf[BUFSIZE];
-	int what, i;
-	char *s;
+	char	ipbuf[BUFSIZE];
+	int		what, i;
+	char   *s;
 
 	if (MyConnect(cptr) && IsUnknown(cptr) &&
 		IsConfServeronly(cptr->acpt->confs->value.aconf))
@@ -2500,10 +2500,10 @@ int m_quit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	aClient *acptr = NULL;
-	char *inpath   = cptr->name;
-	char *user, *path, *killer;
-	int chasing = 0;
+	aClient *acptr	= NULL;
+	char	*inpath = cptr->name;
+	char	*user, *path, *killer;
+	int		 chasing = 0;
 
 	if (!is_allowed(sptr, ACL_KILL))
 		return m_nopriv(cptr, sptr, parc, parv);
@@ -2697,7 +2697,7 @@ int m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg char *away, *awy2 = parv[1];
-	int len;
+	int		  len;
 
 	away = sptr->user->away;
 
@@ -2772,7 +2772,7 @@ int m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_ping(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	char *origin, *destination;
+	char	*origin, *destination;
 
 	origin		= parv[1];
 	destination = parv[2]; /* Will get NULL or pointer (parc >= 2!!) */
@@ -2809,7 +2809,7 @@ int m_ping(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_pong(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	char *origin, *destination;
+	char	*origin, *destination;
 
 	if (parc < 2 || *parv[1] == '\0')
 	{
@@ -2855,8 +2855,8 @@ int m_pong(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aConfItem *aconf;
-	char *name, *password, *encr;
-	char *logstring = NULL;
+	char	  *name, *password, *encr;
+	char	  *logstring = NULL;
 
 	name	 = parv[1];
 	password = parv[2];
@@ -2901,7 +2901,7 @@ int m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if ((aconf->status & CONF_OPS) &&
 		StrEq(encr, aconf->passwd) && !attach_conf(sptr, aconf))
 	{
-		int old = (sptr->user->flags & ALL_UMODES);
+		int	  old = (sptr->user->flags & ALL_UMODES);
 		char *s;
 
 		s	 = index(aconf->host, '@');
@@ -3075,11 +3075,11 @@ int m_pass(aClient *cptr, aClient *sptr, int parc, char *parv[])
  */
 int m_userhost(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	char *p = NULL;
-	aClient *acptr;
+	char	 *p = NULL;
+	aClient	 *acptr;
 	Reg char *s;
-	Reg int i, len;
-	int idx = 1;
+	Reg int	  i, len;
+	int		  idx = 1;
 
 	(void) sprintf(buf, replies[RPL_USERHOST], ME, BadTo(parv[0]));
 	len	  = strlen(buf);
@@ -3130,9 +3130,9 @@ int m_userhost(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_ison(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg aClient *acptr;
-	Reg char *s, **pav = parv;
-	Reg int len = 0, i;
-	char *p		= NULL;
+	Reg char	*s, **pav = parv;
+	Reg int		 len = 0, i;
+	char		*p	 = NULL;
 
 	(void) sprintf(buf, replies[RPL_ISON], ME, BadTo(*parv));
 	len = strlen(buf);
@@ -3162,11 +3162,11 @@ int m_ison(aClient *cptr, aClient *sptr, int parc, char *parv[])
  */
 int m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Reg int flag;
-	Reg int *s;
+	Reg int	   flag;
+	Reg int	  *s;
 	Reg char **p, *m;
-	aClient *acptr = NULL;
-	int what, setflags, penalty = 0;
+	aClient	  *acptr = NULL;
+	int		   what, setflags, penalty = 0;
 
 	what = MODE_ADD;
 
@@ -3357,9 +3357,9 @@ int m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 void send_umode(aClient *cptr, aClient *sptr, int old, int sendmask,
 				char *umode_buf)
 {
-	Reg int *s, flag;
+	Reg int	 *s, flag;
 	Reg char *m;
-	int what = MODE_NULL;
+	int		  what = MODE_NULL;
 
 	if (!sptr->user)
 		return;
@@ -3407,7 +3407,7 @@ void send_umode(aClient *cptr, aClient *sptr, int old, int sendmask,
  */
 void send_umode_out(aClient *cptr, aClient *sptr, int old)
 {
-	Reg int i;
+	Reg int		 i;
 	Reg aClient *acptr;
 
 	send_umode(NULL, sptr, old, SEND_UMODES, buf);
@@ -3483,7 +3483,7 @@ static void save_user(aClient *cptr, aClient *sptr, char *path)
 int m_save(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	char *path = (parc > 2) ? parv[2] : "*no-path*";
+	char	*path = (parc > 2) ? parv[2] : "*no-path*";
 
 	if (parc < 2)
 	{

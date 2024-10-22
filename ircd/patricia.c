@@ -175,13 +175,13 @@ New_Prefix(int family, void *dest, int bitlen)
 static prefix_t *
 ascii2prefix(int family, const char *string)
 {
-	u_long bitlen, maxbitlen = 0;
-	char *cp;
+	u_long		   bitlen, maxbitlen = 0;
+	char		  *cp;
 	struct in_addr sinaddr;
 #ifdef INET6
 	struct in6_addr sinaddr6;
 #endif /* IPV6 */
-	int result;
+	int	 result;
 	char save[MAXLINE];
 
 	if (string == NULL)
@@ -306,9 +306,9 @@ void patricia_clear(patricia_tree_t *patricia, void_fn_t func)
 	if (patricia->head)
 	{
 
-		patricia_node_t *Xstack[PATRICIA_MAXBITS + 1];
+		patricia_node_t	 *Xstack[PATRICIA_MAXBITS + 1];
 		patricia_node_t **Xsp = Xstack;
-		patricia_node_t *Xrn  = patricia->head;
+		patricia_node_t	 *Xrn = patricia->head;
 
 		while (Xrn)
 		{
@@ -382,8 +382,8 @@ patricia_node_t *
 patricia_search_exact(patricia_tree_t *patricia, prefix_t *prefix)
 {
 	patricia_node_t *node;
-	u_char *addr;
-	u_int bitlen;
+	u_char			*addr;
+	u_int			 bitlen;
 
 	assert(patricia);
 	assert(prefix);
@@ -458,9 +458,9 @@ patricia_search_best2(patricia_tree_t *patricia, prefix_t *prefix, int inclusive
 {
 	patricia_node_t *node;
 	patricia_node_t *stack[PATRICIA_MAXBITS + 1];
-	u_char *addr;
-	u_int bitlen;
-	int cnt = 0;
+	u_char			*addr;
+	u_int			 bitlen;
+	int				 cnt = 0;
 
 	assert(patricia);
 	assert(prefix);
@@ -566,9 +566,9 @@ patricia_node_t *
 patricia_lookup(patricia_tree_t *patricia, prefix_t *prefix)
 {
 	patricia_node_t *node, *new_node, *parent, *glue;
-	u_char *addr, *test_addr;
-	u_int bitlen, check_bit, differ_bit;
-	unsigned int i, j, r;
+	u_char			*addr, *test_addr;
+	u_int			 bitlen, check_bit, differ_bit;
+	unsigned int	 i, j, r;
 
 	assert(patricia);
 	assert(prefix);
@@ -930,7 +930,7 @@ void patricia_remove(patricia_tree_t *patricia, patricia_node_t *node)
 patricia_node_t *
 patricia_make_and_lookup_ip(patricia_tree_t *tree, struct IN_ADDR *ip, int bitlen)
 {
-	prefix_t *prefix;
+	prefix_t		*prefix;
 	patricia_node_t *node;
 
 	prefix = New_Prefix(AFINET, ip, bitlen);
@@ -949,7 +949,7 @@ patricia_make_and_lookup_ip(patricia_tree_t *tree, struct IN_ADDR *ip, int bitle
 patricia_node_t *
 patricia_make_and_lookup(patricia_tree_t *tree, const char *string)
 {
-	prefix_t *prefix;
+	prefix_t		*prefix;
 	patricia_node_t *node;
 
 	if ((prefix = ascii2prefix(AF_INET, string)) != NULL)
@@ -976,7 +976,7 @@ patricia_make_and_lookup(patricia_tree_t *tree, const char *string)
 static patricia_node_t *
 patricia_try_search_exact(patricia_tree_t *tree, char *string)
 {
-	prefix_t *prefix;
+	prefix_t		*prefix;
 	patricia_node_t *node;
 	if ((prefix = ascii2prefix(AF_INET, string)) != NULL)
 	{
@@ -1008,7 +1008,7 @@ void patricia_lookup_then_remove(patricia_tree_t *tree, char *string)
 patricia_node_t *
 patricia_match_ip(patricia_tree_t *tree, struct IN_ADDR *ip)
 {
-	prefix_t *prefix;
+	prefix_t		*prefix;
 	patricia_node_t *node;
 #ifdef INET6
 	int len = 128;
@@ -1029,7 +1029,7 @@ patricia_node_t *
 patricia_match_string(patricia_tree_t *tree, const char *string)
 {
 	patricia_node_t *node;
-	prefix_t *prefix;
+	prefix_t		*prefix;
 
 	if ((prefix = ascii2prefix(AF_INET, string)) != NULL)
 	{
@@ -1052,7 +1052,7 @@ patricia_match_string(patricia_tree_t *tree, const char *string)
 patricia_node_t *
 patricia_match_exact_string(patricia_tree_t *tree, const char *string)
 {
-	prefix_t *prefix;
+	prefix_t		*prefix;
 	patricia_node_t *node;
 	if ((prefix = ascii2prefix(AF_INET, string)) != NULL)
 	{

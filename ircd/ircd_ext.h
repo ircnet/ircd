@@ -24,21 +24,21 @@
 /*  External definitions for global variables.
  */
 #ifndef IRCD_C
-extern aClient me;
+extern aClient	me;
 extern aClient *client;
-extern istat_t istat;
-extern iconf_t iconf;
-extern char **myargv;
-extern int rehashed;
-extern int portnum;
-extern int serverbooting;
-extern int firstrejoindone;
-extern char *configfile;
-extern int debuglevel;
-extern int bootopt;
-extern char *debugmode;
-extern char *sbrk0;
-extern char *tunefile;
+extern istat_t	istat;
+extern iconf_t	iconf;
+extern char	  **myargv;
+extern int		rehashed;
+extern int		portnum;
+extern int		serverbooting;
+extern int		firstrejoindone;
+extern char	   *configfile;
+extern int		debuglevel;
+extern int		bootopt;
+extern char	   *debugmode;
+extern char	   *sbrk0;
+extern char	   *tunefile;
 #ifdef DELAY_CLOSE
 extern time_t nextdelayclose;
 #endif
@@ -61,9 +61,9 @@ extern aClient *ListenerLL;
 #define EXTERN
 #endif /* IRCD_C */
 EXTERN RETSIGTYPE s_die(int s);
-EXTERN void restart(char *mesg);
+EXTERN void		  restart(char *mesg);
 EXTERN RETSIGTYPE s_restart(int s);
-EXTERN void server_reboot(void);
-EXTERN void ircd_writetune(char *filename);
-EXTERN void ircd_readtune(char *filename);
+EXTERN void		  server_reboot(void);
+EXTERN void		  ircd_writetune(char *filename);
+EXTERN void		  ircd_readtune(char *filename);
 #undef EXTERN

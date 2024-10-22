@@ -317,9 +317,9 @@ static int dn_find(const u_char *, const u_char *,
 static int ns_name_ntop(const u_char *src, char *dst, size_t dstsiz)
 {
 	const u_char *cp;
-	char *dn, *eom;
-	u_char c;
-	u_int n;
+	char		 *dn, *eom;
+	u_char		  c;
+	u_int		  n;
 
 	cp	= src;
 	dn	= dst;
@@ -415,8 +415,8 @@ static int ns_name_ntop(const u_char *src, char *dst, size_t dstsiz)
 static int ns_name_pton(const char *src, u_char *dst, size_t dstsiz)
 {
 	u_char *label, *bp, *eom;
-	int c, n, escaped;
-	char *cp;
+	int		c, n, escaped;
+	char   *cp;
 
 	escaped = 0;
 	bp		= dst;
@@ -545,8 +545,8 @@ static int ns_name_unpack(const u_char *msg, const u_char *eom,
 						  const u_char *src, u_char *dst, size_t dstsiz)
 {
 	const u_char *srcp, *dstlim;
-	u_char *dstp;
-	int n, len, checked;
+	u_char		 *dstp;
+	int			  n, len, checked;
 
 	len		= -1;
 	checked = 0;
@@ -636,10 +636,10 @@ static int ns_name_unpack(const u_char *msg, const u_char *eom,
 static int ns_name_pack(const u_char *src, u_char *dst, int dstsiz,
 						const u_char **dnptrs, const u_char **lastdnptr)
 {
-	u_char *dstp;
+	u_char		  *dstp;
 	const u_char **cpp, **lpp, *eob, *msg;
-	const u_char *srcp;
-	int n, l;
+	const u_char  *srcp;
+	int			   n, l;
 
 	srcp = src;
 	dstp = dst;
@@ -740,7 +740,7 @@ static int ns_name_uncompress(const u_char *msg, const u_char *eom,
 							  const u_char *src, char *dst, size_t dstsiz)
 {
 	u_char tmp[NS_MAXCDNAME];
-	int n;
+	int	   n;
 
 	if ((n = ns_name_unpack(msg, eom, src, tmp, sizeof tmp)) == -1)
 		return (-1);
@@ -782,7 +782,7 @@ static int ns_name_compress(const char *src, u_char *dst, size_t dstsiz,
 static int ns_name_skip(const u_char **ptrptr, const u_char *eom)
 {
 	const u_char *cp;
-	u_int n;
+	u_int		  n;
 
 	cp = *ptrptr;
 	while (cp < eom && (n = *cp++) != 0)
@@ -872,9 +872,9 @@ static int mklower(int ch)
 static int dn_find(const u_char *domain, const u_char *msg,
 				   const u_char *const *dnptrs, const u_char *const *lastdnptr)
 {
-	const u_char *dn, *cp, *sp;
+	const u_char		*dn, *cp, *sp;
 	const u_char *const *cpp;
-	u_int n;
+	u_int				 n;
 
 	for (cpp = dnptrs; cpp < lastdnptr; cpp++)
 	{

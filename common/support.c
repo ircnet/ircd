@@ -62,7 +62,7 @@ char *mystrdup(char *s)
 
 char *strtoken(char **save, char *str, char *fs)
 {
-	char *pos = *save; /* keep last position across calls */
+	char	 *pos = *save; /* keep last position across calls */
 	Reg char *tmp;
 
 	if (str)
@@ -162,7 +162,7 @@ int snprintf_append(char *str, int size, int pos, const char *fmt, ...)
 char *strerror(int err_no)
 {
 	static char buff[40];
-	char *errp;
+	char	   *errp;
 
 	errp = (err_no > sys_nerr ? (char *) NULL : sys_errlist[err_no]);
 
@@ -191,7 +191,7 @@ char *strerror(int err_no)
 char *myctime(time_t value)
 {
 	static char buf[28];
-	Reg char *p;
+	Reg char   *p;
 
 	(void) strcpy(buf, ctime(&value));
 	if ((p = (char *) index(buf, '\n')) != NULL)
@@ -337,7 +337,7 @@ char *inetntoa(char *in)
 {
 	static char buf[16];
 	Reg u_char *s = (u_char *) in;
-	Reg int a, b, c, d;
+	Reg int		a, b, c, d;
 
 	a = (int) *s++;
 	b = (int) *s++;
@@ -396,9 +396,9 @@ u_long inetaddr(const char *cp)
 int inetaton(const char *cp, struct in_addr *addr)
 {
 	register u_long val;
-	register int base, n;
-	register char c;
-	u_int parts[4];
+	register int	base, n;
+	register char	c;
+	u_int			parts[4];
 	register u_int *pp = parts;
 
 	c = *cp;
@@ -500,12 +500,12 @@ int inetaton(const char *cp, struct in_addr *addr)
 void dumpcore(char *msg, ...)
 {
 	static time_t lastd = 0;
-	static int dumps	= 0;
-	char corename[12];
-	time_t now;
-	int p;
-	va_list va;
-	char s[BUFSIZE];
+	static int	  dumps = 0;
+	char		  corename[12];
+	time_t		  now;
+	int			  p;
+	va_list		  va;
+	char		  s[BUFSIZE];
 
 	now = time(NULL);
 
@@ -543,7 +543,7 @@ void dumpcore(char *msg, ...)
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE) && defined(DO_DEBUG_MALLOC)
 
 static char *marray[100000];
-static int mindex = 0;
+static int	 mindex = 0;
 
 #define SZ_EX (sizeof(char *) + sizeof(size_t) + 4)
 #define SZ_CHST (sizeof(char *) + sizeof(size_t))
@@ -552,9 +552,9 @@ static int mindex = 0;
 
 char *MyMalloc(size_t x)
 {
-	register int i;
+	register int	i;
 	register char **s;
-	char *ret;
+	char		   *ret;
 
 	ret = (char *) malloc(x + (size_t) SZ_EX);
 
@@ -584,11 +584,11 @@ char *MyMalloc(size_t x)
 
 char *MyRealloc(char *x, size_t y)
 {
-	register int l;
+	register int	l;
 	register char **s;
-	char *ret, *cp;
-	size_t i;
-	int k;
+	char		   *ret, *cp;
+	size_t			i;
+	int				k;
 
 	if (x != NULL)
 	{
@@ -631,10 +631,10 @@ char *MyRealloc(char *x, size_t y)
 
 void MyFree(void *p)
 {
-	size_t i;
-	char *j, *x = p;
-	u_char k[4];
-	register int l;
+	size_t			i;
+	char		   *j, *x = p;
+	u_char			k[4];
+	register int	l;
 	register char **s;
 
 	if (!x)
@@ -709,10 +709,10 @@ char *MyRealloc(char *x, size_t y)
 */
 int dgets(int fd, char *buf, int num)
 {
-	static char dgbuf[8192];
-	static char *head = dgbuf, *tail = dgbuf;
+	static char	   dgbuf[8192];
+	static char	  *head = dgbuf, *tail = dgbuf;
 	register char *s, *t;
-	register int n, nr;
+	register int   n, nr;
 
 	/*
 	** Sanity checks.
@@ -808,7 +808,7 @@ dgetsagain:
  */
 char *make_version(void)
 {
-	int ve, re, mi, dv, pl;
+	int	 ve, re, mi, dv, pl;
 	char ver[15];
 
 	sscanf(PATCHLEVEL, "%2d%2d%2d%2d%2d", &ve, &re, &mi, &dv, &pl);
@@ -885,7 +885,7 @@ int truncate(const char *path, off_t length)
 struct hostent *solaris_gethostbyname(const char *name)
 {
 	static struct hostent hp;
-	static char buf[HBUFSIZE];
+	static char			  buf[HBUFSIZE];
 
 	return _switch_gethostbyname_r(name, &hp, buf, sizeof(buf), &h_errno);
 }
@@ -951,7 +951,7 @@ __inline
 {
 	long int srcp1 = (long int) &a;
 	long int srcp2 = (long int) &b;
-	op_t a0, b0;
+	op_t	 a0, b0;
 
 	do
 	{
@@ -1061,7 +1061,7 @@ __inline
 	op_t a0, a1, a2, a3;
 	op_t b0, b1, b2, b3;
 	op_t x;
-	int shl, shr;
+	int	 shl, shr;
 
 	/* Calculate how to shift a word read at the memory operation
      aligned srcp1 to make it aligned for comparison.  */
@@ -1155,11 +1155,11 @@ do0:
 
 int irc_memcmp(const __ptr_t s1, const __ptr_t s2, size_t len)
 {
-	op_t a0;
-	op_t b0;
+	op_t	 a0;
+	op_t	 b0;
 	long int srcp1 = (long int) s1;
 	long int srcp2 = (long int) s2;
-	op_t res;
+	op_t	 res;
 
 	if (len >= OP_T_THRES)
 	{

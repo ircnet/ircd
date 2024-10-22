@@ -33,7 +33,7 @@ static char sendbuf[2048];
 
 static void vsendto_prefix_one(aClient *, aClient *, char *, va_list);
 static char psendbuf[2048];
-static int sentalong[MAXCONNECTIONS];
+static int	sentalong[MAXCONNECTIONS];
 
 /*
 ** dead_link
@@ -47,7 +47,7 @@ static int sentalong[MAXCONNECTIONS];
 */
 static int dead_link(aClient *to, char *pattern, ...)
 {
-	char notice[BUFSIZE];
+	char	notice[BUFSIZE];
 	va_list va;
 
 	va_start(va, pattern);
@@ -73,7 +73,7 @@ static int dead_link(aClient *to, char *pattern, ...)
 */
 void flush_fdary(FdAry *fdp)
 {
-	int i;
+	int		 i;
 	aClient *cptr;
 
 	for (i = 0; i <= fdp->highest; i++)
@@ -98,7 +98,7 @@ void flush_fdary(FdAry *fdp)
 */
 void flush_connections(int fd)
 {
-	Reg int i;
+	Reg int		 i;
 	Reg aClient *cptr;
 
 	if (fd == me.fd)
@@ -233,8 +233,8 @@ tryagain:
 */
 int send_queued(aClient *to)
 {
-	char *msg;
-	int len, rlen, more = 0;
+	char	*msg;
+	int		 len, rlen, more = 0;
 	aClient *bysptr = NULL;
 
 	/*
@@ -332,7 +332,7 @@ int send_queued(aClient *to)
 }
 
 
-static anUser ausr;
+static anUser  ausr;
 static aClient anon;
 
 void initanonymous(void)
@@ -433,7 +433,7 @@ int vsendto_one(aClient *to, char *pattern, va_list va)
 
 int sendto_one(aClient *to, char *pattern, ...)
 {
-	int len;
+	int		len;
 	va_list va;
 	va_start(va, pattern);
 	len = vsendto_one(to, pattern, va);
@@ -450,9 +450,9 @@ int sendto_one(aClient *to, char *pattern, ...)
 void sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr,
 						   char *pattern, ...)
 {
-	Reg Link *lp;
+	Reg Link	*lp;
 	Reg aClient *acptr, *lfrm = from;
-	int len1, len2			  = 0;
+	int			 len1, len2	  = 0;
 
 	if (IsAnonymous(chptr) && IsClient(from))
 	{
@@ -507,7 +507,7 @@ void sendto_channel_butone(aClient *one, aClient *from, aChannel *chptr,
  */
 void sendto_serv_butone(aClient *one, char *pattern, ...)
 {
-	Reg int i, len = 0;
+	Reg int		 i, len = 0;
 	Reg aClient *cptr;
 
 	for (i = fdas.highest; i >= 0; i--)
@@ -528,7 +528,7 @@ void sendto_serv_butone(aClient *one, char *pattern, ...)
 
 int sendto_serv_v(aClient *one, int ver, char *pattern, ...)
 {
-	Reg int i, len = 0, rc = 0;
+	Reg int		 i, len = 0, rc = 0;
 	Reg aClient *cptr;
 
 	for (i = fdas.highest; i >= 0; i--)
@@ -604,10 +604,10 @@ int	sendto_serv_notv(aClient *one, int ver, char *pattern, ...)
  */
 void sendto_common_channels(aClient *user, char *pattern, ...)
 {
-	Reg int i;
+	Reg int		 i;
 	Reg aClient *cptr;
-	Reg Link *channels, *lp;
-	int len = 0;
+	Reg Link	*channels, *lp;
+	int			 len = 0;
 
 	/*      This is kind of funky, but should work.  The first part below
 	is optimized for HUB servers or servers with few clients on
@@ -714,9 +714,9 @@ void sendto_common_channels(aClient *user, char *pattern, ...)
  */
 void sendto_channel_butserv(aChannel *chptr, aClient *from, char *pattern, ...)
 {
-	Reg Link *lp;
+	Reg Link	*lp;
 	Reg aClient *acptr, *lfrm = from;
-	int len = 0;
+	int			 len = 0;
 
 	if (MyClient(from))
 	{ /* Always send to the client itself */
@@ -775,9 +775,9 @@ static int match_it(aClient *one, char *mask, int what)
  */
 void sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 {
-	Reg int i, len = 0;
+	Reg int		 i, len = 0;
 	Reg aClient *cptr;
-	char *mask;
+	char		*mask;
 
 	if (chptr)
 	{
@@ -814,9 +814,9 @@ void sendto_match_servs(aChannel *chptr, aClient *from, char *format, ...)
 int sendto_match_servs_v(aChannel *chptr, aClient *from, int ver,
 						 char *format, ...)
 {
-	Reg int i, len = 0, rc = 0;
+	Reg int		 i, len = 0, rc = 0;
 	Reg aClient *cptr;
-	char *mask;
+	char		*mask;
 
 	if (chptr)
 	{
@@ -919,7 +919,7 @@ int	sendto_match_servs_notv(aChannel *chptr, aClient *from, int ver,
 void sendto_match_butone(aClient *one, aClient *from, char *mask, int what,
 						 char *pattern, ...)
 {
-	int i;
+	int		 i;
 	aClient *cptr,
 			*srch;
 
@@ -978,7 +978,7 @@ void sendto_match_butone(aClient *one, aClient *from, char *mask, int what,
 void sendto_ops_butone(aClient *one, char *from, char *pattern, ...)
 {
 	va_list va;
-	char buf[BUFSIZE];
+	char	buf[BUFSIZE];
 
 	va_start(va, pattern);
 	vsprintf(buf, pattern, va);
@@ -1045,7 +1045,7 @@ static SChan svchans[SCH_MAX] = {
 
 void setup_svchans(void)
 {
-	int i;
+	int	   i;
 	SChan *shptr;
 
 #ifdef LOG_SERVER_CHANNELS
@@ -1106,8 +1106,8 @@ void setup_svchans(void)
 void sendto_flag(u_int chan, char *pattern, ...)
 {
 	Reg aChannel *chptr = NULL;
-	SChan *shptr;
-	char nbuf[1024];
+	SChan		 *shptr;
+	char		  nbuf[1024];
 
 	if (chan >= SCH_MAX)
 		chan = SCH_NOTICE;
@@ -1155,7 +1155,7 @@ void sendto_flag(u_int chan, char *pattern, ...)
 	if ((svchans + chan)->fd >= 0)
 	{
 		char lbuf[1024];
-		int len;
+		int	 len;
 
 		len = sprintf(lbuf, "%u %s\n", (u_int) timeofday, nbuf);
 		(void) write((svchans + chan)->fd, lbuf, len);
@@ -1170,9 +1170,9 @@ static int connlog = -1;
 void logfiles_open(void)
 {
 #ifdef LOG_SERVER_CHANNELS
-	int i;
+	int	   i;
 	SChan *shptr;
-	char fname[BUFSIZE];
+	char   fname[BUFSIZE];
 
 	for (i = SCH_MAX - 1, shptr = svchans + i; i >= 0; i--, shptr--)
 	{
@@ -1230,7 +1230,7 @@ void logfiles_open(void)
 void logfiles_close(void)
 {
 #ifdef LOG_SERVER_CHANNELS
-	int i;
+	int	   i;
 	SChan *shptr;
 
 	for (i = SCH_MAX - 1, shptr = svchans + i; i >= 0; i--, shptr--)
@@ -1274,7 +1274,7 @@ void sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 	** And the rest... just count, I got 154 --Beeth
 	*/
 	char linebuf[1500];
-	int linebuflen;
+	int	 linebuflen;
 	/*
 	** This is a potential buffer overflow.
 	** I mean, when you manage to keep ircd

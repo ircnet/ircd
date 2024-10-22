@@ -17,9 +17,9 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-typedef struct Module aModule;
+typedef struct Module	aModule;
 typedef struct Instance AnInstance;
-typedef struct Target aTarget;
+typedef struct Target	aTarget;
 
 struct Module {
 	char *name;					   /* module name */
@@ -35,22 +35,22 @@ struct Module {
 
 struct Instance {
 	AnInstance *nexti;
-	u_char in;	  /* instance number */
-	aModule *mod; /* module */
-	char *opt;	  /* options read from file */
-	char *popt;	  /* options to send to ircd */
-	void *data;	  /* private data: stats, ... */
-	aTarget *address;
-	aTarget *hostname;
-	u_int timeout;
-	u_int port;
-	char *reason;	/* reject reason */
-	u_char delayed; /* delayed execution mode */
+	u_char		in;	  /* instance number */
+	aModule	   *mod;  /* module */
+	char	   *opt;  /* options read from file */
+	char	   *popt; /* options to send to ircd */
+	void	   *data; /* private data: stats, ... */
+	aTarget	   *address;
+	aTarget	   *hostname;
+	u_int		timeout;
+	u_int		port;
+	char	   *reason;	 /* reject reason */
+	u_char		delayed; /* delayed execution mode */
 };
 
 struct Target {
-	char *value;
-	u_long baseip, lmask; /* a.b.c.d/z */
-	char yes;
+	char	*value;
+	u_long	 baseip, lmask; /* a.b.c.d/z */
+	char	 yes;
 	aTarget *nextt;
 };

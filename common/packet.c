@@ -50,8 +50,8 @@ int dopacket(aClient *cptr, char *buffer, int length)
 {
 	Reg char *ch1;
 	Reg char *ch2, *bufptr;
-	aClient *acpt = cptr->acpt;
-	int r		  = 1;
+	aClient	 *acpt = cptr->acpt;
+	int		  r	   = 1;
 #ifdef ZIP_LINKS
 	int unzipped = 0;
 #endif

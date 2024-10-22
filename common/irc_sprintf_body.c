@@ -14,26 +14,26 @@
 	char *bufend = buf + BUFSIZE;
 #endif
 #endif
-	int n;					   /* (calculated) size of parameter */
-	int count = 0;			   /* counter of bytes written to buffer */
-	int mult  = 0;			   /* multiplicator or shift for numbers */
-	int radix;				   /* parameter base of numbers (8,10,16) */
-	static int width	  = 0; /* width of pad */
-	static int precision  = 0; /* precision width */
-	static char plusminus = 0; /* keeps sign (+/- or space) */
-	static int zeropad	  = 0; /* padding with zeroes */
-	static int minus	  = 0; /* padding to left or right */
-	static int unsig	  = 0; /* unsigned mark */
-	static int dotseen	  = 0; /* dot mark, precision mode */
-	static int hash		  = 0; /* #-mark for 0 to octals and 0x to hex */
-	unsigned long val;		   /* va_args for ints and longs */
-	unsigned long nqval;	   /* temp for ints and longs */
+	int			  n;			 /* (calculated) size of parameter */
+	int			  count = 0;	 /* counter of bytes written to buffer */
+	int			  mult	= 0;	 /* multiplicator or shift for numbers */
+	int			  radix;		 /* parameter base of numbers (8,10,16) */
+	static int	  width		= 0; /* width of pad */
+	static int	  precision = 0; /* precision width */
+	static char	  plusminus = 0; /* keeps sign (+/- or space) */
+	static int	  zeropad	= 0; /* padding with zeroes */
+	static int	  minus		= 0; /* padding to left or right */
+	static int	  unsig		= 0; /* unsigned mark */
+	static int	  dotseen	= 0; /* dot mark, precision mode */
+	static int	  hash		= 0; /* #-mark for 0 to octals and 0x to hex */
+	unsigned long val;			 /* va_args for ints and longs */
+	unsigned long nqval;		 /* temp for ints and longs */
 #ifndef _NOLONGLONG
 	unsigned long long ll_val = 0; /* va_args for long longs */
 	unsigned long long ll_nqval;   /* temp for long longs */
 #endif
-	const char *tab;  /* pointer to proper ato(o,dd,x) table */
-	register char cc; /* current fmt char */
+	const char	 *tab; /* pointer to proper ato(o,dd,x) table */
+	register char cc;  /* current fmt char */
 	register char nomodifiers = 1;
 	register char ilong		  = 0; /* long */
 
@@ -145,7 +145,7 @@
 		if (cc == 'd')
 		decimal: {
 			register char *pdtmpbuf = &dtmpbuf[MAXDIGS]; /* pointer inside scratch buffer */
-			register int fil		= 0;
+			register int   fil		= 0;
 
 			hash  = 0;
 			radix = 10;

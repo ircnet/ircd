@@ -260,7 +260,7 @@ void esendto_one(aClient *orig, aClient *dest, char *imsg, char *fmt, ...)
 void esendto_serv_butone(aClient *orig, aClient *dest, char *dname,
 						 char *imsg, aClient *one, char *fmt, ...)
 {
-	int i;
+	int		 i;
 	aClient *acptr;
 
 	CLEAR_LENGTHS;
@@ -292,7 +292,7 @@ void esendto_serv_butone(aClient *orig, aClient *dest, char *dname,
 void esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 							aChannel *chptr, char *fmt, ...)
 {
-	Link *lp;
+	Link	*lp;
 	aClient *acptr;
 
 	CLEAR_LENGTHS;
@@ -356,9 +356,9 @@ void esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 void esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr,
 						 char *fmt, ...)
 {
-	int i;
+	int		 i;
 	aClient *cptr;
-	char *mask;
+	char	*mask;
 
 	CLEAR_LENGTHS;
 

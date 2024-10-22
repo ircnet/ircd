@@ -84,8 +84,8 @@ int ircd_res_mkquery(int op, const char *dname, int class, int type,
 {
 	register HEADER *hp;
 	register u_char *cp;
-	register int n;
-	u_char *dnptrs[20], **dpp, **lastdnptr;
+	register int	 n;
+	u_char			*dnptrs[20], **dpp, **lastdnptr;
 
 	if ((ircd_res.options & RES_INIT) == 0 && ircd_res_init() == -1)
 	{

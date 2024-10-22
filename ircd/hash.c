@@ -37,18 +37,18 @@ static aHashEntry *hostnameTable = NULL;
 static aHashEntry *ipTable = NULL;
 #endif
 static unsigned int *hashtab = NULL;
-static int clhits = 0, clmiss = 0, clsize = 0;
-static int uidhits = 0, uidmiss = 0, uidsize = 0;
-static int chhits = 0, chmiss = 0, chsize = 0;
-static int sidhits = 0, sidmiss = 0, sidsize = 0;
-static int cnhits = 0, cnmiss = 0, cnsize = 0;
-static int iphits = 0, ipmiss = 0, ipsize = 0;
-int _HASHSIZE		  = 0;
-int _UIDSIZE		  = 0;
-int _CHANNELHASHSIZE  = 0;
-int _SIDSIZE		  = 0;
-int _HOSTNAMEHASHSIZE = 0;
-int _IPHASHSIZE		  = 0;
+static int			 clhits = 0, clmiss = 0, clsize = 0;
+static int			 uidhits = 0, uidmiss = 0, uidsize = 0;
+static int			 chhits = 0, chmiss = 0, chsize = 0;
+static int			 sidhits = 0, sidmiss = 0, sidsize = 0;
+static int			 cnhits = 0, cnmiss = 0, cnsize = 0;
+static int			 iphits = 0, ipmiss = 0, ipsize = 0;
+int					 _HASHSIZE		   = 0;
+int					 _UIDSIZE		   = 0;
+int					 _CHANNELHASHSIZE  = 0;
+int					 _SIDSIZE		   = 0;
+int					 _HOSTNAMEHASHSIZE = 0;
+int					 _IPHASHSIZE	   = 0;
 
 /*
  * Hashing.
@@ -86,8 +86,8 @@ int _IPHASHSIZE		  = 0;
 static u_int hash_nick_name(char *nname, u_int *store)
 {
 	Reg u_char *name = (u_char *) nname;
-	Reg u_char ch;
-	Reg u_int hash = 1;
+	Reg u_char	ch;
+	Reg u_int	hash = 1;
 
 	for (; (ch = *name); name++)
 	{
@@ -114,7 +114,7 @@ static u_int hash_nick_name(char *nname, u_int *store)
 static u_int hash_uid(char *uid, u_int *store)
 {
 	Reg u_char ch;
-	Reg u_int hash = 1;
+	Reg u_int  hash = 1;
 
 	for (; (ch = *uid); uid++)
 	{
@@ -135,7 +135,7 @@ static u_int hash_uid(char *uid, u_int *store)
 static u_int hash_sid(char *sid, u_int *store)
 {
 	Reg u_char ch;
-	Reg u_int hash = 1;
+	Reg u_int  hash = 1;
 
 	for (; (ch = *sid); sid++)
 	{
@@ -161,9 +161,9 @@ static u_int hash_sid(char *sid, u_int *store)
 static u_int hash_channel_name(char *hname, u_int *store, int shortname)
 {
 	Reg u_char *name = (u_char *) hname;
-	Reg u_char ch;
-	Reg int i	   = 30;
-	Reg u_int hash = 5;
+	Reg u_char	ch;
+	Reg int		i	 = 30;
+	Reg u_int	hash = 5;
 
 	if (*name == '!' && shortname == 0)
 		name += 1 + CHIDLEN;
@@ -186,7 +186,7 @@ static u_int hash_host_name(char *hname, u_int *store)
 {
 
 	Reg u_char *name = (u_char *) hname;
-	Reg u_int hash	 = 0;
+	Reg u_int	hash = 0;
 
 	for (; *name; name++)
 	{
@@ -207,8 +207,8 @@ static u_int hash_host_name(char *hname, u_int *store)
 static u_int hash_ip(char *hip, u_int *store)
 {
 
-	Reg u_char *ip = (u_char *) hip;
-	Reg u_int hash = 0;
+	Reg u_char *ip	 = (u_char *) hip;
+	Reg u_int	hash = 0;
 
 	for (; *ip; ip++)
 	{
@@ -380,11 +380,11 @@ void inithashtables(void)
 
 static void bigger_hash_table(int *size, aHashEntry *table, int new)
 {
-	Reg aClient *cptr;
+	Reg aClient	 *cptr;
 	Reg aChannel *chptr;
-	Reg aServer *sptr;
-	aHashEntry *otab = table;
-	int osize		 = *size;
+	Reg aServer	 *sptr;
+	aHashEntry	 *otab	= table;
+	int			  osize = *size;
 
 	while (!new || new <= osize)
 		if (!new)
@@ -419,7 +419,7 @@ static void bigger_hash_table(int *size, aHashEntry *table, int new)
 	}
 	else if (otab == clientTable)
 	{
-		int i;
+		int		 i;
 		aClient *next;
 		Debug((DEBUG_ERROR, "Client Hash Table from %d to %d (%d)",
 			   osize, new, clsize));
@@ -463,7 +463,7 @@ static void bigger_hash_table(int *size, aHashEntry *table, int new)
 #ifdef USE_HOSTHASH
 	else if (otab == hostnameTable)
 	{
-		int i;
+		int		i;
 		anUser *next, *user;
 		Debug((DEBUG_ERROR, "Hostname Hash Table from %d to %d (%d)",
 			   osize, new, clsize));
@@ -510,7 +510,7 @@ static void bigger_hash_table(int *size, aHashEntry *table, int new)
 #ifdef USE_IPHASH
 	else if (otab == ipTable)
 	{
-		int i;
+		int		i;
 		anUser *next, *user;
 		Debug((DEBUG_ERROR, "IP Hash Table from %d to %d (%d)",
 			   osize, new, clsize));
@@ -659,7 +659,7 @@ int add_to_ip_hash_table(char *ip, anUser *user)
 int del_from_client_hash_table(char *name, aClient *cptr)
 {
 	Reg aClient *tmp, *prev = NULL;
-	Reg u_int hashv;
+	Reg u_int	 hashv;
 
 	hashv = cptr->hashv;
 	hashv %= _HASHSIZE;
@@ -701,7 +701,7 @@ int del_from_client_hash_table(char *name, aClient *cptr)
 int del_from_uid_hash_table(char *uid, aClient *cptr)
 {
 	Reg aClient *tmp, *prev = NULL;
-	Reg u_int hashv;
+	Reg u_int	 hashv;
 
 	hashv = cptr->user->hashv;
 	hashv %= _UIDSIZE;
@@ -744,7 +744,7 @@ int del_from_uid_hash_table(char *uid, aClient *cptr)
 int del_from_channel_hash_table(char *name, aChannel *chptr)
 {
 	Reg aChannel *tmp, *prev = NULL;
-	Reg u_int hashv;
+	Reg u_int	  hashv;
 
 	hashv = chptr->hashv;
 	hashv %= _CHANNELHASHSIZE;
@@ -782,7 +782,7 @@ int del_from_channel_hash_table(char *name, aChannel *chptr)
 int del_from_sid_hash_table(aServer *sptr)
 {
 	Reg aServer *tmp, *prev = NULL;
-	Reg u_int hashv;
+	Reg u_int	 hashv;
 
 	hashv = sptr->sidhashv;
 	hashv %= _SIDSIZE;
@@ -823,7 +823,7 @@ int del_from_sid_hash_table(aServer *sptr)
 int del_from_hostname_hash_table(char *hostname, anUser *user)
 {
 	Reg anUser *tmp, *prev = NULL;
-	Reg u_int hashv;
+	Reg u_int	hashv;
 
 	hashv = user->hhashv;
 	hashv %= _HOSTNAMEHASHSIZE;
@@ -866,7 +866,7 @@ int del_from_hostname_hash_table(char *hostname, anUser *user)
 int del_from_ip_hash_table(char *ip, anUser *user)
 {
 	Reg anUser *tmp, *prev = NULL;
-	Reg u_int hashv;
+	Reg u_int	hashv;
 
 	hashv = user->iphashv;
 	hashv %= _IPHASHSIZE;
@@ -909,11 +909,11 @@ int del_from_ip_hash_table(char *ip, anUser *user)
  */
 aClient *hash_find_client(char *name, aClient *cptr)
 {
-	Reg aClient *tmp;
-	Reg aClient *prv = NULL;
+	Reg aClient	   *tmp;
+	Reg aClient	   *prv = NULL;
 	Reg aHashEntry *tmp3;
-	u_int hashv, hv;
-	int count = 0;
+	u_int			hashv, hv;
+	int				count = 0;
 
 	hashv = hash_nick_name(name, &hv);
 	tmp3  = &clientTable[hashv];
@@ -963,11 +963,11 @@ aClient *hash_find_client(char *name, aClient *cptr)
  */
 aClient *hash_find_uid(char *uid, aClient *cptr)
 {
-	Reg aClient *tmp;
-	Reg aClient *prv = NULL;
+	Reg aClient	   *tmp;
+	Reg aClient	   *prv = NULL;
 	Reg aHashEntry *tmp3;
-	u_int hashv, hv;
-	int count = 0;
+	u_int			hashv, hv;
+	int				count = 0;
 
 	hashv = hash_uid(uid, &hv);
 	tmp3  = &uidTable[hashv];
@@ -1019,11 +1019,11 @@ aClient *hash_find_uid(char *uid, aClient *cptr)
 aClient *hash_find_server(char *server, aClient *cptr)
 {
 	Reg aClient *tmp, *prv = NULL;
-	Reg char *t;
-	Reg char ch;
-	aHashEntry *tmp3;
-	u_int hashv, hv;
-	int count = 0;
+	Reg char	*t;
+	Reg char	 ch;
+	aHashEntry	*tmp3;
+	u_int		 hashv, hv;
+	int			 count = 0;
 
 	hashv = hash_nick_name(server, &hv);
 	tmp3  = &clientTable[hashv];
@@ -1092,10 +1092,10 @@ aClient *hash_find_server(char *server, aClient *cptr)
  */
 aChannel *hash_find_channel(char *name, aChannel *chptr)
 {
-	Reg aChannel *tmp, *prv = NULL;
+	Reg aChannel   *tmp, *prv = NULL;
 	Reg aHashEntry *tmp3;
-	u_int hashv, hv;
-	int count = 0;
+	u_int			hashv, hv;
+	int				count = 0;
 
 	hashv = hash_channel_name(name, &hv, 0);
 	tmp3  = &channelTable[hashv];
@@ -1136,7 +1136,7 @@ aChannel *hash_find_channel(char *name, aChannel *chptr)
 aChannel *hash_find_channels(char *name, aChannel *chptr)
 {
 	aChannel *tmp;
-	u_int hashv, hv;
+	u_int	  hashv, hv;
 
 	if (chptr == NULL)
 	{
@@ -1171,11 +1171,11 @@ aChannel *hash_find_channels(char *name, aChannel *chptr)
 */
 aClient *hash_find_sid(char *sid, aClient *cptr)
 {
-	Reg aServer *tmp;
-	Reg aServer *prv = NULL;
+	Reg aServer	   *tmp;
+	Reg aServer	   *prv = NULL;
 	Reg aHashEntry *tmp3;
-	u_int hashv, hv;
-	int count = 0;
+	u_int			hashv, hv;
+	int				count = 0;
 
 	hashv = hash_sid(sid, &hv);
 	tmp3  = &sidTable[hashv];
@@ -1203,10 +1203,10 @@ aClient *hash_find_sid(char *sid, aClient *cptr)
  */
 anUser *hash_find_hostname(char *hostname, anUser *user)
 {
-	Reg anUser *tmp, *prv = NULL;
+	Reg anUser	   *tmp, *prv = NULL;
 	Reg aHashEntry *tmp3;
-	u_int hashv, hv;
-	int count = 0;
+	u_int			hashv, hv;
+	int				count = 0;
 
 	hashv = hash_host_name(hostname, &hv);
 	tmp3  = &hostnameTable[hashv];
@@ -1235,10 +1235,10 @@ anUser *hash_find_hostname(char *hostname, anUser *user)
  */
 anUser *hash_find_ip(char *ip, anUser *user)
 {
-	Reg anUser *tmp, *prv = NULL;
+	Reg anUser	   *tmp, *prv = NULL;
 	Reg aHashEntry *tmp3;
-	u_int hashv, hv;
-	int count = 0;
+	u_int			hashv, hv;
+	int				count = 0;
 
 	hashv = hash_ip(ip, &hv);
 	tmp3  = &ipTable[hashv];
@@ -1270,13 +1270,13 @@ anUser *hash_find_ip(char *ip, anUser *user)
  *       -avalon
  */
 struct HashTable_s {
-	char hash;
-	char *hashname;
+	char		 hash;
+	char		*hashname;
 	aHashEntry **table;
-	int *hits;
-	int *miss;
-	int *nentries;
-	int *size;
+	int			*hits;
+	int			*miss;
+	int			*nentries;
+	int			*size;
 	u_int (*hashfunc)(char *name, u_int *store);
 };
 
@@ -1284,12 +1284,12 @@ struct HashTable_s {
 static void show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables,
 							 int shash, int bucket)
 {
-	int j = 1;
+	int			j = 1;
 	aHashEntry *htab, *tab;
-	aClient *acptr;
-	anUser *auptr;
-	aServer *asptr;
-	aChannel *chptr;
+	aClient	   *acptr;
+	anUser	   *auptr;
+	aServer	   *asptr;
+	aChannel   *chptr;
 
 	htab = *(HashTables[shash].table);
 	tab	 = &htab[bucket];
@@ -1392,9 +1392,9 @@ static void show_hash_bucket(aClient *sptr, struct HashTable_s *HashTables,
 int m_hash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aHashEntry *hashtab = NULL, *tab;
-	int shash			= -1, i, l;
-	int deepest = 0, deeplink = 0, totlink = 0, mosthits = 0, mosthit = 0;
-	int tothits = 0, used = 0, used_now = 0, link_pop[11];
+	int			shash	= -1, i, l;
+	int			deepest = 0, deeplink = 0, totlink = 0, mosthits = 0, mosthit = 0;
+	int			tothits = 0, used = 0, used_now = 0, link_pop[11];
 
 	struct HashTable_s HashTables[] =
 			{

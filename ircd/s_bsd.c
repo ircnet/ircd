@@ -48,23 +48,23 @@ static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.188 2011/01/20 14:26:
 #define IN_LOOPBACKNET 0x7f
 #endif
 
-aClient *local[MAXCONNECTIONS];
-FdAry fdas, fdall;
-int highest_fd = 0, readcalls = 0, udpfd = -1, resfd = -1, adfd = -1;
-time_t timeofday;
+aClient					 *local[MAXCONNECTIONS];
+FdAry					  fdas, fdall;
+int						  highest_fd = 0, readcalls = 0, udpfd = -1, resfd = -1, adfd = -1;
+time_t					  timeofday;
 static struct SOCKADDR_IN mysk;
-static void polludp(void);
+static void				  polludp(void);
 
 static struct SOCKADDR *connect_inet(aConfItem *, aClient *, int *);
-static int completed_connection(aClient *);
-static int check_init(aClient *, char *);
-static int check_ping(char *, int);
-static void do_dns_async(void);
-static int set_sock_opts(int, aClient *);
+static int				completed_connection(aClient *);
+static int				check_init(aClient *, char *);
+static int				check_ping(char *, int);
+static void				do_dns_async(void);
+static int				set_sock_opts(int, aClient *);
 #ifdef UNIXPORT
 static struct SOCKADDR *connect_unix(aConfItem *, aClient *, int *);
-static aClient *add_unixconnection(aClient *, int);
-static char unixpath[256];
+static aClient		   *add_unixconnection(aClient *, int);
+static char				unixpath[256];
 #endif
 static char readbuf[READBUF_SIZE];
 
@@ -148,12 +148,12 @@ void add_local_domain(char *hname, size_t size)
 */
 void report_error(char *text, aClient *cptr)
 {
-	Reg int errtmp = errno; /* debug may change 'errno' */
-	Reg char *host;
-	int err;
+	Reg int		  errtmp = errno; /* debug may change 'errno' */
+	Reg char	 *host;
+	int			  err;
 	SOCK_LEN_TYPE len = sizeof(err);
-	char fmbuf[BUFSIZE + 1];
-	aClient *bysptr = NULL;
+	char		  fmbuf[BUFSIZE + 1];
+	aClient		 *bysptr = NULL;
 
 	extern char *strerror(int);
 
@@ -208,9 +208,9 @@ void report_error(char *text, aClient *cptr)
 int inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 {
 	static struct SOCKADDR_IN server;
-	int ad[4];
-	SOCK_LEN_TYPE len = sizeof(server);
-	char ipname[20];
+	int						  ad[4];
+	SOCK_LEN_TYPE			  len = sizeof(server);
+	char					  ipname[20];
 
 	/* broken config? why allow such broken line to live?
 	** XXX: fix initconf()? --B. */
@@ -378,7 +378,7 @@ int add_listener(aConfItem *aconf)
 int unixport(aClient *cptr, char *path, int port)
 {
 	struct sockaddr_un un;
-	struct stat buf;
+	struct stat		   buf;
 
 	if ((cptr->fd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1)
 	{
@@ -434,7 +434,7 @@ int unixport(aClient *cptr, char *path, int port)
  */
 void close_listeners(void)
 {
-	aClient *acptr, *bcptr;
+	aClient	  *acptr, *bcptr;
 	aConfItem *aconf;
 
 	/*
@@ -473,7 +473,7 @@ void close_listeners(void)
 void open_listener(aClient *cptr)
 {
 	aConfItem *aconf;
-	int dolisten = 1;
+	int		   dolisten = 1;
 
 	aconf = cptr->confs->value.aconf;
 
@@ -517,7 +517,7 @@ void open_listener(aClient *cptr)
 /* Reopens listening sockets on all listeners */
 void reopen_listeners(void)
 {
-	aClient *acptr;
+	aClient	  *acptr;
 	aConfItem *aconf;
 	for (acptr = ListenerLL; acptr; acptr = acptr->next)
 	{
@@ -531,7 +531,7 @@ void reopen_listeners(void)
 
 void activate_delayed_listeners(void)
 {
-	int cnt = 0;
+	int		 cnt = 0;
 	aClient *acptr;
 
 	for (acptr = ListenerLL; acptr; acptr = acptr->next)
@@ -553,10 +553,10 @@ void activate_delayed_listeners(void)
 void start_iauth(int rcvdsig)
 {
 #if defined(USE_IAUTH)
-	static time_t last = 0;
-	static char first  = 1;
-	int sp[2], fd, val;
-	static pid_t iauth_pid = 0;
+	static time_t last	= 0;
+	static char	  first = 1;
+	int			  sp[2], fd, val;
+	static pid_t  iauth_pid = 0;
 
 	if ((bootopt & BOOT_NOIAUTH) != 0)
 		return;
@@ -636,9 +636,9 @@ void start_iauth(int rcvdsig)
 		first = 0;
 	else
 	{
-		int i;
+		int		 i;
 		aClient *cptr;
-		char abuf[BUFSIZ]; /* size of abuf in vsendto_iauth */
+		char	 abuf[BUFSIZ]; /* size of abuf in vsendto_iauth */
 		/* 20 is biggest possible ending "%d O\n\0", which means
 		** 16-digit fd -- very unlikely :> */
 		char *e = abuf + BUFSIZ - 20;
@@ -825,7 +825,7 @@ init_dgram:
 
 void write_pidfile(void)
 {
-	int fd;
+	int	 fd;
 	char buff[20];
 	(void) truncate(IRCDPID_PATH, 0);
 	if ((fd = open(IRCDPID_PATH, O_CREAT | O_WRONLY, 0600)) >= 0)
@@ -855,7 +855,7 @@ void write_pidfile(void)
 static int check_init(aClient *cptr, char *sockn)
 {
 	struct SOCKADDR_IN sk;
-	SOCK_LEN_TYPE len = sizeof(struct SOCKADDR_IN);
+	SOCK_LEN_TYPE	   len = sizeof(struct SOCKADDR_IN);
 
 #ifdef UNIXPORT
 	if (IsUnixSocket(cptr))
@@ -899,9 +899,9 @@ static int check_init(aClient *cptr, char *sockn)
  */
 int check_client(aClient *cptr)
 {
-	char sockname[HOSTLEN + 1];
+	char				sockname[HOSTLEN + 1];
 	Reg struct hostent *hp = NULL;
-	Reg int i;
+	Reg int				i;
 
 #ifdef INET6
 	Debug((DEBUG_DNS, "ch_cl: check access for %s[%s]",
@@ -996,10 +996,10 @@ int check_client(aClient *cptr)
  */
 int check_server_init(aClient *cptr)
 {
-	Reg char *name;
-	Reg aConfItem *c_conf = NULL, *n_conf = NULL;
+	Reg char	   *name;
+	Reg aConfItem  *c_conf = NULL, *n_conf = NULL;
 	struct hostent *hp = NULL;
-	Link *lp;
+	Link		   *lp;
 
 	name = cptr->name;
 	Debug((DEBUG_DNS, "sv_cl: check access for %s[%s]",
@@ -1055,7 +1055,7 @@ int check_server_init(aClient *cptr)
 		if (aconf)
 		{
 			Reg char *s;
-			Link lin;
+			Link	  lin;
 
 			/*
 			** Do a lookup for the CONF line *only* and not
@@ -1082,10 +1082,10 @@ int check_server(aClient *cptr, struct hostent *hp,
 				 aConfItem *c_conf, aConfItem *n_conf)
 {
 	Reg char *name;
-	char abuff[HOSTLEN + USERLEN + 2];
-	char sockname[HOSTLEN + 1], fullname[HOSTLEN + 1];
-	Link *lp = cptr->confs;
-	int i;
+	char	  abuff[HOSTLEN + USERLEN + 2];
+	char	  sockname[HOSTLEN + 1], fullname[HOSTLEN + 1];
+	Link	 *lp = cptr->confs;
+	int		  i;
 
 	if (check_init(cptr, sockname))
 		return -2;
@@ -1549,7 +1549,7 @@ static int set_sock_opts(int fd, aClient *cptr)
 		)
 		{
 			u_char opbuf[256], *t = opbuf;
-			char *s = readbuf;
+			char  *s = readbuf;
 
 			opt = sizeof(opbuf);
 			if (GETSOCKOPT(fd, IPPROTO_IP, IP_OPTIONS, t, &opt) == -1)
@@ -1575,7 +1575,7 @@ static int set_sock_opts(int fd, aClient *cptr)
 
 int get_sockerr(aClient *cptr)
 {
-	int errtmp = errno, err = 0;
+	int			  errtmp = errno, err = 0;
 	SOCK_LEN_TYPE len = sizeof(err);
 
 #ifdef SO_ERROR
@@ -1634,12 +1634,12 @@ void set_non_blocking(int fd, aClient *cptr)
 static int check_clones(aClient *cptr)
 {
 	struct abacklog {
-		struct IN_ADDR ip;
-		time_t PT;
+		struct IN_ADDR	 ip;
+		time_t			 PT;
 		struct abacklog *next;
 	};
-	static struct abacklog *backlog	 = NULL;
-	register struct abacklog **blscn = &backlog,
+	static struct abacklog	  *backlog = NULL;
+	register struct abacklog **blscn   = &backlog,
 							 *blptr;
 	register int count = 0;
 
@@ -1705,8 +1705,8 @@ void add_connection_refuse(int fd, aClient *acptr, int delay)
  */
 aClient *add_connection(aClient *cptr, int fd)
 {
-	Link lin;
-	aClient *acptr;
+	Link	   lin;
+	aClient	  *acptr;
 	aConfItem *aconf = NULL;
 	acptr			 = make_client(NULL);
 
@@ -1722,7 +1722,7 @@ aClient *add_connection(aClient *cptr, int fd)
 	else
 	{
 		struct SOCKADDR_IN addr;
-		SOCK_LEN_TYPE len = sizeof(struct SOCKADDR_IN);
+		SOCK_LEN_TYPE	   len = sizeof(struct SOCKADDR_IN);
 
 		if (getpeername(fd, (SAP) &addr, &len) == -1)
 		{
@@ -1826,7 +1826,7 @@ aClient *add_connection(aClient *cptr, int fd)
 #ifdef UNIXPORT
 static aClient *add_unixconnection(aClient *cptr, int fd)
 {
-	aClient *acptr;
+	aClient	  *acptr;
 	aConfItem *aconf = NULL;
 
 	acptr = make_client(NULL);
@@ -1881,7 +1881,7 @@ static aClient *add_unixconnection(aClient *cptr, int fd)
 */
 static void read_listener(aClient *cptr)
 {
-	int fdnew, max = LISTENER_MAXACCEPT;
+	int		 fdnew, max = LISTENER_MAXACCEPT;
 	aClient *acptr;
 
 	while (max--)
@@ -2128,7 +2128,7 @@ int read_message(time_t delay, FdAry *fdp, int ro)
 #define TST_WRITE_EVENT(thisfd) FD_ISSET(thisfd, &write_set)
 
 	fd_set read_set, write_set;
-	int highfd = -1;
+	int	   highfd = -1;
 #else
 /* most of the following use pfd */
 #define POLLSETREADFLAGS (POLLIN | POLLRDNORM)
@@ -2161,22 +2161,22 @@ int read_message(time_t delay, FdAry *fdp, int ro)
 		pfd->revents = 0;                         \
 	}
 
-	struct pollfd poll_fdarray[MAXCONNECTIONS];
+	struct pollfd  poll_fdarray[MAXCONNECTIONS];
 	struct pollfd *pfd	   = poll_fdarray;
 	struct pollfd *res_pfd = NULL;
 	struct pollfd *udp_pfd = NULL;
 	struct pollfd *ad_pfd  = NULL;
-	aClient *authclnts[MAXCONNECTIONS]; /* mapping of auth fds to client ptrs */
-	int nbr_pfds = 0;
+	aClient		  *authclnts[MAXCONNECTIONS]; /* mapping of auth fds to client ptrs */
+	int			   nbr_pfds = 0;
 #endif
 
-	aClient *cptr;
-	int nfds, ret = 0;
+	aClient		  *cptr;
+	int			   nfds, ret = 0;
 	struct timeval wait;
-	time_t delay2 = delay;
-	int res, length, fd, i;
-	int auth;
-	int write_err = 0;
+	time_t		   delay2 = delay;
+	int			   res, length, fd, i;
+	int			   auth;
+	int			   write_err = 0;
 
 	for (res = 0;;)
 	{
@@ -2560,9 +2560,9 @@ return ret;
 int connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 {
 	Reg struct SOCKADDR *svp;
-	Reg aClient *cptr, *c2ptr;
-	Reg char *s;
-	int i, len;
+	Reg aClient			*cptr, *c2ptr;
+	Reg char			*s;
+	int					 i, len;
 
 #ifdef INET6
 	Debug((DEBUG_NOTICE, "Connect to %s[%s] @%s",
@@ -2733,11 +2733,11 @@ static struct SOCKADDR *connect_inet(aConfItem *aconf, aClient *cptr,
 									 int *lenp)
 {
 	static struct SOCKADDR_IN server;
-	struct SOCKADDR_IN outip;
+	struct SOCKADDR_IN		  outip;
 
 	Reg struct hostent *hp;
-	aClient *acptr;
-	int i;
+	aClient			   *acptr;
+	int					i;
 
 	/*
 	 * Might as well get sockhost from here, the connection is attempted
@@ -2915,9 +2915,9 @@ int utmp_close(int fd)
 void summon(aClient *who, char *namebuf, char *linebuf, char *chname)
 {
 	static char wrerr[] = "NOTICE %s :Write error. Couldn't summon.";
-	int fd;
-	char line[512];
-	struct tm *tp;
+	int			fd;
+	char		line[512];
+	struct tm  *tp;
 
 	tp = localtime(&timeofday);
 	if (strlen(linebuf) > (size_t) 9)
@@ -3026,12 +3026,12 @@ Chat on\n\r");
 */
 void get_my_name(aClient *cptr, char *name, int len)
 {
-	static char tmp[HOSTLEN + 1];
+	static char		tmp[HOSTLEN + 1];
 	struct hostent *hp;
-	char *cname = cptr->name;
-	aConfItem *aconf;
+	char		   *cname = cptr->name;
+	aConfItem	   *aconf;
 #ifdef HAVE_GETIPNODEBYNAME
-	int error_num1, error_num2;
+	int				error_num1, error_num2;
 	struct hostent *hp1, *hp2;
 #endif
 
@@ -3075,7 +3075,7 @@ void get_my_name(aClient *cptr, char *name, int len)
 #endif
 	{
 		char *hname;
-		int i = 0;
+		int	  i = 0;
 
 		for (hname = hp->h_name; hname; hname = hp->h_aliases[i++])
 		{
@@ -3121,7 +3121,7 @@ if someone wants to control this, use M: or C: adequate fields. --B. */
 int setup_ping(aConfItem *aconf)
 {
 	struct SOCKADDR_IN from;
-	int on = 1;
+	int				   on = 1;
 
 	if (udpfd != -1)
 		return udpfd;
@@ -3184,9 +3184,9 @@ int setup_ping(aConfItem *aconf)
 
 void send_ping(aConfItem *aconf)
 {
-	Ping pi;
+	Ping			   pi;
 	struct SOCKADDR_IN sin;
-	aCPing *cp = aconf->ping;
+	aCPing			  *cp = aconf->ping;
 
 #ifdef INET6
 	if (!aconf->ipnum.s6_addr || AND16(aconf->ipnum.s6_addr) == 255 || !cp->port)
@@ -3240,12 +3240,12 @@ void send_ping(aConfItem *aconf)
 
 static int check_ping(char *buf, int len)
 {
-	Ping pi;
-	aConfItem *aconf;
+	Ping		   pi;
+	aConfItem	  *aconf;
 	struct timeval tv;
-	double d;
-	aCPing *cp = NULL;
-	u_long rtt;
+	double		   d;
+	aCPing		  *cp = NULL;
+	u_long		   rtt;
 
 	(void) gettimeofday(&tv, NULL);
 
@@ -3287,13 +3287,13 @@ static int check_ping(char *buf, int len)
  */
 static void polludp(void)
 {
-	static time_t last = 0;
-	static int cnt = 0, mlen = 0, lasterr = 0;
-	Reg char *s;
+	static time_t	   last = 0;
+	static int		   cnt = 0, mlen = 0, lasterr = 0;
+	Reg char		  *s;
 	struct SOCKADDR_IN from;
-	Ping pi;
-	int n;
-	SOCK_LEN_TYPE fromlen = sizeof(from);
+	Ping			   pi;
+	int				   n;
+	SOCK_LEN_TYPE	   fromlen = sizeof(from);
 
 	/*
 	 * find max length of data area of packet.
@@ -3416,11 +3416,11 @@ static void polludp(void)
  */
 static void do_dns_async(void)
 {
-	static Link ln;
-	aClient *cptr;
-	aConfItem *aconf;
+	static Link		ln;
+	aClient		   *cptr;
+	aConfItem	   *aconf;
 	struct hostent *hp;
-	int bytes, pkts;
+	int				bytes, pkts;
 
 	pkts = 0;
 
@@ -3511,12 +3511,12 @@ time_t delay_close(int fd)
 {
 	struct fdlog {
 		struct fdlog *next;
-		int fd;
-		time_t time;
+		int			  fd;
+		time_t		  time;
 	};
 	static struct fdlog *first = NULL, *last = NULL;
-	struct fdlog *next = first, *tmp;
-	int tmpdel		   = 0;
+	struct fdlog		*next	= first, *tmp;
+	int					 tmpdel = 0;
 
 	if (fd == -2)
 	{

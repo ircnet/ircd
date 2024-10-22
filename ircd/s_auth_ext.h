@@ -26,7 +26,7 @@
 #ifndef S_AUTH_C
 #if defined(USE_IAUTH)
 extern u_char iauth_options;
-extern u_int iauth_spawn;
+extern u_int  iauth_spawn;
 #endif
 #
 #define EXTERN extern
@@ -35,8 +35,8 @@ extern u_int iauth_spawn;
 #endif /* S_AUTH_C */
 
 #if defined(USE_IAUTH)
-EXTERN int vsendto_iauth(char *pattern, va_list va);
-EXTERN int sendto_iauth(char *pattern, ...);
+EXTERN int	vsendto_iauth(char *pattern, va_list va);
+EXTERN int	sendto_iauth(char *pattern, ...);
 EXTERN void read_iauth(void);
 EXTERN void report_iauth_conf(aClient *, char *);
 EXTERN void report_iauth_stats(aClient *, char *);

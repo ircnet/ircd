@@ -33,8 +33,8 @@ static const volatile char rcsid[] = "@(#)$Id: s_serv.c,v 1.299 2011/01/20 14:26
 
 static char buf[BUFSIZE];
 
-static int check_link(aClient *);
-static int get_version(char *, char *);
+static int	check_link(aClient *);
+static int	get_version(char *, char *);
 static void trace_one(aClient *, aClient *);
 static void report_listeners(aClient *, char *);
 static void count_servers_users(aClient *, int *, int *);
@@ -123,11 +123,11 @@ int m_version(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_squit(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg aConfItem *aconf;
-	char *server;
-	Reg aClient *acptr = NULL;
-	int rsquit		   = 0;
-	char *comment;
-	static char comment2[TOPICLEN + 1];
+	char		  *server;
+	Reg aClient	  *acptr  = NULL;
+	int			   rsquit = 0;
+	char		  *comment;
+	static char	   comment2[TOPICLEN + 1];
 
 	if (!is_allowed(sptr, ACL_SQUIT))
 		return m_nopriv(cptr, sptr, parc, parv);
@@ -455,7 +455,7 @@ static void send_server(aClient *cptr, aClient *server)
 */
 static void introduce_server(aClient *cptr, aClient *server)
 {
-	int i;
+	int		 i;
 	aClient *acptr;
 
 	for (i = fdas.highest; i >= 0; i--)
@@ -562,12 +562,12 @@ int m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	char info[REALLEN + 1], *inpath, *host;
-	char versionbuf[11]; /* At least PATCHLEVEL size! */
-	aClient *acptr, *bcptr;
+	char	   info[REALLEN + 1], *inpath, *host;
+	char	   versionbuf[11]; /* At least PATCHLEVEL size! */
+	aClient	  *acptr, *bcptr;
 	aConfItem *aconf;
-	int hop = 0;
-	int tmperr;
+	int		   hop = 0;
+	int		   tmperr;
 
 	if (sptr->user) /* in case NICK has been received already */
 	{
@@ -852,13 +852,13 @@ int m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 {
 	Reg aClient *acptr;
-	aClient *bysptr = NULL;
+	aClient		*bysptr = NULL;
 #ifndef HUB
 	int i;
 #endif
 
 	Reg aConfItem *aconf, *bconf;
-	char mlname[HOSTLEN + 1], *inpath, *host, *s, *encr;
+	char		   mlname[HOSTLEN + 1], *inpath, *host, *s, *encr;
 
 	host   = cptr->name;
 	inpath = get_client_name(cptr, TRUE); /* "refresh" inpath with host */
@@ -1291,7 +1291,7 @@ int m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	*/
 	{
 		Reg aChannel *chptr;
-		int rv = atoi(cptr->serv->verstr);
+		int			  rv = atoi(cptr->serv->verstr);
 
 		for (chptr = channel; chptr; chptr = chptr->nextch)
 		{
@@ -1316,9 +1316,9 @@ int m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	else
 	{
 		aServer *asptr;
-		char eobbuf[BUFSIZE];
-		char *e;
-		int eobmaxlen;
+		char	 eobbuf[BUFSIZE];
+		char	*e;
+		int		 eobmaxlen;
 
 		e		  = eobbuf;
 		eobmaxlen = BUFSIZE - 1 /*    ":"     */
@@ -1432,8 +1432,8 @@ int m_info(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_links(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg aServer *asptr;
-	char *mask;
-	aClient *acptr;
+	char		*mask;
+	aClient		*acptr;
 
 	if (parc > 2)
 	{
@@ -1486,9 +1486,9 @@ int m_summon(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #ifdef ENABLE_SUMMON
 	char hostbuf[17], namebuf[10], linebuf[10];
 #ifdef LEAST_IDLE
-	char linetmp[10], ttyname[15]; /* Ack */
+	char		linetmp[10], ttyname[15]; /* Ack */
 	struct stat stb;
-	time_t ltime = (time_t) 0;
+	time_t		ltime = (time_t) 0;
 #endif
 	int fd, flag = 0;
 #endif
@@ -1589,10 +1589,10 @@ int m_summon(aClient *cptr, aClient *sptr, int parc, char *parv[])
  */
 static void report_myservers(aClient *sptr, char *to)
 {
-	int i;
-	int timeconnected;
+	int		 i;
+	int		 timeconnected;
 	aClient *acptr;
-	int users, servers;
+	int		 users, servers;
 
 	for (i = fdas.highest; i >= 0; i--)
 	{
@@ -1725,9 +1725,9 @@ static void report_x_lines(aClient *sptr, char *to)
 static void report_configured_links(aClient *sptr, char *to, int mask)
 {
 	static char null[] = "<NULL>";
-	aConfItem *tmp;
-	int *p, port;
-	char c, *host, *pass, *name;
+	aConfItem  *tmp;
+	int		   *p, port;
+	char		c, *host, *pass, *name;
 
 	if ((mask & (CONF_KILL | CONF_OTHERKILL)))
 		tmp = kconf;
@@ -1796,7 +1796,7 @@ static void report_configured_links(aClient *sptr, char *to, int mask)
 static void report_ping(aClient *sptr, char *to)
 {
 	aConfItem *tmp;
-	aCPing *cp;
+	aCPing	  *cp;
 
 	for (tmp = conf; tmp; tmp = tmp->next)
 		if ((cp = tmp->ping) && cp->lseq)
@@ -1817,7 +1817,7 @@ static void report_ping(aClient *sptr, char *to)
 static void report_fd(aClient *sptr, aClient *acptr, char *to)
 {
 	static char locip[100], *ret;
-	int s;
+	int			s;
 
 	if (IsMe(acptr) || !acptr->acpt || !IsRegistered(acptr))
 		return;
@@ -1851,13 +1851,13 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 
 int m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	static char Lformat[] = ":%s %d %s %s %u %lu %llu %lu %llu :%d";
+	static char		Lformat[] = ":%s %d %s %s %u %lu %llu %lu %llu :%d";
 	struct Message *mptr;
-	aClient *acptr;
-	char stat = parc > 1 ? parv[1][0] : '\0';
-	Reg int i;
-	int wilds, doall;
-	char *name, *cm;
+	aClient		   *acptr;
+	char			stat = parc > 1 ? parv[1][0] : '\0';
+	Reg int			i;
+	int				wilds, doall;
+	char		   *name, *cm;
 
 	/* If request from remote client, let's tame it a little. */
 	if (IsServer(cptr))
@@ -2164,7 +2164,7 @@ int m_users(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 #ifdef USERS_SHOWS_UTMP
 		char namebuf[10], linebuf[10], hostbuf[17];
-		int fd, flag = 0;
+		int	 fd, flag = 0;
 
 		if ((fd = utmp_open()) == -1)
 		{
@@ -2298,8 +2298,8 @@ int m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 	else
 	{
-		aClient *acptr;
-		aServer *asptr;
+		aClient	 *acptr;
+		aServer	 *asptr;
 		aService *svcp;
 
 		if ((acptr = find_client(parv[1], NULL)) && IsServer(acptr))
@@ -2392,9 +2392,9 @@ int m_lusers(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int m_connect(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	int port, tmpport, retval;
+	int		   port, tmpport, retval;
 	aConfItem *aconf;
-	aClient *acptr;
+	aClient	  *acptr;
 
 	if (!is_allowed(sptr, parc > 3 ? ACL_CONNECTREMOTE : ACL_CONNECTLOCAL))
 	{
@@ -2599,8 +2599,8 @@ int m_rehash(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_restart(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg aClient *acptr;
-	Reg int i;
-	char killer[HOSTLEN * 2 + USERLEN + 5];
+	Reg int		 i;
+	char		 killer[HOSTLEN * 2 + USERLEN + 5];
 
 	if (!is_allowed(sptr, ACL_RESTART))
 		return m_nopriv(cptr, sptr, parc, parv);
@@ -2721,9 +2721,9 @@ static void trace_one(aClient *sptr, aClient *acptr)
 int m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	int maskedserv = 0;
-	int showsid	   = 0;
-	int i		   = 0;
+	int		 maskedserv = 0;
+	int		 showsid	= 0;
+	int		 i			= 0;
 
 	if (parc > 1)
 	{
@@ -2838,7 +2838,7 @@ int m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	int i = 0;
+	int		 i = 0;
 
 	if (!MyClient(sptr) || !is_allowed(sptr, ACL_TRACE))
 		return m_nopriv(cptr, sptr, parc, parv);
@@ -2935,7 +2935,7 @@ int m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	register aMotd *temp;
-	struct tm *tm;
+	struct tm	   *tm;
 
 	if (!IsUnknown(sptr))
 	{
@@ -2970,8 +2970,8 @@ int m_motd(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_close(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg aClient *acptr;
-	Reg int i;
-	int closed = 0;
+	Reg int		 i;
+	int			 closed = 0;
 
 	if (!is_allowed(sptr, ACL_CLOSE))
 		return m_nopriv(cptr, sptr, parc, parv);
@@ -3007,11 +3007,11 @@ int m_close(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 int m_eob(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	char eobbuf[BUFSIZE];
-	char *e;
-	char *sid;
-	char *p = NULL;
-	int eobmaxlen;
+	char	 eobbuf[BUFSIZE];
+	char	*e;
+	char	*sid;
+	char	*p = NULL;
+	int		 eobmaxlen;
 	aClient *acptr;
 
 	if (!IsServer(sptr))
@@ -3164,8 +3164,8 @@ int m_eoback(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_die(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg aClient *acptr;
-	Reg int i;
-	char killer[HOSTLEN * 2 + USERLEN + 5];
+	Reg int		 i;
+	char		 killer[HOSTLEN * 2 + USERLEN + 5];
 
 	if (!is_allowed(sptr, ACL_DIE))
 		return m_nopriv(cptr, sptr, parc, parv);
@@ -3198,7 +3198,7 @@ int m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	typedef struct
 	{
-		int id;
+		int	  id;
 		char *command;
 	} SetEntry;
 
@@ -3353,7 +3353,7 @@ int m_set(aClient *cptr, aClient *sptr, int parc, char *parv[])
 */
 
 static char **server_name = NULL;
-static int server_max = 0, server_num = 0;
+static int	  server_max = 0, server_num = 0;
 
 /*
 ** find_server_string
@@ -3467,7 +3467,7 @@ static int check_link(aClient *cptr)
 int check_servername(char *hostname)
 {
 	register char *ch;
-	int dots, chars, rc;
+	int			   dots, chars, rc;
 
 	dots  = 0;
 	chars = 0;
@@ -3566,7 +3566,7 @@ void remove_server_from_tree(aClient *cptr)
 
 static void dump_map_sid(aClient *sptr, char *mask, aClient *root, char *pbuf, int size)
 {
-	int i = 1;
+	int		 i = 1;
 	aClient *acptr;
 
 	*pbuf = '\0';
@@ -3716,8 +3716,8 @@ static void dump_map(aClient *sptr, char *mask, aClient *root, aClient **prevser
 int m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr = NULL;
-	int sids	   = 0;
-	char *mask	   = NULL;
+	int		 sids  = 0;
+	char	*mask  = NULL;
 
 	if (parc > 1)
 	{
@@ -3749,8 +3749,8 @@ int m_map(aClient *cptr, aClient *sptr, int parc, char *parv[])
 static void report_listeners(aClient *sptr, char *to)
 {
 	aConfItem *tmp;
-	aClient *acptr;
-	char *what;
+	aClient	  *acptr;
+	char	  *what;
 
 	for (acptr = ListenerLL; acptr; acptr = acptr->next)
 	{
@@ -3800,7 +3800,7 @@ static void report_listeners(aClient *sptr, char *to)
 int m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	char buf[BUFSIZE];
-	int i, len;
+	int	 i, len;
 
 	/* Prepare ENCAP buffer... */
 	len = sprintf(buf, ":%s ENCAP", sptr->serv->sid);

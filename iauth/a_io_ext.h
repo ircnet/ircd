@@ -40,10 +40,10 @@ EXTERN void vsendto_ircd(char *, va_list);
 EXTERN void sendto_ircd(char *, ...);
 EXTERN void init_io(void);
 EXTERN void loop_io(void);
-EXTERN int tcp_connect(char *, char *, u_short, char **);
+EXTERN int	tcp_connect(char *, char *, u_short, char **);
 
 EXTERN char strConn[256];
-EXTERN int strConnLen;
+EXTERN int	strConnLen;
 
 /* () */
 #undef EXTERN

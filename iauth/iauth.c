@@ -134,7 +134,7 @@ static void init_signals(void)
 
 void write_pidfile(void)
 {
-	int fd;
+	int	 fd;
 	char pidbuf[32];
 	(void) truncate(IAUTHPID_PATH, 0);
 	if ((fd = open(IAUTHPID_PATH, O_CREAT | O_WRONLY, 0600)) >= 0)
@@ -162,7 +162,7 @@ void write_pidfile(void)
 int main(int argc, char *argv[])
 {
 	time_t nextst = time(NULL) + 90;
-	char *xopt;
+	char  *xopt;
 
 	if (argc == 2 && !strcmp(argv[1], "-X"))
 		exit(0);

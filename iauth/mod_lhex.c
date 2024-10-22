@@ -105,8 +105,8 @@ static void lhex_stats(AnInstance *self)
  */
 static int lhex_start(u_int cl)
 {
-	char *error;
-	int fd;
+	char				*error;
+	int					 fd;
 	struct lhex_private *mydata = cldata[cl].instance->data;
 
 	if (cldata[cl].state & A_DENY)
@@ -153,7 +153,7 @@ static int lhex_work(u_int cl)
 		** We haven't sent the query yet, the connection was just
 		** established.
 		*/
-		char query[3 + 7 + 6 + 4 + USERLEN + 2 * HOSTLEN + 8 + 3]; /*strlen(atoi(cl))<=8*/
+		char  query[3 + 7 + 6 + 4 + USERLEN + 2 * HOSTLEN + 8 + 3]; /*strlen(atoi(cl))<=8*/
 		char *ident = cldata[cl].authuser;
 
 		/* This is part of every request */
@@ -193,7 +193,7 @@ static int lhex_work(u_int cl)
 		/* data's in from the other end */
 		char *ch, *nch;
 		u_int id;
-		int retval = 0;
+		int	  retval = 0;
 
 		cldata[cl].inbuffer[cldata[cl].buflen] = '\0';
 		nch									   = cldata[cl].inbuffer;

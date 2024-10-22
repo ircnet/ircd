@@ -18,8 +18,8 @@
  */
 
 typedef struct hashentry {
-	int hits;
-	int links;
+	int	  hits;
+	int	  links;
 	void *list;
 } aHashEntry;
 

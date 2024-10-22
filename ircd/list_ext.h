@@ -24,9 +24,9 @@
 /*  External definitions for global variables.
  */
 #ifndef LIST_C
-extern anUser *usrtop;
-extern aServer *svrtop;
-extern int numclients;
+extern anUser	  *usrtop;
+extern aServer	  *svrtop;
+extern int		   numclients;
 extern const char *DefInfo;
 #endif /* LIST_C */
 
@@ -43,26 +43,26 @@ EXTERN void outofmemory(void);
 EXTERN void checklists(void);
 EXTERN void send_listinfo(aClient *cptr, char *name);
 #endif /* DEBUGMOE */
-EXTERN aClient *make_client(aClient *from);
-EXTERN void free_client(aClient *cptr);
-EXTERN anUser *make_user(aClient *cptr, int iplen);
-EXTERN aServer *make_server(aClient *cptr);
-EXTERN void free_user(anUser *user);
-EXTERN void free_server(aServer *serv);
-EXTERN void remove_client_from_list(Reg aClient *cptr);
-EXTERN void reorder_client_in_list(aClient *cptr);
-EXTERN void add_client_to_list(aClient *cptr);
-EXTERN Link *find_user_link(Reg Link *lp, Reg aClient *ptr);
-EXTERN Link *find_channel_link(Reg Link *lp, Reg aChannel *ptr);
-EXTERN Link *make_link(void);
-EXTERN invLink *make_invlink(void);
-EXTERN void free_link(Reg Link *lp);
-EXTERN void free_invlink(Reg invLink *lp);
-EXTERN aClass *make_class(void);
-EXTERN void free_class(Reg aClass *tmp);
+EXTERN aClient	 *make_client(aClient *from);
+EXTERN void		  free_client(aClient *cptr);
+EXTERN anUser	 *make_user(aClient *cptr, int iplen);
+EXTERN aServer	 *make_server(aClient *cptr);
+EXTERN void		  free_user(anUser *user);
+EXTERN void		  free_server(aServer *serv);
+EXTERN void		  remove_client_from_list(Reg aClient *cptr);
+EXTERN void		  reorder_client_in_list(aClient *cptr);
+EXTERN void		  add_client_to_list(aClient *cptr);
+EXTERN Link		 *find_user_link(Reg Link *lp, Reg aClient *ptr);
+EXTERN Link		 *find_channel_link(Reg Link *lp, Reg aChannel *ptr);
+EXTERN Link		 *make_link(void);
+EXTERN invLink	 *make_invlink(void);
+EXTERN void		  free_link(Reg Link *lp);
+EXTERN void		  free_invlink(Reg invLink *lp);
+EXTERN aClass	 *make_class(void);
+EXTERN void		  free_class(Reg aClass *tmp);
 EXTERN aConfItem *make_conf(void);
-EXTERN void delist_conf(aConfItem *aconf);
-EXTERN void free_conf(aConfItem *aconf);
-EXTERN void add_fd(int fd, FdAry *ary);
-EXTERN int del_fd(int fd, FdAry *ary);
+EXTERN void		  delist_conf(aConfItem *aconf);
+EXTERN void		  free_conf(aConfItem *aconf);
+EXTERN void		  add_fd(int fd, FdAry *ary);
+EXTERN int		  del_fd(int fd, FdAry *ary);
 #undef EXTERN

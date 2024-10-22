@@ -52,10 +52,10 @@ struct stats ircst, *ircstp = &ircst;
 
 char *date(time_t clock)
 {
-	static char buf[80], plus;
+	static char	   buf[80], plus;
 	Reg struct tm *lt, *gm;
-	struct tm gmbuf;
-	int minswest;
+	struct tm	   gmbuf;
+	int			   minswest;
 
 	if (!clock)
 		time(&clock);
@@ -278,7 +278,7 @@ void get_sockhost(aClient *cptr, char *host)
 char *my_name_for_link(char *name, int count)
 {
 	static char namebuf[HOSTLEN];
-	Reg char *start = name;
+	Reg char   *start = name;
 
 	if (count <= 0 || count > 5)
 		return start;
@@ -306,8 +306,8 @@ char *my_name_for_link(char *name, int count)
  */
 int mark_blind_servers(aClient *cptr, aClient *server)
 {
-	Reg int i, j = 0;
-	Reg aClient *acptr;
+	Reg int		   i, j = 0;
+	Reg aClient	  *acptr;
 	Reg aConfItem *aconf;
 
 	for (i = fdas.highest; i >= 0; i--)
@@ -352,7 +352,7 @@ static void exit_server(aClient *cptr, aClient *acptr, aClient *from,
 						const char *comment, const char *comment2)
 {
 	aClient *acptr2;
-	int flags;
+	int		 flags;
 
 	/* Remove all the servers recursively. */
 	while (acptr->serv->down)
@@ -628,7 +628,7 @@ int exit_client(aClient *cptr, aClient *sptr, aClient *from,
 		else
 		{
 			const char *c = comment;
-			int i		  = 0;
+			int			i = 0;
 			while (*c && *c != ' ')
 				if (*c++ == '.')
 					i++;
@@ -675,9 +675,9 @@ static void exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 							const char *comment)
 {
 	Reg aClient *acptr;
-	Reg int i;
-	Reg Link *lp;
-	invLink *ilp;
+	Reg int		 i;
+	Reg Link	*lp;
+	invLink		*ilp;
 
 	/*
 	**  For a server or user quitting, propagage the information to
@@ -965,7 +965,7 @@ static void exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 void checklist(void)
 {
 	Reg aClient *acptr;
-	Reg int i, j;
+	Reg int		 i, j;
 
 	if (!(bootopt & BOOT_AUTODIE))
 		return;
@@ -1014,10 +1014,10 @@ void initruntimeconf(void)
 
 void tstats(aClient *cptr, char *name)
 {
-	Reg aClient *acptr;
-	Reg int i;
+	Reg aClient		 *acptr;
+	Reg int			  i;
 	Reg struct stats *sp;
-	struct stats tmp;
+	struct stats	  tmp;
 
 	sp = &tmp;
 	bcopy((char *) ircstp, (char *) sp, sizeof(*sp));
@@ -1107,11 +1107,11 @@ time_t motd_mtime;
 
 void read_motd(char *filename)
 {
-	int fd, len;
+	int				fd, len;
 	register aMotd *temp, *last;
-	struct stat Sb;
-	char line[80];
-	register char *tmp;
+	struct stat		Sb;
+	char			line[80];
+	register char  *tmp;
 
 	if ((fd = open(filename, O_RDONLY)) == -1)
 		return;

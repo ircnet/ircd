@@ -32,13 +32,13 @@ static const volatile char rcsid[] = "@(#)$Id: mod_rfc931.c,v 1.20 2004/10/01 20
 
 struct _instance_data {
 	u_char options;
-	u_int tried;
-	u_int connected;
-	u_int unx;
-	u_int other;
-	u_int bad;
-	u_int skipped;
-	u_int clean, timeout;
+	u_int  tried;
+	u_int  connected;
+	u_int  unx;
+	u_int  other;
+	u_int  bad;
+	u_int  skipped;
+	u_int  clean, timeout;
 };
 
 /*
@@ -112,8 +112,8 @@ static void rfc931_stats(AnInstance *self)
  */
 static int rfc931_start(u_int cl)
 {
-	char *error;
-	int fd;
+	char				  *error;
+	int					   fd;
 	struct _instance_data *st = cldata[cl].instance->data;
 
 	if (st->options & OPT_LAZY && cldata[cl].state & A_DENY)
@@ -188,7 +188,7 @@ static int rfc931_work(u_int cl)
 	else
 	{
 		/* data's in from the ident server */
-		char *ch;
+		char  *ch;
 		u_char bad = 0;
 
 		cldata[cl].inbuffer[cldata[cl].buflen] = '\0';

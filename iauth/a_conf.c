@@ -53,7 +53,7 @@ static int match_ipmask(aTarget *mask, char *ipaddr)
 #ifdef INET6
 	return 1;
 #else
-	int i1, i2, i3, i4;
+	int	   i1, i2, i3, i4;
 	u_long iptested;
 
 	if (sscanf(ipaddr, "%d.%d.%d.%d", &i1, &i2, &i3, &i4) != 4)
@@ -66,16 +66,16 @@ static int match_ipmask(aTarget *mask, char *ipaddr)
 /* conf_read: read the configuration file, instanciate modules */
 char *conf_read(char *cfile)
 {
-	AnInstance *ident = NULL; /* make sure this module is used */
-	u_char needh	  = 0;	  /* do we need hostname information for any host? */
-	u_char o_req = 0, o_dto = 0, o_wup = 0, o_del = 0;
-	static char o_all[5];
-	u_int timeout = DEFAULT_TIMEOUT, totto = 0;
-	u_int lnnb	  = 0, i;
-	u_char icount = 0, Mcnt = 0;
-	char buffer[160], *ch;
+	AnInstance	*ident = NULL; /* make sure this module is used */
+	u_char		 needh = 0;	   /* do we need hostname information for any host? */
+	u_char		 o_req = 0, o_dto = 0, o_wup = 0, o_del = 0;
+	static char	 o_all[5];
+	u_int		 timeout = DEFAULT_TIMEOUT, totto = 0;
+	u_int		 lnnb	= 0, i;
+	u_char		 icount = 0, Mcnt = 0;
+	char		 buffer[160], *ch;
 	AnInstance **last = &instances, *itmp;
-	FILE *cfh;
+	FILE		*cfh;
 
 	Mlist[Mcnt++] = &Module_rfc931;
 	Mlist[Mcnt++] = &Module_socks;
@@ -166,7 +166,7 @@ char *conf_read(char *cfile)
 #if defined(USE_DSM)
 			if (!strncmp("shared ", buffer, 7))
 			{
-				char lfname[80];
+				char  lfname[80];
 				void *mod_handle;
 				aModule *(*load_func)();
 
@@ -267,8 +267,8 @@ char *conf_read(char *cfile)
 			while (fgets(buffer, 160, cfh))
 			{
 				aTarget **ttmp;
-				u_long baseip = 0, lmask = 0;
-				int inverse = 0;
+				u_long	  baseip = 0, lmask = 0;
+				int		  inverse = 0;
 
 				if ((ch = index(buffer, '\n')))
 				{
@@ -498,7 +498,7 @@ char *conf_read(char *cfile)
 	if (cfile)
 	{
 		aTarget *ttmp;
-		char *err;
+		char	*err;
 
 		printf("\nModule(s) loaded:\n");
 		while (itmp)
@@ -630,7 +630,7 @@ int conf_match(u_int cl, AnInstance *inst)
 void conf_ircd(void)
 {
 	AnInstance *itmp = instances;
-	aTarget *ttmp;
+	aTarget	   *ttmp;
 
 	sendto_ircd("a");
 	while (itmp)

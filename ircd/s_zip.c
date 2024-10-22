@@ -133,7 +133,7 @@ void zip_free(aClient *cptr)
 char *unzip_packet(aClient *cptr, char *buffer, int *length)
 {
 	Reg z_stream *zin = cptr->zip->in;
-	int r;
+	int			  r;
 
 	if (*length != 0 && zin->avail_in != 0)
 	{
@@ -208,7 +208,7 @@ char *unzip_packet(aClient *cptr, char *buffer, int *length)
 char *zip_buffer(aClient *cptr, char *buffer, int *length, int flush)
 {
 	Reg z_stream *zout = cptr->zip->out;
-	int r;
+	int			  r;
 
 	if (buffer)
 	{

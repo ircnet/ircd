@@ -28,7 +28,7 @@ static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.165 2010/08/11 17:39:0
 #include "s_externs.h"
 #undef IRCD_C
 
-aClient me;			   /* That's me */
+aClient	 me;		   /* That's me */
 aClient *client = &me; /* Pointer to beginning of Client list */
 
 static void open_debugfile(void), setup_signals(void), io_loop(void);
@@ -37,20 +37,20 @@ static void open_debugfile(void), setup_signals(void), io_loop(void);
 static RETSIGTYPE s_slave(int s);
 #endif
 
-istat_t istat;
-iconf_t iconf;
-char **myargv;
-int rehashed		= 0;
-int portnum			= -1;						   /* Server port number, listening this */
-char *configfile	= IRCDCONF_PATH;			   /* Server configuration file */
-int debuglevel		= -1;						   /* Server debug level */
-int bootopt			= BOOT_PROT | BOOT_STRICTPROT; /* Server boot option flags */
-int serverbooting	= 1;
-int firstrejoindone = 0;  /* Server rejoined the network after
+istat_t				istat;
+iconf_t				iconf;
+char			  **myargv;
+int					rehashed		= 0;
+int					portnum			= -1;						   /* Server port number, listening this */
+char			   *configfile		= IRCDCONF_PATH;			   /* Server configuration file */
+int					debuglevel		= -1;						   /* Server debug level */
+int					bootopt			= BOOT_PROT | BOOT_STRICTPROT; /* Server boot option flags */
+int					serverbooting	= 1;
+int					firstrejoindone = 0;  /* Server rejoined the network after
 					   start */
-char *debugmode		= ""; /*  -"-    -"-   -"-   -"- */
-char *sbrk0;			  /* initial sbrk(0) */
-char *tunefile					  = IRCDTUNE_PATH;
+char			   *debugmode		= ""; /*  -"-    -"-   -"-   -"- */
+char			   *sbrk0;				  /* initial sbrk(0) */
+char			   *tunefile	  = IRCDTUNE_PATH;
 volatile static int dorehash	  = 0,
 					dorestart	  = 0,
 					restart_iauth = 0;
@@ -84,7 +84,7 @@ RETSIGTYPE s_die(int s)
 #ifdef UNIXPORT
 	{
 		aClient *acptr;
-		char unixpath[256];
+		char	 unixpath[256];
 		for (acptr = ListenerLL; acptr; acptr = acptr->next)
 		{
 			if (IsUnixSocket(acptr))
@@ -227,13 +227,13 @@ void server_reboot(void)
 static time_t try_connections(time_t currenttime)
 {
 	Reg aConfItem *aconf;
-	Reg aClient *cptr;
-	aConfItem **pconf;
-	int confrq;
-	time_t next = 0;
-	aClass *cltmp;
-	aConfItem *con_conf = NULL;
-	int allheld			= 1;
+	Reg aClient	  *cptr;
+	aConfItem	 **pconf;
+	int			   confrq;
+	time_t		   next = 0;
+	aClass		  *cltmp;
+	aConfItem	  *con_conf = NULL;
+	int			   allheld	= 1;
 #ifdef DISABLE_DOUBLE_CONNECTS
 	int i;
 #endif
@@ -392,8 +392,8 @@ static time_t try_connections(time_t currenttime)
 time_t calculate_preference(time_t currenttime)
 {
 	aConfItem *aconf;
-	aCPing *cp;
-	double f, f2;
+	aCPing	  *cp;
+	double	   f, f2;
 
 	for (aconf = conf; aconf; aconf = aconf->next)
 	{
@@ -438,11 +438,11 @@ time_t calculate_preference(time_t currenttime)
 static int delayed_kills(time_t currenttime)
 {
 	static time_t dk_rehashed = 0; /* time of last rehash we're processing */
-	static int dk_lastfd;		   /* fd we last checked */
-	static int dk_checked;		   /* # clients we checked */
-	static int dk_killed;		   /* # clients we killed */
-	Reg aClient *cptr;
-	Reg int i, j;
+	static int	  dk_lastfd;	   /* fd we last checked */
+	static int	  dk_checked;	   /* # clients we checked */
+	static int	  dk_killed;	   /* # clients we killed */
+	Reg aClient	 *cptr;
+	Reg int		  i, j;
 
 	if (dk_rehashed == 0)
 	{
@@ -460,7 +460,7 @@ static int delayed_kills(time_t currenttime)
 
 	for (i = dk_lastfd; i >= j; i--)
 	{
-		int kflag	 = 0;
+		int	  kflag	 = 0;
 		char *reason = NULL;
 
 		if (!(cptr = local[i]) || !IsPerson(cptr))
@@ -519,11 +519,11 @@ static time_t check_pings(time_t currenttime)
 	static time_t lkill = 0;
 #endif
 	Reg aClient *cptr;
-	Reg int kflag	= 0;
-	aClient *bysptr = NULL;
-	int ping		= 0, i;
-	time_t oldest	= 0, timeout;
-	char *reason	= NULL;
+	Reg int		 kflag	= 0;
+	aClient		*bysptr = NULL;
+	int			 ping	= 0, i;
+	time_t		 oldest = 0, timeout;
+	char		*reason = NULL;
 
 	for (i = highest_fd; i >= 0; i--)
 	{
@@ -827,8 +827,8 @@ int main(int argc, char *argv[])
 	*/
 	while (--argc > 0 && (*++argv)[0] == '-')
 	{
-		char *p	 = argv[0] + 1;
-		int flag = *p++;
+		char *p	   = argv[0] + 1;
+		int	  flag = *p++;
 
 		if (flag == '\0' || *p == '\0')
 		{
@@ -1034,7 +1034,7 @@ int main(int argc, char *argv[])
 	else
 	{
 		aClient *acptr = NULL;
-		int i;
+		int		 i;
 
 		for (i = 0; i <= highest_fd; i++)
 		{
@@ -1095,7 +1095,7 @@ int main(int argc, char *argv[])
 	ircd_writetune(tunefile);
 	if (bootopt & BOOT_INETD)
 	{
-		aClient *tmp;
+		aClient	  *tmp;
 		aConfItem *aconf;
 
 		tmp = make_client(NULL);
@@ -1166,7 +1166,7 @@ int main(int argc, char *argv[])
 static void io_loop(void)
 {
 	static time_t delay = 0;
-	int maxs			= 4;
+	int			  maxs	= 4;
 
 	if (timeofday >= nextpreference)
 		nextpreference = calculate_preference(timeofday);
@@ -1443,7 +1443,7 @@ static void setup_signals(void)
  */
 void ircd_writetune(char *filename)
 {
-	int fd;
+	int	 fd;
 	char buf[100];
 
 	if (!filename || !*filename)
@@ -1474,7 +1474,7 @@ void ircd_writetune(char *filename)
  */
 void ircd_readtune(char *filename)
 {
-	int fd, t_data[7];
+	int	 fd, t_data[7];
 	char buf[100];
 
 	memset(buf, 0, sizeof(buf));

@@ -43,7 +43,7 @@ static const volatile char rcsid[] = "@(#)$Id: s_auth.c,v 1.55 2007/12/15 23:21:
  */
 static void set_clean_username(aClient *cptr)
 {
-	int i = 0, dirty = 0;
+	int	  i = 0, dirty = 0;
 	char *s;
 
 	if (cptr->auth == NULL)
@@ -91,10 +91,10 @@ static void set_clean_username(aClient *cptr)
 #if defined(USE_IAUTH)
 
 u_char iauth_options = 0;
-u_int iauth_spawn	 = 0;
-char *iauth_version	 = NULL;
+u_int  iauth_spawn	 = 0;
+char  *iauth_version = NULL;
 
-static aExtCf *iauth_conf	 = NULL;
+static aExtCf	*iauth_conf	 = NULL;
 static aExtData *iauth_stats = NULL;
 
 /*
@@ -106,7 +106,7 @@ static aExtData *iauth_stats = NULL;
 int vsendto_iauth(char *pattern, va_list va)
 {
 	static char abuf[BUFSIZ], *p;
-	int i, len;
+	int			i, len;
 
 	if (adfd < 0)
 	{
@@ -160,10 +160,10 @@ int sendto_iauth(char *pattern, ...)
 void read_iauth(void)
 {
 	static char obuf[READBUF_SIZE + 1], last = '?';
-	static int olen = 0, ia_dbg = 0;
-	char buf[READBUF_SIZE + 1], *start, *end, tbuf[BUFSIZ];
-	aClient *cptr;
-	int i;
+	static int	olen = 0, ia_dbg = 0;
+	char		buf[READBUF_SIZE + 1], *start, *end, tbuf[BUFSIZ];
+	aClient	   *cptr;
+	int			i;
 
 	if (adfd == -1)
 	{
@@ -703,7 +703,7 @@ void send_authports(aClient *cptr)
 {
 	struct SOCKADDR_IN us, them;
 
-	char authbuf[32];
+	char		  authbuf[32];
 	SOCK_LEN_TYPE ulen, tlen;
 
 	Debug((DEBUG_NOTICE, "write_authports(%x) fd %d authfd %d stat %d",
@@ -756,9 +756,9 @@ void send_authports(aClient *cptr)
 void read_authports(aClient *cptr)
 {
 	Reg char *s, *t;
-	Reg int len;
-	char ruser[513], system[8];
-	u_short remp = 0, locp = 0;
+	Reg int	  len;
+	char	  ruser[513], system[8];
+	u_short	  remp = 0, locp = 0;
 
 	*system = *ruser = '\0';
 	Debug((DEBUG_NOTICE, "read_authports(%x) fd %d authfd %d stat %d",

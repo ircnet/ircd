@@ -307,22 +307,22 @@ typedef struct {
 		(cp) += INT32SZ;                                                                                                                              \
 	}
 
-#define PUTSHORT(s, cp)                           \
-	{                                             \
-		register u_int16_t t_s = (u_int16_t) (s); \
-		register u_char *t_cp  = (u_char *) (cp); \
-		*t_cp++				   = t_s >> 8;        \
-		*t_cp				   = t_s;             \
-		(cp) += INT16SZ;                          \
+#define PUTSHORT(s, cp)                            \
+	{                                              \
+		register u_int16_t t_s	= (u_int16_t) (s); \
+		register u_char	  *t_cp = (u_char *) (cp); \
+		*t_cp++					= t_s >> 8;        \
+		*t_cp					= t_s;             \
+		(cp) += INT16SZ;                           \
 	}
 
-#define PUTLONG(l, cp)                            \
-	{                                             \
-		register u_int32_t t_l = (u_int32_t) (l); \
-		register u_char *t_cp  = (u_char *) (cp); \
-		*t_cp++				   = t_l >> 24;       \
-		*t_cp++				   = t_l >> 16;       \
-		*t_cp++				   = t_l >> 8;        \
-		*t_cp				   = t_l;             \
-		(cp) += INT32SZ;                          \
+#define PUTLONG(l, cp)                             \
+	{                                              \
+		register u_int32_t t_l	= (u_int32_t) (l); \
+		register u_char	  *t_cp = (u_char *) (cp); \
+		*t_cp++					= t_l >> 24;       \
+		*t_cp++					= t_l >> 16;       \
+		*t_cp++					= t_l >> 8;        \
+		*t_cp					= t_l;             \
+		(cp) += INT32SZ;                           \
 	}

@@ -82,10 +82,10 @@ void free_service(aClient *cptr)
 
 static aClient *best_service(char *name, aClient *cptr)
 {
-	Reg aClient *acptr = NULL;
-	Reg aClient *bcptr;
+	Reg aClient	 *acptr = NULL;
+	Reg aClient	 *bcptr;
 	Reg aService *sp;
-	int len = strlen(name);
+	int			  len = strlen(name);
 
 	if (!index(name, '@') || !(acptr = find_service(name, cptr)))
 		for (sp = svctop; sp; sp = sp->nexts)
@@ -112,7 +112,7 @@ void check_services_butone(long action, aServer *servp, aClient *cptr,
 						   char *fmt, ...)
 /* shouldn't cptr be named sptr? */
 {
-	char nbuf[NICKLEN + USERLEN + HOSTLEN + 3];
+	char		  nbuf[NICKLEN + USERLEN + HOSTLEN + 3];
 	Reg aService *sp;
 
 	*nbuf = '\0';
@@ -132,7 +132,7 @@ void check_services_butone(long action, aServer *servp, aClient *cptr,
 			if ((sp->wants & (SERVICE_WANT_PREFIX | SERVICE_WANT_UID)) && cptr && IsRegisteredUser(cptr) &&
 				(action & SERVICE_MASK_PREFIX))
 			{
-				char buf[2048];
+				char	buf[2048];
 				va_list va;
 				va_start(va, fmt);
 				(void) va_arg(va, char *);
@@ -193,7 +193,7 @@ static void sendnum_toone(aClient *cptr, int wants, aClient *sptr,
 	else
 	/* old style NICK + USER + UMODE */
 	{
-		char nbuf[NICKLEN + USERLEN + HOSTLEN + 3];
+		char  nbuf[NICKLEN + USERLEN + HOSTLEN + 3];
 		char *prefix;
 
 		if (wants & SERVICE_WANT_PREFIX)
@@ -249,11 +249,11 @@ void check_services_num(aClient *sptr, char *umode)
 
 aConfItem *find_conf_service(aClient *cptr, int type, aConfItem *aconf)
 {
-	static char uhost[HOSTLEN + USERLEN + 3];
-	Reg aConfItem *tmp;
-	char *s;
+	static char		uhost[HOSTLEN + USERLEN + 3];
+	Reg aConfItem  *tmp;
+	char		   *s;
 	struct hostent *hp;
-	int i;
+	int				i;
 
 	for (tmp = conf; tmp; tmp = tmp->next)
 	{
@@ -310,14 +310,14 @@ aConfItem *find_conf_service(aClient *cptr, int type, aConfItem *aconf)
 */
 int m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	aClient *acptr = NULL, *bcptr = NULL;
+	aClient	 *acptr = NULL, *bcptr = NULL;
 	aService *svc;
 #ifdef USE_SERVICES
 	aConfItem *aconf;
 #endif
 	aServer *sp = NULL;
-	char *dist, *server = NULL, *info;
-	int type, i;
+	char	*dist, *server = NULL, *info;
+	int		 type, i;
 
 	if (sptr->user)
 	{
@@ -507,9 +507,9 @@ int m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_servlist(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	Reg aService *sp;
-	Reg aClient *acptr;
-	char *mask = BadPtr(parv[1]) ? "*" : parv[1];
-	int type   = 0;
+	Reg aClient	 *acptr;
+	char		 *mask = BadPtr(parv[1]) ? "*" : parv[1];
+	int			  type = 0;
 
 	if (parc > 2)
 		type = BadPtr(parv[2]) ? 0 : strtol(parv[2], NULL, 0);
@@ -535,7 +535,7 @@ int m_servlist(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	int burst = 0;
+	int		 burst = 0;
 
 	if (!MyConnect(sptr))
 	{
@@ -641,7 +641,7 @@ int m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (burst & (SERVICE_WANT_CHANNEL | SERVICE_WANT_VCHANNEL | SERVICE_WANT_MODE | SERVICE_WANT_TOPIC))
 	{
-		char modebuf[MODEBUFLEN], parabuf[MODEBUFLEN];
+		char	  modebuf[MODEBUFLEN], parabuf[MODEBUFLEN];
 		aChannel *chptr;
 
 		for (chptr = channel; chptr; chptr = chptr->nextch)

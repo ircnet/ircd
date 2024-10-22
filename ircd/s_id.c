@@ -67,7 +67,7 @@ static signed int alphabet_id[256] =
 char *ltoid(long l, int n)
 {
 	static char idrpl[UIDLEN + 1]; /* Currently nothing longer should be used. */
-	int i = n - 1;
+	int			i = n - 1;
 	/*
 	 * 2014-04-19  Kurt Roeckx
 	 *  * s_id.c/ltoid(): Fix checking of max length of UID.
@@ -121,8 +121,8 @@ char *get_chid(void)
 int close_chid(char *id)
 {
 	static time_t last = 0;
-	static char current;
-	char *curid;
+	static char	  current;
+	char		 *curid;
 
 	if (timeofday - last > 900 || id[0] == current)
 	{
@@ -256,8 +256,8 @@ void	init_sid(char *conf)
 char *next_uid(void)
 {
 	static char uid[UIDLEN + 1 + 5]; /* why +5? --Beeth */
-	static long curr_cid   = 0;
-	static int needfinduid = 0;
+	static long curr_cid	= 0;
+	static int	needfinduid = 0;
 
 	do
 	{

@@ -26,30 +26,30 @@ typedef struct AuthData anAuthData;
 
 struct AuthData {
 	/* the following are set by a_io.c and may be read by modules */
-	char user[USERLEN + 1];		/* username */
-	char passwd[PASSWDLEN + 1]; /* password */
-	char host[HOSTLEN + 1];		/* hostname */
-	char itsip[HOSTLEN + 1];	/* client ip */
-	u_short itsport;			/* client port */
-	char ourip[HOSTLEN + 1];	/* our ip */
-	u_short ourport;			/* our port */
-	u_int state;				/* state (general) */
+	char	user[USERLEN + 1];	   /* username */
+	char	passwd[PASSWDLEN + 1]; /* password */
+	char	host[HOSTLEN + 1];	   /* hostname */
+	char	itsip[HOSTLEN + 1];	   /* client ip */
+	u_short itsport;			   /* client port */
+	char	ourip[HOSTLEN + 1];	   /* our ip */
+	u_short ourport;			   /* our port */
+	u_int	state;				   /* state (general) */
 
 	/* the following are set by modules */
-	char *authuser;	 /* authenticated username */
+	char  *authuser; /* authenticated username */
 	u_char authfrom; /* where we got authuser from */
 
 	/* the following are for use by a_io.c only */
-	char idone[BDSIZE]; /* keeping track of instances' work */
-	u_char ileft;		/* time saver, anything left? */
+	char   idone[BDSIZE]; /* keeping track of instances' work */
+	u_char ileft;		  /* time saver, anything left? */
 
 	/* the following are shared by a_io.c & modules */
-	char *inbuffer;		  /* input buffer */
-	u_int buflen;		  /* length of data in buffer */
-	int rfd, wfd;		  /* fd's */
-	AnInstance *instance; /* the module instanciation working */
-	u_int mod_status;	  /* used by the module only! */
-	time_t timeout;		  /* timeout */
+	char	   *inbuffer;	/* input buffer */
+	u_int		buflen;		/* length of data in buffer */
+	int			rfd, wfd;	/* fd's */
+	AnInstance *instance;	/* the module instanciation working */
+	u_int		mod_status; /* used by the module only! */
+	time_t		timeout;	/* timeout */
 };
 
 #define A_ACTIVE 0x0001 /* entry is active */

@@ -61,9 +61,9 @@ static int get_conf_ping(aConfItem *aconf)
 
 int get_client_class(aClient *acptr)
 {
-	Reg Link *tmp;
+	Reg Link   *tmp;
 	Reg aClass *cl;
-	int retc = BAD_CLIENT_CLASS;
+	int			retc = BAD_CLIENT_CLASS;
 
 	if (acptr && !IsMe(acptr) && (acptr->confs))
 		for (tmp = acptr->confs; tmp; tmp = tmp->next)
@@ -82,9 +82,9 @@ int get_client_class(aClient *acptr)
 
 int get_client_ping(aClient *acptr)
 {
-	int ping = 0, ping2;
+	int		   ping = 0, ping2;
 	aConfItem *aconf;
-	Link *link;
+	Link	  *link;
 
 	link = acptr->confs;
 
@@ -140,7 +140,7 @@ void add_class(int class, int ping, int confreq, int maxli, int sendq,
 	aClass *t, *p;
 #ifdef ENABLE_CIDR_LIMITS
 	char *tmp;
-	int cidrlen = 0, cidramount = 0;
+	int	  cidrlen = 0, cidramount = 0;
 
 	if (cidrlen_s)
 	{
@@ -280,7 +280,7 @@ void initclass(void)
 void report_classes(aClient *sptr, char *to)
 {
 	Reg aClass *cltmp;
-	char tmp[64] = "";
+	char		tmp[64] = "";
 
 	for (cltmp = FirstClass(); cltmp; cltmp = NextClass(cltmp))
 	{
@@ -302,8 +302,8 @@ void report_classes(aClient *sptr, char *to)
 
 int get_sendq(aClient *cptr, int bursting)
 {
-	Reg int sendq = QUEUELEN;
-	Reg Link *tmp;
+	Reg int		sendq = QUEUELEN;
+	Reg Link   *tmp;
 	Reg aClass *cl;
 
 	if (cptr->serv && cptr->serv->nline)

@@ -81,23 +81,23 @@
 #define RES_MAXNDOTS 15	 /* should reflect bit field size */
 
 struct __res_state {
-	int retrans;	/* retransmition time interval */
-	int retry;		/* number of times to retransmit */
+	int	   retrans; /* retransmition time interval */
+	int	   retry;	/* number of times to retransmit */
 	u_long options; /* option flags - see below. */
-	int nscount;	/* number of name servers */
+	int	   nscount; /* number of name servers */
 	struct SOCKADDR_IN
-			nsaddr_list[MAXNS];	 /* address of name server */
-#define nsaddr nsaddr_list[0]	 /* for backward compatibility */
-	u_short id;					 /* current message id */
-	char *dnsrch[MAXDNSRCH + 1]; /* components of domain to search */
-	char defdname[256];			 /* default domain (deprecated) */
-	u_long pfcode;				 /* RES_PRF_ flags - see below. */
-	unsigned ndots : 4;			 /* threshold for initial abs. query */
-	unsigned nsort : 4;			 /* number of elements in sort_list[] */
-	char unused[3];
+			nsaddr_list[MAXNS];		/* address of name server */
+#define nsaddr nsaddr_list[0]		/* for backward compatibility */
+	u_short	 id;					/* current message id */
+	char	*dnsrch[MAXDNSRCH + 1]; /* components of domain to search */
+	char	 defdname[256];			/* default domain (deprecated) */
+	u_long	 pfcode;				/* RES_PRF_ flags - see below. */
+	unsigned ndots : 4;				/* threshold for initial abs. query */
+	unsigned nsort : 4;				/* number of elements in sort_list[] */
+	char	 unused[3];
 	struct {
 		struct in_addr addr;
-		u_int32_t mask;
+		u_int32_t	   mask;
 	} sort_list[MAXRESOLVSORT];
 	char pad[72]; /* on an i386 this means 512b total */
 };
@@ -159,22 +159,22 @@ typedef enum
 } res_sendhookact;
 
 typedef res_sendhookact (*res_send_qhook)(struct SOCKADDR_IN *const *ns,
-										  const u_char **query,
-										  int *querylen,
-										  u_char *ans,
-										  int anssiz,
-										  int *resplen);
+										  const u_char			   **query,
+										  int						*querylen,
+										  u_char					*ans,
+										  int						 anssiz,
+										  int						*resplen);
 
 typedef res_sendhookact (*res_send_rhook)(const struct SOCKADDR_IN *ns,
-										  const u_char *query,
-										  int querylen,
-										  u_char *ans,
-										  int anssiz,
-										  int *resplen);
+										  const u_char			   *query,
+										  int						querylen,
+										  u_char				   *ans,
+										  int						anssiz,
+										  int					   *resplen);
 #endif
 
 struct res_sym {
-	int number;		 /* Identifying number, like T_MX */
+	int	  number;	 /* Identifying number, like T_MX */
 	char *name;		 /* Its symbolic name, like "MX" */
 	char *humanname; /* Its fun name, like "mail exchanger" */
 };

@@ -50,7 +50,7 @@ EXTERN char *myctime(time_t value);
 EXTERN char *mybasename(char *);
 #ifdef INET6
 EXTERN char *inetntop(int af, const void *in, char *local_dummy, size_t the_size);
-EXTERN int inetpton(int af, const char *src, void *dst);
+EXTERN int	 inetpton(int af, const char *src, void *dst);
 #endif
 #if !defined(HAVE_INET_NTOA)
 EXTERN char *inetntoa(char *in);
@@ -70,13 +70,13 @@ EXTERN void dumpcore(char *msg, ...);
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE) && defined(DO_DEBUG_MALLOC)
 EXTERN char *MyMalloc(size_t x);
 EXTERN char *MyRealloc(char *x, size_t y);
-EXTERN void MyFree(void *x);
+EXTERN void	 MyFree(void *x);
 #else  /* DEBUGMODE && !CLIENT_COMPILE && !DO_DEBUG_MALLOC */
 EXTERN char *MyMalloc(size_t x);
 EXTERN char *MyRealloc(char *x, size_t y);
 #endif /* DEBUGMODE && !CLIENT_COMPILE && !DO_DEBUG_MALLOC */
-EXTERN int dgets(int fd, char *buf, int num);
-EXTERN char *make_version(void);
+EXTERN int	  dgets(int fd, char *buf, int num);
+EXTERN char	 *make_version(void);
 EXTERN char **make_isupport(void);
 #ifdef SOLARIS_2_3
 EXTERN struct hostent *solaris_gethostbyname(const char *name);

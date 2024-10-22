@@ -34,9 +34,9 @@ static const volatile char rcsid[] = "@(#)$Id: whowas.c,v 1.12 2004/11/19 15:10:
 #undef WHOWAS_C
 
 static aName *was;
-int ww_index = 0, ww_size = MAXCONNECTIONS * 2;
+int			  ww_index = 0, ww_size = MAXCONNECTIONS * 2;
 static aLock *locked;
-int lk_index = 0, lk_size = MAXCONNECTIONS * 2;
+int			  lk_index = 0, lk_size = MAXCONNECTIONS * 2;
 
 static void grow_whowas(void)
 {
@@ -71,7 +71,7 @@ static void grow_locked(void)
 void add_history(aClient *cptr, aClient *nodelay)
 {
 	Reg aName *np;
-	Reg Link *uwas;
+	Reg Link  *uwas;
 
 	cptr->user->refcnt++;
 
@@ -368,10 +368,10 @@ void initwhowas(void)
 */
 int m_whowas(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
-	Reg aName *wp, *wp2 = NULL;
-	Reg int j	   = 0;
-	Reg anUser *up = NULL;
-	int max		   = -1;
+	Reg aName  *wp, *wp2 = NULL;
+	Reg int		j	= 0;
+	Reg anUser *up	= NULL;
+	int			max = -1;
 	/*
 	 * 2014-04-19  Kurt Roeckx
 	 *  * whowas.c/m_whowas(): Initialize p to NULL for call to strtoken()
@@ -442,10 +442,10 @@ int m_whowas(aClient *cptr, aClient *sptr, int parc, char *parv[])
 void count_whowas_memory(int *wwu, int *wwa, u_long *wwam, int *wwuw)
 {
 	Reg anUser *tmp;
-	Reg Link *tmpl;
-	Reg int i, j;
-	int u = 0, a = 0, w = 0;
-	u_long am = 0;
+	Reg Link   *tmpl;
+	Reg int		i, j;
+	int			u = 0, a = 0, w = 0;
+	u_long		am = 0;
 
 	for (i = 0; i < ww_size; i++)
 		if ((tmp = was[i].ww_user))

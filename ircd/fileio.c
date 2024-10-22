@@ -44,10 +44,10 @@ file_open(const char *filename, int mode, int fmode)
 FBFILE *
 fbopen(const char *filename, const char *mode)
 {
-	int openmode = 0;
-	int pmode	 = 0;
-	FBFILE *fb	 = NULL;
-	int fd;
+	int		openmode = 0;
+	int		pmode	 = 0;
+	FBFILE *fb		 = NULL;
+	int		fd;
 	s_assert(filename);
 	s_assert(mode);
 

@@ -440,9 +440,9 @@ extern int inet_netof(struct in_addr in);
 #endif
 #if !defined(HAVE_ARPA_INET_H)
 extern unsigned long int inet_addr(const char *cp);
-extern int inet_aton(const char *cp, struct in_addr *addr);
-extern int inet_netof(struct in_addr in);
-extern char *inet_ntoa(struct in_addr in);
+extern int				 inet_aton(const char *cp, struct in_addr *addr);
+extern int				 inet_netof(struct in_addr in);
+extern char				*inet_ntoa(struct in_addr in);
 #endif
 
 /*  Signals portability problems.
@@ -499,7 +499,7 @@ extern struct hostent *__switch_gethostbyname(const char *name);
  * returns null in h->aliases.  Workaround: use the undocumented
  * _switch_gethostbyname_r(...).
  */
-extern struct hostent *_switch_gethostbyname_r(const char *name,
+extern struct hostent *_switch_gethostbyname_r(const char	  *name,
 											   struct hostent *hp,
 											   char *buf, int size,
 											   int *h_errno);

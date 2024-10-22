@@ -34,8 +34,8 @@ typedef struct Class {
 	int maxUHGlobal;
 	int links;
 #ifdef ENABLE_CIDR_LIMITS
-	int cidr_len;
-	int cidr_amount;
+	int						 cidr_len;
+	int						 cidr_amount;
 	struct _patricia_tree_t *ip_limits;
 #endif
 	struct Class *next;
