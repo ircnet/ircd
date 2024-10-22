@@ -21,12 +21,12 @@
 #ifndef _PATRICIA_H
 #define _PATRICIA_H
 
+#include <arpa/inet.h>
+#include <assert.h>
+#include <netinet/in.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <assert.h>
 
 #ifndef FALSE
 #define FALSE 0
@@ -39,48 +39,41 @@
 #endif
 
 /* typedef unsigned int u_int; */
-typedef void (*void_fn_t) ();
-#define prefix_touchar(prefix) ((u_char *)&(prefix)->add.sin)
+typedef void (*void_fn_t)();
+#define prefix_touchar(prefix) ((u_char *) &(prefix)->add.sin)
 #define MAXLINE 1024
-#define BIT_TEST(f, b)  ((f) & (b))
+#define BIT_TEST(f, b) ((f) & (b))
 
 #include <netinet/in.h>
 #include <sys/socket.h>
 
-typedef struct _prefix_t
-{
-	u_short family;		/* AF_INET | AF_INET6 */
-	u_short bitlen;		/* same as mask? */
-	int ref_count;		/* reference count */
+typedef struct _prefix_t {
+	u_short family; /* AF_INET | AF_INET6 */
+	u_short bitlen; /* same as mask? */
+	int ref_count;  /* reference count */
 	union
 	{
 		struct in_addr sin;
 #ifdef INET6
 		struct in6_addr sin6;
-#endif				/* IPV6 */
-	}
-	add;
-}
-prefix_t;
+#endif /* IPV6 */
+	} add;
+} prefix_t;
 
 
-typedef struct _patricia_node_t
-{
-	u_int bit;		/* flag if this node used */
-	prefix_t *prefix;	/* who we are in patricia tree */
-	struct _patricia_node_t *l, *r;	/* left and right children */
-	struct _patricia_node_t *parent;	/* may be used */
+typedef struct _patricia_node_t {
+	u_int bit;                       /* flag if this node used */
+	prefix_t *prefix;                /* who we are in patricia tree */
+	struct _patricia_node_t *l, *r;  /* left and right children */
+	struct _patricia_node_t *parent; /* may be used */
 	void *data;
-}
-patricia_node_t;
+} patricia_node_t;
 
-typedef struct _patricia_tree_t
-{
+typedef struct _patricia_tree_t {
 	patricia_node_t *head;
-	u_int maxbits;		/* for IP, 32 bit addresses */
-	int num_active_node;	/* for debug purpose */
-}
-patricia_tree_t;
+	u_int maxbits;       /* for IP, 32 bit addresses */
+	int num_active_node; /* for debug purpose */
+} patricia_tree_t;
 
 
 EXTERN patricia_node_t *patricia_match_ip(patricia_tree_t *, struct IN_ADDR *);
@@ -107,51 +100,67 @@ EXTERN patricia_node_t *patricia_make_and_lookup_ip(patricia_tree_t *, struct IN
 
 
 #define PATRICIA_MAXBITS 128
-#define PATRICIA_NBIT(x)        (0x80 >> ((x) & 0x7f))
-#define PATRICIA_NBYTE(x)       ((x) >> 3)
+#define PATRICIA_NBIT(x) (0x80 >> ((x) & 0x7f))
+#define PATRICIA_NBYTE(x) ((x) >> 3)
 
-#define PATRICIA_DATA_GET(node, type) (type *)((node)->data)
-#define PATRICIA_DATA_SET(node, value) ((node)->data = (void *)(value))
+#define PATRICIA_DATA_GET(node, type) (type *) ((node)->data)
+#define PATRICIA_DATA_SET(node, value) ((node)->data = (void *) (value))
 
-#define PATRICIA_WALK(Xhead, Xnode) \
-    do { \
-        patricia_node_t *Xstack[PATRICIA_MAXBITS+1]; \
-        patricia_node_t **Xsp = Xstack; \
-        patricia_node_t *Xrn = (Xhead); \
-        while ((Xnode = Xrn)) { \
-            if (Xnode->prefix)
+#define PATRICIA_WALK(Xhead, Xnode)                    \
+	do {                                               \
+		patricia_node_t *Xstack[PATRICIA_MAXBITS + 1]; \
+		patricia_node_t **Xsp = Xstack;                \
+		patricia_node_t *Xrn = (Xhead);                \
+		while ((Xnode = Xrn))                          \
+		{                                              \
+			if (Xnode->prefix)
 
-#define PATRICIA_WALK_ALL(Xhead, Xnode) \
-do { \
-        patricia_node_t *Xstack[PATRICIA_MAXBITS+1]; \
-        patricia_node_t **Xsp = Xstack; \
-        patricia_node_t *Xrn = (Xhead); \
-        while ((Xnode = Xrn)) { \
-	    if (1)
+#define PATRICIA_WALK_ALL(Xhead, Xnode)                \
+	do {                                               \
+		patricia_node_t *Xstack[PATRICIA_MAXBITS + 1]; \
+		patricia_node_t **Xsp = Xstack;                \
+		patricia_node_t *Xrn = (Xhead);                \
+		while ((Xnode = Xrn))                          \
+		{                                              \
+			if (1)
 
-#define PATRICIA_WALK_BREAK { \
-	    if (Xsp != Xstack) { \
-		Xrn = *(--Xsp); \
-	     } else { \
+#define PATRICIA_WALK_BREAK              \
+	{                                    \
+		if (Xsp != Xstack)               \
+		{                                \
+			Xrn = *(--Xsp);              \
+		}                                \
+		else                             \
+		{                                \
+			Xrn = (patricia_node_t *) 0; \
+		}                                \
+		continue;                        \
+	}
+
+#define PATRICIA_WALK_END            \
+	if (Xrn->l)                      \
+	{                                \
+		if (Xrn->r)                  \
+		{                            \
+			*Xsp++ = Xrn->r;         \
+		}                            \
+		Xrn = Xrn->l;                \
+	}                                \
+	else if (Xrn->r)                 \
+	{                                \
+		Xrn = Xrn->r;                \
+	}                                \
+	else if (Xsp != Xstack)          \
+	{                                \
+		Xrn = *(--Xsp);              \
+	}                                \
+	else                             \
+	{                                \
 		Xrn = (patricia_node_t *) 0; \
-	    } \
-	    continue; }
-
-#define PATRICIA_WALK_END \
-            if (Xrn->l) { \
-                if (Xrn->r) { \
-                    *Xsp++ = Xrn->r; \
-                } \
-                Xrn = Xrn->l; \
-            } else if (Xrn->r) { \
-                Xrn = Xrn->r; \
-            } else if (Xsp != Xstack) { \
-                Xrn = *(--Xsp); \
-            } else { \
-                Xrn = (patricia_node_t *) 0; \
-            } \
-        } \
-    } while (0)
+	}                                \
+	}                                \
+	}                                \
+	while (0)
 
 /*
  * 2011-01-20  Piotr Kucharski

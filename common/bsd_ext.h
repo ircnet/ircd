@@ -24,7 +24,7 @@
 /*  External definitions for global variables.
  */
 #ifndef BSD_C
-#ifdef  DEBUGMODE
+#ifdef DEBUGMODE
 extern int writecalls, writeb[];
 #endif /* DEBUGMODE */
 #endif /* BSD_C */
@@ -36,6 +36,6 @@ extern int writecalls, writeb[];
 #else /* BSD_C */
 #define EXTERN
 #endif /* BSD_C */
-EXTERN RETSIGTYPE dummy (int s);
-EXTERN int deliver_it (aClient *cptr, char *str, int len);
+EXTERN RETSIGTYPE dummy(int s);
+EXTERN int deliver_it(aClient *cptr, char *str, int len);
 #undef EXTERN

@@ -21,14 +21,14 @@
 ** WHOWAS structure moved here from whowas.c
 */
 typedef struct aname {
-	anUser	*ww_user;
-	aClient	*ww_online;
-	time_t	ww_logout;
-	char	ww_nick[NICKLEN+1];
-	char	ww_info[REALLEN+1];
+	anUser *ww_user;
+	aClient *ww_online;
+	time_t ww_logout;
+	char ww_nick[NICKLEN + 1];
+	char ww_info[REALLEN + 1];
 } aName;
 
 typedef struct alock {
-	time_t	logout;
-	char	nick[NICKLEN + 1];
+	time_t logout;
+	char nick[NICKLEN + 1];
 } aLock;

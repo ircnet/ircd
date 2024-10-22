@@ -26,15 +26,15 @@
 #include "config.h"
 #include "patchlevel.h"
 
-#include "dbuf_def.h"	/* needed for struct_def.h, sigh */
-#include "class_def.h"	/* needed for struct_def.h, sigh */
+#include "class_def.h" /* needed for struct_def.h, sigh */
+#include "dbuf_def.h"  /* needed for struct_def.h, sigh */
 #include "struct_def.h"
 #ifdef INET6
-# include "../ircd/nameser_def.h"
+#include "../ircd/nameser_def.h"
 #endif
+#include "common_def.h" /* for isdigit, isalpha etc. */
 #include "support_def.h"
-#include "common_def.h"	/* for isdigit, isalpha etc. */
 
 #include "a_conf_def.h"
-#include "a_struct_def.h"
 #include "a_log_def.h"
+#include "a_struct_def.h"

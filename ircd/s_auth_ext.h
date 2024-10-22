@@ -24,25 +24,25 @@
 /*  External definitions for global functions.
  */
 #ifndef S_AUTH_C
-# if defined(USE_IAUTH)
+#if defined(USE_IAUTH)
 extern u_char iauth_options;
 extern u_int iauth_spawn;
-# endif
+#endif
 #
-# define EXTERN extern
+#define EXTERN extern
 #else /* S_AUTH_C */
-# define EXTERN
+#define EXTERN
 #endif /* S_AUTH_C */
 
 #if defined(USE_IAUTH)
-EXTERN int vsendto_iauth (char *pattern, va_list va);
-EXTERN int sendto_iauth (char *pattern, ...);
+EXTERN int vsendto_iauth(char *pattern, va_list va);
+EXTERN int sendto_iauth(char *pattern, ...);
 EXTERN void read_iauth(void);
-EXTERN void report_iauth_conf (aClient *, char *);
-EXTERN void report_iauth_stats (aClient *, char *);
+EXTERN void report_iauth_conf(aClient *, char *);
+EXTERN void report_iauth_stats(aClient *, char *);
 #endif
-EXTERN void start_auth (Reg aClient *cptr);
-EXTERN void send_authports (aClient *cptr);
-EXTERN void read_authports (Reg aClient *cptr);
+EXTERN void start_auth(Reg aClient *cptr);
+EXTERN void send_authports(aClient *cptr);
+EXTERN void read_authports(Reg aClient *cptr);
 
 #undef EXTERN

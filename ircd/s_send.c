@@ -27,22 +27,22 @@ static const volatile char rcsid[] = "@(#)$Id: s_send.c,v 1.11 2007/12/16 06:10:
 #include "s_externs.h"
 #undef S_SEND_C
 
-static	char	oldprefixbuf[512];	/* old style server-server prefix */
-static	char	newprefixbuf[512];	/* new style server-server prefix */
-static	char	prefixbuf[512];		/* server-client prefix */
-static	char	suffixbuf[2048];	/* suffix */
+static char oldprefixbuf[512]; /* old style server-server prefix */
+static char newprefixbuf[512]; /* new style server-server prefix */
+static char prefixbuf[512];    /* server-client prefix */
+static char suffixbuf[2048];   /* suffix */
 
-static	int	oldplen, newplen, plen, slen; /* length of the above buffers */
-static	int	maxplen, lastmax;
+static int oldplen, newplen, plen, slen; /* length of the above buffers */
+static int maxplen, lastmax;
 
-#define	CLEAR_LENGTHS	oldplen = newplen = plen = slen = maxplen = lastmax =0;
+#define CLEAR_LENGTHS oldplen = newplen = plen = slen = maxplen = lastmax = 0;
 
 /*
 ** esend_message
 **	Wrapper for send_message() that deals with the multiple buffers
 **	we now have to deal with UIDs.
 */
-static	void	esend_message(aClient *to)
+static void esend_message(aClient *to)
 {
 	if (maxplen != lastmax)
 	{
@@ -56,7 +56,7 @@ static	void	esend_message(aClient *to)
 		lastmax = maxplen;
 	}
 
-	if (/*ST_UID*/IsServer(to) && newplen > 0)
+	if (/*ST_UID*/ IsServer(to) && newplen > 0)
 	{
 		send_message(to, newprefixbuf, newplen);
 		if (slen)
@@ -68,7 +68,7 @@ static	void	esend_message(aClient *to)
 	{
 		if (IsServer(to))
 		{
-		    send_message(to, oldprefixbuf, oldplen);
+			send_message(to, oldprefixbuf, oldplen);
 		}
 		else
 		{
@@ -85,8 +85,8 @@ static	void	esend_message(aClient *to)
 ** build_old_prefix
 **	function responsible for filling oldprefixbuf using pre-UID conventions
 */
-static void	build_old_prefix(aClient *orig, char *imsg, aClient *dest,
-	char *dname)
+static void build_old_prefix(aClient *orig, char *imsg, aClient *dest,
+							 char *dname)
 {
 	if (oldplen != 0)
 	{
@@ -108,8 +108,8 @@ static void	build_old_prefix(aClient *orig, char *imsg, aClient *dest,
 **	function responsible for filling oldprefixbuf with the origin and/or
 **	destination's UID if they exist.
 */
-static void	build_new_prefix(aClient *orig, char *imsg, aClient *dest,
-	char *dname)
+static void build_new_prefix(aClient *orig, char *imsg, aClient *dest,
+							 char *dname)
 {
 	char *oname = NULL;
 
@@ -140,7 +140,7 @@ static void	build_new_prefix(aClient *orig, char *imsg, aClient *dest,
 	newplen = sprintf(newprefixbuf, ":%s %s %s", oname, imsg, dname);
 	if (newplen > maxplen)
 	{
-	    maxplen = newplen;
+		maxplen = newplen;
 	}
 }
 
@@ -203,13 +203,13 @@ static void	build_prefix(aClient *orig, char *imsg, aClient *dest,
 ** build_suffix
 **	function responsible for filling suffixbuf.
 */
-static void	build_suffix(char *format, va_list va)
+static void build_suffix(char *format, va_list va)
 {
 	if (slen)
 	{
 		return;
 	}
-	
+
 	slen = vsprintf(suffixbuf, format, va);
 	suffixbuf[slen++] = '\r';
 	suffixbuf[slen++] = '\n';
@@ -234,12 +234,12 @@ static void	build_suffix(char *format, va_list va)
 ** esendto_one()
 **	send a message to a single client
 */
-void	esendto_one(aClient *orig, aClient *dest, char *imsg, char *fmt, ...)
+void esendto_one(aClient *orig, aClient *dest, char *imsg, char *fmt, ...)
 {
 	va_list va;
 
 	CLEAR_LENGTHS;
-	if (/*ST_UID*/IsServer(dest->from))
+	if (/*ST_UID*/ IsServer(dest->from))
 	{
 		build_new_prefix(orig, imsg, dest, NULL);
 	}
@@ -257,10 +257,10 @@ void	esendto_one(aClient *orig, aClient *dest, char *imsg, char *fmt, ...)
 ** esendto_serv_butone
 ** 	send message to all connected servers except 'one'
 */
-void	esendto_serv_butone(aClient *orig, aClient *dest, char *dname,
-		char *imsg, aClient *one, char *fmt, ...)
+void esendto_serv_butone(aClient *orig, aClient *dest, char *dname,
+						 char *imsg, aClient *one, char *fmt, ...)
 {
-	int	i;
+	int i;
 	aClient *acptr;
 
 	CLEAR_LENGTHS;
@@ -269,9 +269,9 @@ void	esendto_serv_butone(aClient *orig, aClient *dest, char *dname,
 		if ((acptr = local[fdas.fd[i]]) &&
 			(!one || acptr != one->from) && !IsMe(acptr))
 		{
-			if (newplen == 0 && /*ST_UID*/IsServer(acptr))
+			if (newplen == 0 && /*ST_UID*/ IsServer(acptr))
 				build_new_prefix(orig, imsg, dest, dname);
-			if (oldplen == 0 && (/*ST_NOTUID*/0 || newplen <= 0))
+			if (oldplen == 0 && (/*ST_NOTUID*/ 0 || newplen <= 0))
 				build_old_prefix(orig, imsg, dest, dname);
 			if (slen == 0)
 			{
@@ -289,11 +289,11 @@ void	esendto_serv_butone(aClient *orig, aClient *dest, char *dname,
 ** esendto_channel_butone
 ** 	send message to all connected servers except 'one'
 */
-void	esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
-		       aChannel *chptr, char *fmt, ...)
+void esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
+							aChannel *chptr, char *fmt, ...)
 {
-	Link	*lp;
-	aClient	*acptr;
+	Link *lp;
+	aClient *acptr;
 
 	CLEAR_LENGTHS;
 
@@ -302,7 +302,7 @@ void	esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 		acptr = lp->value.cptr;
 		if (acptr->from == one || IsMe(acptr))
 		{
-			continue;	/* ...was the one I should skip */
+			continue; /* ...was the one I should skip */
 		}
 		if (acptr == orig)
 		{
@@ -315,23 +315,24 @@ void	esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 			if (plen == 0)
 			{
 				plen = sprintf(prefixbuf,
-					":anonymous!anonymous@"
-					"anonymous. %s %s", imsg,
-					chptr->chname);
+							   ":anonymous!anonymous@"
+							   "anonymous. %s %s",
+							   imsg,
+							   chptr->chname);
 			}
 		}
 		else
 		{
 			/* to servers */
-			if (newplen == 0 && /*ST_UID*/IsServer(acptr))
+			if (newplen == 0 && /*ST_UID*/ IsServer(acptr))
 			{
 				build_new_prefix(orig, imsg, NULL,
-					chptr->chname);
+								 chptr->chname);
 			}
-			if (oldplen == 0 && (/*ST_NOTUID*/0 || newplen <= 0))
+			if (oldplen == 0 && (/*ST_NOTUID*/ 0 || newplen <= 0))
 			{
 				build_old_prefix(orig, imsg, NULL,
-					chptr->chname);
+								 chptr->chname);
 			}
 		}
 
@@ -352,12 +353,12 @@ void	esendto_channel_butone(aClient *orig, char *imsg, aClient *one,
 **	send to all servers which match the mask at the end of a channel name
 **	(if there is a mask present) or to all if no mask.
 */
-void	esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr,
-		char *fmt, ...)
+void esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr,
+						 char *fmt, ...)
 {
-	int	i;
-	aClient	*cptr;
-	char	*mask;
+	int i;
+	aClient *cptr;
+	char *mask;
 
 	CLEAR_LENGTHS;
 
@@ -365,11 +366,11 @@ void	esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr,
 	{
 		if (*chptr->chname == '&')
 		{
-		    return;
+			return;
 		}
 		if ((mask = get_channelmask(chptr->chname)))
 		{
-		    mask++;
+			mask++;
 		}
 	}
 	else
@@ -385,15 +386,15 @@ void	esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr,
 		}
 		if (!BadPtr(mask) && match(mask, cptr->name))
 		{
-		    continue;
+			continue;
 		}
-		if (newplen == 0 && /*ST_UID*/IsServer(cptr))
+		if (newplen == 0 && /*ST_UID*/ IsServer(cptr))
 		{
-		    build_new_prefix(orig, imsg, NULL, chptr->chname);
+			build_new_prefix(orig, imsg, NULL, chptr->chname);
 		}
-		if (oldplen == 0 && (/*ST_NOTUID*/0 || newplen <= 0))
+		if (oldplen == 0 && (/*ST_NOTUID*/ 0 || newplen <= 0))
 		{
-		    build_old_prefix(orig, imsg, NULL, chptr->chname);
+			build_old_prefix(orig, imsg, NULL, chptr->chname);
 		}
 		if (slen == 0)
 		{
@@ -406,4 +407,3 @@ void	esendto_match_servs(aClient *orig, char *imsg, aChannel *chptr,
 		esend_message(cptr);
 	}
 }
-

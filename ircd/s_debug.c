@@ -32,144 +32,144 @@ static const volatile char rcsid[] = "@(#)$Id: s_debug.c,v 1.56 2009/11/13 20:25
  * Option string.  Must be before #ifdef DEBUGMODE.
  * spaces are not allowed.
  */
-char	serveropts[] = {
-#ifndef	NO_IDENT
-'a',
+char serveropts[] = {
+#ifndef NO_IDENT
+		'a',
 #endif
-#ifdef	CHROOTDIR
-'c',
+#ifdef CHROOTDIR
+		'c',
 #endif
-#ifdef	CMDLINE_CONFIG
-'C',
+#ifdef CMDLINE_CONFIG
+		'C',
 #endif
-#ifdef	DEBUGMODE
-'D',
+#ifdef DEBUGMODE
+		'D',
 #endif
-#ifdef	RANDOM_NDELAY
-'d',
+#ifdef RANDOM_NDELAY
+		'd',
 #endif
-#ifdef	OPER_REHASH
-'E',
+#ifdef OPER_REHASH
+		'E',
 #endif
-#ifdef	SLOW_ACCEPT
-'f',
+#ifdef SLOW_ACCEPT
+		'f',
 #endif
-#ifdef	CLONE_CHECK
-'F',
+#ifdef CLONE_CHECK
+		'F',
 #endif
-#ifdef	HUB
-'H',
+#ifdef HUB
+		'H',
 #endif
-#ifdef	BETTER_CDELAY
-'h',
+#ifdef BETTER_CDELAY
+		'h',
 #endif
-#ifdef	DEFAULT_INVISIBLE
-'I',
+#ifdef DEFAULT_INVISIBLE
+		'I',
 #endif
-#ifdef	JAPANESE
-'j',
+#ifdef JAPANESE
+		'j',
 #endif
-#ifdef	OPER_DIE
-'J',
+#ifdef OPER_DIE
+		'J',
 #endif
-#ifdef	OPER_KILL
-# ifndef  OPER_KILL_REMOTE
-'k',
-# else
-'K',
-# endif
+#ifdef OPER_KILL
+#ifndef OPER_KILL_REMOTE
+		'k',
+#else
+		'K',
+#endif
 #endif
 #ifdef FAILED_OPERLOG
-'l',
+		'l',
 #endif
-#ifdef	LEAST_IDLE
-'L',
+#ifdef LEAST_IDLE
+		'L',
 #endif
-#ifdef	M4_PREPROC
-'m',
+#ifdef M4_PREPROC
+		'm',
 #endif
-#ifdef	IDLE_FROM_MSG
-'M',
+#ifdef IDLE_FROM_MSG
+		'M',
 #endif
-#ifdef	BETTER_NDELAY
-'n',
+#ifdef BETTER_NDELAY
+		'n',
 #endif
-#ifdef	CRYPT_OPER_PASSWORD
-'p',
+#ifdef CRYPT_OPER_PASSWORD
+		'p',
 #endif
-#ifdef	CRYPT_LINK_PASSWORD
-'P',
+#ifdef CRYPT_LINK_PASSWORD
+		'P',
 #endif
-#ifdef	OPER_SQUIT_REMOTE
-'Q',
+#ifdef OPER_SQUIT_REMOTE
+		'Q',
 #endif
-#ifdef	OPER_RESTART
-'R',
+#ifdef OPER_RESTART
+		'R',
 #endif
-#ifdef	USE_SERVICES
-'s',
+#ifdef USE_SERVICES
+		's',
 #endif
-#ifdef	ENABLE_SUMMON
-'S',
+#ifdef ENABLE_SUMMON
+		'S',
 #endif
 #ifdef TOPIC_WHO_TIME
-'T',
+		'T',
 #endif
-#ifndef	NO_PREFIX
-'u',
+#ifndef NO_PREFIX
+		'u',
 #endif
-#ifdef	USERS_SHOWS_UTMP
-'U',
+#ifdef USERS_SHOWS_UTMP
+		'U',
 #endif
-#ifdef	ENABLE_SIDTRACE
-'v',
+#ifdef ENABLE_SIDTRACE
+		'v',
 #endif
-#ifdef	UNIXPORT
-'X',
+#ifdef UNIXPORT
+		'X',
 #endif
-#ifdef	USE_SYSLOG
-'Y',
+#ifdef USE_SYSLOG
+		'Y',
 #endif
-#ifdef	ZIP_LINKS
-'Z',
+#ifdef ZIP_LINKS
+		'Z',
 #endif
 #ifdef INET6
-'6',
+		'6',
 #endif
-'\0'};
+		'\0'};
 
 #ifdef DEBUGMODE
-static	char	debugbuf[2*READBUF_SIZE]; /* needs to be big.. */
+static char debugbuf[2 * READBUF_SIZE]; /* needs to be big.. */
 
-void	debug(int level, char *form, ...)
+void debug(int level, char *form, ...)
 {
-	int	err = errno;
+	int err = errno;
 
-#ifdef	USE_SYSLOG
+#ifdef USE_SYSLOG
 	if (level == DEBUG_ERROR)
-	    {
-# if HAVE_VSYSLOG
+	{
+#if HAVE_VSYSLOG
 		va_list va;
 		va_start(va, form);
 		vsyslog(LOG_ERR, form, va);
 		va_end(va);
-# else
+#else
 		va_list va;
 		va_start(va, form);
 		vsprintf(debugbuf, form, va);
 		va_end(va);
 		syslog(LOG_ERR, "%s", debugbuf);
-# endif
-	    }
+#endif
+	}
 #endif
 	if ((debuglevel >= 0) && (level <= debuglevel))
-	    {
+	{
 		va_list va;
 		va_start(va, form);
-		(void)vsprintf(debugbuf, form, va);
+		(void) vsprintf(debugbuf, form, va);
 		va_end(va);
-		(void)fprintf(stderr, "%s\n", debugbuf);
-	    }
+		(void) fprintf(stderr, "%s\n", debugbuf);
+	}
 	errno = err;
 }
 #endif /* DEBUGMODE */
@@ -181,165 +181,165 @@ void	debug(int level, char *form, ...)
  * different field names for "struct rusage".
  * -avalon
  */
-void	send_usage(aClient *cptr, char *nick)
+void send_usage(aClient *cptr, char *nick)
 {
 #if HAVE_GETRUSAGE
-	struct	rusage	rus;
-	time_t	secs, rup;
-#ifdef	hz
-# define hzz hz
+	struct rusage rus;
+	time_t secs, rup;
+#ifdef hz
+#define hzz hz
 #else
-# ifdef HZ
-#  define hzz HZ
-# else
-	int	hzz = 1;
-#  ifdef HPUX
-	hzz = (int)sysconf(_SC_CLK_TCK);
-#  endif
-# endif
+#ifdef HZ
+#define hzz HZ
+#else
+	int hzz = 1;
+#ifdef HPUX
+	hzz = (int) sysconf(_SC_CLK_TCK);
+#endif
+#endif
 #endif
 
 	if (getrusage(RUSAGE_SELF, &rus) == -1)
-	    {
-		sendto_one(cptr,":%s NOTICE %s :Getruseage error: %s.",
-			   me.name, nick, strerror(errno));
+	{
+		sendto_one(cptr, ":%s NOTICE %s :Getruseage error: %s.",
+				   me.name, nick, strerror(errno));
 		return;
-	    }
+	}
 	secs = rus.ru_utime.tv_sec + rus.ru_stime.tv_sec;
 	rup = timeofday - me.since;
 	if (secs == 0)
 		secs = 1;
 
 	sendto_one(cptr,
-		   ":%s %d %s :CPU Secs %lu:%lu User %lu:%lu System %lu:%lu",
-		   me.name, RPL_STATSDEBUG, nick, secs/60, secs%60,
-		   rus.ru_utime.tv_sec/60, rus.ru_utime.tv_sec%60,
-		   rus.ru_stime.tv_sec/60, rus.ru_stime.tv_sec%60);
+			   ":%s %d %s :CPU Secs %lu:%lu User %lu:%lu System %lu:%lu",
+			   me.name, RPL_STATSDEBUG, nick, secs / 60, secs % 60,
+			   rus.ru_utime.tv_sec / 60, rus.ru_utime.tv_sec % 60,
+			   rus.ru_stime.tv_sec / 60, rus.ru_stime.tv_sec % 60);
 	if (rup && hzz)
 		sendto_one(cptr, ":%s %d %s :RSS %lu ShMem %lu Data %lu Stack %lu",
-			   me.name, RPL_STATSDEBUG, nick, rus.ru_maxrss,
-			   rus.ru_ixrss / (rup * hzz),
-			   rus.ru_idrss / (rup * hzz),
-			   rus.ru_isrss / (rup * hzz));
+				   me.name, RPL_STATSDEBUG, nick, rus.ru_maxrss,
+				   rus.ru_ixrss / (rup * hzz),
+				   rus.ru_idrss / (rup * hzz),
+				   rus.ru_isrss / (rup * hzz));
 	sendto_one(cptr, ":%s %d %s :Swaps %lu Reclaims %lu Faults %lu",
-		   me.name, RPL_STATSDEBUG, nick, rus.ru_nswap,
-		   rus.ru_minflt, rus.ru_majflt);
+			   me.name, RPL_STATSDEBUG, nick, rus.ru_nswap,
+			   rus.ru_minflt, rus.ru_majflt);
 	sendto_one(cptr, ":%s %d %s :Block in %lu out %lu",
-		   me.name, RPL_STATSDEBUG, nick, rus.ru_inblock,
-		   rus.ru_oublock);
+			   me.name, RPL_STATSDEBUG, nick, rus.ru_inblock,
+			   rus.ru_oublock);
 	sendto_one(cptr, ":%s %d %s :Msg Rcv %lu Send %lu",
-		   me.name, RPL_STATSDEBUG, nick, rus.ru_msgrcv, rus.ru_msgsnd);
+			   me.name, RPL_STATSDEBUG, nick, rus.ru_msgrcv, rus.ru_msgsnd);
 	sendto_one(cptr, ":%s %d %s :Signals %lu Context Vol. %lu Invol %lu",
-		   me.name, RPL_STATSDEBUG, nick, rus.ru_nsignals,
-		   rus.ru_nvcsw, rus.ru_nivcsw);
+			   me.name, RPL_STATSDEBUG, nick, rus.ru_nsignals,
+			   rus.ru_nvcsw, rus.ru_nivcsw);
 #else /* HAVE_GETRUSAGE */
-# if HAVE_TIMES
-	struct	tms	tmsbuf;
-	time_t	secs, mins;
-	int	hzz = 1, ticpermin;
-	int	umin, smin, usec, ssec;
+#if HAVE_TIMES
+	struct tms tmsbuf;
+	time_t secs, mins;
+	int hzz = 1, ticpermin;
+	int umin, smin, usec, ssec;
 
-#  ifdef HPUX
+#ifdef HPUX
 	hzz = sysconf(_SC_CLK_TCK);
-#  endif
+#endif
 	ticpermin = hzz * 60;
 
 	umin = tmsbuf.tms_utime / ticpermin;
-	usec = (tmsbuf.tms_utime%ticpermin)/(float)hzz;
+	usec = (tmsbuf.tms_utime % ticpermin) / (float) hzz;
 	smin = tmsbuf.tms_stime / ticpermin;
-	ssec = (tmsbuf.tms_stime%ticpermin)/(float)hzz;
+	ssec = (tmsbuf.tms_stime % ticpermin) / (float) hzz;
 	secs = usec + ssec;
-	mins = (secs/60) + umin + smin;
+	mins = (secs / 60) + umin + smin;
 	secs %= hzz;
 
 	if (times(&tmsbuf) == -1)
-	    {
+	{
 		sendto_one(cptr, ":%s %d %s :times(2) error: %s.",
-			   me.name, RPL_STATSDEBUG, nick, strerror(errno));
+				   me.name, RPL_STATSDEBUG, nick, strerror(errno));
 		return;
-	    }
+	}
 	secs = tmsbuf.tms_utime + tmsbuf.tms_stime;
 
 	sendto_one(cptr,
-		   ":%s %d %s :CPU Secs %lu:%lu User %lu:%lu System %lu:%lu",
-		   me.name, RPL_STATSDEBUG, nick, mins, secs, umin, usec,
-		   smin, ssec);
-# endif /* HAVE_TIMES */
+			   ":%s %d %s :CPU Secs %lu:%lu User %lu:%lu System %lu:%lu",
+			   me.name, RPL_STATSDEBUG, nick, mins, secs, umin, usec,
+			   smin, ssec);
+#endif /* HAVE_TIMES */
 #endif /* HAVE_GETRUSAGE */
 	sendto_one(cptr, ":%s %d %s :DBUF alloc %lu blocks %lu",
-		   me.name, RPL_STATSDEBUG, nick, istat.is_dbufuse,
-		   istat.is_dbufnow);
+			   me.name, RPL_STATSDEBUG, nick, istat.is_dbufuse,
+			   istat.is_dbufnow);
 #ifdef DEBUGMODE
 	sendto_one(cptr, ":%s %d %s :Reads %lu Writes %lu",
-		   me.name, RPL_STATSDEBUG, nick, readcalls, writecalls);
+			   me.name, RPL_STATSDEBUG, nick, readcalls, writecalls);
 	sendto_one(cptr,
-		   ":%s %d %s :Writes:  <0 %d 0 %d <16 %d <32 %d <64 %d",
-		   me.name, RPL_STATSDEBUG, nick,
-		   writeb[0], writeb[1], writeb[2], writeb[3], writeb[4]);
+			   ":%s %d %s :Writes:  <0 %d 0 %d <16 %d <32 %d <64 %d",
+			   me.name, RPL_STATSDEBUG, nick,
+			   writeb[0], writeb[1], writeb[2], writeb[3], writeb[4]);
 	sendto_one(cptr,
-		   ":%s %d %s :<128 %d <256 %d <512 %d <1024 %d >1024 %d",
-		   me.name, RPL_STATSDEBUG, nick,
-		   writeb[5], writeb[6], writeb[7], writeb[8], writeb[9]);
+			   ":%s %d %s :<128 %d <256 %d <512 %d <1024 %d >1024 %d",
+			   me.name, RPL_STATSDEBUG, nick,
+			   writeb[5], writeb[6], writeb[7], writeb[8], writeb[9]);
 #endif
 	return;
 }
 
-void	send_defines(aClient *cptr, char *nick, char *extend)
+void send_defines(aClient *cptr, char *nick, char *extend)
 {
-    	sendto_one(cptr, ":%s %d %s :HUB:%s MS:%d", 
-		   ME, RPL_STATSDEFINE, nick,
+	sendto_one(cptr, ":%s %d %s :HUB:%s MS:%d",
+			   ME, RPL_STATSDEFINE, nick,
 #ifdef HUB
-		   "yes",
+			   "yes",
 #else
-		   "no",
+			   "no",
 #endif
-		   MAXSERVERS);
-    	sendto_one(cptr,
-		   ":%s %d %s :LQ:%d MXC:%d TS:%d HRD:%d HGL:%d WWD:%d ATO:%d",
-		   ME, RPL_STATSDEFINE, nick, LISTENQUEUE, MAXCONNECTIONS,
-		   TIMESEC, HANGONRETRYDELAY, HANGONGOODLINK, WRITEWAITDELAY,
-		   ACCEPTTIMEOUT);
-    	sendto_one(cptr, ":%s %d %s :KCTL:%d DCTL:%d LDCTL:%d CF:%d MCPU:%d",
-		   ME, RPL_STATSDEFINE, nick, KILLCHASETIMELIMIT,
-		   DELAYCHASETIMELIMIT, LDELAYCHASETIMELIMIT,
-		   CLIENT_FLOOD, MAXCHANNELSPERUSER);
+			   MAXSERVERS);
+	sendto_one(cptr,
+			   ":%s %d %s :LQ:%d MXC:%d TS:%d HRD:%d HGL:%d WWD:%d ATO:%d",
+			   ME, RPL_STATSDEFINE, nick, LISTENQUEUE, MAXCONNECTIONS,
+			   TIMESEC, HANGONRETRYDELAY, HANGONGOODLINK, WRITEWAITDELAY,
+			   ACCEPTTIMEOUT);
+	sendto_one(cptr, ":%s %d %s :KCTL:%d DCTL:%d LDCTL:%d CF:%d MCPU:%d",
+			   ME, RPL_STATSDEFINE, nick, KILLCHASETIMELIMIT,
+			   DELAYCHASETIMELIMIT, LDELAYCHASETIMELIMIT,
+			   CLIENT_FLOOD, MAXCHANNELSPERUSER);
 	sendto_one(cptr, ":%s %d %s :H:%d N:%d N0:%d D:%d U:%d R:%d T:%d C:%d P:%d K:%d",
-		   ME, RPL_STATSDEFINE, nick, HOSTLEN, LOCALNICKLEN, 
+			   ME, RPL_STATSDEFINE, nick, HOSTLEN, LOCALNICKLEN,
 #ifdef MINLOCALNICKLEN
-		   MINLOCALNICKLEN,
+			   MINLOCALNICKLEN,
 #else
-		   1,
+			   1,
 #endif
-		   UIDLEN, USERLEN,
-		   REALLEN, TOPICLEN, CHANNELLEN, PASSWDLEN, KEYLEN);
+			   UIDLEN, USERLEN,
+			   REALLEN, TOPICLEN, CHANNELLEN, PASSWDLEN, KEYLEN);
 	sendto_one(cptr, ":%s %d %s :BS:%d MXR:%d MXB:%d MXBL:%d PY:%d",
-		   ME, RPL_STATSDEFINE, nick, BUFSIZE, MAXRECIPIENTS, MAXBANS,
-		   MAXBANLENGTH, MAXPENALTY);
+			   ME, RPL_STATSDEFINE, nick, BUFSIZE, MAXRECIPIENTS, MAXBANS,
+			   MAXBANLENGTH, MAXPENALTY);
 	sendto_one(cptr, ":%s %d %s :ZL:%d CM:%d CP:%d DC:%d",
-		ME, RPL_STATSDEFINE, nick,
-#ifdef	ZIP_LINKS
-		ZIP_LEVEL,
+			   ME, RPL_STATSDEFINE, nick,
+#ifdef ZIP_LINKS
+			   ZIP_LEVEL,
 #else
-		-1,
+			   -1,
 #endif
-#ifdef	CLONE_CHECK
-		CLONE_MAX, CLONE_PERIOD,
+#ifdef CLONE_CHECK
+			   CLONE_MAX, CLONE_PERIOD,
 #else
-		-1, -1,
+			   -1, -1,
 #endif
-#ifdef	DELAY_CLOSE
-		DELAY_CLOSE
+#ifdef DELAY_CLOSE
+			   DELAY_CLOSE
 #else
-		-1
+			   -1
 #endif
-		);
+	);
 	sendto_one(cptr, ":%s %d %s :AC:%d CA:%d S:%d SS:%d/%d/%d SU:%d/%d/%d",
-		ME, RPL_STATSDEFINE, nick, iconf.aconnect, iconf.caccept, 
-		iconf.split, SPLIT_SERVERS, iconf.split_minservers, istat.is_eobservers,
-		SPLIT_USERS, iconf.split_minusers, istat.is_user[0] + istat.is_user[1]);
+			   ME, RPL_STATSDEFINE, nick, iconf.aconnect, iconf.caccept,
+			   iconf.split, SPLIT_SERVERS, iconf.split_minservers, istat.is_eobservers,
+			   SPLIT_USERS, iconf.split_minusers, istat.is_user[0] + istat.is_user[1]);
 #ifdef CLIENTS_CHANNEL
 	sendto_one(cptr, ":%s %d %s :CCL:0x%X", ME, RPL_STATSDEFINE, nick,
-		CLIENTS_CHANNEL_LEVEL);
+			   CLIENTS_CHANNEL_LEVEL);
 #endif
 	/* note that it's safe to check extend[1], it will at worst be null.
 	** if we ever need extend[2], check length first... --B. */
@@ -348,69 +348,69 @@ void	send_defines(aClient *cptr, char *nick, char *extend)
 		char **isup = isupport;
 		while (*isup)
 		{
-      	sendto_one(cptr, replies[RPL_ISUPPORT], ME, nick, *isup);
+			sendto_one(cptr, replies[RPL_ISUPPORT], ME, nick, *isup);
 			isup++;
 		}
 	}
 }
 
-void	count_memory(aClient *cptr, char *nick, int debug)
+void count_memory(aClient *cptr, char *nick, int debug)
 {
-	extern	aChannel	*channel;
-	extern	aClass		*classes;
-	extern	aConfItem	*conf;
-	extern	int		_HASHSIZE, _CHANNELHASHSIZE;
+	extern aChannel *channel;
+	extern aClass *classes;
+	extern aConfItem *conf;
+	extern int _HASHSIZE, _CHANNELHASHSIZE;
 
-	Reg	aClient		*acptr;
-	Reg	Link		*link;
-	Reg	aChannel	*chptr;
-	Reg	aConfItem	*aconf;
-	Reg	aClass		*cltmp;
+	Reg aClient *acptr;
+	Reg Link *link;
+	Reg aChannel *chptr;
+	Reg aConfItem *aconf;
+	Reg aClass *cltmp;
 
-	int	lc = 0, d_lc = 0,	/* local clients */
-		ch = 0, d_ch = 0,	/* channels */
-		lcc = 0, d_lcc = 0,	/* local client conf links */
-		rc = 0, d_rc = 0,	/* remote clients */
-		us = 0, d_us = 0,	/* user structs */
-		chu = 0, d_chu = 0,	/* channel users */
-		chi = 0, d_chi = 0,	/* channel invites */
-		chb = 0, d_chb = 0,	/* channel bans */
-		chh = 0, d_chh = 0,	/* channel in history */
-		wwu = 0, d_wwu = 0,	/* whowas users */
-		cl = 0, d_cl = 0,	/* classes */
-		co = 0, d_co = 0;	/* conf lines */
+	int lc = 0, d_lc = 0,       /* local clients */
+			ch = 0, d_ch = 0,   /* channels */
+			lcc = 0, d_lcc = 0, /* local client conf links */
+			rc = 0, d_rc = 0,   /* remote clients */
+			us = 0, d_us = 0,   /* user structs */
+			chu = 0, d_chu = 0, /* channel users */
+			chi = 0, d_chi = 0, /* channel invites */
+			chb = 0, d_chb = 0, /* channel bans */
+			chh = 0, d_chh = 0, /* channel in history */
+			wwu = 0, d_wwu = 0, /* whowas users */
+			cl = 0, d_cl = 0,   /* classes */
+			co = 0, d_co = 0;   /* conf lines */
 
-	int	usi = 0, d_usi = 0,	/* users invited */
-		usc = 0, d_usc = 0,	/* users in channels */
-		aw = 0, d_aw = 0,	/* aways set */
-		wwa = 0, d_wwa = 0,	/* whowas aways */
-		wwuw = 0, d_wwuw = 0;   /* whowas uwas */
+	int usi = 0, d_usi = 0,       /* users invited */
+			usc = 0, d_usc = 0,   /* users in channels */
+			aw = 0, d_aw = 0,     /* aways set */
+			wwa = 0, d_wwa = 0,   /* whowas aways */
+			wwuw = 0, d_wwuw = 0; /* whowas uwas */
 
-	u_long	chm = 0, d_chm = 0,	/* memory used by channels */
-		chhm = 0, d_chhm = 0,	/* memory used by channel in history */
-		chbm = 0, d_chbm = 0,	/* memory used by channel bans */
-		lcm = 0, d_lcm = 0,	/* memory used by local clients */
-		rcm = 0, d_rcm = 0,	/* memory used by remote clients */
-		awm = 0, d_awm = 0,	/* memory used by aways */
-		wwam = 0, d_wwam = 0,	/* whowas away memory used */
-		wwm = 0, d_wwm = 0,	/* whowas array memory used */
-		dm = 0, d_dm = 0,	/* delay array memory used */
-		com = 0, d_com = 0,	/* memory used by conf lines */
-		db = 0, d_db = 0,	/* memory used by dbufs */
-		rm = 0, d_rm = 0,	/* res memory used */
-		totcl = 0, d_totcl = 0,
-		totch = 0, d_totch = 0,
-		totww = 0, d_totww = 0,
-		tot = 0, d_tot = 0;
-	time_t	start = 0;
+	u_long chm = 0, d_chm = 0,    /* memory used by channels */
+			chhm = 0, d_chhm = 0, /* memory used by channel in history */
+			chbm = 0, d_chbm = 0, /* memory used by channel bans */
+			lcm = 0, d_lcm = 0,   /* memory used by local clients */
+			rcm = 0, d_rcm = 0,   /* memory used by remote clients */
+			awm = 0, d_awm = 0,   /* memory used by aways */
+			wwam = 0, d_wwam = 0, /* whowas away memory used */
+			wwm = 0, d_wwm = 0,   /* whowas array memory used */
+			dm = 0, d_dm = 0,     /* delay array memory used */
+			com = 0, d_com = 0,   /* memory used by conf lines */
+			db = 0, d_db = 0,     /* memory used by dbufs */
+			rm = 0, d_rm = 0,     /* res memory used */
+			totcl = 0, d_totcl = 0,
+		   totch = 0, d_totch = 0,
+		   totww = 0, d_totww = 0,
+		   tot = 0, d_tot = 0;
+	time_t start = 0;
 
 	if (debug)
-	    {
+	{
 		start = time(NULL);
 		count_whowas_memory(&d_wwu, &d_wwa, &d_wwam, &d_wwuw);
 		d_wwm = sizeof(aName) * ww_size;
 		d_dm = sizeof(aLock) * lk_size;
-	    }
+	}
 	wwu = istat.is_wwusers;
 	wwa = istat.is_wwaways;
 	wwam = istat.is_wwawaysmem;
@@ -435,7 +435,7 @@ void	count_memory(aClient *cptr, char *nick, int debug)
 			if (MyConnect(acptr))
 			{
 				d_lc++;
-				for (link = acptr->confs; link; link=link->next)
+				for (link = acptr->confs; link; link = link->next)
 				{
 					d_lcc++;
 				}
@@ -446,11 +446,11 @@ void	count_memory(aClient *cptr, char *nick, int debug)
 			}
 			if (acptr->user)
 			{
-				invLink	*ilink;
+				invLink *ilink;
 
 				d_us++;
 				for (ilink = acptr->user->invited; ilink;
-				     ilink = ilink->next)
+					 ilink = ilink->next)
 				{
 					d_usi++;
 				}
@@ -458,7 +458,7 @@ void	count_memory(aClient *cptr, char *nick, int debug)
 				if (acptr->user->away)
 				{
 					d_aw++;
-					d_awm += (strlen(acptr->user->away)+1);
+					d_awm += (strlen(acptr->user->away) + 1);
 				}
 			}
 		}
@@ -486,13 +486,13 @@ void	count_memory(aClient *cptr, char *nick, int debug)
 			if (chptr->users == 0)
 			{
 				d_chh++;
-				d_chhm+=strlen(chptr->chname)+sizeof(aChannel);
+				d_chhm += strlen(chptr->chname) + sizeof(aChannel);
 			}
 			else
 			{
 				d_ch++;
 				d_chm += (strlen(chptr->chname) +
-					  sizeof(aChannel));
+						  sizeof(aChannel));
 			}
 			for (link = chptr->members; link; link = link->next)
 			{
@@ -520,9 +520,9 @@ void	count_memory(aClient *cptr, char *nick, int debug)
 		for (aconf = conf; aconf; aconf = aconf->next)
 		{
 			d_co++;
-			d_com += aconf->host ? strlen(aconf->host)+1 : 0;
-			d_com += aconf->passwd ? strlen(aconf->passwd)+1 : 0;
-			d_com += aconf->name ? strlen(aconf->name)+1 : 0;
+			d_com += aconf->host ? strlen(aconf->host) + 1 : 0;
+			d_com += aconf->passwd ? strlen(aconf->passwd) + 1 : 0;
+			d_com += aconf->name ? strlen(aconf->name) + 1 : 0;
 			d_com += aconf->ping ? sizeof(*aconf->ping) : 0;
 			d_com += sizeof(aConfItem);
 		}
@@ -534,162 +534,162 @@ void	count_memory(aClient *cptr, char *nick, int debug)
 
 	if (debug)
 		sendto_one(cptr, ":%s %d %s :Request processed in %u seconds",
-			   me.name, RPL_STATSDEBUG, nick, time(NULL) - start);
+				   me.name, RPL_STATSDEBUG, nick, time(NULL) - start);
 
 	sendto_one(cptr,
-		   ":%s %d %s :Client Local %d(%lu) Remote %d(%lu) Auth %d(%lu)",
-		   me.name, RPL_STATSDEBUG, nick, lc, lcm, rc, rcm,
-		   istat.is_auth, istat.is_authmem);
-	if (debug
-	    && (lc != d_lc || lcm != d_lcm || rc != d_rc || rcm != d_rcm))
+			   ":%s %d %s :Client Local %d(%lu) Remote %d(%lu) Auth %d(%lu)",
+			   me.name, RPL_STATSDEBUG, nick, lc, lcm, rc, rcm,
+			   istat.is_auth, istat.is_authmem);
+	if (debug && (lc != d_lc || lcm != d_lcm || rc != d_rc || rcm != d_rcm))
 	{
 		sendto_one(cptr,
-			":%s %d %s :Client Local %d(%lu) Remote %d(%lu) [REAL]",
-			me.name, RPL_STATSDEBUG, nick, d_lc, d_lcm, d_rc,
-			d_rcm);
+				   ":%s %d %s :Client Local %d(%lu) Remote %d(%lu) [REAL]",
+				   me.name, RPL_STATSDEBUG, nick, d_lc, d_lcm, d_rc,
+				   d_rcm);
 	}
 	sendto_one(cptr,
-		   ":%s %d %s :Users %d in/visible %d/%d(%lu) Invites %d(%lu)",
-		   me.name, RPL_STATSDEBUG, nick, us, istat.is_user[1],
-		   istat.is_user[0], us*sizeof(anUser), usi,
-		   usi*sizeof(Link));
+			   ":%s %d %s :Users %d in/visible %d/%d(%lu) Invites %d(%lu)",
+			   me.name, RPL_STATSDEBUG, nick, us, istat.is_user[1],
+			   istat.is_user[0], us * sizeof(anUser), usi,
+			   usi * sizeof(Link));
 	if (debug && (us != d_us || usi != d_usi))
 	{
 		sendto_one(cptr,
-			   ":%s %d %s :Users %d(%lu) Invites %d(%lu) [REAL]",
-			   me.name, RPL_STATSDEBUG, nick, d_us,
-			   d_us*sizeof(anUser), d_usi, d_usi * sizeof(Link));
+				   ":%s %d %s :Users %d(%lu) Invites %d(%lu) [REAL]",
+				   me.name, RPL_STATSDEBUG, nick, d_us,
+				   d_us * sizeof(anUser), d_usi, d_usi * sizeof(Link));
 	}
 	sendto_one(cptr, ":%s %d %s :User channels %d(%lu) Aways %d(%lu)",
-		   me.name, RPL_STATSDEBUG, nick, usc, usc*sizeof(Link),
-		   aw, awm);
+			   me.name, RPL_STATSDEBUG, nick, usc, usc * sizeof(Link),
+			   aw, awm);
 	if (debug && (usc != d_usc || aw != d_aw || awm != d_awm))
 	{
 		sendto_one(cptr,
-			":%s %d %s :User channels %d(%lu) Aways %d(%lu) [REAL]",
-			   me.name, RPL_STATSDEBUG, nick, d_usc,
-			   d_usc*sizeof(Link), d_aw, d_awm);
+				   ":%s %d %s :User channels %d(%lu) Aways %d(%lu) [REAL]",
+				   me.name, RPL_STATSDEBUG, nick, d_usc,
+				   d_usc * sizeof(Link), d_aw, d_awm);
 	}
 	sendto_one(cptr, ":%s %d %s :Attached confs %d(%lu)",
-		   me.name, RPL_STATSDEBUG, nick, lcc, lcc*sizeof(Link));
+			   me.name, RPL_STATSDEBUG, nick, lcc, lcc * sizeof(Link));
 	if (debug && lcc != d_lcc)
 	{
 		sendto_one(cptr, ":%s %d %s :Attached confs %d(%lu) [REAL]",
-			   me.name, RPL_STATSDEBUG, nick, d_lcc,
-			   d_lcc*sizeof(Link));
+				   me.name, RPL_STATSDEBUG, nick, d_lcc,
+				   d_lcc * sizeof(Link));
 	}
 
-	totcl = lcm + rcm + us*sizeof(anUser) + usc*sizeof(Link) + awm;
-	totcl += lcc*sizeof(Link) + usi*sizeof(Link);
-	d_totcl = d_lcm + d_rcm + d_us*sizeof(anUser) + d_usc*sizeof(Link);
-	d_totcl += d_awm + d_lcc*sizeof(Link) + d_usi*sizeof(Link);
+	totcl = lcm + rcm + us * sizeof(anUser) + usc * sizeof(Link) + awm;
+	totcl += lcc * sizeof(Link) + usi * sizeof(Link);
+	d_totcl = d_lcm + d_rcm + d_us * sizeof(anUser) + d_usc * sizeof(Link);
+	d_totcl += d_awm + d_lcc * sizeof(Link) + d_usi * sizeof(Link);
 
 	sendto_one(cptr, ":%s %d %s :Conflines %d(%lu)",
-		   me.name, RPL_STATSDEBUG, nick, co, com);
+			   me.name, RPL_STATSDEBUG, nick, co, com);
 	if (debug && (co != d_co || com != d_com))
 	{
 		sendto_one(cptr, ":%s %d %s :Conflines %d(%lu) [REAL]",
-			   me.name, RPL_STATSDEBUG, nick, d_co, d_com);
+				   me.name, RPL_STATSDEBUG, nick, d_co, d_com);
 	}
 
 	sendto_one(cptr, ":%s %d %s :Classes %d(%lu)",
-		   me.name, RPL_STATSDEBUG, nick, cl, cl*sizeof(aClass));
+			   me.name, RPL_STATSDEBUG, nick, cl, cl * sizeof(aClass));
 	if (debug && cl != d_cl)
 	{
 		sendto_one(cptr, ":%s %d %s :Classes %d(%lu) [REAL]",
-			   me.name, RPL_STATSDEBUG, nick, d_cl,
-			   d_cl*sizeof(aClass));
+				   me.name, RPL_STATSDEBUG, nick, d_cl,
+				   d_cl * sizeof(aClass));
 	}
 
 	sendto_one(cptr,
-   ":%s %d %s :Channels %d(%lu) Modes %d(%lu) History %d(%lu) Cache %d(%lu)",
-		   me.name, RPL_STATSDEBUG, nick, ch, chm, chb, chbm, chh,
-		   chhm, istat.is_cchan, istat.is_cchanmem);
-	if (debug && (ch != d_ch || chm != d_chm || chb != d_chb
-		      || chbm != d_chbm || chh != d_chh || chhm != d_chhm))
+			   ":%s %d %s :Channels %d(%lu) Modes %d(%lu) History %d(%lu) Cache %d(%lu)",
+			   me.name, RPL_STATSDEBUG, nick, ch, chm, chb, chbm, chh,
+			   chhm, istat.is_cchan, istat.is_cchanmem);
+	if (debug && (ch != d_ch || chm != d_chm || chb != d_chb || chbm != d_chbm || chh != d_chh || chhm != d_chhm))
 	{
 		sendto_one(cptr,
-	       ":%s %d %s :Channels %d(%lu) Modes %d(%lu) History %d(%lu) [REAL]",
-			   me.name, RPL_STATSDEBUG, nick, d_ch, d_chm, d_chb,
-			   d_chbm, d_chh, d_chhm);
+				   ":%s %d %s :Channels %d(%lu) Modes %d(%lu) History %d(%lu) [REAL]",
+				   me.name, RPL_STATSDEBUG, nick, d_ch, d_chm, d_chb,
+				   d_chbm, d_chh, d_chhm);
 	}
 	sendto_one(cptr, ":%s %d %s :Channel members %d(%lu) invite %d(%lu)",
-		   me.name, RPL_STATSDEBUG, nick, chu, chu*sizeof(Link),
-		   chi, chi*sizeof(Link));
+			   me.name, RPL_STATSDEBUG, nick, chu, chu * sizeof(Link),
+			   chi, chi * sizeof(Link));
 	if (debug && (chu != d_chu || chi != d_chi))
 	{
 		sendto_one(cptr,
-			":%s %d %s :Channel members %d(%lu) invite %d(%lu) "
-			"[REAL]", me.name, RPL_STATSDEBUG, nick, d_chu, 
-			d_chu*sizeof(Link), d_chi, d_chi*sizeof(Link));
+				   ":%s %d %s :Channel members %d(%lu) invite %d(%lu) "
+				   "[REAL]",
+				   me.name, RPL_STATSDEBUG, nick, d_chu,
+				   d_chu * sizeof(Link), d_chi, d_chi * sizeof(Link));
 	}
-	totch = chm + chhm + chbm + chu*sizeof(Link) + chi*sizeof(Link);
-	d_totch = d_chm + d_chhm + d_chbm + d_chu*sizeof(Link)
-		  + d_chi*sizeof(Link);
+	totch = chm + chhm + chbm + chu * sizeof(Link) + chi * sizeof(Link);
+	d_totch = d_chm + d_chhm + d_chbm + d_chu * sizeof(Link) + d_chi * sizeof(Link);
 
 	sendto_one(cptr,
-		   ":%s %d %s :Whowas users %d(%lu) away %d(%lu) links %d(%lu)",
-		   me.name, RPL_STATSDEBUG, nick, wwu, wwu*sizeof(anUser),
-		   wwa, wwam, wwuw, wwuw*sizeof(Link));
-	if (debug && (wwu != d_wwu || wwa != d_wwa || wwam != d_wwam
-		      || wwuw != d_wwuw))
+			   ":%s %d %s :Whowas users %d(%lu) away %d(%lu) links %d(%lu)",
+			   me.name, RPL_STATSDEBUG, nick, wwu, wwu * sizeof(anUser),
+			   wwa, wwam, wwuw, wwuw * sizeof(Link));
+	if (debug && (wwu != d_wwu || wwa != d_wwa || wwam != d_wwam || wwuw != d_wwuw))
 	{
 		sendto_one(cptr,
-			":%s %d %s :Whowas users %d(%lu) away %d(%lu) "
-			"links %d(%lu) [REAL]", me.name, RPL_STATSDEBUG,
-			nick, d_wwu, d_wwu*sizeof(anUser),
-			d_wwa, d_wwam, d_wwuw, d_wwuw*sizeof(Link));
+				   ":%s %d %s :Whowas users %d(%lu) away %d(%lu) "
+				   "links %d(%lu) [REAL]",
+				   me.name, RPL_STATSDEBUG,
+				   nick, d_wwu, d_wwu * sizeof(anUser),
+				   d_wwa, d_wwam, d_wwuw, d_wwuw * sizeof(Link));
 	}
 	sendto_one(cptr, ":%s %d %s :Whowas array %d(%lu) Delay array %d(%lu)",
-		   me.name, RPL_STATSDEBUG, nick, ww_size, wwm, lk_size, dm);
+			   me.name, RPL_STATSDEBUG, nick, ww_size, wwm, lk_size, dm);
 	if (debug && (wwm != d_wwm || dm != d_dm))
 	{
 		sendto_one(cptr,
-			":%s %d %s :Whowas array %d(%lu) Delay array %d(%lu) "
-			"[REAL]", me.name, RPL_STATSDEBUG, nick, ww_size,
-			d_wwm, lk_size, d_dm);
+				   ":%s %d %s :Whowas array %d(%lu) Delay array %d(%lu) "
+				   "[REAL]",
+				   me.name, RPL_STATSDEBUG, nick, ww_size,
+				   d_wwm, lk_size, d_dm);
 	}
 
-	totww = wwu*sizeof(anUser) + wwam + wwm;
-	d_totww = d_wwu*sizeof(anUser) + d_wwam + d_wwm;
+	totww = wwu * sizeof(anUser) + wwam + wwm;
+	d_totww = d_wwu * sizeof(anUser) + d_wwam + d_wwm;
 
 	sendto_one(cptr, ":%s %d %s :Hash: client %d(%lu) chan %d(%lu)",
-		me.name, RPL_STATSDEBUG, nick, _HASHSIZE,
-		sizeof(aHashEntry) * _HASHSIZE,
-		_CHANNELHASHSIZE, sizeof(aHashEntry) * _CHANNELHASHSIZE);
+			   me.name, RPL_STATSDEBUG, nick, _HASHSIZE,
+			   sizeof(aHashEntry) * _HASHSIZE,
+			   _CHANNELHASHSIZE, sizeof(aHashEntry) * _CHANNELHASHSIZE);
 	d_db = db = istat.is_dbufnow * sizeof(dbufbuf);
 	db = istat.is_dbufnow * sizeof(dbufbuf);
 	sendto_one(cptr,
-		":%s %d %s :Dbuf blocks %lu(%lu) (> %lu [%lu]) (%lu < %lu) "
-		"[%lu]", me.name, RPL_STATSDEBUG, nick, istat.is_dbufnow, db,
-		istat.is_dbuf,
-		(u_int) (((u_int)BUFFERPOOL) / ((u_int)sizeof(dbufbuf))),
-		istat.is_dbufuse, istat.is_dbufmax, istat.is_dbufmore);
+			   ":%s %d %s :Dbuf blocks %lu(%lu) (> %lu [%lu]) (%lu < %lu) "
+			   "[%lu]",
+			   me.name, RPL_STATSDEBUG, nick, istat.is_dbufnow, db,
+			   istat.is_dbuf,
+			   (u_int) (((u_int) BUFFERPOOL) / ((u_int) sizeof(dbufbuf))),
+			   istat.is_dbufuse, istat.is_dbufmax, istat.is_dbufmore);
 
 	d_rm = rm = cres_mem(cptr, nick);
 
-	tot = totww + totch + totcl + com + cl*sizeof(aClass) + db + rm;
+	tot = totww + totch + totcl + com + cl * sizeof(aClass) + db + rm;
 	tot += sizeof(aHashEntry) * _HASHSIZE;
 	tot += sizeof(aHashEntry) * _CHANNELHASHSIZE;
-	d_tot = d_totww + d_totch + d_totcl + d_com + d_cl*sizeof(aClass);
+	d_tot = d_totww + d_totch + d_totcl + d_com + d_cl * sizeof(aClass);
 	d_tot += d_db + d_rm;
 	d_tot += sizeof(aHashEntry) * _HASHSIZE;
 	d_tot += sizeof(aHashEntry) * _CHANNELHASHSIZE;
 
 	sendto_one(cptr, ":%s %d %s :Total: ww %lu ch %lu cl %lu co %lu db %lu",
-		   me.name, RPL_STATSDEBUG, nick, totww, totch, totcl, com,db);
+			   me.name, RPL_STATSDEBUG, nick, totww, totch, totcl, com, db);
 	if (debug && tot != d_tot)
 	{
 		sendto_one(cptr,
-			":%s %d %s :Total: ww %lu ch %lu cl %lu co %lu "
-			"db %lu [REAL]", me.name, RPL_STATSDEBUG, nick,
-			d_totww, d_totch, d_totcl, d_com, d_db);
+				   ":%s %d %s :Total: ww %lu ch %lu cl %lu co %lu "
+				   "db %lu [REAL]",
+				   me.name, RPL_STATSDEBUG, nick,
+				   d_totww, d_totch, d_totcl, d_com, d_db);
 		sendto_one(cptr, ":%s %d %s :TOTAL: %lu [REAL]",
-			me.name, RPL_STATSDEBUG, nick, d_tot);
+				   me.name, RPL_STATSDEBUG, nick, d_tot);
 	}
 	sendto_one(cptr, ":%s %d %s :TOTAL: %d sbrk(0)-etext: %u",
-		   me.name, RPL_STATSDEBUG, nick, tot,
-		   (u_long)sbrk((size_t)0)-(u_long)sbrk0);
+			   me.name, RPL_STATSDEBUG, nick, tot,
+			   (u_long) sbrk((size_t) 0) - (u_long) sbrk0);
 	return;
 }
-
