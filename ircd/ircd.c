@@ -896,15 +896,15 @@ int	main(int argc, char *argv[])
 		    case 'v':
 				(void) printf("ircd %s %s\n\tzlib %s\n\tircd.conf delimiter %c\n\t%s #%s\n",
 							  IRC_VERSION, serveropts,
-#ifndef    ZIP_LINKS
+#ifndef ZIP_LINKS
 							  "not used",
 #else
-						zlib_version,
+							  zlib_version,
 #endif
 							  IRCDCONF_DELIMITER,
 							  creation, generation);
 				exit(0);
-		    case 'x':
+			case 'x':
 #ifdef	DEBUGMODE
                         (void)setuid((uid_t)uid);
 						debuglevel = atoi(p);
@@ -1137,7 +1137,7 @@ int	main(int argc, char *argv[])
 	printf("Server %s (%s) version %s starting%s%s", ME, me.serv->sid,
 		   IRC_VERSION, (bootopt & BOOT_TTY) ? " in foreground mode." : ".",
 #ifdef DEBUGMODE
-			"(DEBUGMODE)\n"
+		   "(DEBUGMODE)\n"
 #else
 		   "\n"
 #endif

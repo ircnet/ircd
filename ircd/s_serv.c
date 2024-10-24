@@ -2895,7 +2895,7 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 }
 
 #ifdef ENABLE_SIDTRACE
-int	m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 
@@ -2907,22 +2907,22 @@ int	m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (!IsPerson(acptr))
 			continue;
 
-		if (strncmp(acptr->user->uid, me.serv->sid, SIDLEN-1))
+		if (strncmp(acptr->user->uid, me.serv->sid, SIDLEN - 1))
 			continue;
 
 		sendto_one(sptr, replies[RPL_ETRACEFULL],
-			ME, sptr->name,
-			IsAnOper(acptr) ? "Oper" : "User",
-			MyClient(acptr) ? get_client_class(acptr) : -1,
-			acptr->name, acptr->user->username,
-			acptr->user->host, get_client_ip(acptr),
+				   ME, sptr->name,
+				   IsAnOper(acptr) ? "Oper" : "User",
+				   MyClient(acptr) ? get_client_class(acptr) : -1,
+				   acptr->name, acptr->user->username,
+				   acptr->user->host, get_client_ip(acptr),
 #ifdef XLINE
-			MyClient(acptr) ? acptr->user2 : "-",
-			MyClient(acptr) ? acptr->user3 : "-",
+				   MyClient(acptr) ? acptr->user2 : "-",
+				   MyClient(acptr) ? acptr->user3 : "-",
 #else
-			"-", "-",
+				   "-", "-",
 #endif
-			acptr->info);
+				   acptr->info);
 	}
 
 	sendto_one(sptr, replies[RPL_ETRACEEND], ME, sptr->name, "*",
