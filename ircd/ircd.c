@@ -817,6 +817,8 @@ int	main(int argc, char *argv[])
 	make_server(&me);
 	register_server(&me);
 
+	version = make_version();	/* Generate readable version string */
+
 	/*
 	** All command line parameters have the syntax "-fstring"
 	** or "-f string" (e.g. the space is optional). String may
@@ -895,7 +897,7 @@ int	main(int argc, char *argv[])
 			break;
 		    case 'v':
 				(void) printf("ircd %s %s\n\tzlib %s\n\tircd.conf delimiter %c\n\t%s #%s\n",
-							  IRC_VERSION, serveropts,
+							  version, serveropts,
 #ifndef ZIP_LINKS
 							  "not used",
 #else
@@ -1135,7 +1137,7 @@ int	main(int argc, char *argv[])
 	       generation);
 #endif
 	printf("Server %s (%s) version %s starting%s%s", ME, me.serv->sid,
-		   IRC_VERSION, (bootopt & BOOT_TTY) ? " in foreground mode." : ".",
+		   version, (bootopt & BOOT_TTY) ? " in foreground mode." : ".",
 #ifdef DEBUGMODE
 		   "(DEBUGMODE)\n"
 #else

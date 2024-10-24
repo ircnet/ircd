@@ -111,7 +111,7 @@ int m_version(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	if (hunt_server(cptr, sptr, ":%s VERSION :%s", 1, parc, parv) == HUNTED_ISME)
 		sendto_one(sptr, replies[RPL_VERSION], ME, BadTo(parv[0]),
-				   IRC_VERSION, ME, me.serv->sid, serveropts);
+				   version, ME, me.serv->sid, serveropts);
 	return 2;
 }
 
@@ -2781,7 +2781,7 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			}
 			/* passthru */
 			sendto_one(sptr, replies[RPL_TRACELINK], ME,
-					   BadTo(parv[0]), IRC_VERSION,
+					   BadTo(parv[0]), version,
 					   (maskedserv || showsid) ? parv[1] : acptr->name,
 					   acptr->from->name,
 					   acptr->from->serv->version,
@@ -2838,7 +2838,7 @@ int	m_trace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 	}
 	sendto_one(sptr, replies[RPL_TRACEEND], ME, BadTo(parv[0]),
-			   showsid ? me.serv->sid : acptr->name, IRC_VERSION);
+			   showsid ? me.serv->sid : acptr->name, version);
 
 	return 2;
 }
@@ -2897,7 +2897,7 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 
 	sendto_one(sptr, replies[RPL_ETRACEEND], ME, sptr->name, ME,
-			   IRC_VERSION);
+			   version);
 	return 2;
 }
 
@@ -2933,7 +2933,7 @@ int m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	}
 
 	sendto_one(sptr, replies[RPL_ETRACEEND], ME, sptr->name, "*",
-			   IRC_VERSION);
+			   version);
 
 	return 3;
 }

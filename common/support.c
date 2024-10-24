@@ -798,6 +798,22 @@ dgetsreturnbuf:
 	goto dgetsagain;
 }
 
+/*
+ * Make a 'readable' version string.
+ */
+char *make_version(void)
+{
+#if defined(SHOW_GIT_HASH) && defined(GIT_HASH)
+	char *version;
+	int version_len = strlen(IRC_VERSION) + 10;
+	version = (char *) MyMalloc(version_len);
+	snprintf(version, version_len, "%s(%.7s)", IRC_VERSION, GIT_HASH);
+	return version;
+#else
+	return mystrdup(IRC_VERSION);
+#endif
+}
+
 #ifndef CLIENT_COMPILE
 /* Make RPL_ISUPPORT (005) numeric contents */
 char	**make_isupport(void)

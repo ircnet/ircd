@@ -17,6 +17,7 @@
  */
 
 #ifndef	PATCHLEVEL
-#define PATCHLEVEL "0212000000" /* for server identification */
+#define PATCHLEVEL "0212000000" /* For server identification */
 #endif
 #define IRC_VERSION "2.12.0-pre" /* A 'readable' version string */
+#define SHOW_GIT_HASH /* For versions that are not tagged in Git (e.g. 2.12.0-pre) */

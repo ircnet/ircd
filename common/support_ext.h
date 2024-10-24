@@ -76,6 +76,7 @@ EXTERN char *MyMalloc (size_t x);
 EXTERN char *MyRealloc (char *x, size_t y);
 #endif /* DEBUGMODE && !CLIENT_COMPILE && !DO_DEBUG_MALLOC */
 EXTERN int dgets (int fd, char *buf, int num);
+EXTERN char *make_version(void);
 EXTERN char **make_isupport(void);
 #ifdef SOLARIS_2_3
 EXTERN struct hostent *solaris_gethostbyname (const char *name);

@@ -169,7 +169,7 @@ int	main(int argc, char *argv[])
 
 	if (isatty(0))
 	{
-		(void) printf("iauth %s", IRC_VERSION);
+		(void) printf("iauth %s", make_version());
 #if defined(USE_DSM)
 		(void)printf(" (with DSM support)\n");
 #else
@@ -200,7 +200,7 @@ int	main(int argc, char *argv[])
 	xopt = conf_read(NULL);
 	init_filelogs();
 	sendto_log(ALOG_DMISC, LOG_NOTICE, "Daemon starting (%s%s).",
-			   IRC_VERSION,
+			   make_version(),
 #if defined(IAUTH_DEBUG)
 			   "+debug"
 #else
@@ -208,7 +208,7 @@ int	main(int argc, char *argv[])
 #endif
 	);
 	init_io();
-	sendto_ircd("V %s", IRC_VERSION);
+	sendto_ircd("V %s", make_version());
 	sendto_ircd("O %s", xopt);
 	conf_ircd();
 
