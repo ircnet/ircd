@@ -168,20 +168,20 @@ int	main(int argc, char *argv[])
 		exit(0);
 
 	if (isatty(0))
-	    {
-		(void)printf("iauth %s", IRC_VERSION);
+	{
+		(void) printf("iauth %s", IRC_VERSION);
 #if defined(USE_DSM)
-			(void)printf(" (with DSM support)\n");
+		(void)printf(" (with DSM support)\n");
 #else
-			(void)printf("\n");
+		(void) printf("\n");
 #endif
 		if (argc == 3 && !strcmp(argv[1], "-c"))
-		    {
-			(void)printf("\nReading \"%s\"\n\n", argv[2]);
+		{
+			(void) printf("\nReading \"%s\"\n\n", argv[2]);
 			conf_read(argv[2]);
-		    }
+		}
 		else
-		    {
+		{
 #if defined(INET6)
 			(void)printf("\t+INET6\n");
 #endif
@@ -191,22 +191,22 @@ int	main(int argc, char *argv[])
 #if defined(USE_POLL)
 			(void)printf("\t+USE_POLL\n");
 #endif
-		    }
+		}
 		exit(0);
-	    }
+	}
 
 	init_signals();
 	init_syslog();
 	xopt = conf_read(NULL);
 	init_filelogs();
 	sendto_log(ALOG_DMISC, LOG_NOTICE, "Daemon starting (%s%s).",
-		   IRC_VERSION,
+			   IRC_VERSION,
 #if defined(IAUTH_DEBUG)
-		   "+debug"
+			"+debug"
 #else
-		   ""
+			   ""
 #endif
-		   );
+	);
 	init_io();
 	sendto_ircd("V %s", IRC_VERSION);
 	sendto_ircd("O %s", xopt);
