@@ -202,7 +202,7 @@ int	main(int argc, char *argv[])
 	sendto_log(ALOG_DMISC, LOG_NOTICE, "Daemon starting (%s%s).",
 			   IRC_VERSION,
 #if defined(IAUTH_DEBUG)
-			"+debug"
+			   "+debug"
 #else
 			   ""
 #endif
