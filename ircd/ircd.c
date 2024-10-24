@@ -48,7 +48,6 @@ int	bootopt = BOOT_PROT|BOOT_STRICTPROT;	/* Server boot option flags */
 int	serverbooting = 1;
 int	firstrejoindone = 0;		/* Server rejoined the network after
 					   start */
-char	*debugmode = "";		/*  -"-    -"-   -"-   -"- */
 char	*sbrk0;				/* initial sbrk(0) */
 char	*tunefile = IRCDTUNE_PATH;
 volatile static	int	dorehash = 0,
@@ -818,8 +817,6 @@ int	main(int argc, char *argv[])
 	make_server(&me);
 	register_server(&me);
 
-	version = make_version();	/* Generate readable version string */
-
 	/*
 	** All command line parameters have the syntax "-fstring"
 	** or "-f string" (e.g. the space is optional). String may
@@ -898,7 +895,7 @@ int	main(int argc, char *argv[])
 			break;
 		    case 'v':
 			(void)printf("ircd %s %s\n\tzlib %s\n\tircd.conf delimiter %c\n\t%s #%s\n",
-				     version, serveropts,
+				     IRC_VERSION, serveropts,
 #ifndef	ZIP_LINKS
 				     "not used",
 #else
@@ -911,7 +908,6 @@ int	main(int argc, char *argv[])
 #ifdef	DEBUGMODE
                         (void)setuid((uid_t)uid);
 			debuglevel = atoi(p);
-			debugmode = *p ? p : "0";
 			bootopt |= BOOT_DEBUG;
 			break;
 #else
@@ -1139,7 +1135,7 @@ int	main(int argc, char *argv[])
 	       generation);
 #endif
 	printf("Server %s (%s) version %s starting%s%s", ME, me.serv->sid,
-		version, (bootopt & BOOT_TTY) ? " in foreground mode." : ".",
+		IRC_VERSION, (bootopt & BOOT_TTY) ? " in foreground mode." : ".",
 #ifdef DEBUGMODE
 		"(DEBUGMODE)\n"
 #else

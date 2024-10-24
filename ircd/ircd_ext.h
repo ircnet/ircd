@@ -36,7 +36,6 @@ extern int firstrejoindone;
 extern char *configfile;
 extern int debuglevel;
 extern int bootopt;
-extern char *debugmode;
 extern char *sbrk0;
 extern char *tunefile;
 #ifdef DELAY_CLOSE

@@ -3298,7 +3298,7 @@ static	void	polludp(void)
 	 */
 	if (!mlen)
 	    {
-		mlen = sizeof(readbuf) - strlen(ME) - strlen(version);
+		mlen = sizeof(readbuf) - strlen(ME) - strlen(IRC_VERSION);
 		mlen -= 6;
 		if (mlen < 0)
 			mlen = 0;
@@ -3401,7 +3401,7 @@ static	void	polludp(void)
 	s += n;
 	(void)strcpy(s, ME);
 	s += strlen(s)+1;
-	(void)strcpy(s, version);
+	(void)strcpy(s, IRC_VERSION);
 	s += strlen(s);
 	(void)sendto(udpfd, readbuf, s-readbuf, 0, (SAP)&from ,sizeof(from));
 	return;
