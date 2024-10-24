@@ -26,7 +26,6 @@
 #ifndef VERSION_C
 extern char *generation;
 extern char *creation;
-extern char *version;
 extern char *pass_version;
 extern char *infotext[];
 extern char **isupport;

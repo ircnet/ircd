@@ -17,6 +17,6 @@
  */
 
 #ifndef	PATCHLEVEL
-#define PATCHLEVEL "0212000100"		/* for server identification */
-#define DEVLEVEL 'a'
+#define PATCHLEVEL "0212000000" /* for server identification */
 #endif
+#define IRC_VERSION "2.12.0-pre" /* A 'readable' version string */

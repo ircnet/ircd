@@ -798,33 +798,6 @@ dgetsreturnbuf:
 	goto dgetsagain;
 }
 
-/*
- * Make 'readable' version string.
- */
-char	*make_version(void)
-{
-	int ve, re, mi, dv, pl;
-	char ver[32];
-
-	sscanf(PATCHLEVEL, "%2d%2d%2d%2d%2d", &ve, &re, &mi, &dv, &pl);
-	/* version & revision */
-	sprintf(ver, "%d.%d", ve, (mi == 99) ? re + 1 : re);
-	if (mi == 99) mi = -1;
-	/* minor revision */
-	sprintf(ver + strlen(ver), ".%d", mi);
-	if (dv)
-	{
-		/* alpha/beta, note how visual patchlevel is raised above */
-		sprintf(ver + strlen(ver), "%c%d", DEVLEVEL, dv);
-#ifdef GIT_HASH
-		sprintf(ver + strlen(ver), "(%.7s)", GIT_HASH);
-#endif
-	}
-	if (pl)	/* patchlevel */
-		sprintf(ver + strlen(ver), "p%d", pl);
-	return mystrdup(ver);
-}
-
 #ifndef CLIENT_COMPILE
 /* Make RPL_ISUPPORT (005) numeric contents */
 char	**make_isupport(void)
