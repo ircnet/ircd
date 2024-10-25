@@ -721,7 +721,7 @@
 
 /*
 ** If you don't feel your users should use too long nicknames, you can
-** restrict length of their dnicks here.
+** restrict length of their nicks here.
 */
 #define LOCALNICKLEN 15
 
