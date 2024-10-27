@@ -540,6 +540,7 @@ static	aConfItem 	*initconf(void)
 #ifdef XLINE
 				case 'e':
 #endif
+				case 'S':
 				case 'R':
 				case 'D':
 				case 'I':
