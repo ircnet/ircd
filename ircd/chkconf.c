@@ -280,8 +280,8 @@ static	void	showconf(void)
 static	aConfItem 	*initconf(void)
 {
 	int	fd;
-	char	*tmp, *tmp3 = NULL, *s;
-	int	ccount = 0, ncount = 0, flags = 0, nr = 0;
+	char *tmp, *tmp3 = NULL, *tmp4 = NULL, *s;
+	int ccount = 0, ncount = 0, flags = 0, i, nr = 0;
 	aConfItem *aconf = NULL, *ctop = NULL;
 	int	mandatory_found = 0, valid = 1;
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
@@ -521,13 +521,14 @@ static	aConfItem 	*initconf(void)
 			if ((tmp = getfield(NULL)) == NULL)
 				break;
 			if (aconf->status & CONF_CLIENT_MASK)
-			    {
+			{
 				if (!*tmp)
 					config_error(CF_WARN, CK_FILE, CK_LINE,
-						"no class, default 0");
+								 "no class, default 0");
 				aconf->class = get_class(atoi(tmp), nr);
-			    }
+			}
 			tmp3 = getfield(NULL);
+			tmp4 = getfield(NULL);
 		} while (0); /* to use break without compiler warnings */
 
 		if ((aconf->status & CONF_CLIENT) && tmp3)
@@ -726,6 +727,59 @@ static	aConfItem 	*initconf(void)
 			else
 				config_error(CF_ERR, CK_FILE, CK_LINE,
 					"no SID in M-line");
+			if (tmp3 && *tmp3)
+			{
+				for (s = tmp3; *s; s++)
+				{
+					if (!isdigit(*s))
+					{
+						config_error(CF_ERR, CK_FILE, CK_LINE,
+									 "Invalid value for split servers in M-line: %s", tmp3);
+						break;
+					}
+				}
+
+				if (*s == '\0')
+				{
+					i = atoi(tmp3);
+					if (i < SPLIT_SERVERS)
+					{
+						config_error(CF_WARN, CK_FILE, CK_LINE,
+									 "Split servers (%d) in M-Line is lower than SPLIT_SERVERS (%d)", i, SPLIT_SERVERS);
+					}
+				}
+			}
+			else
+			{
+				config_error(CF_ERR, CK_FILE, CK_LINE, "No split servers in M-line");
+			}
+
+			if (tmp4 && *tmp4)
+			{
+				for (s = tmp4; *s; s++)
+				{
+					if (!isdigit(*s))
+					{
+						config_error(CF_ERR, CK_FILE, CK_LINE,
+									 "Invalid value for split users in M-line: %s", tmp4);
+						break;
+					}
+				}
+
+				if (*s == '\0')
+				{
+					i = atoi(tmp4);
+					if (i < SPLIT_USERS)
+					{
+						config_error(CF_WARN, CK_FILE, CK_LINE,
+									 "Split users (%d) in M-Line is lower than SPLIT_USERS (%d)", i, SPLIT_USERS);
+					}
+				}
+			}
+			else
+			{
+				config_error(CF_ERR, CK_FILE, CK_LINE, "No split users in M-line");
+			}
 		}
 		if (aconf->status & CONF_ADMIN)
 		{
