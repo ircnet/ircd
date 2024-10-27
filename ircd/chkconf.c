@@ -587,6 +587,9 @@ static	aConfItem 	*initconf(void)
 				case 'p':
 				case 'P':
 				case 't':
+#ifdef ENABLE_SIDTRACE
+				case 'v':
+#endif
 					break;
 				case ' ':
 				case '\t':
