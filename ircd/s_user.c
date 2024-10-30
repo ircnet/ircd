@@ -2720,11 +2720,12 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			MyFree(away);
 			sptr->user->away = NULL;
 		    }
-		if (sptr->user->flags & FLAGS_AWAY)
+				//We no longer need to send MODE to support away-notify
+	/*	if (sptr->user->flags & FLAGS_AWAY)
 			sendto_serv_butone(cptr, ":%s MODE %s :-a",
-				sptr->user->uid, parv[0]);
+				sptr->user->uid, parv[0]); */
 
-		//sendto_serv_butone(cptr, ":%s AWAY", parv[0]);
+		sendto_serv_butone(cptr, ":%s AWAY", parv[0]);
 		sendto_channels_butserv_caps(sptr, 0, CAP_AWAY_NOTIFY, ":%s AWAY", parv[0]);
 
 		if (MyConnect(sptr))
@@ -2746,7 +2747,7 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	    }
 	len++;
 
-  //sendto_serv_butone(cptr, ":%s AWAY :%s", parv[0], awy2);
+  sendto_serv_butone(cptr, ":%s AWAY :%s", parv[0], awy2);
 	sendto_channels_butserv_caps(sptr, 0, CAP_AWAY_NOTIFY, ":%s AWAY :%s", parv[0], awy2);
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_AWAY, NULL, sptr,
@@ -2764,8 +2765,9 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		istat.is_away++;
 		istat.is_awaymem += len;
 		away = (char *)MyMalloc(len);
-		sendto_serv_butone(cptr, ":%s MODE %s :+a",
-			sptr->user->uid, parv[0]);
+		//No need to send MODE to support away-notify
+		//sendto_serv_butone(cptr, ":%s MODE %s :+a",
+		//	sptr->user->uid, parv[0]);
 	    }
 
 	sptr->user->flags |= FLAGS_AWAY;
@@ -3248,27 +3250,8 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			case '\t' :
 				break;
 			case 'a' : /* fall through case */
-				/* users should use the AWAY message */
-				if (cptr && !IsServer(cptr))
-					break;
-				if (what == MODE_DEL && sptr->user->away)
-				    {
-					istat.is_away--;
-					istat.is_awaymem -= (strlen(sptr->user->away) + 1);
-					MyFree(sptr->user->away);
-					sptr->user->away = NULL;
-#ifdef  USE_SERVICES
-				check_services_butone(SERVICE_WANT_AWAY,
-						      sptr->user->servp, sptr,
-						      ":%s AWAY", parv[0]);
-#endif
-				    }
-#ifdef  USE_SERVICES
-				if (what == MODE_ADD)
-				check_services_butone(SERVICE_WANT_AWAY,
-						      sptr->user->servp, sptr,
-						      ":%s AWAY :", parv[0]);
-#endif
+			/* We will be sending AWAY via burst to support away-notify */
+				break;
 			default :
 				for (s = user_modes; (flag = *s); s += 2)
 					if (*m == (char)(*(s+1)))
