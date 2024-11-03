@@ -402,6 +402,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		if (IsXlined(sptr))
 		{
 			sptr->exitc = EXITC_XLINE;
+			sendto_flag(SCH_LOCAL, "X-lined %s.", get_client_host(sptr));
 			return exit_client(cptr, sptr, &me,
 				XLINE_EXIT_REASON);
 		}
@@ -479,8 +480,8 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		if (!isvalidusername(lbuf))
 		{
 			ircstp->is_ref++;
-			sendto_flag(SCH_LOCAL, "Invalid username:  %s@%s.",
-				lbuf, sptr->sockhost);
+			sendto_flag(SCH_LOCAL, "Invalid username %s from %s.",
+				lbuf, get_client_host(sptr));
 			sptr->exitc = EXITC_REF;
 			return exit_client(cptr, sptr, &me, "Invalid username");
 		}
@@ -631,8 +632,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		 */
 		if (!IsKlineExempt(sptr) && find_kill(sptr, 0, &reason))
 		{
-			sendto_flag(SCH_LOCAL, "K-lined %s@%s.",
-				    user->username, sptr->sockhost);
+			sendto_flag(SCH_LOCAL, "K-lined %s.", get_client_host(sptr));
 			ircstp->is_ref++;
 			sptr->exitc = EXITC_KLINE;
 			if (reason)
@@ -2470,7 +2470,7 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int	m_post(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	sendto_flag(SCH_LOCAL, "Denied http-post connection from %s.",
-		cptr->sockhost);
+		get_client_host(cptr));
 	return m_quit(cptr, sptr, parc, parv);
 }
 
