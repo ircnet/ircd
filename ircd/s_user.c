@@ -574,12 +574,9 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 
 			ircstp->is_ref++;
 			sptr->exitc = exit_msg[i].shortm;
-			if (exit_msg[i].shortm != EXITC_BADPASS)
-			{
-				sendto_flag(SCH_LOCAL, "%s from %s.",
-					exit_msg[i].longm,
-					get_client_host(sptr));
-			}
+			sendto_flag(SCH_LOCAL, "%s from %s.",
+						exit_msg[i].longm,
+						get_client_host(sptr));
 			return exit_client(cptr, cptr, &me, exit_msg[i].longm);
 		}
 #ifndef	NO_PREFIX
