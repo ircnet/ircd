@@ -2467,7 +2467,7 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int	m_post(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	sendto_flag(SCH_LOCAL, "Denied http-post connection from %s.",
-		get_client_host(cptr));
+				get_client_host(cptr));
 	return m_quit(cptr, sptr, parc, parv);
 }
 
