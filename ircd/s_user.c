@@ -481,7 +481,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		{
 			ircstp->is_ref++;
 			sendto_flag(SCH_LOCAL, "Invalid username %s from %s.",
-				lbuf, get_client_host(sptr));
+						lbuf, get_client_host(sptr));
 			sptr->exitc = EXITC_REF;
 			return exit_client(cptr, sptr, &me, "Invalid username");
 		}

@@ -1761,7 +1761,7 @@ aClient	*add_connection(aClient *cptr, int fd)
 		if (check_clones(acptr) > CLONE_MAX)
 		{
 			sendto_flag(SCH_LOCAL, "Rejecting connection from %s.",
-				get_client_host(acptr));
+						get_client_host(acptr));
 			acptr->exitc = EXITC_CLONE;
 			sendto_flog(acptr, EXITC_CLONE, "", acptr->sockhost);
 #ifdef DELAY_CLOSE
