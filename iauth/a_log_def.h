@@ -37,5 +37,6 @@
 #define	ALOG_DSOCKSC	0x040000	/* debug: module socks cache */
 #define	ALOG_DPIPE	0x080000	/* debug: module pipe */
 #define	ALOG_DLHEX	0x100000	/* debug: module pipe */
-
-#define	ALOG_DALL	0x1F3700	/* any debug flag */
+#define	ALOG_DNSBL	0x200000	/* debug: module dnsbl */
+#define	ALOG_DNSBLC	0x400000	/* debug: module dnsbl cache */
+#define	ALOG_DALL	0x7F3700	/* any debug flag */
