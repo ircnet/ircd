@@ -86,7 +86,7 @@ static void dnsbl_succeed(u_int cl, char *listname, char *result)
 		mydata->rejects++;
 	}
 	if (mydata->options & OPT_LOG)
-		sendto_log(ALOG_FLOG, LOG_INFO, "%s: found: %s[%s]",
+		sendto_log(ALOG_FLOG|ALOG_DNSBL, LOG_INFO, "%s: found: %s[%s]",
 				   listname, cldata[cl].host, cldata[cl].itsip);
 }
 
@@ -250,7 +250,7 @@ static char *dnsbl_init(AnInstance *self)
 				l = (struct dnsbl_list *)
 						malloc(sizeof(struct dnsbl_list));
 				l->host = strdup(name);
-				sendto_log(ALOG_DMISC, LOG_NOTICE,
+				sendto_log(ALOG_DNSBL, LOG_NOTICE,
 						   "dnsbl_init: Added %s as dnsbl", name);
 				l->next = mydata->host_list;
 				mydata->host_list = l;
@@ -342,59 +342,92 @@ static void dnsbl_stats(AnInstance *self)
  * It is responsible for sending error messages where appropriate.
  * In case of failure, it's responsible for cleaning up (e.g. dnsbl_clean
  * will NOT be called)
+ *
+ * IPv4/IPv6 conversion has been taken from HOPM https://github.com/ircd-hybrid/hopm
  */
 static int dnsbl_start(u_int cl)
 {
+	char lookup[128];
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
 	struct dnsbl_list *l, *m;
-	char *req;
-	char *ip, *c1, *c2, *c3;
-	int ipl;
-	struct hostent *hst = NULL;
+	struct hostent *he = NULL;
+	struct addrinfo hints, *addr_res;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_UNSPEC;
+	hints.ai_flags = AI_NUMERICHOST;
+
+	if (getaddrinfo(cldata[cl].itsip, NULL, &hints, &addr_res))
+	{
+		DebugLog((ALOG_DNSBL, 0,
+				  "dnsbl_start(%d): invalid address '%s', skipping ",
+				  cl, cldata[cl].itsip));
+
+		return -1;
+	}
 
 	if (cldata[cl].state & A_DENY)
 	{
 		/* no point of doing anything */
-		DebugLog((ALOG_DNSBL, 0,
-				  "dnsbl_start(%d): A_DENY alredy set ", cl));
-		return -1;
-	}
-
-	if (strchr(cldata[cl].itsip, ':'))
-	{
-		DebugLog((ALOG_DNSBL, 0,
-				  "dnsbl_start(%d): %s is IPv6, skipping ",
-				  cl, cldata[cl].itsip));
+		DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): A_DENY already set ", cl));
 		return -1;
 	}
 
 	if (dnsbl_check_cache(cl))
 		return -1;
 
-	ip = strdup(cldata[cl].itsip);
-	ipl = strlen(ip);
-	DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): checking %s", cl, ip));
+	DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): checking %s", cl, cldata[cl].itsip));
 
-	strtok(ip, ".");
-	c3 = strtok(NULL, ".");
-	c2 = strtok(NULL, ".");
-	c1 = strtok(NULL, ".");
-
-	for (l = mydata->host_list; l && !hst; l = l->next)
+	for (l = mydata->host_list; l && !he; l = l->next)
 	{
-		req = malloc(strlen(l->host) + ipl + 3);
-		sprintf(req, "%s.%s.%s.%s.%s", c1, c2, c3, ip, l->host);
+		if (addr_res->ai_family == AF_INET)
+		{
+			const struct sockaddr_in *v4 = (const struct sockaddr_in *) addr_res->ai_addr;
+			const uint8_t *b = (const uint8_t *) &v4->sin_addr.s_addr;
+
+			snprintf(lookup, sizeof(lookup), "%u.%u.%u.%u.%s",
+					 (unsigned int) (b[3]), (unsigned int) (b[2]),
+					 (unsigned int) (b[1]), (unsigned int) (b[0]),
+					 l->host);
+		}
+		else if (addr_res->ai_family == AF_INET6)
+		{
+			const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *) addr_res->ai_addr;
+			const uint8_t *b = (const uint8_t *) &v6->sin6_addr.s6_addr;
+			snprintf(lookup, sizeof(lookup),
+					 "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x."
+					 "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%s",
+					 (unsigned int) (b[15] & 0xF), (unsigned int) (b[15] >> 4),
+					 (unsigned int) (b[14] & 0xF), (unsigned int) (b[14] >> 4),
+					 (unsigned int) (b[13] & 0xF), (unsigned int) (b[13] >> 4),
+					 (unsigned int) (b[12] & 0xF), (unsigned int) (b[12] >> 4),
+					 (unsigned int) (b[11] & 0xF), (unsigned int) (b[11] >> 4),
+					 (unsigned int) (b[10] & 0xF), (unsigned int) (b[10] >> 4),
+					 (unsigned int) (b[9] & 0xF), (unsigned int) (b[9] >> 4),
+					 (unsigned int) (b[8] & 0xF), (unsigned int) (b[8] >> 4),
+					 (unsigned int) (b[7] & 0xF), (unsigned int) (b[7] >> 4),
+					 (unsigned int) (b[6] & 0xF), (unsigned int) (b[6] >> 4),
+					 (unsigned int) (b[5] & 0xF), (unsigned int) (b[5] >> 4),
+					 (unsigned int) (b[4] & 0xF), (unsigned int) (b[4] >> 4),
+					 (unsigned int) (b[3] & 0xF), (unsigned int) (b[3] >> 4),
+					 (unsigned int) (b[2] & 0xF), (unsigned int) (b[2] >> 4),
+					 (unsigned int) (b[1] & 0xF), (unsigned int) (b[1] >> 4),
+					 (unsigned int) (b[0] & 0xF), (unsigned int) (b[0] >> 4),
+					 l->host);
+		}
+		else
+			continue;
+
 		DebugLog((ALOG_DNSBL, 0,
 				  "dnsbl_start(%d): gethostbyname() for %s",
-				  cl, req));
-		hst = gethostbyname(req);
+				  cl, lookup));
+		he = gethostbyname(lookup);
 		m = l;
-		free(req);
 	}
 	mydata->total++;
 
-	if (hst)
-		dnsbl_succeed(cl, m->host, hst->h_addr_list[0]);
+	if (he)
+		dnsbl_succeed(cl, m->host, he->h_addr_list[0]);
 	else
 	{
 		DebugLog((ALOG_DNSBL, 0,
@@ -403,7 +436,6 @@ static int dnsbl_start(u_int cl)
 		dnsbl_add_cache(cl, DNSBL_FAILED);
 	}
 
-	free(ip);
 	return -1;
 }
 
