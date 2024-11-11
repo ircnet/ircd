@@ -28,9 +28,9 @@
 #include "a_io_ext.h"
 #include "a_log_ext.h"
 
+#include "mod_dnsbl_ext.h"
+#include "mod_lhex_ext.h"
+#include "mod_pipe_ext.h"
 #include "mod_rfc931_ext.h"
 #include "mod_socks_ext.h"
-#include "mod_pipe_ext.h"
-#include "mod_lhex_ext.h"
 #include "mod_webproxy_ext.h"
-#include "mod_dnsbl_ext.h"

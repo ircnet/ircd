@@ -23,8 +23,11 @@
 static const volatile char rcsid[] = "@(#)$Id: mod_dnsbl.c,v 1.1 2024/10/1 15:35:00 patrick Exp $";
 #endif
 
+// clang-format off
+// "os.h" must be included before "a_defines.h"
 #include "os.h"
 #include "a_defines.h"
+// clang-format on
 #define MOD_DNSBL_C
 #include "a_externs.h"
 #undef MOD_DNSBL_C
@@ -86,7 +89,7 @@ static void dnsbl_succeed(u_int cl, char *listname, char *result)
 		mydata->rejects++;
 	}
 	if (mydata->options & OPT_LOG)
-		sendto_log(ALOG_FLOG|ALOG_DNSBL, LOG_INFO, "%s: found: %s[%s]",
+		sendto_log(ALOG_FLOG | ALOG_IRCD | ALOG_DNSBL, LOG_INFO, "%s: found: %s[%s]",
 				   listname, cldata[cl].host, cldata[cl].itsip);
 }
 
