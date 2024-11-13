@@ -270,3 +270,27 @@ void sendto_service(aClient *service, char *fmt, ...)
 		sendto_one(service, ":%s ENCAP %s PARSE %s %s", me.serv->sid, service->service->servp->sid, me.serv->sid, buf);
 	}
 }
+
+/*
+ * Disconnects all local clients that are currently negotiating with a specific SASL service.
+ * This function must be called when a SASL service exits.
+ */
+void unlink_sasl_service(aClient *cptr)
+{
+	aClient *acptr;
+	int i;
+	char comment[BUFSIZE];
+
+	snprintf(comment, BUFSIZE, "%s died", cptr->name);
+
+	for (i = 0; i <= highest_fd; i++)
+	{
+		if (!(acptr = local[i]))
+			continue;
+
+		if (acptr->sasl_service == cptr && !IsRegisteredUser(acptr))
+		{
+			exit_client(acptr, acptr, &me, comment);
+		}
+	}
+}
