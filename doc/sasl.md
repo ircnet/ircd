@@ -7,6 +7,7 @@ The following things are different:
 * the L-message contains the cloak (`L <loginName> <cloak>`) and the ircd sets it after successful authentication
 * the H-message contains a hostmask (`H <nick>[[ident]@ip]`)
 * additional N-message to allow the SASL service to send a NOTICE to a user (`N :<notice>`)
+* additional K-message to allow the SASL service to disconnect a user before registration (K :<reason>`), e.g. if he fails to log in too often
 * services as described in *SERVICE.txt* will be used
 
 You need to set up at least one service with the flags SERVICE_WANT_SASL and SERVICE_WANT_ENCAP.

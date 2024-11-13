@@ -588,7 +588,6 @@ struct Client	{
 	int caps; /* Enabled capabilities */
 	int cap_negotation; /* CAP negotiation is in progress. Registration must wait for "CAP END" */
 	aClient *sasl_service; /* The SASL service that is responsible for this user. */
-	int sasl_auth_attempts; /* Number of SASL authentication attempts */
 	char *spoof_tmp; /* Contains the spoofed hostname until it was applied to the user */
 };
 

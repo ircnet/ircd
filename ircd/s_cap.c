@@ -194,7 +194,7 @@ int cap_end(aClient *cptr, aClient *sptr, char *arg)
 		return 0;
 	}
 
-	if ((sptr->sasl_service != NULL || sptr->sasl_auth_attempts > 0) && !IsSASLAuthed(sptr))
+	if (sptr->sasl_service != NULL && !IsSASLAuthed(sptr))
 	{
 		// SASL authentication exchange has been aborted
 		return process_implicit_sasl_abort(sptr);
