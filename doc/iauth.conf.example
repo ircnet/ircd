@@ -45,3 +45,8 @@ module rfc931
 #	port = 3128
 #	option = reject,careful
 #	reason = Denied access (insecure proxy found)
+
+# Reject clients based on DNS BL.
+#module dnsbl
+#	option = log,reject,servers=bl1.example.org,bl2.example.org
+#	reason = Denied access (DNSBL)
