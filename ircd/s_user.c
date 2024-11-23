@@ -2211,11 +2211,6 @@ static	void	send_whois(aClient *sptr, aClient *acptr)
 	if (IsAnOper(acptr))
 		sendto_one(sptr, replies[RPL_WHOISOPERATOR], ME, BadTo(sptr->name), name);
 
-	/* Show SASL user to opers on this server */
-    if (IsSASLAuthed(acptr) && MyClient(sptr) && IsAnOper(sptr))
-    {
-        sendto_one(sptr, replies[RPL_WHOISLOGGEDIN], ME, BadTo(sptr->name), name, acptr->sasl_user);
-    }
 	/* send a 320 numeric RPL_WHOISCLOAKED reply if client is spoofed.
 	 * reply defined as SPOOF_WHOISCLOAKED in config.h -- mh 20191230 */
 	if (IsSpoofed(acptr))
