@@ -135,8 +135,8 @@
 #define	OPER_KLINE
 #define	OPER_TKLINE
 /* In a perfect world these two (or at least second) would be undefined. */
-#define	OPER_KILL
-#define	OPER_KILL_REMOTE
+#undef	OPER_KILL
+#undef	OPER_KILL_REMOTE
 
 /*
  * Maximum number of network connections your server will allow.  This must
@@ -147,7 +147,7 @@
  * 1 server = 1 connection, 1 user = 1 connection.
  * Due to various sanity checks during startup, minimum is 13.
  */
-#define MAXCONNECTIONS	50
+#define MAXCONNECTIONS	4096
 
 /* MAXIMUM LINKS
  *
@@ -231,7 +231,7 @@
  * If file is not absolute path, ircd etc path is prepended.
  * Note that "#include" must be at the beginning of the line.
  */ 
-#undef	CONFIG_DIRECTIVE_INCLUDE
+#define	CONFIG_DIRECTIVE_INCLUDE
 
 /*
  * If you wish to have the server send 'vital' messages about server
@@ -308,7 +308,7 @@
  * Define this if you want to use crypted passwords for operators in your
  * ircd.conf file. See contrib/mkpasswd/README for more details on this.
  */
-#undef	CRYPT_OPER_PASSWORD
+#define	CRYPT_OPER_PASSWORD
 
 /*
  * If you want to store encrypted passwords in N-lines for server links,
@@ -457,7 +457,7 @@
 ** This adds ability to ban users with specified realnames from
 ** connecting to the server. May be useful for various drones.
 */
-#undef XLINE
+#define XLINE
 
 /*
 ** Define the reason users get as a rejection message.
@@ -502,7 +502,7 @@
 /*
  * Max number of channels a user is allowed to join.
  */
-#define MAXCHANNELSPERUSER  21	/* Recommended value: 21 */
+#define MAXCHANNELSPERUSER  42	/* Recommended value: 21 */
 
 /*
  * USE_IAUTH makes ircd use the iauth program for authentication.
