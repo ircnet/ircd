@@ -509,14 +509,14 @@ int	m_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_one(sptr, replies[RPL_YOURESERVICE], ME, BadTo(sptr->name),
 			   sptr->name);
 		sendto_one(sptr, replies[RPL_YOURHOST], ME, BadTo(sptr->name),
-                           get_client_name(&me, FALSE), version);
+                           get_client_name(&me, FALSE), IRC_VERSION);
 		while (*isup)
 		{
 			sendto_one(sptr,replies[RPL_ISUPPORT], ME,
 			BadTo(sptr->name), *isup);
 			isup++;
 		}
-		sendto_one(sptr, replies[RPL_MYINFO], ME, BadTo(sptr->name), ME, version);
+		sendto_one(sptr, replies[RPL_MYINFO], ME, BadTo(sptr->name), ME, IRC_VERSION);
 		sendto_flag(SCH_NOTICE, "Service %s connected",
 			    get_client_name(sptr, TRUE));
 		istat.is_unknown--;

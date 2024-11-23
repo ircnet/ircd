@@ -721,7 +721,7 @@
 
 /*
 ** If you don't feel your users should use too long nicknames, you can
-** restrict length of their dnicks here.
+** restrict length of their nicks here.
 */
 #define LOCALNICKLEN 15
 
@@ -904,8 +904,8 @@
 ** Make sure that if zlib isn't found, or you don't want to use it, that you
 ** don't define ZIP_LINKS
 */
-#ifndef	USE_ZLIB
-#undef	ZIP_LINKS
+#if	!defined(USE_ZLIB) && defined(ZIP_LINKS)
+# error ZIP_LINKS defined but no ZLIB available
 #endif
 
 #if defined(TIMEDKLINES)

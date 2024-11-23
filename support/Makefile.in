@@ -151,7 +151,8 @@ IRCD_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
 
 IAUTH_COMMON_OBJS = clsupport.o clmatch.o # This is a little evil
 IAUTH_OBJS = iauth.o a_conf.o a_io.o a_log.o \
-             mod_lhex.o mod_pipe.o mod_rfc931.o mod_socks.o mod_webproxy.o
+             mod_lhex.o mod_pipe.o mod_rfc931.o mod_socks.o \
+             mod_webproxy.o mod_dnsbl.o
 
 CHKCONF_COMMON_OBJS = match.o
 CHKCONF_OBJS = chkconf.o
@@ -413,6 +414,9 @@ mod_socks.o: ../iauth/mod_socks.c config.h ../common/struct_def.h setup.h
 
 mod_webproxy.o: ../iauth/mod_webproxy.c config.h ../common/struct_def.h setup.h
 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_webproxy.c
+
+mod_dnsbl.o: ../iauth/mod_dnsbl.c config.h ../common/struct_def.h setup.h
+	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_dnsbl.c
 
 chkconf.o: ../ircd/chkconf.c setup.h config.h ../common/struct_def.h ../ircd/config_read.c
 	$(CC) $(CC_CFLAGS) -DCHKCONF_COMPILE -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" \
