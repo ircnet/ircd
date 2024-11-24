@@ -116,7 +116,9 @@ int	main(int argc, char *argv[])
 		configdir = argv[2];
 		argc-=2;
 		argv+=2;
+#ifdef CONFIG_DIRECTIVE_INCLUDE
 		config_set_ircdconf_dir(configdir);
+#endif
 	}
 	if (argc > 1)
 		configfile = argv[1];
