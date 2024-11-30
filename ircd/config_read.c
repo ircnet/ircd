@@ -44,11 +44,14 @@ struct Config
 	aConfig *next;
 };
 
+char * config_ircdconf_dir = IRCDCONF_DIR;
+
 #ifdef CONFIG_DIRECTIVE_INCLUDE
 static aConfig	*config_read(FILE *, int, aFile *);
 static void	config_free(aConfig *);
 aFile	*new_config_file(char *, aFile *, int);
 void	config_error(int, aFile *, int, char *, ...);
+static void	config_set_ircdconf_dir(char *);
 #else
 void	config_error(int, char *, int, char *, ...);
 #endif
@@ -60,7 +63,7 @@ void	config_error(int, char *, int, char *, ...);
 ** #include "filename"
 ** # must be first char on the line, word include, one space, then ",
 ** filename and another " must be the last char on the line.
-** If filename does not start with slash, it's loaded from IRCDCONF_DIR.
+** If filename does not start with slash, it's loaded from config_ircdconf_dir.
 */
 
 /* read from supplied fd, putting line by line onto aConfig struct.
@@ -135,7 +138,7 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 			if (*start != '/')
 			{
 				filep += snprintf(file, FILEMAX,
-					"%s", IRCDCONF_DIR);
+					"%s", config_ircdconf_dir);
 			}
 			if ((end - start) + (filep - file) >= FILEMAX)
 			{
@@ -158,6 +161,7 @@ aConfig *config_read(FILE *fd, int depth, aFile *curfile)
 					goto eatline;
 				}
 			}
+
 			if ((fdn = fopen(file, "r")) == NULL)
 			{
 				config_error(CF_ERR, curfile, linenum,
@@ -258,6 +262,24 @@ aFile *new_config_file(char *filename, aFile *parent, int fnr)
         }
         return tmp;
 }
+
+static void	config_set_ircdconf_dir(char * configdir)
+{
+	size_t len = strlen(configdir);
+	if (configdir[len - 1] != '/') {
+		// Allocate memory for new string with extra '/' and null-terminator
+		char *temp = malloc(len + 2);
+		if (temp == NULL) {
+			perror("malloc");
+			return;
+		}
+		strcpy(temp, configdir);
+		temp[len] = '/';
+		temp[len + 1] = '\0';
+		configdir = temp;
+	}
+	config_ircdconf_dir = configdir;
+}
 #endif /* CONFIG_DIRECTIVE_INCLUDE */
 
 #ifdef CONFIG_DIRECTIVE_INCLUDE
@@ -276,7 +298,7 @@ void config_error(int level, char *filename, int line, char *pattern, ...)
 
 	if (!etclen)
 	{
-		etclen = strlen(IRCDCONF_DIR);
+		etclen = strlen(config_ircdconf_dir);
 	}
 
 	va_start(va, pattern);
@@ -285,7 +307,7 @@ void config_error(int level, char *filename, int line, char *pattern, ...)
 
 	/* no need to show full path, if the same dir */
 	filep = filename;
-	if (0 == strncmp(filename, IRCDCONF_DIR, etclen))
+	if (0 == strncmp(filename, config_ircdconf_dir, etclen))
 		filep += etclen;
 #ifdef CHKCONF_COMPILE
 	if (level == CF_NONE)
@@ -300,7 +322,7 @@ void config_error(int level, char *filename, int line, char *pattern, ...)
 		while ((curF && curF->parent))
 		{
 			filep = curF->parent->filename;
-			if (0 == strncmp(filep, IRCDCONF_DIR, etclen))
+			if (0 == strncmp(filep, config_ircdconf_dir, etclen))
 				filep += etclen;
 			fprintf(stderr, "\tincluded in %s:%d\n",
 				filep, curF->includeline);

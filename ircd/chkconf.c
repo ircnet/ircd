@@ -73,6 +73,7 @@ static	int	checkSID(char *, int);
 static	int	numclasses = 0, *classarr = (int *)NULL, debugflag = 0;
 static	char	nullfield[] = "";
 static	char	maxsendq[12];
+char * configdir = IRCDCONF_DIR;
 
 #define	SHOWSTR(x)	((x) ? (x) : "*")
 
@@ -90,6 +91,7 @@ int	main(int argc, char *argv[])
 			"includes and/or M4)\n");
 		(void)printf("\t-d[#]\tthe bigger number, the more verbose "
 			"chkconf is in its checks\n");
+		(void)printf("\t-c\tUse folder instead of %s\n", IRCDCONF_DIR);
 		(void)printf("\tDefault ircd.conf = %s\n", IRCDCONF_PATH);
 		exit(0);
 	}
@@ -108,6 +110,15 @@ int	main(int argc, char *argv[])
 		showflag = 1;
 		argc--;
 		argv++;
+	}
+	if (argc > 2 && !strncmp(argv[1], "-c", 2))
+	{
+		configdir = argv[2];
+		argc-=2;
+		argv+=2;
+#ifdef CONFIG_DIRECTIVE_INCLUDE
+		config_set_ircdconf_dir(configdir);
+#endif
 	}
 	if (argc > 1)
 		configfile = argv[1];
@@ -232,7 +243,7 @@ static	void	showconf(void)
 #if defined(CONFIG_DIRECTIVE_INCLUDE)
 	if (debugflag)
 	{
-		etclen = strlen(IRCDCONF_DIR);
+		etclen = strlen(configdir);
 	}
 	fdn = fdopen(fd, "r");
 	p2 = config_read(fdn, 0, new_config_file(configfile, NULL, 0));
@@ -240,7 +251,7 @@ static	void	showconf(void)
 	{
 		if (debugflag)
 			printf("%s:%d:", p->file->filename +
-				(strncmp(p->file->filename, IRCDCONF_DIR,
+				(strncmp(p->file->filename, configdir,
 				etclen) == 0 ? etclen : 0), p->linenum);
 		printf("%s\n", p->line);
 	}
