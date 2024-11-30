@@ -271,7 +271,7 @@ static void	config_set_ircdconf_dir(char * configdir)
 		char *temp = malloc(len + 2);
 		if (temp == NULL) {
 			perror("malloc");
-			return 1;
+			return;
 		}
 		strcpy(temp, configdir);
 		temp[len] = '/';
