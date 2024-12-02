@@ -1,5 +1,4 @@
 # Makefile for the mkpasswd
-# CVS $Id: Makefile,v 1.2 2001/10/20 17:57:23 q Exp $
 
 CC=gcc
 CFLAGS	= -O2 -Wall

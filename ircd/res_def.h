@@ -1,6 +1,4 @@
 /*
- * $Id: res_def.h,v 1.7 2008/06/24 00:12:56 chopin Exp $
- *
  * ircd/res_def.h (C)opyright 1992 Darren Reed.
  */
 

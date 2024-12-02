@@ -17,7 +17,6 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- *   $Id: struct_def.h,v 1.152 2011/01/20 14:26:56 bif Exp $
  */
 
 typedef	struct	ConfItem aConfItem;

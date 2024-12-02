@@ -1,5 +1,3 @@
-/* "@(#)$Id: config_read.c,v 1.33 2005/05/13 17:39:12 chopin Exp $"; */
-
 /* used in config_error() */
 #define CF_NONE 0
 #define CF_WARN 1

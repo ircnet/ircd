@@ -17,8 +17,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-/*   $Id: sys_def.h,v 1.3 2001/10/20 17:57:30 q Exp $   */
-
 #if defined(DEBUGMODE) && !defined(CLIENT_COMPILE) && \
     !defined(CHKCONF_COMPILE) && defined(DO_DEBUG_MALLOC)
 # define	free(x)		MyFree(x)
