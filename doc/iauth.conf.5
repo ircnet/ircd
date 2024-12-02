@@ -160,20 +160,20 @@ of servers sending "Date:" header along (which is common with some
 Apache+PHP configurations).
 
 .TP
-.B dnsbl
-This module checks dnsbl and if a ip is found, handle on it
+.B DNSBL
+This module performs a DNS query to check if an IP address is blacklisted.
 
-This module understands 3 options
+This module understands 3 options:
 .B log
-to log the ip which is listed on the dnsbl
+to log the IP which is listed on the DNSBL
 .B reject
-to reject the connection which is listed on the dnsbl
+to reject the connection which is listed on the DNSBL
 .B paranoid
-Double check that the dnsbl is actual responding a 127.0.0.X ip
+Double check that the DNSBL is actually responding a 127.0.0.x IP
 .B servers
-a comman seperate dnsbl domains which are checked, this iauth module cannot 
-check which dnsbl type is used so only use for dnsbl's suitable where all
-registrations are blocked
+A comma-separated list of DNSBL domains which are checked. This iauth module cannot
+check which DNSBL type is used so only use for DNSBLs suitable where all
+registrations are blocked.
 
 .SH EXAMPLE
 The following file will cause the IRC daemon to reject all connections
