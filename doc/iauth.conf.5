@@ -159,6 +159,22 @@ this parameter, module will accept any "HTTP/1.? 200" with an exception
 of servers sending "Date:" header along (which is common with some
 Apache+PHP configurations).
 
+.TP
+.B dnsbl
+This module checks dnsbl and if a ip is found, handle on it
+
+This module understands 3 options
+.B log
+to log the ip which is listed on the dnsbl
+.B reject
+to reject the connection which is listed on the dnsbl
+.B paranoid
+Double check that the dnsbl is actual responding a 127.0.0.X ip
+.B servers
+a comman seperate dnsbl domains which are checked, this iauth module cannot 
+check which dnsbl type is used so only use for dnsbl's suitable where all
+registrations are blocked
+
 .SH EXAMPLE
 The following file will cause the IRC daemon to reject all connections
 originating from a system where an open proxy is running for hosts within
@@ -194,6 +210,9 @@ module webproxy
         option = reject,careful
         port = 3128
 
+module dnsbl
+	option = log,reject,paranoid,servers=bl1.example.org,bl2.example.org
+	reason = Denied access (DNSBL)
 .fi
 .RE
 .SH CAVEATS
