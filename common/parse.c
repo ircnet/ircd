@@ -18,10 +18,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: parse.c,v 1.97 2010/08/12 16:29:30 bif Exp $";
-#endif
-
 #include "os.h"
 #include "s_defines.h"
 #define PARSE_C

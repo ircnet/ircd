@@ -17,10 +17,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: chkconf.c,v 1.52 2009/04/29 22:05:08 chopin Exp $";
-#endif
-
 #include "os.h"
 #include "s_defines.h"
 #define CHKCONF_C

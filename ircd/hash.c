@@ -16,9 +16,6 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: hash.c,v 1.57 2008/06/15 00:57:37 chopin Exp $";
-#endif
 
 #include "os.h"
 #include "s_defines.h"

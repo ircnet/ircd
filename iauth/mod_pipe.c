@@ -17,10 +17,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: mod_pipe.c,v 1.8 2006/08/08 08:42:15 chopin Exp $";
-#endif
-
 #include "os.h"
 #include "a_defines.h"
 #define MOD_PIPE_C

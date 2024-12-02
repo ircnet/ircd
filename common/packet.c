@@ -18,10 +18,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: packet.c,v 1.13 2004/10/01 20:22:12 chopin Exp $";
-#endif
-
 #include "os.h"
 #include "s_defines.h"
 #define PACKET_C

@@ -23,10 +23,6 @@
 #include "s_externs.h"
 #undef RES_C
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: res.c,v 1.53 2009/03/15 01:01:04 chopin Exp $";
-#endif
-
 /* because there is a lot of debug code in here :-) */
 /* #undef	DEBUG */
 

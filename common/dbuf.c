@@ -17,10 +17,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: dbuf.c,v 1.12 2004/10/01 20:22:12 chopin Exp $";
-#endif
-
 /*
 ** For documentation of the *global* functions implemented here,
 ** see the header file (dbuf.h).

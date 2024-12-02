@@ -18,10 +18,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: mod_webproxy.c,v 1.4 2005/01/27 19:17:44 chopin Exp $";
-#endif
-
 #include "os.h"
 #include "a_defines.h"
 #define MOD_PROXY_C

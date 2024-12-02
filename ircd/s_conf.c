@@ -47,10 +47,6 @@
  *  Added close() into configuration file (was forgotten...)
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_conf.c,v 1.195 2010/08/11 17:16:51 bif Exp $";
-#endif
-
 #include "os.h"
 #include "s_defines.h"
 #define S_CONF_C

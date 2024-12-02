@@ -23,10 +23,6 @@
  * is referenced like a circular loop. Should be faster and more efficient.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: whowas.c,v 1.12 2004/11/19 15:10:08 chopin Exp $";
-#endif
-
 #include "os.h"
 #include "s_defines.h"
 #define WHOWAS_C
