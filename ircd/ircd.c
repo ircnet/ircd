@@ -18,10 +18,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: ircd.c,v 1.165 2010/08/11 17:39:00 bif Exp $";
-#endif
-
 #include "os.h"
 #include "s_defines.h"
 #define IRCD_C

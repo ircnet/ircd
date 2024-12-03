@@ -55,7 +55,6 @@
 
 /*
  *	@(#)resolv.h	8.1 (Berkeley) 6/2/93
- *	$Id: resolv_def.h,v 1.8 2004/03/15 18:19:54 chopin Exp $
  */
 
 /*

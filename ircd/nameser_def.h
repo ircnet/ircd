@@ -77,7 +77,6 @@
 
 /*
  *      @(#)nameser.h	8.1 (Berkeley) 6/2/93
- *	$Id: nameser_def.h,v 1.5 2005/01/03 17:33:55 q Exp $
  */
 
 /*

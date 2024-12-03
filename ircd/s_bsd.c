@@ -34,10 +34,6 @@
  * Added SO_REUSEADDR fix from zessel@informatik.uni-kl.de
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_bsd.c,v 1.188 2011/01/20 14:26:56 bif Exp $";
-#endif
-
 #include "os.h"
 #include "s_defines.h"
 #define S_BSD_C

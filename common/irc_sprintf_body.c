@@ -1,4 +1,3 @@
-/* $Id: irc_sprintf_body.c,v 1.2 2003/07/18 16:24:25 chopin Exp $ */
 {
 #ifndef IRC_SPRINTF_V
 	va_list ap;

@@ -17,8 +17,6 @@
  *
  */
 
-static const volatile char rcsid[] = "@(#)$Id: ircdwatch.c,v 1.10 2004/10/02 01:20:43 chopin Exp $";
-
 #include <stdio.h>
 #include <stdlib.h>     /* atol() */
 #include <unistd.h>     /* fork() exec() */
@@ -476,8 +474,7 @@ Usage:\n\
      --kill, stop both ircdwatch and ircd\n\
      --rest, stop ircdwatch but let ircd alone\n\
      --help, display this text\n\
-\n\
-%s\n", rcsid);
+\n");
 }
 
 int

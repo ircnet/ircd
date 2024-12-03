@@ -53,11 +53,6 @@
  * --Copyright--
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static const volatile char sccsid[] = "@(#)res_mkquery.c	8.1 (Berkeley) 6/4/93";
-static const volatile char rcsid[] = "$Id: res_mkquery.c,v 1.8 2004/10/01 20:22:14 chopin Exp $";
-#endif /* LIBC_SCCS and not lint */
-
 #include "os.h"
 #include "s_defines.h"
 #define RES_MKQUERY_C

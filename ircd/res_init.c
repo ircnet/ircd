@@ -53,11 +53,6 @@
  * --Copyright--
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static const volatile char sccsid[] = "@(#)res_init.c	8.1 (Berkeley) 6/7/93";
-static const volatile char rcsid[] = "$Id: res_init.c,v 1.16 2005/01/03 22:17:00 q Exp $";
-#endif /* LIBC_SCCS and not lint */
-
 #include "os.h"
 #include "s_defines.h"
 #define RES_INIT_C

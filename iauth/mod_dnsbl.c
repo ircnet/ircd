@@ -19,10 +19,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: mod_dnsbl.c,v 1.1 2024/10/1 15:35:00 patrick Exp $";
-#endif
-
 // clang-format off
 // "os.h" must be included before "a_defines.h"
 #include "os.h"

@@ -5,7 +5,6 @@
 
 /*  This file contains external definitions for global variables and functions
     defined in common/irc_sprintf.c.
-    $Id: irc_sprintf_ext.h,v 1.5 2003/07/18 16:24:25 chopin Exp $
  */
 
 /*  External definitions for global functions.

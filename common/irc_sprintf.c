@@ -6,10 +6,6 @@
  *
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "$Id: irc_sprintf.c,v 1.5 2004/10/01 20:22:12 chopin Exp $";
-#endif
-
 #define IRC_SPRINTF_C
 #include "irc_sprintf_ext.h"
 #undef IRC_SPRINTF_C

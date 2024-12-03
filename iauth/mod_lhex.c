@@ -17,10 +17,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id mod_lhex.c,v 1.12 1999/02/06 21:43:52 kalt Exp $";
-#endif
-
 #include "os.h"
 #include "a_defines.h"
 #define MOD_LHEX_C

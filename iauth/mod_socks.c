@@ -17,10 +17,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: mod_socks.c,v 1.43 2004/10/03 17:13:42 chopin Exp $";
-#endif
-
 #include "os.h"
 #include "a_defines.h"
 #define MOD_SOCKS_C

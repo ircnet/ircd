@@ -17,10 +17,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: s_send.c,v 1.11 2007/12/16 06:10:13 chopin Exp $";
-#endif
-
 #include "os.h"
 #include "s_defines.h"
 #define S_SEND_C

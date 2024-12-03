@@ -20,8 +20,6 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  *  USA
- *
- *  $Id: fileio.c,v 1.1 2005/02/15 19:16:09 chopin Exp $
  */
 #include "fileio.h"
 #define s_assert(x)

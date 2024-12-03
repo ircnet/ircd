@@ -1,5 +1,3 @@
-# @(#)$Id: m4macros,v 1.3 2002/05/19 22:45:47 jv Exp $
-
 The following macros are included in "ircd.m4" for use with the m4 text
 preprocessor.  "ircd.m4" is parsed before the IRC server conf file so they
 are all available for use with that.

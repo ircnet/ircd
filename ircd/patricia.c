@@ -13,8 +13,6 @@
  *   along with this program; if not, write to the Free Software
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: patricia.c,v 1.4 2009/03/15 00:20:43 chopin Exp $
- *
  * Imported from ratbox with minor function name changes.
  * Id: patricia.c,v 7.14 2003/06/12 13:46:26 androsyn Exp
  *

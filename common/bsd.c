@@ -18,10 +18,6 @@
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
-#ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: bsd.c,v 1.13 2005/12/27 02:23:48 chopin Exp $";
-#endif
-
 #include "os.h"
 #include "s_defines.h"
 #define BSD_C

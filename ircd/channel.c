@@ -31,10 +31,6 @@
  * Moved is_full() from list.c
  */
 
-#ifndef	lint
-static const volatile char rcsid[] = "@(#)$Id: channel.c,v 1.279 2010/08/12 16:23:14 bif Exp $";
-#endif
-
 #include "os.h"
 #include "s_defines.h"
 #define CHANNEL_C
