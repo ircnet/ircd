@@ -40,4 +40,5 @@ EXTERN time_t expire_cache (time_t now);
 EXTERN void flush_cache(void);
 EXTERN int m_dns (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN u_long cres_mem (aClient *sptr, char *nick);
+EXTERN int bad_hostname (char *name, int len);
 #undef EXTERN

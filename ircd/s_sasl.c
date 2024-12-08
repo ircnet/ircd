@@ -147,11 +147,23 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	else if (*parv[3] == 'L')
 	{
 		// Login
-		acptr->sasl_user = mystrdup(parv[4]);
 		if (parc >= 6) {
-			// Store spoofed hostname. It will finally be set by attach_Iline().
-			acptr->spoof_tmp = mystrdup(parv[5]);
+			if (bad_hostname(parv[5], strlen(parv[5])))
+			{
+				char comment[BUFSIZE];
+				sendto_flag(SCH_ERROR, "Received bad hostname %s from %s", parv[5], acptr->sasl_service->name);
+				acptr->exitc = EXITC_SASL_REQUIRED;
+				snprintf(comment, BUFSIZE, "Bad hostname (%s)", parv[5]);
+				exit_client(acptr, acptr, &me, comment);
+				return;
+			}
+			else
+			{
+				// Store spoofed hostname. It will finally be set by attach_Iline().
+				acptr->spoof_tmp = mystrdup(parv[5]);
+			}
 		}
+		acptr->sasl_user = mystrdup(parv[4]);
 		sendto_one(acptr, replies[RPL_LOGGEDIN], me.name, BadTo(acptr->name), BadTo(acptr->name),
 				   acptr->user ? acptr->user->username : "unknown",
 				   acptr->spoof_tmp ? acptr->spoof_tmp : acptr->sockhost,
