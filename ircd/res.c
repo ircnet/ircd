@@ -54,7 +54,6 @@ static	ResRQ	*find_id (int);
 static	int	hash_number (unsigned char *);
 static	void	update_list (ResRQ *, aCache *);
 static	int	hash_name (char *);
-static	int	bad_hostname (char *, int);
 
 static	struct cacheinfo {
 	int	ca_adds;
@@ -1846,7 +1845,7 @@ u_long	cres_mem(aClient *sptr, char *nick)
 }
 
 
-static	int	bad_hostname(char *name, int len)
+int bad_hostname(char *name, int len)
 {
 	char	*s, c;
 
