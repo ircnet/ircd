@@ -1845,7 +1845,7 @@ u_long	cres_mem(aClient *sptr, char *nick)
 }
 
 
-int	bad_hostname(char *name, int len)
+int bad_hostname(char *name, int len)
 {
 	char	*s, c;
 
