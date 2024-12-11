@@ -4,7 +4,7 @@ This implementation is based on the documentation from Mantas Mikulėnas. Read *
 The following things are different:
 * logout is not supported
 * abortion of authentication is not supported, the user has to disable SASL explicitly at his IRC client if he wants to connect without authentication
-* the L-message contains the cloak (`L <loginName> <cloak>`) and the ircd sets it after successful authentication
+* the L-message contains the cloak (`L <loginName> :<cloak>`) and the ircd sets it after successful authentication
 * the H-message contains a hostmask (`H <nick>[[ident]@ip]`)
 * additional N-message to allow the SASL service to send a NOTICE to a user (`N :<notice>`)
 * additional K-message to allow the SASL service to disconnect a user before registration (K :<reason>`), e.g. if he fails to log in too often
@@ -38,7 +38,7 @@ You need to set up at least one service with the flags SERVICE_WANT_SASL and SER
     // The server forwards the message to the SASL service
     [Server -> Service] :000B SASL 000BAAAAD SASLService@irc1.localhost C dXNlcjEAdXNlcjEAdXNlcjEtcGFzc3dvcmQxMjM=
     // The service validates the credentials and sends success messages including the cloaked hostname
-    [Service -> Server] ENCAP 000B SASL 000BAAAAD * L user1 spoof1.ircnet.com
+    [Service -> Server] ENCAP 000B SASL 000BAAAAD * L user1 :spoof1.ircnet.com
     [Service -> Server] ENCAP 000B SASL 000BAAAAD * D S
     // The server sets the cloaked hostname and sends a success message to the client
     [Server -> User]    :irc1.localhost 900 patrick :You are now logged in as user1.
