@@ -147,7 +147,8 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	else if (*parv[3] == 'L')
 	{
 		// Login
-		if (parc == 6) {
+		if (parc == 6)
+		{
 			if (bad_hostname(parv[5], strlen(parv[5])))
 			{
 				char comment[BUFSIZE];
