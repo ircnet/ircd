@@ -441,7 +441,7 @@ void	read_iauth(void)
 
 			    /* Copy kill reason received from iauth */
 			    reason = strstr(start, " :");
-			    if (reason && (reason + 2 != '\0'))
+			    if (reason && *(reason + 2) != '\0')
 			    {
 				    if (cptr->reason)
 				    {
