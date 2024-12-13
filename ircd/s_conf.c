@@ -862,6 +862,47 @@ static	int	is_attached(aConfItem *aconf, aClient *cptr)
 	return (lp) ? 1 : 0;
 }
 
+int attach_conf_check_limits(aClient *cptr, aConfItem *aconf, anUser *user, int *hcnt, int *ucnt, int *ghcnt, int *gucnt)
+{
+	(*ghcnt)++;
+
+	if (ConfMaxHGlobal(aconf) > 0 && *ghcnt >= ConfMaxHGlobal(aconf))
+	{
+		return -6; /* EXITC_GHMAX */
+	}
+	if (MyConnect(user->bcptr))
+	{
+		(*hcnt)++;
+		if (ConfMaxHLocal(aconf) > 0 && *hcnt >= ConfMaxHLocal(aconf))
+		{
+			return -4; /* EXITC_LHMAX */
+		}
+		if (!mycmp(user->bcptr->auth, cptr->auth))
+		{
+			(*ucnt)++;
+			(*gucnt)++;
+		}
+	}
+	else
+	{
+		if (!mycmp(user->username, cptr->user->username))
+		{
+			(*gucnt)++;
+		}
+	}
+	if (ConfMaxUHLocal(aconf) > 0 && *ucnt >= ConfMaxUHLocal(aconf))
+	{
+		return -5; /* EXITC_LUHMAX */
+	}
+
+	if (ConfMaxUHGlobal(aconf) > 0 && *gucnt >= ConfMaxUHGlobal(aconf))
+	{
+		return -7; /* EXITC_GUHMAX */
+	}
+
+	return 0;
+}
+
 /*
 ** attach_conf
 **	Associate a specific configuration entry to a *local*
@@ -919,47 +960,9 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 				if (!mycmp(cptr->sockhost, user->host))
 #endif
 				{
-					ghcnt++;
-					if (ConfMaxHGlobal(aconf) > 0 &&
-					     ghcnt >= ConfMaxHGlobal(aconf))
-					{
-						return -6; /* EXITC_GHMAX */
-					}
-					if (MyConnect(user->bcptr))
-					{
-						hcnt++;
-						if (ConfMaxHLocal(aconf) > 0 &&
-						    hcnt >= ConfMaxHLocal(aconf))
-						{
-							return -4; /* EXITC_LHMAX */
-						}
-						if (!mycmp(user->bcptr->auth,
-							   cptr->auth))
-						{
-							ucnt++;
-							gucnt++;
-						}
-					}
-					else
-					{
-						if (!mycmp(user->username,
-							   cptr->user->username
-							   ))
-						{
-							gucnt++;
-						}
-					}
-					if (ConfMaxUHLocal(aconf) > 0 &&
-					    ucnt >= ConfMaxUHLocal(aconf))
-					{
-						return -5; /* EXITC_LUHMAX */
-					}
-	
-					if (ConfMaxUHGlobal(aconf) > 0 &&
-					    gucnt >= ConfMaxUHGlobal(aconf))
-					{
-						return -7; /* EXITC_GUHMAX */
-					}
+					int ret = attach_conf_check_limits(cptr, aconf, user, &hcnt, &ucnt, &ghcnt, &gucnt);
+					if (ret != 0)
+						return ret;
 				}
 		}
 	}
