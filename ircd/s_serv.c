@@ -3809,10 +3809,11 @@ static void report_listeners(aClient *sptr, char *to)
 static	char *encap_whitelisted(char *cmd)
 {
 	char *whitelist[] = {
-        "SASL",
+		"SASL",
+		"TKLINE", "UNTKLINE",
 		NULL
 	};
-    int i;
+	int i;
 
 	for (i = 0; whitelist[i]; i++)
 		if (!strcasecmp(cmd, whitelist[i]))
