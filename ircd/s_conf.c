@@ -950,20 +950,40 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		if (ConfMaxHLocal(aconf) > 0 || ConfMaxUHLocal(aconf) > 0 ||
 		    ConfMaxHGlobal(aconf) > 0 || ConfMaxUHGlobal(aconf) > 0 )
 		{
-#ifdef YLINE_LIMITS_IPHASH
-			for ((user = hash_find_ip(cptr->user->sip, NULL));
-			     user; user = user->iphnext)
-				if (!mycmp(cptr->user->sip, user->sip))
-#else
-			for ((user = hash_find_hostname(cptr->sockhost, NULL));
-			     user; user = user->hhnext)
-				if (!mycmp(cptr->sockhost, user->host))
-#endif
+			if(IsSASLAuthed(cptr) && cptr->spoof_tmp != NULL)
+			{
+				/*
+				 * Because all cloaked connections have the same IP address (SPOOF_IP),
+				 * we use the cloaked hostname to check the Y-line limits (instead of IP or sockhost).
+				 * (Originally from mh 2020-06-25)
+				 */
+				for ((user = hash_find_hostname(cptr->spoof_tmp, NULL)); user; user = user->hhnext)
 				{
-					int ret = attach_conf_check_limits(cptr, aconf, user, &hcnt, &ucnt, &ghcnt, &gucnt);
-					if (ret != 0)
-						return ret;
+					if (!mycmp(cptr->spoof_tmp, user->host))
+					{
+						int ret = attach_conf_check_limits(cptr, aconf, user, &hcnt, &ucnt, &ghcnt, &gucnt);
+						if (ret != 0)
+							return ret;
+					}
 				}
+			}
+			else
+			{
+#ifdef YLINE_LIMITS_IPHASH
+				for ((user = hash_find_ip(cptr->user->sip, NULL));
+					 user; user = user->iphnext)
+					if (!mycmp(cptr->user->sip, user->sip))
+#else
+				for ((user = hash_find_hostname(cptr->sockhost, NULL));
+					 user; user = user->hhnext)
+					if (!mycmp(cptr->sockhost, user->host))
+#endif
+					{
+						int ret = attach_conf_check_limits(cptr, aconf, user, &hcnt, &ucnt, &ghcnt, &gucnt);
+						if (ret != 0)
+							return ret;
+					}
+			}
 		}
 	}
 
