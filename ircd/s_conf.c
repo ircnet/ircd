@@ -950,7 +950,7 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		if (ConfMaxHLocal(aconf) > 0 || ConfMaxUHLocal(aconf) > 0 ||
 		    ConfMaxHGlobal(aconf) > 0 || ConfMaxUHGlobal(aconf) > 0 )
 		{
-			if(IsSASLAuthed(cptr) && cptr->spoof_tmp != NULL)
+			if (IsSASLAuthed(cptr) && cptr->spoof_tmp != NULL)
 			{
 				/*
 				 * Because all cloaked connections have the same IP address (SPOOF_IP),
