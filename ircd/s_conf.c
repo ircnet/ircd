@@ -862,6 +862,47 @@ static	int	is_attached(aConfItem *aconf, aClient *cptr)
 	return (lp) ? 1 : 0;
 }
 
+int attach_conf_check_limits(aClient *cptr, aConfItem *aconf, anUser *user, int *hcnt, int *ucnt, int *ghcnt, int *gucnt)
+{
+	(*ghcnt)++;
+
+	if (ConfMaxHGlobal(aconf) > 0 && *ghcnt >= ConfMaxHGlobal(aconf))
+	{
+		return -6; /* EXITC_GHMAX */
+	}
+	if (MyConnect(user->bcptr))
+	{
+		(*hcnt)++;
+		if (ConfMaxHLocal(aconf) > 0 && *hcnt >= ConfMaxHLocal(aconf))
+		{
+			return -4; /* EXITC_LHMAX */
+		}
+		if (!mycmp(user->bcptr->auth, cptr->auth))
+		{
+			(*ucnt)++;
+			(*gucnt)++;
+		}
+	}
+	else
+	{
+		if (!mycmp(user->username, cptr->user->username))
+		{
+			(*gucnt)++;
+		}
+	}
+	if (ConfMaxUHLocal(aconf) > 0 && *ucnt >= ConfMaxUHLocal(aconf))
+	{
+		return -5; /* EXITC_LUHMAX */
+	}
+
+	if (ConfMaxUHGlobal(aconf) > 0 && *gucnt >= ConfMaxUHGlobal(aconf))
+	{
+		return -7; /* EXITC_GUHMAX */
+	}
+
+	return 0;
+}
+
 /*
 ** attach_conf
 **	Associate a specific configuration entry to a *local*
@@ -909,58 +950,40 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		if (ConfMaxHLocal(aconf) > 0 || ConfMaxUHLocal(aconf) > 0 ||
 		    ConfMaxHGlobal(aconf) > 0 || ConfMaxUHGlobal(aconf) > 0 )
 		{
-#ifdef YLINE_LIMITS_IPHASH
-			for ((user = hash_find_ip(cptr->user->sip, NULL));
-			     user; user = user->iphnext)
-				if (!mycmp(cptr->user->sip, user->sip))
-#else
-			for ((user = hash_find_hostname(cptr->sockhost, NULL));
-			     user; user = user->hhnext)
-				if (!mycmp(cptr->sockhost, user->host))
-#endif
+			if (IsSASLAuthed(cptr) && cptr->spoof_tmp != NULL)
+			{
+				/*
+				 * Because all cloaked connections have the same IP address (SPOOF_IP),
+				 * we use the cloaked hostname to check the Y-line limits (instead of IP or sockhost).
+				 * (Originally from mh 2020-06-25)
+				 */
+				for ((user = hash_find_hostname(cptr->spoof_tmp, NULL)); user; user = user->hhnext)
 				{
-					ghcnt++;
-					if (ConfMaxHGlobal(aconf) > 0 &&
-					     ghcnt >= ConfMaxHGlobal(aconf))
+					if (!mycmp(cptr->spoof_tmp, user->host))
 					{
-						return -6; /* EXITC_GHMAX */
-					}
-					if (MyConnect(user->bcptr))
-					{
-						hcnt++;
-						if (ConfMaxHLocal(aconf) > 0 &&
-						    hcnt >= ConfMaxHLocal(aconf))
-						{
-							return -4; /* EXITC_LHMAX */
-						}
-						if (!mycmp(user->bcptr->auth,
-							   cptr->auth))
-						{
-							ucnt++;
-							gucnt++;
-						}
-					}
-					else
-					{
-						if (!mycmp(user->username,
-							   cptr->user->username
-							   ))
-						{
-							gucnt++;
-						}
-					}
-					if (ConfMaxUHLocal(aconf) > 0 &&
-					    ucnt >= ConfMaxUHLocal(aconf))
-					{
-						return -5; /* EXITC_LUHMAX */
-					}
-	
-					if (ConfMaxUHGlobal(aconf) > 0 &&
-					    gucnt >= ConfMaxUHGlobal(aconf))
-					{
-						return -7; /* EXITC_GUHMAX */
+						int ret = attach_conf_check_limits(cptr, aconf, user, &hcnt, &ucnt, &ghcnt, &gucnt);
+						if (ret != 0)
+							return ret;
 					}
 				}
+			}
+			else
+			{
+#ifdef YLINE_LIMITS_IPHASH
+				for ((user = hash_find_ip(cptr->user->sip, NULL));
+					 user; user = user->iphnext)
+					if (!mycmp(cptr->user->sip, user->sip))
+#else
+				for ((user = hash_find_hostname(cptr->sockhost, NULL));
+					 user; user = user->hhnext)
+					if (!mycmp(cptr->sockhost, user->host))
+#endif
+					{
+						int ret = attach_conf_check_limits(cptr, aconf, user, &hcnt, &ucnt, &ghcnt, &gucnt);
+						if (ret != 0)
+							return ret;
+					}
+			}
 		}
 	}
 
