@@ -132,7 +132,7 @@ int	get_con_freq(aClass *clptr)
  * immeadiately after the first one (class 0).
  */
 void	add_class(int class, int ping, int confreq, int maxli, int sendq,
-		int bsendq, int hlocal, int uhlocal, int hglobal, int uhglobal
+		int bsendq, int hlocal, int uhlocal, int sasllocal, int hglobal, int uhglobal
 #ifdef ENABLE_CIDR_LIMITS
 		, char *cidrlen_s
 #endif
@@ -180,9 +180,9 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 	else
 		p = t;
 	Debug((DEBUG_DEBUG,
-"Add Class %d: p %x t %x - cf: %d pf: %d ml: %d sq: %d.%d ml: %d.%d mg: %d.%d",
-		class, p, t, confreq, ping, maxli, sendq, bsendq, hlocal, uhlocal,
-	       hglobal, uhglobal));
+		   "Add Class %d: p %x t %x - cf: %d pf: %d ml: %d sq: %d.%d ml: %d.%d.%d mg: %d.%d",
+		   class, p, t, confreq, ping, maxli, sendq, bsendq, hlocal, uhlocal, sasllocal,
+		   hglobal, uhglobal));
 	Class(p) = class;
 	ConFreq(p) = confreq;
 	PingFreq(p) = ping;
@@ -192,6 +192,7 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 	MaxBSendq(p) = bsendq ? bsendq : 0;
 	MaxHLocal(p) = hlocal;
 	MaxUHLocal(p) = uhlocal;
+	MaxSASLLocal(p) = sasllocal;
 	MaxHGlobal(p) = hglobal;
 	MaxUHGlobal(p) = uhglobal;
 
@@ -270,6 +271,7 @@ void	initclass(void)
 	NextClass(FirstClass()) = NULL;
 	MaxHLocal(FirstClass()) = 1;
 	MaxUHLocal(FirstClass()) = 1;
+	MaxSASLLocal(FirstClass()) = 0;
 	MaxHGlobal(FirstClass()) = 1;
 	MaxUHGlobal(FirstClass()) = 1;
 #ifdef ENABLE_CIDR_LIMITS
@@ -296,7 +298,7 @@ void	report_classes(aClient *sptr, char *to)
 		sendto_one(sptr, replies[RPL_STATSYLINE], ME, BadTo(to), 'Y',
 			Class(cltmp), PingFreq(cltmp), ConFreq(cltmp),
 			MaxLinks(cltmp), MaxSendq(cltmp), MaxBSendq(cltmp),
-			MaxHLocal(cltmp), MaxUHLocal(cltmp),
+			MaxHLocal(cltmp), MaxUHLocal(cltmp), MaxSASLLocal(cltmp),
 			MaxHGlobal(cltmp), MaxUHGlobal(cltmp), Links(cltmp), tmp);
 	}
 }

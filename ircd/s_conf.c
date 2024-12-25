@@ -907,7 +907,7 @@ int attach_conf_check_limits(aClient *cptr, aConfItem *aconf, anUser *user, int 
 ** attach_conf
 **	Associate a specific configuration entry to a *local*
 **	client (this is the one which used in accepting the
-**	connection). Note, that this automaticly changes the
+**	connection). Note, that this automatically changes the
 **	attachment if there was an old one...
 **	Non-zero return value is used in register_user().
 */
@@ -936,6 +936,26 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		int hcnt = 0, ucnt = 0;
 		int ghcnt = 0, gucnt = 0;
 		anUser *user = NULL;
+
+		/* Check local SASL limit if configured and if the user is authenticated. */
+		if (ConfMaxSASLLocal(aconf) > 0 && IsSASLAuthed(cptr))
+		{
+			Reg aClient *c2ptr;
+			int cnt = 0, i;
+
+			for (i = 0; i <= highest_fd; i++)
+			{
+				if (!(c2ptr = local[i]) || cptr == c2ptr || !IsSASLAuthed(c2ptr))
+					continue;
+				if (!mycmp(cptr->sasl_user, c2ptr->sasl_user))
+				{
+					cnt++;
+					if (cnt >= ConfMaxSASLLocal(aconf))
+						return -10; /* EXITC_LOCAL_SASL_MAX */
+				}
+			}
+		}
+
 		/* check on local/global limits per host and per user@host */
 
 #ifdef ENABLE_CIDR_LIMITS
@@ -986,7 +1006,6 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 			}
 		}
 	}
-
 
 	lp = make_link();
 	istat.is_conflink++;
@@ -1873,22 +1892,41 @@ int 	initconf(int opt)
 		if (aconf->status & CONF_CLASS)
 		{
 			if (atoi(aconf->host) >= 0)
+			{
+				int maxHLocal = 1, maxUHLocal = 1, maxSASLLocal = 0;
+				if (tmp3)
+				{
+					maxHLocal = atoi(tmp3);
+					char *s = index(tmp3, '.');
+					if (s)
+					{
+						s++;
+						maxUHLocal = atoi(s);
+						s = index(s, '.');
+						if (s)
+						{
+							maxSASLLocal = atoi(s + 1);
+						}
+					}
+				}
+
 				add_class(atoi(aconf->host),
-					  atoi(aconf->passwd),
-					  atoi(aconf->name), aconf->port,
-					  tmp ? atoi(tmp) : 0,
-					  (tmp && index(tmp, '.')) ?
-					  atoi(index(tmp, '.') + 1) : 0,
-					  tmp3 ? atoi(tmp3) : 1,
-					  (tmp3 && index(tmp3, '.')) ?
-					  atoi(index(tmp3, '.') + 1) : 1,
- 					  tmp4 ? atoi(tmp4) : 1,
-					  (tmp4 && index(tmp4, '.')) ?
-					  atoi(index(tmp4, '.') + 1) : 1
+						  atoi(aconf->passwd),
+						  atoi(aconf->name),
+						  aconf->port,
+						  tmp ? atoi(tmp) : 0,
+						  (tmp && index(tmp, '.')) ? atoi(index(tmp, '.') + 1) : 0,
+						  maxHLocal,
+						  maxUHLocal,
+						  maxSASLLocal,
+						  tmp4 ? atoi(tmp4) : 1,
+						  (tmp4 && index(tmp4, '.')) ? atoi(index(tmp4, '.') + 1) : 1
 #ifdef ENABLE_CIDR_LIMITS
-					  , tmp5
+						  ,
+						  tmp5
 #endif
 				);
+			}
 			continue;
 		}
 		/*

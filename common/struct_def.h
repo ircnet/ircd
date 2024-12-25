@@ -967,6 +967,7 @@ typedef enum ServerChannels {
 #define EXITC_KILL	'K'	/* KILLed */
 #define EXITC_LHMAX	'L'	/* local clients per host max limit */
 #define EXITC_LUHMAX	'l'	/* local clients per user@host max limit */
+#define EXITC_LOCAL_SASL_MAX	's'	/* max limit for local clients per SASL account */
 #define EXITC_MBUF	'M'	/* mem alloc error */
 #define EXITC_PING	'P'	/* ping timeout */
 #define EXITC_BADPASS	'p'	/* bad password */

@@ -30,6 +30,7 @@ typedef struct Class {
 	int	maxBSendq;
 	int	maxHLocal;
 	int	maxUHLocal;
+	int maxSASLLocal;
 	int	maxHGlobal;
 	int	maxUHGlobal;
 	int	links;
@@ -49,6 +50,7 @@ typedef struct Class {
 #define	MaxBSendq(x)	((x)->maxBSendq)
 #define	MaxHLocal(x)	((x)->maxHLocal)
 #define	MaxUHLocal(x)	((x)->maxUHLocal)
+#define	MaxSASLLocal(x)	((x)->maxSASLLocal)
 #define	MaxHGlobal(x)	((x)->maxHGlobal)
 #define	MaxUHGlobal(x)	((x)->maxUHGlobal)
 #define	Links(x)	((x)->links)
@@ -62,6 +64,7 @@ typedef struct Class {
 #define	ConfSendq(x)	(Class(x)->maxSendq)
 #define	ConfMaxHLocal(x)	(Class(x)->maxHLocal)
 #define	ConfMaxUHLocal(x)	(Class(x)->maxUHLocal)
+#define	ConfMaxSASLLocal(x)	(Class(x)->maxSASLLocal)
 #define	ConfMaxHGlobal(x)	(Class(x)->maxHGlobal)
 #define	ConfMaxUHGlobal(x)	(Class(x)->maxUHGlobal)
 #ifdef ENABLE_CIDR_LIMITS
