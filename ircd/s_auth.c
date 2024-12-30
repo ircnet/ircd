@@ -426,13 +426,13 @@ void	read_iauth(void)
 			    /*authentication finished*/
 			    ClearXAuth(cptr);
 			    SetDoneXAuth(cptr);
-			    if (WaitingXAuth(cptr))
+				if (cptr->name[0] && cptr->user && !IsCAPNegotiation(cptr))
 				{
-				    ClearWXAuth(cptr);
+				    ClearWXAuth(cptr); // TODO: remove obsolete code
 				    register_user(cptr, cptr, cptr->name,
 						  cptr->user->username);
 				}
-			    else
+			    else // TODO: remove obsolete code
 				    ClearWXAuth(cptr);
 		      }
 		    else

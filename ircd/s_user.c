@@ -408,7 +408,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #endif
 
 #if defined(USE_IAUTH)
-		if (iauth_options & XOPT_EARLYPARSE && DoingXAuth(cptr))
+		if (DoingXAuth(cptr))
 		{
 			cptr->flags |= FLAGS_WXAUTH;
 			/* fool check_pings() and give iauth more time! */

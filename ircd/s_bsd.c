@@ -2223,12 +2223,16 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 			** so no need to check for anything!
 			*/
 #if defined(USE_IAUTH)
-			if (DoingDNS(cptr) || DoingAuth(cptr) ||
+				// TODO
+			if (DoingDNS(cptr)
+					/*|| DoingAuth(cptr) ||
 			    WaitingXAuth(cptr) ||
 			    (DoingXAuth(cptr) &&
-			     !(iauth_options & XOPT_EARLYPARSE)))
+			     !(iauth_options & XOPT_EARLYPARSE))*/
+							)
 #else
-			if (DoingDNS(cptr) || DoingAuth(cptr))
+				// TODO
+			if (DoingDNS(cptr) /*|| DoingAuth(cptr)*/)
 #endif
 				continue;
 #if !defined(USE_POLL)
@@ -2485,7 +2489,7 @@ deadsocket:
 		length = 1;	/* for fall through case */
 		if (!NoNewLine(cptr) || TST_READ_EVENT(fd))
 		    {
-			if (!DoingAuth(cptr))
+			//if (!DoingAuth(cptr))
 				length = read_packet(cptr, TST_READ_EVENT(fd));
 		    }
 		readcalls++;
