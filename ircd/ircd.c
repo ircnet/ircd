@@ -303,12 +303,8 @@ static	time_t	try_connections(time_t currenttime)
 			}
 			/* an unknown traveller we have */
 			if (
-#ifndef INET6
-				cptr->ip.s_addr == aconf->ipnum.s_addr
-#else
 				!memcmp(cptr->ip.s6_addr,
 					aconf->ipnum.s6_addr, 16)
-#endif
 			)
 			{
 				/* IP the same. Coincidence? Maybe.

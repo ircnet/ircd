@@ -29,9 +29,7 @@
 #include "dbuf_def.h"	/* needed for struct_def.h, sigh */
 #include "class_def.h"	/* needed for struct_def.h, sigh */
 #include "struct_def.h"
-#ifdef INET6
-# include "../ircd/nameser_def.h"
-#endif
+#include "../ircd/nameser_def.h"
 #include "support_def.h"
 #include "common_def.h"	/* for isdigit, isalpha etc. */
 

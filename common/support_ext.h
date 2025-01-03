@@ -28,9 +28,7 @@
 #else /* SUPPORT_C */
 #define EXTERN
 #endif /* SUPPORT_C */
-#ifdef INET6
 EXTERN char ipv6string[INET6_ADDRSTRLEN];
-#endif
 EXTERN char *mystrdup (char *s);
 #if !defined(HAVE_STRTOKEN)
 EXTERN char *strtoken (char **save, char *str, char *fs);
@@ -48,10 +46,8 @@ EXTERN char *strerror (int err_no);
 #endif /* HAVE_STRERROR */
 EXTERN char *myctime (time_t value);
 EXTERN char *mybasename (char *);
-#ifdef INET6
 EXTERN char *inetntop(int af, const void *in, char *local_dummy, size_t the_size);
 EXTERN int inetpton(int af, const char *src, void *dst);
-#endif
 #if !defined(HAVE_INET_NTOA)
 EXTERN char *inetntoa (char *in);
 #endif /* HAVE_INET_NTOA */

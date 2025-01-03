@@ -1361,11 +1361,7 @@ void	sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 		cptr->auth ? cptr->auth : "?",
 		/* client IP */
 		cptr->user ? cptr->user->sip :
-#ifdef INET6
 		inetntop(AF_INET6, (char *)&cptr->ip, ipv6string, sizeof(ipv6string)),
-#else
-		inetntoa((char *)&cptr->ip),
-#endif
 		/* client (remote) port */
 		cptr->port,
 		/* server sockhost (IP plus port or unix socket path) */
