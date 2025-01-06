@@ -48,19 +48,62 @@ static	void	conf_err(u_int nb, char *msg, char *chk)
 /*
  * Match address by #IP bitmask (10.11.12.128/27)
  */
-static	int	match_ipmask(aTarget *mask, char *ipaddr)
+static	int	match_ipmask(char *mask, char *ip)
 {
-#ifdef INET6
-	return 1;
-#else
-        int i1, i2, i3, i4;
-	u_long iptested;
+	int m, j;
+	u_long lmask;
+	char *p, dummy[128];
+	struct IN_ADDR mask_addr, ip_addr;
 
-        if (sscanf(ipaddr, "%d.%d.%d.%d", &i1, &i2, &i3, &i4) != 4) 
+	if (inetpton(AF_INET6, ip, (void *) ip_addr.s6_addr) != 1)
 		return -1;
-	iptested = htonl(i1 * 0x1000000 + i2 * 0x10000 + i3 * 0x100 + i4);
-        return ((iptested & mask->lmask) == mask->baseip) ? 0 : 1;
-#endif
+
+	strncpyzt(dummy, mask, sizeof(dummy));
+	mask = dummy;
+
+	if (!(p = index(mask, '/')))
+		return -1;
+
+	*p = '\0';
+
+	if (sscanf(p + 1, "%d", &m) != 1)
+		return -1;
+
+	if (!m)
+		return 0; /* x.x.x.x/0 always matches */
+
+	if (m < 0 || m > 128)
+		return -1;
+
+	if (inetpton(AF_INET6, mask, (void *) mask_addr.s6_addr) != 1)
+		return -1;
+
+	/* Make sure that the ipv4 notation still works. */
+	if (IN6_IS_ADDR_V4MAPPED(&mask_addr))
+	{
+		if (m <= 32)
+			m += 96;
+		if (m <= 96)
+			return -1;
+	}
+
+	j = m & 0x1F; /* number not multiple of 32 bits */
+	m >>= 5;      /* number of 32 bits */
+
+	if (m && memcmp((void *) (mask_addr.s6_addr),
+					(void *) (ip_addr.s6_addr), m << 2))
+		return 1;
+
+	if (j)
+	{
+		lmask = htonl((u_long) 0xffffffffL << (32 - j));
+		if ((((u_int32_t *) (mask_addr.s6_addr))[m] ^
+			 ((u_int32_t *) (ip_addr.s6_addr))[m]) &
+			lmask)
+			return 1;
+	}
+
+	return 0;
 }
 
 /* conf_read: read the configuration file, instanciate modules */
@@ -267,7 +310,6 @@ char	*conf_read(char *cfile)
 			while (fgets(buffer, 160, cfh))
 			    {
 				aTarget **ttmp;
-				u_long baseip = 0, lmask = 0;
 				int inverse = 0;
 
 				if ((ch = index(buffer, '\n')))
@@ -330,7 +372,7 @@ char	*conf_read(char *cfile)
 					}
 				    }
 				else if (!strncasecmp(buffer+1, "ip = ", 5))
-				    {
+				{
 					ttmp = &((*last)->address);
 					ch = buffer + 6;
 					if (*ch == '!')
@@ -338,32 +380,7 @@ char	*conf_read(char *cfile)
 						inverse = 1;
 						ch++;
 					}
-					if (strchr(ch, '/'))
-					    {
-						int i1, i2, i3, i4, m;
-						
-						if (sscanf(ch,"%d.%d.%d.%d/%d",
-							   &i1, &i2, &i3, &i4,
-							   &m) != 5 ||
-						    m < 1 || m > 31)
-						    {
-							conf_err(lnnb,
-								 "Bad mask.",
-								 cfile);
-							continue;
-						    }
-						lmask = htonl((u_long)0xffffffffL << (32 - m));
-						baseip = htonl(i1 * 0x1000000 +
-							       i2 * 0x10000 +
-							       i3 * 0x100 +
-							       i4);
-					    }
-					else
-					    {
-						lmask = 0;
-						baseip = 0;
-					    }
-				    }
+				}
 				else if (!strncmp(buffer+1, "timeout = ", 10))
 				    {
 					u_int local_timeout;
@@ -399,11 +416,6 @@ char	*conf_read(char *cfile)
 				*ttmp = (aTarget *) malloc(sizeof(aTarget));
 				(*ttmp)->yes = inverse ? -1 : 0;
 				(*ttmp)->value = mystrdup(ch);
-				if ((*ttmp)->baseip)
-				    {
-					(*ttmp)->lmask = lmask;
-					(*ttmp)->baseip = baseip;
-				    }
 				(*ttmp)->nextt = NULL;
 			    }
 			if ((*last)->port == 0 &&
@@ -585,19 +597,13 @@ int	conf_match(u_int cl, AnInstance *inst)
 	{
 		while (ttmp)
 		{
-			if (ttmp->baseip)
+			if (match_ipmask(ttmp->value, cldata[cl].itsip) == 0)
 			{
-				if (match_ipmask(ttmp, cldata[cl].itsip) == 0)
-				{
-					return ttmp->yes;
-				}
+				return ttmp->yes;
 			}
-			else
+			if (match(ttmp->value, cldata[cl].itsip) == 0)
 			{
-				if (match(ttmp->value, cldata[cl].itsip) == 0)
-				{
-					return ttmp->yes;
-				}
+				return ttmp->yes;
 			}
 			ttmp = ttmp->nextt;
 		}
