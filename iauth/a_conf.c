@@ -80,7 +80,6 @@ char	*conf_read(char *cfile)
 	Mlist[Mcnt++] = &Module_rfc931;
 	Mlist[Mcnt++] = &Module_socks;
 	Mlist[Mcnt++] = &Module_pipe;
-	Mlist[Mcnt++] = &Module_lhex;
 	Mlist[Mcnt++] = &Module_webproxy;
 	Mlist[Mcnt++] = &Module_dnsbl;
 	Mlist[Mcnt] = NULL;
