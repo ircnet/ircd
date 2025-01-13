@@ -755,8 +755,8 @@ AC_CACHE_CHECK([whether string.h and strings.h may both be included],
 ac_cv_header_string,
 [
     AC_COMPILE_IFELSE(
-    [#include <string.h>
-    #include <strings.h>],
+    [AC_LANG_SOURCE([[#include <string.h>
+    #include <strings.h>]])],
     [ac_cv_header_string=yes],
     [ac_cv_header_string=no])
 ])
