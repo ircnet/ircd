@@ -594,7 +594,7 @@ yes
   AC_MSG_RESULT($irc_cv_v6type)
 
   if test "x$irc_cv_v6type" = xunknown; then
-     AC_MSG_WARN([[You have an unknown IPv6 system. You will probably need to change the Makefile manually, or #undef INET6 in setup.h]])
+     AC_MSG_WARN([[You have an unknown IPv6 system. You will probably need to change the Makefile manually]])
   fi
 
   dnl eventually update LIBS

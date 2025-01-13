@@ -6289,8 +6289,8 @@ fi
 $as_echo "$irc_cv_v6type" >&6; }
 
   if test "x$irc_cv_v6type" = xunknown; then
-     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You have an unknown IPv6 system. You will probably need to change the Makefile manually, or #undef INET6 in setup.h" >&5
-$as_echo "$as_me: WARNING: You have an unknown IPv6 system. You will probably need to change the Makefile manually, or #undef INET6 in setup.h" >&2;}
+     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: You have an unknown IPv6 system. You will probably need to change the Makefile manually" >&5
+$as_echo "$as_me: WARNING: You have an unknown IPv6 system. You will probably need to change the Makefile manually" >&2;}
   fi
 
     case $irc_cv_v6type in
