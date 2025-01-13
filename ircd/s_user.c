@@ -392,7 +392,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 				sptr->hostp->h_name : sptr->sockhost)) &&
 				match(xtmp->source_ip, sptr->user->sip) &&
 				strchr(xtmp->source_ip, '/') && 
-				match_ipmask(xtmp->source_ip, sptr, 0)))
+				match_ipmask_client(xtmp->source_ip, sptr, 0)))
 				continue;
 			SetXlined(sptr);
 			break;

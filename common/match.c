@@ -363,3 +363,63 @@ int	isvalidusername(char *username)
 	return 1;
 }
 
+/*
+ * Match an IP against a subnet (10.11.12.128/27, fdf0:584f:e66b::/48).
+ */
+int match_ipmask(char *mask, char *ip)
+{
+	int m, j;
+	u_long lmask;
+	char *p, dummy[128];
+	struct IN_ADDR mask_addr, ip_addr;
+
+	if (inetpton(AF_INET6, ip, (void *) ip_addr.s6_addr) != 1)
+		return -1;
+
+	strncpyzt(dummy, mask, sizeof(dummy));
+	mask = dummy;
+
+	if (!(p = index(mask, '/')))
+		return -1;
+
+	*p = '\0';
+
+	if (sscanf(p + 1, "%d", &m) != 1)
+		return -1;
+
+	if (!m)
+		return 0; /* x.x.x.x/0 always matches */
+
+	if (m < 0 || m > 128)
+		return -1;
+
+	if (inetpton(AF_INET6, mask, (void *) mask_addr.s6_addr) != 1)
+		return -1;
+
+	/* Make sure that the ipv4 notation still works. */
+	if (IN6_IS_ADDR_V4MAPPED(&mask_addr))
+	{
+		if (m <= 32)
+			m += 96;
+		if (m <= 96)
+			return -1;
+	}
+
+	j = m & 0x1F; /* number not multiple of 32 bits */
+	m >>= 5;      /* number of 32 bits */
+
+	if (m && memcmp((void *) (mask_addr.s6_addr),
+					(void *) (ip_addr.s6_addr), m << 2))
+		return 1;
+
+	if (j)
+	{
+		lmask = htonl((u_long) 0xffffffffL << (32 - j));
+		if ((((u_int32_t *) (mask_addr.s6_addr))[m] ^
+			 ((u_int32_t *) (ip_addr.s6_addr))[m]) &
+			lmask)
+			return 1;
+	}
+
+	return 0;
+}
