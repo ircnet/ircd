@@ -190,24 +190,24 @@ void	free_client(aClient *cptr)
 }
 
 /*
-** 'make_user' add's an User information block to a client
+** 'make_user' adds a User information block to a client
 ** if it was not previously allocated.
-** iplen is lenght of the IP we want to allocate.
 */
-anUser	*make_user(aClient *cptr, int iplen)
+anUser *make_user(aClient *cptr)
 {
 	Reg	anUser	*user;
 
 	user = cptr->user;
 	if (!user)
-	    {
-		user = (anUser *)MyMalloc(sizeof(anUser) + iplen);
-		memset(user, 0, sizeof(anUser) + iplen);
+	{
+		user = (anUser *)MyMalloc(sizeof(anUser));
+		memset(user, 0, sizeof(anUser));
 
 #ifdef	DEBUGMODE
 		users.inuse++;
 #endif
 		user->away = NULL;
+		user->sip = NULL;
 		user->refcnt = 1;
 		user->joined = 0;
 		user->flags = 0;
@@ -219,7 +219,7 @@ anUser	*make_user(aClient *cptr, int iplen)
 		user->bcptr = cptr;
 		if (cptr->next)	/* the only cptr->next == NULL is me */
 			istat.is_users++;
-	    }
+	}
 	return user;
 }
 
@@ -315,6 +315,11 @@ void	free_user(anUser *user)
 			istat.is_away--;
 			istat.is_awaymem -= (strlen(user->away) + 1);
 			MyFree(user->away);
+		}
+
+		if (user->sip)
+		{
+			MyFree(user->sip);
 		}
 		MyFree(user);
 #ifdef	DEBUGMODE

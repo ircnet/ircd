@@ -1404,7 +1404,7 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	*/
 	acptr = make_client(cptr);
 	add_client_to_list(acptr);
-	(void)make_user(acptr, strlen(parv[5]));
+	(void) make_user(acptr);
 	/* more corrrect is this, but we don't yet have ->mask, so...
 	acptr->user->servp = find_server_name(sptr->serv->mask->serv->snum);
 	... just remember to change it one day --Beeth */
@@ -1436,7 +1436,7 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	acptr->hopcount = sptr->hopcount;
 	/* The client is already killed if the uid is too long. */
 	strcpy(acptr->uid, uid);
-	strcpy(acptr->user->sip, parv[5]);
+	acptr->user->sip = mystrdup(parv[5]);
 	add_to_uid_hash_table(uid, acptr);
 	{
 	    char	*pv[4];
@@ -2409,8 +2409,8 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	realname = parv[4];
 	
 	inetntop(AF_INET6, (char *)&sptr->ip, ipbuf, sizeof(ipbuf));
-	user = make_user(sptr, strlen(ipbuf));
-	strcpy(user->sip, ipbuf);
+	user = make_user(sptr);
+	user->sip = mystrdup(ipbuf);
 
 	user->servp = me.serv;
 	me.serv->refcnt++;
