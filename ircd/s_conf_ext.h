@@ -76,9 +76,7 @@ EXTERN char *iline_flags_to_string(long flags);
 EXTERN long iline_flags_parse(char *string);
 EXTERN char *pline_flags_to_string(long flags);
 EXTERN long pline_flags_parse(char *string);
-# ifdef	INET6
 EXTERN char *ipv6_convert (char *orig);
-# endif
 #ifdef TKLINE
 EXTERN int m_tkline(aClient *, aClient *, int, char **);
 EXTERN int m_untkline(aClient *, aClient *, int, char **);

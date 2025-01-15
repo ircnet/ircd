@@ -673,8 +673,6 @@ extern int h_errno;
  *  IPv4 or IPv6 structures?
  */
 
-#ifdef INET6
-
 # define AND16(x) ((x)[0]&(x)[1]&(x)[2]&(x)[3]&(x)[4]&(x)[5]&(x)[6]&(x)[7]&(x)[8]&(x)[9]&(x)[10]&(x)[11]&(x)[12]&(x)[13]&(x)[14]&(x)[15])
 extern unsigned char minus_one[];
 # define WHOSTENTP(x) ((x)[0]|(x)[1]|(x)[2]|(x)[3]|(x)[4]|(x)[5]|(x)[6]|(x)[7]|(x)[8]|(x)[9]|(x)[10]|(x)[11]|(x)[12]|(x)[13]|(x)[14]|(x)[15])
@@ -690,20 +688,6 @@ extern unsigned char minus_one[];
 
 #ifndef INET6_ADDRSTRLEN   
 #define INET6_ADDRSTRLEN   46
-#endif
-
-#else /* INET6 */
-
-# define	AFINET		AF_INET
-# define	SOCKADDR_IN	sockaddr_in
-# define	SOCKADDR	sockaddr
-# define	SIN_FAMILY	sin_family
-# define	SIN_PORT	sin_port
-# define	SIN_ADDR	sin_addr
-# define	S_ADDR		s_addr
-# define	IN_ADDR		in_addr
-
-# define WHOSTENTP(x) (x)
 #endif
 
 /* Courtesy of AC_CHECK_TYPES autoconf macro in configure */
