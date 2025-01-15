@@ -41,4 +41,5 @@ EXTERN char *collapse (char *pattern);
 EXTERN int mycmp (char *s1, char *s2);
 EXTERN int myncmp (char *str1, char *str2, int n);
 EXTERN int isvalidusername (char *username);
+EXTERN int match_ipmask(char *mask, char *ip);
 #undef EXTERN

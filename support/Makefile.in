@@ -154,7 +154,7 @@ IAUTH_OBJS = iauth.o a_conf.o a_io.o a_log.o \
              mod_pipe.o mod_rfc931.o mod_socks.o \
              mod_webproxy.o mod_dnsbl.o
 
-CHKCONF_COMMON_OBJS = match.o
+CHKCONF_COMMON_OBJS = match.o clsupport.o
 CHKCONF_OBJS = chkconf.o
 CHKCONF = chkconf
 

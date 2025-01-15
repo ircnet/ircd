@@ -450,7 +450,7 @@ void	det_confs_butmask(aClient *cptr, int mask)
  * Now should work for IPv6 too.
  * returns -1 on error, 0 on match, 1 when NO match.
  */
-int    match_ipmask(char *mask, aClient *cptr, int maskwithusername)
+int match_ipmask_client(char *mask, aClient *cptr, int maskwithusername)
 {
 	int	m;
 	char	*p;
@@ -623,9 +623,9 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 			if (strchr(aconf->host, '/'))	/* 1.2.3.0/24 */
 			{
 				
-				/* match_ipmask takes care of checking
+				/* match_ipmask_client takes care of checking
 				** possible username if aconf->host has '@' */
-				if (match_ipmask(aconf->host, cptr, 1))
+				if (match_ipmask_client(aconf->host, cptr, 1))
 				{
 					/* Try another I:line. */
 					continue;
@@ -1137,7 +1137,7 @@ aConfItem	*find_Oline(char *name, aClient *cptr)
 		*/
 		if (match(tmp->host, userhost) && match(tmp->host, userip) &&
 			(!strchr(tmp->host, '/') 
-			|| match_ipmask(tmp->host, cptr, 1)))
+			|| match_ipmask_client(tmp->host, cptr, 1)))
 			continue;
 		if (tmp->clients < MaxLinks(Class(tmp)))
 			return tmp;
@@ -2318,7 +2318,7 @@ findkline:
 		    {
 			if (strchr(tmp->host, '/'))
 			    {
-				if (match_ipmask((*tmp->host == '=') ?
+				if (match_ipmask_client((*tmp->host == '=') ?
 						 tmp->host+1: tmp->host, cptr, 1))
 					continue;
 			    }
@@ -2332,7 +2332,7 @@ findkline:
 		else /* resolved */
 			if (strchr(tmp->host, '/'))
 			    {
-				if (match_ipmask(tmp->host, cptr, 1))
+				if (match_ipmask_client(tmp->host, cptr, 1))
 					continue;
 			    }
 			else
@@ -2555,7 +2555,7 @@ void	find_bounce(aClient *cptr, int class, int fd)
 		{
 			if (strchr(aconf->host, '/'))
 			{
-				if (match_ipmask(aconf->host, cptr, 1))
+				if (match_ipmask_client(aconf->host, cptr, 1))
 					continue;
 			}
 			else if (match(aconf->host, cptr->sockhost))
@@ -2771,7 +2771,7 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 			/* unresolved */
 			if (strchr(aconf->host, '/'))
 			{
-				if (match_ipmask(*aconf->host == '=' ?
+				if (match_ipmask_client(*aconf->host == '=' ?
 					aconf->host + 1 : aconf->host,
 					acptr, 1))
 				{
@@ -2798,7 +2798,7 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 			}
 			if (strchr(aconf->host, '/'))
 			{
-				if (match_ipmask(aconf->host, acptr, 1))
+				if (match_ipmask_client(aconf->host, acptr, 1))
 				{
 					continue;
 				}
@@ -2903,7 +2903,7 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		/* disallow all forms of bad u@h format and block *@* without flags too */
 		err = 1;
 	}
-	if (!err && host && strchr(host, '/') && match_ipmask(host, sptr, 0) == -1)
+	if (!err && host && strchr(host, '/') && match_ipmask_client(host, sptr, 0) == -1)
 	{
 		/* check validity of 1.2.3.0/24 or it will be spewing errors
 		** for every connecting client. */
