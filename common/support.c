@@ -28,9 +28,7 @@ static const volatile char rcsid[] = "@(#)$Id: support.c,v 1.46 2009/03/15 01:25
 #undef SUPPORT_C
 #include "git_hash.h"
 
-#ifdef INET6
 char ipv6string[INET6_ADDRSTRLEN];
-#endif
 
 unsigned char minus_one[]={ 255, 255, 255, 255, 255, 255, 255, 255, 255,
                                         255, 255, 255, 255, 255, 255, 255, 0};
@@ -218,7 +216,6 @@ char	*mybasename(char *path)
 	return path;
 }
 
-#ifdef INET6
 /*
  * inetntop: return the : notation of a given IPv6 internet number.
  *	     or the dotted-decimal notation for IPv4
@@ -323,7 +320,6 @@ int	inetpton(int af, const char *src, void *dst)
 	    }
 	return inet_pton(af, src, dst);
 }
-#endif
 
 #if !defined(HAVE_INET_NTOA)
 /*

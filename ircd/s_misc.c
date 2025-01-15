@@ -256,11 +256,7 @@ char	*get_client_ip(aClient *cptr)
 	}
 	else
 	{
-#ifdef INET6
 		return inetntop(AF_INET6, (char *)&cptr->ip, ipv6string, sizeof(ipv6string));
-#else
-		return inetntoa((char *)&cptr->ip);
-#endif
 	}
 }
 

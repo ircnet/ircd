@@ -2408,11 +2408,7 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	server   = parv[3];
 	realname = parv[4];
 	
-#ifdef INET6
 	inetntop(AF_INET6, (char *)&sptr->ip, ipbuf, sizeof(ipbuf));
-#else
-	strcpy(ipbuf, (char *)inetntoa((char *)&sptr->ip));
-#endif
 	user = make_user(sptr, strlen(ipbuf));
 	strcpy(user->sip, ipbuf);
 
@@ -3005,12 +3001,8 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #ifdef UNIXPORT
 			IsUnixSocket(sptr) ? sptr->sockhost :
 #endif
-#ifdef INET6
                        inet_ntop(AF_INET6, (char *)&sptr->ip, ipv6string,
 			       sizeof(ipv6string))
-#else
-                       inetntoa((char *)&sptr->ip)
-#endif
 		       );
 #endif /* defined(USE_SYSLOG) && defined(SYSLOG_OPER) */
 
@@ -3045,12 +3037,9 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #ifdef UNIXPORT
 				IsUnixSocket(sptr) ? sptr->sockhost :
 #endif
-#ifdef INET6
 				inetntop(AF_INET6, (char *)&sptr->ip,
 					ipv6string, sizeof(ipv6string))
-#else
-				inetntoa((char *)&sptr->ip)
-#endif
+
 				);
 			(void)alarm(3);
 		  	(void)write(logfile, buf, strlen(buf));

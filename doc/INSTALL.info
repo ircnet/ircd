@@ -97,9 +97,6 @@ default behaviour:
      tells "configure" not to look for the zlib.  Defining this will
      keep you from using server link compression.
 
-`--enable-ip6'
-     Enable IPv6 support (See notes below)
-
 `--enable-dsm'
      Enable Dynamically Shared Modules support for iauth
 

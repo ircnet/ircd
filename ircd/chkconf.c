@@ -204,9 +204,7 @@ static	int	openconf(void)
 #endif
 			"-I", includedir,
 #endif
-#ifdef INET6
 			"-DINET6",
-#endif
 			IRCDM4_PATH, configfile, (char *) NULL);
 		perror("m4");
 		exit(-1);

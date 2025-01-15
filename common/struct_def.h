@@ -42,7 +42,7 @@ typedef struct        LineItem aExtData;
 #define	HOSTLEN		63	/* Length of hostname.  Updated to         */
 				/* comply with RFC1123                     */
 
-#if defined(INET6) && (INET6_ADDRSTRLEN > HOSTLEN)
+#if (INET6_ADDRSTRLEN > HOSTLEN)
 #error HOSTLEN must not be smaller than INET6_ADDRSTRLEN
 #endif
 

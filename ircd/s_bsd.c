@@ -267,19 +267,12 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 	if (port)
 	    {
 		server.SIN_FAMILY = AFINET;
-#ifdef INET6
 		if (!ip || (!isxdigit(*ip) && *ip != ':'))
 			server.sin6_addr = in6addr_any;
 		else
 			if(!inetpton(AF_INET6, ip, server.sin6_addr.s6_addr))
 				bcopy(minus_one, server.sin6_addr.s6_addr,
 				      IN6ADDRSZ);
-#else
-		if (!ip || !isdigit(*ip))
-			server.sin_addr.s_addr = INADDR_ANY;
-		else
-			server.sin_addr.s_addr = inetaddr(ip);
-#endif
 		server.SIN_PORT = htons(port);
 		/*
 		 * Try 10 times to bind the socket with an interval of 20
@@ -315,11 +308,7 @@ int	inetport(aClient *cptr, char *ip, char *ipmask, int port, int dolisten)
 
 	if (cptr->fd > highest_fd)
 		highest_fd = cptr->fd;
-#ifdef INET6
 	bcopy(server.sin6_addr.s6_addr, cptr->ip.s6_addr, IN6ADDRSZ);
-#else
-	cptr->ip.s_addr = server.sin_addr.s_addr; /* broken on linux at least*/
-#endif
 	cptr->port = port;
 	local[cptr->fd] = cptr;
 	if (dolisten)
@@ -879,13 +868,9 @@ static	int	check_init(aClient *cptr, char *sockn)
 		report_error("connect failure: %s %s", cptr);
 		return -1;
 	    }
-#ifdef INET6
 	inetntop(AF_INET6, (char *)&sk.sin6_addr, sockn, INET6_ADDRSTRLEN);
 	Debug((DEBUG_DNS,"sockn %x",sockn));
 	Debug((DEBUG_DNS,"sockn %s",sockn));
-#else
-	(void)strcpy(sockn, (char *)inetntoa((char *)&sk.sin_addr));
-#endif
 	bcopy((char *)&sk.SIN_ADDR, (char *)&cptr->ip, sizeof(struct IN_ADDR));
 	cptr->port = ntohs(sk.SIN_PORT);
 
@@ -905,15 +890,9 @@ int	check_client(aClient *cptr)
 	Reg	struct	hostent *hp = NULL;
 	Reg	int	i;
  
-#ifdef INET6
 	Debug((DEBUG_DNS, "ch_cl: check access for %s[%s]",
 		cptr->name, inet_ntop(AF_INET6, (char *)&cptr->ip, ipv6string,
 				      sizeof(ipv6string))));
-#else
-	Debug((DEBUG_DNS, "ch_cl: check access for %s[%s]",
-		cptr->name, inetntoa((char *)&cptr->ip)));
-#endif
-
 	if (check_init(cptr, sockname))
 		return -1;
 
@@ -933,7 +912,6 @@ int	check_client(aClient *cptr)
 				break;
 		if (!hp->h_addr_list[i])
 		    {
-#ifdef INET6
 			sendto_flag(SCH_ERROR,
 				    "IP# Mismatch: %s != %s[%08x%08x%08x%08x]",
 				    inetntop(AF_INET6, (char *)&cptr->ip,
@@ -942,11 +920,7 @@ int	check_client(aClient *cptr)
 				    ((unsigned long *)hp->h_addr)[1],
 				    ((unsigned long *)hp->h_addr)[2],
 				    ((unsigned long *)hp->h_addr)[3]); 
-#else
-			sendto_flag(SCH_ERROR, "IP# Mismatch: %s != %s[%08x]",
-				    inetntoa((char *)&cptr->ip), hp->h_name,
-				    *((unsigned long *)hp->h_addr));
-#endif
+
 			hp = NULL;
 			cptr->hostp = NULL;
 		    }
@@ -967,15 +941,10 @@ int	check_client(aClient *cptr)
 #ifdef UNIXPORT
 		IsUnixSocket(cptr) ||
 #endif
-#ifdef INET6
 		IN6_IS_ADDR_LOOPBACK(&cptr->ip) ||
 		/* If s6_addr32 was standard, we could just compare them,
 		 * not memcmp. --B. */
 		!memcmp(cptr->ip.s6_addr, mysk.sin6_addr.s6_addr, 16)
-#else
-		inetnetof(cptr->ip) == IN_LOOPBACKNET ||
-		cptr->ip.S_ADDR == mysk.SIN_ADDR.S_ADDR
-#endif
 		)
 	{
 		ircstp->is_loc++;
@@ -1101,7 +1070,6 @@ check_serverback:
 				break;
 		if (!hp->h_addr_list[i])
 		    {
-#ifdef INET6
 			sendto_flag(SCH_ERROR,
 				    "IP# Mismatch: %s != %s[%08x%08x%08x%08x]",
 				    inetntop(AF_INET6, (char *)&cptr->ip,
@@ -1110,11 +1078,6 @@ check_serverback:
 				    ((unsigned long *)hp->h_addr)[1],
 				    ((unsigned long *)hp->h_addr)[2],
 				    ((unsigned long *)hp->h_addr)[3]); 
-#else
-			sendto_flag(SCH_ERROR, "IP# Mismatch: %s != %s[%08x]",
-				    inetntoa((char *)&cptr->ip), hp->h_name,
-				    *((unsigned long *)hp->h_addr));
-#endif
 			hp = NULL;
 		    }
 	    }
@@ -1218,11 +1181,7 @@ check_serverback:
 	}
 
 	if (
-#ifdef INET6
 		AND16(c_conf->ipnum.s6_addr) == 255
-#else
-		c_conf->ipnum.s_addr == -1
-#endif
 #ifdef UNIXPORT
 		&& !IsUnixSocket(cptr)
 #endif
@@ -1538,41 +1497,6 @@ static	int	set_sock_opts(int fd, aClient *cptr)
 	SETSOCKOPT(fd, SOL_SOCKET, SO_SNDLOWAT, &opt, opt);
 # endif
 #endif
-#if defined(IP_OPTIONS) && defined(IPPROTO_IP) && !defined(AIX) && \
-    !defined(INET6)
-	/*
-	 * Mainly to turn off and alert us to source routing, here.
-	 * Method borrowed from Wietse Venema's TCP wrapper.
-	 */
-	{
-	    if (!IsListener(cptr)
-#ifdef UNIXPORT
-		&& !IsUnixSocket(cptr)
-#endif
-		)
-		{
-		    u_char	opbuf[256], *t = opbuf;
-		    char	*s = readbuf;
-
-		    opt = sizeof(opbuf);
-		    if (GETSOCKOPT(fd, IPPROTO_IP, IP_OPTIONS, t, &opt) == -1)
-			    report_error("getsockopt(IP_OPTIONS) %s:%s", cptr);
-		    else if (opt > 0)
-			{
-			    for (; opt > 0; opt--, s+= 3)
-				    (void)sprintf(s, " %02x", *t++);
-			    *s = '\0';
-			    sendto_flag(SCH_NOTICE,
-					"Connection %s with IP opts%s",
-					get_client_name(cptr, TRUE), readbuf);
-			    Debug((DEBUG_NOTICE,
-				   "Connection %s with IP opts%s",
-				   get_client_name(cptr, TRUE), readbuf));
-			    ret = -1;
-			}
-		}
-	}
-#endif
 	return ret;
 }
 
@@ -1660,11 +1584,7 @@ static  int     check_clones(aClient *cptr)
 	    }
 	/* Now add new item to the list */
 	blptr = (struct abacklog *) MyMalloc(sizeof(struct abacklog));
-#ifdef INET6
 	bcopy(cptr->ip.s6_addr, blptr->ip.s6_addr, IN6ADDRSZ);
-#else
-	blptr->ip.s_addr = cptr->ip.s_addr;
-#endif
 	blptr->PT = timeofday;
 	blptr->next = backlog;
 	backlog = blptr;
@@ -1673,11 +1593,7 @@ static  int     check_clones(aClient *cptr)
 	blptr = backlog;
 	while (blptr != NULL)
 	    {
-#ifdef INET6
 		if (bcmp(blptr->ip.s6_addr, cptr->ip.s6_addr, IN6ADDRSZ) == 0)
-#else
-		if (blptr->ip.s_addr == cptr->ip.s_addr)
-#endif
 			count++;
 		blptr = blptr->next;
 	    }
@@ -1746,13 +1662,9 @@ aClient	*add_connection(aClient *cptr, int fd)
 		/* Copy ascii address to 'sockhost' just in case. Then we
 		 * have something valid to put into error messages...
 		 */
-#ifdef INET6
 		inetntop(AF_INET6, (char *)&addr.sin6_addr, ipv6string,
 			  sizeof(ipv6string));
 		get_sockhost(acptr, (char *)ipv6string);
-#else
-		get_sockhost(acptr, (char *)inetntoa((char *)&addr.sin_addr));
-#endif
 		bcopy ((char *)&addr.SIN_ADDR, (char *)&acptr->ip,
 			sizeof(struct IN_ADDR));
 		acptr->port = ntohs(addr.SIN_PORT);
@@ -1779,14 +1691,9 @@ aClient	*add_connection(aClient *cptr, int fd)
 		lin.flags = ASYNC_CLIENT;
 		lin.value.cptr = acptr;
 		lin.next = NULL;
-#ifdef INET6
 		Debug((DEBUG_DNS, "lookup %s",
 		       inet_ntop(AF_INET6, (char *)&addr.sin6_addr,
 				 ipv6string, sizeof(ipv6string))));
-#else
-		Debug((DEBUG_DNS, "lookup %s",
-		       inetntoa((char *)&addr.sin_addr)));
-#endif
 		acptr->hostp = gethost_byaddr((char *)&acptr->ip, &lin);
 		if (!acptr->hostp)
 			SetDNS(acptr);
@@ -2040,11 +1947,7 @@ static	int	read_packet(aClient *cptr, int msg_ready)
 	    !(IsPerson(cptr) && DBufLength(&cptr->recvQ) > 6090))
 	    {
 		errno = 0;
-#ifdef INET6
 		length = recvfrom(cptr->fd, readbuf, sizeof(readbuf), 0, 0, 0);
-#else
-		length = recv(cptr->fd, readbuf, sizeof(readbuf), 0);
-#endif
 #if defined(DEBUGMODE) && defined(DEBUG_READ)
 		if (length > 0)
 			Debug((DEBUG_READ,
@@ -2562,16 +2465,10 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 	Reg	char	*s;
 	int	i, len;
 
-#ifdef INET6
 	Debug((DEBUG_NOTICE,"Connect to %s[%s] @%s",
 	       aconf->name, aconf->host,
 	       inet_ntop(AF_INET6, (char *)&aconf->ipnum, ipv6string,
 			 sizeof(ipv6string))));
-#else
-	Debug((DEBUG_NOTICE,"Connect to %s[%s] @%s",
-	       aconf->name, aconf->host,
-	       inetntoa((char *)&aconf->ipnum)));
-#endif
 
 	if ((c2ptr = find_server(aconf->name, NULL)))
 	    {
@@ -2598,17 +2495,9 @@ int	connect_server(aConfItem *aconf, aClient *by, struct hostent *hp)
 		nextdnscheck = 1;
 		s = (char *)index(aconf->host, '@');
 		s++; /* should NEVER be NULL */
-#ifdef INET6
 		if (!inetpton(AF_INET6, s, aconf->ipnum.s6_addr))
-#else
-		if ((aconf->ipnum.s_addr = inetaddr(s)) == -1)
-#endif
 		    {
-#ifdef INET6
 			bzero(aconf->ipnum.s6_addr, IN6ADDRSZ);
-#else
-			aconf->ipnum.s_addr = 0;
-#endif
 			hp = gethost_byname(s, &lin);
 			Debug((DEBUG_NOTICE, "co_sv: hp %x ac %x na %s ho %s",
 				hp, aconf, aconf->name, s));
@@ -2757,11 +2646,7 @@ static	struct	SOCKADDR *connect_inet(aConfItem *aconf, aClient *cptr,
 		memset(&outip, 0, sizeof(outip));
 		outip.SIN_PORT = 0;
 		outip.SIN_FAMILY = AFINET;
-#ifdef INET6
 		if (!inetpton(AF_INET6, aconf->source_ip, outip.sin6_addr.s6_addr))
-#else
-		if ((outip.sin_addr.s_addr = inetaddr(aconf->source_ip)) == -1)
-#endif
 		{
 			sendto_flag(SCH_ERROR, "Invalid source IP (%s) in C:line",
 				aconf->source_ip);
@@ -2793,16 +2678,10 @@ static	struct	SOCKADDR *connect_inet(aConfItem *aconf, aClient *cptr,
 	 * conf line, whether as a result of the hostname lookup or the ip#
 	 * being present instead. If we don't know it, then the connect fails.
 	 */
-#ifdef INET6
 	if (isdigit(*aconf->host) && (AND16(aconf->ipnum.s6_addr) == 255))
 		if (!inetpton(AF_INET6, aconf->host,aconf->ipnum.s6_addr))
 			bcopy(minus_one, aconf->ipnum.s6_addr, IN6ADDRSZ);
 	if (AND16(aconf->ipnum.s6_addr) == 255)
-#else
-	if (isdigit(*aconf->host) && (aconf->ipnum.s_addr == -1))
-		aconf->ipnum.s_addr = inetaddr(aconf->host);
-	if (aconf->ipnum.s_addr == -1)
-#endif
 	    {
 		hp = cptr->hostp;
 		if (!hp)
@@ -3043,12 +2922,8 @@ void	get_my_name(aClient *cptr, char *name, int len)
 	mysk.SIN_PORT = 0;
 	
 	if ((aconf = find_me())->passwd && isdigit(*aconf->passwd))
-#ifdef INET6
 		if(!inetpton(AF_INET6, aconf->passwd, mysk.sin6_addr.s6_addr))
 			bcopy(minus_one, mysk.sin6_addr.s6_addr, IN6ADDRSZ);
-#else
-		mysk.sin_addr.s_addr = inetaddr(aconf->passwd);
-#endif
 
 	if (gethostname(name, len) == -1)
 		return;
@@ -3125,20 +3000,13 @@ int	setup_ping(aConfItem *aconf)
 		return udpfd;
 	bzero((char *)&from, sizeof(from));
 	if (aconf->passwd && isdigit(*aconf->passwd))
-#ifdef INET6
 	    {
 		if (!inetpton(AF_INET6, aconf->passwd,from.sin6_addr.s6_addr))
 			bcopy(minus_one, from.sin6_addr.s6_addr, IN6ADDRSZ);
 	    }
-#else
-	  from.sin_addr.s_addr = inetaddr(aconf->passwd);
-#endif
+
 	else
-#ifdef INET6
 	  from.SIN_ADDR = in6addr_any;
-#else
-	  from.sin_addr.s_addr = htonl(INADDR_ANY); /* hmmpf */
-#endif
 	from.SIN_PORT = htons((u_short) aconf->port);
 	from.SIN_FAMILY = AFINET;
 
@@ -3186,11 +3054,7 @@ void	send_ping(aConfItem *aconf)
 	struct	SOCKADDR_IN	sin;
 	aCPing	*cp = aconf->ping;
 
-#ifdef INET6
 	if (!aconf->ipnum.s6_addr || AND16(aconf->ipnum.s6_addr) == 255 || !cp->port)
-#else
-	if (!aconf->ipnum.s_addr || aconf->ipnum.s_addr == -1 || !cp->port)
-#endif
 		return;
 	if (aconf->class->conFreq == 0) /* avoid flooding */
 		return;
@@ -3216,23 +3080,13 @@ void	send_ping(aConfItem *aconf)
 	    }
 
 	bzero((char *)&sin, sizeof(sin));
-#ifdef INET6
 	bcopy(aconf->ipnum.s6_addr, sin.sin6_addr.s6_addr, IN6ADDRSZ);
-#else
-	sin.sin_addr.s_addr = aconf->ipnum.s_addr;
-#endif
 	sin.SIN_PORT = htons(cp->port);
 	sin.SIN_FAMILY = AFINET;
 	(void)gettimeofday(&pi.pi_tv, NULL);
-#ifdef INET6
 	Debug((DEBUG_SEND,"Send ping to %s,%d fd %d, %d bytes",
 	       inet_ntop(AF_INET6, (char *)&aconf->ipnum, ipv6string, sizeof(ipv6string)),
 	       cp->port, udpfd, sizeof(pi)));
-#else
-	Debug((DEBUG_SEND,"Send ping to %s,%d fd %d, %d bytes",
-	       inetntoa((char *)&aconf->ipnum),
-	       cp->port, udpfd, sizeof(pi)));
-#endif
 	(void)sendto(udpfd, (char *)&pi, sizeof(pi), 0,(SAP)&sin,sizeof(sin));
 }
 
@@ -3319,18 +3173,10 @@ static	void	polludp(void)
 			char buf[100];
 
 			sprintf(buf, "udp port recvfrom() from %s to %%s: %%s",
-#ifdef INET6
 				from.sin6_addr.s6_addr
-#else
-				from.sin_addr.s_addr
-#endif
 				== 0 ? "unknown" :
-#ifdef INET6
 				inetntop(AF_INET6, (char *)&from.sin6_addr,
 					ipv6string, sizeof(ipv6string))
-#else
-				inetntoa((char *)&from.sin_addr)
-#endif
 				);
 			report_error(buf, &me);
 #endif /* confusion */
@@ -3346,13 +3192,9 @@ static	void	polludp(void)
 			    {
 				sendto_flag(SCH_NOTICE,
 				    "udp packet dropped: %d bytes from %s.%d",
-#ifdef INET6
 					    n, inetntop(AF_INET6,
 					 (char *)&from.sin6_addr, ipv6string,
 							 sizeof(ipv6string)),
-#else
-					    n,inetntoa((char *)&from.sin_addr),
-#endif
 					    ntohs(from.SIN_PORT));
 				lasterr = timeofday;
 			    }
@@ -3363,16 +3205,10 @@ static	void	polludp(void)
 	else
 		cnt = 0, last = timeofday;
 
-#ifdef INET6
 	Debug((DEBUG_NOTICE, "udp (%d) %d bytes from %s,%d", cnt, n,
 	       inet_ntop(AF_INET6, (char *)&from.sin6_addr, ipv6string,
 			 sizeof(ipv6string)),
 	       ntohs(from.SIN_PORT)));
-#else
-	Debug((DEBUG_NOTICE, "udp (%d) %d bytes from %s,%d", cnt, n,
-	       inetntoa((char *)&from.sin_addr),
-	       ntohs(from.SIN_PORT)));
-#endif
 
 	readbuf[n] = '\0';
 	ircstp->is_udpok++;
