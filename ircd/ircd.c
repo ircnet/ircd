@@ -719,7 +719,7 @@ static	void	setup_me(aClient *mp)
 	SetMe(mp);
 	mp->serv->snum = find_server_num (ME);
 	/* we don't fill our own IP -> 0 as ip lenght */
-	(void) make_user(mp,0);
+	(void) make_user(mp);
 	istat.is_users++;	/* here, cptr->next is NULL, see make_user() */
 	mp->user->flags |= FLAGS_OPER;
 	mp->serv->up = mp;
