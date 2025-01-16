@@ -687,14 +687,14 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		{
 			find_bounce(cptr, ConfClass(aconf), -1);
 		}
-		/* Set spoofed hostname */
-		if(cptr->spoof_tmp && *cptr->spoof_tmp)
+		/* Set cloaked hostname */
+		if(cptr->cloak_tmp && *cptr->cloak_tmp)
 		{
-			strncpyzt(cptr->sockhost, cptr->spoof_tmp, HOSTLEN + 1);
-			strncpyzt(cptr->user->host, cptr->spoof_tmp, HOSTLEN + 1);
-			MyFree(cptr->spoof_tmp);
-			cptr->spoof_tmp = NULL;
-			SetSpoofed(cptr);
+			strncpyzt(cptr->sockhost, cptr->cloak_tmp, HOSTLEN + 1);
+			strncpyzt(cptr->user->host, cptr->cloak_tmp, HOSTLEN + 1);
+			MyFree(cptr->cloak_tmp);
+			cptr->cloak_tmp = NULL;
+			SetCloaked(cptr);
 		}
 		break;
 	}
@@ -940,16 +940,16 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		if (ConfMaxHLocal(aconf) > 0 || ConfMaxUHLocal(aconf) > 0 ||
 		    ConfMaxHGlobal(aconf) > 0 || ConfMaxUHGlobal(aconf) > 0 )
 		{
-			if (IsSASLAuthed(cptr) && cptr->spoof_tmp != NULL)
+			if (IsSASLAuthed(cptr) && cptr->cloak_tmp != NULL)
 			{
 				/*
-				 * Because all cloaked connections have the same IP address (SPOOF_IP),
+				 * Because all cloaked connections have the same IP address (CLOAK_IP),
 				 * we use the cloaked hostname to check the Y-line limits (instead of IP or sockhost).
 				 * (Originally from mh 2020-06-25)
 				 */
-				for ((user = hash_find_hostname(cptr->spoof_tmp, NULL)); user; user = user->hhnext)
+				for ((user = hash_find_hostname(cptr->cloak_tmp, NULL)); user; user = user->hhnext)
 				{
-					if (!mycmp(cptr->spoof_tmp, user->host))
+					if (!mycmp(cptr->cloak_tmp, user->host))
 					{
 						int ret = attach_conf_check_limits(cptr, aconf, user, &hcnt, &ucnt, &ghcnt, &gucnt);
 						if (ret != 0)

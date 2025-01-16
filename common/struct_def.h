@@ -193,7 +193,7 @@ typedef enum Status {
 #define FLAGS_RESTRICT	0x0010 /* restricted user */
 #define FLAGS_AWAY		0x0020 /* user is away */
 #define FLAGS_EXEMPT	0x0040 /* user is exempted from k-lines */
-#define FLAGS_SPOOFED	0x0080 /* user is spoofed */
+#define FLAGS_CLOAKED	0x0080 /* user's hostname is cloaked */
 #ifdef XLINE
 #define FLAGS_XLINED	0x0100	/* X-lined client */
 #endif
@@ -266,8 +266,8 @@ typedef enum Status {
 #define SetXlined(x)		((x)->user->flags |= FLAGS_XLINED)
 #define ClearXlined(x)		((x)->user->flags &= ~FLAGS_XLINED)
 #endif
-#define IsSpoofed(x)	((x)->user && (x)->user->flags & FLAGS_SPOOFED)
-#define SetSpoofed(x)	((x)->user->flags |= FLAGS_SPOOFED)
+#define IsCloaked(x)	((x)->user && (x)->user->flags & FLAGS_CLOAKED)
+#define SetCloaked(x)	((x)->user->flags |= FLAGS_CLOAKED)
 #define IsTLS(x)        ((x)->user && (x)->user->flags & FLAGS_TLS)
 #define SetTLS(x)       ((x)->user->flags |= FLAGS_TLS)
 #define IsCAPNegotiation(x)	(MyConnect(x) && (x)->cap_negotation)
@@ -585,7 +585,7 @@ struct Client	{
 	int caps; /* Enabled capabilities */
 	int cap_negotation; /* CAP negotiation is in progress. Registration must wait for "CAP END" */
 	aClient *sasl_service; /* The SASL service that is responsible for this user. */
-	char *spoof_tmp; /* Contains the spoofed hostname until it was applied to the user */
+	char *cloak_tmp; /* Contains the cloaked hostname until it was applied to the user */
 };
 
 #define	CLIENT_LOCAL_SIZE sizeof(aClient)

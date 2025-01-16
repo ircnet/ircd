@@ -779,11 +779,11 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, WHOISTLS_NOTICE);
 		}
 #endif
-		/* send a notice to client if the connection is spoofed.
-		 * notice is defined as SPOOF_NOTICE in config.h -- mh 20191230 */
-		if (IsSpoofed(sptr))
+		/* send a notice to client if client's hostname is cloaked.
+		 * notice is defined as CLOAKED_NOTICE in config.h -- mh 20191230 */
+		if (IsCloaked(sptr))
 		{
-			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, SPOOF_NOTICE);
+			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, CLOAKED_NOTICE);
 		}
 		if (IsConfNoResolve(sptr->confs->value.aconf))
 		{
@@ -2208,9 +2208,9 @@ static	void	send_whois(aClient *sptr, aClient *acptr)
 	if (IsAnOper(acptr))
 		sendto_one(sptr, replies[RPL_WHOISOPERATOR], ME, BadTo(sptr->name), name);
 
-	/* send a 320 numeric RPL_WHOISCLOAKED reply if client is spoofed.
+	/* send a 320 numeric RPL_WHOISCLOAKED reply if client's hostname is cloaked.
 	 * reply defined as SPOOF_WHOISCLOAKED in config.h -- mh 20191230 */
-	if (IsSpoofed(acptr))
+	if (IsCloaked(acptr))
 	{
 		sendto_one(sptr, replies[RPL_WHOISCLOAKED], ME, BadTo(sptr->name), name, SPOOF_WHOISCLOAKED);
 	}
