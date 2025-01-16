@@ -792,7 +792,7 @@
  * Define to the message you want to show in /WHOIS reply
  * (RPL_WHOISCLOAKED) for cloaked local clients. (mandatory)
  */
-#define SPOOF_WHOISCLOAKED  "is a Cloaked Connection (Spoof)"
+#define CLOAK_WHOISEXTRA  "is a Cloaked Connection (Spoof)"
 
 /*
  * The IP address shown instead of the real one
