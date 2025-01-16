@@ -46,6 +46,7 @@ EXTERN int sendto_serv_v (aClient *one, int ver, char *pattern, ...);
 EXTERN void sendto_common_channels (aClient *user, char *pattern, ...);
 EXTERN void sendto_channel_butserv (aChannel *chptr, aClient *from,
 				    char *pattern, ...);
+EXTERN void sendto_channels_butserv_caps(aClient *from, int caps, char *pattern, ...);
 EXTERN void sendto_channel_butserv_caps(aChannel *chptr, aClient *from, int caps, int excluded_caps,
 										char *pattern, ...);
 EXTERN void sendto_match_servs (aChannel *chptr, aClient *from,
