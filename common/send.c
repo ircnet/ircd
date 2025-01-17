@@ -764,13 +764,15 @@ void sendto_channels_butserv_caps(aClient *from, int caps, char *pattern, ...)
 		if (!from->user)
 		  return 0;
 
-		    // Iterate through all channels the user is on
+		// Iterate through all channels the user is on
+		va_start(va, pattern);
     for (channels = from->user->channel; channels; channels = channels->next)
     {
-        va_start(va, pattern);
+
         sendto_channel_butserv_caps(channels->value.chptr, from, CAP_AWAY_NOTIFY, 0, pattern, va);
-        va_end(va);
     }
+
+		va_end(va);
 }
 
 /*
