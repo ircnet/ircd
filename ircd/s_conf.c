@@ -2337,17 +2337,15 @@ findkline:
 			check = ident;
 		/* host & IP matching.. */
 		if (!ip) /* unresolved */
-		    {
+		{
 			if (strchr(tmp->host, '/'))
-			    {
+			{
 				if (match_ipmask_client((*tmp->host == '=') ? tmp->host + 1 : tmp->host, cptr, 1, 1))
 					continue;
-			    }
-			else          
-				if (match((*tmp->host == '=') ? tmp->host+1 :
-					  tmp->host, host))
-					continue;
-		    }
+			}
+			else if (match((*tmp->host == '=') ? tmp->host + 1 : tmp->host, host))
+				continue;
+		}
 		else if (*tmp->host == '=') /* numeric only */
 			continue;
 		else /* resolved */
