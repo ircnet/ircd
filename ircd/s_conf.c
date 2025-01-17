@@ -455,7 +455,7 @@ int match_ipmask_client(char *mask, aClient *cptr, int maskwithusername, int pre
 	int	m;
 	char	*p;
 	struct  IN_ADDR addr;
-	struct	IN_ADDR	client_addr = prefer_cloak ? get_client_addr(cptr) : cptr->ip;
+	struct IN_ADDR client_addr = prefer_cloak ? get_client_addr(cptr) : cptr->ip;
 	char	dummy[128];
 	char	*omask;
 	u_long	lmask;
@@ -501,15 +501,16 @@ int match_ipmask_client(char *mask, aClient *cptr, int maskwithusername, int pre
 	j = m & 0x1F;	/* number not mutliple of 32 bits */
 	m >>= 5;	/* number of 32 bits */
 
-	if (m && memcmp((void *)(addr.s6_addr),
-		(void *)(client_addr.s6_addr), m << 2))
+	if (m && memcmp((void *) (addr.s6_addr),
+					(void *) (client_addr.s6_addr), m << 2))
 		return 1;
 
 	if (j)
 	{
-		lmask = htonl((u_long)0xffffffffL << (32 - j));
-		if ((((u_int32_t *)(addr.s6_addr))[m] ^
-			((u_int32_t *)(client_addr.s6_addr))[m]) & lmask)
+		lmask = htonl((u_long) 0xffffffffL << (32 - j));
+		if ((((u_int32_t *) (addr.s6_addr))[m] ^
+			 ((u_int32_t *) (client_addr.s6_addr))[m]) &
+			lmask)
 			return 1;
 	}
 
@@ -535,12 +536,12 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 	int	retval = -2; /* EXITC_NOILINE in register_user() */
 
 	/* We fill uaddr and uhost now, before aconf loop. */
-	if(HAS_CLOAK_IP(cptr) && cptr->cloak_tmp)
+	if (HAS_CLOAK_IP(cptr) && cptr->cloak_tmp)
 	{
 		// Set IP address
-		char cloak_ip[HOSTLEN+1];
+		char cloak_ip[HOSTLEN + 1];
 		inetntop(AF_INET6, (void *) cptr->cloak_ip.s6_addr, cloak_ip, sizeof(cloak_ip));
-		if(cptr->user->sip)
+		if (cptr->user->sip)
 		{
 			MyFree(cptr->user->sip);
 		}
@@ -765,8 +766,8 @@ static int	add_cidr_limit(aClient *cptr, aConfItem *aconf)
 	if(pnode == NULL)
 	{
 		pnode = patricia_make_and_lookup_ip(ConfCidrTree(aconf),
-					&addr,
-					aconf->class->cidr_len);
+											&addr,
+											aconf->class->cidr_len);
 
 		if(pnode == NULL)
 			return -1;
@@ -1157,8 +1158,7 @@ aConfItem	*find_Oline(char *name, aClient *cptr)
 		** the ip does.
 		*/
 		if (match(tmp->host, userhost) && match(tmp->host, userip) &&
-			(!strchr(tmp->host, '/') 
-			|| match_ipmask_client(tmp->host, cptr, 1, 1)))
+			(!strchr(tmp->host, '/') || match_ipmask_client(tmp->host, cptr, 1, 1)))
 			continue;
 		if (tmp->clients < MaxLinks(Class(tmp)))
 			return tmp;
@@ -2340,8 +2340,7 @@ findkline:
 		    {
 			if (strchr(tmp->host, '/'))
 			    {
-				if (match_ipmask_client((*tmp->host == '=') ?
-						 tmp->host+1: tmp->host, cptr, 1, 1))
+				if (match_ipmask_client((*tmp->host == '=') ? tmp->host + 1 : tmp->host, cptr, 1, 1))
 					continue;
 			    }
 			else          
@@ -2353,10 +2352,10 @@ findkline:
 			continue;
 		else /* resolved */
 			if (strchr(tmp->host, '/'))
-			    {
+			{
 				if (match_ipmask_client(tmp->host, cptr, 1, 1))
 					continue;
-			    }
+			}
 			else
 				if (match(tmp->host, ip) &&
 				    match(tmp->host, host))
@@ -2793,9 +2792,8 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 			/* unresolved */
 			if (strchr(aconf->host, '/'))
 			{
-				if (match_ipmask_client(*aconf->host == '=' ?
-					aconf->host + 1 : aconf->host,
-					acptr, 1, 1))
+				if (match_ipmask_client(*aconf->host == '=' ? aconf->host + 1 : aconf->host,
+										acptr, 1, 1))
 				{
 					continue;
 				}

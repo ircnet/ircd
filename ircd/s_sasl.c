@@ -151,8 +151,7 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (parc == 7)
 		{
 			// Validate and store the user's unique IP address
-			if (match_ipmask(SASL_CLOAK_IP_RANGE, parv[5])
-				|| inetpton(AF_INET6, parv[5], (void *) acptr->cloak_ip.s6_addr) != 1)
+			if (match_ipmask(SASL_CLOAK_IP_RANGE, parv[5]) || inetpton(AF_INET6, parv[5], (void *) acptr->cloak_ip.s6_addr) != 1)
 			{
 				sendto_flag(SCH_ERROR, "Received bad IP address %s from %s", parv[5], acptr->sasl_service->name);
 				acptr->exitc = EXITC_SASL_REQUIRED;

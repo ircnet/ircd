@@ -243,7 +243,7 @@ char	*get_client_host(aClient *cptr)
 
 struct IN_ADDR get_client_addr(aClient *cptr)
 {
-	if(HAS_CLOAK_IP(cptr))
+	if (HAS_CLOAK_IP(cptr))
 		return cptr->cloak_ip;
 	else
 		return cptr->ip;
