@@ -786,7 +786,7 @@
  * Define to the message you want to send to clients connecting
  * with a cloaked hostname, undef to disable sending a notice.
  */
-#define CLOAKED_NOTICE    "Due to an administrative decision, your connection is cloaked."
+#define CLOAK_NOTICE    "Due to an administrative decision, your connection is cloaked."
 
 /*
  * Define to the message you want to show in /WHOIS reply

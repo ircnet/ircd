@@ -780,10 +780,10 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		}
 #endif
 		/* send a notice to client if client's hostname is cloaked.
-		 * notice is defined as CLOAKED_NOTICE in config.h -- mh 20191230 */
+		 * notice is defined as CLOAK_NOTICE in config.h -- mh 20191230 */
 		if (IsCloaked(sptr))
 		{
-			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, CLOAKED_NOTICE);
+			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, CLOAK_NOTICE);
 		}
 		if (IsConfNoResolve(sptr->confs->value.aconf))
 		{
