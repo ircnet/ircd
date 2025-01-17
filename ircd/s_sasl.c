@@ -113,6 +113,7 @@ int m_sasl(aClient *cptr, aClient *sptr, int parc, char *parv[])
 void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient * acptr;
+	char comment[BUFSIZE];
 
 	if (parc < 5)
 	{
@@ -147,22 +148,29 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	else if (*parv[3] == 'L')
 	{
 		// Login
-		if (parc == 6)
+		if (parc == 7)
 		{
-			if (bad_hostname(parv[5], strlen(parv[5])))
+			// Validate and store the user's unique IP address
+			if (match_ipmask(SASL_CLOAK_IP_RANGE, parv[5])
+				|| inetpton(AF_INET6, parv[5], (void *) acptr->cloak_ip.s6_addr) != 1)
 			{
-				char comment[BUFSIZE];
-				sendto_flag(SCH_ERROR, "Received bad hostname %s from %s", parv[5], acptr->sasl_service->name);
+				sendto_flag(SCH_ERROR, "Received bad IP address %s from %s", parv[5], acptr->sasl_service->name);
 				acptr->exitc = EXITC_SASL_REQUIRED;
-				snprintf(comment, BUFSIZE, "Bad hostname (%s)", parv[5]);
+				snprintf(comment, BUFSIZE, "Bad IP address (%s)", parv[5]);
 				exit_client(acptr, acptr, &me, comment);
 				return;
 			}
-			else
+			if (bad_hostname(parv[6], strlen(parv[6])))
 			{
-				// Store cloaked hostname. It will finally be set by attach_Iline().
-				acptr->cloak_tmp = mystrdup(parv[5]);
+				sendto_flag(SCH_ERROR, "Received bad hostname %s from %s", parv[6], acptr->sasl_service->name);
+				acptr->exitc = EXITC_SASL_REQUIRED;
+				snprintf(comment, BUFSIZE, "Bad hostname (%s)", parv[6]);
+				exit_client(acptr, acptr, &me, comment);
+				return;
 			}
+
+			// Store cloaked hostname. IP address and hostname will finally be set by attach_Iline().
+			acptr->cloak_tmp = mystrdup(parv[6]);
 		}
 		acptr->sasl_user = mystrdup(parv[4]);
 		sendto_one(acptr, replies[RPL_LOGGEDIN], me.name, BadTo(acptr->name), BadTo(acptr->name),
