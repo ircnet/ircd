@@ -42,6 +42,7 @@ EXTERN int check_registered (aClient *sptr);
 EXTERN int check_registered_service (aClient *sptr);
 EXTERN char *get_client_name (aClient *sptr, int showip);
 EXTERN char *get_client_host (aClient *cptr);
+EXTERN struct IN_ADDR get_client_addr(aClient *cptr);
 EXTERN char *get_client_ip (aClient *cptr);
 EXTERN void get_sockhost (Reg aClient *cptr, Reg char *host);
 EXTERN char *my_name_for_link (char *name, Reg int count);

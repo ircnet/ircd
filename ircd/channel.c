@@ -389,7 +389,7 @@ static	Link	*match_modeid(int type, aClient *cptr, aChannel *chptr)
 				}
 				/* so now we check CIDR */
 				if (strchr(tmp->value.alist->host, '/') &&
-					match_ipmask_client(tmp->value.alist->host, cptr, 0) == 0)
+					match_ipmask_client(tmp->value.alist->host, cptr, 0, 1) == 0)
 				{
 					break;
 				}

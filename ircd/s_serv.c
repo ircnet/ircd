@@ -1837,6 +1837,7 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 {
 	static char locip[100], *ret;
 	int s;
+	struct IN_ADDR addr = get_client_addr(acptr);
 
 	if (IsMe(acptr) || !acptr->acpt || !IsRegistered(acptr))
 		return;
@@ -1844,16 +1845,15 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 	s = strlen(ret) + 1;
 	memcpy(locip, ret, s < sizeof(locip) ? s : sizeof(locip));
 	locip[sizeof(locip) - 1] = 0;
-	sendto_one(sptr,":%s %d %s %d %s %d %s %d %s %s %d",
-		ME,RPL_STATSLINKINFO,to,
-		acptr->fd,
-		locip,
-		acptr->acpt->port,
-		inetntop(AF_INET6, (char *)&acptr->ip, ipv6string, sizeof(ipv6string)),
-		acptr->port,acptr->name,
-		acptr->user ? acptr->user->username : acptr->auth,
-		acptr->user ? timeofday - acptr->user->last : -1
-		);
+	sendto_one(sptr, ":%s %d %s %d %s %d %s %d %s %s %d",
+			   ME, RPL_STATSLINKINFO, to,
+			   acptr->fd,
+			   locip,
+			   acptr->acpt->port,
+			   inetntop(AF_INET6, &addr, ipv6string, sizeof(ipv6string)),
+			   acptr->port, acptr->name,
+			   acptr->user ? acptr->user->username : acptr->auth,
+			   acptr->user ? timeofday - acptr->user->last : -1);
 }
 
 int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])

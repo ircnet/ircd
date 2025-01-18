@@ -795,10 +795,10 @@
 #define CLOAK_WHOISEXTRA  "is a Cloaked Connection (Spoof)"
 
 /*
- * The IP address shown instead of the real one
- *  (for example in /STATS L) for cloaked clients. (mandatory)
+ * Besides the cloaked hostname a user also gets a unique IP address assigned by a SASL service.
+ * This defines the range of IP addresses that are allowed to be set.
  */
-#define CLOAK_IP    "255.255.255.255"
+#define SASL_CLOAK_IP_RANGE "fdf0:584f:e66b::/48"
 
 /************************************************************************
  *
