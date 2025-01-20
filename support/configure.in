@@ -810,6 +810,11 @@ AC_C_CONST
 AC_CHECK_LIB(crypt, crypt)
 AC_CHECK_LIB(socket, socket)
 AC_CHECK_LIB(nsl, socket)
+AC_CHECK_LIB([cares], [ares_library_init],
+  [AC_DEFINE([HAVE_CARES], [1], [Define if c-ares is available])
+   AC_SUBST([CARES_LIBS], [-lcares])
+   AC_MSG_RESULT([found c-ares])],
+  [AC_MSG_ERROR([c-ares library is required but not found!])])
 
 IRC_MATHLIB
 IRC_PATH_ZLIB
