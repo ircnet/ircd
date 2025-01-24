@@ -577,7 +577,6 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		}
 		else
 		{
-			uaddr[0] = '\0';
 			uhost[0] = '\0';
 		}
 	}
