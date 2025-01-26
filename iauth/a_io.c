@@ -94,11 +94,18 @@ static	void	next_io(int cl, AnInstance *last)
 		    close(cldata[cl].wfd);
 	    cldata[cl].rfd = cldata[cl].wfd = 0;
 	}
-		       
+	if (cldata[cl].data)
+	{
+		sendto_log(ALOG_IRCD|ALOG_DMISC, LOG_ERR,
+		          "module \"%s\" didn't clean data",
+		          last->mod->name);
+	}
     cldata[cl].buflen = 0;
     cldata[cl].mod_status = 0;
     cldata[cl].instance = NULL;
     cldata[cl].timeout = 0;
+    cldata[cl].async = 0;
+    cldata[cl].data = NULL;
 
     /* third, if A_START is set, a new pass has to be started */
     if (cldata[cl].state & A_START)
@@ -298,6 +305,8 @@ static	void	parse_ircd(void)
 			cldata[cl].state = 0;
 			if (cldata[cl].rfd > 0 || cldata[cl].wfd > 0)
 				cldata[cl].instance->mod->clean(cl);
+			//TODO: async modules?
+			//TODO: data cleanup?
 			cldata[cl].instance = NULL;
 			/* log something here? hmmpf */
 			if (cldata[cl].authuser)
@@ -354,6 +363,9 @@ static	void	parse_ircd(void)
 			cldata[cl].instance = NULL;
 			cldata[cl].authuser = NULL;
 			cldata[cl].inbuffer = NULL;
+			//TODO: async modules?
+			//TODO: data cleanup?
+
 			/*
 			** this is the ugly part of having a slave (considering
 			** that ircd remaps fd's: there is lag between the
@@ -737,6 +749,21 @@ void	loop_io(void)
 #endif
 }
 
+void	loop_async(void)
+{
+	int i;
+
+	for (i = 0; i <= cl_highest; i++)
+	{
+	    if (cldata[i].state & A_ACTIVE && cldata[i].async)
+		{
+			if (cldata[i].instance->mod->work(i) != 0)
+			{
+				next_io(i, cldata[i].instance);
+			}
+		}
+	}
+}
 /*
  * set_non_blocking (ripped from ircd/s_bsd.c)
  */

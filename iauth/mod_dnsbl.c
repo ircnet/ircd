@@ -27,6 +27,8 @@ static const volatile char rcsid[] = "@(#)$Id: mod_dnsbl.c,v 1.1 2024/10/1 15:35
 // "os.h" must be included before "a_defines.h"
 #include "os.h"
 #include "a_defines.h"
+#include "ares.h"
+
 // clang-format on
 #define MOD_DNSBL_C
 #include "a_externs.h"
@@ -57,6 +59,13 @@ struct dnsbl_list {
 	struct dnsbl_list *next;
 };
 
+struct dnsbl_query {
+	u_int cl;
+	u_int requests;
+	u_int found;
+	AnInstance *self;
+};
+
 struct dnsbl_private {
 	struct hostlog *cache;
 	char *reason;
@@ -66,8 +75,28 @@ struct dnsbl_private {
 	u_int chitc, chito, chitn, cmiss, cnow, cmax;
 	u_int found, failed, good, total, rejects;
 	struct dnsbl_list *host_list;
+	ares_channel channel;
 };
 
+/*
+ * Returns true if this ip should be blocked,
+ * false if it should be allowed. 
+ */
+static int dnsbl_check_hit(struct dnsbl_private *mydata, char *result)
+{
+
+	if (
+	    (
+			mydata->options & OPT_PARANOID && 
+			result[0] == '\177' && result[1] == '\0' && result[2] == '\0'
+		) ||
+		mydata->options & OPT_PARANOID == 0
+	)
+	{
+		return TRUE;
+	}
+	return FALSE;
+}
 /*
  * dnsbl_succeed
  *
@@ -82,11 +111,22 @@ static void dnsbl_succeed(u_int cl, char *listname, char *result)
 										   result[0] == '\177' && result[1] == '\0' &&
 										   result[2] == '\0' /*  && result[3] == '\2' */))
 	{
-		cldata[cl].state |= A_DENY;
-		sendto_ircd("k %d %s %u #dnsbl :%s", cl,
-					cldata[cl].itsip, cldata[cl].itsport,
-					reason ? reason : "");
-		mydata->rejects++;
+		if ( cldata[cl].instance->mod->name == "dnsbl" )
+		{
+
+			mydata->rejects++;
+			// make iauth get to 'work' to retrieve the data
+
+			// TODO: store data so dnsbl_work can retrieve the data
+			sendto_ircd("k %d %s %u #dnsbl :%s", cl,
+						cldata[cl].itsip, cldata[cl].itsport,
+						reason ? reason : "");
+
+		} else {
+			sendto_ircd("> S %d is ignored because not conected to mod_dnsbl #%s %u #dnsbl :%s", cl,
+						cldata[cl].itsip, cldata[cl].itsport,
+						cldata[cl].instance->mod->name);
+		}
 	}
 	if (mydata->options & OPT_LOG)
 		sendto_log(ALOG_FLOG | ALOG_IRCD | ALOG_DNSBL, LOG_INFO, "%s: found: %s[%s]",
@@ -101,7 +141,7 @@ static void dnsbl_succeed(u_int cl, char *listname, char *result)
 static void dnsbl_add_cache(u_int cl, u_int state)
 {
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
-	struct hostlog *next;
+	struct hostlog *newcache;
 
 	if (state == DNSBL_FOUND)
 		mydata->found++;
@@ -117,12 +157,12 @@ static void dnsbl_add_cache(u_int cl, u_int state)
 	if (mydata->cnow > mydata->cmax)
 		mydata->cmax = mydata->cnow;
 
-	next = mydata->cache;
-	mydata->cache = (struct hostlog *) malloc(sizeof(struct hostlog));
-	mydata->cache->expire = time(NULL) + mydata->lifetime;
-	strcpy(mydata->cache->ip, cldata[cl].itsip);
-	mydata->cache->state = state;
-	mydata->cache->next = next;
+	newcache = (struct hostlog *) malloc(sizeof(struct hostlog));
+	newcache->expire = time(NULL) + mydata->lifetime;
+	strcpy(newcache->ip, cldata[cl].itsip);
+	newcache->state = state;
+	newcache->next = mydata->cache;
+	mydata->cache = newcache;
 	DebugLog((ALOG_DNSBLC, 0,
 			  "dnsbl_add_cache(%d): new cache %s, result=%d",
 			  cl, mydata->cache->ip, state));
@@ -195,10 +235,14 @@ static int dnsbl_check_cache(u_int cl)
  */
 static char *dnsbl_init(AnInstance *self)
 {
+	sendto_ircd("> dnsbl init start");
+
 	struct dnsbl_private *mydata;
 	struct dnsbl_list *l;
 	char tmpbuf[255], cbuf[32], *s;
 	static char txtbuf[255];
+	struct ares_options options;
+	int optmask = 0;
 
 	if (self->opt == NULL)
 		return "Aie! no option(s): nothing to be done!";
@@ -209,6 +253,21 @@ static char *dnsbl_init(AnInstance *self)
 	mydata->cache = NULL;
 	mydata->host_list = NULL;
 	mydata->lifetime = CACHETIME;
+
+	ares_library_init(ARES_LIB_INIT_ALL);
+	if (!ares_threadsafety()) {
+		return "Aie! No DNSBL host: nothing to be done!";
+	}
+
+	/* Enable event thread so we don't have to monitor file descriptors */
+	memset(&options, 0, sizeof(options));
+	optmask      |= ARES_OPT_EVENT_THREAD;
+	options.evsys = ARES_EVSYS_DEFAULT;
+
+	/* queries */
+	if (ares_init_options(&mydata->channel, &options, optmask) != ARES_SUCCESS) {
+		sendto_ircd("> Aie! No DNSBL host: nothing to be done!");
+	}
 
 	tmpbuf[0] = txtbuf[0] = '\0';
 	if (strstr(self->opt, "log"))
@@ -298,6 +357,8 @@ static char *dnsbl_init(AnInstance *self)
 		mydata->reason = mystrdup(self->reason);
 	}
 	self->popt = strdup(tmpbuf + 1);
+	sendto_ircd("> dnsbl init end");
+
 	return txtbuf + 2;
 }
 
@@ -310,6 +371,7 @@ void dnsbl_release(AnInstance *self)
 {
 	struct dnsbl_private *mydata = self->data;
 	struct dnsbl_list *l, *n;
+	int cl;
 
 	for (l = mydata->host_list; l; l = n)
 	{
@@ -317,6 +379,19 @@ void dnsbl_release(AnInstance *self)
 		n = l->next;
 		free(l);
 	}
+
+	cl = MAXCONNECTIONS;
+	while (cl > 0 )
+	{
+		if (cldata[cl].instance == self && cldata[cl].data )
+		{
+			free(cldata[cl].data);
+			cldata[cl].data = NULL;
+		}
+		cl--;
+	}
+	ares_destroy(mydata->channel);
+	ares_library_cleanup();
 
 	free(mydata);
 	free(self->popt);
@@ -335,6 +410,61 @@ static void dnsbl_stats(AnInstance *self)
 				mydata->total, mydata->rejects);
 }
 
+
+static void dnsbl_callback(void * arg, int status, int timeouts, struct hostent *host)
+{
+	DebugLog((ALOG_DNSBL, 0, "dnsbl_callback start"));
+
+	struct dnsbl_query * qd = (struct dnsbl_query *)arg;
+	u_int cl = qd->cl;
+	struct dnsbl_private *mydata = cldata[cl].instance->data;
+
+	DebugLog((ALOG_DNSBL, 0, "dnsbl_callback(%d)", cl));
+	sendto_ircd("> dnsbl callback for %d", cl);
+	qd->requests--;
+	if (status == ARES_SUCCESS && host)
+	{
+		//TODO: can we still add them
+		qd->found++;
+		dnsbl_succeed(cl, "dnsbl", host->h_addr_list[0]);
+	}
+	if(qd->requests < 1)
+	{
+		// no more responses expected
+		// did we find anything ?
+		DebugLog((ALOG_DNSBL, 0, "dnsbl_callback(%d): found %d", cl, qd->found));
+
+		if(qd->found < 1)
+		{
+			// no hit
+			dnsbl_add_cache(cl, DNSBL_FAILED);
+		}
+		else
+		{
+			// hit, and it's logged
+			// TODO: ?
+		}
+		if (cldata[cl].instance != qd->self)
+		{
+			// callback has arived after the instance was finished, silenty clenanup
+			DebugLog((ALOG_DNSBL, 0, "dnsbl_callback(%d): already no longer in this instance", cl));
+			DebugLog((ALOG_DNSBL, 0, "dnsbl_callback(%d) free data", cl));
+			free(arg);
+		}
+		else
+		{
+			DebugLog((ALOG_DNSBL, 0, "dnsbl_callback(%d) free redirected", cl));
+			// trigger the work routine to return the result
+			cldata[cl].async = 1;
+		}
+	}
+	else
+	{
+		DebugLog((ALOG_DNSBL, 0, "dnsbl_callback(%d) free not needed", cl));
+		sendto_ircd("> dnsbl more work needed for %d: %d", cl, qd->requests);
+	}
+}
+
 /*
  * dnsbl_start
  *
@@ -350,28 +480,26 @@ static void dnsbl_stats(AnInstance *self)
  */
 static int dnsbl_start(u_int cl)
 {
+	sendto_ircd("> dnsbl start start");
+
 	char lookup[128];
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
-	struct dnsbl_list *l, *m;
-	struct hostent *he = NULL;
+	struct dnsbl_list *l;
 	struct addrinfo hints, *addr_res;
-
+	struct dnsbl_query *qd;
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_UNSPEC;
+	hints.ai_family = AF_INET;
 	hints.ai_flags = AI_NUMERICHOST;
 
+	sendto_ircd("> wtf ? %d %s", cl, cldata[cl].itsip);
 	if (getaddrinfo(cldata[cl].itsip, NULL, &hints, &addr_res))
 	{
-		DebugLog((ALOG_DNSBL, 0,
-				  "dnsbl_start(%d): invalid address '%s', skipping ",
-				  cl, cldata[cl].itsip));
-
+		DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): invalid address '%s', skipping ", cl, cldata[cl].itsip));
 		return -1;
 	}
 
 	if (cldata[cl].state & A_DENY)
 	{
-		/* no point of doing anything */
 		DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): A_DENY already set ", cl));
 		return -1;
 	}
@@ -380,8 +508,14 @@ static int dnsbl_start(u_int cl)
 		return -1;
 
 	DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): checking %s", cl, cldata[cl].itsip));
+	qd = (struct dnsbl_query *)malloc(sizeof(struct dnsbl_query));
+	qd->cl = cl;
+	qd->requests = 0;
+	qd->found = 0;
+	qd->self = cldata[cl].instance;
+	cldata[cl].data = qd;
 
-	for (l = mydata->host_list; l && !he; l = l->next)
+	for (l = mydata->host_list; l; l = l->next)
 	{
 		if (addr_res->ai_family == AF_INET)
 		{
@@ -421,25 +555,15 @@ static int dnsbl_start(u_int cl)
 		else
 			continue;
 
-		DebugLog((ALOG_DNSBL, 0,
-				  "dnsbl_start(%d): gethostbyname() for %s",
-				  cl, lookup));
-		he = gethostbyname(lookup);
-		m = l;
+		DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): ares_gethostbyname() for %s", cl, lookup));
+		qd->requests++;
+		ares_gethostbyname(mydata->channel, lookup, AF_INET, dnsbl_callback, (void *)qd);
 	}
 	mydata->total++;
-
-	if (he)
-		dnsbl_succeed(cl, m->host, he->h_addr_list[0]);
-	else
-	{
-		DebugLog((ALOG_DNSBL, 0,
-				  "dnsbl_start(%d): gethostbyname() reported %s",
-				  cl, hstrerror(h_errno)));
-		dnsbl_add_cache(cl, DNSBL_FAILED);
-	}
-
-	return -1;
+	// ares_queue_wait_empty(mydata->channel, 0);
+	sendto_ircd("> dnsbl start end");
+	// cldata[cl].async = 1;
+	return 0;
 }
 
 /*
@@ -454,11 +578,33 @@ static int dnsbl_start(u_int cl)
 static int dnsbl_work(u_int cl)
 {
 	/*
-   ** There' nothing to do here
-   */
+	 * There' nothing to do here
+	 */
+	struct dnsbl_private *mydata = cldata[cl].instance->data;
+
 	DebugLog((ALOG_DNSBL, 0,
 			  "dnsbl_work(%d) invoked but why?", cl));
-	return 0;
+	cldata[cl].async = 0;
+
+	// if data
+	if(cldata[cl].data)
+	{
+		// only delete the data if no more requests are expected
+		struct dnsbl_query * qd = (struct dnsbl_query *)cldata[cl].data;
+		if(qd->requests < 1){
+			DebugLog((ALOG_DNSBL, 0, "dnsbl_work(%d) free data", cl));
+			void * idata = cldata[cl].data;
+			cldata[cl].data = NULL;
+			free(idata);
+		}
+		else
+		{
+			DebugLog((ALOG_DNSBL, 0, "dnsbl_work(%d) free ABORTED", cl));
+		}
+	}
+	DebugLog((ALOG_DNSBL, 0,
+			  "dnsbl_work(%d) done? %d", cl, cldata[cl].data));
+	return -1;
 }
 
 /*
@@ -471,10 +617,23 @@ static int dnsbl_work(u_int cl)
 static void dnsbl_clean(u_int cl)
 {
 	DebugLog((ALOG_DNSBL, 0, "dnsbl_clean(%d): cleaning up", cl));
-	/*
-	 * only one of rfd and wfd may be set at the same time,
-	 * in any case, they would be the same fd, so only close() once
-	 */
+	cldata[cl].async = 0;
+	// if data
+	if(cldata[cl].data)
+	{
+		// only delete the data if no more requests are expected
+		struct dnsbl_query * qd = (struct dnsbl_query *)cldata[cl].data;
+		if(qd->requests < 1){
+			DebugLog((ALOG_DNSBL, 0, "dnsbl_cleanup(%d) free data", cl));
+			free(cldata[cl].data);
+		}
+		else
+		{
+			DebugLog((ALOG_DNSBL, 0, "dnsbl_cleanup(%d) free ABORTED", cl));
+		}
+	}
+	// we might leak this data, handle this in the callback
+	cldata[cl].data = NULL;
 }
 
 /*
@@ -491,6 +650,7 @@ static int dnsbl_timeout(u_int cl)
 	dnsbl_clean(cl);
 	return -1;
 }
+
 
 aModule Module_dnsbl = { "dnsbl", dnsbl_init, dnsbl_release, dnsbl_stats,
 						 dnsbl_start, dnsbl_work, dnsbl_timeout, dnsbl_clean };

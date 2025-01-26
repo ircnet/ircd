@@ -51,6 +51,8 @@ struct AuthData
 	AnInstance	*instance;	/* the module instanciation working */
 	u_int	mod_status;		/* used by the module only! */
 	time_t	timeout;		/* timeout */
+	u_short	async;			/* module is running async, this triggers the main loop*/
+	void	*data;			/* module specific data */
 };
 
 #define	A_ACTIVE	0x0001	/* entry is active */

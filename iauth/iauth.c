@@ -221,7 +221,7 @@ int	main(int argc, char *argv[])
 	while (1)
 	    {
 		loop_io();
-
+		loop_async();
 		if (do_log)
 		    {
 			sendto_log(ALOG_IRCD|ALOG_DMISC, LOG_INFO,
