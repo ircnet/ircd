@@ -450,11 +450,12 @@ void	det_confs_butmask(aClient *cptr, int mask)
  * Now should work for IPv6 too.
  * returns -1 on error, 0 on match, 1 when NO match.
  */
-int match_ipmask_client(char *mask, aClient *cptr, int maskwithusername)
+int match_ipmask_client(char *mask, aClient *cptr, int maskwithusername, int prefer_cloak)
 {
 	int	m;
 	char	*p;
 	struct  IN_ADDR addr;
+	struct IN_ADDR client_addr = prefer_cloak ? get_client_addr(cptr) : cptr->ip;
 	char	dummy[128];
 	char	*omask;
 	u_long	lmask;
@@ -500,15 +501,16 @@ int match_ipmask_client(char *mask, aClient *cptr, int maskwithusername)
 	j = m & 0x1F;	/* number not mutliple of 32 bits */
 	m >>= 5;	/* number of 32 bits */
 
-	if (m && memcmp((void *)(addr.s6_addr), 
-		(void *)(cptr->ip.s6_addr), m << 2))
+	if (m && memcmp((void *) (addr.s6_addr),
+					(void *) (client_addr.s6_addr), m << 2))
 		return 1;
 
 	if (j)
 	{
-		lmask = htonl((u_long)0xffffffffL << (32 - j));
-		if ((((u_int32_t *)(addr.s6_addr))[m] ^
-			((u_int32_t *)(cptr->ip.s6_addr))[m]) & lmask)
+		lmask = htonl((u_long) 0xffffffffL << (32 - j));
+		if ((((u_int32_t *) (addr.s6_addr))[m] ^
+			 ((u_int32_t *) (client_addr.s6_addr))[m]) &
+			lmask)
 			return 1;
 	}
 
@@ -534,20 +536,50 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 	int	retval = -2; /* EXITC_NOILINE in register_user() */
 
 	/* We fill uaddr and uhost now, before aconf loop. */
-	sprintf(uaddr, "%s@%s", cptr->username, sockhost);
-	if (hp)
+	if (HAS_CLOAK_IP(cptr) && cptr->cloak_tmp)
 	{
-		char	fullname[HOSTLEN+1];
+		// Set IP address
+		char cloak_ip[HOSTLEN + 1];
+		inetntop(AF_INET6, (void *) cptr->cloak_ip.s6_addr, cloak_ip, sizeof(cloak_ip));
+		if (cptr->user->sip)
+		{
+			MyFree(cptr->user->sip);
+		}
+		cptr->user->sip = mystrdup(cloak_ip);
 
-		/* If not for add_local_domain, I wouldn't need this
-		** fullname. Can't we add_local_domain somewhere in
-		** dns code? --B. */
-		strncpyzt(fullname, hp->h_name, sizeof(fullname));
-		add_local_domain(fullname, HOSTLEN - strlen(fullname));
-		Debug((DEBUG_DNS, "a_il: %s->%s", sockhost, fullname));
-		sprintf(uhost, "%s@%s", cptr->username, fullname);
+		// Set hostname
+		strncpyzt(cptr->sockhost, cptr->cloak_tmp, HOSTLEN + 1);
+		strncpyzt(cptr->user->host, cptr->cloak_tmp, HOSTLEN + 1);
+		MyFree(cptr->cloak_tmp);
+		cptr->cloak_tmp = NULL;
+
+		// Mark as cloaked
+		SetCloaked(cptr);
+
+		// Set variables for I-Line check
+		sprintf(uaddr, "%s@%s", cptr->username, cptr->user->sip);
+		sprintf(uhost, "%s@%s", cptr->username, cptr->user->host);
 	}
-	/* all uses of uhost are guarded by if (hp), so no need to zero it. */
+	else
+	{
+		sprintf(uaddr, "%s@%s", cptr->username, sockhost);
+		if (hp)
+		{
+			char fullname[HOSTLEN + 1];
+
+			/* If not for add_local_domain, I wouldn't need this
+			** fullname. Can't we add_local_domain somewhere in
+			** dns code? --B. */
+			strncpyzt(fullname, hp->h_name, sizeof(fullname));
+			add_local_domain(fullname, HOSTLEN - strlen(fullname));
+			Debug((DEBUG_DNS, "a_il: %s->%s", sockhost, fullname));
+			sprintf(uhost, "%s@%s", cptr->username, fullname);
+		}
+		else
+		{
+			uhost[0] = '\0';
+		}
+	}
 
 	for (aconf = conf; aconf; aconf = aconf->next)
 	{
@@ -585,7 +617,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		{
 			int	namematched = 0;
 
-			if (hp)
+			if (*uhost)
 			{
 				if (!UHConfMatch(aconf->name, uhost, ulen))
 				{
@@ -625,7 +657,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 				
 				/* match_ipmask_client takes care of checking
 				** possible username if aconf->host has '@' */
-				if (match_ipmask_client(aconf->host, cptr, 1))
+				if (match_ipmask_client(aconf->host, cptr, 1, 1))
 				{
 					/* Try another I:line. */
 					continue;
@@ -661,7 +693,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 
 		/* Various cases of +r. */
 		if (IsConfRestricted(aconf) ||
-			(!hp && IsConfRNoDNS(aconf)) ||
+			(!(*uhost) && IsConfRNoDNS(aconf)) ||
 			(!(cptr->flags & FLAGS_GOTID) && IsConfRNoIdent(aconf)))
 		{
 			SetRestricted(cptr);
@@ -678,7 +710,7 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 #endif
 
 		/* Copy uhost (hostname) over sockhost, if conf flag permits. */
-		if (hp && !IsConfNoResolve(aconf))
+		if (!IsCloaked(cptr) && *uhost && !IsConfNoResolve(aconf))
 		{
 			get_sockhost(cptr, uhost+ulen);
 		}
@@ -686,15 +718,6 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		if ((retval = attach_conf(cptr, aconf)) < -1)
 		{
 			find_bounce(cptr, ConfClass(aconf), -1);
-		}
-		/* Set cloaked hostname */
-		if(cptr->cloak_tmp && *cptr->cloak_tmp)
-		{
-			strncpyzt(cptr->sockhost, cptr->cloak_tmp, HOSTLEN + 1);
-			strncpyzt(cptr->user->host, cptr->cloak_tmp, HOSTLEN + 1);
-			MyFree(cptr->cloak_tmp);
-			cptr->cloak_tmp = NULL;
-			SetCloaked(cptr);
 		}
 		break;
 	}
@@ -731,18 +754,19 @@ aConfItem	*count_cnlines(Link *lp)
 static int	add_cidr_limit(aClient *cptr, aConfItem *aconf)
 {
 	patricia_node_t *pnode;
+	struct IN_ADDR addr = get_client_addr(cptr);
 
 	if(aconf->class->cidr_amount == 0 || aconf->class->cidr_len == 0)
 		return -1;
 
-	pnode = patricia_match_ip(ConfCidrTree(aconf), &cptr->ip);
+	pnode = patricia_match_ip(ConfCidrTree(aconf), &addr);
 
-	/* doesnt exist, create and then allow */
+	/* doesn't exist, create and then allow */
 	if(pnode == NULL)
 	{
 		pnode = patricia_make_and_lookup_ip(ConfCidrTree(aconf),
-					&cptr->ip,
-					aconf->class->cidr_len);
+											&addr,
+											aconf->class->cidr_len);
 
 		if(pnode == NULL)
 			return -1;
@@ -761,11 +785,12 @@ static int	add_cidr_limit(aClient *cptr, aConfItem *aconf)
 static void	remove_cidr_limit(aClient *cptr, aConfItem *aconf)
 {
 	patricia_node_t *pnode;
+	struct IN_ADDR addr = get_client_addr(cptr);
 
 	if(ConfMaxCidrAmount(aconf) == 0 || ConfCidrLen(aconf) == 0)
 		return;
 
-	pnode = patricia_match_ip(ConfCidrTree(aconf), &cptr->ip);
+	pnode = patricia_match_ip(ConfCidrTree(aconf), &addr);
 
 	if(pnode == NULL)
 		return;
@@ -940,16 +965,12 @@ int	attach_conf(aClient *cptr, aConfItem *aconf)
 		if (ConfMaxHLocal(aconf) > 0 || ConfMaxUHLocal(aconf) > 0 ||
 		    ConfMaxHGlobal(aconf) > 0 || ConfMaxUHGlobal(aconf) > 0 )
 		{
-			if (IsSASLAuthed(cptr) && cptr->cloak_tmp != NULL)
+			if (IsCloaked(cptr))
 			{
-				/*
-				 * Because all cloaked connections have the same IP address (CLOAK_IP),
-				 * we use the cloaked hostname to check the Y-line limits (instead of IP or sockhost).
-				 * (Originally from mh 2020-06-25)
-				 */
-				for ((user = hash_find_hostname(cptr->cloak_tmp, NULL)); user; user = user->hhnext)
+				// Check only by IP address because every SASL account has a unique IP address
+				for ((user = hash_find_ip(cptr->user->sip, NULL)); user; user = user->iphnext)
 				{
-					if (!mycmp(cptr->cloak_tmp, user->host))
+					if (!mycmp(cptr->user->sip, user->sip))
 					{
 						int ret = attach_conf_check_limits(cptr, aconf, user, &hcnt, &ucnt, &ghcnt, &gucnt);
 						if (ret != 0)
@@ -1136,8 +1157,7 @@ aConfItem	*find_Oline(char *name, aClient *cptr)
 		** the ip does.
 		*/
 		if (match(tmp->host, userhost) && match(tmp->host, userip) &&
-			(!strchr(tmp->host, '/') 
-			|| match_ipmask_client(tmp->host, cptr, 1)))
+			(!strchr(tmp->host, '/') || match_ipmask_client(tmp->host, cptr, 1, 1)))
 			continue;
 		if (tmp->clients < MaxLinks(Class(tmp)))
 			return tmp;
@@ -2229,6 +2249,7 @@ int	find_kill(aClient *cptr, int timedklines, char **comment)
 #endif
 	char		*host, *ip, *name, *ident, *check;
 	aConfItem	*tmp;
+	struct IN_ADDR addr;
 #ifdef TKLINE
 	int		tklines = 1;
 #endif
@@ -2242,8 +2263,8 @@ int	find_kill(aClient *cptr, int timedklines, char **comment)
 	}
 
 	host = cptr->sockhost;
-	ip = (char *) inetntop(AF_INET6, (char *)&cptr->ip, ipv6string,
-			       sizeof(ipv6string));
+	addr = get_client_addr(cptr);
+	ip = (char *) inetntop(AF_INET6, &addr, ipv6string, sizeof(ipv6string));
 	if (!strcmp(host, ip))
 		ip = NULL; /* we don't have a name for the ip# */
 	name = cptr->user->username;
@@ -2315,26 +2336,23 @@ findkline:
 			check = ident;
 		/* host & IP matching.. */
 		if (!ip) /* unresolved */
-		    {
+		{
 			if (strchr(tmp->host, '/'))
-			    {
-				if (match_ipmask_client((*tmp->host == '=') ?
-						 tmp->host+1: tmp->host, cptr, 1))
+			{
+				if (match_ipmask_client((*tmp->host == '=') ? tmp->host + 1 : tmp->host, cptr, 1, 1))
 					continue;
-			    }
-			else          
-				if (match((*tmp->host == '=') ? tmp->host+1 :
-					  tmp->host, host))
-					continue;
-		    }
+			}
+			else if (match((*tmp->host == '=') ? tmp->host + 1 : tmp->host, host))
+				continue;
+		}
 		else if (*tmp->host == '=') /* numeric only */
 			continue;
 		else /* resolved */
 			if (strchr(tmp->host, '/'))
-			    {
-				if (match_ipmask_client(tmp->host, cptr, 1))
+			{
+				if (match_ipmask_client(tmp->host, cptr, 1, 1))
 					continue;
-			    }
+			}
 			else
 				if (match(tmp->host, ip) &&
 				    match(tmp->host, host))
@@ -2555,7 +2573,7 @@ void	find_bounce(aClient *cptr, int class, int fd)
 		{
 			if (strchr(aconf->host, '/'))
 			{
-				if (match_ipmask_client(aconf->host, cptr, 1))
+				if (match_ipmask_client(aconf->host, cptr, 1, 1))
 					continue;
 			}
 			else if (match(aconf->host, cptr->sockhost))
@@ -2771,9 +2789,8 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 			/* unresolved */
 			if (strchr(aconf->host, '/'))
 			{
-				if (match_ipmask_client(*aconf->host == '=' ?
-					aconf->host + 1 : aconf->host,
-					acptr, 1))
+				if (match_ipmask_client(*aconf->host == '=' ? aconf->host + 1 : aconf->host,
+										acptr, 1, 1))
 				{
 					continue;
 				}
@@ -2798,7 +2815,7 @@ void do_kline(int tkline, char *who, time_t time, char *user, char *host, char *
 			}
 			if (strchr(aconf->host, '/'))
 			{
-				if (match_ipmask_client(aconf->host, acptr, 1))
+				if (match_ipmask_client(aconf->host, acptr, 1, 1))
 				{
 					continue;
 				}
@@ -2903,7 +2920,7 @@ int	prep_kline(int tkline, aClient *cptr, aClient *sptr, int parc, char **parv)
 		/* disallow all forms of bad u@h format and block *@* without flags too */
 		err = 1;
 	}
-	if (!err && host && strchr(host, '/') && match_ipmask_client(host, sptr, 0) == -1)
+	if (!err && host && strchr(host, '/') && match_ipmask_client(host, sptr, 0, 1) == -1)
 	{
 		/* check validity of 1.2.3.0/24 or it will be spewing errors
 		** for every connecting client. */

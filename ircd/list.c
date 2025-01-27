@@ -147,6 +147,7 @@ aClient	*make_client(aClient *from)
 		cptr->caps = 0;
 		cptr->sasl_service = NULL;
 		cptr->cloak_tmp = NULL;
+		memset(&cptr->cloak_ip, 0, sizeof(cptr->cloak_ip));
 	}
 	return (cptr);
 }

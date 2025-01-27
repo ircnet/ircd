@@ -388,11 +388,10 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 				match(xtmp->name3, nick))
 				continue;
 			if (!BadPtr(xtmp->source_ip) &&
-				(match(xtmp->source_ip, (sptr->hostp ?
-				sptr->hostp->h_name : sptr->sockhost)) &&
-				match(xtmp->source_ip, sptr->user->sip) &&
-				strchr(xtmp->source_ip, '/') && 
-				match_ipmask_client(xtmp->source_ip, sptr, 0)))
+				(match(xtmp->source_ip, (sptr->hostp ? sptr->hostp->h_name : sptr->sockhost)) &&
+				 match(xtmp->source_ip, sptr->user->sip) &&
+				 strchr(xtmp->source_ip, '/') &&
+				 match_ipmask_client(xtmp->source_ip, sptr, 0, 1)))
 				continue;
 			SetXlined(sptr);
 			break;
