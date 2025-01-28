@@ -2755,9 +2755,9 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    }
 		if (sptr->user->flags & FLAGS_AWAY)
 		{
-			/*sendto_serv_butone(cptr, ":%s MODE %s :-a",
-				sptr->uid, parv[0]);*/
-		 sendto_serv_butone(cptr, ":%s AWAY", parv[0]);
+			sendto_serv_butone(cptr, ":%s MODE %s :-a",
+				sptr->uid, parv[0]);
+		 //sendto_serv_butone(cptr, ":%s AWAY", parv[0]);
 		 sendto_channels_butserv_caps(sptr, CAP_AWAY_NOTIFY, ":%s AWAY", parv[0]);
 		}
 		if (MyConnect(sptr))
@@ -2795,9 +2795,9 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		istat.is_away++;
 		istat.is_awaymem += len;
 		away = (char *)MyMalloc(len);
-		/*sendto_serv_butone(cptr, ":%s MODE %s :+a",
-			sptr->uid, parv[0]);*/
-		sendto_serv_butone(cptr, ":%s AWAY :%s", parv[0], awy2);
+		sendto_serv_butone(cptr, ":%s MODE %s :+a",
+			sptr->uid, parv[0]);
+	//	sendto_serv_butone(cptr, ":%s AWAY :%s", parv[0], awy2);
 		sendto_channels_butserv_caps(sptr, CAP_AWAY_NOTIFY, ":%s AWAY :%s", parv[0], awy2);
 	    }
 
