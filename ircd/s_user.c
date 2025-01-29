@@ -388,11 +388,10 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 				match(xtmp->name3, nick))
 				continue;
 			if (!BadPtr(xtmp->source_ip) &&
-				(match(xtmp->source_ip, (sptr->hostp ?
-				sptr->hostp->h_name : sptr->sockhost)) &&
-				match(xtmp->source_ip, sptr->user->sip) &&
-				strchr(xtmp->source_ip, '/') &&
-				match_ipmask_client(xtmp->source_ip, sptr, 0)))
+				(match(xtmp->source_ip, (sptr->hostp ? sptr->hostp->h_name : sptr->sockhost)) &&
+				 match(xtmp->source_ip, sptr->user->sip) &&
+				 strchr(xtmp->source_ip, '/') &&
+				 match_ipmask_client(xtmp->source_ip, sptr, 0, 1)))
 				continue;
 			SetXlined(sptr);
 			break;
@@ -779,11 +778,11 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, WHOISTLS_NOTICE);
 		}
 #endif
-		/* send a notice to client if the connection is spoofed.
-		 * notice is defined as SPOOF_NOTICE in config.h -- mh 20191230 */
-		if (IsSpoofed(sptr))
+		/* send a notice to client if client's hostname is cloaked.
+		 * notice is defined as CLOAK_NOTICE in config.h -- mh 20191230 */
+		if (IsCloaked(sptr))
 		{
-			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, SPOOF_NOTICE);
+			sendto_one(sptr, ":%s NOTICE %s :%s", ME, nick, CLOAK_NOTICE);
 		}
 		if (IsConfNoResolve(sptr->confs->value.aconf))
 		{
@@ -2208,11 +2207,11 @@ static	void	send_whois(aClient *sptr, aClient *acptr)
 	if (IsAnOper(acptr))
 		sendto_one(sptr, replies[RPL_WHOISOPERATOR], ME, BadTo(sptr->name), name);
 
-	/* send a 320 numeric RPL_WHOISCLOAKED reply if client is spoofed.
-	 * reply defined as SPOOF_WHOISCLOAKED in config.h -- mh 20191230 */
-	if (IsSpoofed(acptr))
+	/* send a 320 numeric RPL_WHOISCLOAKED reply if client's hostname is cloaked.
+	 * reply defined as CLOAK_WHOISEXTRA in config.h -- mh 20191230 */
+	if (IsCloaked(acptr))
 	{
-		sendto_one(sptr, replies[RPL_WHOISCLOAKED], ME, BadTo(sptr->name), name, SPOOF_WHOISCLOAKED);
+		sendto_one(sptr, replies[RPL_WHOISCLOAKED], ME, BadTo(sptr->name), name, CLOAK_WHOISEXTRA);
 	}
 	/* send a 320 numeric RPL_WHOISTLS reply if client is connected with SSL/TLS.
 	 * reply defined as WHOISTLS in config.h -- mh 2020-04-27 */

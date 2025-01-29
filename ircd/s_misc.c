@@ -241,18 +241,19 @@ char	*get_client_host(aClient *cptr)
 	return nbuf;
 }
 
+struct IN_ADDR get_client_addr(aClient *cptr)
+{
+	if (HAS_CLOAK_IP(cptr))
+		return cptr->cloak_ip;
+	else
+		return cptr->ip;
+}
+
 char	*get_client_ip(aClient *cptr)
 {
 	if (cptr->user)
 	{
-		if(IsSpoofed(cptr))
-		{
-			return SPOOF_IP;
-		}
-		else
-		{
-			return cptr->user->sip;
-		}
+		return cptr->user->sip;
 	}
 	else
 	{

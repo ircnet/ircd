@@ -784,21 +784,21 @@
 
 /*
  * Define to the message you want to send to clients connecting
- * with a spoofed hostname, undef to disable sending a notice.
+ * with a cloaked hostname, undef to disable sending a notice.
  */
-#define SPOOF_NOTICE    "Due to an administrative decision, your connection is cloaked."
+#define CLOAK_NOTICE    "Due to an administrative decision, your connection is cloaked."
 
 /*
  * Define to the message you want to show in /WHOIS reply
- * (RPL_WHOISCLOAKED) for spoofed local clients. (mandatory)
+ * (RPL_WHOISCLOAKED) for cloaked local clients. (mandatory)
  */
-#define SPOOF_WHOISCLOAKED  "is a Cloaked Connection (Spoof)"
+#define CLOAK_WHOISEXTRA  "is a Cloaked Connection (Spoof)"
 
 /*
- * The IP address shown instead of the real one
- *  (for example in /STATS L) for spoofed clients. (mandatory)
+ * Besides the cloaked hostname a user also gets a unique IP address assigned by a SASL service.
+ * This defines the range of IP addresses that are allowed to be set.
  */
-#define SPOOF_IP    "255.255.255.255"
+#define SASL_CLOAK_IP_RANGE "fdf0:584f:e66b::/48"
 
 /************************************************************************
  *
