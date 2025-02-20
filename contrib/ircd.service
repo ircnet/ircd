@@ -1,0 +1,34 @@
+[Unit]
+Description=IRCNet IRC daemon
+After=network.target
+
+[Service]
+Type=exec
+ExecStart=/home/ircnet/ircd/sbin/ircd -t
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+User=ircnet
+ReadOnlyPaths=/home/ircnet/ircd/
+ReadWritePaths=/home/ircnet/ircd/var/
+PrivateDevices=yes
+PrivateTmp=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectSystem=strict
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+SystemCallArchitectures=native
+SystemCallErrorNumber=EPERM
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target
