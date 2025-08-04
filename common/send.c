@@ -262,7 +262,7 @@ int	send_queued(aClient *to)
 		else
 		    {
 			msg = zip_buffer(to, NULL, &len, 1);
-			
+
 			if (len == -1)
 			       return dead_link(to,
 						"fatal error in zip_buffer()");
@@ -617,7 +617,7 @@ void	sendto_common_channels(aClient *user, char *pattern, ...)
 	out...but I do know the 2nd part will help big client servers
 	fairly well... - Comstud 97/04/24
 */
-     
+
 	if (highest_fd < 50) /* This part optimized for HUB servers... */
 	    {
 		if (MyConnect(user))
@@ -749,6 +749,33 @@ void	sendto_channel_butserv(aChannel *chptr, aClient *from, char *pattern, ...)
 }
 
 /*
+** sendto_channels_butserv_caps
+**
+** Send a message to all members of channels that 'from' is on,
+** who have the specified capabilities, except 'from' itself.
+*/
+void sendto_channels_butserv_caps(aClient *from, int caps, char *pattern, ...)
+{
+	  Reg Link *channels, *lp;
+    Reg aClient *cptr;
+    int len = 0;
+    va_list va;
+
+		if (!from->user)
+		  return 0;
+
+		// Iterate through all channels the user is on
+		va_start(va, pattern);
+    for (channels = from->user->channel; channels; channels = channels->next)
+    {
+
+        sendto_channel_butserv_caps(channels->value.chptr, from, CAP_AWAY_NOTIFY, 0, pattern, va);
+    }
+
+		va_end(va);
+}
+
+/*
  * sendto_channel_butserv_caps
  *
  * Send a message to all members of a channel that are connected to this
@@ -760,7 +787,7 @@ void	sendto_channel_butserv_caps(aChannel *chptr, aClient *from, int caps, int e
 	Reg aClient *acptr, *lfrm = from;
 	int len = 0;
 
-	if (MyClient(from))
+	if (MyClient(from) && caps != CAP_AWAY_NOTIFY)
 	{    /* Always send to the client itself */
 		if ((caps == 0 || HasCap(from, caps)) && (excluded_caps == 0 || !HasCap(from, excluded_caps)))
 		{
@@ -969,7 +996,7 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what,
 	int	i;
 	aClient *cptr,
 		*srch;
-  
+
 	for (i = 0; i <= highest_fd; i++)
 	    {
 		if (!(cptr = local[i]))
@@ -999,7 +1026,7 @@ void	sendto_match_butone(aClient *one, aClient *from, char *mask, int what,
 				continue;
 		}
 		/* my client, does he match ? */
-		else if (!(IsRegisteredUser(cptr) && 
+		else if (!(IsRegisteredUser(cptr) &&
 			   match_it(cptr, mask, what)))
 		{
 			continue;
@@ -1033,7 +1060,7 @@ void	sendto_ops_butone(aClient *one, char *from, char *pattern, ...)
 	va_end(va);
 	sendto_serv_butone(one, ":%s WALLOPS :%s", from, buf);
 	sendto_flag(SCH_WALLOP, "!%s! %s", from, buf);
-	
+
 	return;
 }
 
@@ -1277,7 +1304,7 @@ void	logfiles_close(void)
 #ifdef LOG_SERVER_CHANNELS
 	int	i;
 	SChan	*shptr;
-	
+
 	for (i = SCH_MAX - 1, shptr = svchans + i; i >= 0; i--, shptr--)
 	{
 		if (shptr->fd >= 0)
@@ -1311,7 +1338,7 @@ void	logfiles_close(void)
  */
 void	sendto_flog(aClient *cptr, char msg, char *username, char *hostname)
 {
-	/* 
+	/*
 	** One day we will rewrite linebuf to malloc()s, but for now
 	** we are lazy. The longest linebuf I saw during last year
 	** was 216. Max auth reply can be 1024, see rfc931_work() and

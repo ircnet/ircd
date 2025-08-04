@@ -4,7 +4,7 @@
  *		      University of Oulu, Computing Center
  *
  *   See file AUTHORS in IRC package for additional names of
- *   the programmers. 
+ *   the programmers.
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -112,7 +112,7 @@ static int user_modes[]	     = { FLAGS_OPER, 'o',
 ** Parameters:
 **	aClient *next	First client to check
 **	char	*ch	Search string (may include wilds)
-**	      
+**
 */
 aClient	*next_client(aClient *next, char *ch)
 {
@@ -209,7 +209,7 @@ int	hunt_server(aClient *cptr, aClient *sptr, char *command, int server,
 		    && (IsServer(acptr->from)
 			&& !match_service_dist(acptr, sptr->service->dist)))
 		    {
-			sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), 
+			sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]),
 				   parv[server]);
 			return(HUNTED_NOSUCH);
 		    }
@@ -217,7 +217,7 @@ int	hunt_server(aClient *cptr, aClient *sptr, char *command, int server,
 			   parv[1], parv[2], parv[3], parv[4],
 			   parv[5], parv[6], parv[7], parv[8]);
 		return(HUNTED_PASS);
-	    } 
+	    }
 	sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]), parv[server]);
 	return(HUNTED_NOSUCH);
 }
@@ -372,19 +372,19 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		{
 			if (xtmp->status != CONF_XLINE)
 				continue;
-			if (!BadPtr(xtmp->host) && 
+			if (!BadPtr(xtmp->host) &&
 				match(xtmp->host, username))
 				continue;
-			if (!BadPtr(xtmp->passwd) && 
+			if (!BadPtr(xtmp->passwd) &&
 				match(xtmp->passwd, sptr->user2))
 				continue;
-			if (!BadPtr(xtmp->name) && 
+			if (!BadPtr(xtmp->name) &&
 				match(xtmp->name, sptr->user3))
 				continue;
-			if (!BadPtr(xtmp->name2) && 
+			if (!BadPtr(xtmp->name2) &&
 				match(xtmp->name2, sptr->info))
 				continue;
-			if (!BadPtr(xtmp->name3) && 
+			if (!BadPtr(xtmp->name3) &&
 				match(xtmp->name3, nick))
 				continue;
 			if (!BadPtr(xtmp->source_ip) &&
@@ -426,7 +426,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 				count += 1;
 				if (timeofday - last > 300)
 				    {
-					sendto_flag(SCH_AUTH, 
+					sendto_flag(SCH_AUTH,
 	    "iauth may be not running! (refusing new user connections)");
 					last = timeofday;
 				    }
@@ -670,16 +670,16 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		user->servp->usercnt[0]++;
 		istat.is_user[0]++;
 	}
-	
+
 	check_split();
-	
+
 	if ((istat.is_user[1] + istat.is_user[0]) > istat.is_m_users)
 	{
 
 		istat.is_m_users = istat.is_user[1] + istat.is_user[0];
 		if (timeofday - istat.is_m_users_t >= CLCHSEC)
 		{
-			sendto_flag(SCH_NOTICE, 
+			sendto_flag(SCH_NOTICE,
 				"New highest global client connection: %d",
 				istat.is_m_users);
 			istat.is_m_users_t = timeofday;
@@ -689,7 +689,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 	if (MyConnect(sptr))
 	{
 		char **isup;
-		
+
 		istat.is_unknown--;
 		istat.is_myclnt++;
 		if (istat.is_myclnt > istat.is_m_myclnt)
@@ -763,7 +763,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			BadTo(parv[0]),	*isup);
 			isup++;
 		}
-		
+
 		sendto_one(sptr, replies[RPL_YOURID], ME, BadTo(parv[0]),
 			sptr->uid);
 		(void)m_lusers(sptr, sptr, 1, parv);
@@ -799,7 +799,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		}
 		send_umode(sptr, sptr, 0, ALL_UMODES, buf);
 		nextping = timeofday;
-		
+
 #ifdef SPLIT_CONNECT_NOTICE
 		if (IsSplit())
 		{
@@ -828,7 +828,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 	check_services_butone(SERVICE_WANT_NICK, user->servp, NULL,
 			      "NICK %s :%d", nick, sptr->hopcount+1);
 	check_services_butone(SERVICE_WANT_USER, user->servp, sptr,
-			      ":%s USER %s %s %s :%s", nick, user->username, 
+			      ":%s USER %s %s %s :%s", nick, user->username,
 			      user->host, user->server, sptr->info);
 	if (MyConnect(sptr))	/* all modes about local users */
 		send_umode(NULL, sptr, 0, ALL_UMODES, buf);
@@ -899,7 +899,7 @@ badparamcountkills:
 			}
 			sendto_flag(SCH_ERROR,
 				"Bad NICK param count (%d) from %s via %s: %s NICK%s",
-				parc, sptr->name, 
+				parc, sptr->name,
 				get_client_name(cptr, FALSE),
 				parv[0], buf[0] ? buf : "");
 			return 0;
@@ -966,7 +966,7 @@ badparamcountkills:
 			}
 		}
 	}
-	if (IsServer(cptr) && isdigit(nick[0]) 
+	if (IsServer(cptr) && isdigit(nick[0])
 		&& !strncasecmp(me.serv->sid, nick, SIDLEN))
 	{
 		/* Remote server send us remote user changing his nick
@@ -1112,7 +1112,7 @@ badparamcountkills:
 
 		/* Save acptr */
 		sprintf(path, "(%s@%s[%s](%s) <- %s@%s[%s])",
-			acptr->user->username,	acptr->user->host, 
+			acptr->user->username,	acptr->user->host,
 			acptr->from->name, acptr->name,	user, host, cptr->name);
 		save_user(NULL, acptr, path);
 
@@ -1280,7 +1280,7 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		sendto_one(sptr, replies[ERR_ERRONEOUSNICKNAME], ME, BadTo(parv[0]),
 			parv[1]);
-		
+
 		ircstp->is_kill++;
 		sendto_flag(SCH_KILL, "Bad UNick: %s From: %s %s", parv[1],
 			parv[0], get_client_name(cptr, FALSE));
@@ -1354,8 +1354,8 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			** save_user().
 			*/
 			sendto_one(cptr,
-				":%s SAVE %s :%s (%s@%s)%s <- (%s@%s)%s", 
-				me.serv->sid, uid, ME, 
+				":%s SAVE %s :%s (%s@%s)%s <- (%s@%s)%s",
+				me.serv->sid, uid, ME,
 				acptr->user->username, acptr->user->host,
 				acptr->user->server, user, host, cptr->name);
 
@@ -1384,7 +1384,7 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				    acptr->from->name,
 				    user, host, get_client_name(cptr, FALSE));
 			ircstp->is_kill++;
-			sendto_serv_butone(NULL, 
+			sendto_serv_butone(NULL,
 				   ":%s KILL %s :%s ((%s@%s)%s <- (%s@%s)%s)",
 				   ME, acptr->name, ME,
 				   (acptr->user) ? acptr->user->username:"???",
@@ -1439,7 +1439,7 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	add_to_uid_hash_table(uid, acptr);
 	{
 	    char	*pv[4];
-	    
+
 	    pv[0] = ME;
 	    pv[1] = acptr->name;
 	    pv[2] = parv[6];
@@ -1481,20 +1481,20 @@ static	int	m_message(aClient *cptr, aClient *sptr, int parc,
 	    {
 		/*
 		** restrict destination list to MAXPENALTY/2 recipients to
-		** solve SPAM problem --Yegg 
-		*/ 
+		** solve SPAM problem --Yegg
+		*/
 		if (2*penalty >= MAXPENALTY) {
 		    if (!notice)
 			    sendto_one(sptr, replies[ERR_TOOMANYTARGETS],
 				       ME, BadTo(parv[0]),
 				       "Too many",nick,"No Message Delivered");
-		    continue;      
-		}   
+		    continue;
+		}
 		/*
 		** nickname addressed?
 		*/
 		if (((IsServer(cptr) || IsService(cptr))
-			&& (acptr = find_uid(nick, NULL))) || 
+			&& (acptr = find_uid(nick, NULL))) ||
 			(acptr = find_person(nick, NULL)))
 		    {
 			if (!notice && MyConnect(sptr) &&
@@ -1520,7 +1520,7 @@ static	int	m_message(aClient *cptr, aClient *sptr, int parc,
 					   ME, BadTo(parv[0]), nick);
 			continue;
 		    }
-	
+
 		/*
 		** the following two cases allow masks in NOTICEs
 		** (for OPERs only)
@@ -1561,7 +1561,7 @@ static	int	m_message(aClient *cptr, aClient *sptr, int parc,
 				continue;
 			}
 			sendto_match_butone(
-				IsServer(cptr) ? cptr : NULL, 
+				IsServer(cptr) ? cptr : NULL,
 				sptr, nick + 2, syntax,
 				":%s %s %s :%s", parv[0],
 				cmd, nick, parv[2]);
@@ -1816,7 +1816,7 @@ static	void	who_channel(aClient *sptr, aChannel *chptr, struct who_opts *opts)
 ** who_find
 **	lists all (matching) users.
 **	CPU intensive, but what can be done?
-**	
+**
 **	Reduced CPU load - 05/2001
 */
 static	void	who_find(aClient *sptr, char *mask, struct who_opts *opts)
@@ -1824,7 +1824,7 @@ static	void	who_find(aClient *sptr, char *mask, struct who_opts *opts)
 	aChannel *chptr = NULL;
 	Link	*lp,*lp2;
 	aClient	*acptr;
-	
+
 	/* first, show INvisible matching users on common channels */
 	if (sptr->user) /* service can request who as well */
 	for (lp = sptr->user->channel; lp ;lp = lp->next)
@@ -1835,22 +1835,22 @@ static	void	who_find(aClient *sptr, char *mask, struct who_opts *opts)
 		for (lp2 = chptr->members; lp2 ;lp2 = lp2->next)
 		{
 			acptr = lp2->value.cptr;
-			
+
 			if (!IsInvisible(acptr)
 			    || (acptr->flags & FLAGS_HIDDEN))
 			{
 				continue;
 			}
-			
+
 			if ((opts->flags & WHO_FLAG_OPERS_ONLY) && !IsAnOper(acptr))
 			{
 				continue;
 			}
-			
+
 			/* Mark user with FLAGS_HIDDEN to prevent multiple
 			 * checking.
 			 */
-			
+
 			acptr->flags |= FLAGS_HIDDEN;
 			if (!mask ||
 			     match(mask, acptr->name) == 0 ||
@@ -1859,23 +1859,23 @@ static	void	who_find(aClient *sptr, char *mask, struct who_opts *opts)
 			     match(mask, acptr->user->server) == 0 ||
 			     match(mask, acptr->info) == 0)
 				who_one(sptr, acptr, chptr, NULL, opts);
-		
+
 		}
 	}
 
 	for (acptr = client; acptr; acptr = acptr->next)
 	{
-			
+
 		if (!IsPerson(acptr))
 			continue;
-		
+
 		/* clear the flag */
 		if (acptr->flags & FLAGS_HIDDEN)
 		{
 			acptr->flags &= ~FLAGS_HIDDEN;
 			continue;
 		}
-		
+
 		/* allow local opers to see matching clients
 		 * on _LOCAL_ server and show the user himself */
 		if (IsInvisible(acptr) && (acptr != sptr)
@@ -1884,7 +1884,7 @@ static	void	who_find(aClient *sptr, char *mask, struct who_opts *opts)
 		{
 			continue;
 		}
-		
+
 		/* we wanted only opers */
 		if ((opts->flags & WHO_FLAG_OPERS_ONLY) && !IsAnOper(acptr))
 		{
@@ -1904,7 +1904,7 @@ static	void	who_find(aClient *sptr, char *mask, struct who_opts *opts)
 		     match(mask, acptr->info) == 0)
 			who_one(sptr, acptr, NULL, NULL, opts);
 	}
-	
+
 }
 
 void parse_who_arg(char *arg, struct who_opts *opts) {
@@ -2018,7 +2018,7 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	for (p = NULL, mask = strtoken(&p, parv[1], ",");
 	    mask && penalty <= MAXPENALTY;
 		mask = strtoken(&p, NULL, ","))
-	{ 
+	{
 		channame = NULL;
 		penalty += 1;
 
@@ -2031,7 +2031,7 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			continue;
 
 		/*
-		** We can never have here !mask 
+		** We can never have here !mask
 		** or *mask == '\0', since it would be equal
 		** to parc == 1, that is 'WHO' and/or would not
 		** pass through above for loop.
@@ -2062,7 +2062,7 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			*/
 			channame = mask;
 		}
-		
+
 		if (IsChannelName(channame))
 		{
 			chptr = find_channel(channame, NULL);
@@ -2078,7 +2078,7 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				penalty += 1;
 			}
 		}
-		else 
+		else
 		{
 			aClient	*acptr = NULL;
 
@@ -2106,7 +2106,7 @@ int	m_who(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				** All nice chances lost above.
 				** We must hog our server with that.
 				*/
-				
+
 				/* simplify mask */
 				(void)collapse(mask);
 
@@ -2259,7 +2259,7 @@ int	m_whois(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	tmp = mystrdup(parv[1]);
 
-	for (tmp2 = canonize(tmp); (nick = strtoken(&p, tmp2, ",")); 
+	for (tmp2 = canonize(tmp); (nick = strtoken(&p, tmp2, ","));
 		tmp2 = NULL)
 	    {
 		int	invis, showperson, member, wilds;
@@ -2398,7 +2398,7 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return 1;
    	    }
 	if ((username = (char *)index(parv[1],'@')))
-		*username = '\0'; 
+		*username = '\0';
 
 	/* Copy parameters into better documenting variables */
 
@@ -2406,7 +2406,7 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	umodes   = parv[2];
 	server   = parv[3];
 	realname = parv[4];
-	
+
 	inetntop(AF_INET6, (char *)&sptr->ip, ipbuf, sizeof(ipbuf));
 	user = make_user(sptr);
 	user->sip = mystrdup(ipbuf);
@@ -2476,7 +2476,7 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		}
 	}
 	user->server = find_server_string(me.serv->snum);
-	
+
 	reorder_client_in_list(sptr);
 	if (sptr->info != DefInfo)
 		MyFree(sptr->info);
@@ -2569,7 +2569,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (!(acptr = get_history(user, (long)KILLCHASETIMELIMIT)))
 		    {
 			if (!IsServer(sptr))
-				sendto_one(sptr, replies[ERR_NOSUCHNICK], 
+				sendto_one(sptr, replies[ERR_NOSUCHNICK],
 					   ME, BadTo(parv[0]), user);
 			return 1;
 		    }
@@ -2620,7 +2620,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (IsService(acptr))
 	{
 		sendto_flag(SCH_KILL, "Received KILL message for %s[%s]. "
-			"From %s Path: %s!%s", acptr->name, 
+			"From %s Path: %s!%s", acptr->name,
 			isdigit(acptr->service->servp->sid[0]) ?
 			acptr->service->servp->sid : "2.10", parv[0], inpath,
 			path);
@@ -2630,7 +2630,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		sendto_flag(SCH_KILL, "Received KILL message for "
 			"%s!%s@%s[%s/%s]. From %s Path: %s!%s",
 			acptr->name, acptr->user->username, acptr->user->host,
-			acptr->user->servp->bcptr->name, 
+			acptr->user->servp->bcptr->name,
 			isdigit(acptr->user->servp->sid[0]) ?
 			acptr->user->servp->sid : "2.10", parv[0], inpath,
 			path);
@@ -2641,7 +2641,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if (IsService(acptr))
 		{
 			syslog(LOG_DEBUG, "KILL From %s For %s[%s] Path %s!%s",
-				parv[0], acptr->name, 
+				parv[0], acptr->name,
 				isdigit(acptr->service->servp->sid[0]) ?
 				acptr->service->servp->sid : "2.10",
 				inpath, path);
@@ -2649,9 +2649,9 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		else
 		{
 			syslog(LOG_DEBUG, "KILL From %s For %s!%s@%s[%s/%s] "
-				"Path %s!%s", parv[0], acptr->name, 
+				"Path %s!%s", parv[0], acptr->name,
 				acptr->user->username, acptr->user->host,
-				acptr->user->servp->bcptr->name, 
+				acptr->user->servp->bcptr->name,
 				isdigit(acptr->user->servp->sid[0]) ?
 				acptr->user->servp->sid : "2.10",
 				inpath, path);
@@ -2680,7 +2680,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		acptr->flags |= FLAGS_KILLED;
 	    }
 #ifdef	USE_SERVICES
-	check_services_butone(SERVICE_WANT_KILL, NULL, sptr, 
+	check_services_butone(SERVICE_WANT_KILL, NULL, sptr,
 			      ":%s KILL %s :%s!%s", parv[0], acptr->name,
 			      inpath, path);
 #endif
@@ -2721,7 +2721,7 @@ int	m_kill(aClient *cptr, aClient *sptr, int parc, char *parv[])
 }
 
 /***********************************************************************
- * m_away() - Added 14 Dec 1988 by jto. 
+ * m_away() - Added 14 Dec 1988 by jto.
  *	    Not currently really working, I don't like this
  *	    call at all...
  *
@@ -2753,9 +2753,12 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			sptr->user->away = NULL;
 		    }
 		if (sptr->user->flags & FLAGS_AWAY)
+		{
 			sendto_serv_butone(cptr, ":%s MODE %s :-a",
 				sptr->uid, parv[0]);
-		/* sendto_serv_butone(cptr, ":%s AWAY", parv[0]); */
+		 //sendto_serv_butone(cptr, ":%s AWAY", parv[0]);
+		 sendto_channels_butserv_caps(sptr, CAP_AWAY_NOTIFY, ":%s AWAY", parv[0]);
+		}
 		if (MyConnect(sptr))
 			sendto_one(sptr, replies[RPL_UNAWAY], ME, BadTo(parv[0]));
 #ifdef	USE_SERVICES
@@ -2793,6 +2796,8 @@ int	m_away(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		away = (char *)MyMalloc(len);
 		sendto_serv_butone(cptr, ":%s MODE %s :+a",
 			sptr->uid, parv[0]);
+	//	sendto_serv_butone(cptr, ":%s AWAY :%s", parv[0], awy2);
+		sendto_channels_butserv_caps(sptr, CAP_AWAY_NOTIFY, ":%s AWAY :%s", parv[0], awy2);
 	    }
 
 	sptr->user->flags |= FLAGS_AWAY;
@@ -2875,7 +2880,7 @@ int	m_pong(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	{
 		sendto_one(sptr, replies[ERR_NOSUCHSERVER], ME, BadTo(parv[0]),
 			   destination);
-		return 2;	
+		return 2;
 	}
 	if (!IsMe(acptr))
 	{
@@ -2964,7 +2969,7 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		send_umode_out(cptr, sptr, old);
  		sendto_one(sptr, replies[RPL_YOUREOPER], ME, BadTo(parv[0]));
 #ifdef	USE_SERVICES
-		check_services_butone(SERVICE_WANT_OPER, sptr->user->servp, 
+		check_services_butone(SERVICE_WANT_OPER, sptr->user->servp,
 				      sptr, ":%s MODE %s :+%c", parv[0],
 				      parv[0], IsOper(sptr) ? 'o' : 'O');
 #endif
@@ -2974,7 +2979,7 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			sptr->user->servp->usercnt[2]++;
 		}
 		logstring = "";
-	}	
+	}
 	else /* Wrong password or attach_conf() failed */
 	{
 		(void)detach_conf(sptr, aconf);
@@ -3049,9 +3054,9 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* Modification by pjg */
 	      }
 #endif /* FNAME_OPERLOG */
-	
+
 	} /* logstring != NULL */
-	
+
 	return 3;
     }
 
@@ -3065,7 +3070,7 @@ int	m_oper(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[1] = password
 **	parv[2] = protocol & server versions (server only)
 **	parv[3] = server id & options (server only)
-**	parv[4] = (optional) link options (server only)                  
+**	parv[4] = (optional) link options (server only)
 */
 int	m_pass(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
@@ -3084,7 +3089,7 @@ int	m_pass(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	** in m_user(). */
 	if (parc > 2 && parv[2])
 	    {
-		strncpyzt(buf, parv[2], 15); 
+		strncpyzt(buf, parv[2], 15);
 		if (parc > 3 && parv[3])
 		    {
 			strcat(buf, " ");
@@ -3175,7 +3180,7 @@ int	m_ison(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		if ((acptr = find_person(s, NULL)))
 		    {
 			i = strlen(acptr->name);
-			if (len + i > sizeof(buf) - 4)	
+			if (len + i > sizeof(buf) - 4)
 			{
 				/* leave room for " \r\n\0" */
 				break;
@@ -3226,7 +3231,7 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			sendto_one(sptr, replies[ERR_USERSDONTMATCH], ME, BadTo(parv[0]));
 			return 1;
 	    }
- 
+
 	if (parc < 3)
 	    {
 		m = buf;
@@ -3258,7 +3263,7 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				break;
 			case '-' :
 				what = MODE_DEL;
-				break;	
+				break;
 			/* we may not get these,
 			 * but they shouldnt be in default
 			 */
@@ -3298,7 +3303,7 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 					if (what == MODE_ADD)
 						sptr->user->flags |= flag;
 					else
-						sptr->user->flags &= ~flag;	
+						sptr->user->flags &= ~flag;
 					penalty += 1;
 					break;
 				    }
@@ -3383,7 +3388,7 @@ int	m_umode(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	return penalty;
 }
-	
+
 /*
  * send the MODE string for user (user) to connection cptr
  * -avalon
@@ -3490,7 +3495,7 @@ static	void	save_user(aClient *cptr, aClient *sptr, char *path)
 			sptr->user->host, sptr->uid);
 #endif
 	}
-	
+
 	sendto_common_channels(sptr, ":%s NICK :%s",
 			       sptr->name, sptr->uid);
 	add_history(sptr, NULL);
@@ -3498,7 +3503,7 @@ static	void	save_user(aClient *cptr, aClient *sptr, char *path)
 	check_services_butone(SERVICE_WANT_NICK, sptr->user->servp, sptr,
 			      ":%s NICK :%s", sptr->name, sptr->uid);
 #endif
-	sendto_serv_v(cptr, SV_UID, ":%s SAVE %s :%s%c%s", 
+	sendto_serv_v(cptr, SV_UID, ":%s SAVE %s :%s%c%s",
 		cptr ? cptr->serv->sid : me.serv->sid, sptr->uid,
 		cptr ? cptr->name : ME, cptr ? '!' : ' ', path);
 	sendto_flag(SCH_SAVE, "Received SAVE message for %s. Path: %s!%s",
@@ -3518,7 +3523,7 @@ int	m_save(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	char *path = (parc > 2) ? parv[2] : "*no-path*";
-	
+
 	if (parc < 2)
 	{
 		sendto_flag(SCH_ERROR, "Save with not enough parameters "
