@@ -324,15 +324,6 @@
 /* Define if memcmp is not 8-bit clean. */
 #undef MEMCMP_BROKEN
 
-/* Define if the system provides BSD non-blocking system. */
-#undef NBLOCK_BSD
-
-/* Define if the system provides POSIX non-blocking system. */
-#undef NBLOCK_POSIX
-
-/* Define if the system provides SystemV non-blocking system. */
-#undef NBLOCK_SYSV
-
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
 

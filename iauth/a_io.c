@@ -742,30 +742,12 @@ void	loop_io(void)
  */
 static	void	set_non_blocking(int fd, char *ip, u_short port)
 {
-	int     res, nonb = 0;
+	int res;
 
-#ifdef NBLOCK_POSIX
-        nonb |= O_NONBLOCK;
-#endif
-#ifdef NBLOCK_BSD
-        nonb |= O_NDELAY;
-#endif
-#ifdef NBLOCK_SYSV
-        /* This portion of code might also apply to NeXT.  -LynX */
-        res = 1;
- 
-        if (ioctl (fd, FIONBIO, &res) < 0)
-                sendto_log(ALOG_IRCD, 0, "ioctl(fd,FIONBIO) failed for %s:%u",
-			   ip, port);
-#else   
-        if ((res = fcntl(fd, F_GETFL, 0)) == -1)
-                sendto_log(ALOG_IRCD, 0, "fcntl(fd, F_GETFL) failed for %s:%u",
-			   ip, port);
-        else if (fcntl(fd, F_SETFL, res | nonb) == -1)
-                sendto_log(ALOG_IRCD, 0,
-			   "fcntl(fd, F_SETL, nonb) failed for %s:%u",
-			   ip, port);
-#endif  
+	if ((res = fcntl(fd, F_GETFL, 0)) == -1)
+		sendto_log(ALOG_IRCD, 0, "fcntl(fd, F_GETFL) failed for %s:%u", ip, port);
+	else if (fcntl(fd, F_SETFL, res | O_NONBLOCK) == -1)
+		sendto_log(ALOG_IRCD, 0, "fcntl(fd, F_SETFL, O_NONBLOCK) failed for %s:%u", ip, port);
 }
 
 /*
