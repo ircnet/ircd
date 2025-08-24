@@ -431,84 +431,6 @@ fi
 ])
 
 
-AC_DEFUN(IRC_NON_BLOCKING_SYSTEM,
-[AC_MSG_CHECKING([for a working non-blocking system])
-AC_CACHE_VAL(irc_cv_non_blocking_system,
-[
-changequote(<<, >>)dnl
-irc_precode='#include "confdefs.h"
-#ifdef HAVE_SYS_TYPES_H
-#include <sys/types.h>
-#endif
-#if HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
-#endif
-#if HAVE_FCNTL_H
-#include <fcntl.h>
-#endif
-#if HAVE_SYS_IOCTL_H
-#include <sys/ioctl.h>
-#endif
-#if HAVE_SYS_FILE_H
-#include <sys/file.h>
-#endif
-#if HAVE_SIGNAL_H
-#include <signal.h>
-#endif
-#if HAVE_NETINET_IN_H
-#include <netinet/in.h>
-#endif
-
-RETSIGTYPE alarmed()
-{
-  exit(1);
-}
-
-main()
-{
-  char b[12];
-  struct sockaddr_in x;
-  int f, l = sizeof(x);
-  f = socket(AF_INET, SOCK_DGRAM, 0);
-  if (f >= 0 && !(fcntl(f, F_SETFL, '
-irc_postcode=')))
-    {
-      signal(SIGALRM, alarmed);
-      alarm(3);
-      recvfrom(f, b, 12, 0, &x, &l);
-      alarm(0);
-      exit(0);
-    }
-   exit(1);
-}'
-changequote([, ])dnl
-irc_code_posix="${irc_precode}O_NONBLOCK${irc_postcode}"
-irc_code_bsd="${irc_precode}O_NDELAY${irc_postcode}"
-irc_code_sysv="${irc_precode}FIONBIO${irc_postcode}"
-AC_RUN_IFELSE($irc_code_posix,
-  irc_cv_non_blocking_system=posix,
-  AC_RUN_IFELSE($irc_code_bsd,
-    irc_cv_non_blocking_system=bsd,
-    AC_RUN_IFELSE($irc_code_sysv,
-      irc_cv_non_blocking_system=sysv,
-      irc_cv_non_blocking_system=none)))
-])
-if test $irc_cv_non_blocking_system = posix; then
-  AC_MSG_RESULT([using POSIX O_NONBLOCK])
-  AC_DEFINE([NBLOCK_POSIX], [1], [Define if the system provides POSIX non-blocking system.])
-elif test $irc_cv_non_blocking_system = bsd; then
-  AC_MSG_RESULT([using BSD O_NDELAY])
-  AC_DEFINE([NBLOCK_BSD], [1], [Define if the system provides BSD non-blocking system.])
-elif test $irc_cv_non_blocking_system = sysv; then
-  AC_MSG_RESULT([using SystemV FIONBIO])
-  AC_DEFINE([NBLOCK_SYSV], [1], [Define if the system provides SystemV non-blocking system.])
-else
-  AC_MSG_RESULT([using none])
-  AC_MSG_WARN([I can't find a working non-blocking system.])
-fi
-])
-
-
 AC_DEFUN(IRC_PATH_RESCONF,
 [AC_MSG_CHECKING([for resolver configuration file])
 AC_ARG_WITH(resconf, [  --with-resconf=FILE     use FILE as resolver config file [[/etc/resolv.conf]]], irc_cv_path_resconf="$withval", irc_cv_path_resconf="/etc/resolv.conf")
@@ -828,7 +750,6 @@ IRC_FUNC_MEMCMP
 IRC_SELECT_POLL
 
 IRC_SIGNAL_IMPLEMENTATION
-IRC_NON_BLOCKING_SYSTEM
 IRC_PATH_RESCONF
 IRC_IP6
 IRC_SHAREDMODULES

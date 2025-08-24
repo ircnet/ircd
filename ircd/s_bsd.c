@@ -1516,41 +1516,16 @@ int	get_sockerr(aClient *cptr)
 
 /*
 ** set_non_blocking
-**	Set the client connection into non-blocking mode. If your
-**	system doesn't support this, you can make this a dummy
-**	function (and get all the old problems that plagued the
-**	blocking version of IRC--not a problem if you are a
-**	lightly loaded node...)
+**	Set the client connection into non-blocking mode.
 */
-void	set_non_blocking(int fd, aClient *cptr)
+void set_non_blocking(int fd, aClient *cptr)
 {
-	int	res, nonb = 0;
+	int res;
 
-	/*
-	** NOTE: consult ALL your relevant manual pages *BEFORE* changing
-	**	 these ioctl's.  There are quite a few variations on them,
-	**	 as can be seen by the PCS one.  They are *NOT* all the same.
-	**	 Heed this well. - Avalon.
-	*/
-#ifdef NBLOCK_POSIX
-	nonb |= O_NONBLOCK;
-#endif
-#ifdef NBLOCK_BSD
-	nonb |= O_NDELAY;
-#endif
-#ifdef NBLOCK_SYSV
-	/* This portion of code might also apply to NeXT.  -LynX */
-	res = 1;
-
-	if (ioctl (fd, FIONBIO, &res) < 0)
-		report_error("ioctl(fd,FIONBIO) failed for %s:%s", cptr);
-#else
 	if ((res = fcntl(fd, F_GETFL, 0)) == -1)
-		report_error("fcntl(fd, F_GETFL) failed for %s:%s",cptr);
-	else if (fcntl(fd, F_SETFL, res | nonb) == -1)
-		report_error("fcntl(fd, F_SETL, nonb) failed for %s:%s",cptr);
-#endif
-	return;
+		report_error("fcntl(fd, F_GETFL) failed for %s:%s", cptr);
+	else if (fcntl(fd, F_SETFL, res | O_NONBLOCK) == -1)
+		report_error("fcntl(fd, F_SETFL, O_NONBLOCK) failed for %s:%s", cptr);
 }
 
 #ifdef	CLONE_CHECK
