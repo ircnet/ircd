@@ -863,7 +863,7 @@ static	int	check_init(aClient *cptr, char *sockn)
 		strncpyzt(sockn, me.sockhost, HOSTLEN);
 		bzero((char *)&sk, sizeof(struct SOCKADDR_IN));
 	}
-	else if(cptr->pp2_state)
+	else if(IsPP2(cptr))
 	{
 		inetntop(AF_INET6, (char *)&cptr->ip, sockn, INET6_ADDRSTRLEN);
 	}
