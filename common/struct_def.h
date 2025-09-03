@@ -274,6 +274,7 @@ typedef enum Status {
 #define IsCAPNegotiation(x)	(MyConnect(x) && (x)->cap_negotation)
 #define HasCap(x, y)		(MyConnect(x) && (x)->caps & y)
 #define IsSASLAuthed(x)		((x)->flags & FLAGS_SASL)
+#define IsPP2(x)	(!IN6_IS_ADDR_UNSPECIFIED(&x->pp2_dip) && x->pp2_dport != 0)
 /*
  * defined debugging levels
  */
@@ -405,10 +406,13 @@ struct	ListItem	{
 #define PFLAG_DELAYED		0x00001
 #define PFLAG_SERVERONLY	0x00002
 #define PFLAG_TLS           0x00004
+#define PFLAG_PP2			0x00008
 
 #define IsConfDelayed(x)	((x)->flags & PFLAG_DELAYED)
 #define IsConfServeronly(x)	((x)->flags & PFLAG_SERVERONLY)
 #define IsConfTLS(x)        ((x)->flags & PFLAG_TLS)
+#define IsConfPP2(x)		((x)->flags & PFLAG_PP2)
+#define DoingPP2(x)			((x)->pp2_state && (x)->pp2_state->phase != PROXY_DONE)
 
 #define	IsIllegal(x)	((x)->status & CONF_ILLEGAL)
 
@@ -443,6 +447,35 @@ struct LineItem
     char    *line;
     struct  LineItem *next;
 };
+
+/* PROXY protocol v2 structures */
+typedef enum
+{
+	/* waiting for 16-byte header */
+	PROXY_NEED_HDR = 1,
+	/* waiting for payload bytes */
+	PROXY_NEED_PAYLOAD = 2,
+	/* parsing complete */
+	PROXY_DONE = 3
+} PP2Phase;
+
+typedef struct {
+	/* current parsing phase (see PP2Phase enum) */
+	PP2Phase phase;
+	/* buffer for header and payload data */
+	unsigned char buf[512];
+	/* number of bytes currently stored in 'buf' */
+	size_t buflen;
+	/* number of bytes still required to finish the current phase:
+	 * - starts at 16 (header size)
+	 * - after header is parsed: payload length
+	 * - becomes 0 once that phase is satisfied */
+	size_t need;
+	/* payload length field as advertised in header */
+	uint16_t fam_len;
+	/* family/protocol byte, identifies AF_INET / AF_INET6 / etc. */
+	uint8_t fam;
+} PP2State;
 
 /*
  * Client structures
@@ -588,6 +621,9 @@ struct Client	{
 	int cap_negotation; /* CAP negotiation is in progress. Registration must wait for "CAP END" */
 	aClient *sasl_service; /* The SASL service that is responsible for this user. */
 	char *cloak_tmp; /* Contains the cloaked hostname until it was applied to the user */
+	PP2State *pp2_state;     /* PROXY protocol v2: parser state */
+	struct in6_addr pp2_dip; /* PROXY protocol v2: destination IP address */
+	uint16_t pp2_dport;      /* PROXY protocol v2: destination port */
 };
 
 #define	CLIENT_LOCAL_SIZE sizeof(aClient)

@@ -859,20 +859,27 @@ static	int	check_init(aClient *cptr, char *sockn)
 
 	/* If descriptor is a tty, special checking... */
 	if (isatty(cptr->fd))
-	    {
+	{
 		strncpyzt(sockn, me.sockhost, HOSTLEN);
 		bzero((char *)&sk, sizeof(struct SOCKADDR_IN));
-	    }
+	}
+	else if(cptr->pp2_state)
+	{
+		inetntop(AF_INET6, (char *)&cptr->ip, sockn, INET6_ADDRSTRLEN);
+	}
 	else if (getpeername(cptr->fd, (SAP)&sk, &len) == -1)
-	    {
+	{
 		report_error("connect failure: %s %s", cptr);
 		return -1;
-	    }
-	inetntop(AF_INET6, (char *)&sk.sin6_addr, sockn, INET6_ADDRSTRLEN);
-	Debug((DEBUG_DNS,"sockn %x",sockn));
-	Debug((DEBUG_DNS,"sockn %s",sockn));
-	bcopy((char *)&sk.SIN_ADDR, (char *)&cptr->ip, sizeof(struct IN_ADDR));
-	cptr->port = ntohs(sk.SIN_PORT);
+	}
+	else
+	{
+		inetntop(AF_INET6, (char *)&sk.sin6_addr, sockn, INET6_ADDRSTRLEN);
+		Debug((DEBUG_DNS,"sockn %x",sockn));
+		Debug((DEBUG_DNS,"sockn %s",sockn));
+		bcopy((char *)&sk.SIN_ADDR, (char *)&cptr->ip, sizeof(struct IN_ADDR));
+		cptr->port = ntohs(sk.SIN_PORT);
+	}
 
 	return 0;
 }
@@ -1533,7 +1540,7 @@ void set_non_blocking(int fd, aClient *cptr)
  * check_clones
  * adapted by jecete 4 IRC Ptnet
  */
-static  int     check_clones(aClient *cptr)
+int check_clones(aClient *cptr)
 {
 	struct abacklog {
 		struct  IN_ADDR ip;
@@ -1599,27 +1606,36 @@ void	add_connection_refuse(int fd, aClient *acptr, int delay)
  */
 aClient	*add_connection(aClient *cptr, int fd)
 {
-	Link	lin;
 	aClient *acptr;
 	aConfItem *aconf = NULL;
 	acptr = make_client(NULL);
 
 	aconf = cptr->confs->value.aconf;
 	acptr->acpt = cptr;
+	acptr->fd = fd;
 
 	/* Removed preliminary access check. Full check is performed in
 	 * m_server and m_user instead. Also connection time out help to
 	 * get rid of unwanted connections.
 	 */
-	if (isatty(fd)) /* If descriptor is a tty, special checking... */
+	if (isatty(fd))
+	{
+		/* If descriptor is a tty, special checking... */
 		get_sockhost(acptr, cptr->sockhost);
+		if (IsConfPP2(aconf))
+		{
+			/* Reject tty connections if PROXY protocol is required */
+			add_connection_refuse(fd, acptr, 0);
+			return NULL;
+		}
+	}
 	else
-	    {
+	{
 		struct	SOCKADDR_IN addr;
 		SOCK_LEN_TYPE len = sizeof(struct SOCKADDR_IN);
 
 		if (getpeername(fd, (SAP)&addr, &len) == -1)
-		    {
+	    {
 #if defined(linux)
 			if (errno != ENOTCONN)
 #endif
@@ -1627,7 +1643,7 @@ aClient	*add_connection(aClient *cptr, int fd)
 					     cptr);
 			add_connection_refuse(fd, acptr, 0);
 			return NULL;
-		    }
+		}
 		/* don't want to add "Failed in connecting to" here.. */
 		if (aconf && IsIllegal(aconf))
 		{
@@ -1639,43 +1655,35 @@ aClient	*add_connection(aClient *cptr, int fd)
 		 */
 		inetntop(AF_INET6, (char *)&addr.sin6_addr, ipv6string,
 			  sizeof(ipv6string));
-		get_sockhost(acptr, (char *)ipv6string);
+		get_sockhost(acptr, ipv6string);
 		bcopy ((char *)&addr.SIN_ADDR, (char *)&acptr->ip,
 			sizeof(struct IN_ADDR));
 		acptr->port = ntohs(addr.SIN_PORT);
 
-#ifdef	CLONE_CHECK
-		if (check_clones(acptr) > CLONE_MAX)
+		if (IsConfPP2(aconf))
 		{
-			sendto_flag(SCH_LOCAL, "Rejecting connection from %s.",
-						get_client_host(acptr));
-			acptr->exitc = EXITC_CLONE;
-			sendto_flog(acptr, EXITC_CLONE, "", acptr->sockhost);
-#ifdef DELAY_CLOSE
-			nextdelayclose = delay_close(fd);
-#else
-			(void)send(fd, "ERROR :Too rapid connections from your "
-				"host\r\n", 46, 0);
-#endif
-			/* If DELAY_CLOSE is not defined, delay will
-			** be changed to 0 inside. --B. */
-			add_connection_refuse(fd, acptr, 1);
-			return NULL;
+			if (!is_trusted_proxy((const struct in6_addr *) &addr.sin6_addr))
+			{
+				Debug((DEBUG_INFO,
+					   "pp2(%d): rejecting untrusted connection from %s",
+					   acptr->fd, ipv6string));
+				sendto_flag(SCH_LOCAL,
+							"Rejecting PROXY protocol connection from %s",
+							ipv6string);
+				send(acptr->fd, "ERROR :Proxy connection not allowed\r\n", 37,
+					 0);
+				add_connection_refuse(acptr->fd, acptr, 0);
+				return NULL;
+			}
+			pp2_init(acptr);
 		}
-#endif
-		lin.flags = ASYNC_CLIENT;
-		lin.value.cptr = acptr;
-		lin.next = NULL;
-		Debug((DEBUG_DNS, "lookup %s",
-		       inet_ntop(AF_INET6, (char *)&addr.sin6_addr,
-				 ipv6string, sizeof(ipv6string))));
-		acptr->hostp = gethost_byaddr((char *)&acptr->ip, &lin);
-		if (!acptr->hostp)
-			SetDNS(acptr);
-		nextdnscheck = 1;
-	    }
+		else
+		{
+			if (finalize_connection(acptr, ipv6string) < 0)
+				return NULL;
+		}
+	}
 
-	acptr->fd = fd;
 	set_non_blocking(acptr->fd, acptr);
 	if (set_sock_opts(acptr->fd, acptr) == -1)
 	{
@@ -1689,22 +1697,57 @@ aClient	*add_connection(aClient *cptr, int fd)
 	local[fd] = acptr;
 	add_fd(fd, &fdall);
 	add_client_to_list(acptr);
-	start_auth(acptr);
-#if defined(USE_IAUTH)
-	if (!isatty(fd) && !DoingDNS(acptr))
-	    {
-		int i = 0;
-		
-		while (acptr->hostp->h_aliases[i])
-			sendto_iauth("%d A %s", acptr->fd,
-				     acptr->hostp->h_aliases[i++]);
-		if (acptr->hostp->h_name)
-			sendto_iauth("%d N %s",acptr->fd,acptr->hostp->h_name);
-		else if (acptr->hostp->h_aliases[0])
-			sendto_iauth("%d n", acptr->fd);
-	    }
-#endif
 	return acptr;
+}
+
+int finalize_connection(aClient *cptr, const char *ipstr)
+{
+	Link lin;
+
+#ifdef CLONE_CHECK
+	if (check_clones(cptr) > CLONE_MAX)
+	{
+		sendto_flag(SCH_LOCAL, "Rejecting connection from %s.",
+					get_client_host(cptr));
+		cptr->exitc = EXITC_CLONE;
+		sendto_flog(cptr, EXITC_CLONE, "", cptr->sockhost);
+#ifdef DELAY_CLOSE
+		nextdelayclose = delay_close(cptr->fd);
+#else
+		(void) send(cptr->fd, "ERROR :Too rapid connections from your host\r\n",
+					46, 0);
+#endif
+		/* If DELAY_CLOSE is not defined, delay will be changed to 0 inside.
+		 * --B. */
+		add_connection_refuse(cptr->fd, cptr, 1);
+		return -1;
+	}
+#endif
+
+	lin.flags = ASYNC_CLIENT;
+	lin.value.cptr = cptr;
+	lin.next = NULL;
+	Debug((DEBUG_DNS, "lookup %s", ipstr));
+	cptr->hostp = gethost_byaddr((char *) &cptr->ip, &lin);
+	if (!cptr->hostp)
+		SetDNS(cptr);
+	nextdnscheck = 1;
+
+	start_auth(cptr);
+#if defined(USE_IAUTH)
+	if (!isatty(cptr->fd) && !DoingDNS(cptr))
+	{
+		int i = 0;
+
+		while (cptr->hostp->h_aliases[i])
+			sendto_iauth("%d A %s", cptr->fd, cptr->hostp->h_aliases[i++]);
+		if (cptr->hostp->h_name)
+			sendto_iauth("%d N %s",cptr->fd, cptr->hostp->h_name);
+		else if (cptr->hostp->h_aliases[0])
+			sendto_iauth("%d n", cptr->fd);
+	}
+#endif
+	return 0;
 }
 
 #ifdef	UNIXPORT
@@ -1946,7 +1989,57 @@ static	int	read_packet(aClient *cptr, int msg_ready)
 			return 1;
 		if (length <= 0)
 			return length;
-	    }
+
+		if (cptr->pp2_state)
+		{
+			size_t consumed = 0;
+			int pr = pp2_consume(cptr, (const unsigned char *) readbuf,
+								 (size_t) length, &consumed);
+			if (pr < 0)
+			{
+				/*
+				 * Reject if the PROXY protocol header is invalid.
+				 * This typically indicates one of:
+				 * - misconfiguration (e.g. proxy not sending v2 header)
+				 * - mismatch between proxy and ircd implementation
+				 * - a direct client connection to a port reserved for proxy use
+				 */
+				char *client_ip = get_client_ip(cptr);
+				Debug((DEBUG_INFO,
+					   "pp2(%d): invalid PROXY protocol header from %s",
+					   cptr->fd, client_ip));
+				sendto_flag(SCH_ERROR, "Invalid PROXY protocol header from %s",
+							client_ip);
+				return exit_client(cptr, cptr, &me, "Bad PROXY header");
+			}
+			if (pr == 0)
+			{
+				/* waiting for more header bytes */
+				return 1;
+			}
+			if (consumed > 0)
+			{
+				Debug((DEBUG_READ, "pp2(%d): memmove %zu, old length=%d",
+					   cptr->fd, consumed, length));
+				if (consumed < (size_t) length)
+				{
+					memmove(readbuf, readbuf + consumed,
+							(size_t) length - consumed);
+				}
+				length -= (int) consumed;
+				if (length == 0)
+				{
+					/* header-only read; next read will have IRC bytes */
+					return 1;
+				}
+			}
+			if (pr == 1)
+			{
+				/* PROXY protocol parsing completed successfully. */
+				pp2_free(cptr);
+			}
+		}
+	}
 	else if (msg_ready)
 		return exit_client(cptr, cptr, &me, "EOF From Client");
 
@@ -2101,12 +2194,12 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 			** so no need to check for anything!
 			*/
 #if defined(USE_IAUTH)
-			if (DoingDNS(cptr) || DoingAuth(cptr) ||
+			if ((DoingDNS(cptr) || DoingAuth(cptr) ||
 			    WaitingXAuth(cptr) ||
 			    (DoingXAuth(cptr) &&
-			     !(iauth_options & XOPT_EARLYPARSE)))
+			     !(iauth_options & XOPT_EARLYPARSE))) && !DoingPP2(cptr))
 #else
-			if (DoingDNS(cptr) || DoingAuth(cptr))
+			if ((DoingDNS(cptr) || DoingAuth(cptr)) && !DoingPP2(cptr))
 #endif
 				continue;
 #if !defined(USE_POLL)
@@ -2362,10 +2455,10 @@ deadsocket:
 		    }
 		length = 1;	/* for fall through case */
 		if (!NoNewLine(cptr) || TST_READ_EVENT(fd))
-		    {
-			if (!DoingAuth(cptr))
+		{
+			if (DoingPP2(cptr) || !DoingAuth(cptr))
 				length = read_packet(cptr, TST_READ_EVENT(fd));
-		    }
+		}
 		readcalls++;
 		if (length == FLUSH_BUFFER)
 			continue;

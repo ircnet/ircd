@@ -560,16 +560,32 @@ void	start_auth(aClient *cptr)
 
 	set_non_blocking(cptr->authfd, cptr);
 
-	/* get remote host peer - so that we get right interface -- jrg */
 	tlen = ulen = sizeof(us);
-	if (getpeername(cptr->fd, (struct sockaddr *)&them, &tlen) < 0)
-	    {
-		/* we probably don't need this error message -kalt */
-		report_error("getpeername for auth request %s:%s", cptr);
-		close(cptr->authfd);
-		cptr->authfd = -1;
-		return;
-	    }
+
+	if (IsPP2(cptr))
+	{
+		char src[INET6_ADDRSTRLEN], dst[INET6_ADDRSTRLEN];
+		memset(&them, 0, sizeof(them));
+		them.SIN_FAMILY = AFINET;
+		memcpy(&them.sin6_addr, &cptr->ip, sizeof(cptr->ip));
+		them.SIN_PORT = htons(cptr->port);
+
+		Debug((DEBUG_INFO, "start_auth(%x) pp2 applied: src %s:%u dst %s:%u",
+			   cptr, inetntop(AF_INET6, (char *) &cptr->ip, src, sizeof(src)),
+			   (unsigned) cptr->port,
+			   inetntop(AF_INET6, (char *) &cptr->pp2_dip, dst, sizeof(dst)),
+			   (unsigned) cptr->pp2_dport));
+	}
+	else {
+		if (getpeername(cptr->fd, (struct sockaddr *) &them, &tlen) < 0)
+		{
+				/* we probably don't need this error message -kalt */
+				report_error("getpeername for auth request %s:%s", cptr);
+				close(cptr->authfd);
+				cptr->authfd = -1;
+				return;
+		}
+	}
 	them.SIN_FAMILY = AFINET;
 
 	/* We must bind the local end to the interface that they connected
@@ -579,31 +595,59 @@ void	start_auth(aClient *cptr)
 	(void)getsockname(cptr->fd, (struct sockaddr *)&us, &ulen);
 	us.SIN_FAMILY = AFINET;
 
-	// Check if a source IP has been set in P-Line (usually if an SSL proxy is used)
-	if (cptr->acpt->confs && IsConfTLS(cptr->acpt->confs->value.aconf)
-		&& !BadPtr(cptr->acpt->confs->value.aconf->source_ip))
+	if (IsPP2(cptr))
 	{
-		inetpton(AF_INET6, cptr->acpt->confs->value.aconf->source_ip, us.sin6_addr.s6_addr);
+		memset(&us, 0, sizeof(us));
+		us.SIN_FAMILY = AFINET;
+		memcpy(&us.sin6_addr, &cptr->pp2_dip, sizeof(cptr->pp2_dip));
+	}
+	else
+	{
+		if (getsockname(cptr->fd, (struct sockaddr *)&us, &ulen) < 0) {
+			report_error("getsockname for auth request %s:%s", cptr);
+			close(cptr->authfd);
+			cptr->authfd = -1;
+			return;
+		}
+		us.SIN_FAMILY = AFINET;
+
+		/*
+		 * Check if a source IP has been set in P-Line (usually if an
+		 * SSL proxy is used)
+		 */
+		if (cptr->acpt->confs && IsConfTLS(cptr->acpt->confs->value.aconf) &&
+			!BadPtr(cptr->acpt->confs->value.aconf->source_ip))
+		{
+			inetpton(AF_INET6, cptr->acpt->confs->value.aconf->source_ip,
+					 us.sin6_addr.s6_addr);
+		}
 	}
 
 # if defined(USE_IAUTH)
 	if (adfd >= 0)
-	    {
+	{
 		char abuf[BUFSIZ];
+		unsigned int iauth_lport = IsPP2(cptr) ? (unsigned) cptr->pp2_dport
+											   : (unsigned) ntohs(us.SIN_PORT);
+
 		sprintf(abuf, "%d C %s %u ", cptr->fd,
-			inetntop(AF_INET6, (char *)&them.sin6_addr, ipv6string,
-				 sizeof(ipv6string)), ntohs(them.SIN_PORT));
-		sprintf(abuf+strlen(abuf), "%s %u",
-			inetntop(AF_INET6, (char *)&us.sin6_addr, ipv6string,
-				 sizeof(ipv6string)), ntohs(us.SIN_PORT));
+				inetntop(AF_INET6, (char *) &them.sin6_addr, ipv6string,
+						 sizeof(ipv6string)),
+				(unsigned) ntohs(them.SIN_PORT));
+
+		sprintf(abuf + strlen(abuf), "%s %u",
+				inetntop(AF_INET6, (char *) &us.sin6_addr, ipv6string,
+						 sizeof(ipv6string)),
+				iauth_lport);
+
 		if (sendto_iauth(abuf) == 0)
-		    {
+		{
 			close(cptr->authfd);
 			cptr->authfd = -1;
 			cptr->flags |= FLAGS_XAUTH;
 			return;
-		    }
-	    }
+		}
+	}
 # endif
 	Debug((DEBUG_NOTICE,"auth(%x) from %s %x %x",
 	       cptr, inet_ntop(AF_INET6, (char *)&us.sin6_addr, ipv6string,
@@ -672,19 +716,40 @@ void	send_authports(aClient *cptr)
 	Debug((DEBUG_NOTICE,"write_authports(%x) fd %d authfd %d stat %d",
 		cptr, cptr->fd, cptr->authfd, cptr->status));
 	tlen = ulen = sizeof(us);
-	if (getsockname(cptr->fd, (struct SOCKADDR *)&us, &ulen) ||
-	    getpeername(cptr->fd, (struct SOCKADDR *)&them, &tlen))
+
+	if (getsockname(cptr->fd, (struct SOCKADDR *)&us, &ulen))
 	    {
 #ifdef	USE_SYSLOG
-		syslog(LOG_ERR, "auth get{sock,peer}name error for %s:%m",
+		syslog(LOG_ERR, "auth getsockname error for %s:%m",
 			get_client_name(cptr, TRUE));
 #endif
 		goto authsenderr;
 	    }
 
-	sprintf(authbuf, "%u , %u\r\n",
-		(unsigned int)ntohs(them.SIN_PORT),
-		(unsigned int)ntohs(us.SIN_PORT));
+		if (IsPP2(cptr))
+		{
+			memset(&them, 0, sizeof(them));
+			them.SIN_FAMILY = AFINET;
+			memcpy(&them.sin6_addr, &cptr->ip, sizeof(cptr->ip));
+			them.SIN_PORT = htons(cptr->port);
+			sprintf(authbuf, "%u , %u\r\n", (unsigned int) cptr->port,
+					(unsigned int) cptr->pp2_dport);
+		}
+		else
+		{
+			if (getpeername(cptr->fd, (struct SOCKADDR *)&them, &tlen))
+			{
+#ifdef USE_SYSLOG
+				syslog(LOG_ERR, "auth getpeername error for %s:%m",
+					   get_client_name(cptr, TRUE));
+#endif
+				goto authsenderr;
+			}
+
+			sprintf(authbuf, "%u , %u\r\n",
+					(unsigned int)ntohs(them.SIN_PORT),
+					(unsigned int)ntohs(us.SIN_PORT));
+		}
 
 	Debug((DEBUG_SEND, "sending [%s] to auth port %s.113",
 		authbuf, inet_ntop(AF_INET6, (char *)&them.sin6_addr,
