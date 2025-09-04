@@ -863,9 +863,9 @@ static	int	check_init(aClient *cptr, char *sockn)
 		strncpyzt(sockn, me.sockhost, HOSTLEN);
 		bzero((char *)&sk, sizeof(struct SOCKADDR_IN));
 	}
-	else if(IsPP2(cptr))
+	else if (IsPP2(cptr))
 	{
-		inetntop(AF_INET6, (char *)&cptr->ip, sockn, INET6_ADDRSTRLEN);
+		inetntop(AF_INET6, (char *) &cptr->ip, sockn, INET6_ADDRSTRLEN);
 	}
 	else if (getpeername(cptr->fd, (SAP)&sk, &len) == -1)
 	{
@@ -874,10 +874,10 @@ static	int	check_init(aClient *cptr, char *sockn)
 	}
 	else
 	{
-		inetntop(AF_INET6, (char *)&sk.sin6_addr, sockn, INET6_ADDRSTRLEN);
-		Debug((DEBUG_DNS,"sockn %x",sockn));
-		Debug((DEBUG_DNS,"sockn %s",sockn));
-		bcopy((char *)&sk.SIN_ADDR, (char *)&cptr->ip, sizeof(struct IN_ADDR));
+		inetntop(AF_INET6, (char *) &sk.sin6_addr, sockn, INET6_ADDRSTRLEN);
+		Debug((DEBUG_DNS, "sockn %x", sockn));
+		Debug((DEBUG_DNS, "sockn %s", sockn));
+		bcopy((char *) &sk.SIN_ADDR, (char *) &cptr->ip, sizeof(struct IN_ADDR));
 		cptr->port = ntohs(sk.SIN_PORT);
 	}
 
@@ -1635,7 +1635,7 @@ aClient	*add_connection(aClient *cptr, int fd)
 		SOCK_LEN_TYPE len = sizeof(struct SOCKADDR_IN);
 
 		if (getpeername(fd, (SAP)&addr, &len) == -1)
-	    {
+		{
 #if defined(linux)
 			if (errno != ENOTCONN)
 #endif
@@ -1742,7 +1742,7 @@ int finalize_connection(aClient *cptr, const char *ipstr)
 		while (cptr->hostp->h_aliases[i])
 			sendto_iauth("%d A %s", cptr->fd, cptr->hostp->h_aliases[i++]);
 		if (cptr->hostp->h_name)
-			sendto_iauth("%d N %s",cptr->fd, cptr->hostp->h_name);
+			sendto_iauth("%d N %s", cptr->fd, cptr->hostp->h_name);
 		else if (cptr->hostp->h_aliases[0])
 			sendto_iauth("%d n", cptr->fd);
 	}
@@ -2194,12 +2194,12 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 			** so no need to check for anything!
 			*/
 #if defined(USE_IAUTH)
-			if ((DoingDNS(cptr) || DoingAuth(cptr) ||
-			    WaitingXAuth(cptr) ||
-			    (DoingXAuth(cptr) &&
-			     !(iauth_options & XOPT_EARLYPARSE))) && !DoingPP2(cptr))
+				if ((DoingDNS(cptr) || DoingAuth(cptr) || WaitingXAuth(cptr) ||
+					 (DoingXAuth(cptr) &&
+					  !(iauth_options & XOPT_EARLYPARSE))) &&
+					!DoingPP2(cptr))
 #else
-			if ((DoingDNS(cptr) || DoingAuth(cptr)) && !DoingPP2(cptr))
+				if ((DoingDNS(cptr) || DoingAuth(cptr)) && !DoingPP2(cptr))
 #endif
 				continue;
 #if !defined(USE_POLL)

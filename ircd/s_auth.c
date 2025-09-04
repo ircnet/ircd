@@ -576,14 +576,15 @@ void	start_auth(aClient *cptr)
 			   inetntop(AF_INET6, (char *) &cptr->pp2_dip, dst, sizeof(dst)),
 			   (unsigned) cptr->pp2_dport));
 	}
-	else {
+	else
+	{
 		if (getpeername(cptr->fd, (struct sockaddr *) &them, &tlen) < 0)
 		{
-				/* we probably don't need this error message -kalt */
-				report_error("getpeername for auth request %s:%s", cptr);
-				close(cptr->authfd);
-				cptr->authfd = -1;
-				return;
+			/* we probably don't need this error message -kalt */
+			report_error("getpeername for auth request %s:%s", cptr);
+			close(cptr->authfd);
+			cptr->authfd = -1;
+			return;
 		}
 	}
 	them.SIN_FAMILY = AFINET;
@@ -603,7 +604,8 @@ void	start_auth(aClient *cptr)
 	}
 	else
 	{
-		if (getsockname(cptr->fd, (struct sockaddr *)&us, &ulen) < 0) {
+		if (getsockname(cptr->fd, (struct sockaddr *) &us, &ulen) < 0)
+		{
 			report_error("getsockname for auth request %s:%s", cptr);
 			close(cptr->authfd);
 			cptr->authfd = -1;
@@ -708,64 +710,63 @@ void	start_auth(aClient *cptr)
  */
 void	send_authports(aClient *cptr)
 {
-	struct	SOCKADDR_IN	us, them;
+	struct SOCKADDR_IN us, them;
 
-	char	authbuf[32];
+	char authbuf[32];
 	SOCK_LEN_TYPE ulen, tlen;
 
-	Debug((DEBUG_NOTICE,"write_authports(%x) fd %d authfd %d stat %d",
-		cptr, cptr->fd, cptr->authfd, cptr->status));
+	Debug((DEBUG_NOTICE, "write_authports(%x) fd %d authfd %d stat %d", cptr,
+		   cptr->fd, cptr->authfd, cptr->status));
 	tlen = ulen = sizeof(us);
 
-	if (getsockname(cptr->fd, (struct SOCKADDR *)&us, &ulen))
-	    {
-#ifdef	USE_SYSLOG
+	if (getsockname(cptr->fd, (struct SOCKADDR *) &us, &ulen))
+	{
+#ifdef USE_SYSLOG
 		syslog(LOG_ERR, "auth getsockname error for %s:%m",
-			get_client_name(cptr, TRUE));
+			   get_client_name(cptr, TRUE));
 #endif
 		goto authsenderr;
-	    }
+	}
 
-		if (IsPP2(cptr))
+	if (IsPP2(cptr))
+	{
+		memset(&them, 0, sizeof(them));
+		them.SIN_FAMILY = AFINET;
+		memcpy(&them.sin6_addr, &cptr->ip, sizeof(cptr->ip));
+		them.SIN_PORT = htons(cptr->port);
+		sprintf(authbuf, "%u , %u\r\n", (unsigned int) cptr->port,
+				(unsigned int) cptr->pp2_dport);
+	}
+	else
+	{
+		if (getpeername(cptr->fd, (struct SOCKADDR *) &them, &tlen))
 		{
-			memset(&them, 0, sizeof(them));
-			them.SIN_FAMILY = AFINET;
-			memcpy(&them.sin6_addr, &cptr->ip, sizeof(cptr->ip));
-			them.SIN_PORT = htons(cptr->port);
-			sprintf(authbuf, "%u , %u\r\n", (unsigned int) cptr->port,
-					(unsigned int) cptr->pp2_dport);
-		}
-		else
-		{
-			if (getpeername(cptr->fd, (struct SOCKADDR *)&them, &tlen))
-			{
 #ifdef USE_SYSLOG
-				syslog(LOG_ERR, "auth getpeername error for %s:%m",
-					   get_client_name(cptr, TRUE));
+			syslog(LOG_ERR, "auth getpeername error for %s:%m",
+				   get_client_name(cptr, TRUE));
 #endif
-				goto authsenderr;
-			}
-
-			sprintf(authbuf, "%u , %u\r\n",
-					(unsigned int)ntohs(them.SIN_PORT),
-					(unsigned int)ntohs(us.SIN_PORT));
+			goto authsenderr;
 		}
 
-	Debug((DEBUG_SEND, "sending [%s] to auth port %s.113",
-		authbuf, inet_ntop(AF_INET6, (char *)&them.sin6_addr,
-				    ipv6string, sizeof(ipv6string))));
+		sprintf(authbuf, "%u , %u\r\n", (unsigned int) ntohs(them.SIN_PORT),
+				(unsigned int) ntohs(us.SIN_PORT));
+	}
+
+	Debug((DEBUG_SEND, "sending [%s] to auth port %s.113", authbuf,
+		   inet_ntop(AF_INET6, (char *) &them.sin6_addr, ipv6string,
+					 sizeof(ipv6string))));
 	if (write(cptr->authfd, authbuf, strlen(authbuf)) != strlen(authbuf))
-	    {
-authsenderr:
+	{
+	authsenderr:
 		ircstp->is_abad++;
-		(void)close(cptr->authfd);
+		(void) close(cptr->authfd);
 		if (cptr->authfd == highest_fd)
 			while (!local[highest_fd])
 				highest_fd--;
 		cptr->authfd = -1;
-		cptr->flags &= ~(FLAGS_AUTH|FLAGS_WRAUTH);
+		cptr->flags &= ~(FLAGS_AUTH | FLAGS_WRAUTH);
 		return;
-	    }
+	}
 	cptr->flags &= ~FLAGS_WRAUTH;
 	return;
 }
