@@ -406,7 +406,7 @@ struct	ListItem	{
 #define PFLAG_DELAYED		0x00001
 #define PFLAG_SERVERONLY	0x00002
 #define PFLAG_TLS           0x00004
-#define PFLAG_PP2			0x00008
+#define PFLAG_PP2           0x00008
 
 #define IsConfDelayed(x)	((x)->flags & PFLAG_DELAYED)
 #define IsConfServeronly(x)	((x)->flags & PFLAG_SERVERONLY)
