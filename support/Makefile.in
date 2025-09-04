@@ -147,7 +147,8 @@ IRCD_COMMON_OBJS = bsd.o dbuf.o packet.o send.o match.o parse.o \
 IRCD_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
               s_bsd.o s_conf.o s_debug.o s_err.o s_id.o s_misc.o s_numeric.o \
               s_send.o s_serv.o s_service.o s_user.o s_zip.o whowas.o \
-              res_init.o res_comp.o res_mkquery.o patricia.o s_cap.o s_sasl.o
+              res_init.o res_comp.o res_mkquery.o patricia.o s_cap.o s_sasl.o \
+              s_pp2.o
 
 IAUTH_COMMON_OBJS = clsupport.o clmatch.o # This is a little evil
 IAUTH_OBJS = iauth.o a_conf.o a_io.o a_log.o \
@@ -330,6 +331,9 @@ s_auth.o: ../ircd/s_auth.c setup.h config.h ../common/struct_def.h
 s_bsd.o: ../ircd/s_bsd.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -DIRCDPID_PATH="\"$(IRCDPID_PATH)\"" -DIAUTH_PATH="\"$(IAUTH_PATH)\"" -DIAUTH="\"$(IAUTH)\"" -c -o $@ ../ircd/s_bsd.c
 
+s_cap.o: ../ircd/s_cap.c setup.h config.h ../common/struct_def.h
+	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_cap.c
+
 s_conf.o: ../ircd/s_conf.c setup.h config.h ../common/struct_def.h ../ircd/config_read.c
 	$(CC) $(S_CFLAGS) -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" \
 	-DIRCDM4_PATH="\"$(IRCDM4_PATH)\"" -DIRCDCONF_PATH="\"$(IRCDCONF_PATH)\"" \
@@ -369,6 +373,9 @@ s_zip.o: ../ircd/s_zip.c setup.h config.h ../common/struct_def.h
 
 s_cap.o: ../ircd/s_cap.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_cap.c
+
+s_pp2.o: ../ircd/s_pp2.c setup.h config.h ../common/struct_def.h
+	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_pp2.c
 
 s_sasl.o: ../ircd/s_sasl.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_sasl.c

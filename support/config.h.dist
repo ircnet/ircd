@@ -820,6 +820,16 @@
 #define WHOISTLS "is a Secure Connection (SSL/TLS)"
 #define WHOISTLS_NOTICE "Your connection is secure (SSL/TLS)."
 
+/*
+ * Only connections originating from these addresses are allowed to provide
+ * Proxy protocol v2 headers to pass the real client IP.
+ *
+ * Notes:
+ * - Only add internal proxy IP addresses
+ * - Incorrect or overly broad entries may allow IP spoofing attacks
+ */
+#define TRUSTED_PROXY_ADDRESSES "127.0.0.1", "::1"
+
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */
 /*   STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP STOP  */

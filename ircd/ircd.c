@@ -1010,6 +1010,7 @@ int	main(int argc, char *argv[])
 	open_debugfile();
 	timeofday = time(NULL);
 	(void)init_sys();
+	init_trusted_proxy_ips();
 
 #ifdef USE_SYSLOG
 	openlog(mybasename(myargv[0]), LOG_PID|LOG_NDELAY, LOG_FACILITY);

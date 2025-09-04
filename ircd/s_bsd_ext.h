@@ -65,6 +65,7 @@ EXTERN int connect_server (aConfItem *aconf, aClient *by,
 EXTERN void get_my_name (aClient *cptr, char *name, int len);
 EXTERN int setup_ping (aConfItem *aconf);
 EXTERN void send_ping (aConfItem *aconf);
+EXTERN int finalize_connection(aClient *cptr, const char *ipstr);
 #if defined(ENABLE_SUMMON) || defined(ENABLE_USERS)
 EXTERN int utmp_open(void);
 EXTERN int utmp_read (int fd, char *name, char *line, char *host,
