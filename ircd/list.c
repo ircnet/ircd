@@ -189,7 +189,7 @@ void	free_client(aClient *cptr)
 		{
 			MyFree(cptr->sasl_user);
 		}
-		if(cptr->pp2_state)
+		if (cptr->pp2_state)
 		{
 			pp2_free(cptr);
 		}

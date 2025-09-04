@@ -274,7 +274,7 @@ typedef enum Status {
 #define IsCAPNegotiation(x)	(MyConnect(x) && (x)->cap_negotation)
 #define HasCap(x, y)		(MyConnect(x) && (x)->caps & y)
 #define IsSASLAuthed(x)		((x)->flags & FLAGS_SASL)
-#define IsPP2(x)	(!IN6_IS_ADDR_UNSPECIFIED(&x->pp2_dip) && x->pp2_dport != 0)
+#define IsPP2(x)            (!IN6_IS_ADDR_UNSPECIFIED(&x->pp2_dip) && x->pp2_dport != 0)
 /*
  * defined debugging levels
  */
@@ -411,8 +411,8 @@ struct	ListItem	{
 #define IsConfDelayed(x)	((x)->flags & PFLAG_DELAYED)
 #define IsConfServeronly(x)	((x)->flags & PFLAG_SERVERONLY)
 #define IsConfTLS(x)        ((x)->flags & PFLAG_TLS)
-#define IsConfPP2(x)		((x)->flags & PFLAG_PP2)
-#define DoingPP2(x)			((x)->pp2_state && (x)->pp2_state->phase != PROXY_DONE)
+#define IsConfPP2(x)        ((x)->flags & PFLAG_PP2)
+#define DoingPP2(x)         ((x)->pp2_state && (x)->pp2_state->phase != PROXY_DONE)
 
 #define	IsIllegal(x)	((x)->status & CONF_ILLEGAL)
 

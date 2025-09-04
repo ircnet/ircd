@@ -1963,7 +1963,7 @@ static	int	read_packet(aClient *cptr, int msg_ready)
 
 	if (msg_ready &&
 	    !(IsPerson(cptr) && DBufLength(&cptr->recvQ) > 6090))
-	    {
+	{
 		errno = 0;
 		length = recvfrom(cptr->fd, readbuf, sizeof(readbuf), 0, 0, 0);
 #if defined(DEBUGMODE) && defined(DEBUG_READ)
