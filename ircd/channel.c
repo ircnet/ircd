@@ -3255,6 +3255,34 @@ int	m_topic(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	return penalty;
 }
 
+void invite_notify(aChannel *chptr, aClient *inviter, aClient *target)
+{
+	Link *lp;
+
+	if (!chptr || !inviter || !target)
+	{
+		return;
+	}
+
+	for (lp = chptr->members; lp; lp = lp->next)
+	{
+		aClient *chan_op = lp->value.cptr;
+
+		if (chan_op == inviter)
+		{
+			continue;
+		}
+
+		if (MyConnect(chan_op) && (lp->flags & CHFL_CHANOP) &&
+			HasCap(chan_op, CAP_INVITE_NOTIFY))
+		{
+			sendto_prefix_one(chan_op, inviter, ":%s!%s@%s INVITE %s %s",
+							  inviter->name, inviter->user->username,
+							  inviter->user->host, target->name, chptr->chname);
+		}
+	}
+}
+
 /*
 ** m_invite
 **	parv[0] - sender prefix
@@ -3344,6 +3372,7 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (MyConnect(sptr) && chan_op)
 	{
+		invite_notify(chptr, sptr, acptr);
 		sendto_match_servs(chptr, acptr, "ENCAP * PARSE %s INVITED %s %s %s",
 						   me.serv->sid, sptr->uid, acptr->uid, chptr->chname);
 	}
@@ -3363,7 +3392,6 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 int	m_invited(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aChannel *chptr;
-	Link *lp;
 	aClient *inviter, *target;
 
 	if (!(inviter = find_uid(parv[1], (aClient *)NULL)))
@@ -3381,18 +3409,8 @@ int	m_invited(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return 0;
 	}
 
-	for (lp = chptr->members; lp; lp = lp->next)
-	{
-		aClient *chan_op = lp->value.cptr;
-		if (MyConnect(chan_op)
-			&& (lp->flags & CHFL_CHANOP)
-			&& HasCap(chan_op, CAP_INVITE_NOTIFY))
-		{
-			sendto_prefix_one(chan_op, sptr, ":%s!%s@%s INVITE %s %s",
-							  inviter->name, inviter->user->username,
-							  inviter->user->host, target->name, chptr->chname);
-		}
-	}
+	invite_notify(chptr, inviter, target);
+	return 0;
 }
 
 /*
