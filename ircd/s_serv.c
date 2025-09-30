@@ -3805,6 +3805,7 @@ static	char *encap_whitelisted(char *cmd)
 	char *whitelist[] = {
 		"SASL",
 		"TKLINE", "UNTKLINE",
+		"INVITED",
 		NULL
 	};
 	int i;
@@ -3867,13 +3868,15 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			return 1;
 		}
 
-		/* Resulting format: ":SID ENCAP *.mask sender!u@h COMMAND ..." */
+		/* Resulting format:
+		 *  ":<sender-SID> ENCAP <mask> PARSE <service> <command> [..]"
+		 */
 		len = sprintf(buf, ":%s ENCAP %s PARSE", me.serv->sid, mask);
 		toparse = buf + len;
 		len += sprintf(buf + len, " %s %s", sptr->name, whitelisted);
 		for (i = 3; i < parc; i++)
 			len += sprintf(buf + len, " %s%s", i+1 == parc?":":"", parv[i]);
-		Debug((DEBUG_SEND,"m_encap(cli->serv): %s", buf));
+		Debug((DEBUG_SEND,"m_encap(service->server): %s", buf));
         if(strcmp(mask, me.name) && strcmp(mask, me.serv->sid)) {
             sendto_serv_v(cptr, SV_UID, "%s", buf);
         }
@@ -3892,17 +3895,19 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		p = strchr(toparse, ' ');
 
 		if(p == NULL)
-		    return 2;
+		{
+			return 0;
+		}
 
-		if (p[1] == ':') p[1] = ' ';
+		if (p[1] == ':')
+		{
+			p[1] = ' ';
+		}
 
-		/* toparse now contains: :sendername COMMAND ... :lastarg.
-		 * invariant: parse() ignores :sendername if cptr is client
-		 */
 		Debug((DEBUG_DEBUG,"m_encap(PARSE): %s", toparse));
-		parse(cptr, toparse, toparse + strlen(toparse)); /* Inception .. */
+		parse(cptr, toparse, toparse + strlen(toparse));
 	}
-	return 5;
+	return 0;
 }
 
 /* announces server DIE */
