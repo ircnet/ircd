@@ -38,6 +38,88 @@ static char		iobuf[IOBUFSIZE+1];
 static char		rbuf[IOBUFSIZE+1];	/* incoming ircd stream */
 static int		iob_len = 0, rb_len = 0;
 
+typedef struct {
+	int fd;
+	int want_write;
+	AnInstance *inst;
+} GFD;
+
+#ifndef MAXGFD
+#define MAXGFD MAXI
+#endif
+static GFD gfdv[MAXGFD]; /* fd == 0 indicates a free (unused) entry */
+
+static void gfd_clear_slot(int i)
+{
+	gfdv[i].fd = 0;
+	gfdv[i].want_write = 0;
+	gfdv[i].inst = NULL;
+}
+
+static int gfd_used(int i)
+{
+	return gfdv[i].fd > 0 && gfdv[i].inst != NULL;
+}
+
+/* Registers a global file descriptor for the given instance */
+int io_register_gfd(AnInstance *inst, int fd, int want_write)
+{
+	int i;
+	if (!inst || fd <= 0)
+	{
+		return -1;
+	}
+	for (i = 0; i < MAXGFD; i++)
+	{
+		if (!gfd_used(i))
+		{
+			gfdv[i].fd = fd;
+			gfdv[i].want_write = want_write ? 1 : 0;
+			gfdv[i].inst = inst;
+			return 0;
+		}
+	}
+	return -1;
+}
+
+/* Unregisters all global file descriptors belonging to an instance */
+void io_unregister_gfd(AnInstance *inst)
+{
+	int i;
+	if (!inst)
+	{
+		return;
+	}
+	for (i = 0; i < MAXGFD; i++)
+	{
+		if (gfdv[i].inst == inst)
+		{
+			gfd_clear_slot(i);
+		}
+	}
+}
+
+/* Dispatches I/O event for a ready global file descriptor */
+int io_handle_global_fd(int ready_fd)
+{
+	int handled = 0;
+
+	for (int gi = 0; gi < MAXGFD; gi++)
+	{
+		if (gfd_used(gi) && gfdv[gi].fd == ready_fd)
+		{
+			if (gfdv[gi].inst && gfdv[gi].inst->mod &&
+				gfdv[gi].inst->mod->gwork)
+			{
+				gfdv[gi].inst->mod->gwork(gfdv[gi].inst);
+			}
+			handled = 1;
+			break;
+		}
+	}
+	return handled ? 0 : -1;
+}
+
 void	init_io(void)
 {
     bzero((char *) cldata, sizeof(cldata));
@@ -543,10 +625,43 @@ void	loop_io(void)
 	pfd->fd  = -1;
 #endif  /* USE_POLL */
 
-	SET_READ_EVENT(0); nfds = 1;		/* ircd stream */
-#if defined(USE_POLL) && defined(IAUTH_DEBUG)
+	/* always register fd 0 (ircd stream) first */
+	SET_READ_EVENT(0);
+	nfds = 1;
+
+	/* now register global file descriptors */
+#if !defined(USE_POLL)
+	for (int gi = 0; gi < MAXGFD; gi++)
+	{
+		if (gfd_used(gi))
+		{
+			FD_SET(gfdv[gi].fd, &read_set);
+			if (gfdv[gi].want_write)
+			{
+				FD_SET(gfdv[gi].fd, &write_set);
+			}
+			if (gfdv[gi].fd > highfd)
+			{
+				highfd = gfdv[gi].fd;
+			}
+		}
+	}
+#else
+	for (int gi = 0; gi < MAXGFD; gi++)
+	{
+		if (gfd_used(gi))
+		{
+			CHECK_PFD(gfdv[gi].fd);
+			pfd->events |= POLLSETREADFLAGS;
+			if (gfdv[gi].want_write)
+			{
+				pfd->events |= POLLSETWRITEFLAGS;
+			}
+		}
+	}
+	/* reset fd->client mapping: global FDs remain -1 */
 	for (i = 0; i < MAXCONNECTIONS; i++)
-		fd2cl[i] = -1; /* sanity */
+		fd2cl[i] = -1;
 #endif
 	for (i = 0; i <= cl_highest; i++)
 	    {
@@ -583,18 +698,19 @@ void	loop_io(void)
 		    }
 	    }
 
-	DebugLog((ALOG_DIO, 0, "io_loop(): checking for %d fd's", nfds));
 	wait.tv_sec = 5; wait.tv_usec = 0;
 #if !defined(USE_POLL)
 	nfds = select(highfd + 1, (SELECT_FDSET_TYPE *)&read_set,
 		      (SELECT_FDSET_TYPE *)&write_set, 0, &wait);
-	DebugLog((ALOG_DIO, 0, "io_loop(): select() returned %d, errno = %d",
-		  nfds, errno));
+	if (nfds < 0)
+		DebugLog((ALOG_DIO, 0, "io_loop(): select() returned %d, errno = %d",
+			  nfds, errno));
 #else
 	nfds = poll(poll_fdarray, nbr_pfds,
 		    wait.tv_sec * 1000 + wait.tv_usec/1000 );
-	DebugLog((ALOG_DIO, 0, "io_loop(): poll() returned %d, errno = %d",
-		  nfds, errno));
+	if (nfds < 0)
+		DebugLog((ALOG_DIO, 0, "io_loop(): poll() returned %d, errno = %d",
+			  nfds, errno));
 	pfd = poll_fdarray;
 #endif
 	if (nfds == -1)
@@ -614,6 +730,54 @@ void	loop_io(void)
 	if (nfds == 0)	/* end of timeout */
 		return;
 
+#if !defined(USE_POLL)
+	for (int gi = 0; gi < MAXGFD; gi++)
+	{
+		if (gfd_used(gi))
+		{
+			int ready = 0;
+			if (FD_ISSET(gfdv[gi].fd, &read_set)) { ready = 1; }
+			if (!ready && gfdv[gi].want_write &&
+				FD_ISSET(gfdv[gi].fd, &write_set))
+			{
+				ready = 1;
+			}
+			if (ready)
+			{
+				if (gfdv[gi].inst && gfdv[gi].inst->mod &&
+					gfdv[gi].inst->mod->gwork)
+				{
+					gfdv[gi].inst->mod->gwork(gfdv[gi].inst);
+				}
+				nfds--;
+			}
+		}
+	}
+#else
+	for (struct pollfd *pf = poll_fdarray; pf != poll_fdarray + nbr_pfds; ++pf)
+	{
+		if (pf->revents == 0)
+		{
+			continue;
+		}
+		int fdj = pf->fd;
+		for (int gi = 0; gi < MAXGFD; gi++)
+		{
+			if (gfd_used(gi) && gfdv[gi].fd == fdj)
+			{
+				if (gfdv[gi].inst && gfdv[gi].inst->mod &&
+					gfdv[gi].inst->mod->gwork)
+				{
+					gfdv[gi].inst->mod->gwork(gfdv[gi].inst);
+				}
+				pf->revents = 0;
+				nfds--;
+				break;
+			}
+		}
+	}
+#endif
+
 	/* no matter select() or poll() this is also fd # 0 */
 	if (TST_READ_EVENT(0))
 		nfds--;
@@ -625,16 +789,31 @@ void	loop_io(void)
 #endif
 	    {
 #if defined(USE_POLL)
-		i = fd2cl[pfd->fd];
-# if defined(IAUTH_DEBUG)
-		if (i == -1)
-		    {
-			sendto_log(ALOG_DALL, LOG_CRIT,"io_loop(): fatal bug");
-			exit(1);
-		    }
-# endif
+			/* bounds check against fd2cl array and skip global FDs */
+			int fdj = pfd->fd;
+			/* fd outside mapping range -> not a client FD */
+			if (fdj < 0 || fdj >= MAXCONNECTIONS)
+			{
+				continue;
+			}
+			i = fd2cl[fdj];
+			/* global or unmapped FD -> already handled in global block */
+			if (i == -1)
+			{
+				continue;
+			}
+#if defined(IAUTH_DEBUG)
+			/* sanity check: ensure client index is within valid range */
+			if (i < 0 || i > cl_highest)
+			{
+				sendto_log(ALOG_DALL, LOG_CRIT,
+						   "io_loop(): fatal bug (invalid cl=%d fd=%d)", i,
+						   fdj);
+				exit(1);
+			}
 #endif
-		if (cldata[i].rfd <= 0 && cldata[i].wfd <= 0)
+#endif
+			if (cldata[i].rfd <= 0 && cldata[i].wfd <= 0)
 		    {
 #if defined(USE_POLL)
 			sendto_log(ALOG_IRCD, LOG_CRIT,

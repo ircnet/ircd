@@ -487,11 +487,18 @@ char	*conf_read(char *cfile)
 				printf("\t\tport: %u\n",
 				       itmp->port);
 			if (itmp->mod->init)
-			    {
+			{
 				err = itmp->mod->init(itmp);
 				printf("\t\tInitialization: %s\n",
-				       (err) ? err : "Successful");
-			    }
+					   (err) ? err : "Successful");
+
+				if (err == NULL && itmp->mod->ginit)
+				{
+					int grc = itmp->mod->ginit(itmp);
+					printf("\t\tGlobal initialization: %s\n",
+						   (grc < 0) ? "Failed" : "Successful");
+				}
+			}
 			itmp = itmp->nexti;
 		    }
 	    }
@@ -502,6 +509,11 @@ char	*conf_read(char *cfile)
 			if (itmp->mod->init)
 			{
 				itmp->mod->init(itmp);
+
+				if (itmp->mod->ginit)
+				{
+					itmp->mod->ginit(itmp);
+				}
 			}
 			itmp = itmp->nexti;
 		}

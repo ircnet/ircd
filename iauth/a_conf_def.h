@@ -32,6 +32,11 @@ struct Module
 					 * done (incoming data, timeout..) */
     int		(*timeout)(u_int);	/* called when timeout is reached */
     void	(*clean)(u_int);	/* finish/abort: cleanup*/
+
+	/* Optional global (module-wide) lifecycle hooks */
+	int (*ginit)(AnInstance *);     /* initialize persistent resources */
+	int (*gwork)(AnInstance *);     /* handle global events (if any) */
+	void (*grelease)(AnInstance *); /* cleanup persistent resources */
 };
 
 struct Instance
