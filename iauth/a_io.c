@@ -82,6 +82,30 @@ int io_register_gfd(AnInstance *inst, int fd, int want_write)
 	return -1;
 }
 
+/* Updates write-interest flag for a previously registered global
+ * file descriptor.
+ * Returns 0 on success, -1 if the (inst, fd) pair was not found.
+ */
+int io_update_gfd(AnInstance *inst, int fd, int want_write)
+{
+	int i;
+
+	if (!inst || fd <= 0)
+	{
+		return -1;
+	}
+
+	for (i = 0; i < MAXGFD; i++)
+	{
+		if (gfd_used(i) && gfdv[i].inst == inst && gfdv[i].fd == fd)
+		{
+			gfdv[i].want_write = want_write ? 1 : 0;
+			return 0;
+		}
+	}
+	return -1;
+}
+
 /* Unregisters all global file descriptors belonging to an instance */
 void io_unregister_gfd(AnInstance *inst)
 {
@@ -102,9 +126,9 @@ void io_unregister_gfd(AnInstance *inst)
 /* Dispatches I/O event for a ready global file descriptor */
 int io_handle_global_fd(int ready_fd)
 {
-	int handled = 0;
+	int gi, handled = 0;
 
-	for (int gi = 0; gi < MAXGFD; gi++)
+	for (gi = 0; gi < MAXGFD; gi++)
 	{
 		if (gfd_used(gi) && gfdv[gi].fd == ready_fd)
 		{
@@ -123,6 +147,47 @@ int io_handle_global_fd(int ready_fd)
 void	init_io(void)
 {
     bzero((char *) cldata, sizeof(cldata));
+}
+
+/*
+ * Count iauth instances that should run after the client has sent NICK/USER
+ * (and possibly CAP/AUTHENTICATE).
+ *
+ * Criteria:
+ *  - instance has wait_for_reg set (directly or implicitly)
+ *  - and is not currently skipped:
+ *      - skip_if_sasl:  skip when A_SASL is set
+ *      - skip_if_ident: skip when A_GOTIDENT is set
+ */
+static int count_wait_for_reg_instances(int cl)
+{
+    int n = 0;
+    AnInstance *it = instances;
+
+    while (it)
+    {
+        int cm = conf_match((u_int)cl, it);
+        if (cm == 0)
+		{
+			if (it->wait_for_reg)
+			{
+				if (it->skip_if_sasl && (cldata[cl].state & A_SASL))
+				{
+					/* module would be skipped later due to completed SASL */
+				}
+				else if (it->skip_if_ident && (cldata[cl].state & A_GOTIDENT))
+				{
+					/* module would be skipped later due to ident reply */
+				}
+				else
+				{
+					n++;
+				}
+			}
+		}
+        it = it->nexti;
+    }
+    return n;
 }
 
 /* sendto_ircd() functions */
@@ -156,42 +221,101 @@ void	sendto_ircd(char *pattern, ...)
  */
 static	void	next_io(int cl, AnInstance *last)
 {
-    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): last=%s state=0x%X", cl, last,
-	      (last) ? last->mod->name : "", cldata[cl].state));
-
-    /* first, bail out immediately if the entry is flagged A_DONE */
-    if (cldata[cl].state & A_DONE)
-	    return;
-
-    /* second, make sure the last instance which ran cleaned up */
-    if (cldata[cl].rfd > 0 || cldata[cl].wfd > 0)
+	/* If any module set A_DENY, stop scheduling immediately */
+	if (cldata[cl].state & A_DENY)
 	{
-	    /* last is defined here */
-	    sendto_log(ALOG_IRCD|ALOG_DMISC, LOG_ERR,
-		       "module \"%s\" didn't clean up fd's! (%d %d)",
-		       last->mod->name, cldata[cl].rfd, cldata[cl].wfd);
-	    if (cldata[cl].rfd > 0)
-		    close(cldata[cl].rfd);
-	    if (cldata[cl].wfd > 0 && cldata[cl].rfd != cldata[cl].wfd)
-		    close(cldata[cl].wfd);
-	    cldata[cl].rfd = cldata[cl].wfd = 0;
+		DebugLog((ALOG_DSPY, 0,
+				  "skipping further modules for client %d (A_DENY set)", cl));
+		   sendto_ircd("D %d %s %u ", cl,
+					   cldata[cl].itsip,
+					   cldata[cl].itsport,
+					   cldata[cl].authuser);
+		return;
 	}
-		       
-    cldata[cl].buflen = 0;
-    cldata[cl].mod_status = 0;
-    cldata[cl].instance = NULL;
-    cldata[cl].timeout = 0;
 
-    /* third, if A_START is set, a new pass has to be started */
+	DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): last=%s state=0x%X", cl, last,
+			  (last) ? last->mod->name : "", cldata[cl].state));
+
+	/*
+	 * iauth distinguishes between:
+	 *   (1) modules which run immediately after the TCP
+	 *       connection is established;
+	 *   (2) wait_for_reg modules which run after the client has sent
+	 *       NICK/USER (and possibly CAP/AUTHENTICATE), but
+	 *       before registration completes (before numeric 001).
+	 *
+	 * This block handles (2). On the first detection that any
+	 * wait_for_reg modules are required for this client, we notify
+	 * ircd with:   "P <clid> <n>"
+	 * where <n> is the number of wait_for_reg modules. The 'P' tells
+	 * ircd to hold registration until we later signal completion with 'H'.
+	 */
+	if (!(cldata[cl].state & A_WAIT_FOR_REG))
+	{
+		int n = count_wait_for_reg_instances(cl);
+		if (n > 0)
+		{
+			sendto_log(ALOG_DSPY, LOG_DEBUG,
+					   "sending wait_for_reg request to ircd for %d", cl);
+			sendto_ircd("P %d %d", cl, n);
+			cldata[cl].state |= A_WAIT_FOR_REG;
+			/*
+ 			 * If called from inside a module (last != NULL), clear the current
+			 * instance pointer. Otherwise, iauth would still think a module is
+			 * running and could block the later "H" completion signal.
+			 */
+			if (last)
+			{
+				cldata[cl].instance = NULL;
+			}
+			return;
+		}
+	}
+	/* Stop here if this entry is already completed (A_DONE) */
+	if (cldata[cl].state & A_DONE)
+	{
+		return;
+	}
+
+	/* Next, ensure that the previously running instance has cleaned up its FDs.
+	 * This applies only when advancing from 'last' (i.e., switching modules).
+	 * If last == NULL (external trigger such as 'H'), do not discard
+	 * the currently running module.
+	 */
+	if (last && (cldata[cl].rfd > 0 || cldata[cl].wfd > 0))
+	{
+		/* last is defined here */
+		sendto_log(ALOG_IRCD | ALOG_DMISC, LOG_ERR,
+				   "module \"%s\" didn't clean up fd's! (%d %d)",
+				   last->mod->name, cldata[cl].rfd, cldata[cl].wfd);
+		if (cldata[cl].rfd > 0)
+			close(cldata[cl].rfd);
+		if (cldata[cl].wfd > 0 && cldata[cl].rfd != cldata[cl].wfd)
+			close(cldata[cl].wfd);
+		cldata[cl].rfd = cldata[cl].wfd = 0;
+	}
+
+	cldata[cl].buflen = 0;
+	cldata[cl].mod_status = 0;
+
+	if (last)
+	{
+		cldata[cl].instance = NULL;
+	}
+
+	cldata[cl].timeout = 0;
+
+    /* If A_START is set, a new pass has to be started */
     if (cldata[cl].state & A_START)
 	{
 	    cldata[cl].state ^= A_START;
 	    DebugLog((ALOG_DIO, 0, "next_io(#%d, %x): Starting again",
 		      cl, last));
-	    last = NULL; /* start from beginning */
+      	/* start from beginning */
+	    last = NULL;
 	}
 
-    /* fourth, find next instance to be ran */
+    /* Find next instance to be run */
     if (last == NULL)
 	{
 	    cldata[cl].instance = instances;
@@ -215,6 +339,49 @@ static	void	next_io(int cl, AnInstance *last)
 		    cldata[cl].instance = cldata[cl].instance->nexti;
 		    continue;
 		}
+		/* Implicit skip or defer based on option flags:
+		 * skip_if_sasl / skip_if_ident */
+		if (cldata[cl].instance)
+		{
+			AnInstance *inst = cldata[cl].instance;
+			const char *modname = (inst->mod && inst->mod->name)
+										  ? inst->mod->name
+										  : "<unknown>";
+
+			/* Skip if SASL already succeeded */
+			if (inst->skip_if_sasl && (cldata[cl].state & A_SASL))
+			{
+				SetBit(cldata[cl].idone, inst->in);
+				cldata[cl].instance = inst->nexti;
+				DebugLog((ALOG_DIO, 0,
+						  "skipping module \"%s\" (in=%d) due to SASL",
+						  modname, inst->in));
+				continue;
+			}
+
+			/* Skip if an ident reply was already received */
+			if (inst->skip_if_ident && (cldata[cl].state & A_GOTIDENT))
+			{
+				SetBit(cldata[cl].idone, inst->in);
+				cldata[cl].instance = inst->nexti;
+				DebugLog((ALOG_DIO, 0,
+						  "skipping module \"%s\" (in=%d) due to ident",
+						  modname, inst->in));
+				continue;
+			}
+
+			/* Defer wait_for_reg modules until client registration */
+			if (inst->wait_for_reg && !(cldata[cl].state & A_REG_PENDING))
+			{
+				cldata[cl].instance = inst->nexti;
+				DebugLog((ALOG_DIO, 0,
+						  "deferring module \"%s\" (in=%d) "
+						  "waiting for client registration",
+						  modname, inst->in));
+				continue;
+			}
+		}
+
 	    cm = conf_match(cl, cldata[cl].instance);
 	    DebugLog((ALOG_DIO, 0,
 	      "conf_match(#%d, %x, goth=%d, noh=%d) said \"%s\" for %x (%s)",
@@ -240,6 +407,20 @@ static	void	next_io(int cl, AnInstance *last)
 	    if (cldata[cl].ileft == 0)
 		{
 		    /* we are done */
+            if (cldata[cl].state & A_DENY) {
+				sendto_log(ALOG_DSPY, LOG_DEBUG,
+						   "suppressing D for %d (A_DENY set)", cl);
+				return;
+			}
+			if ((cldata[cl].state & A_WAIT_FOR_REG) &&
+				!(cldata[cl].state & A_REG_PENDING))
+			{
+				sendto_log(ALOG_DSPY, LOG_DEBUG,
+						   "deferring D for %d (P sent; waiting for "
+						   "client registration)",
+						   cl);
+				return;
+			}
 		    sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip,
 				cldata[cl].itsport);
                     cldata[cl].state |= A_DONE;
@@ -550,6 +731,57 @@ static	void	parse_ircd(void)
 			/* RPL_HELLO to be exact, but who cares. */
 			strConnLen = sprintf(strConn, ":%s 020 * :", chp+2);
 			break;
+		case 'S': /* SASL status: 1 = success */
+			if (chp[2] == '1') {
+				cldata[cl].state |= A_SASL;
+			}
+			break;
+        case 'H': /* ircd received NICK/USER and possibly CAP/AUTHENTICATE
+ 					 and is waiting for iauth before registering the user */
+ 		  	/* If already denied, ignore 'H' to avoid deferring teardown */
+			sendto_log(ALOG_DSPY, LOG_DEBUG,
+					   "received registration pending trigger (H) for client "
+					   "%d: [%s]",
+					   cl, chp);
+
+			/* Entry must be active */
+			if (!(cldata[cl].state & A_ACTIVE))
+			{
+				sendto_log(ALOG_IRCD, LOG_WARNING,
+						   "Warning: Entry %d [H] is not active.", cl);
+				break;
+			}
+
+			/* Mark registration pending */
+			cldata[cl].state |= A_REG_PENDING;
+			sendto_log(ALOG_DSPY, LOG_DEBUG,
+					   "marking registration pending for %d (state=0x%lx)",
+					   cl, (unsigned long) cldata[cl].state);
+
+			/* If a module is still running, wait until it completes */
+			if (cldata[cl].rfd > 0 || cldata[cl].wfd > 0)
+			{
+				const char *modname = "<none>";
+				/* reschedule once current module completes */
+				cldata[cl].state |= A_START;
+				if (cldata[cl].instance && cldata[cl].instance->mod &&
+					cldata[cl].instance->mod->name)
+				{
+					modname = cldata[cl].instance->mod->name;
+				}
+				sendto_log(ALOG_DSPY, LOG_DEBUG,
+						   "deferring until current module "
+						   "completes (cl=%d, running=%s)",
+						   cl, modname);
+				break;
+			}
+
+			sendto_log(ALOG_DSPY, LOG_DEBUG,
+					   "no active module; starting wait_for_reg modules now "
+					   "(cl=%d)", cl);
+			next_io(cl, NULL);
+
+			break;
 		default:
 			sendto_log(ALOG_IRCD, LOG_ERR, "Unexpected data [%s]",
 				   chp);
@@ -610,9 +842,10 @@ void	loop_io(void)
         int        nbr_pfds = 0;
 #endif
 
-	int i, nfds = 0;
+	int gi, i, nfds = 0;
 	struct timeval wait;
 	time_t now = time(NULL);
+	struct pollfd *pf;
 
 #if !defined(USE_POLL)
 	FD_ZERO(&read_set);
@@ -631,7 +864,7 @@ void	loop_io(void)
 
 	/* now register global file descriptors */
 #if !defined(USE_POLL)
-	for (int gi = 0; gi < MAXGFD; gi++)
+	for (gi = 0; gi < MAXGFD; gi++)
 	{
 		if (gfd_used(gi))
 		{
@@ -647,7 +880,7 @@ void	loop_io(void)
 		}
 	}
 #else
-	for (int gi = 0; gi < MAXGFD; gi++)
+	for (gi = 0; gi < MAXGFD; gi++)
 	{
 		if (gfd_used(gi))
 		{
@@ -731,7 +964,7 @@ void	loop_io(void)
 		return;
 
 #if !defined(USE_POLL)
-	for (int gi = 0; gi < MAXGFD; gi++)
+	for (gi = 0; gi < MAXGFD; gi++)
 	{
 		if (gfd_used(gi))
 		{
@@ -754,14 +987,15 @@ void	loop_io(void)
 		}
 	}
 #else
-	for (struct pollfd *pf = poll_fdarray; pf != poll_fdarray + nbr_pfds; ++pf)
+	for (pf = poll_fdarray; pf != poll_fdarray + nbr_pfds; ++pf)
 	{
+		int fdj;
 		if (pf->revents == 0)
 		{
 			continue;
 		}
-		int fdj = pf->fd;
-		for (int gi = 0; gi < MAXGFD; gi++)
+		fdj = pf->fd;
+		for (gi = 0; gi < MAXGFD; gi++)
 		{
 			if (gfd_used(gi) && gfdv[gi].fd == fdj)
 			{
@@ -956,16 +1190,23 @@ int	tcp_connect(char *ourIP, char *theirIP, u_short port, char **error)
 	 */
 	bzero((char *)&sk, sizeof(sk));
 	sk.SIN_FAMILY = AFINET;
-	if(!inetpton(AF_INET6, ourIP, sk.sin6_addr.s6_addr))
-		bcopy(minus_one, sk.sin6_addr.s6_addr, IN6ADDRSZ);
-	sk.SIN_PORT = htons(0);
-	if (bind(fd, (SAP)&sk, sizeof(sk)) < 0)
-	    {
-		sprintf(errbuf, "bind() failed: %s", strerror(errno));
-		*error = errbuf;
-		close(fd);
-		return -1;
-	    }
+
+	if(ourIP)
+	{
+		if (!inetpton(AF_INET6, ourIP, sk.sin6_addr.s6_addr))
+		{
+			bcopy(minus_one, sk.sin6_addr.s6_addr, IN6ADDRSZ);
+		}
+		sk.SIN_PORT = htons(0);
+
+		if (bind(fd, (SAP) &sk, sizeof(sk)) < 0)
+		{
+			sprintf(errbuf, "bind() failed: %s", strerror(errno));
+			*error = errbuf;
+			close(fd);
+			return -1;
+		}
+	}
 	set_non_blocking(fd, theirIP, port);
 	if(!inetpton(AF_INET6, theirIP, sk.sin6_addr.s6_addr))
 		bcopy(minus_one, sk.sin6_addr.s6_addr, IN6ADDRSZ);
@@ -982,3 +1223,37 @@ int	tcp_connect(char *ourIP, char *theirIP, u_short port, char **error)
 	return fd;
 }
 
+/*
+ * Ident state helpers (called by modules, e.g. rfc931)
+ * - OK:    set A_GOTIDENT
+ * - FAIL:  set A_NOIDENT   (timeout/refused/unavailable)
+ * Both trigger the scheduler via next_io() so wait_for_ident
+ * modules can proceed.
+ */
+void iauth_mark_ident_ok(u_int cl)
+{
+	if (cl >= MAXCONNECTIONS)
+		return;
+	if (!(cldata[cl].state & A_ACTIVE))
+		return;
+
+	if (!(cldata[cl].state & A_GOTIDENT)) {
+		cldata[cl].state |= A_GOTIDENT;
+		sendto_log(ALOG_DSPY, LOG_DEBUG, "ident: ok for #%u (state=0x%lX)", cl,
+				   (unsigned long) cldata[cl].state);
+	}
+	/* if nothing is running, try to advance */
+	if (cldata[cl].instance == NULL)
+		next_io((int)cl, NULL);
+}
+
+void iauth_mark_noident(u_int cl)
+{
+	if (cl >= MAXCONNECTIONS)
+		return;
+
+	cldata[cl].state |= A_NOIDENT;
+	sendto_log(ALOG_DSPY, LOG_DEBUG, "ident: unavailable for #%u", cl);
+	if (cldata[cl].instance == NULL)
+		next_io((int)cl, NULL);
+}

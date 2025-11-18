@@ -139,6 +139,7 @@ static	int	rfc931_start(u_int cl)
 		DebugLog((ALOG_D931, 0,
 			  "rfc931_start(%d): tcp_connect() reported %s",
 			  cl, error));
+		iauth_mark_noident(cl);
 		return -1;
 	    }
 
@@ -177,9 +178,10 @@ static	int	rfc931_work(u_int cl)
 			DebugLog((ALOG_D931, 0,
 				  "rfc931_work(%d): write() failed: %s", cl,
 				  strerror(errno)));
+			iauth_mark_noident(cl);
 			close(cldata[cl].wfd);
 			cldata[cl].rfd = cldata[cl].wfd = 0;
-			return 1;
+			return -1;
 		    }
 		else
 			st->connected += 1;
@@ -262,6 +264,7 @@ static	int	rfc931_work(u_int cl)
 						    cldata[cl].itsip,
 						    cldata[cl].itsport,
 						    cldata[cl].authuser);
+					iauth_mark_ident_ok(cl);
 				    }
 				else
 					bad = 1;
@@ -295,11 +298,15 @@ static	int	rfc931_work(u_int cl)
 						   cldata[cl].inbuffer);
 				    }
 			    }
-			/*
-			** In any case, our job is done, let's cleanup.
-			*/
-			close(cldata[cl].rfd);
-			cldata[cl].rfd = 0;
+				/*
+				* In any case, our job is done, cleanup.
+				*/
+				if (bad)
+				{
+					iauth_mark_noident(cl);
+				}
+				close(cldata[cl].rfd);
+				cldata[cl].rfd = 0;
 			return -1;
 		    }
 		else
@@ -321,6 +328,16 @@ static	void	rfc931_clean(u_int cl)
 
 	st->clean += 1;
 	DebugLog((ALOG_D931, 0, "rfc931_clean(%d): cleaning up", cl));
+
+	/*
+     * if the connection closed but no ident status
+     * (A_GOTIDENT or A_NOIDENT) has been set yet, assume ident
+     * is unavailable.
+     */
+	if (!(cldata[cl].state & (A_GOTIDENT | A_NOIDENT))) {
+		iauth_mark_noident(cl);
+	}
+
 	/*
 	** only one of rfd and wfd may be set at the same time,
 	** in any case, they would be the same fd, so only close() once
@@ -347,6 +364,7 @@ static	int	rfc931_timeout(u_int cl)
 	st->timeout += 1;
 	DebugLog((ALOG_D931, 0, "rfc931_timeout(%d): calling rfc931_clean ",
 		  cl));
+	iauth_mark_noident(cl);
 	rfc931_clean(cl);
 	return -1;
 }

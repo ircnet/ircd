@@ -324,6 +324,31 @@ char	*canonize(char *buffer)
 
 int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 {
+#if defined(USE_IAUTH)
+	if (MyConnect(sptr) && (sptr->flags & DEFER_USER_REG))
+	{
+		/* iauth previously sent 'P' to inform the ircd that it
+         * requires NICK/USER (and possibly CAP/AUTHENTICATE).
+         */
+		if (sptr->exitc == EXITC_AREF || sptr->exitc == EXITC_AREFQ) {
+			Debug((DEBUG_INFO,
+				   "DEFER_USER_REG: fallthrough due to exitc=%d (fd=%d)",
+				   sptr->exitc, sptr->fd));
+			sptr->flags &= ~DEFER_USER_REG;
+		}
+		else
+		{
+			 /* 1. Send 'H' message to tell iauth to run wait_for_reg modules
+			  * 2. Defer registration until iauth sends 'D'
+			  */
+			sendto_iauth("%d H %d", sptr->fd,
+						 (sptr->flags & FLAGS_SASL) ? 1 : 0);
+			strncpyzt(sptr->user->username, username, USERLEN + 1);
+			return 1;
+		}
+	}
+#endif
+
 	Reg	aConfItem *aconf;
 	aClient	*acptr;
 	anUser	*user = sptr->user;
@@ -409,33 +434,54 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 #if defined(USE_IAUTH)
 		if (iauth_options & XOPT_EARLYPARSE && DoingXAuth(cptr))
 		{
-			cptr->flags |= FLAGS_WXAUTH;
-			/* fool check_pings() and give iauth more time! */
-			cptr->firsttime = timeofday;
-			cptr->lasttime = timeofday;
-			strncpyzt(sptr->user->username, username, USERLEN+1);
-			if (sptr->passwd[0])
-				sendto_iauth("%d P %s", sptr->fd, sptr->passwd);
-			sendto_iauth("%d U %s", sptr->fd, sptr->user->username);
-			return 1;
+			/* If iauth already set a 'K', do not defer here again. */
+			if (sptr->exitc == EXITC_AREF || sptr->exitc == EXITC_AREFQ)
+			{
+				Debug((DEBUG_INFO,
+					   "EARLYPARSE bypass due to exitc=%d (fd=%d)",
+					   sptr->exitc, sptr->fd));
+				/* Fall through to the kill check below. */
+			}
+			else
+			{
+				/* Do not block parsing */
+				if (!(cptr->flags & DEFER_USER_REG))
+				{
+					cptr->flags |= FLAGS_WXAUTH;
+				}
+				/* fool check_pings() and give iauth more time! */
+				cptr->firsttime = timeofday;
+				cptr->lasttime = timeofday;
+				strncpyzt(sptr->user->username, username, USERLEN + 1);
+
+				if (sptr->passwd[0])
+					sendto_iauth("%d P %s", sptr->fd, sptr->passwd);
+
+				sendto_iauth("%d U %s", sptr->fd, sptr->user->username);
+				return 1;
+			}
 		}
 		if (!DoneXAuth(sptr) && (iauth_options & XOPT_REQUIRED))
 		{
+			if (sptr->flags & DEFER_USER_REG)
+			{
+				return 1; /* defer */
+			}
 			if (iauth_options & XOPT_NOTIMEOUT)
 			{
 				count += 1;
 				if (timeofday - last > 300)
-				    {
-					sendto_flag(SCH_AUTH, 
-	    "iauth may be not running! (refusing new user connections)");
+				{
+					sendto_flag(SCH_AUTH, "iauth may be not running! (refusing "
+										  "new user connections)");
 					last = timeofday;
-				    }
+				}
 				sptr->exitc = EXITC_AUTHFAIL;
 			}
 			else
 				sptr->exitc = EXITC_AUTHTOUT;
 			return exit_client(cptr, cptr, &me,
-				"Authentication failure! - no iauth?");
+							   "Authentication failure! - no iauth?");
 		}
 		if (timeofday - last > 300 && count)
 		{

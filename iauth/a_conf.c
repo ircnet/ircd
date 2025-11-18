@@ -1,6 +1,7 @@
 /************************************************************************
  *   IRC - Internet Relay Chat, iauth/a_conf.c
  *   Copyright (C) 1998 Christophe Kalt
+ *   Copyright (C) 2025 IRCnet.com team
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -241,6 +242,10 @@ char	*conf_read(char *cfile)
 			(*last)->address = NULL;
 			(*last)->timeout = timeout;
 			(*last)->reason	= NULL;
+			(*last)->wait_for_reg = 0;
+			(*last)->skip_if_sasl = 0;
+			(*last)->wait_for_ident = 0;
+			(*last)->skip_if_ident = 0;
 			(*last)->delayed = o_del;
 			(*last)->port = 0;
 			if (Mlist[i] == &Module_rfc931)
@@ -278,16 +283,112 @@ char	*conf_read(char *cfile)
 				    }
 				*ch = '\0';
 				if (!strncasecmp(buffer+1, "option = ", 9))
-				    {
+				{
 					if ((*last)->opt)
 						conf_err(lnnb,
-					 "Duplicate option keyword: ignored.",
-							 cfile);
+								 "Duplicate option keyword: ignored.",
+								 cfile);
 					else
-						(*last)->opt =
-							mystrdup(buffer + 10);
+					{
+						/* Parse comma-separated option tokens */
+						const char *p = buffer + 10, *q;
+						char tmpbuf[512];
+						int j = 0;
+
+						(*last)->opt = mystrdup(buffer + 10);
+
+						/* trim leading spaces/tabs */
+						while (*p == ' ' || *p == '\t')
+						{
+							p++;
+						}
+						/* copy line to tmpbuf in lowercase */
+						while (*p && *p != '\n' &&
+							   j < (int) sizeof(tmpbuf) - 1)
+						{
+							char ch2 = *p++;
+							if (ch2 >= 'A' && ch2 <= 'Z')
+							{
+								ch2 = (char) (ch2 - 'A' + 'a');
+							}
+							tmpbuf[j++] = ch2;
+						}
+						tmpbuf[j] = '\0';
+
+						/* iterate tokens split by commas; token may be key
+						 * or key=value */
+						q = tmpbuf;
+						while (*q)
+						{
+							char *eq, token[256];
+							const char *start, *end;
+							size_t token_len;
+
+							/* skip separators and whitespace */
+							while (*q == ' ' || *q == '\t' || *q == ',')
+							{
+								q++;
+							}
+							if (!*q)
+							{
+								break;
+							}
+							start = q;
+							while (*q && *q != ',')
+							{
+								q++;
+							}
+							end = q;
+
+							/* trim trailing spaces */
+							while (end > start &&
+								   (end[-1] == ' ' || end[-1] == '\t'))
+							{
+								end--;
+							}
+							if (end <= start)
+							{
+								continue;
+							}
+
+							/* extract token */
+							token_len = (size_t) (end - start);
+							if (token_len >= sizeof(token))
+							{
+								token_len = sizeof(token) - 1;
+							}
+							memcpy(token, start, token_len);
+							token[token_len] = '\0';
+
+							/* split name[=value] */
+							eq = strchr(token, '=');
+							if (eq)
+							{
+								/* we only care about the name */
+								*eq = '\0';
+							}
+							if (!strcmp(token, "wait_for_reg"))
+							{
+								(*last)->wait_for_reg = 1;
+							}
+							else if (!strcmp(token, "skip_if_sasl"))
+							{
+								(*last)->wait_for_reg = 1;
+								(*last)->skip_if_sasl = 1;
+							}
+							else if (!strcmp(token, "wait_for_ident"))
+							{
+								(*last)->wait_for_ident = 1;
+							}
+							else if (!strcmp(token, "skip_if_ident"))
+							{
+								(*last)->wait_for_ident = 1;
+								(*last)->skip_if_ident = 1;
+							}
+						}
+					}
 					continue;
-				    }
+				}
 				if (!strncasecmp(buffer+1, "reason = ", 9))
 				{
 					if ((*last)->reason)
@@ -535,6 +636,23 @@ char	*conf_read(char *cfile)
 int	conf_match(u_int cl, AnInstance *inst)
 {
 	aTarget *ttmp;
+
+	/*
+	 * If the module is configured with option wait_for_ident,
+	 * do not start it until the ident lookup has finished:
+	 *   - A_GOTIDENT: ident succeeded (USERID available)
+	 *   - A_NOIDENT:  ident is definitively unavailable (timeout/refused/fail)
+	 *
+	 * If neither flag is set yet, ask the scheduler to try again later.
+	 */
+	if (inst->wait_for_ident || inst->skip_if_ident)
+	{
+		if ((cldata[cl].state & (A_GOTIDENT | A_NOIDENT)) == 0)
+		{
+			/* try again later */
+			return 1;
+		}
+	}
 
 	/* general case, always matches */
 	if (inst->address == NULL && inst->hostname == NULL)

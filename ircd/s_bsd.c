@@ -2101,10 +2101,9 @@ int	read_message(time_t delay, FdAry *fdp, int ro)
 			** so no need to check for anything!
 			*/
 #if defined(USE_IAUTH)
-			if (DoingDNS(cptr) || DoingAuth(cptr) ||
-			    WaitingXAuth(cptr) ||
-			    (DoingXAuth(cptr) &&
-			     !(iauth_options & XOPT_EARLYPARSE)))
+				if (DoingDNS(cptr) || DoingAuth(cptr) || WaitingXAuth(cptr) ||
+					(DoingXAuth(cptr) && !((iauth_options & XOPT_EARLYPARSE) ||
+										   (cptr->flags & DEFER_USER_REG))))
 #else
 			if (DoingDNS(cptr) || DoingAuth(cptr))
 #endif
