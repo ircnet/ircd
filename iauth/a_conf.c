@@ -285,8 +285,7 @@ char	*conf_read(char *cfile)
 				if (!strncasecmp(buffer+1, "option = ", 9))
 				{
 					if ((*last)->opt)
-						conf_err(lnnb,
-								 "Duplicate option keyword: ignored.",
+						conf_err(lnnb, "Duplicate option keyword: ignored.",
 								 cfile);
 					else
 					{
@@ -303,8 +302,7 @@ char	*conf_read(char *cfile)
 							p++;
 						}
 						/* copy line to tmpbuf in lowercase */
-						while (*p && *p != '\n' &&
-							   j < (int) sizeof(tmpbuf) - 1)
+						while (*p && *p != '\n' && j < (int) sizeof(tmpbuf) - 1)
 						{
 							char ch2 = *p++;
 							if (ch2 >= 'A' && ch2 <= 'Z')

@@ -313,14 +313,14 @@ static	void	next_io(int cl, AnInstance *last)
 	    last = NULL;
 	}
 
-    /* Find next instance to be run */
-    if (last == NULL)
+	/* Find next instance to be run */
+	if (last == NULL)
 	{
 		cldata[cl].instance = instances;
 		cldata[cl].ileft = 0;
 	}
-    else
-	    cldata[cl].instance = last->nexti;
+	else
+		cldata[cl].instance = last->nexti;
 
     while (cldata[cl].instance)
 	{
@@ -404,8 +404,8 @@ static	void	next_io(int cl, AnInstance *last)
 		      cl, last, cldata[cl].ileft));
 	    if (cldata[cl].ileft == 0)
 		{
-		    /* we are done */
-            if (cldata[cl].state & A_DENY)
+			/* we are done */
+			if (cldata[cl].state & A_DENY)
 			{
 				sendto_log(ALOG_DSPY, LOG_DEBUG,
 						   "suppressing D for %d (A_DENY set)", cl);
