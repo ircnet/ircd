@@ -334,7 +334,8 @@ static	void	rfc931_clean(u_int cl)
      * (A_GOTIDENT or A_NOIDENT) has been set yet, assume ident
      * is unavailable.
      */
-	if (!(cldata[cl].state & (A_GOTIDENT | A_NOIDENT))) {
+	if (!(cldata[cl].state & (A_GOTIDENT | A_NOIDENT)))
+	{
 		iauth_mark_noident(cl);
 	}
 

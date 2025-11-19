@@ -45,7 +45,7 @@ EXTERN int tcp_connect (char *, char *, u_short, char **);
 EXTERN char strConn[256];
 EXTERN int strConnLen;
 
-int  io_register_gfd(AnInstance *inst, int fd, int want_write);
+int io_register_gfd(AnInstance *inst, int fd, int want_write);
 void io_unregister_gfd(AnInstance *inst);
 int io_update_gfd(AnInstance *inst, int fd, int want_write);
 #undef EXTERN

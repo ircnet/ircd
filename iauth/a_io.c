@@ -226,10 +226,8 @@ static	void	next_io(int cl, AnInstance *last)
 	{
 		DebugLog((ALOG_DSPY, 0,
 				  "skipping further modules for client %d (A_DENY set)", cl));
-		   sendto_ircd("D %d %s %u ", cl,
-					   cldata[cl].itsip,
-					   cldata[cl].itsport,
-					   cldata[cl].authuser);
+		sendto_ircd("D %d %s %u ", cl, cldata[cl].itsip, cldata[cl].itsport,
+					cldata[cl].authuser);
 		return;
 	}
 
@@ -318,8 +316,8 @@ static	void	next_io(int cl, AnInstance *last)
     /* Find next instance to be run */
     if (last == NULL)
 	{
-	    cldata[cl].instance = instances;
-	    cldata[cl].ileft = 0;
+		cldata[cl].instance = instances;
+		cldata[cl].ileft = 0;
 	}
     else
 	    cldata[cl].instance = last->nexti;
@@ -407,7 +405,8 @@ static	void	next_io(int cl, AnInstance *last)
 	    if (cldata[cl].ileft == 0)
 		{
 		    /* we are done */
-            if (cldata[cl].state & A_DENY) {
+            if (cldata[cl].state & A_DENY)
+			{
 				sendto_log(ALOG_DSPY, LOG_DEBUG,
 						   "suppressing D for %d (A_DENY set)", cl);
 				return;
@@ -732,7 +731,8 @@ static	void	parse_ircd(void)
 			strConnLen = sprintf(strConn, ":%s 020 * :", chp+2);
 			break;
 		case 'S': /* SASL status: 1 = success */
-			if (chp[2] == '1') {
+			if (chp[2] == '1')
+			{
 				cldata[cl].state |= A_SASL;
 			}
 			break;
@@ -778,7 +778,8 @@ static	void	parse_ircd(void)
 
 			sendto_log(ALOG_DSPY, LOG_DEBUG,
 					   "no active module; starting wait_for_reg modules now "
-					   "(cl=%d)", cl);
+					   "(cl=%d)",
+					   cl);
 			next_io(cl, NULL);
 
 			break;
@@ -1191,7 +1192,7 @@ int	tcp_connect(char *ourIP, char *theirIP, u_short port, char **error)
 	bzero((char *)&sk, sizeof(sk));
 	sk.SIN_FAMILY = AFINET;
 
-	if(ourIP)
+	if (ourIP)
 	{
 		if (!inetpton(AF_INET6, ourIP, sk.sin6_addr.s6_addr))
 		{
@@ -1237,14 +1238,15 @@ void iauth_mark_ident_ok(u_int cl)
 	if (!(cldata[cl].state & A_ACTIVE))
 		return;
 
-	if (!(cldata[cl].state & A_GOTIDENT)) {
+	if (!(cldata[cl].state & A_GOTIDENT))
+	{
 		cldata[cl].state |= A_GOTIDENT;
 		sendto_log(ALOG_DSPY, LOG_DEBUG, "ident: ok for #%u (state=0x%lX)", cl,
 				   (unsigned long) cldata[cl].state);
 	}
 	/* if nothing is running, try to advance */
 	if (cldata[cl].instance == NULL)
-		next_io((int)cl, NULL);
+		next_io((int) cl, NULL);
 }
 
 void iauth_mark_noident(u_int cl)

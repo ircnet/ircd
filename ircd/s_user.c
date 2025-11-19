@@ -330,7 +330,8 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		/* iauth previously sent 'P' to inform the ircd that it
          * requires NICK/USER (and possibly CAP/AUTHENTICATE).
          */
-		if (sptr->exitc == EXITC_AREF || sptr->exitc == EXITC_AREFQ) {
+		if (sptr->exitc == EXITC_AREF || sptr->exitc == EXITC_AREFQ)
+		{
 			Debug((DEBUG_INFO,
 				   "DEFER_USER_REG: fallthrough due to exitc=%d (fd=%d)",
 				   sptr->exitc, sptr->fd));
@@ -338,9 +339,9 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		}
 		else
 		{
-			 /* 1. Send 'H' message to tell iauth to run wait_for_reg modules
-			  * 2. Defer registration until iauth sends 'D'
-			  */
+			/* 1. Send 'H' message to tell iauth to run wait_for_reg modules
+			 * 2. Defer registration until iauth sends 'D'
+			 */
 			sendto_iauth("%d H %d", sptr->fd,
 						 (sptr->flags & FLAGS_SASL) ? 1 : 0);
 			strncpyzt(sptr->user->username, username, USERLEN + 1);
