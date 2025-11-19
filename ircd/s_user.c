@@ -438,8 +438,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			/* If iauth already set a 'K', do not defer here again. */
 			if (sptr->exitc == EXITC_AREF || sptr->exitc == EXITC_AREFQ)
 			{
-				Debug((DEBUG_INFO,
-					   "EARLYPARSE bypass due to exitc=%d (fd=%d)",
+				Debug((DEBUG_INFO, "EARLYPARSE bypass due to exitc=%d (fd=%d)",
 					   sptr->exitc, sptr->fd));
 				/* Fall through to the kill check below. */
 			}

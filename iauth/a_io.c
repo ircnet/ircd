@@ -161,13 +161,13 @@ void	init_io(void)
  */
 static int count_wait_for_reg_instances(int cl)
 {
-    int n = 0;
-    AnInstance *it = instances;
+	int n = 0;
+	AnInstance *it = instances;
 
-    while (it)
-    {
-        int cm = conf_match((u_int)cl, it);
-        if (cm == 0)
+	while (it)
+	{
+		int cm = conf_match((u_int) cl, it);
+		if (cm == 0)
 		{
 			if (it->wait_for_reg)
 			{
@@ -185,9 +185,9 @@ static int count_wait_for_reg_instances(int cl)
 				}
 			}
 		}
-        it = it->nexti;
-    }
-    return n;
+		it = it->nexti;
+	}
+	return n;
 }
 
 /* sendto_ircd() functions */
@@ -352,8 +352,8 @@ static	void	next_io(int cl, AnInstance *last)
 				SetBit(cldata[cl].idone, inst->in);
 				cldata[cl].instance = inst->nexti;
 				DebugLog((ALOG_DIO, 0,
-						  "skipping module \"%s\" (in=%d) due to SASL",
-						  modname, inst->in));
+						  "skipping module \"%s\" (in=%d) due to SASL", modname,
+						  inst->in));
 				continue;
 			}
 
@@ -736,9 +736,9 @@ static	void	parse_ircd(void)
 				cldata[cl].state |= A_SASL;
 			}
 			break;
-        case 'H': /* ircd received NICK/USER and possibly CAP/AUTHENTICATE
+		case 'H': /* ircd received NICK/USER and possibly CAP/AUTHENTICATE
  					 and is waiting for iauth before registering the user */
- 		  	/* If already denied, ignore 'H' to avoid deferring teardown */
+			/* If already denied, ignore 'H' to avoid deferring teardown */
 			sendto_log(ALOG_DSPY, LOG_DEBUG,
 					   "received registration pending trigger (H) for client "
 					   "%d: [%s]",
@@ -755,8 +755,8 @@ static	void	parse_ircd(void)
 			/* Mark registration pending */
 			cldata[cl].state |= A_REG_PENDING;
 			sendto_log(ALOG_DSPY, LOG_DEBUG,
-					   "marking registration pending for %d (state=0x%lx)",
-					   cl, (unsigned long) cldata[cl].state);
+					   "marking registration pending for %d (state=0x%lx)", cl,
+					   (unsigned long) cldata[cl].state);
 
 			/* If a module is still running, wait until it completes */
 			if (cldata[cl].rfd > 0 || cldata[cl].wfd > 0)
@@ -970,7 +970,10 @@ void	loop_io(void)
 		if (gfd_used(gi))
 		{
 			int ready = 0;
-			if (FD_ISSET(gfdv[gi].fd, &read_set)) { ready = 1; }
+			if (FD_ISSET(gfdv[gi].fd, &read_set))
+			{
+				ready = 1;
+			}
 			if (!ready && gfdv[gi].want_write &&
 				FD_ISSET(gfdv[gi].fd, &write_set))
 			{
@@ -1257,5 +1260,5 @@ void iauth_mark_noident(u_int cl)
 	cldata[cl].state |= A_NOIDENT;
 	sendto_log(ALOG_DSPY, LOG_DEBUG, "ident: unavailable for #%u", cl);
 	if (cldata[cl].instance == NULL)
-		next_io((int)cl, NULL);
+		next_io((int) cl, NULL);
 }
