@@ -214,6 +214,40 @@ void	sendto_ircd(char *pattern, ...)
         va_end(va);
 }
 
+static char *iauth_skip_ws(char *p)
+{
+	while (*p == ' ' || *p == '\t')
+		p++;
+	return p;
+}
+
+/* Reads a token up to the next whitespace and stores it in dst (bounded).
+ * Returns a pointer to the character right after the token.
+ */
+static char *iauth_read_token(char *p, char *dst, size_t dstlen)
+{
+	size_t i = 0;
+
+	p = iauth_skip_ws(p);
+	if (!*p)
+	{
+		if (dstlen > 0)
+			dst[0] = '\0';
+		return p;
+	}
+
+	while (*p && *p != ' ' && *p != '\t')
+	{
+		if (i + 1 < dstlen)
+			dst[i++] = *p;
+		p++;
+	}
+	if (dstlen > 0)
+		dst[i] = '\0';
+
+	return p;
+}
+
 /*
  * next_io
  *
@@ -442,7 +476,14 @@ static	void	next_io(int cl, AnInstance *last)
 		    cldata[cl].state |= A_DELAYEDSENT;
 		}
 
-	    cldata[cl].timeout = time(NULL) + cldata[cl].instance->timeout;
+		DebugLog((ALOG_DIO, 0,
+				  "next_io(#%d): calling %s->start() with instance=%p", cl,
+				  cldata[cl].instance && cldata[cl].instance->mod
+						  ? cldata[cl].instance->mod->name
+						  : "<null>",
+				  cldata[cl].instance));
+
+		cldata[cl].timeout = time(NULL) + cldata[cl].instance->timeout;
 	    r = cldata[cl].instance->mod->start(cl);
 	    DebugLog((ALOG_DIO, 0,
 		      "next_io(#%d, %x): %s->start() returned %d",
@@ -465,7 +506,7 @@ static	void	next_io(int cl, AnInstance *last)
  */
 static	void	parse_ircd(void)
 {
-	char *ch, *chp, *buf = iobuf;
+	char *ch, *chp, *buf = iobuf, *p;
 	int cl = -1, ncl;
 
 	iobuf[iob_len] = '\0';
@@ -520,7 +561,11 @@ static	void	parse_ircd(void)
 				free(cldata[cl].inbuffer);
 				cldata[cl].inbuffer = NULL;
 			    }
-			cldata[cl].user[0] = '\0';
+			cldata[cl].nick[0] = '\0';
+			cldata[cl].user1[0] = '\0';
+			cldata[cl].user2[0] = '\0';
+			cldata[cl].user3[0] = '\0';
+			cldata[cl].realname[0] = '\0';
 			cldata[cl].passwd[0] = '\0';
 			cldata[cl].host[0] = '\0';
 			bzero(cldata[cl].idone, BDSIZE);
@@ -682,7 +727,7 @@ static	void	parse_ircd(void)
 			    }
 			if (cldata[cl].state & A_IGNORE)
 				break;
-			strcpy(cldata[cl].user, chp+2);
+			strcpy(cldata[cl].user1, chp + 2);
 			cldata[cl].state |= A_GOTU|A_START;
 			if (cldata[cl].instance == NULL)
 				next_io(cl, NULL);
@@ -750,6 +795,32 @@ static	void	parse_ircd(void)
 				sendto_log(ALOG_IRCD, LOG_WARNING,
 						   "Warning: Entry %d [H] is not active.", cl);
 				break;
+			}
+
+			/* Parse and store values of:
+			 * H <nick> <user1> <user2> <user3> :<realname> */
+			p = chp + 1;
+			p = iauth_skip_ws(p);
+
+			p = iauth_read_token(p, cldata[cl].nick, sizeof(cldata[cl].nick));
+			p = iauth_read_token(p, cldata[cl].user1, sizeof(cldata[cl].user1));
+			p = iauth_read_token(p, cldata[cl].user2, sizeof(cldata[cl].user2));
+			p = iauth_read_token(p, cldata[cl].user3, sizeof(cldata[cl].user3));
+
+			p = iauth_skip_ws(p);
+			if (*p == ':')
+				p++;
+			p = iauth_skip_ws(p);
+
+			if (*p)
+			{
+				strncpy(cldata[cl].realname, p,
+						sizeof(cldata[cl].realname) - 1);
+				cldata[cl].realname[sizeof(cldata[cl].realname) - 1] = '\0';
+			}
+			else
+			{
+				cldata[cl].realname[0] = '\0';
 			}
 
 			/* Mark registration pending */

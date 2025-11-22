@@ -342,8 +342,8 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			/* 1. Send 'H' message to tell iauth to run wait_for_reg modules
 			 * 2. Defer registration until iauth sends 'D'
 			 */
-			sendto_iauth("%d H %d", sptr->fd,
-						 (sptr->flags & FLAGS_SASL) ? 1 : 0);
+			sendto_iauth("%d H %s %s %s %s :%s", sptr->fd, sptr->name,
+						 sptr->user1, sptr->user2, sptr->user3, sptr->info);
 			strncpyzt(sptr->user->username, username, USERLEN + 1);
 			return 1;
 		}
@@ -435,18 +435,13 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 					   sptr->exitc, sptr->fd));
 				/* Fall through to the kill check below. */
 			}
-			else
+			else if (!(cptr->flags & DEFER_USER_REG))
 			{
-				/* Do not block parsing */
-				if (!(cptr->flags & DEFER_USER_REG))
-				{
-					cptr->flags |= FLAGS_WXAUTH;
-				}
+				cptr->flags |= FLAGS_WXAUTH;
 				/* fool check_pings() and give iauth more time! */
 				cptr->firsttime = timeofday;
 				cptr->lasttime = timeofday;
-				strncpyzt(sptr->user->username, username, USERLEN + 1);
-
+				strncpyzt(sptr->user->username, username, USERLEN+1);
 				if (sptr->passwd[0])
 					sendto_iauth("%d P %s", sptr->fd,sptr->passwd);
 				sendto_iauth("%d U %s", sptr->fd, username);

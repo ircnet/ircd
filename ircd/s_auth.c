@@ -115,6 +115,7 @@ int	vsendto_iauth(char *pattern, va_list va)
 	}
 
 	vsprintf(abuf, pattern, va);
+	Debug((DEBUG_INFO, "Sending to iauth [%s]", abuf));
 	strcat(abuf, "\n");
 	p = abuf;
 	len = strlen(p);
@@ -305,13 +306,25 @@ void	read_iauth(void)
 			if (*start == 'P') /* iauth has wait_for_reg modules */
 			{
 				int fd = atoi(start + 2);
-				aClient *pc = local[fd];
-				if (pc && MyConnect(pc))
+				cptr = local[fd];
+				if (cptr && MyConnect(cptr))
 				{
-					pc->flags |= DEFER_USER_REG;
+					cptr->flags |= DEFER_USER_REG;
 					Debug((DEBUG_INFO,
 						   "set DEFER_USER_REG on fd=%d (flags now=0x%08x)", fd,
-						   pc->flags));
+						   cptr->flags));
+
+					/* Did we get 'P' after NICK/USER? */
+					if (MyConnect(cptr) && !IsServer(cptr) &&
+						cptr->name[0] != '\0' && cptr->user != NULL &&
+						!IsRegistered(cptr))
+					{
+						Debug((DEBUG_INFO,
+							   "got delayed P [%s] - executing register_user()",
+							   start));
+						ClearWXAuth(cptr);
+						register_user(cptr, cptr, cptr->name, cptr->user1);
+					}
 				}
 				start = end;
 				continue;
@@ -446,7 +459,7 @@ void	read_iauth(void)
 						   start));
 					ClearWXAuth(cptr);
 					cptr->flags &= ~DEFER_USER_REG;
-					register_user(cptr, cptr, cptr->name, cptr->user->username);
+					register_user(cptr, cptr, cptr->name, cptr->user1);
 				}
 				else
 				{

@@ -27,7 +27,6 @@ typedef struct AuthData anAuthData;
 struct AuthData
 {
 	/* the following are set by a_io.c and may be read by modules */
-	char	user[USERLEN+1];	/* username */
 	char	passwd[PASSWDLEN+1];	/* password */
 	char	host[HOSTLEN+1];	/* hostname */
 	char	itsip[HOSTLEN+1];	/* client ip */
@@ -35,6 +34,11 @@ struct AuthData
 	char	ourip[HOSTLEN+1];	/* our ip */
 	u_short	ourport;		/* our port */
 	u_int	state;			/* state (general) */
+	char nick[NICKLEN+1]; /* nick */
+	char user1[USERLEN+1]; /* username */
+	char user2[USERLEN+1]; /* umodes */
+	char user3[HOSTLEN+1]; /* servername */
+	char realname[REALLEN+1]; /* realname */
 
 	/* the following are set by modules */
 	char	*authuser;		/* authenticated username */
