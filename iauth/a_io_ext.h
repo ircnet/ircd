@@ -48,4 +48,6 @@ EXTERN int strConnLen;
 int io_register_gfd(AnInstance *inst, int fd, int want_write);
 void io_unregister_gfd(AnInstance *inst);
 int io_update_gfd(AnInstance *inst, int fd, int want_write);
+void iauth_mark_ident_ok(u_int cl);
+void iauth_mark_noident(u_int cl);
 #undef EXTERN
