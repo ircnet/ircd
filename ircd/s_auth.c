@@ -331,7 +331,7 @@ void	read_iauth(void)
 			}
 		    if (*start != 'U' && *start != 'u' && *start != 'o' &&
 			*start != 'K' && *start != 'k' &&
-			*start != 'D')
+			*start != 'D' && *start != 'R')
 			{
 			    sendto_flag(SCH_AUTH, "Garbage from iauth [%s]",
 					start);
@@ -466,6 +466,21 @@ void	read_iauth(void)
 					Debug((DEBUG_INFO, "got D [%s]", start));
 					ClearWXAuth(cptr);
 					cptr->flags &= ~DEFER_USER_REG;
+				}
+			}
+			else if (start[0] == 'R')
+			{
+				/* module sends a line to be forwarded as-is to the user */
+				if(!IsRegisteredUser(cptr))
+				{
+					char *msg = start + strlen(tbuf);
+					if (*msg == ':')
+						msg++;
+
+					if (*msg)
+						sendto_one(cptr, "%s", msg);
+
+					Debug((DEBUG_INFO, "got R [%s]", start));
 				}
 			}
 			else
