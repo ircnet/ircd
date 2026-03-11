@@ -39,6 +39,7 @@ struct AuthData
 	char user2[USERLEN+1]; /* umodes */
 	char user3[HOSTLEN+1]; /* servername */
 	char realname[REALLEN+1]; /* realname */
+	char *sasl_user;		/* sasl user */
 
 	/* the following are set by modules */
 	char	*authuser;		/* authenticated username */

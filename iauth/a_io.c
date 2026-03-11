@@ -561,6 +561,15 @@ static	void	parse_ircd(void)
 				free(cldata[cl].inbuffer);
 				cldata[cl].inbuffer = NULL;
 			    }
+			if (cldata[cl].sasl_user)
+			{
+				/* shouldn't be here - hmmpf */
+				sendto_log(ALOG_IRCD|ALOG_DIO, LOG_WARNING,
+						   "Unreleased data [%c %d]!", chp[0],
+						   cl);
+				free(cldata[cl].sasl_user);
+				cldata[cl].sasl_user = NULL;
+			}
 			cldata[cl].nick[0] = '\0';
 			cldata[cl].user1[0] = '\0';
 			cldata[cl].user2[0] = '\0';
@@ -613,6 +622,9 @@ static	void	parse_ircd(void)
 			if (cldata[cl].inbuffer)
 				free(cldata[cl].inbuffer);
 			cldata[cl].inbuffer = NULL;
+			if (cldata[cl].sasl_user)
+				free(cldata[cl].sasl_user);
+			cldata[cl].sasl_user = NULL;
 			break;
 		case 'R': /* fd remap */
 			if (!(cldata[cl].state & A_ACTIVE))
@@ -654,6 +666,15 @@ static	void	parse_ircd(void)
 				free(cldata[ncl].inbuffer);
 				cldata[ncl].inbuffer = NULL;
 			    }
+			if (cldata[ncl].sasl_user)
+			{
+				/* shouldn't be here - hmmpf */
+				sendto_log(ALOG_IRCD|ALOG_DIO, LOG_WARNING,
+						   "Unreleased buffer [%c %d]!",
+						   chp[0], ncl);
+				free(cldata[ncl].sasl_user);
+				cldata[ncl].sasl_user = NULL;
+			}
 			bcopy(cldata+cl, cldata+ncl, sizeof(anAuthData));
 
 			cldata[cl].state = 0;
@@ -661,6 +682,7 @@ static	void	parse_ircd(void)
 			cldata[cl].instance = NULL;
 			cldata[cl].authuser = NULL;
 			cldata[cl].inbuffer = NULL;
+			cldata[cl].sasl_user = NULL;
 			/*
 			** this is the ugly part of having a slave (considering
 			** that ircd remaps fd's: there is lag between the
@@ -775,11 +797,9 @@ static	void	parse_ircd(void)
 			/* RPL_HELLO to be exact, but who cares. */
 			strConnLen = sprintf(strConn, ":%s 020 * :", chp+2);
 			break;
-		case 'S': /* SASL status: 1 = success */
-			if (chp[2] == '1')
-			{
-				cldata[cl].state |= A_SASL;
-			}
+		case 'S': /* SASL authentication */
+			cldata[cl].state |= A_SASL;
+			cldata[cl].sasl_user = mystrdup(chp+2);
 			break;
 		case 'H': /* ircd received NICK/USER and possibly CAP/AUTHENTICATE
  					 and is waiting for iauth before registering the user */
