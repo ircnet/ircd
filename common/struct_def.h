@@ -167,6 +167,7 @@ typedef enum Status {
 #define	FLAGS_WXAUTH	0x0004000 /* same as above, but also prevent parsing */
 #define	FLAGS_NONL	0x0008000 /* No \n in buffer */
 #define	FLAGS_CBURST	0x0010000 /* set to mark connection burst being sent */
+#define	DEFER_USER_REG	0x0020000 /* iauth wants ircd to defer register_user() */
 #define	FLAGS_QUIT	0x0040000 /* QUIT :comment shows it's not a split */
 #define	FLAGS_SPLIT	0x0080000 /* client QUITting because of a netsplit */
 #define	FLAGS_HIDDEN	0x0100000 /* netsplit is behind a hostmask,
@@ -194,9 +195,7 @@ typedef enum Status {
 #define FLAGS_AWAY		0x0020 /* user is away */
 #define FLAGS_EXEMPT	0x0040 /* user is exempted from k-lines */
 #define FLAGS_CLOAKED	0x0080 /* user's hostname is cloaked */
-#ifdef XLINE
 #define FLAGS_XLINED	0x0100	/* X-lined client */
-#endif
 #define FLAGS_TLS		0x0200 /* user is on a secure connection port (SSL/TLS) -- mh 2020-04-27 */
 #define	SEND_UMODES	(FLAGS_INVISIBLE|FLAGS_OPER|FLAGS_WALLOP|FLAGS_AWAY|FLAGS_RESTRICT)
 #define	ALL_UMODES	(SEND_UMODES|FLAGS_LOCOP)
@@ -261,11 +260,9 @@ typedef enum Status {
 #define	ClearXAuth(x)		((x)->flags &= ~FLAGS_XAUTH)
 #define	ClearWXAuth(x)		((x)->flags &= ~FLAGS_WXAUTH)
 #define ClearListenerInactive(x) ((x)->flags &= ~FLAGS_LISTENINACTIVE)
-#ifdef XLINE
 #define IsXlined(x)		((x)->user && (x)->user->flags & FLAGS_XLINED)
 #define SetXlined(x)		((x)->user->flags |= FLAGS_XLINED)
 #define ClearXlined(x)		((x)->user->flags &= ~FLAGS_XLINED)
-#endif
 #define IsCloaked(x)	((x)->user && (x)->user->flags & FLAGS_CLOAKED)
 #define SetCloaked(x)	((x)->user->flags |= FLAGS_CLOAKED)
 #define HAS_CLOAK_IP(x) (!IN6_IS_ADDR_UNSPECIFIED(&((x)->cloak_ip)))
@@ -317,9 +314,7 @@ struct	ConfItem	{
 	char	*passwd;
 	char	*name;
 	char	*name2;
-#ifdef XLINE
 	char	*name3;
-#endif
 	int	port;
 	long	flags;		/* I-line flags */
 	int	pref;		/* preference value */
@@ -365,9 +360,7 @@ struct	ListItem	{
 #define	CONF_TKILL		0x200000
 #define	CONF_TOTHERKILL		0x400000
 #endif
-#ifdef XLINE
 #define CONF_XLINE		0x800000
-#endif
 #define	CONF_OPS		CONF_OPERATOR
 #define	CONF_SERVER_MASK	(CONF_CONNECT_SERVER | CONF_NOCONNECT_SERVER |\
 				 CONF_ZCONNECT_SERVER)
@@ -381,9 +374,7 @@ struct	ListItem	{
 #define CFLAG_NORESOLVE		0x00010
 #define CFLAG_FALL		0x00020
 #define CFLAG_NORESOLVEMATCH	0x00040
-#ifdef XLINE
 #define CFLAG_XEXEMPT		0x00080
-#endif
 #define CFLAG_REQUIRE_SASL	0x00100
 
 /* K-Line flags */
@@ -397,9 +388,7 @@ struct	ListItem	{
 #define IsConfNoResolve(x)	((x)->flags & CFLAG_NORESOLVE)
 #define IsConfNoResolveMatch(x)	((x)->flags & CFLAG_NORESOLVEMATCH)
 #define IsConfFallThrough(x)	((x)->flags & CFLAG_FALL)
-#ifdef XLINE
 #define IsConfXlineExempt(x)	((x)->flags & CFLAG_XEXEMPT)
-#endif
 #define IsConfRequireSASL(x)	((x)->flags & CFLAG_REQUIRE_SASL)
 
 #define PFLAG_DELAYED		0x00001
@@ -577,13 +566,12 @@ struct Client	{
 	char	passwd[PASSWDLEN+1];
 	char	exitc;
 	char	*reason;	/* additional exit message */
-#ifdef XLINE
 	/* Those logically should be in anUser struct, but would be null for
-	** all remote users... so better waste two pointers for all local
-	** non-users than two pointers for all remote users. --B. */
+	** all remote users... so better waste three pointers for all local
+	** non-users than three pointers for all remote users. --B. */
+	char	*user1;	/* 1st param of USER */
 	char	*user2;	/* 2nd param of USER */
 	char	*user3;	/* 3rd param of USER */
-#endif
 	int caps; /* Enabled capabilities */
 	int cap_negotation; /* CAP negotiation is in progress. Registration must wait for "CAP END" */
 	aClient *sasl_service; /* The SASL service that is responsible for this user. */
@@ -978,9 +966,7 @@ typedef enum ServerChannels {
 #define EXITC_AREF	'U'	/* Unauthorized by iauth */
 #define EXITC_AREFQ	'u'	/* Unauthorized by iauth, be quiet */
 #define EXITC_VIRUS	'v'	/* joined a channel used by PrettyPark virus */
-#ifdef XLINE
 #define EXITC_XLINE	'X'	/* Forbidden GECOS */
-#endif
 #define EXITC_YLINEMAX	'Y'	/* Y:line max clients limit */
 
 /* eXternal authentication slave OPTions */

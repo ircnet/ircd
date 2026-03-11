@@ -205,7 +205,7 @@ int cap_end(aClient *cptr, aClient *sptr, char *arg)
 	// complete registration if we received NICK and USER already
 	if (sptr->name[0] && sptr->user)
 	{
-		return register_user(cptr, sptr, sptr->name, sptr->user->username);
+		return register_user(cptr, sptr, sptr->name, sptr->user1);
 	}
 
 	return 0;

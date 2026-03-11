@@ -109,12 +109,10 @@ long	iline_flags_parse(char *string)
 	{
 		tmp |= CFLAG_KEXEMPT;
 	}
-#ifdef XLINE
 	if (index(string,'e'))
 	{
 		tmp |= CFLAG_XEXEMPT;
 	}
-#endif
 	if (index(string,'N'))
 	{
 		tmp |= CFLAG_NORESOLVE;
@@ -157,12 +155,10 @@ char	*iline_flags_to_string(long flags)
 	{
 		*s++ = 'E';
 	}
-#ifdef XLINE
 	if (flags & CFLAG_XEXEMPT)
 	{
 		*s++ = 'e';
 	}
-#endif
 	if (flags & CFLAG_NORESOLVE)
 	{
 		*s++ = 'N';
@@ -702,12 +698,10 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		{
 			SetKlineExempt(cptr);
 		}
-#ifdef XLINE
 		if (IsConfXlineExempt(aconf))
 		{
 			ClearXlined(cptr);
 		}
-#endif
 
 		/* Copy uhost (hostname) over sockhost, if conf flag permits. */
 		if (!IsCloaked(cptr) && *uhost && !IsConfNoResolve(aconf))
@@ -1787,11 +1781,9 @@ int 	initconf(int opt)
 			case 'y':
 			        aconf->status = CONF_CLASS;
 		        	break;
-#ifdef XLINE
 			case 'X':
 				aconf->status = CONF_XLINE;
 				break;
-#endif
 		    default:
 			Debug((DEBUG_ERROR, "Error in config file: %s", line));
 			break;
@@ -1821,7 +1813,6 @@ int 	initconf(int opt)
 			DupString(aconf->name, tmp);
 			if ((tmp = getfield(NULL)) == NULL)
 				break;
-#ifdef XLINE
 			if (aconf->status == CONF_XLINE)
 			{
 				DupString(aconf->name2, tmp);
@@ -1833,7 +1824,6 @@ int 	initconf(int opt)
 				DupString(aconf->source_ip, tmp);
 				break;
 			}
-#endif
 			aconf->port = 0;
 			if (sscanf(tmp, "0x%x", &aconf->port) != 1 ||
 			    aconf->port == 0)
@@ -1859,9 +1849,7 @@ int 	initconf(int opt)
 		istat.is_confmem += aconf->passwd ? strlen(aconf->passwd)+1 :0;
 		istat.is_confmem += aconf->name ? strlen(aconf->name)+1 : 0;
 		istat.is_confmem += aconf->name2 ? strlen(aconf->name2)+1 : 0;
-#ifdef XLINE
 		istat.is_confmem += aconf->name3 ? strlen(aconf->name3)+1 : 0;
-#endif
 		istat.is_confmem += aconf->source_ip ? strlen(aconf->source_ip)+1 : 0;
 
 		/*
