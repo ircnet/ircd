@@ -3816,6 +3816,12 @@ static	char *encap_whitelisted(char *cmd)
 	return NULL;
 }
 
+static int encap_too_long(void)
+{
+	sendto_flag(SCH_ERROR, "ENCAP too long");
+	return 1;
+}
+
 /*
  * Routes an ENCAP message.
  *
