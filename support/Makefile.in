@@ -371,9 +371,6 @@ s_user.o: ../ircd/s_user.c setup.h config.h ../common/struct_def.h
 s_zip.o: ../ircd/s_zip.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_zip.c
 
-s_cap.o: ../ircd/s_cap.c setup.h config.h ../common/struct_def.h
-	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_cap.c
-
 s_pp2.o: ../ircd/s_pp2.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_pp2.c
 
