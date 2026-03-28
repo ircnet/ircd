@@ -3817,6 +3817,53 @@ static	char *encap_whitelisted(char *cmd)
 	return NULL;
 }
 
+static int encap_too_long(void)
+{
+	sendto_flag(SCH_ERROR, "ENCAP too long");
+	return 1;
+}
+
+/*
+ * Routes an ENCAP message.
+ *
+ * If the message is not only for me:
+ *  - exact target (no wildcards) => route via normal server routing
+ *  - wildcard target             => use broadcast routing
+ *
+ * Sensitive service traffic such as SASL should use SID as target.
+ */
+static void encap_route(aClient *cptr, char *mask, char *buf)
+{
+	aClient *acptr;
+	int exact;
+
+	if (!strcmp(mask, me.name) || !strcmp(mask, me.serv->sid))
+		return;
+
+	exact = (strchr(mask, '*') == NULL &&
+			 strchr(mask, '?') == NULL &&
+			 strchr(mask, '#') == NULL);
+
+	if (!exact)
+	{
+		sendto_serv_v(cptr, SV_UID, "%s", buf);
+		return;
+	}
+
+	acptr = find_sid(mask, NULL);
+	if (!acptr)
+		acptr = find_server(mask, NULL);
+
+	if (!acptr)
+	{
+		// Unknown target
+		return;
+	}
+
+	if (acptr->from != cptr)
+		sendto_one(acptr, "%s", buf);
+}
+
 /*
 ** allows ENCAPsulation of commands
 ** parv[0] is ignored (though it's source)
@@ -3829,83 +3876,105 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	char buf[BUFSIZE];
 	char *mask, *whitelisted;
 	char *toparse, *p;
-	int i, len, matched;
+	int i, len, n;
 
 	mask = parv[1];
-	if (IsServer(cptr)) {
+
+	if (IsServer(cptr))
+	{
 		/* Prepare ENCAP buffer... */
-		len = sprintf(buf, ":%s ENCAP", sptr->serv->sid);
+		len = snprintf(buf, sizeof(buf), ":%s ENCAP", sptr->serv->sid);
+		if (len < 0 || len >= BUFSIZE)
+			return encap_too_long();
+
 		for (i = 1; i < parc; i++)
 		{
-			if (len + strlen(parv[i]) >= BUFSIZE-2)
-			{
-				/* This can get cut. */
-				sendto_flag(SCH_ERROR, "ENCAP too long (%s)", buf);
-				/* Sending incomplete ENCAP means data corruption.
-				** Should we squit the link that fed us this? --B. */
-				return 1;
-			}
-			if (i == 3) toparse = buf + len;
+			if (i == 3)
+				toparse = buf + len;
+
 			if (i >= 3 && i == parc - 1)
-				len += sprintf(buf+len, " :%s", parv[i]);
+				n = snprintf(buf + len, BUFSIZE - len, " :%s", parv[i]);
 			else
-				len += sprintf(buf+len, " %s", parv[i]);
+				n = snprintf(buf + len, BUFSIZE - len, " %s", parv[i]);
+
+			if (n < 0 || n >= BUFSIZE - len)
+			{
+				/* Do not send incomplete ENCAP. */
+				return encap_too_long();
+			}
+			len += n;
 		}
-		Debug((DEBUG_SEND,"m_encap(serv->serv): %s", buf));
-		/* ...and broadcast it, if the message is not (only) for me. */
-		if(strcmp(mask, me.name) && strcmp(mask, me.serv->sid)) {
-            sendto_serv_v(cptr, SV_UID, "%s", buf);
-        }
+
+		Debug((DEBUG_SEND, "m_encap(serv->serv): %s", buf));
+		encap_route(cptr, mask, buf);
+
 		/* Nothing of real interest here .. */
 		if (parc < 5 || strcmp(parv[2], "PARSE") || !encap_whitelisted(parv[4]))
 			return 0;
-	} else if (MyService(cptr)) {
-		/* Check that the command is whitelisted */
+	}
+	else if (MyService(cptr))
+	{
+		/* Check whether the command is whitelisted */
 		whitelisted = encap_whitelisted(parv[2]);
-		if (!whitelisted) {
+		if (!whitelisted)
+		{
 			sendto_one(sptr, ":%s %d %s %s :Unknown command",
-				me.name, ERR_UNKNOWNCOMMAND, sptr->name, parv[2]);
+					   me.name, ERR_UNKNOWNCOMMAND, sptr->name, parv[2]);
 			return 1;
 		}
 
-		/* Resulting format:
-		 *  ":<sender-SID> ENCAP <mask> PARSE <service> <command> [..]"
-		 */
-		len = sprintf(buf, ":%s ENCAP %s PARSE", me.serv->sid, mask);
+		/* Resulting format: ":SID ENCAP *.mask sender!u@h COMMAND ..." */
+		len = snprintf(buf, sizeof(buf), ":%s ENCAP %s PARSE",
+					   me.serv->sid, mask);
+		if (len < 0 || len >= BUFSIZE)
+			return encap_too_long();
+
 		toparse = buf + len;
-		len += sprintf(buf + len, " %s %s", sptr->name, whitelisted);
+
+		n = snprintf(buf + len, BUFSIZE - len, " %s %s",
+					 sptr->name, whitelisted);
+		if (n < 0 || n >= BUFSIZE - len)
+			return encap_too_long();
+		len += n;
+
 		for (i = 3; i < parc; i++)
-			len += sprintf(buf + len, " %s%s", i+1 == parc?":":"", parv[i]);
-		Debug((DEBUG_SEND,"m_encap(service->server): %s", buf));
-        if(strcmp(mask, me.name) && strcmp(mask, me.serv->sid)) {
-            sendto_serv_v(cptr, SV_UID, "%s", buf);
-        }
+		{
+			n = snprintf(buf + len, BUFSIZE - len, " %s%s",
+						 i + 1 == parc ? ":" : "", parv[i]);
+			if (n < 0 || n >= BUFSIZE - len)
+				return encap_too_long();
+			len += n;
+		}
+
+		Debug((DEBUG_SEND, "m_encap(cli->serv): %s", buf));
+		encap_route(cptr, mask, buf);
 	}
 	else
-    {
-	    return 0;
-    }
+	{
+		return 0;
+	}
 
 	/* Target is either FQDN mask, such as *.cz or SID, like 0PN* */
-	if ((strchr(mask, '.') && match(mask, me.name) == 0) || match(mask, me.serv->sid) == 0) {
+	if ((strchr(mask, '.') && match(mask, me.name) == 0) ||
+		match(mask, me.serv->sid) == 0)
+	{
 		/* create prefix */
 		toparse[0] = ':';
 
 		/* We might end up with :prefix :COMMAND here, sigh .. */
 		p = strchr(toparse, ' ');
 
-		if(p == NULL)
-		{
-			return 0;
-		}
+		if (p == NULL)
+			return 2;
 
 		if (p[1] == ':')
-		{
 			p[1] = ' ';
-		}
 
-		Debug((DEBUG_DEBUG,"m_encap(PARSE): %s", toparse));
-		parse(cptr, toparse, toparse + strlen(toparse));
+		/* toparse now contains: :sendername COMMAND ... :lastarg.
+		 * invariant: parse() ignores :sendername if cptr is client
+		 */
+		Debug((DEBUG_DEBUG, "m_encap(PARSE): %s", toparse));
+		parse(cptr, toparse, toparse + strlen(toparse)); /* Inception .. */
 	}
 	return 0;
 }
