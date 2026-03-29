@@ -3389,17 +3389,17 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 **	parv[2] - UID of the invited person
 **	parv[3] - channel name
 */
-int	m_invited(aClient *cptr, aClient *sptr, int parc, char *parv[])
+int m_invited(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aChannel *chptr;
 	aClient *inviter, *target;
 
-	if (!(inviter = find_uid(parv[1], (aClient *)NULL)))
+	if (!(inviter = find_uid(parv[1], (aClient *) NULL)))
 	{
 		return 0;
 	}
 
-	if (!(target = find_uid(parv[2], (aClient *)NULL)))
+	if (!(target = find_uid(parv[2], (aClient *) NULL)))
 	{
 		return 0;
 	}
