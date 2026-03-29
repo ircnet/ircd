@@ -3266,17 +3266,17 @@ void invite_notify(aChannel *chptr, aClient *inviter, aClient *target)
 
 	for (lp = chptr->members; lp; lp = lp->next)
 	{
-		aClient *chan_op = lp->value.cptr;
+		aClient *acptr = lp->value.cptr;
 
-		if (chan_op == inviter)
+		if (acptr == inviter)
 		{
 			continue;
 		}
 
-		if (MyConnect(chan_op) && (lp->flags & CHFL_CHANOP) &&
-			HasCap(chan_op, CAP_INVITE_NOTIFY))
+		if (MyConnect(acptr) && (lp->flags & CHFL_CHANOP) &&
+			HasCap(acptr, CAP_INVITE_NOTIFY))
 		{
-			sendto_prefix_one(chan_op, inviter, ":%s!%s@%s INVITE %s %s",
+			sendto_prefix_one(acptr, inviter, ":%s!%s@%s INVITE %s %s",
 							  inviter->name, inviter->user->username,
 							  inviter->user->host, target->name, chptr->chname);
 		}
