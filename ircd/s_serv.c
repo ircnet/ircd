@@ -3976,7 +3976,7 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		Debug((DEBUG_DEBUG, "m_encap(PARSE): %s", toparse));
 		parse(cptr, toparse, toparse + strlen(toparse)); /* Inception .. */
 	}
-	return 0;
+	return 5;
 }
 
 /* announces server DIE */
