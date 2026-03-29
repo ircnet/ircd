@@ -32,6 +32,7 @@ struct Cap
 		{"ircnet.com/extended-join", CAP_IRCNET_EXTENDED_JOIN},
 		{"multi-prefix",             CAP_MULTI_PREFIX},
 		{"sasl",                     CAP_SASL},
+		{"invite-notify",            CAP_INVITE_NOTIFY},
 		{NULL,                       0}
 };
 

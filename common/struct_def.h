@@ -1050,6 +1050,7 @@ typedef enum ServerChannels {
 #define CAP_IRCNET_EXTENDED_JOIN	0x0002
 #define CAP_MULTI_PREFIX			0x0004
 #define CAP_SASL					0x0008
+#define CAP_INVITE_NOTIFY			0x0010
 
 /* WHO parameter flags */
 #define WHO_FLAG_OPERS_ONLY	0x0001

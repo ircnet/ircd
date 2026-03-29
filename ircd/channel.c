@@ -3255,6 +3255,34 @@ int	m_topic(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	return penalty;
 }
 
+void invite_notify(aChannel *chptr, aClient *inviter, aClient *target)
+{
+	Link *lp;
+
+	if (!chptr || !inviter || !target)
+	{
+		return;
+	}
+
+	for (lp = chptr->members; lp; lp = lp->next)
+	{
+		aClient *acptr = lp->value.cptr;
+
+		if (acptr == inviter)
+		{
+			continue;
+		}
+
+		if (MyConnect(acptr) && (lp->flags & CHFL_CHANOP) &&
+			HasCap(acptr, CAP_INVITE_NOTIFY))
+		{
+			sendto_prefix_one(acptr, inviter, ":%s!%s@%s INVITE %s %s",
+							  inviter->name, inviter->user->username,
+							  inviter->user->host, target->name, chptr->chname);
+		}
+	}
+}
+
 /*
 ** m_invite
 **	parv[0] - sender prefix
@@ -3265,6 +3293,7 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
 	aChannel *chptr;
+	int chan_op;
 
 	if (!(acptr = find_person(parv[1], (aClient *)NULL)))
 	    {
@@ -3320,7 +3349,8 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		return 1;
 	}
 
-	if ((chptr->mode.mode & MODE_INVITEONLY) &&  !is_chan_op(sptr, chptr))
+	chan_op = is_chan_op(sptr, chptr);
+	if ((chptr->mode.mode & MODE_INVITEONLY) && !chan_op)
 	{
 		sendto_one(sptr, replies[ERR_CHANOPRIVSNEEDED],
 			   ME, BadTo(parv[0]), chptr->chname);
@@ -3340,11 +3370,48 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    sptr->user && is_chan_op(sptr, chptr))
 			add_invite(sptr, acptr, chptr);
 
+	if (MyConnect(sptr) && chan_op)
+	{
+		invite_notify(chptr, sptr, acptr);
+		sendto_match_servs(chptr, acptr, "ENCAP * PARSE %s INVITED %s %s %s",
+						   me.serv->sid, sptr->uid, acptr->uid, chptr->chname);
+	}
+
 	sendto_prefix_one(acptr, sptr, ":%s INVITE %s :%s",parv[0],
 			  acptr->name, ((chptr) ? (chptr->chname) : parv[2]));
 	return 2;
 }
 
+/*
+** m_invited
+**	parv[0] - server which send the command over ENCAP
+**	parv[1] - UID of the inviter
+**	parv[2] - UID of the invited person
+**	parv[3] - channel name
+*/
+int m_invited(aClient *cptr, aClient *sptr, int parc, char *parv[])
+{
+	aChannel *chptr;
+	aClient *inviter, *target;
+
+	if (!(inviter = find_uid(parv[1], (aClient *) NULL)))
+	{
+		return 0;
+	}
+
+	if (!(target = find_uid(parv[2], (aClient *) NULL)))
+	{
+		return 0;
+	}
+
+	if (!(chptr = find_channel(parv[3], NullChn)))
+	{
+		return 0;
+	}
+
+	invite_notify(chptr, inviter, target);
+	return 0;
+}
 
 /*
 ** m_list
