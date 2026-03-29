@@ -50,6 +50,7 @@ struct Message msgtab[] = {
 { "TRACE",    0, MPAR, { _m(m_trace), _m(m_trace), _m(m_trace), _m(m_trace), _m(m_unreg) } },
 { "TOPIC",    1, MPAR, { _m(m_nop), _m(m_topic), _m(m_topic), _m(m_nop), _m(m_unreg) } },
 { "INVITE",   2, MPAR, { _m(m_nop), _m(m_invite), _m(m_invite), _m(m_nop), _m(m_unreg) } },
+{ "INVITED",  3, MPAR, { _m(m_invited), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
 { "WALLOPS",  1, MPAR, { _m(m_wallops), _m(m_nop), _m(m_nop), _m(m_nop), _m(m_unreg) } },
 { "PING",     1, MPAR, { _m(m_ping), _m(m_ping), _m(m_ping), _m(m_ping), _m(m_unreg) } },
 { "PONG",     1, MPAR, { _m(m_pong), _m(m_pong), _m(m_pong), _m(m_pong), _m(m_unreg) } },

@@ -3805,6 +3805,7 @@ static	char *encap_whitelisted(char *cmd)
 	char *whitelist[] = {
 		"SASL",
 		"TKLINE", "UNTKLINE",
+		"INVITED",
 		NULL
 	};
 	int i;
@@ -3975,7 +3976,7 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		Debug((DEBUG_DEBUG, "m_encap(PARSE): %s", toparse));
 		parse(cptr, toparse, toparse + strlen(toparse)); /* Inception .. */
 	}
-	return 5;
+	return 0;
 }
 
 /* announces server DIE */
