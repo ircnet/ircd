@@ -1,0 +1,39 @@
+[Unit]
+Description=IRC daemon
+Wants=network-online.target
+After=network-online.target network.target
+
+[Service]
+Type=exec
+WorkingDirectory=/home/ircd/irc
+ExecStart=/home/ircd/irc/sbin/ircd -t
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=2
+User=ircd
+Group=ircd
+LimitCORE=infinity
+ReadOnlyPaths=/home/ircd/irc/
+ReadWritePaths=/home/ircd/irc/var/
+PrivateDevices=yes
+PrivateTmp=yes
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectSystem=strict
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+SystemCallArchitectures=native
+SystemCallErrorNumber=EPERM
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target

@@ -187,6 +187,7 @@ char	*iline_flags_to_string(long flags)
  * D - delayed port
  * S - server only port
  * T - secure (SSL/TLS) port
+ * P - PROXY protocol v2 port
  */
 long pline_flags_parse(char *string)
 {
@@ -194,6 +195,10 @@ long pline_flags_parse(char *string)
 	if (index(string, 'D'))
 	{
 		tmp |= PFLAG_DELAYED;
+	}
+	if (index(string, 'P'))
+	{
+		tmp |= PFLAG_PP2;
 	}
 	if (index(string, 'S'))
 	{
@@ -219,7 +224,12 @@ char *pline_flags_to_string(long flags)
 	{
 		*s++ = 'D';
 	}
-			
+
+	if (flags & PFLAG_PP2)
+	{
+		*s++ = 'P';
+	}
+
 	if (flags & PFLAG_SERVERONLY)
 	{
 		*s++ = 'S';

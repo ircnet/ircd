@@ -147,6 +147,9 @@ aClient	*make_client(aClient *from)
 		cptr->sasl_service = NULL;
 		cptr->cloak_tmp = NULL;
 		memset(&cptr->cloak_ip, 0, sizeof(cptr->cloak_ip));
+		cptr->pp2_state = NULL;
+		memset(&cptr->pp2_dip, 0, sizeof(cptr->pp2_dip));
+		cptr->pp2_dport = 0;
 	}
 	return (cptr);
 }
@@ -181,9 +184,13 @@ void	free_client(aClient *cptr)
 			MyFree(cptr->user2);
 		if (cptr->user3)
 			MyFree(cptr->user3);
-		if(cptr->sasl_user)
+		if (cptr->sasl_user)
 		{
 			MyFree(cptr->sasl_user);
+		}
+		if (cptr->pp2_state)
+		{
+			pp2_free(cptr);
 		}
 	}
 	MyFree(cptr);

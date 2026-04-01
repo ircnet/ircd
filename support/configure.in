@@ -82,7 +82,7 @@ irc_zlib_include=],[for irc_dir in "$irc_zlib_include" \
 ])
 irc_save_LIBS="$LIBS"
 LIBS="-lz $LIBS"
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[inflate()]])],[no_zlib_library=
+AC_LINK_IFELSE([AC_LANG_CALL([], [inflate])],[no_zlib_library=
 irc_zlib_library=
 LIBS="$irc_save_LIBS"],[LIBS="$irc_save_LIBS"
 for irc_dir in "$irc_zlib_library" \

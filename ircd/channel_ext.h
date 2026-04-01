@@ -62,8 +62,8 @@ EXTERN int m_njoin (Reg aClient *cptr, Reg aClient *sptr, int parc,
 EXTERN int m_part (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_kick (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_topic (aClient *cptr, aClient *sptr, int parc, char *parv[]);
-EXTERN int m_invite (aClient *cptr, aClient *sptr, int parc,
-			 char *parv[]);
+EXTERN int m_invite (aClient *cptr, aClient *sptr, int parc,char *parv[]);
+EXTERN int m_invited (aClient *cptr, aClient *sptr, int parc,char *parv[]);
 EXTERN int m_list (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN int m_names (aClient *cptr, aClient *sptr, int parc, char *parv[]);
 EXTERN time_t collect_channel_garbage (time_t now);
