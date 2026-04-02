@@ -324,6 +324,32 @@ char	*canonize(char *buffer)
 
 int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 {
+#if defined(USE_IAUTH)
+	if (MyConnect(sptr) && (sptr->flags & DEFER_USER_REG))
+	{
+		/* iauth previously sent 'P' to inform the ircd that it
+         * requires NICK/USER (and possibly CAP/AUTHENTICATE).
+         */
+		if (sptr->exitc == EXITC_AREF || sptr->exitc == EXITC_AREFQ)
+		{
+			Debug((DEBUG_INFO,
+				   "DEFER_USER_REG: fallthrough due to exitc=%d (fd=%d)",
+				   sptr->exitc, sptr->fd));
+			sptr->flags &= ~DEFER_USER_REG;
+		}
+		else
+		{
+			/* 1. Send 'H' message to tell iauth to run wait_for_reg modules
+			 * 2. Defer registration until iauth sends 'D'
+			 */
+			sendto_iauth("%d H %s %s %s %s :%s", sptr->fd, sptr->name,
+						 sptr->user1, sptr->user2, sptr->user3, sptr->info);
+			strncpyzt(sptr->user->username, username, USERLEN + 1);
+			return 1;
+		}
+	}
+#endif
+
 	Reg	aConfItem *aconf;
 	aClient	*acptr;
 	anUser	*user = sptr->user;
@@ -332,11 +358,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 	char	prefix;
 #endif
 	int	i;
-#ifdef XLINE
-	static char savedusername[USERLEN+1];
-
-	strncpyzt(savedusername, username, USERLEN+1);
-#endif
 
 	user->last = timeofday;
 	parv[0] = sptr->name;
@@ -352,7 +373,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		static time_t last = 0;
 		static u_int count = 0;
 #endif
-#ifdef XLINE
 		aConfItem *xtmp;
 
 		/* Just for clarification, so there's less confusion:
@@ -373,7 +393,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			if (xtmp->status != CONF_XLINE)
 				continue;
 			if (!BadPtr(xtmp->host) && 
-				match(xtmp->host, username))
+				match(xtmp->host, sptr->user1))
 				continue;
 			if (!BadPtr(xtmp->passwd) && 
 				match(xtmp->passwd, sptr->user2))
@@ -404,38 +424,51 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			return exit_client(cptr, sptr, &me,
 				XLINE_EXIT_REASON);
 		}
-#endif
 
 #if defined(USE_IAUTH)
 		if (iauth_options & XOPT_EARLYPARSE && DoingXAuth(cptr))
 		{
-			cptr->flags |= FLAGS_WXAUTH;
-			/* fool check_pings() and give iauth more time! */
-			cptr->firsttime = timeofday;
-			cptr->lasttime = timeofday;
-			strncpyzt(sptr->user->username, username, USERLEN+1);
-			if (sptr->passwd[0])
-				sendto_iauth("%d P %s", sptr->fd, sptr->passwd);
-			sendto_iauth("%d U %s", sptr->fd, sptr->user->username);
-			return 1;
+			/* If iauth already set a 'K', do not defer here again. */
+			if (sptr->exitc == EXITC_AREF || sptr->exitc == EXITC_AREFQ)
+			{
+				Debug((DEBUG_INFO, "EARLYPARSE bypass due to exitc=%d (fd=%d)",
+					   sptr->exitc, sptr->fd));
+				/* Fall through to the kill check below. */
+			}
+			else if (!(cptr->flags & DEFER_USER_REG))
+			{
+				cptr->flags |= FLAGS_WXAUTH;
+				/* fool check_pings() and give iauth more time! */
+				cptr->firsttime = timeofday;
+				cptr->lasttime = timeofday;
+				strncpyzt(sptr->user->username, username, USERLEN+1);
+				if (sptr->passwd[0])
+					sendto_iauth("%d P %s", sptr->fd,sptr->passwd);
+				sendto_iauth("%d U %s", sptr->fd, username);
+				return 1;
+			}
 		}
 		if (!DoneXAuth(sptr) && (iauth_options & XOPT_REQUIRED))
 		{
+			if (sptr->flags & DEFER_USER_REG)
+			{
+				return 1; /* defer */
+			}
 			if (iauth_options & XOPT_NOTIMEOUT)
 			{
 				count += 1;
 				if (timeofday - last > 300)
-				    {
-					sendto_flag(SCH_AUTH, 
-	    "iauth may be not running! (refusing new user connections)");
+				{
+					sendto_flag(SCH_AUTH, "iauth may be not running! (refusing "
+										  "new user connections)");
 					last = timeofday;
-				    }
+				}
 				sptr->exitc = EXITC_AUTHFAIL;
 			}
 			else
 				sptr->exitc = EXITC_AUTHTOUT;
 			return exit_client(cptr, cptr, &me,
-				"Authentication failure! - no iauth?");
+							   "Authentication failure! - no iauth?");
 		}
 		if (timeofday - last > 300 && count)
 		{
@@ -529,7 +562,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 			strncpy(&user->username[1], buf2, USERLEN);
 		}
 		else
-			strncpy(user->username, buf2, USERLEN+1);
+			strncpy(user->username, buf2, USERLEN + 1);
 		user->username[USERLEN] = '\0';
 		/* eos */
 #else
@@ -731,17 +764,13 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 # if defined(CLIENTS_CHANNEL) && (CLIENTS_CHANNEL_LEVEL & CCL_CONN)
 		sendto_flag(SCH_CLIENT, "%s %s %s %s CONN %s"
 # if (CLIENTS_CHANNEL_LEVEL & CCL_CONNINFO)
-#  ifdef XLINE
-         " %s %s %s"
-#  endif
+         	" %s %s %s"
 			" :%s"
 # endif
 			, sptr->uid, nick, user->username,
 			user->host, user->sip
 # if (CLIENTS_CHANNEL_LEVEL & CCL_CONNINFO)
-#  ifdef XLINE
-         , savedusername, sptr->user2, sptr->user3
-#  endif
+         	, sptr->user1, sptr->user2, sptr->user3
 			, sptr->info
 # endif
 			);
@@ -1214,7 +1243,7 @@ nickkilldone:
 			** --must test this and exit m_nick too!!!
 			*/
 			if (register_user(cptr, sptr, nick,
-					  sptr->user->username)
+					  sptr->user1)
 			    == FLUSH_BUFFER)
 				return FLUSH_BUFFER;
 		}
@@ -2483,18 +2512,16 @@ int	m_user(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (strlen(realname) > REALLEN)
 		realname[REALLEN] = '\0';
 	sptr->info = mystrdup(realname);
-#ifdef XLINE
+	sptr->user1 = mystrdup(username);
 	sptr->user2 = mystrdup(umodes);
 	sptr->user3 = mystrdup(server);
-#endif
-	if (sptr->name[0] && !IsCAPNegotiation(sptr)) /* NICK already received, now we have USER... */
+
+	if (sptr->name[0] && !IsCAPNegotiation(sptr))
 	{
-		return register_user(cptr, sptr, sptr->name, username);
+		/* NICK already received, now we have USER... */
+		return register_user(cptr, sptr, sptr->name, sptr->user1);
 	}
-	else
-	{
-		strncpyzt(sptr->user->username, username, USERLEN+1);
-	}
+
 	return 2;
 }
 

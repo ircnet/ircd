@@ -184,6 +184,13 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		{
 			// Authentication successful
 			acptr->flags |= FLAGS_SASL;
+#if defined(USE_IAUTH)
+			/* Notify iauth of successful SASL authentication */
+			if (MyConnect(acptr))
+			{
+				sendto_iauth("%d S %s", acptr->fd, acptr->sasl_user);
+			}
+#endif
 			sendto_one(acptr, replies[RPL_SASLSUCCESS], me.name, BadTo(acptr->name));
 			acptr->sasl_service = NULL;
 		}
