@@ -3793,6 +3793,38 @@ static void report_listeners(aClient *sptr, char *to)
 	}
 }
 
+static void
+encap_route(aClient *cptr, char *mask, char *buf)
+{
+	aClient *acptr;
+	int exact;
+
+	if (!strcmp(mask, me.name) || !strcmp(mask, me.serv->sid))
+		return;
+
+	exact = (strchr(mask, '*') == NULL &&
+			 strchr(mask, '?') == NULL &&
+			 strchr(mask, '#') == NULL);
+
+	if (!exact)
+	{
+		sendto_serv_v(cptr, SV_UID, "%s", buf);
+		return;
+	}
+
+	acptr = find_sid(mask, NULL);
+	if (!acptr)
+		acptr = find_server(mask, NULL);
+
+	if (!acptr)
+	{
+		return;
+	}
+
+	if (acptr->from != cptr)
+		sendto_one(acptr, "%s", buf);
+}
+
 /*
 ** allows ENCAPsulation of commands
 ** parv[0] is ignored (though it's source)
@@ -3823,8 +3855,8 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		else
 			len += sprintf(buf+len, " %s", parv[i]);
 	}
-	/* ...and broadcast it. */
-	sendto_serv_v(cptr, SV_UID, "%s", buf);
+
+	encap_route(cptr, parv[1], buf);
 
 	/* FIXME: in 2.11.1 */
 	/* Do we match parv[1]? */
