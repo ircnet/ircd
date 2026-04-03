@@ -134,11 +134,6 @@ This module is for authentication TCP connections using the protocol
 defined in RFC 1413 (which obsoletes RFC 931).  It is always loaded, and
 does not recognize the \fIhost\fP nor \fIip\fP fields.
 .TP
-.B lhex
-This module acts as a proxy, communicating with a LHEx server to perform
-authentication of client connections.  It takes a single (mandatory)
-option, which is the IP-address of the LHEx server to use.
-.TP
 .B webproxy
 This module performs a basic HTTP CONNECT to verify that the host where the
 connection originated from doesn't run an open WWW proxy.
@@ -181,17 +176,10 @@ originating from a system where an open proxy is running for hosts within
 *.fr and *.enserb.u-bordeaux.fr but not for other hosts matching
 *.u-bordeaux.fr.  For all connections, an ident lookup (RFC 1413) will be
 performed as well as checking for WWW proxy on port 8080 and 3128.
-In addition, every connection is authenticated with the LHEx
-server at IP-address 127.0.0.1. Client will be let in after ident and
-lhex are done but if socks or webproxy finds an open proxy, client will
-be removed asap.
 
 .RS
 .nf
 module rfc931
-
-module lhex
-        option = 127.0.0.1
 
 delayed
 

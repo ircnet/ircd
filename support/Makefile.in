@@ -150,7 +150,7 @@ IRCD_OBJS = channel.o class.o hash.o ircd.o list.o res.o s_auth.o \
 
 IAUTH_COMMON_OBJS = clsupport.o clmatch.o # This is a little evil
 IAUTH_OBJS = iauth.o a_conf.o a_io.o a_log.o \
-             mod_lhex.o mod_pipe.o mod_rfc931.o mod_socks.o \
+             mod_pipe.o mod_rfc931.o mod_socks.o \
              mod_webproxy.o mod_dnsbl.o
 
 CHKCONF_COMMON_OBJS = match.o
@@ -383,9 +383,6 @@ a_io.o: ../iauth/a_io.c config.h ../common/struct_def.h setup.h
 
 a_log.o: ../iauth/a_log.c config.h ../common/struct_def.h setup.h
 	$(CC) $(A_CFLAGS) -DIAUTHDBG_PATH="\"$(IAUTHDBG_PATH)\"" -DFNAME_AUTHLOG="\"$(FNAME_AUTHLOG)\"" -c -o $@ ../iauth/a_log.c
-
-mod_lhex.o: ../iauth/mod_lhex.c config.h ../common/struct_def.h setup.h
-	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_lhex.c
 
 mod_pipe.o: ../iauth/mod_pipe.c config.h ../common/struct_def.h setup.h
 	$(CC) $(A_CFLAGS) -c -o $@ ../iauth/mod_pipe.c

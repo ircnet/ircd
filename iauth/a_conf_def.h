@@ -53,7 +53,6 @@ struct Instance
 struct Target
 {
     char	*value;
-    u_long	baseip, lmask;		/* a.b.c.d/z */
     char	yes;
     aTarget	*nextt;
 };

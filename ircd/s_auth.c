@@ -334,14 +334,9 @@ void	read_iauth(void)
 			    start = end;
 			    continue;
 			}
-#ifndef	INET6
-		    sprintf(tbuf, "%c %d %s %u ", start[0], i,
-			    inetntoa((char *)&cptr->ip), cptr->port);
-#else
 		    sprintf(tbuf, "%c %d %s %u ", start[0], i,
 			    inetntop(AF_INET6, (char *)&cptr->ip, 
 			    ipv6string, sizeof(ipv6string)), cptr->port);
-#endif
 		    if (strncmp(tbuf, start, strlen(tbuf)))
 			{
 			    /* this is fairly common and can be ignored */
@@ -588,30 +583,19 @@ void	start_auth(aClient *cptr)
 	if (cptr->acpt->confs && IsConfTLS(cptr->acpt->confs->value.aconf)
 		&& !BadPtr(cptr->acpt->confs->value.aconf->source_ip))
 	{
-# ifdef INET6
 		inetpton(AF_INET6, cptr->acpt->confs->value.aconf->source_ip, us.sin6_addr.s6_addr);
-# else
-		us.sin_addr.s_addr = inetaddr(cptr->acpt->confs->value.aconf->source_ip);
-# endif
 	}
 
 # if defined(USE_IAUTH)
 	if (adfd >= 0)
 	    {
 		char abuf[BUFSIZ];
-#  ifdef INET6
 		sprintf(abuf, "%d C %s %u ", cptr->fd,
 			inetntop(AF_INET6, (char *)&them.sin6_addr, ipv6string,
 				 sizeof(ipv6string)), ntohs(them.SIN_PORT));
 		sprintf(abuf+strlen(abuf), "%s %u",
 			inetntop(AF_INET6, (char *)&us.sin6_addr, ipv6string,
 				 sizeof(ipv6string)), ntohs(us.SIN_PORT));
-#  else
-		sprintf(abuf, "%d C %s %u ", cptr->fd,
-			inetntoa((char *)&them.sin_addr),ntohs(them.SIN_PORT));
-		sprintf(abuf+strlen(abuf), "%s %u",
-			inetntoa((char *)&us.sin_addr), ntohs(us.SIN_PORT));
-#  endif
 		if (sendto_iauth(abuf) == 0)
 		    {
 			close(cptr->authfd);
@@ -621,42 +605,26 @@ void	start_auth(aClient *cptr)
 		    }
 	    }
 # endif
-# ifdef INET6
 	Debug((DEBUG_NOTICE,"auth(%x) from %s %x %x",
 	       cptr, inet_ntop(AF_INET6, (char *)&us.sin6_addr, ipv6string,
 			       sizeof(ipv6string)), us.sin6_addr.s6_addr[14],
 	       us.sin6_addr.s6_addr[15]));
-# else
-	Debug((DEBUG_NOTICE,"auth(%x) from %s",
-	       cptr, inetntoa((char *)&us.sin_addr)));
-# endif
 	them.SIN_PORT = htons(113);
 	us.SIN_PORT = htons(0);  /* bind assigns us a port */
 	if (bind(cptr->authfd, (struct SOCKADDR *)&us, ulen) >= 0)
 	    {
 		(void)getsockname(cptr->fd, (struct SOCKADDR *)&us, &ulen);
-# ifdef INET6
 		Debug((DEBUG_NOTICE,"auth(%x) to %s",
 			cptr, inet_ntop(AF_INET6, (char *)&them.sin6_addr,
 					ipv6string, sizeof(ipv6string))));
-# else
-		Debug((DEBUG_NOTICE,"auth(%x) to %s",
-			cptr, inetntoa((char *)&them.sin_addr)));
-# endif
 		(void)alarm((unsigned)4);
 		if (connect(cptr->authfd, (struct SOCKADDR *)&them,
 			    tlen) == -1 && errno != EINPROGRESS)
 		    {
-# ifdef INET6
 			Debug((DEBUG_ERROR,
 				"auth(%x) connect failed to %s - %d", cptr,
 				inet_ntop(AF_INET6, (char *)&them.sin6_addr,
 					  ipv6string, sizeof(ipv6string)), errno));
-# else
-			Debug((DEBUG_ERROR,
-				"auth(%x) connect failed to %s - %d", cptr,
-				inetntoa((char *)&them.sin_addr), errno));
-# endif
 			ircstp->is_abad++;
 			/*
 			 * No error report from this...
@@ -672,16 +640,10 @@ void	start_auth(aClient *cptr)
 	    {
 		report_error("binding stream socket for auth request %s:%s",
 			     cptr);
-# ifdef INET6
 		Debug((DEBUG_ERROR,"auth(%x) bind failed on %s port %d - %d",
 		      cptr, inet_ntop(AF_INET6, (char *)&us.sin6_addr,
 		      ipv6string, sizeof(ipv6string)),
 		      ntohs(us.SIN_PORT), errno));
-# else
-		Debug((DEBUG_ERROR,"auth(%x) bind failed on %s port %d - %d",
-		      cptr, inetntoa((char *)&us.sin_addr),
-		      ntohs(us.SIN_PORT), errno));
-# endif
 	    }
 
 	cptr->flags |= (FLAGS_WRAUTH|FLAGS_AUTH);
@@ -724,14 +686,9 @@ void	send_authports(aClient *cptr)
 		(unsigned int)ntohs(them.SIN_PORT),
 		(unsigned int)ntohs(us.SIN_PORT));
 
-#ifdef INET6
 	Debug((DEBUG_SEND, "sending [%s] to auth port %s.113",
 		authbuf, inet_ntop(AF_INET6, (char *)&them.sin6_addr,
 				    ipv6string, sizeof(ipv6string))));
-#else
-	Debug((DEBUG_SEND, "sending [%s] to auth port %s.113",
-		authbuf, inetntoa((char *)&them.sin_addr)));
-#endif
 	if (write(cptr->authfd, authbuf, strlen(authbuf)) != strlen(authbuf))
 	    {
 authsenderr:

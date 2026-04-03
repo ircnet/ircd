@@ -133,9 +133,7 @@ char	serveropts[] = {
 #ifdef	ZIP_LINKS
 'Z',
 #endif
-#ifdef INET6
 '6',
-#endif
 '\0'};
 
 #ifdef DEBUGMODE

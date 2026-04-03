@@ -742,30 +742,12 @@ void	loop_io(void)
  */
 static	void	set_non_blocking(int fd, char *ip, u_short port)
 {
-	int     res, nonb = 0;
+	int res;
 
-#ifdef NBLOCK_POSIX
-        nonb |= O_NONBLOCK;
-#endif
-#ifdef NBLOCK_BSD
-        nonb |= O_NDELAY;
-#endif
-#ifdef NBLOCK_SYSV
-        /* This portion of code might also apply to NeXT.  -LynX */
-        res = 1;
- 
-        if (ioctl (fd, FIONBIO, &res) < 0)
-                sendto_log(ALOG_IRCD, 0, "ioctl(fd,FIONBIO) failed for %s:%u",
-			   ip, port);
-#else   
-        if ((res = fcntl(fd, F_GETFL, 0)) == -1)
-                sendto_log(ALOG_IRCD, 0, "fcntl(fd, F_GETFL) failed for %s:%u",
-			   ip, port);
-        else if (fcntl(fd, F_SETFL, res | nonb) == -1)
-                sendto_log(ALOG_IRCD, 0,
-			   "fcntl(fd, F_SETL, nonb) failed for %s:%u",
-			   ip, port);
-#endif  
+	if ((res = fcntl(fd, F_GETFL, 0)) == -1)
+		sendto_log(ALOG_IRCD, 0, "fcntl(fd, F_GETFL) failed for %s:%u", ip, port);
+	else if (fcntl(fd, F_SETFL, res | O_NONBLOCK) == -1)
+		sendto_log(ALOG_IRCD, 0, "fcntl(fd, F_SETFL, O_NONBLOCK) failed for %s:%u", ip, port);
 }
 
 /*
@@ -795,12 +777,8 @@ int	tcp_connect(char *ourIP, char *theirIP, u_short port, char **error)
 	 */
 	bzero((char *)&sk, sizeof(sk));
 	sk.SIN_FAMILY = AFINET;
-#if defined(INET6)
 	if(!inetpton(AF_INET6, ourIP, sk.sin6_addr.s6_addr))
 		bcopy(minus_one, sk.sin6_addr.s6_addr, IN6ADDRSZ);
-#else
-	sk.sin_addr.s_addr = inetaddr(ourIP);
-#endif
 	sk.SIN_PORT = htons(0);
 	if (bind(fd, (SAP)&sk, sizeof(sk)) < 0)
 	    {
@@ -810,12 +788,8 @@ int	tcp_connect(char *ourIP, char *theirIP, u_short port, char **error)
 		return -1;
 	    }
 	set_non_blocking(fd, theirIP, port);
-#if defined(INET6)
 	if(!inetpton(AF_INET6, theirIP, sk.sin6_addr.s6_addr))
 		bcopy(minus_one, sk.sin6_addr.s6_addr, IN6ADDRSZ);
-#else
-	sk.sin_addr.s_addr = inetaddr(theirIP);
-#endif
 	sk.SIN_PORT = htons(port);
 	if (connect(fd, (SAP)&sk, sizeof(sk)) < 0 && errno != EINPROGRESS)
 	    {

@@ -110,11 +110,7 @@ patricia_prefix_toa2(prefix_t * prefix, char *buff, int buf_len)
 static char *
 prefix_toa(prefix_t * prefix)
 {
-#ifdef INET6
 	static char buf[INET6_ADDRSTRLEN + 6];
-#else
-	static char buf[16 + 6];
-#endif
 	return (patricia_prefix_toa2(prefix, buf, sizeof(buf)));
 }
 #endif
@@ -122,13 +118,8 @@ static prefix_t *
 patricia_new_prefix2(int family, void *dest, int bitlen, prefix_t * prefix)
 {
 	int dynamic_allocated = 0;
-#ifdef INET6
 	int default_bitlen = 128;
-#else
-	int default_bitlen = 32;
-#endif
 
-#ifdef INET6
 	if(family == AF_INET6)
 	{
 		default_bitlen = 128;
@@ -140,7 +131,6 @@ patricia_new_prefix2(int family, void *dest, int bitlen, prefix_t * prefix)
 		memcpy(&prefix->add.sin6, dest, 16);
 	}
 	else
-#endif /* IPV6 */
 	if(family == AF_INET)
 	{
 		if(prefix == NULL)
@@ -179,9 +169,7 @@ ascii2prefix(int family, const char *string)
 	u_long bitlen, maxbitlen = 0;
 	char *cp;
 	struct in_addr sinaddr;
-#ifdef INET6
 	struct in6_addr sinaddr6;
-#endif /* IPV6 */
 	int result;
 	char save[MAXLINE];
 
@@ -192,21 +180,17 @@ ascii2prefix(int family, const char *string)
 	if(family == 0)
 	{
 		family = AF_INET;
-#ifdef INET6
 		if(strchr(string, ':'))
 			family = AF_INET6;
-#endif /* IPV6 */
 	}
 	if(family == AF_INET)
 	{
 		maxbitlen = 32;
 	}
-#ifdef INET6
 	else if(family == AF_INET6)
 	{
 		maxbitlen = 128;
 	}
-#endif /* IPV6 */
 
 	if((cp = strchr(string, '/')) != NULL)
 	{
@@ -231,14 +215,12 @@ ascii2prefix(int family, const char *string)
 			return (NULL);
 		return (New_Prefix(AF_INET, &sinaddr, bitlen));
 	}
-#ifdef INET6
 	else if(family == AF_INET6)
 	{
 		if((result = inetpton(AF_INET6, string, &sinaddr6)) <= 0)
 			return (NULL);
 		return (New_Prefix(AF_INET6, &sinaddr6, bitlen));
 	}
-#endif /* IPV6 */
 	else
 		return (NULL);
 }
@@ -963,13 +945,11 @@ patricia_make_and_lookup(patricia_tree_t * tree, const char *string)
 		node = patricia_lookup(tree, prefix);
 	}
 	else
-#ifdef INET6
 	if((prefix = ascii2prefix(AF_INET6, string)) != NULL)
 	{
 		node = patricia_lookup(tree, prefix);
 	}
 	else
-#endif
 		return NULL;
 #ifdef PATRICIA_DEBUG
 	printf("patricia_make_and_lookup: %s/%d\n", prefix_toa(prefix), prefix->bitlen);
@@ -990,14 +970,12 @@ patricia_try_search_exact(patricia_tree_t * tree, char *string)
 		patricia_deref_prefix(prefix);
 		return (node);
 	}
-#ifdef INET6
 	else if((prefix = ascii2prefix(AF_INET6, string)) != NULL)
 	{
 		node = patricia_search_exact(tree, prefix);
 		patricia_deref_prefix(prefix);
 		return (node);
 	}
-#endif
 	else
 		return NULL;
 }
@@ -1017,11 +995,7 @@ patricia_match_ip(patricia_tree_t * tree, struct IN_ADDR *ip)
 {
 	prefix_t *prefix;
 	patricia_node_t *node;
-#ifdef INET6
 	int len = 128;
-#else
-	int len = 32;
-#endif
 		
 	if((prefix = New_Prefix(AFINET, ip, len)) != NULL)
 	{
@@ -1044,14 +1018,12 @@ patricia_match_string(patricia_tree_t * tree, const char *string)
 		patricia_deref_prefix(prefix);
 	}
 	else
-#ifdef INET6
 	if((prefix = ascii2prefix(AF_INET6, string)) != NULL)
 	{
 		node = patricia_search_best(tree, prefix);
 		patricia_deref_prefix(prefix);
 	}
 	else
-#endif
 		return NULL;
 	return node;
 }
@@ -1067,14 +1039,12 @@ patricia_match_exact_string(patricia_tree_t * tree, const char *string)
 		patricia_deref_prefix(prefix);
 	}
 	else
-#ifdef INET6
 	if((prefix = ascii2prefix(AF_INET6, string)) != NULL)
 	{
 		node = patricia_search_exact(tree, prefix);
 		patricia_deref_prefix(prefix);
 	}
 	else
-#endif
 		return NULL;
 	return node;
 }

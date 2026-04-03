@@ -17,9 +17,7 @@
 #define	AR_TTL		600	/* TTL in seconds for dns cache entries */
 
 #define FLG_A_VALID		1
-#ifdef INET6
 #define FLG_AAAA_VALID		2
-#endif
 #define FLG_PTR_PEND_FWD	4
 #define FLG_PTR_PEND_REV	8
 #define FLG_PTR_PEND		(FLG_PTR_PEND_FWD|FLG_PTR_PEND_REV)

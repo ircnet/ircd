@@ -1834,13 +1834,9 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 	if (IsMe(acptr) || !acptr->acpt || !IsRegistered(acptr))
 		return;
 	ret = 
-#ifdef INET6
 		inetntop(AF_INET6,
 		(char *)&acptr->acpt->ip,
 		ipv6string, sizeof(ipv6string));
-#else
-		inetntoa((char *)&acptr->acpt->ip);
-#endif
 	s = strlen(ret) + 1;
 	memcpy(locip, ret, s < sizeof(locip) ? s : sizeof(locip));
 	locip[sizeof(locip) - 1] = 0;
@@ -1849,13 +1845,9 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 		acptr->fd,
 		locip,
 		acptr->acpt->port,
-#ifdef INET6
 		inetntop(AF_INET6,
 		(char *)&acptr->ip,
 		ipv6string, sizeof(ipv6string)),
-#else
-		inetntoa((char *)&acptr->ip),
-#endif
 		acptr->port,acptr->name,
 		acptr->user ? acptr->user->username : acptr->auth,
 		acptr->user ? timeofday - acptr->user->last : -1

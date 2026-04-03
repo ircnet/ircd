@@ -182,9 +182,7 @@ int	main(int argc, char *argv[])
 		}
 		else
 		{
-#if defined(INET6)
 			(void)printf("\t+INET6\n");
-#endif
 #if defined(IAUTH_DEBUG)
 			(void)printf("\t+IAUTH_DEBUG\n");
 #endif

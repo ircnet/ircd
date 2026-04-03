@@ -949,12 +949,6 @@
 #error MINLOCALNICKLEN bigger than (max)LOCALNICKLEN
 #endif
 
-/* we should probably not bother with that :) */
-#if !defined(NBLOCK_POSIX) && !defined(NBLOCK_BSD) && !defined(NBLOCK_SYSV)
-#undef LISTENER_MAXACCEPT
-#define LISTENER_MAXACCEPT 1
-#endif
-
 /* well, we save some memory if we don't actually need either of the hashes */
 #if defined(YLINE_LIMITS_IPHASH) || defined(FIND_USERHOST_IPHASH)
 #define USE_IPHASH

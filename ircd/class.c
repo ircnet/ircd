@@ -199,11 +199,7 @@ void	add_class(int class, int ping, int confreq, int maxli, int sendq,
 	if (cidrlen > 0 && CidrLen(p) == 0 && p->ip_limits == NULL)
 	{
 		CidrLen(p) = cidrlen;
-#  ifdef INET6
 		p->ip_limits = (struct _patricia_tree_t *) patricia_new(128);
-#  else
-		p->ip_limits = (struct _patricia_tree_t *) patricia_new(32);
-#  endif
 	}
 	if (CidrLen(p) != cidrlen)
 	{

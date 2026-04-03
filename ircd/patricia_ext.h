@@ -55,9 +55,7 @@ typedef struct _prefix_t
 	union
 	{
 		struct in_addr sin;
-#ifdef INET6
 		struct in6_addr sin6;
-#endif				/* IPV6 */
 	}
 	add;
 }

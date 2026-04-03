@@ -145,7 +145,7 @@ struct __res_state {
 /*			0x00008000	*/
 
 /* hooks are still experimental as of 4.9.2 */
-#if defined(INET6) && defined(__GNUC__)
+#if defined(__GNUC__)
 
 #else
 

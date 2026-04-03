@@ -97,11 +97,7 @@ static void ircd_res_setoptions (char *, char *);
 #ifdef RESOLVSORT
 static const char sort_mask[] = "/&";
 #define ISSORTMASK(ch) (strchr(sort_mask, ch) != NULL)
-#ifdef INET6
 static u_int32_t ircd_net_mask (struct in_addr);
-#else
-static u_int32_t ircd_net_mask (struct in_addr);
-#endif
 #endif
 
 #if !defined(isascii)	/* XXX - could be a function */
@@ -189,19 +185,11 @@ int	ircd_res_init(void)
 	if (!ircd_res.id)
 		ircd_res.id = ircd_res_randomid();
 
-#ifdef INET6
 # ifdef USELOOPBACK
 	ircd_res.nsaddr.sin6_addr = in6addr_loopback;
 # else
 	ircd_res.nsaddr.sin6_addr = in6addr_any;
 # endif
-#else
-# ifdef USELOOPBACK
-	ircd_res.nsaddr.sin_addr = inet_makeaddr(IN_LOOPBACKNET, 1);
-# else
-	ircd_res.nsaddr.sin_addr.s_addr = INADDR_ANY;
-# endif
-#endif /* INET6 */
 	ircd_res.nsaddr.SIN_FAMILY = AFINET;
 	ircd_res.nsaddr.SIN_PORT = htons(NAMESERVER_PORT);
 	ircd_res.nscount = 1;
@@ -321,11 +309,7 @@ int	ircd_res_init(void)
 		    if ((tmp=index(cp, '\n')) || (tmp=index(cp, '\r')))
 			*tmp = '\0';
 		    if (
-#ifdef INET6
 			inetpton(AF_INET6, cp, a.s6_addr)
-#else
-			inetaton(cp, &a)
-#endif
 			)
 		    {
 			ircd_res.nsaddr_list[nserv].SIN_ADDR = a;
@@ -337,9 +321,7 @@ int	ircd_res_init(void)
 		    continue;
 		}
 #ifdef RESOLVSORT
-#ifdef INET6
 #error No support for RESOLVSORT and INET6
-#endif
 		if (MATCH(buf, "sortlist")) {
 		    struct in_addr a;
 
