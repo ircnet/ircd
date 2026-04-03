@@ -3818,8 +3818,6 @@ encap_route(aClient *cptr, char *mask, char *buf)
 
 	if (!acptr)
 	{
-		sendto_flag(SCH_ERROR,
-					"Cannot route ENCAP to unknown target %s", mask);
 		return;
 	}
 
