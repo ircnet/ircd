@@ -68,6 +68,44 @@ struct dnsbl_private {
 	struct dnsbl_list *host_list;
 };
 
+static void dnsbl_free_cache(struct dnsbl_private *mydata)
+{
+	struct hostlog *pl, *next;
+
+	for (pl = mydata->cache; pl; pl = next)
+	{
+		next = pl->next;
+		free(pl);
+	}
+	mydata->cache = NULL;
+	mydata->cnow = 0;
+}
+
+static void dnsbl_free_host_list(struct dnsbl_private *mydata)
+{
+	struct dnsbl_list *l, *n;
+
+	for (l = mydata->host_list; l; l = n)
+	{
+		free(l->host);
+		n = l->next;
+		free(l);
+	}
+	mydata->host_list = NULL;
+}
+
+static void dnsbl_free_private(struct dnsbl_private *mydata)
+{
+	if (!mydata)
+		return;
+
+	dnsbl_free_cache(mydata);
+	dnsbl_free_host_list(mydata);
+	if (mydata->reason)
+		free(mydata->reason);
+	free(mydata);
+}
+
 /*
  * dnsbl_succeed
  *
@@ -233,6 +271,8 @@ static char *dnsbl_init(AnInstance *self)
 	if (mydata->options == 0)
 	{
 		DebugLog((ALOG_DNSBL, 0, "dnsbl_init: Aie! unknown option(s): nothing to be done!"));
+		dnsbl_free_private(mydata);
+		self->data = NULL;
 		return "Aie! unknown option(s): nothing to be done!";
 	}
 
@@ -264,6 +304,8 @@ static char *dnsbl_init(AnInstance *self)
 	if (mydata->host_list == NULL)
 	{
 		DebugLog((ALOG_DNSBL, 0, "dnsbl_init: Aie! No DNSBL host: nothing to be done!"));
+		dnsbl_free_private(mydata);
+		self->data = NULL;
 		return "Aie! No DNSBL host: nothing to be done!";
 	}
 
@@ -309,17 +351,11 @@ static char *dnsbl_init(AnInstance *self)
 void dnsbl_release(AnInstance *self)
 {
 	struct dnsbl_private *mydata = self->data;
-	struct dnsbl_list *l, *n;
 
-	for (l = mydata->host_list; l; l = n)
-	{
-		free(l->host);
-		n = l->next;
-		free(l);
-	}
-
-	free(mydata);
+	dnsbl_free_private(mydata);
+	self->data = NULL;
 	free(self->popt);
+	self->popt = NULL;
 }
 
 /*
@@ -373,11 +409,15 @@ static int dnsbl_start(u_int cl)
 	{
 		/* no point of doing anything */
 		DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): A_DENY already set ", cl));
+		freeaddrinfo(addr_res);
 		return -1;
 	}
 
 	if (dnsbl_check_cache(cl))
+	{
+		freeaddrinfo(addr_res);
 		return -1;
+	}
 
 	DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): checking %s", cl, cldata[cl].itsip));
 
@@ -438,6 +478,8 @@ static int dnsbl_start(u_int cl)
 				  cl, hstrerror(h_errno)));
 		dnsbl_add_cache(cl, DNSBL_FAILED);
 	}
+
+	freeaddrinfo(addr_res);
 
 	return -1;
 }
