@@ -50,3 +50,9 @@ module rfc931
 #module dnsbl
 #	option = log,reject,servers=bl1.example.org,bl2.example.org
 #	reason = Denied access (DNSBL)
+
+#module dnsbl
+#    option = log,reject,skip_if_ident,skip_if_sasl
+#    reason = Denied access (DNSBL)
+#    entry = torexit.dan.me.uk|Tor Exit Node
+#    entry = dnsbl.dronebl.org|You are listed in DroneBL - https://dronebl.org/lookup?ip={ip}
