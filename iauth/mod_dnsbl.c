@@ -20,11 +20,10 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: mod_dnsbl.c,v 1.1 2024/10/1 15:35:00 patrick Exp $";
+static const volatile char rcsid[] = "@(#)$Id: mod_dnsbl.c,v 1.2 2026/04/03 20:28:00 ai Exp $";
 #endif
 
 // clang-format off
-// "os.h" must be included before "a_defines.h"
 #include "os.h"
 #include "a_defines.h"
 // clang-format on
@@ -32,10 +31,17 @@ static const volatile char rcsid[] = "@(#)$Id: mod_dnsbl.c,v 1.1 2024/10/1 15:35
 #include "a_externs.h"
 #undef MOD_DNSBL_C
 
-/****************************** PRIVATE *************************************/
+#include "../ircd/resolv_def.h"
+#include "../ircd/res_init_ext.h"
+#include "../ircd/res_comp_ext.h"
+#include "../ircd/res_mkquery_ext.h"
 
 /* Cache time in minutes */
 #define CACHETIME 30
+#define DNSBL_LOOKUPLEN 512
+#define DNSBL_MAXPACKET 512
+#define DNSBL_GWORK_BUDGET 64
+#define DNSBL_MAX_ACTIVE_QUERIES 128
 
 struct hostlog {
 	struct hostlog *next;
@@ -52,10 +58,36 @@ struct hostlog {
 #define DNSBL_FOUND 1
 #define DNSBL_FAILED 2
 
+#define DNSBL_PENDING 0
+#define DNSBL_DONE_FOUND 1
+#define DNSBL_DONE_CLEAN 2
+#define DNSBL_DONE_FAILED 3
+
+#define DNSBL_PARSE_IGNORE 0
+#define DNSBL_PARSE_FOUND 1
+#define DNSBL_PARSE_NEXT_HOST 2
+#define DNSBL_PARSE_RETRY 3
+
 struct dnsbl_list {
 	char *host;
 	struct dnsbl_list *next;
 };
+
+typedef struct dnsbl_pending {
+	int active;
+	int wake_r;
+	int wake_w;
+	int final_state;
+	u_short qid;
+	u_int ns_index;
+	u_int tries;
+	time_t deadline;
+	struct dnsbl_list *current;
+	char lookup[DNSBL_LOOKUPLEN];
+	char listname[HOSTLEN + 1];
+	unsigned char answer[INADDRSZ];
+	u_int queue_seq;
+} DnsblPending;
 
 struct dnsbl_private {
 	struct hostlog *cache;
@@ -66,21 +98,265 @@ struct dnsbl_private {
 	u_int chitc, chito, chitn, cmiss, cnow, cmax;
 	u_int found, failed, good, total, rejects;
 	struct dnsbl_list *host_list;
+	int gfd;
+	u_int qid_seq;
+	u_int queue_seq;
+	DnsblPending pend[MAXCONNECTIONS];
 };
 
-/*
- * dnsbl_succeed
- *
- * Found a host in DNSBL. Deal with it.
- */
+static int dnsbl_resolver_ready = 0;
+
+static void dnsbl_close_client_rfd(u_int cl)
+{
+	if (cldata[cl].rfd > 0)
+	{
+		close(cldata[cl].rfd);
+		cldata[cl].rfd = 0;
+	}
+	cldata[cl].wfd = 0;
+	cldata[cl].buflen = 0;
+}
+
+static void dnsbl_reset_pending(DnsblPending *p)
+{
+	if (p->wake_w > 0)
+	{
+		close(p->wake_w);
+		p->wake_w = 0;
+	}
+	p->wake_r = 0;
+	bzero((char *) p, sizeof(*p));
+}
+
+static int dnsbl_make_wakeup(u_int cl, int *rfd_out, int *wfd_out)
+{
+	int sp[2];
+	int flags;
+
+	if (socketpair(AF_UNIX, SOCK_STREAM, 0, sp) < 0)
+	{
+		DebugLog((ALOG_DNSBL, 0, "dnsbl_make_wakeup(%d): socketpair() failed: %s",
+				  cl, strerror(errno)));
+		return -1;
+	}
+
+	flags = fcntl(sp[0], F_GETFL, 0);
+	if (flags >= 0)
+		(void) fcntl(sp[0], F_SETFL, flags | O_NONBLOCK);
+	flags = fcntl(sp[1], F_GETFL, 0);
+	if (flags >= 0)
+		(void) fcntl(sp[1], F_SETFL, flags | O_NONBLOCK);
+
+	cldata[cl].rfd = sp[0];
+	*rfd_out = sp[0];
+	*wfd_out = sp[1];
+	return 0;
+}
+
+static int dnsbl_ns_count(void)
+{
+	return MAX(1, ircd_res.nscount);
+}
+
+static int dnsbl_max_sends(void)
+{
+	return MAX(1, dnsbl_ns_count() * MAX(1, ircd_res.retry));
+}
+
+static int dnsbl_max_active_queries(void)
+{
+	return (DNSBL_MAX_ACTIVE_QUERIES < MAXCONNECTIONS) ?
+		DNSBL_MAX_ACTIVE_QUERIES : MAXCONNECTIONS;
+}
+
+static int dnsbl_count_inflight(struct dnsbl_private *mydata)
+{
+	u_int i;
+	int n = 0;
+
+	for (i = 0; i < MAXCONNECTIONS; i++)
+	{
+		DnsblPending *p = &mydata->pend[i];
+
+		if (p->active && p->final_state == DNSBL_PENDING && p->qid != 0)
+			n++;
+	}
+	return n;
+}
+
+static void dnsbl_dispatch_queued(struct dnsbl_private *mydata);
+
+static int dnsbl_same_ns(const struct SOCKADDR_IN *a, const struct SOCKADDR_IN *b)
+{
+	return a->SIN_FAMILY == b->SIN_FAMILY &&
+			a->SIN_PORT == b->SIN_PORT &&
+			memcmp(a->SIN_ADDR.S_ADDR, b->SIN_ADDR.S_ADDR,
+				   sizeof(a->SIN_ADDR.S_ADDR)) == 0;
+}
+
+static u_short dnsbl_new_qid(struct dnsbl_private *mydata)
+{
+	u_int n;
+
+	for (n = 0; n < 1024; n++)
+	{
+		u_short qid = (u_short) (ircd_res_randomid() ^ (++mydata->qid_seq));
+		u_int i;
+		int used = 0;
+
+		if (qid == 0)
+			qid = 1;
+		for (i = 0; i < MAXCONNECTIONS; i++)
+		{
+			if (mydata->pend[i].active && mydata->pend[i].qid == qid)
+			{
+				used = 1;
+				break;
+			}
+		}
+		if (!used)
+			return qid;
+	}
+	return 0;
+}
+
+static int dnsbl_find_by_wake_r(struct dnsbl_private *mydata, int wake_r)
+{
+	u_int i;
+
+	if (wake_r <= 0)
+		return -1;
+
+	for (i = 0; i < MAXCONNECTIONS; i++)
+	{
+		if ((mydata->pend[i].active || mydata->pend[i].wake_w > 0) &&
+			mydata->pend[i].wake_r == wake_r)
+			return (int) i;
+	}
+	return -1;
+}
+
+static DnsblPending *dnsbl_pending_for_cl(struct dnsbl_private *mydata, u_int cl, u_int *owner_out)
+{
+	int owner = -1;
+
+	if (cldata[cl].rfd > 0)
+		owner = dnsbl_find_by_wake_r(mydata, cldata[cl].rfd);
+	if (owner < 0 && (mydata->pend[cl].active || mydata->pend[cl].wake_w > 0))
+		owner = (int) cl;
+	if (owner < 0)
+		return NULL;
+	if (owner_out)
+		*owner_out = (u_int) owner;
+	return &mydata->pend[owner];
+}
+
+static int dnsbl_build_lookup(u_int cl, struct dnsbl_list *l, char *lookup,
+					 size_t lookup_len)
+{
+	struct addrinfo hints, *addr_res;
+	int rc;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_UNSPEC;
+	hints.ai_flags = AI_NUMERICHOST;
+
+	rc = getaddrinfo(cldata[cl].itsip, NULL, &hints, &addr_res);
+	if (rc)
+		return -1;
+
+	if (addr_res->ai_family == AF_INET)
+	{
+		const struct sockaddr_in *v4 = (const struct sockaddr_in *) addr_res->ai_addr;
+		const uint8_t *b = (const uint8_t *) &v4->sin_addr.s_addr;
+
+		snprintf(lookup, lookup_len, "%u.%u.%u.%u.%s",
+				 (unsigned int) (b[3]), (unsigned int) (b[2]),
+				 (unsigned int) (b[1]), (unsigned int) (b[0]),
+				 l->host);
+	}
+	else if (addr_res->ai_family == AF_INET6)
+	{
+		const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *) addr_res->ai_addr;
+		const uint8_t *b = (const uint8_t *) &v6->sin6_addr.s6_addr;
+
+		snprintf(lookup, lookup_len,
+				 "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x."
+				 "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%s",
+				 (unsigned int) (b[15] & 0xF), (unsigned int) (b[15] >> 4),
+				 (unsigned int) (b[14] & 0xF), (unsigned int) (b[14] >> 4),
+				 (unsigned int) (b[13] & 0xF), (unsigned int) (b[13] >> 4),
+				 (unsigned int) (b[12] & 0xF), (unsigned int) (b[12] >> 4),
+				 (unsigned int) (b[11] & 0xF), (unsigned int) (b[11] >> 4),
+				 (unsigned int) (b[10] & 0xF), (unsigned int) (b[10] >> 4),
+				 (unsigned int) (b[9] & 0xF), (unsigned int) (b[9] >> 4),
+				 (unsigned int) (b[8] & 0xF), (unsigned int) (b[8] >> 4),
+				 (unsigned int) (b[7] & 0xF), (unsigned int) (b[7] >> 4),
+				 (unsigned int) (b[6] & 0xF), (unsigned int) (b[6] >> 4),
+				 (unsigned int) (b[5] & 0xF), (unsigned int) (b[5] >> 4),
+				 (unsigned int) (b[4] & 0xF), (unsigned int) (b[4] >> 4),
+				 (unsigned int) (b[3] & 0xF), (unsigned int) (b[3] >> 4),
+				 (unsigned int) (b[2] & 0xF), (unsigned int) (b[2] >> 4),
+				 (unsigned int) (b[1] & 0xF), (unsigned int) (b[1] >> 4),
+				 (unsigned int) (b[0] & 0xF), (unsigned int) (b[0] >> 4),
+				 l->host);
+	}
+	else
+	{
+		freeaddrinfo(addr_res);
+		return -1;
+	}
+
+	freeaddrinfo(addr_res);
+	return 0;
+}
+
+static void dnsbl_free_cache(struct dnsbl_private *mydata)
+{
+	struct hostlog *pl, *next;
+
+	for (pl = mydata->cache; pl; pl = next)
+	{
+		next = pl->next;
+		free(pl);
+	}
+	mydata->cache = NULL;
+	mydata->cnow = 0;
+}
+
+static void dnsbl_free_host_list(struct dnsbl_private *mydata)
+{
+	struct dnsbl_list *l, *n;
+
+	for (l = mydata->host_list; l; l = n)
+	{
+		free(l->host);
+		n = l->next;
+		free(l);
+	}
+	mydata->host_list = NULL;
+}
+
+static void dnsbl_free_private(struct dnsbl_private *mydata)
+{
+	if (!mydata)
+		return;
+
+	dnsbl_free_cache(mydata);
+	dnsbl_free_host_list(mydata);
+	if (mydata->reason)
+		free(mydata->reason);
+	free(mydata);
+}
+
 static void dnsbl_succeed(u_int cl, char *listname, char *result)
 {
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
 	char *reason = mydata->reason;
 
 	if (mydata->options & OPT_PARANOID || (mydata->options & OPT_DENY &&
-										   result[0] == '\177' && result[1] == '\0' &&
-										   result[2] == '\0' /*  && result[3] == '\2' */))
+						   result[0] == '\177' && result[1] == '\0' &&
+						   result[2] == '\0'))
 	{
 		cldata[cl].state |= A_DENY;
 		sendto_ircd("k %d %s %u #dnsbl :%s", cl,
@@ -93,11 +369,6 @@ static void dnsbl_succeed(u_int cl, char *listname, char *result)
 				   listname, cldata[cl].host, cldata[cl].itsip);
 }
 
-/*
- * dnsbl_add_cache
- *
- * Add an entry to the cache.
- */
 static void dnsbl_add_cache(u_int cl, u_int state)
 {
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
@@ -107,7 +378,7 @@ static void dnsbl_add_cache(u_int cl, u_int state)
 		mydata->found++;
 	else if (state == DNSBL_FAILED)
 		mydata->failed++;
-	else /* state == OK */
+	else
 		mydata->good++;
 
 	if (mydata->lifetime == 0)
@@ -128,16 +399,12 @@ static void dnsbl_add_cache(u_int cl, u_int state)
 			  cl, mydata->cache->ip, state));
 }
 
-/*
- * dnsbl_check_cache
- *
- * Check cache for an entry.
- */
 static int dnsbl_check_cache(u_int cl)
 {
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
 	struct hostlog **last, *pl;
 	time_t now = time(NULL);
+	static char cached_hit[4] = { 127, 0, 0, 2 };
 
 	if (!mydata || mydata->lifetime == 0)
 		return 0;
@@ -166,13 +433,13 @@ static int dnsbl_check_cache(u_int cl)
 			DebugLog((ALOG_DNSBLC, 0,
 					  "dnsbl_check_cache(%d): match (%u)",
 					  cl, pl->state));
-			pl->expire = now + mydata->lifetime; /* dubious */
-			if (pl->state == 1)
+			pl->expire = now + mydata->lifetime;
+			if (pl->state == DNSBL_FOUND)
 			{
-				dnsbl_succeed(cl, "cached", "");
+				dnsbl_succeed(cl, "cached", cached_hit);
 				mydata->chito++;
 			}
-			else if (pl->state == 0)
+			else if (pl->state == OK)
 				mydata->chitn++;
 			else
 				mydata->chitc++;
@@ -184,15 +451,370 @@ static int dnsbl_check_cache(u_int cl)
 	return 0;
 }
 
-/******************************** PUBLIC ************************************/
+static int dnsbl_ginit(AnInstance *self)
+{
+	struct dnsbl_private *mydata = self->data;
+	int flags;
 
-/*
- * dnsbl_init
- *
- * This procedure is called when a particular module is loaded.
- * Returns NULL if everything went fine,
- * an error message otherwise.
- */
+	if (!dnsbl_resolver_ready)
+	{
+		if (ircd_res_init() == 0)
+			dnsbl_resolver_ready = 1;
+		else
+			return -1;
+	}
+
+	if (mydata->gfd > 0)
+		return 0;
+
+	mydata->gfd = socket(AFINET, SOCK_DGRAM, 0);
+	if (mydata->gfd < 0)
+	{
+		DebugLog((ALOG_DNSBL, 0, "dnsbl_ginit: socket() failed: %s",
+				  strerror(errno)));
+		return -1;
+	}
+	flags = fcntl(mydata->gfd, F_GETFL, 0);
+	if (flags >= 0)
+		(void) fcntl(mydata->gfd, F_SETFL, flags | O_NONBLOCK);
+
+	if (io_register_gfd(self, mydata->gfd, 0) < 0)
+	{
+		DebugLog((ALOG_DNSBL, 0, "dnsbl_ginit: io_register_gfd failed"));
+		close(mydata->gfd);
+		mydata->gfd = 0;
+		return -1;
+	}
+
+	return 0;
+}
+
+static void dnsbl_grelease(AnInstance *self)
+{
+	struct dnsbl_private *mydata = self->data;
+	u_int i;
+
+	if (!mydata)
+		return;
+
+	for (i = 0; i < MAXCONNECTIONS; i++)
+	{
+		if (cldata[i].instance == self && (cldata[i].rfd > 0 || cldata[i].wfd > 0))
+			dnsbl_close_client_rfd(i);
+	}
+
+	for (i = 0; i < MAXCONNECTIONS; i++)
+	{
+		if (mydata->pend[i].active || mydata->pend[i].wake_w > 0)
+			dnsbl_reset_pending(&mydata->pend[i]);
+	}
+
+	if (mydata->gfd > 0)
+	{
+		io_unregister_gfd(self);
+		close(mydata->gfd);
+		mydata->gfd = 0;
+	}
+}
+
+static void dnsbl_complete(struct dnsbl_private *mydata, u_int cl, int final_state)
+{
+	DnsblPending *p = &mydata->pend[cl];
+	ssize_t wr;
+
+	if (!p->active)
+		return;
+
+	p->qid = 0;
+	p->deadline = 0;
+	p->final_state = final_state;
+	if (p->wake_w > 0)
+	{
+		wr = write(p->wake_w, "D", 1);
+		if (wr < 0 && errno != EWOULDBLOCK && errno != EAGAIN)
+			DebugLog((ALOG_DNSBL, 0,
+				  "dnsbl_complete(%u): wake write failed: %s",
+				  cl, strerror(errno)));
+	}
+
+	dnsbl_dispatch_queued(mydata);
+}
+
+static int dnsbl_send_request(u_int cl, struct dnsbl_private *mydata)
+{
+	DnsblPending *p = &mydata->pend[cl];
+	char packet[DNSBL_MAXPACKET];
+	HEADER *hptr = (HEADER *) packet;
+	int packet_len;
+	int send_len;
+
+	if (mydata->gfd <= 0 && dnsbl_ginit(cldata[cl].instance) < 0)
+		return -1;
+
+	while (p->current)
+	{
+		if (p->tries == 0)
+		{
+			if (dnsbl_build_lookup(cl, p->current, p->lookup, sizeof(p->lookup)) != 0)
+				return -1;
+		}
+
+		if (p->tries >= (u_int) dnsbl_max_sends())
+		{
+			p->current = p->current->next;
+			p->tries = 0;
+			p->lookup[0] = '\0';
+			continue;
+		}
+
+		p->ns_index = p->tries % dnsbl_ns_count();
+		p->qid = dnsbl_new_qid(mydata);
+		if (p->qid == 0)
+			return -1;
+
+		bzero(packet, sizeof(packet));
+		packet_len = ircd_res_mkquery(QUERY, p->lookup, C_IN, T_A,
+						 NULL, 0, NULL, (u_char *) packet, sizeof(packet));
+		if (packet_len <= 0)
+			return -1;
+		hptr->id = htons(p->qid);
+
+		send_len = sendto(mydata->gfd, packet, packet_len, 0,
+				  (struct sockaddr *) &ircd_res.nsaddr_list[p->ns_index],
+				  sizeof(ircd_res.nsaddr_list[p->ns_index]));
+		p->tries++;
+		if (send_len == packet_len)
+		{
+			p->deadline = time(NULL) + MAX(1, ircd_res.retrans);
+			DebugLog((ALOG_DNSBL, 0,
+					  "dnsbl_send_request(%d): qid=%u ns=%u try=%u host=%s name=%s",
+					  cl, p->qid, p->ns_index, p->tries,
+					  p->current ? p->current->host : "?", p->lookup));
+			return 0;
+		}
+
+		DebugLog((ALOG_DNSBL, 0,
+				  "dnsbl_send_request(%d): sendto failed on ns=%u: %s",
+				  cl, p->ns_index, strerror(errno)));
+		p->qid = 0;
+	}
+
+	return -1;
+}
+
+static void dnsbl_dispatch_queued(struct dnsbl_private *mydata)
+{
+	int inflight;
+
+	if (!mydata || mydata->gfd <= 0)
+		return;
+
+	inflight = dnsbl_count_inflight(mydata);
+	while (inflight < dnsbl_max_active_queries())
+	{
+		u_int i;
+		int best = -1;
+		u_int best_seq = 0;
+
+		for (i = 0; i < MAXCONNECTIONS; i++)
+		{
+			DnsblPending *p = &mydata->pend[i];
+
+			if (!p->active || p->final_state != DNSBL_PENDING || p->qid != 0)
+				continue;
+			if (best < 0 || p->queue_seq < best_seq)
+			{
+				best = (int) i;
+				best_seq = p->queue_seq;
+			}
+		}
+
+		if (best < 0)
+			break;
+
+		if (dnsbl_send_request((u_int) best, mydata) == 0)
+		{
+			DebugLog((ALOG_DNSBL, 0,
+					  "dnsbl_dispatch_queued: activated cl=%d inflight=%d/%d",
+					  best, inflight + 1, dnsbl_max_active_queries()));
+			inflight++;
+			continue;
+		}
+
+		{
+			DnsblPending *p = &mydata->pend[best];
+			ssize_t wr = -1;
+
+			DebugLog((ALOG_DNSBL, 0,
+					  "dnsbl_dispatch_queued: activation failed for cl=%d", best));
+			p->qid = 0;
+			p->deadline = 0;
+			p->final_state = DNSBL_DONE_FAILED;
+			if (p->wake_w > 0)
+			{
+				wr = write(p->wake_w, "D", 1);
+				if (wr < 0 && errno != EWOULDBLOCK && errno != EAGAIN)
+					DebugLog((ALOG_DNSBL, 0,
+						  "dnsbl_dispatch_queued(%d): wake write failed: %s",
+						  best, strerror(errno)));
+			}
+		}
+	}
+}
+
+static int dnsbl_parse_reply(DnsblPending *p, const u_char *buf, size_t len,
+				 const struct SOCKADDR_IN *src,
+				 unsigned char *answer)
+{
+	const HEADER *hptr = (const HEADER *) buf;
+	const u_char *cp = buf + HFIXEDSZ;
+	const u_char *eob = buf + len;
+	char qname[DNSBL_LOOKUPLEN];
+	char rrname[DNSBL_LOOKUPLEN];
+	u_int16_t id, qdcount, ancount, qtype, qclass;
+	int n;
+
+	if (len < HFIXEDSZ)
+		return DNSBL_PARSE_IGNORE;
+
+	id = ntohs(hptr->id);
+	qdcount = ntohs(hptr->qdcount);
+	ancount = ntohs(hptr->ancount);
+	if (!hptr->qr || id != p->qid)
+		return DNSBL_PARSE_IGNORE;
+	if (!dnsbl_same_ns(src, &ircd_res.nsaddr_list[p->ns_index]))
+		return DNSBL_PARSE_IGNORE;
+
+	if (qdcount == 0)
+		return DNSBL_PARSE_RETRY;
+
+	n = ircd_dn_expand(buf, eob, cp, qname, sizeof(qname));
+	if (n <= 0)
+		return DNSBL_PARSE_RETRY;
+	cp += n;
+	if (cp + QFIXEDSZ > eob)
+		return DNSBL_PARSE_RETRY;
+	qtype = ircd_getshort(cp);
+	cp += INT16SZ;
+	qclass = ircd_getshort(cp);
+	cp += INT16SZ;
+	if (qtype != T_A || qclass != C_IN || strcasecmp(qname, p->lookup) != 0)
+		return DNSBL_PARSE_IGNORE;
+
+	while (--qdcount > 0)
+	{
+		n = __ircd_dn_skipname(cp, eob);
+		if (n < 0)
+			return DNSBL_PARSE_RETRY;
+		cp += n;
+		if (cp + QFIXEDSZ > eob)
+			return DNSBL_PARSE_RETRY;
+		cp += QFIXEDSZ;
+	}
+
+	if (hptr->tc)
+		return DNSBL_PARSE_RETRY;
+	if (hptr->rcode == NXDOMAIN)
+		return DNSBL_PARSE_NEXT_HOST;
+	if (hptr->rcode != NOERROR)
+		return DNSBL_PARSE_RETRY;
+	if (ancount == 0)
+		return DNSBL_PARSE_NEXT_HOST;
+
+	while (ancount-- > 0 && cp < eob)
+	{
+		u_int16_t type, class, dlen;
+
+		n = ircd_dn_expand(buf, eob, cp, rrname, sizeof(rrname));
+		if (n <= 0)
+			return DNSBL_PARSE_RETRY;
+		cp += n;
+		if (cp + RRFIXEDSZ > eob)
+			return DNSBL_PARSE_RETRY;
+		type = ircd_getshort(cp);
+		cp += INT16SZ;
+		class = ircd_getshort(cp);
+		cp += INT16SZ;
+		cp += INT32SZ;
+		dlen = ircd_getshort(cp);
+		cp += INT16SZ;
+		if (cp + dlen > eob)
+			return DNSBL_PARSE_RETRY;
+		if (type == T_A && class == C_IN && dlen == INADDRSZ)
+		{
+			memcpy(answer, cp, INADDRSZ);
+			return DNSBL_PARSE_FOUND;
+		}
+		cp += dlen;
+	}
+
+	return DNSBL_PARSE_NEXT_HOST;
+}
+
+static int dnsbl_find_by_qid(struct dnsbl_private *mydata, u_short qid)
+{
+	u_int i;
+
+	for (i = 0; i < MAXCONNECTIONS; i++)
+	{
+		if (mydata->pend[i].active && mydata->pend[i].qid == qid)
+			return (int) i;
+	}
+	return -1;
+}
+
+static void dnsbl_gwork_one(struct dnsbl_private *mydata, const u_char *buf,
+			 size_t len, const struct SOCKADDR_IN *src)
+{
+	const HEADER *hptr = (const HEADER *) buf;
+	unsigned char answer[INADDRSZ];
+	int cl;
+	int action;
+	DnsblPending *p;
+
+	if (len < HFIXEDSZ)
+		return;
+
+	cl = dnsbl_find_by_qid(mydata, ntohs(hptr->id));
+	if (cl < 0)
+		return;
+
+	p = &mydata->pend[cl];
+	bzero(answer, sizeof(answer));
+	action = dnsbl_parse_reply(p, buf, len, src, answer);
+	if (action == DNSBL_PARSE_IGNORE)
+		return;
+
+	if (action == DNSBL_PARSE_FOUND)
+	{
+		memcpy(p->answer, answer, sizeof(p->answer));
+		if (p->current && p->current->host)
+		{
+			strncpy(p->listname, p->current->host, HOSTLEN);
+			p->listname[HOSTLEN] = '\0';
+		}
+		dnsbl_complete(mydata, (u_int) cl, DNSBL_DONE_FOUND);
+		return;
+	}
+
+	p->qid = 0;
+	p->deadline = 0;
+	if (action == DNSBL_PARSE_NEXT_HOST)
+	{
+		p->current = p->current ? p->current->next : NULL;
+		p->tries = 0;
+		p->lookup[0] = '\0';
+		if (dnsbl_send_request((u_int) cl, mydata) == 0)
+			return;
+		dnsbl_complete(mydata, (u_int) cl, DNSBL_DONE_CLEAN);
+		return;
+	}
+
+	if (dnsbl_send_request((u_int) cl, mydata) == 0)
+		return;
+	dnsbl_complete(mydata, (u_int) cl, DNSBL_DONE_FAILED);
+}
+
 static char *dnsbl_init(AnInstance *self)
 {
 	struct dnsbl_private *mydata;
@@ -209,6 +831,7 @@ static char *dnsbl_init(AnInstance *self)
 	mydata->cache = NULL;
 	mydata->host_list = NULL;
 	mydata->lifetime = CACHETIME;
+	mydata->gfd = 0;
 
 	tmpbuf[0] = txtbuf[0] = '\0';
 	if (strstr(self->opt, "log"))
@@ -233,6 +856,8 @@ static char *dnsbl_init(AnInstance *self)
 	if (mydata->options == 0)
 	{
 		DebugLog((ALOG_DNSBL, 0, "dnsbl_init: Aie! unknown option(s): nothing to be done!"));
+		dnsbl_free_private(mydata);
+		self->data = NULL;
 		return "Aie! unknown option(s): nothing to be done!";
 	}
 
@@ -264,6 +889,8 @@ static char *dnsbl_init(AnInstance *self)
 	if (mydata->host_list == NULL)
 	{
 		DebugLog((ALOG_DNSBL, 0, "dnsbl_init: Aie! No DNSBL host: nothing to be done!"));
+		dnsbl_free_private(mydata);
+		self->data = NULL;
 		return "Aie! No DNSBL host: nothing to be done!";
 	}
 
@@ -301,32 +928,17 @@ static char *dnsbl_init(AnInstance *self)
 	return txtbuf + 2;
 }
 
-/*
- * dnsbl_release
- *
- * This procedure is called when a particular module is unloaded.
- */
 void dnsbl_release(AnInstance *self)
 {
 	struct dnsbl_private *mydata = self->data;
-	struct dnsbl_list *l, *n;
 
-	for (l = mydata->host_list; l; l = n)
-	{
-		free(l->host);
-		n = l->next;
-		free(l);
-	}
-
-	free(mydata);
+	dnsbl_grelease(self);
+	dnsbl_free_private(mydata);
+	self->data = NULL;
 	free(self->popt);
+	self->popt = NULL;
 }
 
-/*
- * dnsbl_stats
- *
- * This procedure is called regularly to update statistics sent to ircd.
- */
 static void dnsbl_stats(AnInstance *self)
 {
 	struct dnsbl_private *mydata = self->data;
@@ -335,25 +947,10 @@ static void dnsbl_stats(AnInstance *self)
 				mydata->total, mydata->rejects);
 }
 
-/*
- * dnsbl_start
- *
- * This procedure is called to start the host check procedure.
- * Returns 0 if everything went fine,
- * -1 otherwise (nothing to be done, or failure)
- *
- * It is responsible for sending error messages where appropriate.
- * In case of failure, it's responsible for cleaning up (e.g. dnsbl_clean
- * will NOT be called)
- *
- * IPv4/IPv6 conversion has been taken from HOPM https://github.com/ircd-hybrid/hopm
- */
 static int dnsbl_start(u_int cl)
 {
-	char lookup[128];
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
-	struct dnsbl_list *l, *m;
-	struct hostent *he = NULL;
+	DnsblPending *p = &mydata->pend[cl];
 	struct addrinfo hints, *addr_res;
 
 	memset(&hints, 0, sizeof(hints));
@@ -365,13 +962,12 @@ static int dnsbl_start(u_int cl)
 		DebugLog((ALOG_DNSBL, 0,
 				  "dnsbl_start(%d): invalid address '%s', skipping ",
 				  cl, cldata[cl].itsip));
-
 		return -1;
 	}
+	freeaddrinfo(addr_res);
 
 	if (cldata[cl].state & A_DENY)
 	{
-		/* no point of doing anything */
 		DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): A_DENY already set ", cl));
 		return -1;
 	}
@@ -379,118 +975,183 @@ static int dnsbl_start(u_int cl)
 	if (dnsbl_check_cache(cl))
 		return -1;
 
-	DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): checking %s", cl, cldata[cl].itsip));
+	if (mydata->gfd <= 0 && dnsbl_ginit(cldata[cl].instance) < 0)
+		return -1;
 
-	for (l = mydata->host_list; l && !he; l = l->next)
-	{
-		if (addr_res->ai_family == AF_INET)
-		{
-			const struct sockaddr_in *v4 = (const struct sockaddr_in *) addr_res->ai_addr;
-			const uint8_t *b = (const uint8_t *) &v4->sin_addr.s_addr;
+	if (p->active || p->wake_w > 0)
+		dnsbl_reset_pending(p);
+	if (cldata[cl].rfd > 0)
+		dnsbl_close_client_rfd(cl);
 
-			snprintf(lookup, sizeof(lookup), "%u.%u.%u.%u.%s",
-					 (unsigned int) (b[3]), (unsigned int) (b[2]),
-					 (unsigned int) (b[1]), (unsigned int) (b[0]),
-					 l->host);
-		}
-		else if (addr_res->ai_family == AF_INET6)
-		{
-			const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *) addr_res->ai_addr;
-			const uint8_t *b = (const uint8_t *) &v6->sin6_addr.s6_addr;
-			snprintf(lookup, sizeof(lookup),
-					 "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x."
-					 "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%s",
-					 (unsigned int) (b[15] & 0xF), (unsigned int) (b[15] >> 4),
-					 (unsigned int) (b[14] & 0xF), (unsigned int) (b[14] >> 4),
-					 (unsigned int) (b[13] & 0xF), (unsigned int) (b[13] >> 4),
-					 (unsigned int) (b[12] & 0xF), (unsigned int) (b[12] >> 4),
-					 (unsigned int) (b[11] & 0xF), (unsigned int) (b[11] >> 4),
-					 (unsigned int) (b[10] & 0xF), (unsigned int) (b[10] >> 4),
-					 (unsigned int) (b[9] & 0xF), (unsigned int) (b[9] >> 4),
-					 (unsigned int) (b[8] & 0xF), (unsigned int) (b[8] >> 4),
-					 (unsigned int) (b[7] & 0xF), (unsigned int) (b[7] >> 4),
-					 (unsigned int) (b[6] & 0xF), (unsigned int) (b[6] >> 4),
-					 (unsigned int) (b[5] & 0xF), (unsigned int) (b[5] >> 4),
-					 (unsigned int) (b[4] & 0xF), (unsigned int) (b[4] >> 4),
-					 (unsigned int) (b[3] & 0xF), (unsigned int) (b[3] >> 4),
-					 (unsigned int) (b[2] & 0xF), (unsigned int) (b[2] >> 4),
-					 (unsigned int) (b[1] & 0xF), (unsigned int) (b[1] >> 4),
-					 (unsigned int) (b[0] & 0xF), (unsigned int) (b[0] >> 4),
-					 l->host);
-		}
-		else
-			continue;
+	if (dnsbl_make_wakeup(cl, &p->wake_r, &p->wake_w) < 0)
+		return -1;
 
-		DebugLog((ALOG_DNSBL, 0,
-				  "dnsbl_start(%d): gethostbyname() for %s",
-				  cl, lookup));
-		he = gethostbyname(lookup);
-		m = l;
-	}
+	p->active = 1;
+	p->final_state = DNSBL_PENDING;
+	p->current = mydata->host_list;
+	p->tries = 0;
+	p->qid = 0;
+	p->deadline = 0;
+	p->lookup[0] = '\0';
+	p->listname[0] = '\0';
+	p->queue_seq = ++mydata->queue_seq;
+	bzero(p->answer, sizeof(p->answer));
 	mydata->total++;
 
-	if (he)
-		dnsbl_succeed(cl, m->host, he->h_addr_list[0]);
-	else
+	if (dnsbl_count_inflight(mydata) >= dnsbl_max_active_queries())
 	{
 		DebugLog((ALOG_DNSBL, 0,
-				  "dnsbl_start(%d): gethostbyname() reported %s",
-				  cl, hstrerror(h_errno)));
-		dnsbl_add_cache(cl, DNSBL_FAILED);
+				  "dnsbl_start(%d): queued (inflight=%d limit=%d)",
+				  cl, dnsbl_count_inflight(mydata), dnsbl_max_active_queries()));
 	}
 
-	return -1;
-}
+	dnsbl_dispatch_queued(mydata);
+	if (p->final_state != DNSBL_PENDING)
+		return 0;
+	if (p->qid != 0)
+		return 0;
 
-/*
- * dnsbl_work
- *
- * This procedure is called whenever there's new data in the buffer.
- * Returns 0 if everything went fine, and there is more work to be done,
- * Returns -1 if the module has finished its work (and cleaned up).
- *
- * It is responsible for sending error messages where appropriate.
- */
-static int dnsbl_work(u_int cl)
-{
-	/*
-   ** There' nothing to do here
-   */
-	DebugLog((ALOG_DNSBL, 0,
-			  "dnsbl_work(%d) invoked but why?", cl));
+	DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): waiting in queue", cl));
 	return 0;
 }
 
-/*
- * dnsbl_clean
- *
- * This procedure is called whenever the module should interrupt its work.
- * It is responsible for cleaning up any allocated data, and in particular
- * closing file descriptors.
- */
-static void dnsbl_clean(u_int cl)
+static int dnsbl_work(u_int cl)
 {
-	DebugLog((ALOG_DNSBL, 0, "dnsbl_clean(%d): cleaning up", cl));
-	/*
-	 * only one of rfd and wfd may be set at the same time,
-	 * in any case, they would be the same fd, so only close() once
-	 */
-}
+	struct dnsbl_private *mydata = cldata[cl].instance->data;
+	u_int owner;
+	DnsblPending *p = dnsbl_pending_for_cl(mydata, cl, &owner);
 
-/*
- * dnsbl_timeout
- *
- * This procedure is called whenever the timeout set by the module is
- * reached.
- *
- * Returns 0 if things are okay, -1 if check was aborted.
- */
-static int dnsbl_timeout(u_int cl)
-{
-	DebugLog((ALOG_DNSBL, 0, "dnsbl_timeout(%d): calling dnsbl_clean ", cl));
-	dnsbl_clean(cl);
+	if (!p || !p->active)
+	{
+		dnsbl_close_client_rfd(cl);
+		return -1;
+	}
+
+	if (p->final_state == DNSBL_PENDING)
+		return 0;
+
+	if (p->final_state == DNSBL_DONE_FOUND)
+	{
+		dnsbl_add_cache(cl, DNSBL_FOUND);
+		dnsbl_succeed(cl, p->listname[0] ? p->listname : "dnsbl",
+				     (char *) p->answer);
+	}
+	else if (p->final_state == DNSBL_DONE_CLEAN)
+	{
+		dnsbl_add_cache(cl, OK);
+	}
+	else
+	{
+		dnsbl_add_cache(cl, DNSBL_FAILED);
+	}
+
+	cldata[cl].timeout = 0;
+	dnsbl_close_client_rfd(cl);
+	dnsbl_reset_pending(&mydata->pend[owner]);
 	return -1;
 }
 
-aModule Module_dnsbl = { "dnsbl", dnsbl_init, dnsbl_release, dnsbl_stats,
-						 dnsbl_start, dnsbl_work, dnsbl_timeout, dnsbl_clean };
+static void dnsbl_clean(u_int cl)
+{
+	struct dnsbl_private *mydata = cldata[cl].instance->data;
+	u_int owner;
+	DnsblPending *p = dnsbl_pending_for_cl(mydata, cl, &owner);
+
+	DebugLog((ALOG_DNSBL, 0, "dnsbl_clean(%d): cleaning up", cl));
+	cldata[cl].timeout = 0;
+	dnsbl_close_client_rfd(cl);
+	if (p && (p->active || p->wake_w > 0))
+	{
+		dnsbl_reset_pending(&mydata->pend[owner]);
+		dnsbl_dispatch_queued(mydata);
+	}
+}
+
+static int dnsbl_timeout(u_int cl)
+{
+	struct dnsbl_private *mydata = cldata[cl].instance->data;
+	u_int owner;
+	DnsblPending *p = dnsbl_pending_for_cl(mydata, cl, &owner);
+
+	DebugLog((ALOG_DNSBL, 0, "dnsbl_timeout(%d)", cl));
+	if (!p || !p->active)
+		return -1;
+
+	p->final_state = DNSBL_DONE_FAILED;
+	return dnsbl_work(cl);
+}
+
+static int dnsbl_gwork(AnInstance *self)
+{
+	struct dnsbl_private *mydata = self->data;
+	u_char buf[DNSBL_MAXPACKET];
+	struct SOCKADDR_IN src;
+	socklen_t slen;
+	ssize_t n;
+	int budget;
+
+	if (!mydata || mydata->gfd <= 0)
+		return 0;
+
+	for (budget = DNSBL_GWORK_BUDGET; budget > 0; budget--)
+	{
+		slen = sizeof(src);
+		n = recvfrom(mydata->gfd, buf, sizeof(buf), 0,
+				 (struct sockaddr *) &src, &slen);
+		if (n < 0)
+		{
+			if (errno == EWOULDBLOCK || errno == EAGAIN)
+				break;
+			DebugLog((ALOG_DNSBL, 0, "dnsbl_gwork: recvfrom failed: %s",
+					  strerror(errno)));
+			break;
+		}
+		if (n == 0)
+			break;
+
+		dnsbl_gwork_one(mydata, buf, (size_t) n, &src);
+	}
+	if (budget == 0)
+		DebugLog((ALOG_DNSBL, 0,
+			  "dnsbl_gwork: budget exhausted, deferring remaining packets"));
+	return 0;
+}
+
+static void dnsbl_gtick(AnInstance *self)
+{
+	struct dnsbl_private *mydata = self->data;
+	time_t now = time(NULL);
+	u_int cl;
+
+	if (!mydata)
+		return;
+	if (mydata->gfd <= 0)
+		(void) dnsbl_ginit(self);
+
+	for (cl = 0; cl < MAXCONNECTIONS; cl++)
+	{
+		DnsblPending *p = &mydata->pend[cl];
+
+		if (!p->active || p->final_state != DNSBL_PENDING || p->qid == 0)
+			continue;
+		if (p->deadline > now)
+			continue;
+
+		DebugLog((ALOG_DNSBL, 0,
+				  "dnsbl_gtick: timeout cl=%u qid=%u host=%s try=%u",
+				  cl, p->qid, p->current ? p->current->host : "?", p->tries));
+		p->qid = 0;
+		p->deadline = 0;
+		if (dnsbl_send_request(cl, mydata) == 0)
+			continue;
+		dnsbl_complete(mydata, cl, DNSBL_DONE_FAILED);
+	}
+
+	dnsbl_dispatch_queued(mydata);
+}
+
+aModule Module_dnsbl = {
+	"dnsbl", dnsbl_init, dnsbl_release, dnsbl_stats,
+	dnsbl_start, dnsbl_work, dnsbl_timeout, dnsbl_clean,
+	dnsbl_ginit, dnsbl_gtick, dnsbl_gwork, dnsbl_grelease
+};
