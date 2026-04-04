@@ -248,6 +248,47 @@ static char *iauth_read_token(char *p, char *dst, size_t dstlen)
 	return p;
 }
 
+static void next_io(int cl, AnInstance *last);
+
+/*
+ * If an already-running async module became skippable because later state
+ * arrived (for example successful SASL or a completed ident reply), abort it
+ * now instead of waiting for it to finish.
+ */
+static void iauth_abort_skippable(int cl)
+{
+	AnInstance *inst;
+	const char *reason = NULL;
+
+	if (cl < 0 || cl >= MAXCONNECTIONS)
+		return;
+	if (!(cldata[cl].state & A_ACTIVE))
+		return;
+
+	inst = cldata[cl].instance;
+	if (!inst)
+		return;
+
+	if (inst->skip_if_sasl && (cldata[cl].state & A_SASL))
+		reason = "SASL";
+	else if (inst->skip_if_ident && (cldata[cl].state & A_GOTIDENT))
+		reason = "ident";
+	else
+		return;
+
+	sendto_log(ALOG_DSPY, LOG_DEBUG,
+			   "aborting running module \"%s\" for %d due to %s",
+			   (inst->mod && inst->mod->name) ? inst->mod->name : "<unknown>",
+			   cl, reason);
+
+	if ((cldata[cl].rfd > 0 || cldata[cl].wfd > 0) && inst->mod && inst->mod->clean)
+		inst->mod->clean(cl);
+
+	cldata[cl].timeout = 0;
+	SetBit(cldata[cl].idone, inst->in);
+	next_io(cl, inst);
+}
+
 /*
  * next_io
  *
@@ -799,7 +840,10 @@ static	void	parse_ircd(void)
 			break;
 		case 'S': /* SASL authentication */
 			cldata[cl].state |= A_SASL;
+			if (cldata[cl].sasl_user)
+				free(cldata[cl].sasl_user);
 			cldata[cl].sasl_user = mystrdup(chp+2);
+			iauth_abort_skippable(cl);
 			break;
 		case 'H': /* ircd received NICK/USER and possibly CAP/AUTHENTICATE
  					 and is waiting for iauth before registering the user */
@@ -1338,6 +1382,7 @@ void iauth_mark_ident_ok(u_int cl)
 		sendto_log(ALOG_DSPY, LOG_DEBUG, "ident: ok for #%u (state=0x%lX)", cl,
 				   (unsigned long) cldata[cl].state);
 	}
+	iauth_abort_skippable((int) cl);
 	/* if nothing is running, try to advance */
 	if (cldata[cl].instance == NULL)
 		next_io((int) cl, NULL);
