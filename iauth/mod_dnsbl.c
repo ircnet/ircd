@@ -20,7 +20,7 @@
  */
 
 #ifndef lint
-static const volatile char rcsid[] = "@(#)$Id: mod_dnsbl.c,v 1.2 2026/04/03 20:28:00 ai Exp $";
+static const volatile char rcsid[] = "@(#)$Id: mod_dnsbl.c,v 1.3 2026/04/04 00:00:00 ai Exp $";
 #endif
 
 // clang-format off
@@ -46,6 +46,8 @@ static const volatile char rcsid[] = "@(#)$Id: mod_dnsbl.c,v 1.2 2026/04/03 20:2
 struct hostlog {
 	struct hostlog *next;
 	char ip[HOSTLEN + 1];
+	char listname[DNSBL_LOOKUPLEN];
+	unsigned char answer[INADDRSZ];
 	u_char state; /* 0 = not found, 1 = found, 2 = timeout */
 	time_t expire;
 };
@@ -70,6 +72,7 @@ struct hostlog {
 
 struct dnsbl_list {
 	char *host;
+	char *reason;
 	struct dnsbl_list *next;
 };
 
@@ -84,7 +87,7 @@ typedef struct dnsbl_pending {
 	time_t deadline;
 	struct dnsbl_list *current;
 	char lookup[DNSBL_LOOKUPLEN];
-	char listname[HOSTLEN + 1];
+	char listname[DNSBL_LOOKUPLEN];
 	unsigned char answer[INADDRSZ];
 	u_int queue_seq;
 } DnsblPending;
@@ -98,6 +101,7 @@ struct dnsbl_private {
 	u_int chitc, chito, chitn, cmiss, cnow, cmax;
 	u_int found, failed, good, total, rejects;
 	struct dnsbl_list *host_list;
+	char *desc;
 	int gfd;
 	u_int qid_seq;
 	u_int queue_seq;
@@ -185,6 +189,59 @@ static int dnsbl_count_inflight(struct dnsbl_private *mydata)
 }
 
 static void dnsbl_dispatch_queued(struct dnsbl_private *mydata);
+
+static int dnsbl_opt_eq(const char *token, const char *name)
+{
+	return strcmp(token, name) == 0;
+}
+
+static int dnsbl_opt_startswith(const char *token, const char *name)
+{
+	size_t n = strlen(name);
+	return strncmp(token, name, n) == 0;
+}
+
+static int dnsbl_appendf(char **buf, size_t *size, size_t *used, const char *fmt, ...)
+{
+	va_list ap;
+	int needed;
+	char *nbuf;
+	size_t nsize;
+
+	if (!buf || !size || !used || !fmt)
+		return -1;
+
+	va_start(ap, fmt);
+	needed = vsnprintf((*buf) ? (*buf + *used) : NULL,
+					 (*buf && *size > *used) ? (*size - *used) : 0,
+					 fmt, ap);
+	va_end(ap);
+	if (needed < 0)
+		return -1;
+	if (*buf && (size_t) needed < (*size - *used))
+	{
+		*used += (size_t) needed;
+		return 0;
+	}
+
+	nsize = (*size != 0) ? *size : 128;
+	while (nsize <= *used + (size_t) needed)
+		nsize *= 2;
+	nbuf = (char *) realloc(*buf, nsize);
+	if (!nbuf)
+		return -1;
+	*buf = nbuf;
+	*size = nsize;
+
+	va_start(ap, fmt);
+	needed = vsnprintf(*buf + *used, *size - *used, fmt, ap);
+	va_end(ap);
+	if (needed < 0)
+		return -1;
+	*used += (size_t) needed;
+	return 0;
+}
+
 
 static int dnsbl_same_ns(const struct SOCKADDR_IN *a, const struct SOCKADDR_IN *b)
 {
@@ -331,6 +388,8 @@ static void dnsbl_free_host_list(struct dnsbl_private *mydata)
 	for (l = mydata->host_list; l; l = n)
 	{
 		free(l->host);
+		if (l->reason)
+			free(l->reason);
 		n = l->next;
 		free(l);
 	}
@@ -346,17 +405,119 @@ static void dnsbl_free_private(struct dnsbl_private *mydata)
 	dnsbl_free_host_list(mydata);
 	if (mydata->reason)
 		free(mydata->reason);
+	if (mydata->desc)
+		free(mydata->desc);
 	free(mydata);
 }
 
-static void dnsbl_succeed(u_int cl, char *listname, char *result)
+static struct dnsbl_list *dnsbl_add_host(struct dnsbl_private *mydata, const char *host, const char *reason)
+{
+	struct dnsbl_list *l, **tail;
+
+	if (!mydata || !host || !*host)
+		return NULL;
+
+	l = (struct dnsbl_list *) malloc(sizeof(struct dnsbl_list));
+	if (!l)
+		return NULL;
+	l->host = mystrdup((char *) host);
+	l->reason = (reason && *reason) ? mystrdup((char *) reason) : NULL;
+	l->next = NULL;
+
+	tail = &mydata->host_list;
+	while (*tail)
+		tail = &(*tail)->next;
+	*tail = l;
+	return l;
+}
+
+static const char *dnsbl_reason_template(struct dnsbl_private *mydata, const char *listname)
+{
+	struct dnsbl_list *l;
+
+	for (l = mydata->host_list; l; l = l->next)
+	{
+		if (!strcasecmp(l->host, (char *) listname))
+			return l->reason ? l->reason : mydata->reason;
+	}
+	return mydata->reason;
+}
+
+static char *dnsbl_expand_reason(u_int cl, const char *tmpl, const char *domain)
+{
+	const char *ip = cldata[cl].itsip ? cldata[cl].itsip : "";
+	const char *host = cldata[cl].host ? cldata[cl].host : "";
+	size_t len = 0;
+	const char *p;
+	char *out, *w;
+
+	if (!tmpl)
+		return mystrdup("");
+
+	for (p = tmpl; *p; )
+	{
+		if (!strncmp(p, "{ip}", 4))
+		{
+			len += strlen(ip);
+			p += 4;
+		}
+		else if (!strncmp(p, "{domain}", 8))
+		{
+			len += strlen(domain ? domain : "");
+			p += 8;
+		}
+		else if (!strncmp(p, "{host}", 6))
+		{
+			len += strlen(host);
+			p += 6;
+		}
+		else
+		{
+			len++;
+			p++;
+		}
+	}
+
+	out = (char *) malloc(len + 1);
+	for (p = tmpl, w = out; *p; )
+	{
+		if (!strncmp(p, "{ip}", 4))
+		{
+			strcpy(w, ip);
+			w += strlen(ip);
+			p += 4;
+		}
+		else if (!strncmp(p, "{domain}", 8))
+		{
+			const char *d = domain ? domain : "";
+			strcpy(w, d);
+			w += strlen(d);
+			p += 8;
+		}
+		else if (!strncmp(p, "{host}", 6))
+		{
+			strcpy(w, host);
+			w += strlen(host);
+			p += 6;
+		}
+		else
+		{
+			*w++ = *p++;
+		}
+	}
+	*w = '\0';
+	return out;
+}
+
+static void dnsbl_succeed(u_int cl, const char *listname, const unsigned char *result)
 {
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
-	char *reason = mydata->reason;
+	const char *tmpl = dnsbl_reason_template(mydata, listname);
+	char *reason = dnsbl_expand_reason(cl, tmpl, listname);
 
 	if (mydata->options & OPT_PARANOID || (mydata->options & OPT_DENY &&
-						   result[0] == '\177' && result[1] == '\0' &&
-						   result[2] == '\0'))
+					   result[0] == '\177' && result[1] == '\0' &&
+					   result[2] == '\0'))
 	{
 		cldata[cl].state |= A_DENY;
 		sendto_ircd("k %d %s %u #dnsbl :%s", cl,
@@ -367,12 +528,15 @@ static void dnsbl_succeed(u_int cl, char *listname, char *result)
 	if (mydata->options & OPT_LOG)
 		sendto_log(ALOG_FLOG | ALOG_IRCD | ALOG_DNSBL, LOG_INFO, "%s: found: %s[%s]",
 				   listname, cldata[cl].host, cldata[cl].itsip);
+	if (reason)
+		free(reason);
 }
-
-static void dnsbl_add_cache(u_int cl, u_int state)
+static void dnsbl_add_cache(u_int cl, u_int state, const char *listname,
+				 const unsigned char *answer)
 {
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
-	struct hostlog *next;
+	struct hostlog *pl;
+	time_t expire;
 
 	if (state == DNSBL_FOUND)
 		mydata->found++;
@@ -381,19 +545,53 @@ static void dnsbl_add_cache(u_int cl, u_int state)
 	else
 		mydata->good++;
 
-	if (mydata->lifetime == 0)
+	if (mydata->lifetime == 0 || state == DNSBL_FAILED)
 		return;
 
+	expire = time(NULL) + mydata->lifetime;
+	for (pl = mydata->cache; pl; pl = pl->next)
+	{
+		if (!strcasecmp(pl->ip, cldata[cl].itsip))
+		{
+			pl->expire = expire;
+			pl->state = state;
+			if (listname)
+			{
+				strncpy(pl->listname, listname, sizeof(pl->listname) - 1);
+				pl->listname[sizeof(pl->listname) - 1] = '\0';
+			}
+			else
+				pl->listname[0] = '\0';
+			if (answer)
+				memcpy(pl->answer, answer, sizeof(pl->answer));
+			else
+				bzero(pl->answer, sizeof(pl->answer));
+			DebugLog((ALOG_DNSBLC, 0,
+				  "dnsbl_add_cache(%d): refreshed cache %s, result=%d",
+				  cl, pl->ip, state));
+			return;
+		}
+	}
+
+	pl = (struct hostlog *) malloc(sizeof(struct hostlog));
+	if (!pl)
+		return;
+	bzero((char *) pl, sizeof(*pl));
+	pl->expire = expire;
+	strcpy(pl->ip, cldata[cl].itsip);
+	pl->state = state;
+	if (listname)
+	{
+		strncpy(pl->listname, listname, sizeof(pl->listname) - 1);
+		pl->listname[sizeof(pl->listname) - 1] = '\0';
+	}
+	if (answer)
+		memcpy(pl->answer, answer, sizeof(pl->answer));
+	pl->next = mydata->cache;
+	mydata->cache = pl;
 	mydata->cnow++;
 	if (mydata->cnow > mydata->cmax)
 		mydata->cmax = mydata->cnow;
-
-	next = mydata->cache;
-	mydata->cache = (struct hostlog *) malloc(sizeof(struct hostlog));
-	mydata->cache->expire = time(NULL) + mydata->lifetime;
-	strcpy(mydata->cache->ip, cldata[cl].itsip);
-	mydata->cache->state = state;
-	mydata->cache->next = next;
 	DebugLog((ALOG_DNSBLC, 0,
 			  "dnsbl_add_cache(%d): new cache %s, result=%d",
 			  cl, mydata->cache->ip, state));
@@ -404,8 +602,6 @@ static int dnsbl_check_cache(u_int cl)
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
 	struct hostlog **last, *pl;
 	time_t now = time(NULL);
-	static char cached_hit[4] = { 127, 0, 0, 2 };
-
 	if (!mydata || mydata->lifetime == 0)
 		return 0;
 
@@ -421,8 +617,8 @@ static int dnsbl_check_cache(u_int cl)
 		if (pl->expire < now)
 		{
 			DebugLog((ALOG_DNSBLC, 0,
-					  "dnsbl_check_cache(%d): free %s (%d < %d)",
-					  cl, pl->ip, pl->expire, now));
+					  "dnsbl_check_cache(%d): free %s (%ld < %ld)",
+					  cl, pl->ip, (long) pl->expire, (long) now));
 			*last = pl->next;
 			free(pl);
 			mydata->cnow--;
@@ -436,7 +632,9 @@ static int dnsbl_check_cache(u_int cl)
 			pl->expire = now + mydata->lifetime;
 			if (pl->state == DNSBL_FOUND)
 			{
-				dnsbl_succeed(cl, "cached", cached_hit);
+				dnsbl_succeed(cl,
+						 pl->listname[0] ? pl->listname : "dnsbl",
+						 pl->answer);
 				mydata->chito++;
 			}
 			else if (pl->state == OK)
@@ -790,8 +988,8 @@ static void dnsbl_gwork_one(struct dnsbl_private *mydata, const u_char *buf,
 		memcpy(p->answer, answer, sizeof(p->answer));
 		if (p->current && p->current->host)
 		{
-			strncpy(p->listname, p->current->host, HOSTLEN);
-			p->listname[HOSTLEN] = '\0';
+			strncpy(p->listname, p->current->host, sizeof(p->listname) - 1);
+			p->listname[sizeof(p->listname) - 1] = '\0';
 		}
 		dnsbl_complete(mydata, (u_int) cl, DNSBL_DONE_FOUND);
 		return;
@@ -819,8 +1017,10 @@ static char *dnsbl_init(AnInstance *self)
 {
 	struct dnsbl_private *mydata;
 	struct dnsbl_list *l;
-	char tmpbuf[255], cbuf[32], *s;
-	static char txtbuf[255];
+	char *tmpbuf = NULL, *s;
+	char *txtbuf = NULL;
+	size_t tmpbuf_size = 0, tmpbuf_used = 0;
+	size_t txtbuf_size = 0, txtbuf_used = 0;
 
 	if (self->opt == NULL)
 		return "Aie! no option(s): nothing to be done!";
@@ -833,99 +1033,192 @@ static char *dnsbl_init(AnInstance *self)
 	mydata->lifetime = CACHETIME;
 	mydata->gfd = 0;
 
-	tmpbuf[0] = txtbuf[0] = '\0';
-	if (strstr(self->opt, "log"))
+	if (dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, "") < 0 ||
+		dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, "") < 0)
 	{
-		mydata->options |= OPT_LOG;
-		strcat(tmpbuf, ",log");
-		strcat(txtbuf, ", Log");
+		dnsbl_free_private(mydata);
+		self->data = NULL;
+		return "Aie! out of memory";
 	}
-	if (strstr(self->opt, "reject"))
+	if (self->opt)
 	{
-		mydata->options |= OPT_DENY;
-		strcat(tmpbuf, ",reject");
-		strcat(txtbuf, ", Reject");
-	}
-	if (strstr(self->opt, "paranoid"))
-	{
-		mydata->options |= OPT_PARANOID;
-		strcat(tmpbuf, ",paranoid");
-		strcat(txtbuf, ", Paranoid");
+		char *opts = mystrdup(self->opt);
+		char *last = NULL;
+		char *tok;
+
+		if (!opts)
+		{
+			dnsbl_free_private(mydata);
+			self->data = NULL;
+			return "Aie! out of memory";
+		}
+		for (tok = strtoken(&last, opts, ","); tok;
+			 tok = strtoken(&last, NULL, ","))
+		{
+			char *eq;
+			char *name;
+			char *value = NULL;
+
+			while (*tok && isspace((unsigned char) *tok))
+				tok++;
+			for (s = tok + strlen(tok); s > tok && isspace((unsigned char) s[-1]); )
+				*--s = '\0';
+			if (!*tok)
+				continue;
+
+			eq = strchr(tok, '=');
+			if (eq)
+			{
+				*eq++ = '\0';
+				value = eq;
+				while (*value && isspace((unsigned char) *value))
+					value++;
+			}
+			name = tok;
+
+			if (dnsbl_opt_eq(name, "log"))
+			{
+				mydata->options |= OPT_LOG;
+				dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, ",log");
+				dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, ", Log");
+			}
+			else if (dnsbl_opt_eq(name, "reject"))
+			{
+				mydata->options |= OPT_DENY;
+				dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, ",reject");
+				dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, ", Reject");
+			}
+			else if (dnsbl_opt_eq(name, "paranoid"))
+			{
+				mydata->options |= OPT_PARANOID;
+				dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, ",paranoid");
+				dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, ", Paranoid");
+			}
+			else if (dnsbl_opt_startswith(name, "servers") && value)
+			{
+				char *servers = mystrdup(value);
+				char *slast = NULL;
+				char *name2;
+
+				if (!servers)
+					continue;
+				for (name2 = strtoken(&slast, servers, ","); name2;
+					 name2 = strtoken(&slast, NULL, ","))
+				{
+					while (*name2 && isspace((unsigned char) *name2))
+						name2++;
+					for (s = name2 + strlen(name2);
+						 s > name2 && isspace((unsigned char) s[-1]); )
+						*--s = '\0';
+					if (*name2)
+					{
+						dnsbl_add_host(mydata, name2, NULL);
+						sendto_log(ALOG_DNSBL, LOG_NOTICE,
+						   "dnsbl_init: Added %s as dnsbl", name2);
+					}
+				}
+				free(servers);
+			}
+			else if (dnsbl_opt_startswith(name, "cache") && value)
+			{
+				char *endp = NULL;
+				unsigned long v;
+
+				errno = 0;
+				v = strtoul(value, &endp, 10);
+				if (errno == 0 && endp && *endp == '\0' && v <= (unsigned long) (UINT_MAX / 60))
+					mydata->lifetime = (u_int) v;
+			}
+		}
+		free(opts);
 	}
 
 	if (mydata->options == 0)
 	{
 		DebugLog((ALOG_DNSBL, 0, "dnsbl_init: Aie! unknown option(s): nothing to be done!"));
+		free(tmpbuf);
+		free(txtbuf);
 		dnsbl_free_private(mydata);
 		self->data = NULL;
 		return "Aie! unknown option(s): nothing to be done!";
 	}
 
-	if ((s = strstr(self->opt, "servers")))
-	{
-		char *ch = index(s, '=');
 
-		if (++ch)
+	if (self->module_kv)
+	{
+		aConfKV *kv = self->module_kv;
+		while (kv)
 		{
-			char *name, *last = NULL;
-			for (name = strtoken(&last, ch, ","); name;
-				 name = strtoken(&last, NULL, ","))
+			if (!strcasecmp(kv->key, "entry"))
 			{
-				while (name && *name && isspace(*name))
-					name++;
-				if (!name || !*name)
-					continue;
-				l = (struct dnsbl_list *)
-						malloc(sizeof(struct dnsbl_list));
-				l->host = strdup(name);
-				sendto_log(ALOG_DNSBL, LOG_NOTICE,
-						   "dnsbl_init: Added %s as dnsbl", name);
-				l->next = mydata->host_list;
-				mydata->host_list = l;
+				char *tmp = mystrdup(kv->value);
+				char *sep = strchr(tmp, '|');
+				char *host = tmp;
+				char *rsn = NULL;
+				char *e;
+
+				while (*host && isspace(*host))
+					host++;
+				if (sep)
+				{
+					*sep++ = '\0';
+					rsn = sep;
+					while (*rsn && isspace(*rsn))
+						rsn++;
+					for (e = rsn + strlen(rsn); e > rsn && isspace((unsigned char)e[-1]); )
+						*--e = '\0';
+				}
+				for (e = host + strlen(host); e > host && isspace((unsigned char)e[-1]); )
+					*--e = '\0';
+				if (*host)
+				{
+					dnsbl_add_host(mydata, host, rsn);
+					sendto_log(ALOG_DNSBL, LOG_NOTICE,
+					   "dnsbl_init: Added %s as dnsbl%s", host,
+					   (rsn && *rsn) ? " with custom reason" : "");
+				}
+				free(tmp);
 			}
+			kv = kv->next;
 		}
 	}
 
 	if (mydata->host_list == NULL)
 	{
 		DebugLog((ALOG_DNSBL, 0, "dnsbl_init: Aie! No DNSBL host: nothing to be done!"));
+		free(tmpbuf);
+		free(txtbuf);
 		dnsbl_free_private(mydata);
 		self->data = NULL;
 		return "Aie! No DNSBL host: nothing to be done!";
 	}
 
-	if (strstr(self->opt, "cache"))
-	{
-		char *ch = index(self->opt, '=');
-
-		if (ch)
-			mydata->lifetime = atoi(++ch);
-	}
-	sprintf(cbuf, ",cache=%d", mydata->lifetime);
-	strcat(tmpbuf, cbuf);
-	sprintf(cbuf, ", Cache %d (min)", mydata->lifetime);
-	strcat(txtbuf, cbuf);
+	dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, ",cache=%u", mydata->lifetime);
+	dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, ", Cache %u (min)", mydata->lifetime);
 	mydata->lifetime *= 60;
-	strcat(tmpbuf, ",list=");
-	strcat(txtbuf, ", List(s): ");
+	dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, ",list=");
+	dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, ", List(s): ");
 	l = mydata->host_list;
-	strcat(tmpbuf, l->host);
-	strcat(txtbuf, l->host);
-
-	for (l = l->next; l; l = l->next)
+	if (l)
 	{
-		strcat(tmpbuf, ",");
-		strcat(txtbuf, ", ");
-		strcat(tmpbuf, l->host);
-		strcat(txtbuf, l->host);
+		dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, "%s", l->host);
+		dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, "%s", l->host);
+		for (l = l->next; l; l = l->next)
+		{
+			dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, ",%s", l->host);
+			dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, ", %s", l->host);
+		}
 	}
 
 	if (self->reason)
-	{
 		mydata->reason = mystrdup(self->reason);
-	}
-	self->popt = strdup(tmpbuf + 1);
-	return txtbuf + 2;
+	mydata->desc = txtbuf;
+	self->popt = (tmpbuf && tmpbuf[0]) ? mystrdup(tmpbuf + 1) : mystrdup("");
+	if (!self->popt)
+		self->popt = mystrdup("");
+	if (!mydata->desc)
+		mydata->desc = mystrdup("");
+	return (mydata->desc && mydata->desc[0]) ? mydata->desc + 2 : mydata->desc;
 }
 
 void dnsbl_release(AnInstance *self)
@@ -1032,17 +1325,17 @@ static int dnsbl_work(u_int cl)
 
 	if (p->final_state == DNSBL_DONE_FOUND)
 	{
-		dnsbl_add_cache(cl, DNSBL_FOUND);
+		dnsbl_add_cache(cl, DNSBL_FOUND, p->listname, p->answer);
 		dnsbl_succeed(cl, p->listname[0] ? p->listname : "dnsbl",
 				     (char *) p->answer);
 	}
 	else if (p->final_state == DNSBL_DONE_CLEAN)
 	{
-		dnsbl_add_cache(cl, OK);
+		dnsbl_add_cache(cl, OK, NULL, NULL);
 	}
 	else
 	{
-		dnsbl_add_cache(cl, DNSBL_FAILED);
+		dnsbl_add_cache(cl, DNSBL_FAILED, NULL, NULL);
 	}
 
 	cldata[cl].timeout = 0;
