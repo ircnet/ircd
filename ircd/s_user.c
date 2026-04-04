@@ -54,8 +54,7 @@ send_unick(aClient *cptr, aClient *sptr, char *nick, char *umodebuf)
 			sptr->user->username, sptr->user->host,
 			get_client_ip(sptr),
 			(*umodebuf) ? umodebuf : "+",
-			(IsSASLAuthed(sptr) && sptr->sasl_user) ?
-			sptr->sasl_user : "*",
+			IsSASLAuthed(sptr) ? sptr->sasl_user : "*",
 			sptr->info);
 	else
 		sendto_one(cptr,

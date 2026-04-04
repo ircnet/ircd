@@ -344,8 +344,7 @@ send_unick(aClient *cptr, aClient *acptr)
 			acptr->user->host,
 			get_client_ip(acptr),
 			(*umodebuf) ? umodebuf : "+",
-			(IsSASLAuthed(acptr) && acptr->sasl_user) ?
-			acptr->sasl_user : "*",
+			IsSASLAuthed(acptr) ? acptr->sasl_user : "*",
 			acptr->info);
 	else
 		sendto_one(cptr,
