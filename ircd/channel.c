@@ -2577,10 +2577,15 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* Notify all users on the channel */
 		sendto_channel_butserv_caps(chptr, sptr, CAP_IRCNET_EXTENDED_JOIN, 0,
 									":%s JOIN %s %s %s 0 %s :%s",
-									parv[0], chptr->chname, sptr->uid, get_client_ip(sptr), "*", sptr->info);
+									parv[0], chptr->chname, sptr->uid,
+									get_client_ip(sptr),
+									IsSASLAuthed(sptr) ? sptr->sasl_user : "*",
+									sptr->info);
 		sendto_channel_butserv_caps(chptr, sptr, CAP_EXTENDED_JOIN, CAP_IRCNET_EXTENDED_JOIN,
 									":%s JOIN %s %s :%s",
-									parv[0], chptr->chname, "*", sptr->info);
+									parv[0], chptr->chname,
+									IsSASLAuthed(sptr) ? sptr->sasl_user : "*",
+									sptr->info);
 		sendto_channel_butserv_caps(chptr, sptr, 0, CAP_EXTENDED_JOIN|CAP_IRCNET_EXTENDED_JOIN,
 									":%s JOIN :%s", parv[0], chptr->chname);
 		del_invite(sptr, chptr);
@@ -2819,10 +2824,15 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #endif
 		sendto_channel_butserv_caps(chptr, acptr, CAP_IRCNET_EXTENDED_JOIN, 0,
 									":%s JOIN %s %s %s %d %s :%s",
-									acptr->name, chptr->chname, acptr->uid, get_client_ip(acptr), netjoin, "*", acptr->info);
+									acptr->name, chptr->chname, acptr->uid,
+									get_client_ip(acptr), netjoin,
+									IsSASLAuthed(acptr) ? acptr->sasl_user : "*",
+									acptr->info);
 		sendto_channel_butserv_caps(chptr, acptr, CAP_EXTENDED_JOIN, CAP_IRCNET_EXTENDED_JOIN,
 									":%s JOIN %s %s :%s",
-									acptr->name, chptr->chname, "*", acptr->info);
+									acptr->name, chptr->chname,
+									IsSASLAuthed(acptr) ? acptr->sasl_user : "*",
+									acptr->info);
 		/* Little syntax trick. Put ":" before channel name if it is
 		** not burst, so clients can use it for discriminating normal
 		** join from netjoin. 2.10.x is using NJOIN only during
