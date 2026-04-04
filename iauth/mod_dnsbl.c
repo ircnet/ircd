@@ -754,7 +754,17 @@ static int dnsbl_send_request(u_int cl, struct dnsbl_private *mydata)
 		if (p->tries == 0)
 		{
 			if (dnsbl_build_lookup(cl, p->current, p->lookup, sizeof(p->lookup)) != 0)
-				return -1;
+			{
+				DebugLog((ALOG_DNSBL, 0,
+						  "dnsbl_send_request(%d): invalid lookup host=%s, skipping",
+						  cl, p->current ? p->current->host : "?"));
+				p->current = p->current->next;
+				p->tries = 0;
+				p->qid = 0;
+				p->deadline = 0;
+				p->lookup[0] = '\0';
+				continue;
+			}
 		}
 
 		if (p->tries >= (u_int) dnsbl_max_sends())
@@ -772,9 +782,19 @@ static int dnsbl_send_request(u_int cl, struct dnsbl_private *mydata)
 
 		bzero(packet, sizeof(packet));
 		packet_len = ircd_res_mkquery(QUERY, p->lookup, C_IN, T_A,
-						 NULL, 0, NULL, (u_char *) packet, sizeof(packet));
+					 NULL, 0, NULL, (u_char *) packet, sizeof(packet));
 		if (packet_len <= 0)
-			return -1;
+		{
+			DebugLog((ALOG_DNSBL, 0,
+				  "dnsbl_send_request(%d): mkquery failed host=%s name=%s, skipping",
+				  cl, p->current ? p->current->host : "?", p->lookup));
+			p->current = p->current->next;
+			p->tries = 0;
+			p->qid = 0;
+			p->deadline = 0;
+			p->lookup[0] = '\0';
+			continue;
+		}
 		hptr->id = htons(p->qid);
 
 		send_len = sendto(mydata->gfd, packet, packet_len, 0,
@@ -784,6 +804,8 @@ static int dnsbl_send_request(u_int cl, struct dnsbl_private *mydata)
 		if (send_len == packet_len)
 		{
 			p->deadline = time(NULL) + MAX(1, ircd_res.retrans);
+			if (cldata[cl].timeout == 0 && cldata[cl].instance)
+				cldata[cl].timeout = time(NULL) + cldata[cl].instance->timeout;
 			DebugLog((ALOG_DNSBL, 0,
 					  "dnsbl_send_request(%d): qid=%u ns=%u try=%u host=%s name=%s",
 					  cl, p->qid, p->ns_index, p->tries,
@@ -1304,7 +1326,10 @@ static int dnsbl_start(u_int cl)
 	if (p->qid != 0)
 		return 0;
 
-	DebugLog((ALOG_DNSBL, 0, "dnsbl_start(%d): waiting in queue", cl));
+	// Keep the module timeout running even while the lookup is still queued.
+	DebugLog((ALOG_DNSBL, 0,
+		      "dnsbl_start(%d): waiting in queue (timeout_at=%ld)",
+		      cl, (long) cldata[cl].timeout));
 	return 0;
 }
 
