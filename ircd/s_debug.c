@@ -33,6 +33,7 @@ static const volatile char rcsid[] = "@(#)$Id: s_debug.c,v 1.56 2009/11/13 20:25
  * spaces are not allowed.
  */
 char	serveropts[] = {
+'A',	/* supports extended UNICK with SASL account */
 #ifndef	NO_IDENT
 'a',
 #endif

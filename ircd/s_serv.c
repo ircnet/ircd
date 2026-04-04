@@ -44,6 +44,7 @@ const	char	*check_servername_errors[3][2] = {
 	{ "invalid", "Bogus servername - invalid chars in hostname" },
 	{ "bogus", "Bogus servername - no dot"}};
 static	int	send_users(aClient *, aClient *, int, char **);
+static	void	send_unick(aClient *, aClient *);
 
 /*
 ** m_functions execute protocol messages on this server:
@@ -327,6 +328,37 @@ static int	get_version(char *version, char *id)
 	return result;
 }
 
+static	void
+send_unick(aClient *cptr, aClient *acptr)
+{
+	char umodebuf[BUFSIZE];
+
+	send_umode(NULL, acptr, 0, SEND_UMODES, umodebuf);
+
+	if (cptr->serv->version & SV_UNICK_SASL)
+		sendto_one(cptr,
+			":%s UNICK %s %s %s %s %s %s %s :%s",
+			acptr->user->servp->sid,
+			acptr->name, acptr->uid,
+			acptr->user->username,
+			acptr->user->host,
+			get_client_ip(acptr),
+			(*umodebuf) ? umodebuf : "+",
+			(IsSASLAuthed(acptr) && acptr->sasl_user) ?
+			acptr->sasl_user : "*",
+			acptr->info);
+	else
+		sendto_one(cptr,
+			":%s UNICK %s %s %s %s %s %s :%s",
+			acptr->user->servp->sid,
+			acptr->name, acptr->uid,
+			acptr->user->username,
+			acptr->user->host,
+			get_client_ip(acptr),
+			(*umodebuf) ? umodebuf : "+",
+			acptr->info);
+}
+
 /*
 ** check_version
 **      The PASS command delivers additional information about incoming
@@ -388,6 +420,9 @@ int	check_version(aClient *cptr)
 				    misc, id, get_client_name(cptr, TRUE));
 			return exit_client(cptr, cptr, &me, "Bad flags");
 		}
+
+		if (strchr(misc, 'A'))
+			cptr->hopcount |= SV_UNICK_SASL;
 	}
 
 #ifdef JAPANESE
@@ -1258,15 +1293,7 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 			** These are only true when *BOTH* NICK and USER have
 			** been received. -avalon
 			*/
-			send_umode(NULL, acptr, 0, SEND_UMODES, buf);
-			sendto_one(cptr,
-					   ":%s UNICK %s %s %s %s %s %s :%s",
-					   acptr->user->servp->sid,
-					   acptr->name, acptr->uid,
-					   acptr->user->username,
-					   acptr->user->host,
-					   get_client_ip(acptr),
-					   (*buf) ? buf : "+", acptr->info);
+			send_unick(cptr, acptr);
 		    }
 		else if (IsService(acptr) && match_service_dist(cptr, acptr->service->dist))
 		{

@@ -32,6 +32,7 @@ static const volatile char rcsid[] = "@(#)$Id: s_user.c,v 1.280 2010/08/12 16:29
 #undef S_USER_C
 
 static void	save_user (aClient *, aClient *, char *);
+static void	send_unick(aClient *, aClient *, char *, char *);
 
 static char buf[BUFSIZE], buf2[BUFSIZE];
 
@@ -42,6 +43,29 @@ static int user_modes[]	     = { FLAGS_OPER, 'o',
 				 FLAGS_RESTRICT, 'r',
 				 FLAGS_AWAY, 'a',
 				 0, 0 };
+
+static void
+send_unick(aClient *cptr, aClient *sptr, char *nick, char *umodebuf)
+{
+	if (cptr->serv->version & SV_UNICK_SASL)
+		sendto_one(cptr,
+			":%s UNICK %s %s %s %s %s %s %s :%s",
+			sptr->user->servp->sid, nick, sptr->uid,
+			sptr->user->username, sptr->user->host,
+			get_client_ip(sptr),
+			(*umodebuf) ? umodebuf : "+",
+			(IsSASLAuthed(sptr) && sptr->sasl_user) ?
+			sptr->sasl_user : "*",
+			sptr->info);
+	else
+		sendto_one(cptr,
+			":%s UNICK %s %s %s %s %s %s :%s",
+			sptr->user->servp->sid, nick, sptr->uid,
+			sptr->user->username, sptr->user->host,
+			get_client_ip(sptr),
+			(*umodebuf) ? umodebuf : "+",
+			sptr->info);
+}
 
 /*
 ** m_functions execute protocol messages on this server:
@@ -817,11 +841,7 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		{
 			continue;
 		}
-		sendto_one(acptr,
-				":%s UNICK %s %s %s %s %s %s :%s",
-				user->servp->sid, nick, sptr->uid,
-				user->username, user->host, get_client_ip(sptr),
-				(*buf) ? buf : "+", sptr->info);
+		send_unick(acptr, sptr, nick, buf);
 	}	/* for(my-leaf-servers) */
 #ifdef	USE_SERVICES
 #if 0
@@ -1257,18 +1277,27 @@ nickkilldone:
 **	parv[4] = client host name
 **	parv[5] = client ip
 **	parv[6] = users mode
-**	parv[7] = users real name info
+**	parv[7] = optional SASL account or users real name info
+**	parv[8] = users real name info (when SASL account is present)
 */
 int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	aClient *acptr;
-	char	*uid, nick[NICKLEN+2], *user, *host, *realname;
+	char	*uid, nick[NICKLEN+2], *user, *host, *realname, *sasl_user = NULL;
 
 	strncpyzt(nick, parv[1], NICKLEN+1);
 	uid = parv[2];
 	user = parv[3];
 	host = parv[4];
-	realname = parv[7];
+	if (parc >= 9)
+	{
+		sasl_user = parv[7];
+		realname = parv[8];
+	}
+	else
+	{
+		realname = parv[7];
+	}
 
 	/*
 	 * if do_nick_name() returns a null name OR if the server sent a nick
@@ -1437,6 +1466,11 @@ int	m_unick(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	strcpy(acptr->uid, uid);
 	acptr->user->sip = mystrdup(parv[5]);
 	add_to_uid_hash_table(uid, acptr);
+	if (sasl_user && strcmp(sasl_user, "*") && *sasl_user)
+	{
+		acptr->sasl_user = mystrdup(sasl_user);
+		acptr->flags |= FLAGS_SASL;
+	}
 	{
 	    char	*pv[4];
 	    

@@ -942,9 +942,10 @@ typedef	struct	{
 
 /* used for sendto_serv */
 
-#define	SV_OLD		0x0000
-#define SV_UID		0x0001
-#define	SV_2_11		SV_UID
+#define	SV_OLD			0x0000
+#define SV_UID			0x0001
+#define	SV_2_11			SV_UID
+#define SV_UNICK_SASL	0x0002
 
 /* used for sendto_flag */
 
