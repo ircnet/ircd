@@ -21,6 +21,16 @@ typedef struct Module aModule;
 typedef struct Instance AnInstance;
 typedef struct Target aTarget;
 
+typedef struct ConfKV aConfKV;
+
+struct ConfKV
+{
+    char	*key;
+    char	*value;
+    aConfKV	*next;
+};
+
+
 struct Module
 {
     char	*name;			/* module name */
@@ -58,6 +68,7 @@ struct Instance
 	u_char  wait_for_ident; /* wait until ident lookup completes */
 	u_char 	skip_if_ident;  /* skip module if we got an ident reply */
     char	*reason;		/* reject reason */
+    aConfKV	*module_kv;		/* module-specific key/value pairs */
     u_char	delayed;		/* delayed execution mode */
 };
 
