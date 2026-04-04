@@ -509,16 +509,24 @@ char	*conf_read(char *cfile)
 
 	if (ident == NULL)
 	    {
-		ident = *last = (AnInstance *) malloc(sizeof(AnInstance));
+		ident = *last = (AnInstance *) calloc(1, sizeof(AnInstance));
+		if (ident == NULL)
+			return NULL;
+
 		(*last)->nexti = NULL;
-		(*last)->opt = NULL;
+		(*last)->in = icount;
 		(*last)->mod = &Module_rfc931;
+		(*last)->opt = NULL;
+		(*last)->popt = NULL;
+		(*last)->data = NULL;
 		(*last)->hostname = NULL;
 		(*last)->address = NULL;
 		(*last)->timeout = DEFAULT_TIMEOUT;
-		(*last)->in = icount;
-		(*last)->popt = NULL;
-		(*last)->address = NULL;
+		(*last)->wait_for_reg = 0;
+		(*last)->skip_if_sasl = 0;
+		(*last)->wait_for_ident = 0;
+		(*last)->skip_if_ident = 0;
+		(*last)->reason = NULL;
 		(*last)->module_kv = NULL;
 		(*last)->delayed = o_del;
 		(*last)->port = 0;
