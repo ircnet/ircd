@@ -548,11 +548,12 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	add_server_to_tree(acptr);
 #ifdef USE_SERVICES
 	check_services_butone(SERVICE_WANT_SERVER, acptr->serv, acptr,
-	                      ":%s SERVER %s %d %s :%s",
+	                      ":%s SERVER %s %d %s %s :%s",
 	                      acptr->serv->up->name,
 	                      acptr->name,
 	                      acptr->hopcount + 1,
 	                      acptr->serv->sid,
+	                      acptr->serv->verstr,
 	                      acptr->info);
 #endif
 	/* And introduce the server to others. */
@@ -812,9 +813,9 @@ int	m_server(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		introduce_server(cptr, acptr);
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_SERVER, acptr->serv, acptr,
-				      ":%s SERVER %s %d %s :%s", parv[0],
+				      ":%s SERVER %s %d %s %s :%s", parv[0],
 				      acptr->name, hop+1, acptr->serv->sid,
-				      acptr->info);
+				      acptr->serv->verstr, acptr->info);
 #endif
 		sendto_flag(SCH_SERVER, "Received SERVER %s from %s (%d %s)",
 			    acptr->name, parv[0], hop+1, acptr->info);
@@ -1227,8 +1228,8 @@ int	m_server_estab(aClient *cptr, char *sid, char *versionbuf)
 	add_fd(cptr->fd, &fdas);
 #ifdef	USE_SERVICES
 	check_services_butone(SERVICE_WANT_SERVER, cptr->serv, cptr,
-			      ":%s SERVER %s %d %s :%s", ME, cptr->name,
-			      cptr->hopcount+1, cptr->serv->sid, cptr->info);
+			      ":%s SERVER %s %d %s %s :%s", ME, cptr->name,
+			      cptr->hopcount+1, cptr->serv->sid, cptr->serv->verstr, cptr->info);
 #endif
 	sendto_flag(SCH_SERVER, "Received SERVER %s from %s (%d %s)",
 		cptr->name, ME, 1, cptr->info);

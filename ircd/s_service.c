@@ -671,10 +671,11 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				continue;
 			split = (MyConnect(acptr) &&
 				 mycmp(acptr->name, acptr->sockhost));
-			sendto_one(sptr, ":%s SERVER %s %d %s :%s",
+			sendto_one(sptr, ":%s SERVER %s %d %s %s :%s",
 				acptr->serv->up->name, acptr->name,
 				acptr->hopcount+1,
 				acptr->serv->sid,
+				acptr->serv->verstr,
 				acptr->info);
 		    }
 	    }
