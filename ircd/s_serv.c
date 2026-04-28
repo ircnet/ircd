@@ -546,7 +546,15 @@ int    m_smask(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	add_to_sid_hash_table(parv[1], acptr);
 
 	add_server_to_tree(acptr);
-
+#ifdef USE_SERVICES
+	check_services_butone(SERVICE_WANT_SERVER, acptr->serv, acptr,
+	                      ":%s SERVER %s %d %s :%s",
+	                      acptr->serv->up->name,
+	                      acptr->name,
+	                      acptr->hopcount + 1,
+	                      acptr->serv->sid,
+	                      acptr->info);
+#endif
 	/* And introduce the server to others. */
 	introduce_server(cptr, acptr);
 
