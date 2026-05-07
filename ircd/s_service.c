@@ -198,15 +198,15 @@ static	void	sendnum_toone(aClient *cptr, int wants, aClient *sptr,
 
 	if ((wants & SERVICE_WANT_UID) && sptr->user)
 		sendto_one(cptr, ":%s UNICK %s %s %s %s %s %s %s :%s",
-			sptr->user->servp->sid,
-			(wants & SERVICE_WANT_NICK) ? sptr->name : ".",
-			sptr->uid,
-			(wants & SERVICE_WANT_USER) ? sptr->user->username : ".",
-			(wants & SERVICE_WANT_USER) ? sptr->user->host : ".",
-			(wants & SERVICE_WANT_USER) ? get_client_ip(sptr) : ".",
-			(wants & (SERVICE_WANT_UMODE|SERVICE_WANT_OPER)) ? umode : "+",
- 		    (wants & SERVICE_WANT_USER) ? (IsSASLAuthed(sptr) ? sptr->sasl_user : "*") : "",
-			(wants & SERVICE_WANT_USER) ? sptr->info : "");
+				   sptr->user->servp->sid,
+				   (wants & SERVICE_WANT_NICK) ? sptr->name : ".",
+				   sptr->uid,
+				   (wants & SERVICE_WANT_USER) ? sptr->user->username : ".",
+				   (wants & SERVICE_WANT_USER) ? sptr->user->host : ".",
+				   (wants & SERVICE_WANT_USER) ? get_client_ip(sptr) : ".",
+				   (wants & (SERVICE_WANT_UMODE | SERVICE_WANT_OPER)) ? umode : "+",
+				   (wants & SERVICE_WANT_USER) ? (IsSASLAuthed(sptr) ? sptr->sasl_user : "*") : "",
+				   (wants & SERVICE_WANT_USER) ? sptr->info : "");
 	else
 	if (wants & SERVICE_WANT_EXTNICK)
 		/* extended NICK syntax */
@@ -673,13 +673,13 @@ int	m_servset(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			split = (MyConnect(acptr) &&
 				 mycmp(acptr->name, acptr->sockhost));
 			sendto_one(sptr, ":%s SERVER %s %d %s %s :%s",
-			           acptr->serv->up->serv->sid,
-			           acptr->name,
-			           acptr->hopcount + 1,
-			           acptr->serv->sid,
-			           acptr->serv->verstr,
-			           acptr->info);
-		    }
+					   acptr->serv->up->serv->sid,
+					   acptr->name,
+					   acptr->hopcount + 1,
+					   acptr->serv->sid,
+					   acptr->serv->verstr,
+					   acptr->info);
+			}
 	    }
 
 	if (burst & (SERVICE_WANT_NICK|SERVICE_WANT_USER|SERVICE_WANT_SERVICE))

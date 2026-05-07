@@ -756,10 +756,10 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 		}
 #ifdef	USE_SERVICES
 		check_services_butone(SERVICE_WANT_SQUIT, sptr->serv, sptr,
-		                      ":%s SQUIT %s :%s",
-		                      sptr->serv->up->serv->sid,
-		                      sptr->serv->sid,
-		                      comment);
+							  ":%s SQUIT %s :%s",
+							  sptr->serv->up->serv->sid,
+							  sptr->serv->sid,
+							  comment);
 #endif
 		del_from_sid_hash_table(sptr->serv);
 		remove_server_from_tree(sptr);
