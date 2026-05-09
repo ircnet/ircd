@@ -597,18 +597,6 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 		{
 			continue;
 		}
-		if (IsConfRequireSASL(aconf) && !IsSASLAuthed(cptr))
-		{
-			if (IsConfFallThrough(aconf))
-			{
-				continue;
-			}
-			else
-			{
-				retval = -9; /* EXITC_SASL_REQUIRED */
-				break;
-			}
-		}
 		/* aconf->name can be NULL with wrong I:line in the config
 		** (without all required fields). If aconf->host can be NULL,
 		** I don't know. Anyway, this is an error! --B. */
@@ -678,7 +666,18 @@ int	attach_Iline(aClient *cptr, struct hostent *hp, char *sockhost)
 				}
 			}
 		} /* else empty aconf->host, match any ipaddr */
-
+		if (IsConfRequireSASL(aconf) && !IsSASLAuthed(cptr))
+		{
+			if (IsConfFallThrough(aconf))
+			{
+				continue;
+			}
+			else
+			{
+				retval = -9; /* EXITC_SASL_REQUIRED */
+				break;
+			}
+		}
 		/* Password check, if I:line has it. If 'F' flag, try another
 		** I:line, otherwise bail out and reject client. */
 		if (!BadPtr(aconf->passwd) &&
