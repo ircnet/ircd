@@ -1512,7 +1512,8 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 			if (*ip)
 			    {
 				if ((*ip == MODE_ANONYMOUS || *ip == MODE_REOP)
-					&& whatt == MODE_ADD && !IsServer(sptr))
+					&& whatt == MODE_ADD && MyConnect(sptr)
+					&& !IsServer(sptr))
 					sendto_one(cptr,
 						   replies[ERR_UNKNOWNMODE],
 						   ME, BadTo(sptr->name), *curr,
