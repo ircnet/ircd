@@ -91,7 +91,7 @@ int pp2_consume(aClient *cptr, const unsigned char *data, size_t len, size_t *co
 											   0x0A, 0x51, 0x55, 0x49, 0x54, 0x0A };
 	char sig[3 * 12 + 1], src[INET6_ADDRSTRLEN], dst[INET6_ADDRSTRLEN];
 	size_t off = 0;
-	int i;
+	int i, fr;
 	*consumed_out = 0;
 
 	while (off < len && cptr->pp2_state->phase != PROXY_DONE)
@@ -288,7 +288,11 @@ int pp2_consume(aClient *cptr, const unsigned char *data, size_t len, size_t *co
 
 			Debug((DEBUG_INFO, "pp2(%d): complete", cptr->fd));
 
-			if (finalize_connection(cptr, src) < 0)
+			fr = finalize_connection(cptr, src);
+
+			if (fr == FLUSH_BUFFER)
+				return FLUSH_BUFFER;
+			if (fr < 0)
 			{
 				*consumed_out = off;
 				return -1;
