@@ -1767,7 +1767,7 @@ static	void	who_one(aClient *sptr, aClient *acptr, aChannel *repchan,
 		if (opts->flags & WHO_FLAG_INFO)
 			len += snprintf_append(buf, BUFSIZE, len, " :%s", acptr->info);
 
-		sendto_one(sptr, buf);
+		sendto_one(sptr, "%s", buf);
 	}
 	else
 	{
