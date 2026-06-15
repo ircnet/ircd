@@ -3275,7 +3275,7 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (!jp_valid(acptr->from, chptr, parv[2]))
 	{
 		sendto_one(sptr, replies[ERR_BADCHANMASK], ME,
-			chptr ? chptr->chname : parv[2]);
+			 BadTo(parv[0]), chptr ? chptr->chname : parv[2]);
 		return 1;
 	}
 #endif
