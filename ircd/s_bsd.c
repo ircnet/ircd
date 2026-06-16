@@ -1711,6 +1711,12 @@ int finalize_connection(aClient *cptr, const char *ipstr)
 					get_client_host(cptr));
 		cptr->exitc = EXITC_CLONE;
 		sendto_flog(cptr, EXITC_CLONE, "", cptr->sockhost);
+
+		if (cptr->fd >= 0
+			&& cptr->fd < MAXCONNECTIONS
+			&& local[cptr->fd] == cptr)
+			return exit_client(cptr, cptr, &me,
+			                   "Too rapid connections from your host");
 #ifdef DELAY_CLOSE
 		nextdelayclose = delay_close(cptr->fd);
 #else
@@ -1995,6 +2001,8 @@ static	int	read_packet(aClient *cptr, int msg_ready)
 			size_t consumed = 0;
 			int pr = pp2_consume(cptr, (const unsigned char *) readbuf,
 								 (size_t) length, &consumed);
+			if (pr == FLUSH_BUFFER)
+				return FLUSH_BUFFER;
 			if (pr < 0)
 			{
 				/*

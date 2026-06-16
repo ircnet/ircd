@@ -1511,12 +1511,14 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 
 			if (*ip)
 			    {
-				if ((*ip == MODE_ANONYMOUS || *ip == MODE_REOP)
-					&& whatt == MODE_ADD && !IsServer(sptr))
-					sendto_one(cptr,
-						   replies[ERR_UNKNOWNMODE],
-						   ME, BadTo(sptr->name), *curr,
-						   chptr->chname);
+				    if (*ip == MODE_REOP
+					    && whatt == MODE_ADD
+					    && MyConnect(sptr)
+					    && !IsServer(sptr))
+					    sendto_one(cptr,
+					               replies[ERR_UNKNOWNMODE],
+					               ME, BadTo(sptr->name), *curr,
+					               chptr->chname);
 				else
 				    {
 					/*
@@ -3312,7 +3314,7 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	if (!jp_valid(acptr->from, chptr, parv[2]))
 	{
 		sendto_one(sptr, replies[ERR_BADCHANMASK], ME,
-			chptr ? chptr->chname : parv[2]);
+			 BadTo(parv[0]), chptr ? chptr->chname : parv[2]);
 		return 1;
 	}
 #endif
