@@ -139,10 +139,9 @@ aClient	*make_client(aClient *from)
 #ifdef	ZIP_LINKS
 		cptr->zip = NULL;
 #endif
-#ifdef XLINE
+		cptr->user1 = NULL;
 		cptr->user2 = NULL;
 		cptr->user3 = NULL;
-#endif
 		cptr->cap_negotation = 0;
 		cptr->caps = 0;
 		cptr->sasl_service = NULL;
@@ -179,12 +178,12 @@ void	free_client(aClient *cptr)
 		{
 			MyFree(cptr->cloak_tmp);
 		}
-#ifdef XLINE
+		if (cptr->user1)
+			MyFree(cptr->user1);
 		if (cptr->user2)
 			MyFree(cptr->user2);
 		if (cptr->user3)
 			MyFree(cptr->user3);
-#endif
 		if (cptr->sasl_user)
 		{
 			MyFree(cptr->sasl_user);
@@ -619,9 +618,7 @@ aConfItem	*make_conf(void)
 	aconf->clients = aconf->port = 0;
 	aconf->next = NULL;
 	aconf->host = aconf->passwd = aconf->name = aconf->name2 = NULL;
-#ifdef XLINE
 	aconf->name3 = NULL;
-#endif
 	aconf->ping = NULL;
 	aconf->status = CONF_ILLEGAL;
 	aconf->pref = -1;
@@ -656,9 +653,7 @@ void	free_conf(aConfItem *aconf)
 	istat.is_confmem -= aconf->passwd ? strlen(aconf->passwd)+1 : 0;
 	istat.is_confmem -= aconf->name ? strlen(aconf->name)+1 : 0;
 	istat.is_confmem -= aconf->name2 ? strlen(aconf->name2)+1 : 0;
-#ifdef XLINE
 	istat.is_confmem -= aconf->name3 ? strlen(aconf->name3)+1 : 0;
-#endif
 	istat.is_confmem -= aconf->ping ? sizeof(*aconf->ping) : 0;
 	istat.is_confmem -= aconf->source_ip ? strlen(aconf->source_ip)+1 : 0;
 	istat.is_confmem -= sizeof(aConfItem);
@@ -673,10 +668,8 @@ void	free_conf(aConfItem *aconf)
 	MyFree(aconf->passwd);
 	MyFree(aconf->name);
 	MyFree(aconf->name2);
-#ifdef XLINE
 	if (aconf->name3)
 		MyFree(aconf->name3);
-#endif
 	MyFree(aconf);
 #ifdef	DEBUGMODE
 	aconfs.inuse--;

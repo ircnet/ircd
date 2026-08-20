@@ -1,6 +1,7 @@
 /************************************************************************
  *   IRC - Internet Relay Chat, ircd/s_auth.c
  *   Copyright (C) 1992 Darren Reed
+ *   Copyright (C) 2025 IRCnet.com team
  *
  *   This program is free software; you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -114,6 +115,7 @@ int	vsendto_iauth(char *pattern, va_list va)
 	}
 
 	vsprintf(abuf, pattern, va);
+	Debug((DEBUG_INFO, "Sending to iauth [%s]", abuf));
 	strcat(abuf, "\n");
 	p = abuf;
 	len = strlen(p);
@@ -301,9 +303,35 @@ void	read_iauth(void)
 			    start = end;
 			    continue;
 			}
+			if (*start == 'P') /* iauth has wait_for_reg modules */
+			{
+				int fd = atoi(start + 2);
+				cptr = local[fd];
+				if (cptr && MyConnect(cptr))
+				{
+					cptr->flags |= DEFER_USER_REG;
+					Debug((DEBUG_INFO,
+						   "set DEFER_USER_REG on fd=%d (flags now=0x%08x)", fd,
+						   cptr->flags));
+
+					/* Did we get 'P' after NICK/USER? */
+					if (MyConnect(cptr) && !IsServer(cptr) &&
+						cptr->name[0] != '\0' && cptr->user != NULL &&
+						!IsRegistered(cptr))
+					{
+						Debug((DEBUG_INFO,
+							   "got delayed P [%s] - executing register_user()",
+							   start));
+						ClearWXAuth(cptr);
+						register_user(cptr, cptr, cptr->name, cptr->user1);
+					}
+				}
+				start = end;
+				continue;
+			}
 		    if (*start != 'U' && *start != 'u' && *start != 'o' &&
 			*start != 'K' && *start != 'k' &&
-			*start != 'D')
+			*start != 'D' && *start != 'R')
 			{
 			    sendto_flag(SCH_AUTH, "Garbage from iauth [%s]",
 					start);
@@ -335,7 +363,7 @@ void	read_iauth(void)
 			    continue;
 			}
 		    sprintf(tbuf, "%c %d %s %u ", start[0], i,
-			    inetntop(AF_INET6, (char *)&cptr->ip, 
+			    inetntop(AF_INET6, (char *)&cptr->ip,
 			    ipv6string, sizeof(ipv6string)), cptr->port);
 		    if (strncmp(tbuf, start, strlen(tbuf)))
 			{
@@ -363,7 +391,7 @@ void	read_iauth(void)
 				    continue;
 				}
 			    if (cptr->auth != cptr->username)
-				{   
+				{
 				    istat.is_authmem -= strlen(cptr->auth) + 1;
 				    istat.is_auth -= 1;
 				    MyFree(cptr->auth);
@@ -416,66 +444,103 @@ void	read_iauth(void)
 				}
 			    strncpyzt(cptr->user->username, tbuf, USERLEN+1);
 			}
-		    else if (start[0] == 'D')
-		      {
-			    /*authentication finished*/
-			    ClearXAuth(cptr);
-			    SetDoneXAuth(cptr);
-			    if (WaitingXAuth(cptr))
-				{
-				    ClearWXAuth(cptr);
-				    register_user(cptr, cptr, cptr->name,
-						  cptr->user->username);
-				}
-			    else
-				    ClearWXAuth(cptr);
-		      }
-		    else
+			else if (start[0] == 'D')
 			{
-			    char *reason;
+				/*authentication finished*/
+				ClearXAuth(cptr);
+				SetDoneXAuth(cptr);
 
-			    /* Copy kill reason received from iauth */
-			    reason = strstr(start, " :");
-			    if (reason && *(reason + 2) != '\0')
-			    {
-				    if (cptr->reason)
-				    {
-					    MyFree(cptr->reason);
-				    }
-				    cptr->reason = mystrdup(reason + 2);
-			    }
-			    /*
+				if ((WaitingXAuth(cptr) || (cptr->flags & DEFER_USER_REG)) &&
+					MyConnect(cptr) && !IsServer(cptr) &&
+					cptr->name[0] != '\0' && cptr->user != NULL &&
+					!IsRegistered(cptr))
+				{
+					Debug((DEBUG_INFO, "got D [%s] - executing register_user()",
+						   start));
+					ClearWXAuth(cptr);
+					cptr->flags &= ~DEFER_USER_REG;
+					register_user(cptr, cptr, cptr->name, cptr->user1);
+				}
+				else
+				{
+					Debug((DEBUG_INFO, "got D [%s]", start));
+					ClearWXAuth(cptr);
+					cptr->flags &= ~DEFER_USER_REG;
+				}
+			}
+			else if (start[0] == 'R')
+			{
+				/* module sends a line to be forwarded as-is to the user */
+				if(!IsRegisteredUser(cptr))
+				{
+					char *msg = start + strlen(tbuf);
+					if (*msg == ':')
+						msg++;
+
+					if (*msg)
+						sendto_one(cptr, "%s", msg);
+
+					Debug((DEBUG_INFO, "got R [%s]", start));
+				}
+			}
+			else
+			{
+				char *reason;
+
+				Debug((DEBUG_INFO, "got K [%s]", start));
+
+				/* Copy kill reason received from iauth */
+				reason = strstr(start, " :");
+				if (reason && *(reason + 2) != '\0')
+				{
+					if (cptr->reason)
+					{
+						MyFree(cptr->reason);
+					}
+					cptr->reason = mystrdup(reason + 2);
+				}
+				/*
 			    ** mark for kill, because it cannot be killed
 			    ** yet: we don't even know if this is a server
 			    ** or a user connection!
 			    */
-			    if (start[0] == 'K')
-				    cptr->exitc = EXITC_AREF;
-			    else
-				    cptr->exitc = EXITC_AREFQ;
-			    /* should also check to make sure it's still
-			       an unregistered client.. */
+				if (start[0] == 'K')
+					cptr->exitc = EXITC_AREF;
+				else
+					cptr->exitc = EXITC_AREFQ;
 
-			    /* Finally, working after registration. --B. */
-			    if (IsRegisteredUser(cptr))
-			    {
-                        	if (cptr->exitc == EXITC_AREF)
+				/* If we got NICK and USER we can assume it is a client
+				   and can kill it directly */
+				if (MyConnect(cptr) && cptr->name[0] != '\0' &&
+					cptr->user != NULL)
 				{
-					sendto_flag(SCH_LOCAL,
-                                		"Denied after connection "
-						"from %s.",
-						get_client_host(cptr));
+					if (cptr->exitc == EXITC_AREF)
+					{
+						sendto_flag(SCH_LOCAL, "Denied connection from %s (%s)",
+									get_client_host(cptr),
+									cptr->reason ? cptr->reason
+												 : "Denied access");
+					}
+					(void) exit_client(cptr, cptr, &me,
+									   cptr->reason ? cptr->reason
+													: "Denied access");
 				}
-                        	(void) exit_client(cptr, cptr, &me,
-					cptr->reason ? cptr->reason :
-					"Denied access");
-			    }
+				else
+				{
+					Debug((DEBUG_NOTICE,
+						   "Defer kill: missing nick/user (name='%s', "
+						   "user=%p, uname_set=%d)\n",
+						   cptr->name, (void *) cptr->user,
+						   (cptr->user && cptr->user->username[0] != '\0')
+								   ? 1
+								   : 0));
+				}
 			}
-		    start = end;
+			start = end;
 		}
-	    olen -= start - buf;
-	    if (olen)
-		    memcpy(obuf, start, olen);
+		olen -= start - buf;
+		if (olen)
+			memcpy(obuf, start, olen);
 	}
 }
 

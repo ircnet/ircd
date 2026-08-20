@@ -219,8 +219,18 @@ int	main(int argc, char *argv[])
 
 	write_pidfile();
 	while (1)
-	    {
+	{
+		AnInstance *it = instances;
 		loop_io();
+
+		while (it)
+		{
+			if (it->mod->gtick)
+			{
+				it->mod->gtick(it);
+			}
+			it = it->nexti;
+		}
 
 		if (do_log)
 		    {
@@ -243,6 +253,6 @@ int	main(int argc, char *argv[])
 			    }
 			nextst = time(NULL) + 60;
 		    }
-	    }
+	}
 }
 

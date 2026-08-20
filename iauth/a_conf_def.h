@@ -32,6 +32,12 @@ struct Module
 					 * done (incoming data, timeout..) */
     int		(*timeout)(u_int);	/* called when timeout is reached */
     void	(*clean)(u_int);	/* finish/abort: cleanup*/
+
+	/* Optional global (module-wide) lifecycle hooks */
+	int (*ginit)(AnInstance *);     /* initialize persistent resources */
+	void (*gtick)(AnInstance *);    /* invoked periodically */
+	int (*gwork)(AnInstance *);     /* handle global events (if any) */
+	void (*grelease)(AnInstance *); /* cleanup persistent resources */
 };
 
 struct Instance
@@ -46,6 +52,11 @@ struct Instance
     aTarget	*hostname;
     u_int	timeout;
     u_int	port;
+	u_char	wait_for_reg;   /* wait until client sent NICK/USER
+ 							   (and possibly CAP/AUTHENTICATE) */
+	u_char	skip_if_sasl;   /* skip module if SASL authentication succeeded. */
+	u_char  wait_for_ident; /* wait until ident lookup completes */
+	u_char 	skip_if_ident;  /* skip module if we got an ident reply */
     char	*reason;		/* reject reason */
     u_char	delayed;		/* delayed execution mode */
 };

@@ -27,7 +27,6 @@ typedef struct AuthData anAuthData;
 struct AuthData
 {
 	/* the following are set by a_io.c and may be read by modules */
-	char	user[USERLEN+1];	/* username */
 	char	passwd[PASSWDLEN+1];	/* password */
 	char	host[HOSTLEN+1];	/* hostname */
 	char	itsip[HOSTLEN+1];	/* client ip */
@@ -35,6 +34,12 @@ struct AuthData
 	char	ourip[HOSTLEN+1];	/* our ip */
 	u_short	ourport;		/* our port */
 	u_int	state;			/* state (general) */
+	char nick[NICKLEN+1]; /* nick */
+	char user1[USERLEN+1]; /* username */
+	char user2[USERLEN+1]; /* umodes */
+	char user3[HOSTLEN+1]; /* servername */
+	char realname[REALLEN+1]; /* realname */
+	char *sasl_user;		/* sasl user */
 
 	/* the following are set by modules */
 	char	*authuser;		/* authenticated username */
@@ -67,6 +72,25 @@ struct AuthData
 #define A_UNIX		0x1000	/* authuser is suitable for use by ircd */
 #define A_DELAYEDSENT	0x2000	/* client already has been let in to ircd */
 #define A_DENY		0x8000	/* connection should be denied access */
+#define A_SASL		0x10000	/* SASL auth succeeded */
+
+/* iauth has detected that one or more wait_for_reg modules
+ * apply to this client and has sent "P <clid> <n>" to ircd.
+ * ircd will now hold registration until the client has completed
+ * its introduction (NICK/USER and possibly CAP/AUTHENTICATE),
+ * after which ircd will signal readiness with "H".
+ */
+#define A_WAIT_FOR_REG	0x20000
+
+/* Client has sent NICK/USER and possibly CAP/AUTHENTICATE.
+ * wait_for_reg modules may run.
+ */
+#define A_REG_PENDING	0x40000
+
+/* Ident (rfc931) completion flags (used for wait_for_ident option) */
+#define A_GOTIDENT      0x80000   /* ident finished with a username */
+#define A_NOIDENT		0x100000  /* ident lookup failed or unavailable
+                                   * (timeout/refused/fail) */
 
 #define SetBit(v,n)	v[n/8] |=  (1 << (n % 8))
 #define UnsetBit(v,n)	v[n/8] &= ~(1 << (n % 8))

@@ -1730,7 +1730,6 @@ static int report_array[18][3] = {
 		{ 0, 0, 0}
 	};
 
-#ifdef XLINE
 static  void    report_x_lines(aClient *sptr, char *to)
 {
 	aConfItem *tmp;
@@ -1747,7 +1746,6 @@ static  void    report_x_lines(aClient *sptr, char *to)
 			BadTo(tmp->name3), BadTo(tmp->source_ip));
 	}
 }
-#endif
 
 static	void	report_configured_links(aClient *sptr, char *to, int mask)
 {
@@ -2119,12 +2117,10 @@ int	m_stats(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		report_configured_links(cptr, parv[0], CONF_VER);
 		break;
 	case 'X' :
-#ifdef XLINE
 		if (IsAnOper(sptr))
 		{
 			report_x_lines(sptr, parv[0]);
 		}
-#endif
 		break;
 	case 'x' : /* lists */
 #ifdef DEBUGMODE
@@ -2869,11 +2865,7 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				get_client_class(acptr),
 				acptr->name, acptr->user->username,
 				acptr->user->host, get_client_ip(acptr),
-#ifdef XLINE
-				acptr->user2, acptr->user3, 
-#else
-				"-", "-",
-#endif
+				acptr->user2, acptr->user3,
 				acptr->info);
 	}
 	else
@@ -2892,11 +2884,7 @@ int	m_etrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				get_client_class(acptr), 
 				acptr->name, acptr->user->username, 
 				acptr->user->host, get_client_ip(acptr),
-#ifdef XLINE
-				acptr->user2, acptr->user3, 
-#else
-				"-", "-",
-#endif
+				acptr->user2, acptr->user3,
 				acptr->info);
 		}
 	}
@@ -2928,12 +2916,8 @@ int m_sidtrace(aClient *cptr, aClient *sptr, int parc, char *parv[])
 				   MyClient(acptr) ? get_client_class(acptr) : -1,
 				   acptr->name, acptr->user->username,
 				   acptr->user->host, get_client_ip(acptr),
-#ifdef XLINE
 				   MyClient(acptr) ? acptr->user2 : "-",
 				   MyClient(acptr) ? acptr->user3 : "-",
-#else
-				   "-", "-",
-#endif
 				   acptr->info);
 	}
 

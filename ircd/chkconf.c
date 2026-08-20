@@ -499,11 +499,9 @@ static	aConfItem 	*initconf(void)
 			case 'y':
 			        aconf->status = CONF_CLASS;
 		        	break;
-#ifdef XLINE
 			case 'X':
 				aconf->status = CONF_XLINE;
 				break;
-#endif
 		    default:
 			config_error(CF_WARN, CK_FILE, CK_LINE,
 				"unknown conf line letter (%c)\n", *tmp);
@@ -547,9 +545,7 @@ static	aConfItem 	*initconf(void)
 			{
 				switch (*s)
 				{
-#ifdef XLINE
 				case 'e':
-#endif
 				case 'S':
 				case 'R':
 				case 'D':
