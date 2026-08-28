@@ -65,6 +65,7 @@ char	*conf_read(char *cfile)
 	Mlist[Mcnt++] = &Module_pipe;
 	Mlist[Mcnt++] = &Module_webproxy;
 	Mlist[Mcnt++] = &Module_dnsbl;
+	Mlist[Mcnt++] = &Module_external;
 	Mlist[Mcnt] = NULL;
 
 	cfh = fopen((cfile) ? cfile : IAUTHCONF_PATH, "r");
