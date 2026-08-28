@@ -50,3 +50,7 @@ module rfc931
 #module dnsbl
 #	option = log,reject,servers=bl1.example.org,bl2.example.org
 #	reason = Denied access (DNSBL)
+
+# Check clients using an external scanning service.
+#module external
+#	option = sid=000A,host=127.0.0.1,port=9009,srcip=,timeout=20,allow_on_timeout=yes,skip_if_sasl,skip_if_ident
