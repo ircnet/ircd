@@ -158,13 +158,14 @@ Apache+PHP configurations).
 .B DNSBL
 This module performs a DNS query to check if an IP address is blacklisted.
 
-This module understands 3 options:
+This module only accepts 127.0.0.x A responses as valid DNSBL hits.
+Other A responses are ignored and logged as unexpected DNSBL responses.
+
+This module understands the following options:
 .B log
 to log the IP which is listed on the DNSBL
 .B reject
 to reject the connection which is listed on the DNSBL
-.B paranoid
-Double check that the DNSBL is actually responding a 127.0.0.x IP
 .B servers
 A comma-separated list of DNSBL domains which are checked. This iauth module cannot
 check which DNSBL type is used so only use for DNSBLs suitable where all
@@ -199,7 +200,7 @@ module webproxy
         port = 3128
 
 module dnsbl
-	option = log,reject,paranoid,servers=bl1.example.org,bl2.example.org
+	option = log,reject,servers=bl1.example.org,bl2.example.org
 	reason = Denied access (DNSBL)
 .fi
 .RE

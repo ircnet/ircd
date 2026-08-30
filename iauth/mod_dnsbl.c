@@ -54,7 +54,6 @@ struct hostlog {
 
 #define OPT_LOG 0x001
 #define OPT_DENY 0x002
-#define OPT_PARANOID 0x004
 
 #define OK 0
 #define DNSBL_FOUND 1
@@ -69,6 +68,7 @@ struct hostlog {
 #define DNSBL_PARSE_FOUND 1
 #define DNSBL_PARSE_NEXT_HOST 2
 #define DNSBL_PARSE_RETRY 3
+#define DNSBL_PARSE_INVALID 4
 
 struct dnsbl_list {
 	char *host;
@@ -509,15 +509,21 @@ static char *dnsbl_expand_reason(u_int cl, const char *tmpl, const char *domain)
 	return out;
 }
 
-static void dnsbl_succeed(u_int cl, const char *listname, const unsigned char *result)
+static const char *dnsbl_log_value(const char *value)
+{
+	return (value && *value) ? value : "*";
+}
+
+static void dnsbl_succeed(u_int cl, const char *listname,
+			       const unsigned char *answer, const char *source)
 {
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
 	const char *tmpl = dnsbl_reason_template(mydata, listname);
+	const char *ident = (cldata[cl].state & A_GOTIDENT) && cldata[cl].authuser[0] ?
+		cldata[cl].authuser : "";
 	char *reason = dnsbl_expand_reason(cl, tmpl, listname);
 
-	if (mydata->options & OPT_PARANOID || (mydata->options & OPT_DENY &&
-					   result[0] == '\177' && result[1] == '\0' &&
-					   result[2] == '\0'))
+	if (mydata->options & OPT_DENY)
 	{
 		cldata[cl].state |= A_DENY;
 		sendto_ircd("k %d %s %u #dnsbl :%s", cl,
@@ -526,8 +532,28 @@ static void dnsbl_succeed(u_int cl, const char *listname, const unsigned char *r
 		mydata->rejects++;
 	}
 	if (mydata->options & OPT_LOG)
-		sendto_log(ALOG_FLOG | ALOG_IRCD | ALOG_DNSBL, LOG_INFO, "%s: found: %s[%s]",
-				   listname, cldata[cl].host, cldata[cl].itsip);
+	{
+		if (mydata->options & OPT_DENY)
+			sendto_log(ALOG_FLOG | ALOG_IRCD | ALOG_DNSBL, LOG_INFO,
+			   "Denied connection from %s[%s@%s] (DNSBL %s: %s; %u.%u.%u.%u via %s)",
+			   dnsbl_log_value(cldata[cl].nick), ident, cldata[cl].itsip,
+			   listname, reason ? reason : "",
+			   answer ? (u_int) answer[0] : 0,
+			   answer ? (u_int) answer[1] : 0,
+			   answer ? (u_int) answer[2] : 0,
+			   answer ? (u_int) answer[3] : 0,
+			   dnsbl_log_value(source));
+		else
+			sendto_log(ALOG_FLOG | ALOG_IRCD | ALOG_DNSBL, LOG_INFO,
+			   "DNSBL match for %s[%s@%s] on %s (%s; %u.%u.%u.%u via %s)",
+			   dnsbl_log_value(cldata[cl].nick), ident, cldata[cl].itsip,
+			   listname, reason ? reason : "",
+			   answer ? (u_int) answer[0] : 0,
+			   answer ? (u_int) answer[1] : 0,
+			   answer ? (u_int) answer[2] : 0,
+			   answer ? (u_int) answer[3] : 0,
+			   dnsbl_log_value(source));
+	}
 	if (reason)
 		free(reason);
 }
@@ -634,7 +660,7 @@ static int dnsbl_check_cache(u_int cl)
 			{
 				dnsbl_succeed(cl,
 						 pl->listname[0] ? pl->listname : "dnsbl",
-						 pl->answer);
+						 pl->answer, "cache");
 				mydata->chito++;
 			}
 			else if (pl->state == OK)
@@ -893,6 +919,7 @@ static int dnsbl_parse_reply(DnsblPending *p, const u_char *buf, size_t len,
 	char rrname[DNSBL_LOOKUPLEN];
 	u_int16_t id, qdcount, ancount, qtype, qclass;
 	int n;
+	int saw_invalid_a = 0;
 
 	if (len < HFIXEDSZ)
 		return DNSBL_PARSE_IGNORE;
@@ -963,12 +990,14 @@ static int dnsbl_parse_reply(DnsblPending *p, const u_char *buf, size_t len,
 		if (type == T_A && class == C_IN && dlen == INADDRSZ)
 		{
 			memcpy(answer, cp, INADDRSZ);
-			return DNSBL_PARSE_FOUND;
+			if (answer[0] == 127 && answer[1] == 0 && answer[2] == 0)
+				return DNSBL_PARSE_FOUND;
+			saw_invalid_a = 1;
 		}
 		cp += dlen;
 	}
 
-	return DNSBL_PARSE_NEXT_HOST;
+	return saw_invalid_a ? DNSBL_PARSE_INVALID : DNSBL_PARSE_NEXT_HOST;
 }
 
 static int dnsbl_find_by_qid(struct dnsbl_private *mydata, u_short qid)
@@ -1017,9 +1046,19 @@ static void dnsbl_gwork_one(struct dnsbl_private *mydata, const u_char *buf,
 		return;
 	}
 
+	if (action == DNSBL_PARSE_INVALID)
+	{
+		sendto_log(ALOG_DNSBL, LOG_WARNING,
+			   "%s: ignoring unexpected DNSBL response %u.%u.%u.%u for %s[%s]",
+			   p->current && p->current->host ? p->current->host : "?",
+			   (u_int) answer[0], (u_int) answer[1],
+			   (u_int) answer[2], (u_int) answer[3],
+			   cldata[cl].host, cldata[cl].itsip);
+	}
+
 	p->qid = 0;
 	p->deadline = 0;
-	if (action == DNSBL_PARSE_NEXT_HOST)
+	if (action == DNSBL_PARSE_NEXT_HOST || action == DNSBL_PARSE_INVALID)
 	{
 		p->current = p->current ? p->current->next : NULL;
 		p->tries = 0;
@@ -1109,12 +1148,6 @@ static char *dnsbl_init(AnInstance *self)
 				mydata->options |= OPT_DENY;
 				dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, ",reject");
 				dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, ", Reject");
-			}
-			else if (dnsbl_opt_eq(name, "paranoid"))
-			{
-				mydata->options |= OPT_PARANOID;
-				dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, ",paranoid");
-				dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, ", Paranoid");
 			}
 			else if (dnsbl_opt_startswith(name, "servers") && value)
 			{
@@ -1352,7 +1385,7 @@ static int dnsbl_work(u_int cl)
 	{
 		dnsbl_add_cache(cl, DNSBL_FOUND, p->listname, p->answer);
 		dnsbl_succeed(cl, p->listname[0] ? p->listname : "dnsbl",
-				     (char *) p->answer);
+				 p->answer, "dns");
 	}
 	else if (p->final_state == DNSBL_DONE_CLEAN)
 	{
