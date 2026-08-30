@@ -1149,31 +1149,6 @@ static char *dnsbl_init(AnInstance *self)
 				dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, ",reject");
 				dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, ", Reject");
 			}
-			else if (dnsbl_opt_startswith(name, "servers") && value)
-			{
-				char *servers = mystrdup(value);
-				char *slast = NULL;
-				char *name2;
-
-				if (!servers)
-					continue;
-				for (name2 = strtoken(&slast, servers, ","); name2;
-					 name2 = strtoken(&slast, NULL, ","))
-				{
-					while (*name2 && isspace((unsigned char) *name2))
-						name2++;
-					for (s = name2 + strlen(name2);
-						 s > name2 && isspace((unsigned char) s[-1]); )
-						*--s = '\0';
-					if (*name2)
-					{
-						dnsbl_add_host(mydata, name2, NULL);
-						sendto_log(ALOG_DNSBL, LOG_NOTICE,
-						   "dnsbl_init: Added %s as dnsbl", name2);
-					}
-				}
-				free(servers);
-			}
 			else if (dnsbl_opt_startswith(name, "cache") && value)
 			{
 				char *endp = NULL;

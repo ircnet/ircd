@@ -200,8 +200,10 @@ module webproxy
         port = 3128
 
 module dnsbl
-	option = log,reject,servers=bl1.example.org,bl2.example.org
+	option = log,reject
 	reason = Denied access (DNSBL)
+	entry = bl1.example.org
+	entry = bl2.example.org
 .fi
 .RE
 .SH CAVEATS
