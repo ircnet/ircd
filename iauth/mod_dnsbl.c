@@ -76,11 +76,18 @@ struct dnsbl_list {
 	struct dnsbl_list *next;
 };
 
+typedef union dnsbl_addr {
+	struct in_addr v4;
+	struct in6_addr v6;
+} DnsblAddr;
+
 typedef struct dnsbl_pending {
 	int active;
 	int wake_r;
 	int wake_w;
 	int final_state;
+	int addr_family;
+	DnsblAddr addr;
 	u_short qid;
 	u_int ns_index;
 	u_int tries;
@@ -308,35 +315,45 @@ static DnsblPending *dnsbl_pending_for_cl(struct dnsbl_private *mydata, u_int cl
 	return &mydata->pend[owner];
 }
 
-static int dnsbl_build_lookup(u_int cl, struct dnsbl_list *l, char *lookup,
-					 size_t lookup_len)
+static int dnsbl_parse_client_ip(const char *ip, int *family, DnsblAddr *addr)
 {
-	struct addrinfo hints, *addr_res;
-	int rc;
+	int af;
 
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_UNSPEC;
-	hints.ai_flags = AI_NUMERICHOST;
-
-	rc = getaddrinfo(cldata[cl].itsip, NULL, &hints, &addr_res);
-	if (rc)
+	if (!ip || !*ip || !family || !addr)
 		return -1;
 
-	if (addr_res->ai_family == AF_INET)
+	/* A numeric IPv6 address always contains ':'.  Select the family first
+	 * so the textual client address is parsed exactly once. */
+	af = strchr(ip, ':') ? AF_INET6 : AF_INET;
+	bzero((char *) addr, sizeof(*addr));
+	if (af == AF_INET)
 	{
-		const struct sockaddr_in *v4 = (const struct sockaddr_in *) addr_res->ai_addr;
-		const uint8_t *b = (const uint8_t *) &v4->sin_addr.s_addr;
+		if (inetpton(AF_INET, ip, &addr->v4) != 1)
+			return -1;
+	}
+	else if (inetpton(AF_INET6, ip, &addr->v6) != 1)
+		return -1;
 
+	*family = af;
+	return 0;
+}
+
+static int dnsbl_build_lookup(const DnsblPending *p, struct dnsbl_list *l,
+					 char *lookup, size_t lookup_len)
+{
+	const uint8_t *b;
+
+	if (p->addr_family == AF_INET)
+	{
+		b = (const uint8_t *) &p->addr.v4.s_addr;
 		snprintf(lookup, lookup_len, "%u.%u.%u.%u.%s",
 				 (unsigned int) (b[3]), (unsigned int) (b[2]),
 				 (unsigned int) (b[1]), (unsigned int) (b[0]),
 				 l->host);
 	}
-	else if (addr_res->ai_family == AF_INET6)
+	else if (p->addr_family == AF_INET6)
 	{
-		const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *) addr_res->ai_addr;
-		const uint8_t *b = (const uint8_t *) &v6->sin6_addr.s6_addr;
-
+		b = (const uint8_t *) p->addr.v6.s6_addr;
 		snprintf(lookup, lookup_len,
 				 "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x."
 				 "%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%x.%s",
@@ -359,12 +376,8 @@ static int dnsbl_build_lookup(u_int cl, struct dnsbl_list *l, char *lookup,
 				 l->host);
 	}
 	else
-	{
-		freeaddrinfo(addr_res);
 		return -1;
-	}
 
-	freeaddrinfo(addr_res);
 	return 0;
 }
 
@@ -779,7 +792,7 @@ static int dnsbl_send_request(u_int cl, struct dnsbl_private *mydata)
 	{
 		if (p->tries == 0)
 		{
-			if (dnsbl_build_lookup(cl, p->current, p->lookup, sizeof(p->lookup)) != 0)
+			if (dnsbl_build_lookup(p, p->current, p->lookup, sizeof(p->lookup)) != 0)
 			{
 				DebugLog((ALOG_DNSBL, 0,
 						  "dnsbl_send_request(%d): invalid lookup host=%s, skipping",
@@ -1274,20 +1287,16 @@ static int dnsbl_start(u_int cl)
 {
 	struct dnsbl_private *mydata = cldata[cl].instance->data;
 	DnsblPending *p = &mydata->pend[cl];
-	struct addrinfo hints, *addr_res;
+	int addr_family;
+	DnsblAddr addr;
 
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_UNSPEC;
-	hints.ai_flags = AI_NUMERICHOST;
-
-	if (getaddrinfo(cldata[cl].itsip, NULL, &hints, &addr_res))
+	if (dnsbl_parse_client_ip(cldata[cl].itsip, &addr_family, &addr) != 0)
 	{
 		DebugLog((ALOG_DNSBL, 0,
 				  "dnsbl_start(%d): invalid address '%s', skipping ",
 				  cl, cldata[cl].itsip));
 		return -1;
 	}
-	freeaddrinfo(addr_res);
 
 	if (cldata[cl].state & A_DENY)
 	{
@@ -1311,6 +1320,8 @@ static int dnsbl_start(u_int cl)
 
 	p->active = 1;
 	p->final_state = DNSBL_PENDING;
+	p->addr_family = addr_family;
+	memcpy(&p->addr, &addr, sizeof(p->addr));
 	p->current = mydata->host_list;
 	p->tries = 0;
 	p->qid = 0;
