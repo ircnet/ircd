@@ -1162,7 +1162,7 @@ static char *dnsbl_init(AnInstance *self)
 				dnsbl_appendf(&tmpbuf, &tmpbuf_size, &tmpbuf_used, ",reject");
 				dnsbl_appendf(&txtbuf, &txtbuf_size, &txtbuf_used, ", Reject");
 			}
-			else if (dnsbl_opt_startswith(name, "cache") && value)
+			else if (dnsbl_opt_eq(name, "cache") && value)
 			{
 				char *endp = NULL;
 				unsigned long v;
@@ -1318,6 +1318,9 @@ static int dnsbl_start(u_int cl)
 	if (dnsbl_make_wakeup(cl, &p->wake_r, &p->wake_w) < 0)
 		return -1;
 
+	/* Start timeout only once the DNS query is sent. */
+	cldata[cl].timeout = 0;
+
 	p->active = 1;
 	p->final_state = DNSBL_PENDING;
 	p->addr_family = addr_family;
@@ -1345,10 +1348,9 @@ static int dnsbl_start(u_int cl)
 	if (p->qid != 0)
 		return 0;
 
-	// Keep the module timeout running even while the lookup is still queued.
 	DebugLog((ALOG_DNSBL, 0,
-		      "dnsbl_start(%d): waiting in queue (timeout_at=%ld)",
-		      cl, (long) cldata[cl].timeout));
+		      "dnsbl_start(%d): waiting in queue (module timeout paused)",
+		      cl));
 	return 0;
 }
 
