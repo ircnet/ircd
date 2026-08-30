@@ -55,4 +55,4 @@ module rfc931
 
 # Check clients using an external scanning service.
 #module external
-#	option = sid=000A,host=127.0.0.1,port=9009,srcip=,timeout=20,allow_on_timeout=yes,skip_if_sasl,skip_if_ident
+#	option = host=127.0.0.1,port=9009,srcip=,timeout=20,allow_on_timeout=yes,skip_if_sasl,skip_if_ident

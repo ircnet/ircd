@@ -538,7 +538,14 @@ static void dnsbl_succeed(u_int cl, const char *listname,
 
 	if (mydata->options & OPT_DENY)
 	{
+		const char *nick = cldata[cl].nick[0] ? cldata[cl].nick : "*";
+
 		cldata[cl].state |= A_DENY;
+		sendto_ircd("R %u %s %u ::%s 465 %s "
+					":You (*@%s) are banned from this server: %s",
+					cl, cldata[cl].itsip, cldata[cl].itsport,
+					iauth_ircd_name(), nick, cldata[cl].itsip,
+					reason ? reason : "");
 		sendto_ircd("k %d %s %u #dnsbl :%s", cl,
 					cldata[cl].itsip, cldata[cl].itsport,
 					reason ? reason : "");
