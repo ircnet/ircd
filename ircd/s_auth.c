@@ -234,7 +234,7 @@ void	read_iauth(void)
 			    sendto_flag(SCH_AUTH, "iauth version %s running.",
 					iauth_version);
 			    start = end;
-			    sendto_iauth("0 M %s", me.name);
+			    sendto_iauth("0 M %s %s", me.name, me.serv->sid);
 			    continue;
 			}
 		    if (*start == 'a')

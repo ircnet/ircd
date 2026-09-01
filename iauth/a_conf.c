@@ -31,10 +31,38 @@ static const volatile char rcsid[] = "@(#)$Id: a_conf.c,v 1.39 2004/11/13 16:46:
 static aModule *Mlist[16];
 
 #define DEFAULT_TIMEOUT 30
+#define CONF_BUFSIZE 1024
 
 u_int	debuglevel = 0;
 
 AnInstance *instances = NULL;
+
+
+static void	conf_kv_add(AnInstance *inst, const char *key, const char *value)
+{
+	aConfKV **last = &inst->module_kv;
+
+	while (*last)
+		last = &(*last)->next;
+	*last = (aConfKV *) malloc(sizeof(aConfKV));
+	(*last)->key = mystrdup((char *) key);
+	(*last)->value = mystrdup((char *) value);
+	(*last)->next = NULL;
+}
+
+static char *conf_trim(char *s)
+{
+	char *e;
+
+	while (*s == ' ' || *s == '	')
+		s++;
+	if (*s == '\0')
+		return s;
+	e = s + strlen(s);
+	while (e > s && (e[-1] == ' ' || e[-1] == '	'))
+		*--e = '\0';
+	return s;
+}
 
 static	void	conf_err(u_int nb, char *msg, char *chk)
 {
@@ -56,7 +84,7 @@ char	*conf_read(char *cfile)
 	u_int timeout = DEFAULT_TIMEOUT, totto = 0;
 	u_int lnnb = 0, i;
 	u_char icount = 0, Mcnt = 0;
-	char buffer[160], *ch;
+	char buffer[CONF_BUFSIZE], *ch;
 	AnInstance **last = &instances, *itmp;
 	FILE *cfh;
 
@@ -79,7 +107,7 @@ char	*conf_read(char *cfile)
 	    }
 	else
 	    {
-		while (fgets(buffer, 160, cfh))
+		while (fgets(buffer, sizeof(buffer), cfh))
 		    {
 			if ((ch = index(buffer, '\n')))
 			{
@@ -90,7 +118,7 @@ char	*conf_read(char *cfile)
 				conf_err(lnnb, "line too long, ignoring.",
 					 cfile);
 				/* now skip what's left */
-				while (fgets(buffer, 160, cfh))
+				while (fgets(buffer, sizeof(buffer), cfh))
 				{
 					if (index(buffer, '\n'))
 					{
@@ -227,7 +255,7 @@ char	*conf_read(char *cfile)
 			    }
 			if (Mlist[i] == &Module_rfc931 && ident)
 			    {
-				conf_err(lnnb, 
+				conf_err(lnnb,
 				 "This module can only be loaded once.",
 					 cfile);
 				continue;
@@ -247,12 +275,13 @@ char	*conf_read(char *cfile)
 			(*last)->skip_if_sasl = 0;
 			(*last)->wait_for_ident = 0;
 			(*last)->skip_if_ident = 0;
+			(*last)->module_kv = NULL;
 			(*last)->delayed = o_del;
 			(*last)->port = 0;
 			if (Mlist[i] == &Module_rfc931)
 				ident = *last;
 
-			while (fgets(buffer, 160, cfh))
+			while (fgets(buffer, sizeof(buffer), cfh))
 			    {
 				aTarget **ttmp;
 				int inverse = 0;
@@ -267,7 +296,7 @@ char	*conf_read(char *cfile)
 						 "line too long, ignoring.",
 						 cfile);
 					/* now skip what's left */
-					while (fgets(buffer, 160, cfh))
+					while (fgets(buffer, sizeof(buffer), cfh))
 						if (index(buffer,'\n'))
 							break;
 					continue;
@@ -444,8 +473,18 @@ char	*conf_read(char *cfile)
 				    }
 				else
 				    {
-					conf_err(lnnb, "Invalid keyword.",
-						 cfile);
+					char *prop = buffer + 1;
+					char *eq = strstr(prop, " = ");
+
+					if (!eq)
+					{
+						conf_err(lnnb, "Invalid keyword.",
+							 cfile);
+						continue;
+					}
+
+					*eq = '\0';
+					conf_kv_add(*last, conf_trim(prop), conf_trim(eq + 3));
 					continue;
 				    }
 				if (Mlist[i] == &Module_rfc931)
@@ -471,16 +510,25 @@ char	*conf_read(char *cfile)
 
 	if (ident == NULL)
 	    {
-		ident = *last = (AnInstance *) malloc(sizeof(AnInstance));
+		ident = *last = (AnInstance *) calloc(1, sizeof(AnInstance));
+		if (ident == NULL)
+			return NULL;
+
 		(*last)->nexti = NULL;
-		(*last)->opt = NULL;
+		(*last)->in = icount;
 		(*last)->mod = &Module_rfc931;
+		(*last)->opt = NULL;
+		(*last)->popt = NULL;
+		(*last)->data = NULL;
 		(*last)->hostname = NULL;
 		(*last)->address = NULL;
 		(*last)->timeout = DEFAULT_TIMEOUT;
-		(*last)->in = icount;
-		(*last)->popt = NULL;
-		(*last)->address = NULL;
+		(*last)->wait_for_reg = 0;
+		(*last)->skip_if_sasl = 0;
+		(*last)->wait_for_ident = 0;
+		(*last)->skip_if_ident = 0;
+		(*last)->reason = NULL;
+		(*last)->module_kv = NULL;
 		(*last)->delayed = o_del;
 		(*last)->port = 0;
 	    }

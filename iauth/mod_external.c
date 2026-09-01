@@ -87,7 +87,6 @@ struct external_conf {
 	u_int timeout;           /* seconds per client */
 	u_char allow_on_timeout; /* 0=deny, 1=allow */
 	char reason[128];
-	char sid[128];  /* server identifier in CONN */
 	char srcip[64]; /* optional bind() source IP */
 };
 
@@ -482,7 +481,6 @@ static char *external_init(AnInstance *self)
 	S->cfg.allow_on_timeout = 0;
 	external_safe_copy(S->cfg.reason, sizeof(S->cfg.reason),
 					   "Denied access (policy)");
-	external_safe_copy(S->cfg.sid, sizeof(S->cfg.sid), "-");
 	S->gfd = 0;
 	S->qh = S->qt = 0;
 	S->ibuf_len = 0;
@@ -523,11 +521,6 @@ static char *external_init(AnInstance *self)
 								? 1
 								: 0;
 			}
-			else if (!strncasecmp(tok, "sid=", 4))
-			{
-				external_safe_copy(S->cfg.sid, sizeof(S->cfg.sid), tok + 4);
-				external_sanitize_ascii(S->cfg.sid, sizeof(S->cfg.sid));
-			}
 			else if (!strncasecmp(tok, "srcip=", 6))
 			{
 				external_safe_copy(S->cfg.srcip, sizeof(S->cfg.srcip), tok + 6);
@@ -543,9 +536,9 @@ static char *external_init(AnInstance *self)
 
 	DebugLog((ALOG_DMISC, 0,
 			  "external_init: host=%s port=%u timeout=%u allow_on_timeout=%u "
-			  "sid=[%s] reason=[%s]",
+			  "reason=[%s]",
 			  S->cfg.host, S->cfg.port, S->cfg.timeout, S->cfg.allow_on_timeout,
-			  S->cfg.sid, S->cfg.reason));
+			  S->cfg.reason));
 	return NULL;
 }
 
@@ -944,7 +937,7 @@ static int external_start(u_int cl)
 		*cldata[cl].user3 && *cldata[cl].realname)
 	{
 		snprintf(line, sizeof(line), "CONN %s %u %s %s %s %s %s %s %s %s :%s\r\n",
-				 S->cfg.sid, cl, cldata[cl].itsip,
+				 iauth_ircd_sid(), cl, cldata[cl].itsip,
 				 external_nonempty_or_asterisk(cldata[cl].host),
 				 external_nonempty_or_asterisk(cldata[cl].authuser),
 				 external_nonempty_or_asterisk(cldata[cl].sasl_user),
@@ -954,7 +947,7 @@ static int external_start(u_int cl)
 	else
 	{
 		snprintf(line, sizeof(line), "CONN %s %u %s %s %s %s\r\n",
-				 S->cfg.sid, cl, cldata[cl].itsip,
+				 iauth_ircd_sid(), cl, cldata[cl].itsip,
 				 external_nonempty_or_asterisk(cldata[cl].host),
 				 external_nonempty_or_asterisk(cldata[cl].authuser),
 				 external_nonempty_or_asterisk(cldata[cl].sasl_user));
