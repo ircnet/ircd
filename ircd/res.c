@@ -574,15 +574,17 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 	Reg	char	*cp, **alias;
 	Reg	struct	hent	*hp;
 	int	class, type, dlen, len, ans = 0, n;
-	struct	IN_ADDR	dr, *adr;
+	struct	IN_ADDR	dr, *adr, *adr_end;
 
 	cp = buf + sizeof(HEADER);
 	hp = (struct hent *)&(rptr->he);
-	adr = &hp->h_addr;
-	while (WHOSTENTP(adr->S_ADDR))
+	/* h_addr_list is zero-terminated: reserve its final slot. */
+	adr = hp->h_addr_list;
+	adr_end = &hp->h_addr_list[MAXADDRS - 1];
+	while (adr < adr_end && WHOSTENTP(adr->S_ADDR))
 		adr++;
 	alias = hp->h_aliases;
-	while (*alias)
+	while (alias < &hp->h_aliases[MAXALIASES - 1] && *alias)
 		alias++;
 #if defined(SOLARIS_2) && !defined(__GNUC__) /* brain damaged compiler it seems */
 	for (; hptr->qdcount > 0; hptr->qdcount--)
@@ -659,6 +661,15 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 					dlen, hostbuf));
 				return -2;
 			}
+			/* Never overwrite the reserved zero-terminator. */
+			if (adr >= adr_end)
+			{
+				sendto_flag(SCH_ERROR,
+					"Too many IP addresses returned for %s",
+					hostbuf);
+				cp += dlen;
+				break;
+			}
 			hp->h_length = dlen;
 			if (ans == 1)
 				hp->h_addrtype =  (class == C_IN) ?
@@ -699,6 +710,8 @@ static	int	proc_answer(ResRQ *rptr, HEADER *hptr, char *buf, char *eob)
 			}
 			ans++;
 			adr++;
+			/* adr is at most adr_end after the checked insertion. */
+			bzero((char *)adr, sizeof(*adr));
 			cp += dlen;
  			break;
 		case T_PTR :
@@ -934,7 +947,8 @@ struct	hostent	*get_res(char *lp)
 		{
 			last->he.h_name = rptr->he.h_name;
 			rptr->he.h_name = NULL;
-			for (a = 0; rptr->he.h_aliases[a]; a++)
+			for (a = 0; a < MAXALIASES - 1 &&
+				rptr->he.h_aliases[a]; a++)
 			{
 				Debug((DEBUG_DNS, "Copied CNAME %s for %s",
 					rptr->he.h_aliases[a],
@@ -1175,7 +1189,8 @@ static	void	update_list(ResRQ *rptr, aCache *cachep)
 		/*
 		 * Do the same again for IP#'s.
 		 */
-		for (j = 0; WHOSTENTP(rptr->he.h_addr_list[j].S_ADDR); j++)
+		for (j = 0; j < MAXADDRS - 1 &&
+			WHOSTENTP(rptr->he.h_addr_list[j].S_ADDR); j++)
 		{
 			s = (char *)rptr->he.h_addr_list[j].S_ADDR;
 			for (i = 0; (t = cp->he.h_addr_list[i]); i++)
@@ -1396,7 +1411,8 @@ static	aCache	*make_cache(ResRQ *rptr)
 		 * used for search) when the reply is for a PTR request. 
 		 * The "new" thing we get with PTR is the hostname. --fiction
 		 */
-		for (i = 0; WHOSTENTP(rptr->he.h_addr_list[i].S_ADDR); i++)
+		for (i = 0; i < MAXADDRS - 1 &&
+			WHOSTENTP(rptr->he.h_addr_list[i].S_ADDR); i++)
 		{
 			if ((cp = find_cache_number(rptr,
 				(char *)(rptr->he.h_addr_list[i].S_ADDR)
