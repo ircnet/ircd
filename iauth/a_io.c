@@ -38,6 +38,9 @@ static char		iobuf[IOBUFSIZE+1];
 static char		rbuf[IOBUFSIZE+1];	/* incoming ircd stream */
 static int		iob_len = 0, rb_len = 0;
 
+static char		ircd_name[HOSTLEN + 1];
+static char		ircd_sid[SIDLEN + 1];
+
 typedef struct {
 	int fd;
 	int want_write;
@@ -212,6 +215,16 @@ void	sendto_ircd(char *pattern, ...)
         va_start(va, pattern);
         vsendto_ircd(pattern, va);
         va_end(va);
+}
+
+const char *iauth_ircd_name(void)
+{
+	return ircd_name[0] ? ircd_name : "*";
+}
+
+const char *iauth_ircd_sid(void)
+{
+	return ircd_sid[0] ? ircd_sid : "*";
 }
 
 static char *iauth_skip_ws(char *p)
@@ -794,8 +807,12 @@ static	void	parse_ircd(void)
 				   "Error from ircd: %s", chp);
 			break;
 		case 'M':
-			/* RPL_HELLO to be exact, but who cares. */
-			strConnLen = sprintf(strConn, ":%s 020 * :", chp+2);
+			/* M <servername> <sid> */
+			p = chp + 1;
+			p = iauth_read_token(p, ircd_name, sizeof(ircd_name));
+			(void) iauth_read_token(p, ircd_sid, sizeof(ircd_sid));
+			strConnLen = snprintf(strConn, sizeof(strConn),
+						  ":%s 020 * :", iauth_ircd_name());
 			break;
 		case 'S': /* SASL authentication */
 			cldata[cl].state |= A_SASL;
