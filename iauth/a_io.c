@@ -29,9 +29,6 @@ static const volatile char rcsid[] = "@(#)$Id: a_io.c,v 1.31 2005/01/03 17:33:55
 
 anAuthData 	cldata[MAXCONNECTIONS]; /* index == ircd fd */
 static int	cl_highest = -1;
-#if defined(USE_POLL)
-static int	fd2cl[MAXCONNECTIONS]; /* fd -> cl mapping */
-#endif
 
 #define IOBUFSIZE 4096
 static char		iobuf[IOBUFSIZE+1];
@@ -939,14 +936,27 @@ void	loop_io(void)
 # define TST_READ_EVENT( thisfd )       pfd->revents & POLLREADFLAGS
 # define TST_WRITE_EVENT( thisfd )      pfd->revents & POLLWRITEFLAGS
 
-# define CHECK_PFD( thisfd )                    \
-        if ( pfd->fd != thisfd ) {              \
-                pfd = &poll_fdarray[nbr_pfds++];\
-                pfd->fd     = thisfd;           \
-                pfd->events = 0;                \
-					    }
+/* One poll slot per client, global FD and the ircd stream (fd 0). */
+# define IAUTH_MAX_POLL_FDS (MAXCONNECTIONS + MAXGFD + 1)
+# define CHECK_PFD( thisfd )                                      \
+        do {                                                      \
+                if (pfd->fd != (thisfd)) {                         \
+                        if (nbr_pfds >= IAUTH_MAX_POLL_FDS) {     \
+                                sendto_log(ALOG_IRCD, LOG_CRIT,   \
+                                    "io_loop(): poll FD limit exceeded"); \
+                                return;                           \
+                        }                                         \
+                        pfd = &poll_fdarray[nbr_pfds++];           \
+                        pfd->fd = (thisfd);                        \
+                        pfd->events = 0;                          \
+                }                                                 \
+        } while (0)
 
-        struct pollfd   poll_fdarray[MAXCONNECTIONS];
+        static struct pollfd poll_fdarray[IAUTH_MAX_POLL_FDS];
+        static int poll_to_cl[IAUTH_MAX_POLL_FDS]; /* poll slot -> client */
+        static AnInstance *resume_inst[MAXCONNECTIONS];
+        static unsigned char need_clean[MAXCONNECTIONS];
+        static unsigned char bad_global[MAXGFD];
         struct pollfd * pfd     = poll_fdarray;
         int        nbr_pfds = 0;
 #endif
@@ -1001,9 +1011,9 @@ void	loop_io(void)
 			}
 		}
 	}
-	/* reset fd->client mapping: global FDs remain -1 */
-	for (i = 0; i < MAXCONNECTIONS; i++)
-		fd2cl[i] = -1;
+	/* A descriptor number need not be less than MAXCONNECTIONS. */
+	for (i = 0; i < IAUTH_MAX_POLL_FDS; i++)
+		poll_to_cl[i] = -1;
 #endif
 	for (i = 0; i <= cl_highest; i++)
 	    {
@@ -1023,7 +1033,7 @@ void	loop_io(void)
 			if (cldata[i].rfd > highfd)
 				highfd = cldata[i].rfd;
 #else
-			fd2cl[cldata[i].rfd] = i;
+			poll_to_cl[pfd - poll_fdarray] = i;
 #endif
 			nfds++;
 		    }
@@ -1034,7 +1044,7 @@ void	loop_io(void)
 			if (cldata[i].wfd > highfd)
 				highfd = cldata[i].wfd;
 #else
-			fd2cl[cldata[i].wfd] = i;
+			poll_to_cl[pfd - poll_fdarray] = i;
 #endif
 			nfds++;
 		    }
@@ -1071,6 +1081,153 @@ void	loop_io(void)
 	}
 	if (nfds == 0)	/* end of timeout */
 		return;
+
+#if defined(USE_POLL)
+	/*
+	 * Only poll slots, never numeric file descriptors, index these tables.
+	 * Keep the recovery lists static to avoid large per-call stack frames.
+	 */
+	if (poll_fdarray[0].revents & POLLNVAL)
+	{
+		sendto_log(ALOG_IRCD, LOG_CRIT,
+			   "io_loop(): ircd stream has an invalid FD");
+		exit(1);
+	}
+
+	bzero((char *) resume_inst, sizeof(resume_inst));
+	bzero((char *) need_clean, sizeof(need_clean));
+	bzero((char *) bad_global, sizeof(bad_global));
+
+	/*
+	 * Phase 1: snapshot all invalid descriptors and clear stale client
+	 * references BEFORE running a callback that might allocate a new FD.
+	 */
+	for (pf = poll_fdarray + 1; pf < poll_fdarray + nbr_pfds; ++pf)
+	{
+		if (!(pf->revents & POLLNVAL))
+			continue;
+
+		i = poll_to_cl[pf - poll_fdarray];
+		if (i >= 0 && i <= cl_highest && cldata[i].instance &&
+		    (cldata[i].rfd == pf->fd || cldata[i].wfd == pf->fd))
+		{
+			resume_inst[i] = cldata[i].instance;
+			need_clean[i] = 1;
+			if (cldata[i].rfd == pf->fd)
+				cldata[i].rfd = 0;
+			if (cldata[i].wfd == pf->fd)
+				cldata[i].wfd = 0;
+			sendto_log(ALOG_IRCD, LOG_WARNING,
+				   "io_loop(): invalid FD %d for client %d", pf->fd, i);
+		}
+		else
+		{
+			for (gi = 0; gi < MAXGFD; ++gi)
+				if (gfd_used(gi) && gfdv[gi].fd == pf->fd)
+					bad_global[gi] = 1;
+		}
+		pf->revents = 0;
+		nfds--;
+	}
+
+	/*
+	 * Phase 2a: a failed global socket invalidates the current module's
+	 * outstanding requests. Apply the module's timeout policy BEFORE
+	 * grelease() removes pending records, and collect clients for later
+	 * scheduler resumption.
+	 */
+	for (gi = 0; gi < MAXGFD; ++gi)
+	{
+		AnInstance *inst;
+		int gj;
+
+		if (!bad_global[gi] || !gfd_used(gi))
+			continue;
+		inst = gfdv[gi].inst;
+		sendto_log(ALOG_IRCD, LOG_WARNING,
+			   "io_loop(): invalid global module FD %d", gfdv[gi].fd);
+
+		/* Retire all ready events for this module's global sockets. */
+		for (gj = 0; gj < MAXGFD; ++gj)
+		{
+			if (!gfd_used(gj) || gfdv[gj].inst != inst)
+				continue;
+			for (pf = poll_fdarray + 1;
+			     pf < poll_fdarray + nbr_pfds; ++pf)
+			{
+				if (pf->fd == gfdv[gj].fd && pf->revents)
+				{
+					pf->revents = 0;
+					nfds--;
+				}
+			}
+		}
+
+		for (i = 0; i <= cl_highest; ++i)
+		{
+			if (cldata[i].instance != inst)
+				continue;
+			resume_inst[i] = inst;
+			/* timeout() owns the module's success/failure policy and cleanup. */
+			if (inst->mod && inst->mod->timeout)
+				(void) inst->mod->timeout(i);
+			need_clean[i] = 0;
+		}
+		if (inst->mod && inst->mod->grelease)
+			inst->mod->grelease(inst);
+		else
+			io_unregister_gfd(inst);
+	}
+
+	/* Phase 2b: finish invalid per-client descriptors without starting the
+	 * next module until every failed descriptor has been cleaned up. */
+	for (i = 0; i <= cl_highest; ++i)
+	{
+		AnInstance *inst = resume_inst[i];
+
+		if (!inst)
+			continue;
+		if (need_clean[i])
+		{
+			int done = 0;
+			if (!inst->mod)
+			{
+				sendto_log(ALOG_IRCD, LOG_CRIT,
+					   "io_loop(): missing client module");
+				exit(1);
+			}
+			/* Apply the module's timeout/deny policy when a client FD is lost. */
+			if (inst->mod->timeout)
+				done = (inst->mod->timeout(i) != 0);
+			if (!done)
+			{
+				if (!inst->mod->clean)
+				{
+					sendto_log(ALOG_IRCD, LOG_CRIT,
+						   "io_loop(): missing client cleanup callback");
+					exit(1);
+				}
+				inst->mod->clean(i);
+			}
+		}
+		/* Events for sockets closed by cleanup must not be dispatched. */
+		for (pf = poll_fdarray + 1; pf < poll_fdarray + nbr_pfds; ++pf)
+		{
+			if (poll_to_cl[pf - poll_fdarray] == i && pf->revents)
+			{
+				pf->revents = 0;
+				nfds--;
+			}
+		}
+	}
+
+	/* Phase 3: only now may next_io() open and reuse descriptor numbers. */
+	for (i = 0; i <= cl_highest; ++i)
+	{
+		if (resume_inst[i] && cldata[i].instance == resume_inst[i])
+			next_io(i, resume_inst[i]);
+	}
+#endif
 
 #if !defined(USE_POLL)
 	for (gi = 0; gi < MAXGFD; gi++)
@@ -1111,10 +1268,10 @@ void	loop_io(void)
 		{
 			if (gfd_used(gi) && gfdv[gi].fd == fdj)
 			{
-				if (gfdv[gi].inst && gfdv[gi].inst->mod &&
-					gfdv[gi].inst->mod->gwork)
+				AnInstance *inst = gfdv[gi].inst;
+				if (inst->mod && inst->mod->gwork)
 				{
-					gfdv[gi].inst->mod->gwork(gfdv[gi].inst);
+					inst->mod->gwork(inst);
 				}
 				pf->revents = 0;
 				nfds--;
@@ -1135,29 +1292,11 @@ void	loop_io(void)
 #endif
 	    {
 #if defined(USE_POLL)
-			/* bounds check against fd2cl array and skip global FDs */
-			int fdj = pfd->fd;
-			/* fd outside mapping range -> not a client FD */
-			if (fdj < 0 || fdj >= MAXCONNECTIONS)
-			{
+			/* Ignore global, retired or re-used descriptors. */
+			i = poll_to_cl[pfd - poll_fdarray];
+			if (i < 0 || i > cl_highest || !cldata[i].instance ||
+			    (cldata[i].rfd != pfd->fd && cldata[i].wfd != pfd->fd))
 				continue;
-			}
-			i = fd2cl[fdj];
-			/* global or unmapped FD -> already handled in global block */
-			if (i == -1)
-			{
-				continue;
-			}
-#if defined(IAUTH_DEBUG)
-			/* sanity check: ensure client index is within valid range */
-			if (i < 0 || i > cl_highest)
-			{
-				sendto_log(ALOG_DALL, LOG_CRIT,
-						   "io_loop(): fatal bug (invalid cl=%d fd=%d)", i,
-						   fdj);
-				exit(1);
-			}
-#endif
 #endif
 			if (cldata[i].rfd <= 0 && cldata[i].wfd <= 0)
 		    {
