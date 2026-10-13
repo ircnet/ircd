@@ -143,11 +143,19 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (*parv[3] == 'C')
 	{
+		// Forward SASL challenge or response data from the service to the client
 		sendto_one(acptr, "AUTHENTICATE %s", parv[4]);
 	}
 	else if (*parv[3] == 'L')
 	{
 		// Login
+		if (BadPtr(parv[4]) || !strcmp(parv[4], "*"))
+		{
+			sendto_flag(SCH_ERROR, "Received invalid SASL account name from %s", acptr->sasl_service->name);
+			acptr->exitc = EXITC_SASL_REQUIRED;
+			exit_client(acptr, acptr, &me, "Malformed SASL exchange");
+			return;
+		}
 		if (parc == 7)
 		{
 			// Validate and store the user's unique IP address
@@ -171,6 +179,7 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			// Store cloaked hostname. IP address and hostname will finally be set by attach_Iline().
 			acptr->cloak_tmp = mystrdup(parv[6]);
 		}
+
 		acptr->sasl_user = mystrdup(parv[4]);
 		sendto_one(acptr, replies[RPL_LOGGEDIN], me.name, BadTo(acptr->name), BadTo(acptr->name),
 				   acptr->user ? acptr->user->username : "unknown",
@@ -182,7 +191,16 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		// Authentication done
 		if (*parv[4] == 'S')
 		{
-			// Authentication successful
+			// Reject SASL success without a preceding account login.
+			if (BadPtr(acptr->sasl_user))
+			{
+				sendto_flag(SCH_ERROR,
+							"Received SASL success for %s from %s without account name",
+							acptr->uid, acptr->sasl_service->name);
+				acptr->exitc = EXITC_SASL_REQUIRED;
+				exit_client(acptr, acptr, &me, "Malformed SASL exchange");
+				return;
+			}
 			acptr->flags |= FLAGS_SASL;
 #if defined(USE_IAUTH)
 			/* Notify iauth of successful SASL authentication */
