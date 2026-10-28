@@ -177,9 +177,13 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 			}
 
 			// Store cloaked hostname. IP address and hostname will finally be set by attach_Iline().
+			if (acptr->cloak_tmp)
+				MyFree(acptr->cloak_tmp);
 			acptr->cloak_tmp = mystrdup(parv[6]);
 		}
 
+		if (acptr->sasl_user)
+			MyFree(acptr->sasl_user);
 		acptr->sasl_user = mystrdup(parv[4]);
 		sendto_one(acptr, replies[RPL_LOGGEDIN], me.name, BadTo(acptr->name), BadTo(acptr->name),
 				   acptr->user ? acptr->user->username : "unknown",
