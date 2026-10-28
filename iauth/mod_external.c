@@ -37,6 +37,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
@@ -97,6 +98,7 @@ struct external_stats {
 typedef struct
 {
 	int active;  /* 1 = request sent, reply pending */
+	uint64_t request_id; /* opaque identifier sent to the backend */
 	int wake_w;  /* write end of the wakeup socket */
 	char result; /* 'A' allow, 'D' deny */
 	char reason[128];
@@ -126,6 +128,7 @@ struct external_state {
 
 	/* per-client pending state */
 	ExternalPending pend[MAXCONNECTIONS];
+	uint64_t next_request;
 };
 
 /* ------------------------------------------------------------------ */
@@ -199,6 +202,7 @@ static void external_pend_clear(ExternalPending *p)
 		p->wake_w = 0;
 	}
 	p->active = 0;
+	p->request_id = 0;
 	p->result = 0;
 	p->reason[0] = '\0';
 
@@ -265,73 +269,90 @@ static int external_qpop(struct external_state *S, char **pline_out)
 	return 1;
 }
 
-/* Parse "ALLOW <id>" and return id (or -1). */
-static int external_parse_allow(char *line)
+static uint64_t external_next_request(struct external_state *S)
 {
-	char *p = line + 6;
-	int id;
-
-	while (*p == ' ')
+	if (S->next_request >= INT64_MAX)
 	{
-		++p;
+		return 0;
 	}
-	id = atoi(p);
-	return id;
+	return ++S->next_request;
 }
 
-/* Parse "DENY <id> :<reason>" and return id (or -1). */
-static int external_parse_deny(char *line, char *out_reason, size_t out_reason_sz)
+static int external_find_request(struct external_state *S, uint64_t request)
 {
-	char *p = line + 4;
-	int id;
-	char *c;
+	unsigned int cl;
 
-	while (*p == ' ')
+	if (request == 0)
 	{
-		++p;
+		return -1;
 	}
-	id = atoi(p);
-	out_reason[0] = '\0';
-	c = strchr(p, ':');
-	if (c)
+	for (cl = 0; cl < MAXCONNECTIONS; ++cl)
 	{
-		++c;
-		while (*c == ' ')
+		if (S->pend[cl].active && S->pend[cl].request_id == request)
 		{
-			++c;
+			return (int) cl;
 		}
-		external_safe_copy(out_reason, out_reason_sz, c);
-		external_sanitize_ascii(out_reason, out_reason_sz);
 	}
-	return id;
+	return -1;
 }
 
-/* Parse "RAW <id> :<reason>" and return id (or -1). */
-static int external_parse_raw(char *line, char *out_reason, size_t out_reason_sz)
+static int external_parse_reply(char *line, char *verb,
+					uint64_t *request, char *out_text, size_t out_text_sz)
 {
-	char *p = line + 4;
-	int id;
-	char *c;
+	const char *p;
+	char *end;
+	unsigned long long value;
+	size_t n = strlen(verb);
 
+	if (strncasecmp(line, verb, n) || line[n] != ' ')
+	{
+		return 0;
+	}
+	p = line + n + 1;
 	while (*p == ' ')
 	{
 		++p;
 	}
-
-	id = atoi(p);
-	out_reason[0] = '\0';
-	c = strchr(p, ':');
-	if (c)
+	if (*p < '0' || *p > '9')
 	{
-		++c;
-		while (*c == ' ')
-		{
-			++c;
-		}
-		external_safe_copy(out_reason, out_reason_sz, c);
-		external_sanitize_ascii(out_reason, out_reason_sz);
+		return 0;
 	}
-	return id;
+
+	errno = 0;
+	value = strtoull(p, &end, 10);
+	if (errno != 0 || value == 0 || value > INT64_MAX ||
+		(*end != '\0' && *end != ' '))
+	{
+		return 0;
+	}
+	while (*end == ' ')
+	{
+		++end;
+	}
+	if (out_text)
+	{
+		out_text[0] = '\0';
+		if (*end == ':')
+		{
+			++end;
+			while (*end == ' ')
+			{
+				++end;
+			}
+			external_safe_copy(out_text, out_text_sz, end);
+			external_sanitize_ascii(out_text, out_text_sz);
+		}
+		else if (*end != '\0')
+		{
+			return 0;
+		}
+	}
+	else if (*end != '\0')
+	{
+		return 0;
+	}
+	*request = (uint64_t) value;
+	return 1;
 }
 
 /* Create a wakeup socketpair so recv() works in the iauth loop. */
@@ -602,6 +623,7 @@ static int external_gwork(AnInstance *self)
 	char *start;
 	char *eol;
 	int id;
+	uint64_t request;
 	char msg[256];
 	char reason[128];
 	size_t remain;
@@ -711,60 +733,40 @@ static int external_gwork(AnInstance *self)
 
 			if (!strncasecmp(start, "ALLOW ", 6))
 			{
-				id = external_parse_allow(start);
-				DebugLog((ALOG_DMISC, 0,
-						  "external_gwork: parsed ALLOW id=%d", id));
-
-				if (id >= 0 && id < (int) MAXCONNECTIONS && S->pend[id].active)
+				if (external_parse_reply(start, "ALLOW", &request, NULL, 0) &&
+					(id = external_find_request(S, request)) >= 0)
 				{
 					S->pend[id].result = 'A';
-
 					if (S->pend[id].wake_w > 0)
 					{
-						DebugLog((ALOG_DMISC, 0,
-								  "external_gwork: waking client %d with 'A'",
-								  id));
 						(void) write(S->pend[id].wake_w, "A", 1);
 					}
 				}
 				else
 				{
 					DebugLog((ALOG_DMISC, 0,
-							  "external_gwork: ALLOW ignored: invalid/inactive id=%d "
-							  "(active=%d, MAX=%d)",
-							  id,
-							  (id >= 0 && id < (int) MAXCONNECTIONS)
-									  ? S->pend[id].active
-									  : -1,
-							  (int) MAXCONNECTIONS));
+							  "external_gwork: ignoring invalid/stale ALLOW"));
 				}
 			}
 			else if (!strncasecmp(start, "RAW ", 4))
 			{
-				msg[0] = '\0';
-				id = external_parse_raw(start, msg, sizeof(msg));
-
-				if (id >= 0 && id < (int) MAXCONNECTIONS && S->pend[id].active)
+				if (external_parse_reply(start, "RAW", &request, msg, sizeof(msg)) &&
+					(id = external_find_request(S, request)) >= 0)
 				{
 					S->pend[id].raw_pending = 1;
 					external_safe_copy(S->pend[id].rawmsg,
-									   sizeof(S->pend[id].rawmsg),
-									   msg);
-
+								   sizeof(S->pend[id].rawmsg), msg);
 					if (S->pend[id].wake_w > 0)
 					{
 						(void) write(S->pend[id].wake_w, "R", 1);
 					}
 				}
 			}
-			else if (!strncasecmp(start, "DENY", 4))
+			else if (!strncasecmp(start, "DENY ", 5))
 			{
-				reason[0] = '\0';
-				id = external_parse_deny(start, reason, sizeof(reason));
-				DebugLog((ALOG_DMISC, 0,
-						  "external_gwork: parsed DENY id=%d reason=[%s]", id,
-						  reason));
-				if (id >= 0 && id < (int) MAXCONNECTIONS && S->pend[id].active)
+				if (external_parse_reply(start, "DENY", &request,
+										 reason, sizeof(reason)) &&
+					(id = external_find_request(S, request)) >= 0)
 				{
 					S->pend[id].result = 'D';
 					if (reason[0])
@@ -774,22 +776,8 @@ static int external_gwork(AnInstance *self)
 					}
 					if (S->pend[id].wake_w > 0)
 					{
-						DebugLog((ALOG_DMISC, 0,
-								  "external_gwork: waking client %d with 'D'",
-								  id));
 						(void) write(S->pend[id].wake_w, "D", 1);
 					}
-				}
-				else
-				{
-					DebugLog((ALOG_DMISC, 0,
-							  "external_gwork: DENY ignored: invalid/inactive id=%d "
-							  "(active=%d, MAX=%d)",
-							  id,
-							  (id >= 0 && id < (int) MAXCONNECTIONS)
-									  ? S->pend[id].active
-									  : -1,
-							  (int) MAXCONNECTIONS));
 				}
 			}
 			else
@@ -894,6 +882,7 @@ static int external_start(u_int cl)
 {
 	struct external_state *S = (struct external_state *) cldata[cl].instance->data;
 	int rc;
+	uint64_t request;
 	char line[BUFSIZ];
 
 	DebugLog((ALOG_DMISC, 0,
@@ -934,6 +923,21 @@ static int external_start(u_int cl)
 	}
 	external_pend_clear(&S->pend[cl]);
 
+	request = external_next_request(S);
+	if (request == 0)
+	{
+		S->st.errors += 1;
+		DebugLog((ALOG_DMISC, 0,
+				  "external_start(%u): request sequence exhausted", cl));
+		if (!S->cfg.allow_on_timeout)
+		{
+			cldata[cl].state |= A_DENY;
+			sendto_ircd("K %d %s %u %s", cl, cldata[cl].itsip,
+						cldata[cl].itsport, S->cfg.reason);
+		}
+		return -1;
+	}
+
 	if (external_make_wakeup(cl, &S->pend[cl].wake_w) < 0)
 	{
 		if (!S->cfg.allow_on_timeout)
@@ -947,8 +951,8 @@ static int external_start(u_int cl)
 	if (*cldata[cl].nick && *cldata[cl].user1 && *cldata[cl].user2 &&
 		*cldata[cl].user3 && *cldata[cl].realname)
 	{
-		snprintf(line, sizeof(line), "CONN %s %u %s %s %s %s %s %s %s %s :%s\r\n",
-				 iauth_ircd_sid(), cl, cldata[cl].itsip,
+		snprintf(line, sizeof(line), "CONN %s %llu %s %s %s %s %s %s %s %s :%s\r\n",
+				 iauth_ircd_sid(), (unsigned long long) request, cldata[cl].itsip,
 				 external_nonempty_or_asterisk(cldata[cl].host),
 				 external_nonempty_or_asterisk(cldata[cl].authuser),
 				 external_nonempty_or_asterisk(cldata[cl].sasl_user),
@@ -957,8 +961,8 @@ static int external_start(u_int cl)
 	}
 	else
 	{
-		snprintf(line, sizeof(line), "CONN %s %u %s %s %s %s\r\n",
-				 iauth_ircd_sid(), cl, cldata[cl].itsip,
+		snprintf(line, sizeof(line), "CONN %s %llu %s %s %s %s\r\n",
+				 iauth_ircd_sid(), (unsigned long long) request, cldata[cl].itsip,
 				 external_nonempty_or_asterisk(cldata[cl].host),
 				 external_nonempty_or_asterisk(cldata[cl].authuser),
 				 external_nonempty_or_asterisk(cldata[cl].sasl_user));
@@ -979,6 +983,7 @@ static int external_start(u_int cl)
 	if (S->gfd > 0)
 		(void) io_update_gfd(cldata[cl].instance, S->gfd, 1);
 
+	S->pend[cl].request_id = request;
 	S->pend[cl].active = 1;
 	S->pend[cl].result = 0;
 	S->pend[cl].reason[0] = '\0';
