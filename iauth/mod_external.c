@@ -118,6 +118,7 @@ struct external_state {
 	/* output queue */
 	char *outq[EXTERNAL_OQ_MAX];
 	int qh, qt; /* ring-buffer head/tail */
+	size_t outq_off; /* bytes written from the current head on this TCP connection */
 
 	/* input buffer */
 	char ibuf[8192];
@@ -218,21 +219,30 @@ static void external_state_reset_io(struct external_state *S)
 		}
 	}
 	S->qh = S->qt = 0;
+	S->outq_off = 0;
 	S->ibuf_len = 0;
 	S->ibuf[0] = '\0';
 }
 
-static void external_qpush(struct external_state *S, const char *line)
+static int external_qpush(struct external_state *S, const char *line)
 {
 	int next = (S->qt + 1) % EXTERNAL_OQ_MAX;
+	char *copy;
 	if (next == S->qh)
 	{
-		DebugLog((ALOG_DMISC, 0, "external: outq full, dropping AUTH"));
+		DebugLog((ALOG_DMISC, 0, "external: outq full"));
 		S->st.errors += 1;
-		return;
+		return -1;
 	}
-	S->outq[S->qt] = strdup(line ? line : "");
+	copy = strdup(line ? line : "");
+	if (!copy)
+	{
+		S->st.errors += 1;
+		return -1;
+	}
+	S->outq[S->qt] = copy;
 	S->qt = next;
+	return 0;
 }
 
 static int external_qpop(struct external_state *S, char **pline_out)
@@ -251,6 +261,7 @@ static int external_qpop(struct external_state *S, char **pline_out)
 	}
 	S->outq[S->qh] = NULL;
 	S->qh = (S->qh + 1) % EXTERNAL_OQ_MAX;
+	S->outq_off = 0;
 	return 1;
 }
 
@@ -565,10 +576,26 @@ static int external_ginit(AnInstance *self)
 	return 0;
 }
 
+static void external_disconnect(AnInstance *self)
+{
+	struct external_state *S = (struct external_state *) self->data;
+	io_unregister_gfd(self);
+	if (S->gfd > 0)
+	{
+		close(S->gfd);
+		S->gfd = 0;
+	}
+	S->outq_off = 0;
+	S->ibuf_len = 0;
+	S->ibuf[0] = '\0';
+	S->next_reconnect = time(NULL) + 5;
+}
+
 static int external_gwork(AnInstance *self)
 {
 	struct external_state *S = (struct external_state *) self->data;
 	char *line;
+	size_t left;
 	ssize_t w;
 	int e;
 	ssize_t r;
@@ -583,44 +610,29 @@ static int external_gwork(AnInstance *self)
 			  "external_gwork: enter (gfd=%d, qh=%d, qt=%d, ibuf_len=%zu)",
 			  S->gfd, S->qh, S->qt, S->ibuf_len));
 
-	for (;;)
+	while (S->qh != S->qt && S->gfd > 0)
 	{
-		line = NULL;
-		if (!external_qpop(S, &line))
-		{
-			DebugLog((ALOG_DMISC, 0,
-					  "external_gwork: outq empty, nothing to send"));
-			break;
-		}
-
-		DebugLog((ALOG_DMISC, 0,
-				  "external_gwork: sending [%s] on gfd=%d",
-				  line, S->gfd));
-
-		w = write(S->gfd, line, (int) strlen(line));
+		line = S->outq[S->qh];
+		left = strlen(line) - S->outq_off;
+		w = write(S->gfd, line + S->outq_off, left);
 		if (w < 0)
 		{
 			e = errno;
-			DebugLog((ALOG_DMISC, 0,
-					  "external_gwork: write() failed: %s (errno=%d)",
-					  strerror(e), e));
-
-			/*
-             * On any write error (including EAGAIN/EWOULDBLOCK and hard errors),
-             * put the line back into the output queue so it can be retried
-             * after a later reconnect.
-             */
-			external_qpush(S, line);
-			free(line);
-
+			if (e == EINTR)
+				continue;
+			if (e != EAGAIN && e != EWOULDBLOCK)
+			{
+				S->st.errors++;
+				external_disconnect(self);
+				return 0;
+			}
 			break;
 		}
-		else
-		{
-			DebugLog((ALOG_DMISC, 0,
-					  "external_gwork: wrote %zd bytes", w));
-		}
-		free(line);
+		if (w == 0)
+			break;
+		S->outq_off += (size_t) w;
+		if (S->outq_off == strlen(line))
+			(void) external_qpop(S, NULL);
 	}
 
 	if (S->qh == S->qt)
@@ -638,6 +650,13 @@ static int external_gwork(AnInstance *self)
 
 	for (;;)
 	{
+		if (S->ibuf_len == sizeof(S->ibuf) - 1)
+		{
+			/* Upstream sent an overlong protocol line. */
+			S->st.errors++;
+			external_disconnect(self);
+			break;
+		}
 		r = recv(S->gfd, S->ibuf + S->ibuf_len,
 				 sizeof(S->ibuf) - 1 - S->ibuf_len, 0);
 		if (r < 0)
@@ -661,15 +680,7 @@ static int external_gwork(AnInstance *self)
 			DebugLog((ALOG_DMISC, 0,
 					  "external_gwork: upstream closed (EOF), keeping pending "
 					  "clients for timeout handling"));
-			io_unregister_gfd(self);
-			if (S->gfd > 0)
-			{
-				close(S->gfd);
-				DebugLog((ALOG_DMISC, 0,
-						  "external_gwork: closed gfd=%d after EOF/error", S->gfd));
-				S->gfd = 0;
-			}
-			S->next_reconnect = time(NULL) + 5;
+			external_disconnect(self);
 			DebugLog((ALOG_DMISC, 0,
 					  "external_gwork: next_reconnect in 5s (time=%ld)",
 					  (long) S->next_reconnect));
@@ -956,11 +967,17 @@ static int external_start(u_int cl)
 	DebugLog((ALOG_DMISC, 0, "external_start(%u): queueing line=[%s]", cl,
 			  line));
 
-	if (S->qh == S->qt && S->gfd > 0)
+	if (external_qpush(S, line) < 0)
 	{
-		(void) io_update_gfd(cldata[cl].instance, S->gfd, 1);
+		/* Never wait for a reply to a request that was dropped. */
+		if (S->cfg.allow_on_timeout)
+			external_finish_client_allow(cl, S);
+		else
+			external_finish_client_deny(cl, S);
+		return -1;
 	}
-	external_qpush(S, line);
+	if (S->gfd > 0)
+		(void) io_update_gfd(cldata[cl].instance, S->gfd, 1);
 
 	S->pend[cl].active = 1;
 	S->pend[cl].result = 0;
