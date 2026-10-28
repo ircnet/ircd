@@ -47,10 +47,10 @@ module rfc931
 #	reason = Denied access (insecure proxy found)
 
 #module dnsbl
-#    option = log,reject,skip_if_ident,skip_if_sasl
-#    reason = Denied access (DNSBL)
-#    entry = torexit.dan.me.uk|Tor Exit Node
-#    entry = dnsbl.dronebl.org|You are listed in DroneBL - https://dronebl.org/lookup?ip={ip}
+#	option = log,reject,skip_if_ident,skip_if_sasl
+#	reason = Denied access (DNSBL)
+#	entry = torexit.dan.me.uk|Tor Exit Node
+#	entry = dnsbl.dronebl.org|You are listed in DroneBL - https://dronebl.org/lookup?ip={ip}
 
 
 # Check clients using an external scanning service.
