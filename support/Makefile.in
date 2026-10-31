@@ -194,11 +194,11 @@ $(IRCD_BIN): $(GIT_HASH) $(IRCD_COMMON_OBJS) $(IRCD_OBJS)
 
 $(IAUTH): $(GIT_HASH) $(IAUTH_COMMON_OBJS) $(IAUTH_OBJS)
 	$(RM) $@
-	$(CC) $(LDFLAGS) -o $@ $(IAUTH_COMMON_OBJS) git_hash.h $(IAUTH_OBJS) $(LIBS) $(DLIBS)
+	$(CC) $(LDFLAGS) -o $@ $(IAUTH_COMMON_OBJS) $(IAUTH_OBJS) $(LIBS) $(DLIBS)
 
 $(CHKCONF): $(GIT_HASH) $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS)
 	$(RM) $@
-	$(CC) $(LDFLAGS) -o $@ $(CHKCONF_COMMON_OBJS) git_hash.h $(CHKCONF_OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o $@ $(CHKCONF_COMMON_OBJS) $(CHKCONF_OBJS) $(LIBS)
 
 # stuff in contrib/
 
@@ -272,7 +272,7 @@ clmatch.o: ../common/match.c setup.h config.h ../common/struct_def.h
 clparse.o: ../common/parse.c setup.h config.h ../common/struct_def.h
 	$(CC) $(C_CFLAGS) -c -o $@ ../common/parse.c
 
-clsupport.o: ../common/support.c setup.h config.h ../common/struct_def.h ../common/patchlevel.h
+clsupport.o: ../common/support.c setup.h config.h ../common/struct_def.h ../common/patchlevel.h $(GIT_HASH)
 	$(CC) $(C_CFLAGS) -c -o $@ ../common/support.c
 
 bsd.o: ../common/bsd.c setup.h config.h ../common/struct_def.h
@@ -296,7 +296,7 @@ match.o: ../common/match.c setup.h config.h ../common/struct_def.h
 parse.o: ../common/parse.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../common/parse.c
 
-support.o: ../common/support.c setup.h config.h ../common/struct_def.h ../common/patchlevel.h
+support.o: ../common/support.c setup.h config.h ../common/struct_def.h ../common/patchlevel.h $(GIT_HASH)
 	$(CC) $(S_CFLAGS) -c -o $@ ../common/support.c
 
 channel.o: ../ircd/channel.c setup.h config.h ../common/struct_def.h
@@ -357,7 +357,7 @@ s_misc.o: ../ircd/s_misc.c setup.h config.h ../common/struct_def.h
 s_numeric.o: ../ircd/s_numeric.c setup.h config.h ../common/struct_def.h
 	$(CC) $(S_CFLAGS) -c -o $@ ../ircd/s_numeric.c
 
-s_serv.o: ../ircd/s_serv.c setup.h config.h ../common/struct_def.h
+s_serv.o: ../ircd/s_serv.c setup.h config.h ../common/struct_def.h $(GIT_HASH)
 	$(CC) $(S_CFLAGS) -DIRCDMOTD_PATH="\"$(IRCDMOTD_PATH)\"" -c -o $@ ../ircd/s_serv.c
 
 s_send.o: ../ircd/s_send.c setup.h config.h ../common/struct_def.h
