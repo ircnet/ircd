@@ -2831,7 +2831,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		** burst, but 2.11 always. Hence we check for EOB from 2.11
 		** to know what kind of NJOIN it is. --B. */
 		sendto_channel_butserv_caps(chptr, acptr, 0, CAP_EXTENDED_JOIN|CAP_IRCNET_EXTENDED_JOIN,
-									":%s JOIN %s%s", acptr->name, netjoin ? ":" : "", chptr->chname);
+									":%s JOIN %s%s", acptr->name, netjoin ? "" : ":", chptr->chname);
 		/* build MODE for local users on channel, eventually send it */
 		if (*mbuf)
 		    {
