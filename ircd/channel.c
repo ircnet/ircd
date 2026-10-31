@@ -3261,7 +3261,8 @@ void invite_notify(aChannel *chptr, aClient *inviter, aClient *target)
 {
 	Link *lp;
 
-	if (!chptr || !inviter || !target)
+	if (!chptr || !inviter || !target ||
+		!IsRegisteredUser(inviter))
 	{
 		return;
 	}
