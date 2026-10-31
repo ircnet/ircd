@@ -324,6 +324,19 @@ char	*canonize(char *buffer)
 
 int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 {
+	Reg	aConfItem *aconf;
+	aClient	*acptr;
+	anUser	*user = sptr->user;
+	char	*parv[3];
+#ifndef NO_PREFIX
+	char	prefix;
+#endif
+	int	i;
+
+	/* Defer registration while CAP negotiation is in progress. */
+	if (IsCAPNegotiation(sptr))
+		return 1;
+
 #if defined(USE_IAUTH)
 	if (MyConnect(sptr) && (sptr->flags & DEFER_USER_REG))
 	{
@@ -349,15 +362,6 @@ int	register_user(aClient *cptr, aClient *sptr, char *nick, char *username)
 		}
 	}
 #endif
-
-	Reg	aConfItem *aconf;
-	aClient	*acptr;
-	anUser	*user = sptr->user;
-	char	*parv[3];
-#ifndef NO_PREFIX
-	char	prefix;
-#endif
-	int	i;
 
 	user->last = timeofday;
 	parv[0] = sptr->name;
