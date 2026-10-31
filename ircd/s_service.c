@@ -59,7 +59,7 @@ void	free_service(aClient *cptr)
 
 	if ((serv = cptr->service))
 	{
-		if (serv->wants & SERVICE_WANT_SASL)
+		if ((serv->wants | serv->permissions) & SERVICE_WANT_SASL)
 			unlink_sasl_service(cptr);
 		if (serv->nexts)
 			serv->nexts->prevs = serv->prevs;

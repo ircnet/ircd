@@ -337,9 +337,11 @@ void unlink_sasl_service(aClient *cptr)
 		if (!(acptr = local[i]))
 			continue;
 
-		if (acptr->sasl_service == cptr && !IsRegisteredUser(acptr))
+		if (acptr->sasl_service == cptr)
 		{
-			exit_client(acptr, acptr, &me, comment);
+			acptr->sasl_service = NULL;
+			if (!IsRegisteredUser(acptr))
+				exit_client(acptr, acptr, &me, comment);
 		}
 	}
 }
