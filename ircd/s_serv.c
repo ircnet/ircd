@@ -3884,6 +3884,16 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 
 	if (IsServer(cptr))
 	{
+		/* A remote service can arrive over a server link
+		 * without having a server structure. */
+		if (!IsServer(sptr) || !sptr->serv)
+		{
+			sendto_flag(SCH_ERROR,
+						"Ignoring ENCAP from non-server %s via %s",
+						sptr->name, cptr->name);
+			return 0;
+		}
+
 		/* Prepare ENCAP buffer... */
 		len = snprintf(buf, sizeof(buf), ":%s ENCAP", sptr->serv->sid);
 		if (len < 0 || len >= BUFSIZE)
