@@ -773,7 +773,7 @@ static	void	exit_one_client(aClient *cptr, aClient *sptr, aClient *from,
 				    ** nasty hole in the server... --msa
 				    */
 		// Check if it is a client that got an UID during CAP negotiation
-		if (cptr == sptr && sptr->uid[0])
+		if (sptr->uid[0])
 		{
 			del_from_uid_hash_table(sptr->uid, sptr);
 		}
