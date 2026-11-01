@@ -216,6 +216,11 @@ int m_cap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 {
 	int ret = 0;
 
+	if (!MyConnect(sptr))
+	{
+		return 0;
+	}
+
 	if (!strcasecmp(parv[1], "LS"))
 	{
 		cap_ls(sptr, parv[2]);
