@@ -128,7 +128,7 @@ void m_sasl_service(aClient *cptr, aClient *sptr, int parc, char *parv[])
 	// Find user by UID nick
 	acptr = find_uid(parv[1], NULL);
 
-	if (acptr == NULL)
+	if (acptr == NULL || !MyConnect(acptr))
 	{
 		return;
 	}
