@@ -3986,7 +3986,9 @@ int	m_encap(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		 * invariant: parse() ignores :sendername if cptr is client
 		 */
 		Debug((DEBUG_DEBUG, "m_encap(PARSE): %s", toparse));
-		parse(cptr, toparse, toparse + strlen(toparse)); /* Inception .. */
+
+		if (parse(cptr, toparse, toparse + strlen(toparse)) == FLUSH_BUFFER)
+			return FLUSH_BUFFER;
 	}
 	return 5;
 }
