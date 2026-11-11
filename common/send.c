@@ -341,6 +341,7 @@ void initanonymous(void)
 	memset(&ausr, 0, sizeof(anUser));
 	strcpy(ausr.username, "anonymous");
 	strcpy(ausr.host, "anonymous.");
+	ausr.sip = "0.0.0.0";
 	ausr.server = "anonymous.";
 
 	memset(&anon, 0, sizeof(aClient));
@@ -352,7 +353,7 @@ void initanonymous(void)
 	anon.name = anon.namebuf;
 	strcpy(anon.namebuf, "anonymous");
 	strcpy(anon.username, "anonymous");
-	anon.info = "anonymous identity hider";
+	anon.info = "anonymous";
 	anon.exitc = EXITC_UNDEF;
 }
 
@@ -792,6 +793,66 @@ void	sendto_channel_butserv_caps(aChannel *chptr, aClient *from, int caps, int e
 				va_end(va);
 			}
 			(void) send_message(acptr, psendbuf, len);
+		}
+}
+
+static int prepare_join_prefix(aClient *to, aClient *from, char *pattern, ...)
+{
+	va_list va;
+	int len;
+
+	va_start(va, pattern);
+	len = vsendpreprep(to, from, pattern, va);
+	va_end(va);
+	return len;
+}
+
+static int prepare_join(aClient *to, aClient *from, aChannel *chptr,
+			int netjoin)
+{
+	if (HasCap(to, CAP_IRCNET_EXTENDED_JOIN))
+		return prepare_join_prefix(to, from,
+			":%s JOIN %s %s %s %d %s :%s", from->name,
+			chptr->chname, from->uid, get_client_ip(from),
+			netjoin, "*", from->info);
+	if (HasCap(to, CAP_EXTENDED_JOIN))
+		return prepare_join_prefix(to, from, ":%s JOIN %s %s :%s",
+			from->name, chptr->chname, "*", from->info);
+
+	return prepare_join_prefix(to, from, ":%s JOIN %s%s",
+		from->name, netjoin ? "" : ":", chptr->chname);
+}
+
+void sendto_channel_join(aChannel *chptr, aClient *from, int netjoin)
+{
+	Link *lp;
+	aClient *acptr, *lfrm = from;
+	char buf[3][BUFSIZE + 1];
+	int len[3] = { 0, 0, 0 };
+	int i, selflen;
+
+	if (MyClient(from))
+	{
+		selflen = prepare_join(from, from, chptr, netjoin);
+		(void)send_message(from, psendbuf, selflen);
+
+		if (IsQuiet(chptr))
+			return;
+	}
+	if (IsAnonymous(chptr) && IsClient(from))
+		lfrm = &anon;
+
+	for (lp = chptr->clist; lp; lp = lp->next)
+		if (MyClient(acptr = lp->value.cptr) && acptr != from)
+		{
+			i = HasCap(acptr, CAP_IRCNET_EXTENDED_JOIN) ? 2 :
+				HasCap(acptr, CAP_EXTENDED_JOIN) ? 1 : 0;
+			if (!len[i])
+			{
+				len[i] = prepare_join(acptr, lfrm, chptr, netjoin);
+				memcpy(buf[i], psendbuf, len[i] + 1);
+			}
+			(void)send_message(acptr, buf[i], len[i]);
 		}
 }
 

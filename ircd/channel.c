@@ -2577,14 +2577,7 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		/* Complete user entry to the new channel */
 		add_user_to_channel(chptr, sptr, flags);
 		/* Notify all users on the channel */
-		sendto_channel_butserv_caps(chptr, sptr, CAP_IRCNET_EXTENDED_JOIN, 0,
-									":%s JOIN %s %s %s 0 %s :%s",
-									parv[0], chptr->chname, sptr->uid, get_client_ip(sptr), "*", sptr->info);
-		sendto_channel_butserv_caps(chptr, sptr, CAP_EXTENDED_JOIN, CAP_IRCNET_EXTENDED_JOIN,
-									":%s JOIN %s %s :%s",
-									parv[0], chptr->chname, "*", sptr->info);
-		sendto_channel_butserv_caps(chptr, sptr, 0, CAP_EXTENDED_JOIN|CAP_IRCNET_EXTENDED_JOIN,
-									":%s JOIN :%s", parv[0], chptr->chname);
+		sendto_channel_join(chptr, sptr, 0);
 		del_invite(sptr, chptr);
 		if (chptr->topic[0] != '\0')
 		{
@@ -2819,19 +2812,7 @@ int	m_njoin(aClient *cptr, aClient *sptr, int parc, char *parv[])
 #else
 		netjoin = IsBursting(sptr);
 #endif
-		sendto_channel_butserv_caps(chptr, acptr, CAP_IRCNET_EXTENDED_JOIN, 0,
-									":%s JOIN %s %s %s %d %s :%s",
-									acptr->name, chptr->chname, acptr->uid, get_client_ip(acptr), netjoin, "*", acptr->info);
-		sendto_channel_butserv_caps(chptr, acptr, CAP_EXTENDED_JOIN, CAP_IRCNET_EXTENDED_JOIN,
-									":%s JOIN %s %s :%s",
-									acptr->name, chptr->chname, "*", acptr->info);
-		/* Little syntax trick. Put ":" before channel name if it is
-		** not burst, so clients can use it for discriminating normal
-		** join from netjoin. 2.10.x is using NJOIN only during
-		** burst, but 2.11 always. Hence we check for EOB from 2.11
-		** to know what kind of NJOIN it is. --B. */
-		sendto_channel_butserv_caps(chptr, acptr, 0, CAP_EXTENDED_JOIN|CAP_IRCNET_EXTENDED_JOIN,
-									":%s JOIN %s%s", acptr->name, netjoin ? "" : ":", chptr->chname);
+		sendto_channel_join(chptr, acptr, netjoin);
 		/* build MODE for local users on channel, eventually send it */
 		if (*mbuf)
 		    {
