@@ -3279,9 +3279,11 @@ void invite_notify(aChannel *chptr, aClient *inviter, aClient *target)
 		if (MyConnect(acptr) && (lp->flags & CHFL_CHANOP) &&
 			HasCap(acptr, CAP_INVITE_NOTIFY))
 		{
-			sendto_prefix_one(acptr, inviter, ":%s!%s@%s INVITE %s %s",
-							  inviter->name, inviter->user->username,
-							  inviter->user->host, target->name, chptr->chname);
+			sendto_prefix_one(acptr, inviter,
+				":%s INVITE %s %s",
+				inviter->name,
+				target->name,
+				chptr->chname);
 		}
 	}
 }
