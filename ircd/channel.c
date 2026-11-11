@@ -3262,7 +3262,8 @@ void invite_notify(aChannel *chptr, aClient *inviter, aClient *target)
 	Link *lp;
 
 	if (!chptr || !inviter || !target ||
-		!IsRegisteredUser(inviter))
+		!IsRegisteredUser(inviter) ||
+		IsAnonymous(chptr))
 	{
 		return;
 	}
@@ -3375,7 +3376,7 @@ int	m_invite(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    sptr->user && is_chan_op(sptr, chptr))
 			add_invite(sptr, acptr, chptr);
 
-	if (MyConnect(sptr) && chan_op)
+	if (MyConnect(sptr) && chan_op && !IsAnonymous(chptr))
 	{
 		invite_notify(chptr, sptr, acptr);
 		sendto_match_servs(chptr, acptr, "ENCAP * PARSE %s INVITED %s %s %s",
