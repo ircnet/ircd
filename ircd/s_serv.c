@@ -1853,10 +1853,13 @@ static void report_fd(aClient *sptr, aClient *acptr, char *to)
 {
 	static char locip[100], *ret;
 	int s;
-	struct IN_ADDR addr = get_client_addr(acptr);
+	struct IN_ADDR addr;
 
-	if (IsMe(acptr) || !acptr->acpt || !IsRegistered(acptr))
+	if (IsMe(acptr) || !MyConnect(acptr) ||
+	    !acptr->acpt || !IsRegistered(acptr))
 		return;
+
+	addr = get_client_addr(acptr);
 	ret = get_client_ip(acptr);
 	s = strlen(ret) + 1;
 	memcpy(locip, ret, s < sizeof(locip) ? s : sizeof(locip));
