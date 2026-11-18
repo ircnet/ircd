@@ -1511,7 +1511,27 @@ static	int	set_mode(aClient *cptr, aClient *sptr, aChannel *chptr,
 
 			if (*ip)
 			    {
-				    if (*ip == MODE_REOP
+				if (*ip == MODE_ANONYMOUS &&
+				    whatt == MODE_DEL && *chptr->chname == '!')
+					sendto_one(sptr,
+					   replies[ERR_UNIQOPRIVSNEEDED],
+						   ME, BadTo(sptr->name), chptr->chname);
+				else if (*ip == MODE_ANONYMOUS &&
+					   whatt == MODE_ADD &&
+					   *chptr->chname == '#' &&
+					   !IsServer(sptr))
+					sendto_one(cptr,
+						   replies[ERR_UNKNOWNMODE],
+						   ME, BadTo(sptr->name), *curr,
+						   chptr->chname);
+				else if (*ip == MODE_ANONYMOUS && whatt == MODE_ADD &&
+					 *chptr->chname == '!' &&
+					 !IsServer(sptr) &&
+					 !(is_chan_op(sptr, chptr) & CHFL_UNIQOP))
+					sendto_one(sptr,
+					   replies[ERR_UNIQOPRIVSNEEDED],
+						   ME, BadTo(sptr->name), chptr->chname);
+				else if (*ip == MODE_REOP
 					    && whatt == MODE_ADD
 					    && MyConnect(sptr)
 					    && !IsServer(sptr))
@@ -2572,7 +2592,10 @@ int	m_join(aClient *cptr, aClient *sptr, int parc, char *parv[])
 		    (!IsRestricted(sptr) || (*name == '&')) && !chptr->users &&
 		    !(chptr->history && *chptr->chname == '!'))
 		{
-			flags |= CHFL_CHANOP;
+			if (*name == '!')
+				flags |= CHFL_UNIQOP|CHFL_CHANOP;
+			else
+				flags |= CHFL_CHANOP;
 		}
 		/* Complete user entry to the new channel */
 		add_user_to_channel(chptr, sptr, flags);
